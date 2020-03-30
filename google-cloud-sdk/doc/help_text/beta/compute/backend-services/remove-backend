@@ -8,7 +8,8 @@ SYNOPSIS
           : --instance-group-region=INSTANCE_GROUP_REGION
           | --instance-group-zone=INSTANCE_GROUP_ZONE]
           | [--network-endpoint-group=NETWORK_ENDPOINT_GROUP
-          : --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE])
+          : --global-network-endpoint-group
+          | --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE])
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -86,26 +87,31 @@ REQUIRED FLAGS
             service. This flag must be specified if any of the other arguments
             in this group are specified.
 
-         --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE
-            Zone of the network endpoint group to remove from the backend
-            service. If not specified and the compute/zone property isn't set,
-            you may be prompted to select a zone.
+         At most one of these may be specified:
 
-            To avoid prompting when this flag is omitted, you can set the
-            compute/zone property:
+           --global-network-endpoint-group
+              If set, the network endpoint group is global.
 
-                $ gcloud config set compute/zone ZONE
+           --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE
+              Zone of the network endpoint group to remove from the backend
+              service. If not specified and the compute/zone property isn't
+              set, you may be prompted to select a zone.
 
-            A list of zones can be fetched by running:
+              To avoid prompting when this flag is omitted, you can set the
+              compute/zone property:
 
-                $ gcloud compute zones list
+                  $ gcloud config set compute/zone ZONE
 
-            To unset the property, run:
+              A list of zones can be fetched by running:
 
-                $ gcloud config unset compute/zone
+                  $ gcloud compute zones list
 
-            Alternatively, the zone can be stored in the environment variable
-            CLOUDSDK_COMPUTE_ZONE.
+              To unset the property, run:
+
+                  $ gcloud config unset compute/zone
+
+              Alternatively, the zone can be stored in the environment variable
+              CLOUDSDK_COMPUTE_ZONE.
 
 OPTIONAL FLAGS
      At most one of these may be specified:
@@ -121,8 +127,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

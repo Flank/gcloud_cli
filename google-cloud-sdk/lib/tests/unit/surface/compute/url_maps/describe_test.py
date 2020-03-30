@@ -20,11 +20,13 @@ from __future__ import unicode_literals
 
 import textwrap
 
+from googlecloudsdk.command_lib.compute.url_maps import flags
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
+import mock
 
 
 class URLMapsDescribeTest(test_base.BaseTest,
@@ -133,32 +135,60 @@ class URLMapsDescribeTest(test_base.BaseTest,
             """ % {'api': self._api}))
 
   def testDescribeCompletion(self):
-    lister_mock = self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        autospec=True)
-    lister_mock.return_value = resource_projector.MakeSerializable(
-        test_resources.URL_MAPS)
-    uri_list = [
-        'url-map-2',
-        'url-map-4',
-        'url-map-1',
-        'url-map-3',
+    list_json_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
+    self.addCleanup(list_json_patcher.stop)
+    self.list_json = list_json_patcher.start()
+
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.URL_MAPS),
+        resource_projector.MakeSerializable(test_resources.URL_MAPS)
     ]
-    self.RunCompletion('compute url-maps describe ', uri_list)
+    self.RunCompleter(
+        flags.UrlMapsCompleterAlpha,
+        expected_command=[
+            [
+                'compute',
+                'url-maps',
+                'list',
+                '--global',
+                '--uri',
+                '--quiet',
+                '--format=disable',
+            ],
+            [
+                'compute',
+                'url-maps',
+                'list',
+                '--filter=region:*',
+                '--uri',
+                '--quiet',
+                '--format=disable',
+            ],
+        ],
+        expected_completions=[
+            'url-map-2',
+            'url-map-4',
+            'url-map-1',
+            'url-map-3',
+        ],
+        cli=self.cli,
+    )
 
 
-class URLMapsDescribeBetaTest(test_base.BaseTest,
-                              completer_test_base.CompleterBase,
-                              test_case.WithOutputCapture):
+class RegionURLMapsDescribeTest(test_base.BaseTest,
+                                completer_test_base.CompleterBase,
+                                test_case.WithOutputCapture):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self._api = 'beta'
-    self._url_maps_api = self.compute_beta.regionUrlMaps
-    self._url_maps = test_resources.REGION_URL_MAPS_BETA
+    self.SelectApi('v1')
+    self._api = ''
+    self._url_maps_api = self.compute_v1.regionUrlMaps
+    self._url_maps = test_resources.REGION_URL_MAPS
 
   def RunDescribe(self, command):
-    self.Run('beta compute url-maps describe --region us-west-1 ' + command)
+    self.Run(self._api + ' compute url-maps describe --region us-west-1 ' +
+             command)
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
@@ -223,7 +253,7 @@ class URLMapsDescribeBetaTest(test_base.BaseTest,
             - host: youtube.com
               path: /watch/this
               service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/youtube-default
-            """ % {'api': self._api}))
+            """ % {'api': self.api}))
 
   def testSimpleBackendBucketCase(self):
     self.make_requests.side_effect = iter([
@@ -244,19 +274,25 @@ class URLMapsDescribeBetaTest(test_base.BaseTest,
             defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/default-bucket
             name: url-map-4
             selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/url-map-4
-            """ % {'api': self._api}))
+            """ % {'api': self.api}))
 
 
-class URLMapsDescribeAlphaTest(URLMapsDescribeBetaTest):
+class RegionURLMapsDescribeBetaTest(RegionURLMapsDescribeTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._url_maps_api = self.compute_beta.regionUrlMaps
+    self._url_maps = test_resources.REGION_URL_MAPS_BETA
+
+
+class RegionURLMapsDescribeAlphaTest(RegionURLMapsDescribeBetaTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
     self._api = 'alpha'
     self._url_maps_api = self.compute_alpha.regionUrlMaps
     self._url_maps = test_resources.REGION_URL_MAPS_ALPHA
-
-  def RunDescribe(self, command):
-    self.Run('alpha compute url-maps describe --region us-west-1 ' + command)
 
 
 if __name__ == '__main__':

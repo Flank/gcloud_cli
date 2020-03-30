@@ -29,6 +29,16 @@ from googlecloudsdk.command_lib.util.args import labels_util
 class SetManagedCluster(base.UpdateCommand):
   """Set a managed cluster for the workflow template."""
 
+  detailed_help = {
+      'EXAMPLES': """
+To update managed cluster in a workflow template, run:
+
+  $ {command} my_template --region=us-central1 --no-address --num-workers=10 \
+--worker-machine-type=custom-6-23040
+
+"""
+  }
+
   @classmethod
   def Args(cls, parser):
     dataproc = dp.Dataproc(cls.ReleaseTrack())
@@ -38,7 +48,10 @@ class SetManagedCluster(base.UpdateCommand):
           The name of the managed dataproc cluster.
           If unspecified, the workflow template ID will be used.""")
     clusters.ArgsForClusterRef(
-        parser, cls.Beta(), include_deprecated=cls.Beta())
+        parser,
+        cls.Beta(),
+        include_deprecated=cls.Beta(),
+        include_gke_platform_args=False)
     flags.AddTemplateResourceArg(parser, 'set managed cluster',
                                  dataproc.api_version)
     if cls.Beta():

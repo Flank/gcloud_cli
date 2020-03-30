@@ -28,6 +28,7 @@ from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.builds.deploy import build_util
+from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import times
 from surface.builds.deploy.configure import gke
@@ -77,12 +78,6 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     self.addCleanup(self.mocked_storage_v1.Unmock)
     self.storage_msg = core_apis.GetMessagesModule('storage', 'v1')
 
-    self.mocked_crm_v1 = mock.Client(
-        core_apis.GetClientClass('cloudresourcemanager', 'v1'))
-    self.mocked_crm_v1.Mock()
-    self.addCleanup(self.mocked_crm_v1.Unmock)
-    self.crm_msg = core_apis.GetMessagesModule('cloudresourcemanager', 'v1')
-
     self.mocked_scheduler_v1 = mock.Client(
         core_apis.GetClientClass('cloudscheduler', 'v1'))
     self.mocked_scheduler_v1.Mock()
@@ -128,7 +123,9 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     self.mocked_container_v1.projects_locations_clusters.Get.Expect(
         self.container_msg.ContainerProjectsLocationsClustersGetRequest(
             name=cluster_name),
-        response=self.container_msg.Cluster(name=cluster_name))
+        response=self.container_msg.Cluster(
+            name=cluster_name,
+            status=self.container_msg.Cluster.StatusValueValuesEnum.RUNNING))
 
     if bucket_name_override:
       bucket_name = bucket_name_override
@@ -143,12 +140,6 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
               project='my-project',
               prefix=b.id),
           response=self.storage_msg.Buckets(items=[b]))
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_msg.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project'),
-        response=self.crm_msg.Project(
-            projectNumber=1234))
 
   def ExpectMessagesForTriggerDoesNotExist(self, bt_name, bt_create,
                                            bt_create_resp, bt_patch=None,
@@ -188,19 +179,16 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
   def ExpectMessagesForJobDoesNotExist(self, cp_job_id, cp_job_create):
     self.mocked_scheduler_v1.projects_locations_jobs.Get.Expect(
         self.scheduler_msg.CloudschedulerProjectsLocationsJobsGetRequest(
-            name='projects/my-project/locations/{}/jobs/{}'.format(
-                gke._CLEAN_PREVIEW_SCHEDULER_LOCATION, cp_job_id)),
+            name='projects/my-project/locations/us-east1/jobs/' + cp_job_id),
         exception=http_error.MakeHttpError(404, 'not found'))
     self.mocked_scheduler_v1.projects_locations_jobs.Create.Expect(
         self.scheduler_msg.CloudschedulerProjectsLocationsJobsCreateRequest(
-            parent='projects/my-project/locations/{}'.format(
-                gke._CLEAN_PREVIEW_SCHEDULER_LOCATION),
+            parent='projects/my-project/locations/us-east1',
             job=cp_job_create),
         response=cp_job_create)
 
   def ExpectMessagesForJobExists(self, cp_job_id, cp_job_patch):
-    cp_job_name = 'projects/my-project/locations/{}/jobs/{}'.format(
-        gke._CLEAN_PREVIEW_SCHEDULER_LOCATION, cp_job_id)
+    cp_job_name = 'projects/my-project/locations/us-east1/jobs/' + cp_job_id
     self.mocked_scheduler_v1.projects_locations_jobs.Get.Expect(
         self.scheduler_msg.CloudschedulerProjectsLocationsJobsGetRequest(
             name=cp_job_name),
@@ -220,20 +208,34 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         response=bt_patch)
 
   def ExpectMessagesPRPreviewDoesNotExist(
-      self, pp_bt_name='ppgab-test-owner-test-repo-test-pr-pattern',
+      self, pp_bt_name='ppgab-test-owner-test-repo',
       pp_bt_description='Build and deploy on PR create/update against '
-                        'branch pattern "test-pr-pattern"',
-      cp_bt_name='cpgab-test-owner-test-repo-test-pr-pattern',
-      cp_bt_description='Clean expired preview deployments for pull requests '
-                        'against branch pattern "test-pr-pattern"',
-      cp_job_id='cpgab-test-owner-test-repo-test-pr-pattern',
+                        '"test-pr-pattern"',
+      cp_bt_name='cpgab-test-owner-test-repo',
+      cp_bt_description='Clean expired preview deployments for PRs '
+                        'against "test-pr-pattern"',
+      cp_job_id='cpgab-test-owner-test-repo',
       cp_job_description='Every day, run trigger to clean expired preview '
-                         'deployments of test-owner/test-repo',
+                         'deployments for PRs against "test-pr-pattern" in '
+                         'test-owner/test-repo',
       repo_name='test-repo',
       comment_control=False, preview_expiry='3',
+      image='gcr.io/my-project/github.com/test-owner/test-repo:$COMMIT_SHA',
       build_timeout=None,
       pr_pattern='test-pr-pattern'
   ):
+    locations_res = self.scheduler_msg.ListLocationsResponse(locations=[
+        self.scheduler_msg.Location(
+            labels=self.scheduler_msg.Location.LabelsValue(
+                additionalProperties=[
+                    self.scheduler_msg.Location.LabelsValue.AdditionalProperty(
+                        key='cloud.googleapis.com/region',
+                        value='us-east1')]))])
+    self.mocked_scheduler_v1.projects_locations.List.Expect(
+        self.scheduler_msg.CloudschedulerProjectsLocationsListRequest(
+            name='projects/my-project'),
+        response=locations_res)
+
     pp_bt_create = self.DefaultPRPreviewBuildTriggerCreate(
         pp_bt_name,
         pp_bt_description,
@@ -242,6 +244,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         build_timeout=build_timeout,
         preview_expiry=preview_expiry,
         comment_control=comment_control,
+        image=image,
         pr_pattern=pr_pattern)
     pp_bt_create_resp = self.DefaultBuildTriggerCreateResponse(pp_bt_create)
     pp_bt_patch = self.DefaultBuildTriggerPatch(pp_bt_create_resp)
@@ -265,21 +268,20 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     cp_job_create = self.DefaultCleanPreviewSchedulerJobCreate(
         cp_job_id,
         cp_job_description,
-        repo_name=repo_name,
-        pr_pattern=pr_pattern)
+        repo_name=repo_name)
 
     self.ExpectMessagesForJobDoesNotExist(cp_job_id, cp_job_create)
 
     tags = build_util._DEFAULT_CLEAN_PREVIEW_TAGS[:]
     tags.append(repo_name)
-    tags.append('cloudscheduler-job-location_' +
-                gke._CLEAN_PREVIEW_SCHEDULER_LOCATION)
+    tags.append('cloudscheduler-job-location_us-east1')
     tags.append('cloudscheduler-job-id_' + cp_job_id)
     cp_bt_patch = self.TriggerSetTags(cp_bt_create_resp, tags)
     self.ExpectMessagesForTriggerPatch(cp_bt_patch)
 
   def DefaultGitPushBuildTriggerCreate(
       self, name, description, repo_source=None, github_events_config=None,
+      image='gcr.io/my-project/github.com/test-owner/test-repo:$COMMIT_SHA',
       dockerfile='Dockerfile', app_name='test-repo', config='',
       namespace='default', expose='0', cluster='test-cluster',
       location='us-central1',
@@ -322,14 +324,14 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
                     name='gcr.io/cloud-builders/docker',
                     args=[
                         'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                        build_util._IMAGE, '-f',
+                        image, '-f',
                         '${}'.format(build_util._DOCKERFILE_PATH_SUB_VAR), '.'
                     ],
                 ),
                 self.build_msg.BuildStep(
                     id=build_util._PUSH_BUILD_STEP_ID,
                     name='gcr.io/cloud-builders/docker',
-                    args=['push', build_util._IMAGE]
+                    args=['push', image]
                 ),
                 self.build_msg.BuildStep(
                     id=build_util._PREPARE_DEPLOY_BUILD_STEP_ID,
@@ -338,9 +340,9 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
                         'prepare',
                         '--filename=${}'.format(
                             build_util._K8S_YAML_PATH_SUB_VAR),
-                        '--image={}'.format(build_util._IMAGE),
+                        '--image={}'.format(image),
                         '--app=${}'.format(build_util._APP_NAME_SUB_VAR),
-                        '--version=$SHORT_SHA',
+                        '--version=$COMMIT_SHA',
                         '--namespace=${}'.format(
                             build_util._K8S_NAMESPACE_SUB_VAR),
                         '--output=output',
@@ -352,7 +354,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
                 self.build_msg.BuildStep(
                     id=build_util._SAVE_CONFIGS_BUILD_STEP_ID,
                     name='gcr.io/cloud-builders/gsutil',
-                    entrypoint='sh',
+                    entrypoint='bash',
                     args=[
                         '-c',
                         build_util._SAVE_CONFIGS_SCRIPT
@@ -375,6 +377,14 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
             ],
             substitutions=cloudbuild_util.EncodeSubstitutions(
                 substitutions_dict, self.build_msg
+            ),
+            images=[image],
+            artifacts=self.build_msg.Artifacts(
+                objects=self.build_msg.ArtifactObjects(
+                    location='gs://' +
+                    build_util._EXPANDED_CONFIGS_PATH_DYNAMIC,
+                    paths=['output/expanded/*']
+                )
             )
         )
     )
@@ -382,6 +392,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
   def DefaultPRPreviewBuildTriggerCreate(
       self, name, description, repo_owner='test-owner', repo_name='test-repo',
       pr_pattern='test-pr-pattern', preview_expiry='3', comment_control=False,
+      image='gcr.io/my-project/github.com/test-owner/test-repo:$COMMIT_SHA',
       dockerfile='Dockerfile', app_name='test-repo', config='', expose='0',
       cluster='test-cluster', location='us-central1',
       config_staging_dir='my-project_cloudbuild/deploy/config',
@@ -433,14 +444,14 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
                     name='gcr.io/cloud-builders/docker',
                     args=[
                         'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                        build_util._IMAGE, '-f',
+                        image, '-f',
                         '${}'.format(build_util._DOCKERFILE_PATH_SUB_VAR), '.'
                     ],
                 ),
                 self.build_msg.BuildStep(
                     id=build_util._PUSH_BUILD_STEP_ID,
                     name='gcr.io/cloud-builders/docker',
-                    args=['push', build_util._IMAGE]
+                    args=['push', image]
                 ),
                 self.build_msg.BuildStep(
                     id=build_util._PREPARE_DEPLOY_BUILD_STEP_ID,
@@ -448,13 +459,21 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
                     entrypoint='sh',
                     args=[
                         '-c',
-                        build_util._PREPARE_PREVIEW_DEPLOY_SCRIPT
+                        build_util._PREPARE_PREVIEW_DEPLOY_SCRIPT.format(
+                            image=image,
+                            cluster=build_util._GKE_CLUSTER_SUB_VAR,
+                            location=build_util._GKE_LOCATION_SUB_VAR,
+                            k8s_yaml_path=build_util._K8S_YAML_PATH_SUB_VAR,
+                            app_name=build_util._APP_NAME_SUB_VAR,
+                            k8s_annotations=build_util._K8S_ANNOTATIONS_SUB_VAR,
+                            expose_port=build_util._EXPOSE_PORT_SUB_VAR,
+                        )
                     ],
                 ),
                 self.build_msg.BuildStep(
                     id=build_util._SAVE_CONFIGS_BUILD_STEP_ID,
                     name='gcr.io/cloud-builders/gsutil',
-                    entrypoint='sh',
+                    entrypoint='bash',
                     args=[
                         '-c',
                         build_util._SAVE_CONFIGS_SCRIPT
@@ -481,16 +500,25 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
             ],
             substitutions=cloudbuild_util.EncodeSubstitutions(
                 substitutions_dict, self.build_msg
+            ),
+            images=[image],
+            artifacts=self.build_msg.Artifacts(
+                objects=self.build_msg.ArtifactObjects(
+                    location='gs://' +
+                    build_util._EXPANDED_CONFIGS_PATH_DYNAMIC,
+                    paths=['output/expanded/*']
+                )
             )
         )
     )
 
   def DefaultCleanPreviewBuildTriggerCreate(
       self, name, description, repo_owner='test-owner', repo_name='test-repo',
-      app_name='test-repo', cluster='test-cluster', location='us-central1'):
+      app_name='test-repo',
+      cluster='test-cluster', location='us-central1'):
     substitutions_dict = {
         build_util._GKE_CLUSTER_SUB_VAR: cluster,
-        build_util._GKE_LOCATION_SUB_VAR: location
+        build_util._GKE_LOCATION_SUB_VAR: location,
     }
     trigger_tags = build_util._DEFAULT_CLEAN_PREVIEW_TAGS[:]
     trigger_tags.append(app_name)
@@ -532,11 +560,9 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     )
 
   def DefaultCleanPreviewSchedulerJobCreate(
-      self, job_id, description, repo_name='test-repo',
-      pr_pattern='test-pr-pattern'):
+      self, job_id, description, repo_name='test-repo'):
     return self.scheduler_msg.Job(
-        name='projects/my-project/locations/{}/jobs/{}'.format(
-            gke._CLEAN_PREVIEW_SCHEDULER_LOCATION, job_id),
+        name='projects/my-project/locations/us-east1/jobs/{}'.format(job_id),
         description=description,
         schedule=gke._CLEAN_PREVIEW_SCHEDULE,
         timeZone='UTC',
@@ -545,8 +571,8 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
             httpMethod=self.scheduler_msg.HttpTarget.HttpMethodValueValuesEnum
             .POST,
             body=bytes(
-                '{{"projectId":"my-project","repoName":"{}","branchName":"{}"}}'
-                .format(repo_name, pr_pattern).encode('utf-8')),
+                '{{"projectId":"my-project","repoName":"{}","branchName":"master"}}'
+                .format(repo_name).encode('utf-8')),
             oauthToken=self.scheduler_msg.OAuthToken(
                 serviceAccountEmail='my-project@appspot.gserviceaccount.com'
             )
@@ -610,7 +636,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpgab-test-owner-test-repo-test-branch-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
+        'Build and deploy on push to "test-branch-pattern"',
         github_events_config=self.GitHubEventsConfig(
             'test-owner', 'test-repo', branch_pattern='test-branch-pattern')
     )
@@ -635,7 +661,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpgat-test-owner-test-repo-test-tag-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to tag pattern "test-tag-pattern"',
+        'Build and deploy on "test-tag-pattern" tag',
         github_events_config=self.GitHubEventsConfig(
             'test-owner', 'test-repo', tag_pattern='test-tag-pattern')
     )
@@ -674,9 +700,10 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpbmb-bitbucket-test-owner-test-repo-test-branch-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
+        'Build and deploy on push to "test-branch-pattern"',
         repo_source=self.RepoSource('bitbucket_test-owner_test-repo',
-                                    branch_pattern='test-branch-pattern')
+                                    branch_pattern='test-branch-pattern'),
+        image='gcr.io/my-project/bitbucket.org/test-owner/test-repo:$COMMIT_SHA'
     )
 
     bt_create_resp = self.DefaultBuildTriggerCreateResponse(bt_create)
@@ -701,9 +728,10 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpbmt-bitbucket-test-owner-test-repo-test-tag-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to tag pattern "test-tag-pattern"',
+        'Build and deploy on "test-tag-pattern" tag',
         repo_source=self.RepoSource('bitbucket_test-owner_test-repo',
-                                    tag_pattern='test-tag-pattern')
+                                    tag_pattern='test-tag-pattern'),
+        image='gcr.io/my-project/bitbucket.org/test-owner/test-repo:$COMMIT_SHA'
     )
 
     bt_create_resp = self.DefaultBuildTriggerCreateResponse(bt_create)
@@ -806,7 +834,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpgmb-github-test-owner-test-repo-test-branch-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
+        'Build and deploy on push to "test-branch-pattern"',
         repo_source=self.RepoSource(
             'github_test-owner_test-repo', branch_pattern='test-branch-pattern')
     )
@@ -833,7 +861,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpgmt-github-test-owner-test-repo-test-tag-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to tag pattern "test-tag-pattern"',
+        'Build and deploy on "test-tag-pattern" tag',
         repo_source=self.RepoSource('github_test-owner_test-repo',
                                     tag_pattern='test-tag-pattern')
     )
@@ -936,9 +964,10 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpcsb-test-repo-test-branch-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
+        'Build and deploy on push to "test-branch-pattern"',
         repo_source=self.RepoSource('test-repo',
-                                    branch_pattern='test-branch-pattern')
+                                    branch_pattern='test-branch-pattern'),
+        image='gcr.io/my-project/test-repo:$COMMIT_SHA'
     )
 
     bt_create_resp = self.DefaultBuildTriggerCreateResponse(bt_create)
@@ -962,8 +991,10 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpcst-test-repo-test-tag-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to tag pattern "test-tag-pattern"',
-        repo_source=self.RepoSource('test-repo', tag_pattern='test-tag-pattern')
+        'Build and deploy on "test-tag-pattern" tag',
+        repo_source=self.RepoSource('test-repo',
+                                    tag_pattern='test-tag-pattern'),
+        image='gcr.io/my-project/test-repo:$COMMIT_SHA'
     )
 
     bt_create_resp = self.DefaultBuildTriggerCreateResponse(bt_create)
@@ -1061,7 +1092,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpgab-test-owner-test-repo-test-branch-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
+        'Build and deploy on push to "test-branch-pattern"',
         github_events_config=self.GitHubEventsConfig(
             'test-owner', 'test-repo', branch_pattern='test-branch-pattern')
     )
@@ -1081,7 +1112,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     ])
 
     self.AssertErrContains(
-        'Visit https://console.cloud.google.com/cloud-build/triggers/{trigger_id}?project=my-project '
+        'Visit https://console.cloud.google.com/cloud-build/triggers/edit/{trigger_id}?project=my-project '
         'to view the trigger.\n\n'
         'You can visit https://console.cloud.google.com/cloud-build/triggers?project=my-project '
         'to view all Cloud Build triggers.'
@@ -1095,7 +1126,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpgab-test-owner-test-repo-test-branch-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
+        'Build and deploy on push to "test-branch-pattern"',
         github_events_config=self.GitHubEventsConfig(
             'test-owner', 'test-repo', branch_pattern='test-branch-pattern'),
         app_name='override',
@@ -1122,7 +1153,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpgab-test-owner-test-repo-test-branch-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
+        'Build and deploy on push to "test-branch-pattern"',
         github_events_config=self.GitHubEventsConfig(
             'test-owner', 'test-repo', branch_pattern='test-branch-pattern'),
         config_staging_dir='test-bucket',
@@ -1149,7 +1180,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpgab-test-owner-test-repo-test-branch-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
+        'Build and deploy on push to "test-branch-pattern"',
         github_events_config=self.GitHubEventsConfig(
             'test-owner', 'test-repo', branch_pattern='test-branch-pattern'),
         config_staging_dir='test-bucket/path',
@@ -1176,7 +1207,9 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         self.container_msg.ContainerProjectsLocationsClustersGetRequest(
             name=cluster_name,
         ),
-        response=self.container_msg.Cluster(name=cluster_name)
+        response=self.container_msg.Cluster(
+            name=cluster_name,
+            status=self.container_msg.Cluster.StatusValueValuesEnum.RUNNING)
     )
 
     b = self.storage_msg.Bucket(id='my-project_cloudbuild')
@@ -1208,7 +1241,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpgab-test-owner-test-repo-test-branch-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
+        'Build and deploy on push to "test-branch-pattern"',
         github_events_config=self.GitHubEventsConfig(
             'test-owner', 'test-repo', branch_pattern='test-branch-pattern'),
         build_timeout='60s',
@@ -1235,7 +1268,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpgab-test-owner-test-repo-test-branch-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
+        'Build and deploy on push to "test-branch-pattern"',
         github_events_config=self.GitHubEventsConfig(
             'test-owner', 'test-repo', branch_pattern='test-branch-pattern'),
         build_timeout='60s'
@@ -1262,7 +1295,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     bt_name = 'gpgab-test-owner-test-repo-test-branch-pattern'
     bt_create = self.DefaultGitPushBuildTriggerCreate(
         bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
+        'Build and deploy on push to "test-branch-pattern"',
         github_events_config=self.GitHubEventsConfig(
             'test-owner', 'test-repo', branch_pattern='test-branch-pattern'),
         expose='80',
@@ -1283,36 +1316,6 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         '--expose=80'
     ])
 
-  def testServiceAgentAccountMessage(self):
-    self.ExpectInitialMessagesForConfigure()
-
-    bt_name = 'gpgab-test-owner-test-repo-test-branch-pattern'
-    bt_create = self.DefaultGitPushBuildTriggerCreate(
-        bt_name,
-        'Build and deploy on push to branch pattern "test-branch-pattern"',
-        github_events_config=self.GitHubEventsConfig(
-            'test-owner', 'test-repo', branch_pattern='test-branch-pattern')
-    )
-
-    bt_create_resp = self.DefaultBuildTriggerCreateResponse(bt_create)
-    bt_patch = self.DefaultBuildTriggerPatch(bt_create_resp)
-    bt_patch_resp = self.DefaultBuildTriggerPatchResp(bt_patch)
-
-    self.ExpectMessagesForTriggerDoesNotExist(bt_name, bt_create,
-                                              bt_create_resp, bt_patch,
-                                              bt_patch_resp)
-    self.Run([
-        'builds', 'deploy', 'configure', 'gke',
-        '--cluster=test-cluster', '--location=us-central1',
-        '--repo-type=github', '--repo-name=test-repo',
-        '--repo-owner=test-owner', '--branch-pattern=test-branch-pattern'
-    ])
-
-    self.AssertErrContains(
-        'gcloud projects add-iam-policy-binding my-project '
-        '--member=serviceAccount:1234@cloudbuild.gserviceaccount.com '
-        '--role=roles/container.developer --project=my-project')
-
   def testGitPushTriggerExists(self):
     self.ExpectInitialMessagesForConfigure()
 
@@ -1321,7 +1324,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         self.DefaultBuildTriggerCreateResponse(
             self.DefaultGitPushBuildTriggerCreate(
                 bt_name,
-                'Build and deploy on push to branch pattern '
+                'Build and deploy on push to '
                 '"test-branch-pattern"',
                 github_events_config=self.GitHubEventsConfig(
                     'test-owner',
@@ -1379,7 +1382,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
           '--cluster=test-cluster', '--location=us-central1',
           '--repo-type=github', '--repo-name=test-repo',
           '--pull-request-preview', '--pull-request-pattern=test-pr-pattern',
-          '--preview-expiry=0'
+          '--preview-expiry=0',
       ])
 
   def testPullRequestPreview(self):
@@ -1391,7 +1394,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         '--cluster=test-cluster', '--location=us-central1',
         '--repo-type=github', '--repo-name=test-repo',
         '--repo-owner=test-owner', '--pull-request-pattern=test-pr-pattern',
-        '--pull-request-preview'
+        '--pull-request-preview',
     ])
 
   def testPullRequestPreviewTimeout(self):
@@ -1403,7 +1406,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         '--cluster=test-cluster', '--location=us-central1',
         '--repo-type=github', '--repo-name=test-repo',
         '--repo-owner=test-owner', '--pull-request-pattern=test-pr-pattern',
-        '--pull-request-preview', '--timeout=2m'
+        '--pull-request-preview', '--timeout=2m',
     ])
 
   def testPullRequestPreviewTimeoutNoUnits(self):
@@ -1415,7 +1418,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         '--cluster=test-cluster', '--location=us-central1',
         '--repo-type=github', '--repo-name=test-repo',
         '--repo-owner=test-owner', '--pull-request-pattern=test-pr-pattern',
-        '--pull-request-preview', '--timeout=55'
+        '--pull-request-preview', '--timeout=55',
     ])
 
   def testPullRequestPreviewCommentControl(self):
@@ -1427,7 +1430,7 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         '--cluster=test-cluster', '--location=us-central1',
         '--repo-type=github', '--repo-name=test-repo',
         '--repo-owner=test-owner', '--pull-request-pattern=test-pr-pattern',
-        '--pull-request-preview', '--comment-control'
+        '--pull-request-preview', '--comment-control',
     ])
 
   def testPullRequestPreviewPreviewExpiry(self):
@@ -1439,22 +1442,25 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         '--cluster=test-cluster', '--location=us-central1',
         '--repo-type=github', '--repo-name=test-repo',
         '--repo-owner=test-owner', '--pull-request-pattern=test-pr-pattern',
-        '--pull-request-preview', '--preview-expiry=100'
+        '--pull-request-preview', '--preview-expiry=100',
     ])
 
   def testPullRequestPreviewPreviewLongRepoName(self):
     self.ExpectInitialMessagesForConfigure()
     self.ExpectMessagesPRPreviewDoesNotExist(
         pp_bt_name='ppgab-test-owner-' + 'a' * 47,
-        pp_bt_description='Build and deploy on PR create/update against branch '
-                          'pattern "test-pr-pattern"',
+        pp_bt_description='Build and deploy on PR create/update against '
+                          '"test-pr-pattern"',
         cp_bt_name='cpgab-test-owner-' + 'a' * 47,
-        cp_bt_description='Clean expired preview deployments for pull requests '
-                          'against branch pattern "test-pr-pattern"',
+        cp_bt_description='Clean expired preview deployments for PRs '
+                          'against "test-pr-pattern"',
         cp_job_id='cpgab-test-owner-{}'.format('a' * 483),
         cp_job_description='Every day, run trigger to clean expired preview '
-                           'deployments of test-owner/' + 'a' * 490,
-        repo_name='a' * 490
+                           'deployments for PRs against "test-pr-pattern" in '
+                           'test-owner/' + 'a' * 490,
+        repo_name='a' * 490,
+        image='gcr.io/my-project/github.com/test-owner/{}:$COMMIT_SHA'
+        .format('a' * 490)
     )
 
     self.Run([
@@ -1462,42 +1468,30 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         '--cluster=test-cluster', '--location=us-central1',
         '--repo-type=github', '--repo-name=' + 'a' * 490,
         '--repo-owner=test-owner', '--pull-request-pattern=test-pr-pattern',
-        '--pull-request-preview'
-    ])
-
-  def testPullRequestPreviewPreviewPatternEndsWithHyphen(self):
-    self.ExpectInitialMessagesForConfigure()
-    self.ExpectMessagesPRPreviewDoesNotExist(
-        pp_bt_name='ppgab-test-owner-test-repo-pattern-ends-with-hyphen0',
-        pp_bt_description='Build and deploy on PR create/update against branch '
-                          'pattern "pattern-ends-with-hyphen-"',
-        cp_bt_name='cpgab-test-owner-test-repo-pattern-ends-with-hyphen0',
-        cp_bt_description='Clean expired preview deployments for pull requests '
-                          'against branch pattern "pattern-ends-with-hyphen-"',
-        cp_job_id='cpgab-test-owner-test-repo-pattern-ends-with-hyphen-',
-        cp_job_description='Every day, run trigger to clean expired preview '
-                           'deployments of test-owner/test-repo',
-        pr_pattern='pattern-ends-with-hyphen-'
-    )
-
-    self.Run([
-        'builds', 'deploy', 'configure', 'gke',
-        '--cluster=test-cluster', '--location=us-central1',
-        '--repo-type=github', '--repo-name=test-repo',
-        '--repo-owner=test-owner',
-        '--pull-request-pattern=pattern-ends-with-hyphen-',
-        '--pull-request-preview'
+        '--pull-request-preview',
     ])
 
   def testPullRequestPreviewExists(self):
     self.ExpectInitialMessagesForConfigure()
 
-    pp_bt_name = 'ppgab-test-owner-test-repo-test-pr-pattern'
+    locations_res = self.scheduler_msg.ListLocationsResponse(locations=[
+        self.scheduler_msg.Location(
+            labels=self.scheduler_msg.Location.LabelsValue(
+                additionalProperties=[
+                    self.scheduler_msg.Location.LabelsValue.AdditionalProperty(
+                        key='cloud.googleapis.com/region',
+                        value='us-east1')]))])
+    self.mocked_scheduler_v1.projects_locations.List.Expect(
+        self.scheduler_msg.CloudschedulerProjectsLocationsListRequest(
+            name='projects/my-project'),
+        response=locations_res)
+
+    pp_bt_name = 'ppgab-test-owner-test-repo'
     pp_bt_get_resp = self.DefaultBuildTriggerPatch(
         self.DefaultBuildTriggerCreateResponse(
             self.DefaultPRPreviewBuildTriggerCreate(
                 pp_bt_name,
-                'Build and deploy on PR create/update against branch pattern '
+                'Build and deploy on PR create/update against '
                 '"test-pr-pattern"'
             )))
     pp_bt_patch = copy.deepcopy(pp_bt_get_resp)
@@ -1507,12 +1501,12 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     self.ExpectMessagesForTriggerExists(pp_bt_name, pp_bt_get_resp,
                                         pp_bt_patch, pp_bt_patch_resp)
 
-    cp_bt_name = 'cpgab-test-owner-test-repo-test-pr-pattern'
+    cp_bt_name = 'cpgab-test-owner-test-repo'
     cp_bt_get_resp = self.DefaultBuildTriggerCreateResponse(
         self.DefaultCleanPreviewBuildTriggerCreate(
             cp_bt_name,
-            'Clean expired preview deployments for pull requests against '
-            'branch pattern "test-pr-pattern"'
+            'Clean expired preview deployments for PRs against '
+            '"test-pr-pattern"'
         ), trigger_id='555-555-555')
     cp_bt_patch = copy.deepcopy(cp_bt_get_resp)
     cp_bt_patch.id = None
@@ -1522,20 +1516,19 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
     self.ExpectMessagesForTriggerExists(cp_bt_name, cp_bt_get_resp,
                                         cp_bt_patch, cp_bt_patch_resp)
 
-    cp_job_id = 'cpgab-test-owner-test-repo-test-pr-pattern'
+    cp_job_id = 'cpgab-test-owner-test-repo'
     cp_job_patch = self.DefaultCleanPreviewSchedulerJobCreate(
         cp_job_id,
-        'Every day, run trigger to clean expired preview deployments of '
-        'test-owner/test-repo'
+        'Every day, run trigger to clean expired preview deployments for PRs '
+        'against "test-pr-pattern" in test-owner/test-repo'
     )
     self.ExpectMessagesForJobExists(cp_job_id, cp_job_patch)
 
     tags = build_util._DEFAULT_CLEAN_PREVIEW_TAGS[:]
     tags.append('test-repo')
-    tags.append('cloudscheduler-job-location_'
-                + gke._CLEAN_PREVIEW_SCHEDULER_LOCATION)
+    tags.append('cloudscheduler-job-location_us-east1')
     tags.append(
-        'cloudscheduler-job-id_cpgab-test-owner-test-repo-test-pr-pattern')
+        'cloudscheduler-job-id_cpgab-test-owner-test-repo')
     cp_bt_patch = self.TriggerSetTags(cp_bt_patch_resp, tags)
     self.ExpectMessagesForTriggerPatch(cp_bt_patch)
 
@@ -1544,8 +1537,51 @@ class ConfigureGKEDeployTestAlpha(e2e_base.WithMockHttp,
         '--cluster=test-cluster', '--location=us-central1',
         '--repo-type=github', '--repo-name=test-repo',
         '--repo-owner=test-owner', '--pull-request-pattern=test-pr-pattern',
-        '--pull-request-preview'
+        '--pull-request-preview',
     ])
+
+  def testClusterStatusIsNotRunning(self):
+    self.mocked_container_v1.projects_locations_clusters.Get.Expect(
+        self.container_msg.ContainerProjectsLocationsClustersGetRequest(
+            name='projects/my-project/locations/us-central1/clusters/test-cluster'
+        ),
+        response=self.container_msg.Cluster(
+            name='test-cluster',
+            status=self.container_msg.Cluster.StatusValueValuesEnum.PROVISIONING
+        ))
+
+    with self.AssertRaisesExceptionMatches(
+        core_exceptions.Error,
+        'Cluster was found but status is not RUNNING. Status is PROVISIONING.'):
+      self.Run([
+          'builds', 'deploy', 'configure', 'gke',
+          '--cluster=test-cluster', '--location=us-central1',
+          '--repo-type=github', '--repo-name=test-repo',
+          '--repo-owner=test-owner', '--branch-pattern=test-branch-pattern'
+      ])
+
+  def testSchedulerLocationNotFound(self):
+    self.ExpectInitialMessagesForConfigure()
+
+    self.mocked_scheduler_v1.projects_locations.List.Expect(
+        self.scheduler_msg.CloudschedulerProjectsLocationsListRequest(
+            name='projects/my-project'),
+        exception=http_error.MakeHttpError(404, 'not found'))
+
+    with self.AssertRaisesExceptionMatches(
+        core_exceptions.Error,
+        'You must create an App Engine application in your project to use Cloud '
+        'Scheduler. Visit '
+        'https://console.developers.google.com/appengine?project=my-project to '
+        'add an App Engine application.'):
+      self.Run([
+          'builds', 'deploy', 'configure', 'gke',
+          '--cluster=test-cluster', '--location=us-central1',
+          '--repo-type=github', '--repo-name=test-repo',
+          '--repo-owner=test-owner', '--pull-request-pattern=test-pr-pattern',
+          '--pull-request-preview',
+      ])
+
 
 if __name__ == '__main__':
   test_case.main()

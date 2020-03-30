@@ -25,41 +25,46 @@ from googlecloudsdk.command_lib.compute import flags as compute_flags
 from googlecloudsdk.command_lib.compute.network_endpoint_groups import flags
 
 
+DETAILED_HELP = {
+    'EXAMPLES': """
+To add two endpoints to a network endpoint group:
+
+  $ {command} my-neg --zone=us-central1-a --add-endpoint=instance=my-instance1,ip=127.0.0.1,port=1234 --add-endpoint=instance=my-instance2
+
+To remove two endpoints from a network endpoint group:
+
+  $ {command} my-neg --zone=us-central1-a --remove-endpoint=instance=my-instance1,ip=127.0.0.1,port=1234 --remove-endpoint=instance=my-instance2
+"""
+}
+
+
 @base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class Update(base.UpdateCommand):
-  r"""Update a Google Compute Engine network endpoint group.
+  """Update a Google Compute Engine network endpoint group."""
 
-  ## EXAMPLES
+  detailed_help = DETAILED_HELP
+  support_global_scope = True
+  support_hybrid_neg = False
+  support_l4ilb_neg = False
 
-  To add two endpoints to a network endpoint group:
-
-    $ {command} my-neg --zone=us-central1-a \
-      --add-endpoint=instance=my-instance1,ip=127.0.0.1,port=1234 \
-      --add-endpoint=instance=my-instance2
-
-  To remove two endpoints from a network endpoint group:
-
-    $ {command} my-neg --zone=us-central1-a \
-      --remove-endpoint=instance=my-instance1,ip=127.0.0.1,port=1234 \
-      --remove-endpoint=instance=my-instance2
-  """
-
-  @staticmethod
-  def Args(parser):
-    flags.MakeNetworkEndpointGroupsArg().AddArgument(parser)
-    flags.AddUpdateNegArgsToParser(parser)
+  @classmethod
+  def Args(cls, parser):
+    flags.MakeNetworkEndpointGroupsArg(
+        support_global_scope=cls.support_global_scope).AddArgument(parser)
+    flags.AddUpdateNegArgsToParser(
+        parser,
+        support_global_scope=cls.support_global_scope,
+        support_hybrid_neg=cls.support_hybrid_neg,
+        support_l4ilb_neg=cls.support_l4ilb_neg)
 
   def Run(self, args):
-    return self._Run(args)
-
-  def _Run(self, args, support_global_scope=False):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     client = holder.client
     messages = holder.client.messages
     resources = holder.resources
 
     neg_ref = flags.MakeNetworkEndpointGroupsArg(
-        support_global_scope=support_global_scope).ResolveAsResource(
+        support_global_scope=self.support_global_scope).ResolveAsResource(
             args,
             resources,
             scope_lister=compute_flags.GetDefaultScopeLister(holder.client))
@@ -77,32 +82,7 @@ class Update(base.UpdateCommand):
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class AlphaUpdate(Update):
-  r"""Update a Google Compute Engine network endpoint group.
+  """Update a Google Compute Engine network endpoint group."""
 
-  ## EXAMPLES
-
-  To add two endpoints to a network endpoint group:
-
-    $ {command} my-neg --zone=us-central1-a \
-      --add-endpoint=instance=my-instance1,ip=127.0.0.1,port=1234 \
-      --add-endpoint=instance=my-instance2
-
-  To remove two endpoints from a network endpoint group:
-
-    $ {command} my-neg --zone=us-central1-a \
-      --remove-endpoint=instance=my-instance1,ip=127.0.0.1,port=1234 \
-      --remove-endpoint=instance=my-instance2
-  """
-
-  @staticmethod
-  def Args(parser):
-    flags.MakeNetworkEndpointGroupsArg(
-        support_global_scope=True).AddArgument(parser)
-    flags.AddUpdateNegArgsToParser(
-        parser,
-        support_global_scope=True,
-        support_hybrid_neg=True,
-        support_l4ilb_neg=True)
-
-  def Run(self, args):
-    return self._Run(args, support_global_scope=True)
+  support_hybrid_neg = True
+  support_l4ilb_neg = True

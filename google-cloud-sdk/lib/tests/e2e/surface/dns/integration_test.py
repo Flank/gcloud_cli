@@ -110,6 +110,7 @@ NAME        TYPE  TTL    DATA
     import_file_path = self.Touch(directory=self.temp_path)
     with open(import_file_path, 'w') as import_file:
       import_file.write("""\
+$TTL 0
 @          IN  MX    20 mail2.{0}
 @          IN  MX    50 mail3
 {0}  IN  A     192.0.2.1

@@ -92,38 +92,43 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To see the list of all clusters, run:
+To see the list of all clusters in Dataproc's 'us\-central1' region, run:
 
 .RS 2m
-$ gcloud dataproc clusters list
+$ gcloud dataproc clusters list \-\-region='us=central1'
 .RE
 
-To show a cluster whose name is \f5mycluster\fR, run:
+To show a cluster in Dataproc's 'global' region with the name 'mycluster', run:
 
 .RS 2m
-$ gcloud dataproc clusters list \-\-filter='clusterName = mycluster'
+$ gcloud dataproc clusters list \-\-region='global' \e
+    \-\-filter='clusterName = mycluster'
 .RE
 
-To see the list of all clusters with particular labels, run:
+To see the list of all clusters in Dataproc's 'global' region with specified
+labels, run:
 
 .RS 2m
-$ gcloud dataproc clusters list \e
-    \-\-filter='labels.env = staging AND labels.starred = *'
+$ gcloud dataproc clusters list \-\-region='global' \e
+    \-\-filter='labels.env = staging AND
+  labels.starred = *'
 .RE
 
-To see a list of all active clusters with particular labels, run:
+To see a list of all active clusters in Dataproc's 'europe\-west1' region with
+specified labels, run:
 
 .RS 2m
-$ gcloud dataproc clusters list \e
-    \-\-filter='status.state = ACTIVE labels.env = staging AND
- labels.starred = *'
+$ gcloud dataproc clusters list \-\-region='europe\-west1' \e
+    \-\-filter='status.state = ACTIVE AND
+  labels.env = staging AND labels.starred = *'
 .RE
 
 

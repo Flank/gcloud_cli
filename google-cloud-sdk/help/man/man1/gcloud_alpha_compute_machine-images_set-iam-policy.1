@@ -37,7 +37,7 @@ command line. This must be specified.
 .RS 2m
 .TP 2m
 \fIMACHINE_IMAGE\fR
-ID of the machine_image or fully qualified identifier for the machine_image.
+ID of the machine image or fully qualified identifier for the machine image.
 
 .RE
 .sp
@@ -58,8 +58,9 @@ or YAML file conforming to the structure of a Policy
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -73,8 +74,10 @@ https://developers.google.com/compute/docs/reference/latest/
 
 .SH "EXAMPLES"
 
-The following command will read am IAM policy defined in a JSON file
-\'policy.json' and set it for the machine image \f5my\-image\fR:
+The following command reads an IAM policy defined in a \f5policy.json\fR file.RS 2m
+and sets the policy for the machine image `my\-image`:
+
+.RE
 
 .RS 2m
 $ gcloud alpha compute machine\-images set\-iam\-policy my\-image \e
@@ -91,5 +94,9 @@ policy file format and contents.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute machine\-images set\-iam\-policy
+.RE
 

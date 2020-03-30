@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk import calliope
+from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 
@@ -35,9 +36,12 @@ class WorkflowTemplateDeleteUnitTest(unit_base.DataprocUnitTestBase,
                                    workflow_template_name=None,
                                    version=None,
                                    response=None,
-                                   exception=None):
+                                   exception=None,
+                                   region=None):
+    if region is None:
+      region = self.REGION
     if not workflow_template_name:
-      workflow_template_name = self.WorkflowTemplateName()
+      workflow_template_name = self.WorkflowTemplateName(region=region)
     if not (response or exception):
       response = self.messages.Empty()
     self.mock_client.projects_regions_workflowTemplates.Delete.Expect(
@@ -46,16 +50,35 @@ class WorkflowTemplateDeleteUnitTest(unit_base.DataprocUnitTestBase,
         response=response,
         exception=exception)
 
-  def testDeleteWorkflowTemplates(self):
-    self.ExpectDeleteWorkflowTemplate()
+  def _testDeleteWorkflowTemplates(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+    self.ExpectDeleteWorkflowTemplate(region=region)
     self.WriteInput('Y\n')
-    result = self.RunDataproc(
-        'workflow-templates delete {0}'.format(self.WORKFLOW_TEMPLATE))
+    result = self.RunDataproc('workflow-templates delete {0} {1}'.format(
+        self.WORKFLOW_TEMPLATE, region_flag))
     self.AssertErrContains(
         "The workflow template '[test-workflow-template]' will be deleted.")
     self.AssertErrContains('PROMPT_CONTINUE')
-
     self.AssertMessagesEqual(None, result)
+
+  def testDeleteWorkflowTemplates(self):
+    self._testDeleteWorkflowTemplates()
+
+  def testDeleteWorkflowTemplates_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testDeleteWorkflowTemplates(region='global')
+
+  def testDeleteWorkflowTemplates_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testDeleteWorkflowTemplates(
+        region='us-central1', region_flag='--region=us-central1')
+
+  def testDeleteWorkflowTemplates_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('workflow-templates delete foo', set_region=False)
 
   def testDeleteWorkflowTemplatesDecline(self):
     self.WriteInput('n\n')

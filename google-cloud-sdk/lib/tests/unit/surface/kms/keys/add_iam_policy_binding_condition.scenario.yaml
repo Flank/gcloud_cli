@@ -1,5 +1,5 @@
 title: kms keys add-iam-policy-binding scenario test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 
 actions:
 # add binding with condition to a policy with condition

@@ -17,8 +17,7 @@ gcloud alpha domains registrations search\-domains \- search for available domai
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR This command searches for available domains relevant to a
-specified query.
+\fB(ALPHA)\fR Search for available domains relevant to a specified query.
 
 
 
@@ -38,21 +37,22 @@ Domains search query.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To search for domains for my\-new\-project, run:
+To search for domains for \f5\fImy\-new\-project\fR\fR, run:
 
 .RS 2m
 $ gcloud alpha domains registrations search\-domains my\-new\-project
 .RE
 
-To search for a specific domain, and get suggestions for other domain endings,
-run:
+To search for a specific domain, like \f5\fIexample.com\fR\fR, and get
+suggestions for other domain endings, run:
 
 .RS 2m
 $ gcloud alpha domains registrations search\-domains example.com

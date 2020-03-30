@@ -1135,17 +1135,17 @@ class InstanceGroupManagersSetAutoscalingZonalBetaTest(test_base.BaseTest):
     )
 
 
-class InstanceGroupManagersSetAutoscalingBetaTest(test_base.BaseTest):
+class InstanceGroupManagersSetAutoscalingTest(test_base.BaseTest):
 
   INSTANCE_GROUP_MANAGERS = (
-      test_resources.MakeInstanceGroupManagers('beta'))
-  AUTOSCALERS = test_resources.MakeAutoscalers('beta')
+      test_resources.MakeInstanceGroupManagers('v1'))
+  AUTOSCALERS = test_resources.MakeAutoscalers('v1')
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.SelectApi(self.track.prefix)
+    self.SelectApi(self.track.prefix if self.track.prefix else 'v1')
     self.make_requests.side_effect = iter([
         [self.INSTANCE_GROUP_MANAGERS[0]],  # Get IGM.
         self.AUTOSCALERS[1:],
@@ -1221,6 +1221,17 @@ class InstanceGroupManagersSetAutoscalingBetaTest(test_base.BaseTest):
         self.autoscalers_list_request,
         [(self.compute.autoscalers, 'Insert', request)],
     )
+
+
+class InstanceGroupManagersSetAutoscalingBetaTest(
+    InstanceGroupManagersSetAutoscalingTest):
+
+  INSTANCE_GROUP_MANAGERS = (
+      test_resources.MakeInstanceGroupManagers('beta'))
+  AUTOSCALERS = test_resources.MakeAutoscalers('beta')
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testUpdateAutoscaler_Mode(self):
     self.make_requests.side_effect = iter([
@@ -1313,23 +1324,19 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def testInsertAutoscaler_ScaleDown(self):
+  def testInsertAutoscaler_ScaleIn(self):
     self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1 '
-             '--scale-down-control max-scaled-down-replicas=5,time-window=30')
-    scale_down = self.messages.AutoscalingPolicyScaleDownControl(
-        maxScaledDownReplicas=self.messages.FixedOrPercent(
-            fixed=5
-        ),
-        timeWindowSec=30
-    )
+             '--scale-in-control max-scaled-in-replicas=5,time-window=30')
+    scale_in = self.messages.AutoscalingPolicyScaleDownControl(
+        maxScaledDownReplicas=self.messages.FixedOrPercent(fixed=5),
+        timeWindowSec=30)
     request = self.messages.ComputeAutoscalersInsertRequest(
         autoscaler=self.messages.Autoscaler(
             autoscalingPolicy=self.messages.AutoscalingPolicy(
                 customMetricUtilizations=[],
                 maxNumReplicas=10,
-                scaleDownControl=scale_down
-            ),
+                scaleDownControl=scale_in),
             name='group-1-aaaa',
             target=self.managed_instance_group_self_link,
         ),
@@ -1342,23 +1349,20 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(
         [(self.compute.autoscalers, 'Insert', request)],
     )
 
-  def testUpdateAutoscaler_ScaleDown(self):
+  def testUpdateAutoscaler_ScaleIn(self):
     self.make_requests.side_effect = iter([
         [self.INSTANCE_GROUP_MANAGERS[0]],
         self.AUTOSCALERS,
         []
     ])
 
-    scale_down = self.messages.AutoscalingPolicyScaleDownControl(
-        maxScaledDownReplicas=self.messages.FixedOrPercent(
-            fixed=5
-        ),
-        timeWindowSec=30
-    )
+    scale_in = self.messages.AutoscalingPolicyScaleDownControl(
+        maxScaledDownReplicas=self.messages.FixedOrPercent(fixed=5),
+        timeWindowSec=30)
 
     self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1 '
-             '--scale-down-control max-scaled-down-replicas=5,time-window=30')
+             '--scale-in-control max-scaled-in-replicas=5,time-window=30')
 
     custom_metric_utilization = (
         self.messages.AutoscalingPolicyCustomMetricUtilization(
@@ -1374,8 +1378,7 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(
             autoscalingPolicy=self.messages.AutoscalingPolicy(
                 customMetricUtilizations=[custom_metric_utilization],
                 maxNumReplicas=10,
-                scaleDownControl=scale_down
-            ),
+                scaleDownControl=scale_in),
             name='autoscaler-1',
             target=self.managed_instance_group_self_link,
         ),
@@ -1387,6 +1390,46 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(
         self.autoscalers_list_request,
         [(self.compute.autoscalers, 'Update', request)],
     )
+
+  def testUpdatePredictiveAutoscaling(self):
+    self.make_requests.side_effect = iter([[self.INSTANCE_GROUP_MANAGERS[0]],
+                                           self.AUTOSCALERS, []])
+
+    self.Run('compute instance-groups managed set-autoscaling group-1 '
+             '--zone zone-1 '
+             '--cpu-utilization-predictive-method=standard')
+
+    request = self.messages.ComputeAutoscalersUpdateRequest(
+        autoscaler='autoscaler-1',
+        project='my-project',
+        zone='zone-1',
+        autoscalerResource=self.messages.Autoscaler(
+            name='autoscaler-1',
+            autoscalingPolicy=self.messages.AutoscalingPolicy(
+                cpuUtilization=self.messages.AutoscalingPolicyCpuUtilization(
+                    predictiveMethod=self.messages
+                    .AutoscalingPolicyCpuUtilization
+                    .PredictiveMethodValueValuesEnum.STANDARD,),
+                customMetricUtilizations=[
+                    self.messages.AutoscalingPolicyCustomMetricUtilization(
+                        metric='custom.cloudmonitoring.googleapis.com/seconds',
+                        utilizationTarget=60.,
+                        utilizationTargetType=(
+                            self.messages
+                            .AutoscalingPolicyCustomMetricUtilization
+                            .UtilizationTargetTypeValueValuesEnum
+                            .DELTA_PER_MINUTE),
+                    ),
+                ],
+            ),
+            target=self.managed_instance_group_self_link,
+        ),
+    )
+
+    self.CheckRequests(self.managed_instance_group_get_request,
+                       self.autoscalers_list_request,
+                       [(self.compute.autoscalers, 'Update', request)])
+
 
 if __name__ == '__main__':
   test_case.main()

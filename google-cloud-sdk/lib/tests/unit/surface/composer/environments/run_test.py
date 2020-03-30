@@ -70,6 +70,34 @@ class EnvironmentsRunGATest(base.KubectlShellingUnitTest):
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testRunFetchKubectlNamespaceFail(self, exec_mock, tmp_kubeconfig_mock):
+    test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
+        self.messages.Environment.StateValueValuesEnum.RUNNING)
+    self.ExpectEnvironmentGet(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        response=test_env_object)
+    fake_exec = kubectl_util.FakeExec()
+    exec_mock.side_effect = fake_exec
+
+    tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
+
+    def _FailedFetchKubectlNamespaceCallback(*unused_args, **unused_kwargs):
+      return 1
+
+    fake_exec.AddCallback(0, _FailedFetchKubectlNamespaceCallback)
+
+    with self.AssertRaisesExceptionMatches(
+        command_util.Error, 'kubectl returned non-zero status code'):
+      self.RunEnvironments('run', '--project', self.TEST_PROJECT, '--location',
+                           self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID,
+                           self.TEST_SUBCOMMAND)
+    self.assertEqual(1, exec_mock.call_count)
+    fake_exec.Verify()
+
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
   def testRunGetPodsFail(self, exec_mock, tmp_kubeconfig_mock):
     test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
         self.messages.Environment.StateValueValuesEnum.RUNNING)
@@ -290,6 +318,41 @@ class EnvironmentsRunBetaTest(EnvironmentsRunGATest):
 
   def PreSetUp(self):
     self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+  TEST_SUBCOMMAND = 'version'
+
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testRunFetchKubectlNamespaceFailPrivate(self, exec_mock,
+                                              tmp_kubeconfig_mock):
+    private_environment_config = self.messages.PrivateEnvironmentConfig(
+        enablePrivateEnvironment=True)
+    test_env_object = self.MakeEnvironmentWithStateAndClusterLocation(
+        self.messages.Environment.StateValueValuesEnum.RUNNING)
+    test_env_object.config.privateEnvironmentConfig = private_environment_config
+    self.ExpectEnvironmentGet(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        response=test_env_object)
+    fake_exec = kubectl_util.FakeExec()
+    exec_mock.side_effect = fake_exec
+
+    tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
+
+    def _FailedFetchKubectlNamespaceCallback(*unused_args, **unused_kwargs):
+      return 1
+
+    fake_exec.AddCallback(0, _FailedFetchKubectlNamespaceCallback)
+
+    with self.AssertRaisesExceptionMatches(
+        command_util.Error,
+        'enable access to your private Cloud Composer environment'):
+      self.RunEnvironments('run', '--project', self.TEST_PROJECT, '--location',
+                           self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID,
+                           self.TEST_SUBCOMMAND)
+    self.assertEqual(1, exec_mock.call_count)
+    fake_exec.Verify()
 
 
 class EnvironmentsRunAlphaTest(EnvironmentsRunBetaTest):

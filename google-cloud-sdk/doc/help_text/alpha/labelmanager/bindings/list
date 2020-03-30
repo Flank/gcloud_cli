@@ -1,0 +1,110 @@
+NAME
+    gcloud alpha labelmanager bindings list - lists LabelBindings bound to the
+        specified resource or LabelValue
+
+SYNOPSIS
+    gcloud alpha labelmanager bindings list
+        ([LABEL_VALUE_ID : --label-key=LABEL_KEY
+          --label-parent=LABEL_PARENT] --resource=RESOURCE)
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Only a resource or a LabelValue should be specified. When
+    specifying a resource, the full name of the resource must be used. See:
+    https://cloud.google.com/apis/design/resource_names#full_resource_name. The
+    LabelValue can be represented with it's numeric id or with it's display
+    name along with details on the parent LabelKey. The LabelKey's details can
+    be passed as a numeric id or the display name along with the label-parent.
+
+POSITIONAL ARGUMENTS
+     ListLabelBindings. Exactly one of these must be specified:
+
+       LabelValue.
+
+         LABEL_VALUE_ID
+            Display name or numeric id for the LabelValue. The display name
+            must be 1-63 characters, beginning and ending with an alphanumeric
+            character ([a-z0-9A-Z]) with dashes (-), underscores (), dots (.),
+            and alphanumerics between. The numeric id should be of the form
+            labelValues/{numeric_id}. This positional must be specified if any
+            of the other arguments in this group are specified.
+
+         --label-key=LABEL_KEY
+            Display name or numeric id of the parent LabelKey. Numeric ids
+            should be of the form labelKeys/{numeric_id}. --label-key is
+            required when using display name instead of numeric id for
+            LABEL_VALUE_ID.
+
+         --label-parent=LABEL_PARENT
+            Parent of the LabelKey. This must be the form
+            organizations/{org_id}. --label-parent is required when using
+            display name instead of numeric id for the --label-key.
+
+       --resource=RESOURCE
+          Full resource name of the resource that the LabelValue is bound to.
+
+LIST COMMAND FLAGS
+     --filter=EXPRESSION
+        Apply a Boolean filter EXPRESSION to each resource item to be listed.
+        If the expression evaluates True, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --limit=LIMIT
+        Maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --page-size=PAGE_SIZE
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is
+        determined by the service if it supports paging, otherwise it is
+        unlimited (no paging). Paging may be applied before or after --filter
+        and --limit depending on the service.
+
+     --sort-by=[FIELD,...]
+        Comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: --flatten, --sort-by, --filter, --limit.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To list LabelBindings for
+    '//cloudresourcemanager.googleapis.com/projects/123' run:
+
+        $ gcloud alpha labelmanager bindings list \
+            --resource='//cloudresourcemanager.googleapis.com/projects/123'
+
+    To list LabelBindings for labelValues/456 run:
+
+        $ gcloud alpha labelmanager bindings list labelValues/456
+
+    To list LabelBindings for LabelValue 'test' under LabelKey 'labelKeys/789'
+    run:
+
+        $ gcloud alpha labelmanager bindings list test \
+            --label-key='labelKeys/789'
+
+    To list LabelBindings for LabelValue 'test' under LabelKey 'env' that lives
+    under 'organizations/999' run:
+
+        $ gcloud alpha labelmanager bindings list test --label-key='env' \
+            --label-parent='organizations/999'
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

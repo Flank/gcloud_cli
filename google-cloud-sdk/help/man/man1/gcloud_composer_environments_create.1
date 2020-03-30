@@ -208,8 +208,29 @@ will be connected.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create an environment called \f5\fIenv\-1\fR\fR with all the default values,
+run:
+
+.RS 2m
+$ gcloud composer environments create env\-1
+.RE
+
+To create a new environment named \f5\fIenv\-1\fR\fR with the Google Compute
+Engine machine\-type \f5\fIn1\-standard\-8\fR\fR, and the Google Compute Engine
+network \f5\fImy\-network\fR\fR, run:
+
+.RS 2m
+$ gcloud composer environments create env\-1 \e
+    \-\-machine\-type=n1\-standard\-8 \-\-network=my\-network
+.RE
 
 
 

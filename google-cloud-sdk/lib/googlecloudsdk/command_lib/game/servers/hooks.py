@@ -19,20 +19,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import json
-
 from googlecloudsdk.calliope import arg_parsers
-from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import properties
-from googlecloudsdk.core import yaml
 
+DEFAULT_LOCATION = 'global'
 
 PARENT_TEMPLATE = 'projects/{}/locations/{}'
+PARENT_DEPLOYMENT_TEMPLATE = 'projects/{}/locations/{}/gameServerDeployments/{}'
+PARENT_REALM_TEMPLATE = 'projects/{}/locations/{}/realms/{}'
+
+DEPLOYMENT_WILDCARD = '-'
 LOCATION_WILDCARD = '-'
-
-
-class InvalidSpecFileError(exceptions.Error):
-  """Error if a spec file is not valid JSON or YAML."""
+REALM_WILDCARD = '-'
 
 
 def FlattenedArgDict(value):
@@ -40,23 +38,38 @@ def FlattenedArgDict(value):
   return [{'key': key, 'value': value} for key, value in dict_value.items()]
 
 
-def ProcessSpecFile(spec_file):
-  """Reads a JSON/YAML spec_file and returns JSON format of it."""
-
-  try:
-    spec = json.loads(spec_file)
-  except ValueError as e:
-    try:
-      spec = yaml.load(spec_file)
-    except yaml.YAMLParseError as e:
-      raise InvalidSpecFileError('Error parsing spec file: [{}]'.format(e))
-  return json.dumps(spec)
-
-
 def AddDefaultLocationToListRequest(ref, args, req):
   """Python hook for yaml commands to wildcard the location in list requests."""
-  del ref
+  del ref  # Unused
   project = properties.VALUES.core.project.Get(required=True)
   location = args.location or LOCATION_WILDCARD
   req.parent = PARENT_TEMPLATE.format(project, location)
+  return req
+
+
+def AddDefaultLocationAndRealmToListRequest(ref, args, req):
+  """Python hook for yaml commands to wildcard the realm and location in list requests."""
+  del ref
+  project = properties.VALUES.core.project.Get(required=True)
+  location = args.location or LOCATION_WILDCARD
+  # If realm is specified but location is not, we fall back to global, which is
+  # the default location for realms.
+  if args.realm and not args.location:
+    location = DEFAULT_LOCATION
+  realm = args.realm or REALM_WILDCARD
+  req.parent = PARENT_REALM_TEMPLATE.format(project, location, realm)
+  return req
+
+
+def AddDefaultLocationAndDeploymentToListRequest(ref, args, req):
+  """Python hook for yaml commands to wildcard the deployment and location in list requests."""
+  del ref
+  project = properties.VALUES.core.project.Get(required=True)
+  location = args.location or LOCATION_WILDCARD
+  # If deployment is specified but location is not, we fall back to global
+  # which is the default location for realms.
+  if args.deployment and not args.location:
+    location = DEFAULT_LOCATION
+  deployment = args.deployment or DEPLOYMENT_WILDCARD
+  req.parent = PARENT_DEPLOYMENT_TEMPLATE.format(project, location, deployment)
   return req

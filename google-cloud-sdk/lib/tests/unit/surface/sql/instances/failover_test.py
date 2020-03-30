@@ -31,8 +31,9 @@ class _BaseInstancesFailoverTest(object):
     self.mocked_client.instances.Get.Expect(
         request=self.messages.SqlInstancesGetRequest(
             project=self.Project(), instance='my-instance'),
-        response=self.messages.DatabaseInstance(settings=self.messages.Settings(
-            settingsVersion=12345)))
+        response=self.messages.DatabaseInstance(
+            kind='sql#instance',
+            settings=self.messages.Settings(settingsVersion=12345)))
     self.mocked_client.instances.Failover.Expect(
         request=self.messages.SqlInstancesFailoverRequest(
             project=self.Project(),
@@ -44,7 +45,9 @@ class _BaseInstancesFailoverTest(object):
     self.mocked_client.operations.Get.Expect(
         request=self.messages.SqlOperationsGetRequest(
             project=self.Project(), operation='opName'),
-        response=self.messages.Operation(name='opName', status='DONE'))
+        response=self.messages.Operation(
+            name='opName',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql instances failover my-instance')
     self.assertEqual(prompt_mock.call_count, 1)
 

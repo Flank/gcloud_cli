@@ -1,0 +1,182 @@
+title: privateca roots update scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: privateca roots update ca --location europe-west1 --publish-ca-cert --no-publish-crl
+- execute:
+  - command: privateca roots update ca --location europe-west1 --issuance-policy issuance_policy_example_small.yaml
+- execute:
+  - command: privateca roots update ca --location europe-west1 --update-labels tls-ca=true,update-date=20200220
+- execute:
+  - command: privateca roots update ca --location europe-west1 --update-labels tls-ca=true
+  - error: '1: Cannot perform roots command on Subordinate CA. Please use the `privateca
+      subordinates` command group instead.'
+actions:
+- load_resource:
+    path: tests/unit/surface/privateca/test_data/issuance_policy_example_small.yaml
+- execute_command:
+    command: privateca roots update ca --location europe-west1 --publish-ca-cert --no-publish-crl
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+            type: SELF_SIGNED
+            state: ACTIVE
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://privateca\.googleapis\.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca\?alt=json&requestId=[^&]+&updateMask=issuing_options\.include_crl_access_url%2Cissuing_options\.include_ca_cert_url
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              issuingOptions:
+                includeCaCertUrl: true
+                includeCrlAccessUrl: false
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+            response:
+              name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+              type: SELF_SIGNED
+              state: ACTIVE
+              issuingOptions:
+                includeCaCertUrl: true
+                includeCrlAccessUrl: false
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots update ca --location europe-west1 --issuance-policy issuance_policy_example_small.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+            type: SELF_SIGNED
+            state: ACTIVE
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://privateca\.googleapis\.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca\?alt=json&requestId=[^&]+&updateMask=certificate_policy
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              certificatePolicy:
+                allowedLocationsAndOrganizations:
+                - countryCode: US
+                  locality: Sunnyvale
+                  organization: Google, Inc
+                  organizationalUnit: Cloud
+                  province: CA
+                - countryCode: US
+                  locality: Mountain View
+                  organization: Google, Inc
+                  organizationalUnit: Geo
+                  province: CA
+                maximumLifetime: 825d
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+            response:
+              name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+              type: SELF_SIGNED
+              state: ACTIVE
+              certificatePolicy:
+                allowedLocationsAndOrganizations:
+                - countryCode: US
+                  locality: Sunnyvale
+                  organization: Google, Inc
+                  organizationalUnit: Cloud
+                  province: CA
+                - countryCode: US
+                  locality: Mountain View
+                  organization: Google, Inc
+                  organizationalUnit: Geo
+                  province: CA
+                maximumLifetime: 825d
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots update ca --location europe-west1 --update-labels tls-ca=true,update-date=20200220
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+            type: SELF_SIGNED
+            state: ACTIVE
+            labels:
+              tls-ca: 'false'
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://privateca\.googleapis\.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca\?alt=json&requestId=[^&]+&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              labels:
+                tls-ca: 'true'
+                update-date: '20200220'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+            response:
+              name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+              type: SELF_SIGNED
+              state: ACTIVE
+              labels:
+                tls-ca: 'true'
+                update-date: '20200220'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots update ca --location europe-west1 --update-labels tls-ca=true
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+            type: SUBORDINATE
+            state: ACTIVE
+    - expect_exit:
+        code: 1
+        message: Cannot perform roots command on Subordinate CA. Please use the `privateca
+          subordinates` command group instead.

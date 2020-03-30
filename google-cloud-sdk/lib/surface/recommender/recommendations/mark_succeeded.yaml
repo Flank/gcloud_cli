@@ -1,4 +1,4 @@
-- release_tracks: [ALPHA, BETA]
+- release_tracks: [ALPHA, BETA, GA]
   help_text:
     brief: |
       Mark a recommendation's state as SUCCEEDED. mark-succeeded can be applied to recommendations
@@ -6,24 +6,20 @@
     description: |
       Mark a recommendation's state as SUCCEEDED. mark-succeeded can be applied to recommendations
       in ACTIVE, CLAIMED, SUCCEEDED, or FAILED state.
-    ALPHA:
-      examples: |
-        To mark a recommendation as ACTIVE:
+    examples: |
+      To mark a recommendation as SUCCEEDED:
 
-          $ {command} abcd-1234 --project=project-name --location=global --recommender=google.iam.policy.RoleRecommender --etag=abc123 --state-metadata=key1=value1,key2=value2
-    BETA:
-      examples: |
-        To mark a recommendation as ACTIVE:
-
-          $ {command} abcd-1234 --project=project-name --location=global --recommender=google.iam.policy.Recommender --etag=abc123 --state-metadata=key1=value1,key2=value2
+        $ {command} abcd-1234 --project=project-name --location=global --recommender=google.compute.instance.MachineTypeRecommender --etag=abc123 --state-metadata=key1=value1,key2=value2
 
   request:
     collection: recommender.projects.locations.recommenders.recommendations
     method: markSucceeded
     ALPHA:
-      api_version: v1alpha1
+      api_version: v1alpha2
     BETA:
       api_version: v1beta1
+    GA:
+      api_version: v1
 
   arguments:
     resource:
@@ -32,17 +28,21 @@
     params:
     - arg_name: etag
       ALPHA:
-        api_field: googleCloudRecommenderV1alpha1MarkSucceededRequest.etag
+        api_field: googleCloudRecommenderV1alpha2MarkRecommendationSucceededRequest.etag
       BETA:
         api_field: googleCloudRecommenderV1beta1MarkRecommendationSucceededRequest.etag
+      GA:
+        api_field: googleCloudRecommenderV1MarkRecommendationSucceededRequest.etag
       help_text: The fingerprint of the recommendation.
       required: true
     - arg_name: state-metadata
       metavar: KEY=VALUE
       ALPHA:
-        api_field: googleCloudRecommenderV1alpha1MarkSucceededRequest.stateMetadata.additionalProperties
+        api_field: googleCloudRecommenderV1alpha2MarkRecommendationSucceededRequest.stateMetadata.additionalProperties
       BETA:
         api_field: googleCloudRecommenderV1beta1MarkRecommendationSucceededRequest.stateMetadata.additionalProperties
+      GA:
+        api_field: googleCloudRecommenderV1MarkRecommendationSucceededRequest.stateMetadata.additionalProperties
       type:
         arg_dict:
           flatten: true

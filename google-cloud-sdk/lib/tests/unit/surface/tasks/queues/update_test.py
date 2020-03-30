@@ -193,7 +193,9 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                                               maxDoublings=4, minBackoff='1s',
                                               maxBackoff='10s'),
         rateLimits=self.messages.RateLimits(
-            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10),
+        stackdriverLoggingConfig=self.messages.StackdriverLoggingConfig(
+            samplingRatio=0.9))
     self.queues_service.Patch.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
             name=self.queue_name, queue=expected_queue,
@@ -204,7 +206,8 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                         'retryConfig.maxBackoff,'
                         'retryConfig.maxDoublings,'
                         'retryConfig.maxRetryDuration,'
-                        'retryConfig.minBackoff')),
+                        'retryConfig.minBackoff,'
+                        'stackdriverLoggingConfig.samplingRatio')),
         response=expected_queue)
 
     actual_queue = self.Run(self.command + ' my-queue '
@@ -213,7 +216,8 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                             '--max-backoff=10s '
                             '--max-dispatches-per-second=100 '
                             '--max-concurrent-dispatches=10 '
-                            '--routing-override=service:abc')
+                            '--routing-override=service:abc '
+                            '--log-sampling-ratio=0.9')
 
     self.assertEqual(actual_queue, expected_queue)
 
@@ -226,7 +230,9 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                                               maxDoublings=4, minBackoff='1s',
                                               maxBackoff='10s'),
         rateLimits=self.messages.RateLimits(
-            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10),
+        stackdriverLoggingConfig=self.messages.StackdriverLoggingConfig(
+            samplingRatio=0.9))
     self.queues_service.Patch.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
             name=self.queue_name, queue=expected_queue,
@@ -237,7 +243,8 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                         'retryConfig.maxBackoff,'
                         'retryConfig.maxDoublings,'
                         'retryConfig.maxRetryDuration,'
-                        'retryConfig.minBackoff')),
+                        'retryConfig.minBackoff,'
+                        'stackdriverLoggingConfig.samplingRatio')),
         response=expected_queue)
 
     actual_queue = self.Run(self.command + ' my-queue '
@@ -246,7 +253,8 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                             '--max-backoff=10s '
                             '--max-dispatches-per-second=100 '
                             '--max-concurrent-dispatches=10 '
-                            '--routing-override=service:abc')
+                            '--routing-override=service:abc '
+                            '--log-sampling-ratio=0.9')
 
     self.assertEqual(actual_queue, expected_queue)
 
@@ -255,7 +263,8 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
         name=self.queue_name,
         appEngineRoutingOverride=self.messages.AppEngineRouting(),
         retryConfig=self.messages.RetryConfig(),
-        rateLimits=self.messages.RateLimits())
+        rateLimits=self.messages.RateLimits(),
+        stackdriverLoggingConfig=self.messages.StackdriverLoggingConfig())
     self.queues_service.Patch.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
             name=self.queue_name, queue=expected_queue,
@@ -266,7 +275,8 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                         'retryConfig.maxBackoff,'
                         'retryConfig.maxDoublings,'
                         'retryConfig.maxRetryDuration,'
-                        'retryConfig.minBackoff')),
+                        'retryConfig.minBackoff,'
+                        'stackdriverLoggingConfig.samplingRatio')),
         response=expected_queue)
 
     actual_queue = self.Run(self.command + ' my-queue '
@@ -275,7 +285,8 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                             '--clear-max-backoff '
                             '--clear-max-dispatches-per-second '
                             '--clear-max-concurrent-dispatches '
-                            '--clear-routing-override')
+                            '--clear-routing-override '
+                            '--clear-log-sampling-ratio')
 
     self.assertEqual(actual_queue, expected_queue)
 

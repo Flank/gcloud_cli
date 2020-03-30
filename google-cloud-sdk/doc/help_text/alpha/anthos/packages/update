@@ -1,0 +1,78 @@
+NAME
+    gcloud alpha anthos packages update - update a local package with changes
+        from a remote source repo
+
+SYNOPSIS
+    gcloud alpha anthos packages update LOCAL_DIR[@GIT_REF] [--dry-run]
+        [--repo-uri=REPO_URI] [--strategy=STRATEGY] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Update a local package with changes from a remote source repo.
+
+POSITIONAL ARGUMENTS
+     LOCAL_DIR[@GIT_REF]
+        The local package directory to update. Can optionally include a git
+        reference (GIT_REF) to a tag, branch or commit hash to update to.
+        Defaults to last fetched git-ref.
+
+FLAGS
+     --dry-run
+        If true and command fails print the underlying command that was
+        executed and its exit status.
+
+     --repo-uri=REPO_URI
+        git repo url for updating contents. Defaults to the url the package was
+        fetched from.
+
+     --strategy=STRATEGY
+        Controls how changes to the local package are handled. STRATEGY must be
+        one of:
+
+         alpha-git-patch
+            use 'git format-patch' and 'git am' to apply a patch of the changes
+            between the source version and destination version. Requires the
+            local package to have been committed to a local git repo.
+         fast-forward
+            fail without updating if the local package was modified since it
+            was fetched.
+         force-delete-replace
+            This will wipe all local changes to the package. Deletes the
+            contents of local package from PACKAGE_DIR and replace them with
+            the remote
+         resource-merge
+            perform a structural comparison of the original/updated Resources,
+            and merge the changes into the local package.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To update local package ~/my-package-dir:
+
+        $ gcloud alpha anthos packages update ~/my-package-dir
+
+    To update my-package-dir/ to match the v1.3 tag at git URL
+    https://github.com/my-other-account/foo.git:
+
+        $ gcloud alpha anthos packages update my-package-dir@v1.3 \
+            --repo-uri https://github.com/my-other-account/foo.git
+
+    To update by applying a git patch:
+
+        $ git add my-package-dir/
+        $ git commit -m "package updates"
+        $ gcloud alpha anthos packages update my-package-dir/@master \
+            --strategy alpha-git-patch
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

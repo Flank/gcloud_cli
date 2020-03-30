@@ -38,7 +38,7 @@ class BatchGetDocumentsRequest(_messages.Message):
       to a read-only transaction. The new transaction ID will be returned as
       the first response in the stream.
     readTime: Reads documents as they were at the given time. This may not be
-      older than 60 seconds.
+      older than 270 seconds.
     transaction: Reads documents in a transaction.
   """
 
@@ -124,7 +124,8 @@ class CommitResponse(_messages.Message):
   r"""The response for Firestore.Commit.
 
   Fields:
-    commitTime: The time at which the commit occurred.
+    commitTime: The time at which the commit occurred. Any read with an equal
+      or greater `read_time` is guaranteed to see the effects of the commit.
     writeResults: The result of applying the writes.  This i-th write result
       corresponds to the i-th write in the request.
   """
@@ -540,8 +541,8 @@ class FirestoreProjectsDatabasesCollectionGroupsFieldsGetRequest(_messages.Messa
   r"""A FirestoreProjectsDatabasesCollectionGroupsFieldsGetRequest object.
 
   Fields:
-    name: A name of the form `projects/{project_id}/databases/{database_id}/co
-      llectionGroups/{collection_id}/fields/{field_id}`
+    name: Required. A name of the form `projects/{project_id}/databases/{datab
+      ase_id}/collectionGroups/{collection_id}/fields/{field_id}`
   """
 
   name = _messages.StringField(1, required=True)
@@ -560,8 +561,8 @@ class FirestoreProjectsDatabasesCollectionGroupsFieldsListRequest(_messages.Mess
     pageToken: A page token, returned from a previous call to
       FirestoreAdmin.ListFields, that may be used to get the next page of
       results.
-    parent: A parent name of the form `projects/{project_id}/databases/{databa
-      se_id}/collectionGroups/{collection_id}`
+    parent: Required. A parent name of the form `projects/{project_id}/databas
+      es/{database_id}/collectionGroups/{collection_id}`
   """
 
   filter = _messages.StringField(1)
@@ -609,8 +610,8 @@ class FirestoreProjectsDatabasesCollectionGroupsIndexesCreateRequest(_messages.M
   Fields:
     googleFirestoreAdminV1Index: A GoogleFirestoreAdminV1Index resource to be
       passed as the request body.
-    parent: A parent name of the form `projects/{project_id}/databases/{databa
-      se_id}/collectionGroups/{collection_id}`
+    parent: Required. A parent name of the form `projects/{project_id}/databas
+      es/{database_id}/collectionGroups/{collection_id}`
   """
 
   googleFirestoreAdminV1Index = _messages.MessageField('GoogleFirestoreAdminV1Index', 1)
@@ -621,8 +622,8 @@ class FirestoreProjectsDatabasesCollectionGroupsIndexesDeleteRequest(_messages.M
   r"""A FirestoreProjectsDatabasesCollectionGroupsIndexesDeleteRequest object.
 
   Fields:
-    name: A name of the form `projects/{project_id}/databases/{database_id}/co
-      llectionGroups/{collection_id}/indexes/{index_id}`
+    name: Required. A name of the form `projects/{project_id}/databases/{datab
+      ase_id}/collectionGroups/{collection_id}/indexes/{index_id}`
   """
 
   name = _messages.StringField(1, required=True)
@@ -632,8 +633,8 @@ class FirestoreProjectsDatabasesCollectionGroupsIndexesGetRequest(_messages.Mess
   r"""A FirestoreProjectsDatabasesCollectionGroupsIndexesGetRequest object.
 
   Fields:
-    name: A name of the form `projects/{project_id}/databases/{database_id}/co
-      llectionGroups/{collection_id}/indexes/{index_id}`
+    name: Required. A name of the form `projects/{project_id}/databases/{datab
+      ase_id}/collectionGroups/{collection_id}/indexes/{index_id}`
   """
 
   name = _messages.StringField(1, required=True)
@@ -648,8 +649,8 @@ class FirestoreProjectsDatabasesCollectionGroupsIndexesListRequest(_messages.Mes
     pageToken: A page token, returned from a previous call to
       FirestoreAdmin.ListIndexes, that may be used to get the next page of
       results.
-    parent: A parent name of the form `projects/{project_id}/databases/{databa
-      se_id}/collectionGroups/{collection_id}`
+    parent: Required. A parent name of the form `projects/{project_id}/databas
+      es/{database_id}/collectionGroups/{collection_id}`
   """
 
   filter = _messages.StringField(1)
@@ -664,7 +665,7 @@ class FirestoreProjectsDatabasesDocumentsBatchGetRequest(_messages.Message):
   Fields:
     batchGetDocumentsRequest: A BatchGetDocumentsRequest resource to be passed
       as the request body.
-    database: The database name. In the format:
+    database: Required. The database name. In the format:
       `projects/{project_id}/databases/{database_id}`.
   """
 
@@ -678,7 +679,7 @@ class FirestoreProjectsDatabasesDocumentsBeginTransactionRequest(_messages.Messa
   Fields:
     beginTransactionRequest: A BeginTransactionRequest resource to be passed
       as the request body.
-    database: The database name. In the format:
+    database: Required. The database name. In the format:
       `projects/{project_id}/databases/{database_id}`.
   """
 
@@ -691,7 +692,7 @@ class FirestoreProjectsDatabasesDocumentsCommitRequest(_messages.Message):
 
   Fields:
     commitRequest: A CommitRequest resource to be passed as the request body.
-    database: The database name. In the format:
+    database: Required. The database name. In the format:
       `projects/{project_id}/databases/{database_id}`.
   """
 
@@ -703,14 +704,14 @@ class FirestoreProjectsDatabasesDocumentsCreateDocumentRequest(_messages.Message
   r"""A FirestoreProjectsDatabasesDocumentsCreateDocumentRequest object.
 
   Fields:
-    collectionId: The collection ID, relative to `parent`, to list. For
-      example: `chatrooms`.
+    collectionId: Required. The collection ID, relative to `parent`, to list.
+      For example: `chatrooms`.
     document: A Document resource to be passed as the request body.
     documentId: The client-assigned document ID to use for this document.
       Optional. If not specified, an ID will be assigned by the service.
     mask_fieldPaths: The list of field paths in the mask. See Document.fields
       for a field path syntax reference.
-    parent: The parent resource. For example:
+    parent: Required. The parent resource. For example:
       `projects/{project_id}/databases/{database_id}/documents` or `projects/{
       project_id}/databases/{database_id}/documents/chatrooms/{chatroom_id}`
   """
@@ -730,9 +731,9 @@ class FirestoreProjectsDatabasesDocumentsDeleteRequest(_messages.Message):
       exist. When set to `false`, the target document must not exist.
     currentDocument_updateTime: When set, the target document must exist and
       have been last updated at that time.
-    name: The resource name of the Document to delete. In the format:
-      `projects/{project_id}/databases/{database_id}/documents/{document_path}
-      `.
+    name: Required. The resource name of the Document to delete. In the
+      format: `projects/{project_id}/databases/{database_id}/documents/{docume
+      nt_path}`.
   """
 
   currentDocument_exists = _messages.BooleanField(1)
@@ -746,11 +747,11 @@ class FirestoreProjectsDatabasesDocumentsGetRequest(_messages.Message):
   Fields:
     mask_fieldPaths: The list of field paths in the mask. See Document.fields
       for a field path syntax reference.
-    name: The resource name of the Document to get. In the format:
+    name: Required. The resource name of the Document to get. In the format:
       `projects/{project_id}/databases/{database_id}/documents/{document_path}
       `.
     readTime: Reads the version of the document at the given time. This may
-      not be older than 60 seconds.
+      not be older than 270 seconds.
     transaction: Reads the document in a transaction.
   """
 
@@ -766,7 +767,7 @@ class FirestoreProjectsDatabasesDocumentsListCollectionIdsRequest(_messages.Mess
   Fields:
     listCollectionIdsRequest: A ListCollectionIdsRequest resource to be passed
       as the request body.
-    parent: The parent document. In the format:
+    parent: Required. The parent document. In the format:
       `projects/{project_id}/databases/{database_id}/documents/{document_path}
       `. For example: `projects/my-project/databases/my-
       database/documents/chatrooms/my-chatroom`
@@ -780,22 +781,22 @@ class FirestoreProjectsDatabasesDocumentsListRequest(_messages.Message):
   r"""A FirestoreProjectsDatabasesDocumentsListRequest object.
 
   Fields:
-    collectionId: The collection ID, relative to `parent`, to list. For
-      example: `chatrooms` or `messages`.
+    collectionId: Required. The collection ID, relative to `parent`, to list.
+      For example: `chatrooms` or `messages`.
     mask_fieldPaths: The list of field paths in the mask. See Document.fields
       for a field path syntax reference.
     orderBy: The order to sort results by. For example: `priority desc, name`.
     pageSize: The maximum number of documents to return.
     pageToken: The `next_page_token` value returned from a previous List
       request, if any.
-    parent: The parent resource name. In the format:
+    parent: Required. The parent resource name. In the format:
       `projects/{project_id}/databases/{database_id}/documents` or `projects/{
       project_id}/databases/{database_id}/documents/{document_path}`. For
       example: `projects/my-project/databases/my-database/documents` or
       `projects/my-project/databases/my-database/documents/chatrooms/my-
       chatroom`
     readTime: Reads documents as they were at the given time. This may not be
-      older than 60 seconds.
+      older than 270 seconds.
     showMissing: If the list should show missing documents. A missing document
       is a document that does not exist but has sub-documents. These documents
       will be returned with a key but will not have fields,
@@ -819,7 +820,7 @@ class FirestoreProjectsDatabasesDocumentsListenRequest(_messages.Message):
   r"""A FirestoreProjectsDatabasesDocumentsListenRequest object.
 
   Fields:
-    database: The database name. In the format:
+    database: Required. The database name. In the format:
       `projects/{project_id}/databases/{database_id}`.
     listenRequest: A ListenRequest resource to be passed as the request body.
   """
@@ -858,7 +859,7 @@ class FirestoreProjectsDatabasesDocumentsRollbackRequest(_messages.Message):
   r"""A FirestoreProjectsDatabasesDocumentsRollbackRequest object.
 
   Fields:
-    database: The database name. In the format:
+    database: Required. The database name. In the format:
       `projects/{project_id}/databases/{database_id}`.
     rollbackRequest: A RollbackRequest resource to be passed as the request
       body.
@@ -872,7 +873,7 @@ class FirestoreProjectsDatabasesDocumentsRunQueryRequest(_messages.Message):
   r"""A FirestoreProjectsDatabasesDocumentsRunQueryRequest object.
 
   Fields:
-    parent: The parent resource name. In the format:
+    parent: Required. The parent resource name. In the format:
       `projects/{project_id}/databases/{database_id}/documents` or `projects/{
       project_id}/databases/{database_id}/documents/{document_path}`. For
       example: `projects/my-project/databases/my-database/documents` or
@@ -890,7 +891,7 @@ class FirestoreProjectsDatabasesDocumentsWriteRequest(_messages.Message):
   r"""A FirestoreProjectsDatabasesDocumentsWriteRequest object.
 
   Fields:
-    database: The database name. In the format:
+    database: Required. The database name. In the format:
       `projects/{project_id}/databases/{database_id}`. This is only required
       in the first message.
     writeRequest: A WriteRequest resource to be passed as the request body.
@@ -907,7 +908,7 @@ class FirestoreProjectsDatabasesExportDocumentsRequest(_messages.Message):
     googleFirestoreAdminV1ExportDocumentsRequest: A
       GoogleFirestoreAdminV1ExportDocumentsRequest resource to be passed as
       the request body.
-    name: Database to export. Should be of the form:
+    name: Required. Database to export. Should be of the form:
       `projects/{project_id}/databases/{database_id}`.
   """
 
@@ -922,7 +923,7 @@ class FirestoreProjectsDatabasesImportDocumentsRequest(_messages.Message):
     googleFirestoreAdminV1ImportDocumentsRequest: A
       GoogleFirestoreAdminV1ImportDocumentsRequest resource to be passed as
       the request body.
-    name: Database to import into. Should be of the form:
+    name: Required. Database to import into. Should be of the form:
       `projects/{project_id}/databases/{database_id}`.
   """
 
@@ -2002,7 +2003,7 @@ class RollbackRequest(_messages.Message):
   r"""The request for Firestore.Rollback.
 
   Fields:
-    transaction: The transaction to roll back.
+    transaction: Required. The transaction to roll back.
   """
 
   transaction = _messages.BytesField(1)
@@ -2016,7 +2017,7 @@ class RunQueryRequest(_messages.Message):
       to a read-only transaction. The new transaction ID will be returned as
       the first response in the stream.
     readTime: Reads documents as they were at the given time. This may not be
-      older than 60 seconds.
+      older than 270 seconds.
     structuredQuery: A structured query.
     transaction: Reads documents in a transaction.
   """
@@ -2378,9 +2379,7 @@ class Write(_messages.Message):
     delete: A document name to delete. In the format:
       `projects/{project_id}/databases/{database_id}/documents/{document_path}
       `.
-    transform: Applies a transformation to a document. At most one `transform`
-      per document is allowed in a given request. An `update` cannot follow a
-      `transform` on the same document in a given request.
+    transform: Applies a transformation to a document.
     update: A document to write.
     updateMask: The fields to update in this write.  This field can be set
       only when the operation is `update`. If the mask is not set for an
@@ -2390,6 +2389,10 @@ class Write(_messages.Message):
       not present in the input document, are deleted from the document on the
       server. The field paths in this mask must not contain a reserved field
       name.
+    updateTransforms: The transforms to perform after update.  This field can
+      be set only when the operation is `update`. If present, this write is
+      equivalent to performing `update` and `transform` to the same document
+      atomically and in order.
   """
 
   currentDocument = _messages.MessageField('Precondition', 1)
@@ -2397,6 +2400,7 @@ class Write(_messages.Message):
   transform = _messages.MessageField('DocumentTransform', 3)
   update = _messages.MessageField('Document', 4)
   updateMask = _messages.MessageField('DocumentMask', 5)
+  updateTransforms = _messages.MessageField('FieldTransform', 6, repeated=True)
 
 
 class WriteRequest(_messages.Message):
@@ -2462,7 +2466,8 @@ class WriteResponse(_messages.Message):
   r"""The response for Firestore.Write.
 
   Fields:
-    commitTime: The time at which the commit occurred.
+    commitTime: The time at which the commit occurred. Any read with an equal
+      or greater `read_time` is guaranteed to see the effects of the write.
     streamId: The ID of the stream. Only set on the first message, when a new
       stream was created.
     streamToken: A token that represents the position of this response in the

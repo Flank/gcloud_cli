@@ -5,7 +5,7 @@
   "name": "firestore",
   "canonicalName": "Firestore",
   "version": "v1",
-  "revision": "20191107",
+  "revision": "20200313",
   "title": "Cloud Firestore API",
   "description": "Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development.\n",
   "ownerDomain": "google.com",
@@ -17,6 +17,7 @@
   "documentationLink": "https://cloud.google.com/firestore",
   "protocol": "rest",
   "rootUrl": "https://firestore.googleapis.com/",
+  "mtlsRootUrl": "https://firestore.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://firestore.googleapis.com/",
   "batchPath": "batch",
@@ -634,7 +635,7 @@
           "$ref": "TransactionOptions"
         },
         "readTime": {
-          "description": "Reads documents as they were at the given time.\nThis may not be older than 60 seconds.",
+          "description": "Reads documents as they were at the given time.\nThis may not be older than 270 seconds.",
           "type": "string",
           "format": "google-datetime"
         }
@@ -774,12 +775,19 @@
           "type": "string"
         },
         "transform": {
-          "description": "Applies a transformation to a document.\nAt most one `transform` per document is allowed in a given request.\nAn `update` cannot follow a `transform` on the same document in a given\nrequest.",
+          "description": "Applies a transformation to a document.",
           "$ref": "DocumentTransform"
         },
         "updateMask": {
           "description": "The fields to update in this write.\n\nThis field can be set only when the operation is `update`.\nIf the mask is not set for an `update` and the document exists, any\nexisting data will be overwritten.\nIf the mask is set and the document on the server has fields not covered by\nthe mask, they are left unchanged.\nFields referenced in the mask, but not present in the input document, are\ndeleted from the document on the server.\nThe field paths in this mask must not contain a reserved field name.",
           "$ref": "DocumentMask"
+        },
+        "updateTransforms": {
+          "description": "The transforms to perform after update.\n\nThis field can be set only when the operation is `update`. If present, this\nwrite is equivalent to performing `update` and `transform` to the same\ndocument atomically and in order.",
+          "type": "array",
+          "items": {
+            "$ref": "FieldTransform"
+          }
         },
         "currentDocument": {
           "description": "An optional precondition on the document.\n\nThe write will fail if this is set and not met by the target document.",
@@ -877,7 +885,7 @@
           }
         },
         "commitTime": {
-          "description": "The time at which the commit occurred.",
+          "description": "The time at which the commit occurred. Any read with an equal or greater\n`read_time` is guaranteed to see the effects of the commit.",
           "type": "string",
           "format": "google-datetime"
         }
@@ -908,7 +916,7 @@
       "type": "object",
       "properties": {
         "transaction": {
-          "description": "The transaction to roll back.",
+          "description": "Required. The transaction to roll back.",
           "type": "string",
           "format": "byte"
         }
@@ -933,7 +941,7 @@
           "$ref": "TransactionOptions"
         },
         "readTime": {
-          "description": "Reads documents as they were at the given time.\nThis may not be older than 60 seconds.",
+          "description": "Reads documents as they were at the given time.\nThis may not be older than 270 seconds.",
           "type": "string",
           "format": "google-datetime"
         }
@@ -1257,7 +1265,7 @@
           }
         },
         "commitTime": {
-          "description": "The time at which the commit occurred.",
+          "description": "The time at which the commit occurred. Any read with an equal or greater\n`read_time` is guaranteed to see the effects of the write.",
           "type": "string",
           "format": "google-datetime"
         }
@@ -1927,7 +1935,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "name": {
-                  "description": "Database to export. Should be of the form:\n`projects\/{project_id}\/databases\/{database_id}`.",
+                  "description": "Required. Database to export. Should be of the form:\n`projects\/{project_id}\/databases\/{database_id}`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/databases\/[^\/]+$",
@@ -1956,7 +1964,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "name": {
-                  "description": "Database to import into. Should be of the form:\n`projects\/{project_id}\/databases\/{database_id}`.",
+                  "description": "Required. Database to import into. Should be of the form:\n`projects\/{project_id}\/databases\/{database_id}`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/databases\/[^\/]+$",
@@ -2119,7 +2127,7 @@
                       "httpMethod": "POST",
                       "parameters": {
                         "parent": {
-                          "description": "A parent name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}`",
+                          "description": "Required. A parent name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}`",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/collectionGroups\/[^\/]+$",
@@ -2148,7 +2156,7 @@
                       "httpMethod": "GET",
                       "parameters": {
                         "parent": {
-                          "description": "A parent name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}`",
+                          "description": "Required. A parent name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}`",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/collectionGroups\/[^\/]+$",
@@ -2190,7 +2198,7 @@
                       "httpMethod": "GET",
                       "parameters": {
                         "name": {
-                          "description": "A name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}\/indexes\/{index_id}`",
+                          "description": "Required. A name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}\/indexes\/{index_id}`",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/collectionGroups\/[^\/]+\/indexes\/[^\/]+$",
@@ -2216,7 +2224,7 @@
                       "httpMethod": "DELETE",
                       "parameters": {
                         "name": {
-                          "description": "A name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}\/indexes\/{index_id}`",
+                          "description": "Required. A name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}\/indexes\/{index_id}`",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/collectionGroups\/[^\/]+\/indexes\/[^\/]+$",
@@ -2246,7 +2254,7 @@
                       "httpMethod": "GET",
                       "parameters": {
                         "name": {
-                          "description": "A name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}\/fields\/{field_id}`",
+                          "description": "Required. A name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}\/fields\/{field_id}`",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/collectionGroups\/[^\/]+\/fields\/[^\/]+$",
@@ -2307,7 +2315,7 @@
                       "httpMethod": "GET",
                       "parameters": {
                         "parent": {
-                          "description": "A parent name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}`",
+                          "description": "Required. A parent name of the form\n`projects\/{project_id}\/databases\/{database_id}\/collectionGroups\/{collection_id}`",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/collectionGroups\/[^\/]+$",
@@ -2355,10 +2363,10 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "The resource name of the Document to get. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.",
+                      "description": "Required. The resource name of the Document to get. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.",
                       "location": "path",
                       "required": true,
-                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.+$",
+                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.*$",
                       "type": "string"
                     },
                     "mask.fieldPaths": {
@@ -2374,7 +2382,7 @@
                       "format": "byte"
                     },
                     "readTime": {
-                      "description": "Reads the version of the document at the given time.\nThis may not be older than 60 seconds.",
+                      "description": "Reads the version of the document at the given time.\nThis may not be older than 270 seconds.",
                       "location": "query",
                       "type": "string",
                       "format": "google-datetime"
@@ -2399,14 +2407,14 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "The parent resource name. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents` or\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.\nFor example:\n`projects\/my-project\/databases\/my-database\/documents` or\n`projects\/my-project\/databases\/my-database\/documents\/chatrooms\/my-chatroom`",
+                      "description": "Required. The parent resource name. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents` or\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.\nFor example:\n`projects\/my-project\/databases\/my-database\/documents` or\n`projects\/my-project\/databases\/my-database\/documents\/chatrooms\/my-chatroom`",
                       "location": "path",
                       "required": true,
-                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.+$",
+                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.*$",
                       "type": "string"
                     },
                     "collectionId": {
-                      "description": "The collection ID, relative to `parent`, to list. For example: `chatrooms`\nor `messages`.",
+                      "description": "Required. The collection ID, relative to `parent`, to list. For example: `chatrooms`\nor `messages`.",
                       "location": "path",
                       "required": true,
                       "type": "string"
@@ -2440,7 +2448,7 @@
                       "format": "byte"
                     },
                     "readTime": {
-                      "description": "Reads documents as they were at the given time.\nThis may not be older than 60 seconds.",
+                      "description": "Reads documents as they were at the given time.\nThis may not be older than 270 seconds.",
                       "location": "query",
                       "type": "string",
                       "format": "google-datetime"
@@ -2464,53 +2472,6 @@
                   ],
                   "description": "Lists documents."
                 },
-                "createDocument": {
-                  "id": "firestore.projects.databases.documents.createDocument",
-                  "path": "v1/{+parent}/{collectionId}",
-                  "flatPath": "v1/projects/{projectsId}/databases/{databasesId}/documents/{documentsId}/{collectionId}",
-                  "httpMethod": "POST",
-                  "parameters": {
-                    "parent": {
-                      "description": "The parent resource. For example:\n`projects\/{project_id}\/databases\/{database_id}\/documents` or\n`projects\/{project_id}\/databases\/{database_id}\/documents\/chatrooms\/{chatroom_id}`",
-                      "location": "path",
-                      "required": true,
-                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/.+$",
-                      "type": "string"
-                    },
-                    "collectionId": {
-                      "description": "The collection ID, relative to `parent`, to list. For example: `chatrooms`.",
-                      "location": "path",
-                      "required": true,
-                      "type": "string"
-                    },
-                    "documentId": {
-                      "description": "The client-assigned document ID to use for this document.\n\nOptional. If not specified, an ID will be assigned by the service.",
-                      "location": "query",
-                      "type": "string"
-                    },
-                    "mask.fieldPaths": {
-                      "description": "The list of field paths in the mask. See Document.fields for a field\npath syntax reference.",
-                      "location": "query",
-                      "repeated": true,
-                      "type": "string"
-                    }
-                  },
-                  "parameterOrder": [
-                    "parent",
-                    "collectionId"
-                  ],
-                  "request": {
-                    "$ref": "Document"
-                  },
-                  "response": {
-                    "$ref": "Document"
-                  },
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform",
-                    "https://www.googleapis.com/auth/datastore"
-                  ],
-                  "description": "Creates a new document."
-                },
                 "patch": {
                   "id": "firestore.projects.databases.documents.patch",
                   "path": "v1/{+name}",
@@ -2521,7 +2482,7 @@
                       "description": "The resource name of the document, for example\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.",
                       "location": "path",
                       "required": true,
-                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.+$",
+                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.*$",
                       "type": "string"
                     },
                     "updateMask.fieldPaths": {
@@ -2570,10 +2531,10 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "The resource name of the Document to delete. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.",
+                      "description": "Required. The resource name of the Document to delete. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.",
                       "location": "path",
                       "required": true,
-                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.+$",
+                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.*$",
                       "type": "string"
                     },
                     "currentDocument.exists": {
@@ -2607,7 +2568,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "database": {
-                      "description": "The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.",
+                      "description": "Required. The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/databases\/[^\/]+$",
@@ -2636,7 +2597,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "database": {
-                      "description": "The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.",
+                      "description": "Required. The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/databases\/[^\/]+$",
@@ -2665,7 +2626,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "database": {
-                      "description": "The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.",
+                      "description": "Required. The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/databases\/[^\/]+$",
@@ -2694,7 +2655,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "database": {
-                      "description": "The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.",
+                      "description": "Required. The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/databases\/[^\/]+$",
@@ -2723,7 +2684,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "The parent resource name. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents` or\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.\nFor example:\n`projects\/my-project\/databases\/my-database\/documents` or\n`projects\/my-project\/databases\/my-database\/documents\/chatrooms\/my-chatroom`",
+                      "description": "Required. The parent resource name. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents` or\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.\nFor example:\n`projects\/my-project\/databases\/my-database\/documents` or\n`projects\/my-project\/databases\/my-database\/documents\/chatrooms\/my-chatroom`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents$",
@@ -2752,10 +2713,10 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "The parent resource name. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents` or\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.\nFor example:\n`projects\/my-project\/databases\/my-database\/documents` or\n`projects\/my-project\/databases\/my-database\/documents\/chatrooms\/my-chatroom`",
+                      "description": "Required. The parent resource name. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents` or\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.\nFor example:\n`projects\/my-project\/databases\/my-database\/documents` or\n`projects\/my-project\/databases\/my-database\/documents\/chatrooms\/my-chatroom`",
                       "location": "path",
                       "required": true,
-                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.+$",
+                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.*$",
                       "type": "string"
                     }
                   },
@@ -2781,7 +2742,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "database": {
-                      "description": "The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.\nThis is only required in the first message.",
+                      "description": "Required. The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.\nThis is only required in the first message.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/databases\/[^\/]+$",
@@ -2810,7 +2771,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "database": {
-                      "description": "The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.",
+                      "description": "Required. The database name. In the format:\n`projects\/{project_id}\/databases\/{database_id}`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/databases\/[^\/]+$",
@@ -2839,7 +2800,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "The parent document. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.\nFor example:\n`projects\/my-project\/databases\/my-database\/documents\/chatrooms\/my-chatroom`",
+                      "description": "Required. The parent document. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.\nFor example:\n`projects\/my-project\/databases\/my-database\/documents\/chatrooms\/my-chatroom`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents$",
@@ -2868,10 +2829,10 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "The parent document. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.\nFor example:\n`projects\/my-project\/databases\/my-database\/documents\/chatrooms\/my-chatroom`",
+                      "description": "Required. The parent document. In the format:\n`projects\/{project_id}\/databases\/{database_id}\/documents\/{document_path}`.\nFor example:\n`projects\/my-project\/databases\/my-database\/documents\/chatrooms\/my-chatroom`",
                       "location": "path",
                       "required": true,
-                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.+$",
+                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/[^\/]+\/.*$",
                       "type": "string"
                     }
                   },
@@ -2889,6 +2850,53 @@
                     "https://www.googleapis.com/auth/datastore"
                   ],
                   "description": "Lists all the collection IDs underneath a document."
+                },
+                "createDocument": {
+                  "id": "firestore.projects.databases.documents.createDocument",
+                  "path": "v1/{+parent}/{collectionId}",
+                  "flatPath": "v1/projects/{projectsId}/databases/{databasesId}/documents/{documentsId}/{collectionId}",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. The parent resource. For example:\n`projects\/{project_id}\/databases\/{database_id}\/documents` or\n`projects\/{project_id}\/databases\/{database_id}\/documents\/chatrooms\/{chatroom_id}`",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/databases\/[^\/]+\/documents\/.*$",
+                      "type": "string"
+                    },
+                    "collectionId": {
+                      "description": "Required. The collection ID, relative to `parent`, to list. For example: `chatrooms`.",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "documentId": {
+                      "description": "The client-assigned document ID to use for this document.\n\nOptional. If not specified, an ID will be assigned by the service.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "mask.fieldPaths": {
+                      "description": "The list of field paths in the mask. See Document.fields for a field\npath syntax reference.",
+                      "location": "query",
+                      "repeated": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent",
+                    "collectionId"
+                  ],
+                  "request": {
+                    "$ref": "Document"
+                  },
+                  "response": {
+                    "$ref": "Document"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/datastore"
+                  ],
+                  "description": "Creates a new document."
                 }
               }
             }

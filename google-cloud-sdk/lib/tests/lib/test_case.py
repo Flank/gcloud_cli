@@ -834,7 +834,12 @@ class Base(WithContentAssertions):
         old_assert(base_self, expected, actual, *args, **kwargs)
       self.StartObjectPatch(Base, 'assertMultiLineEqual', MyAssert)
 
-  def Touch(self, directory, name=None, contents='', makedirs=False):
+  def Touch(self,
+            directory,
+            name=None,
+            contents='',
+            makedirs=False,
+            create_path=True):
     """Creates a file with the given contents.
 
     Args:
@@ -844,6 +849,7 @@ class Base(WithContentAssertions):
       contents: str, The contents to write to the file.
       makedirs: bool, If true makes any directories necessary for the specified
         directory to exist.
+      create_path: bool, True to create intermediate directories, if needed.
 
     Returns:
       str, The full path of the file that was created.
@@ -863,9 +869,10 @@ class Base(WithContentAssertions):
     # strings by default.
     path = os.path.join(directory, name)
     if isinstance(contents, six.text_type):
-      files_util.WriteFileContents(path, contents)
+      files_util.WriteFileContents(path, contents, create_path=create_path)
     else:
-      files_util.WriteBinaryFileContents(path, contents)
+      files_util.WriteBinaryFileContents(
+          path, contents, create_path=create_path)
 
     return path
 
@@ -980,8 +987,10 @@ class Filters(object):
                   platforms.OperatingSystem.LINUX)
   _IS_ON_MAC = (platforms.OperatingSystem.Current() ==
                 platforms.OperatingSystem.MACOSX)
-  _IS_IN_DEB = os.environ.get('CLOUDSDK_TEST_PLATFORM', '') == 'deb'
-  _IS_IN_RPM = os.environ.get('CLOUDSDK_TEST_PLATFORM', '') == 'rpm'
+  _IS_IN_DEB = enc.GetEncodedValue(os.environ, 'CLOUDSDK_TEST_PLATFORM',
+                                   '') == 'deb'
+  _IS_IN_RPM = enc.GetEncodedValue(os.environ, 'CLOUDSDK_TEST_PLATFORM',
+                                   '') == 'rpm'
   _IS_IN_KOKORO = 'KOKORO_JOB_NAME' in os.environ
 
   @staticmethod
@@ -1540,6 +1549,25 @@ class Filters(object):
     return Filters.skipIf(Filters._IS_ON_LINUX and six.PY3, reason, issue)
 
   @staticmethod
+  def SkipOnKokoroAndLinuxPy3(reason, issue):
+    """A decorator that skips a test on Kokoro Linux when running with python3.
+
+    Note: The skip decorators are for tests that are skipped due to a bug or
+      similar issue. If a test is skipped because it tests (e.g.) some OS
+      specific code, use the DoNotRun... or RunOnly... decorators instead.
+
+    Args:
+      reason: A textual description of why the test is skipped.
+      issue: A bug number tied to this skip. Must be in the format 'b/####...'
+
+    Returns:
+      A decorator that will skip a test on Linux when running with python3.
+    """
+    return Filters.skipIf(
+        Filters._IS_IN_KOKORO and Filters._IS_ON_LINUX and six.PY3, reason,
+        issue)
+
+  @staticmethod
   def RunOnlyOnMac(reason_or_function):
     """A decorator for tests designed to only run on Mac.
 
@@ -1566,6 +1594,25 @@ class Filters(object):
     # Jenkins (underlying Kokoro) sets ENV_VAR to the string 'false' rather than
     # not setting it at all, hence the following string comparison.
     return env and env != 'false'
+
+  @staticmethod
+  def SkipOnKokoroAndLinuxPy3(reason, issue):
+    """A decorator that skips a test on Kokoro Linux when running with python3.
+
+    Note: The skip decorators are for tests that are skipped due to a bug or
+      similar issue. If a test is skipped because it tests (e.g.) some OS
+      specific code, use the DoNotRun... or RunOnly... decorators instead.
+
+    Args:
+      reason: A textual description of why the test is skipped.
+      issue: A bug number tied to this skip. Must be in the format 'b/####...'
+
+    Returns:
+      A decorator that will skip a test on Linux when running with python3.
+    """
+    return Filters.skipIf(
+        Filters._IS_IN_KOKORO and Filters._IS_ON_LINUX and six.PY3, reason,
+        issue)
 
   @staticmethod
   def SkipInKokoro(reason, issue):
@@ -1951,7 +1998,8 @@ class WithOutputCapture(WithContentAssertions):
     self.stderr.fileno = self.MockStderrFileNo
     self.StartPatch('sys.stdout', new=self.stdout)
     self.StartPatch('sys.stderr', new=self.stderr)
-    self._show_test_output = os.getenv('CLOUDSDK_SHOW_TEST_OUTPUT', '0') == '1'
+    self._show_test_output = enc.GetEncodedValue(
+        os.environ, 'CLOUDSDK_SHOW_TEST_OUTPUT', '0') == '1'
     self._encoding_was_set = False
     # Python 3 does not have this method, but handles exception scope as if it
     # is always used.

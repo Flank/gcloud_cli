@@ -1,5 +1,25 @@
 title: LabelManager - LabelKeys - Create test
 release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: labelmanager keys create env --label-parent="organizations/123" --async
+  - stdout: |
+      done: false
+      name: operations/clk.12345
+- execute:
+  - command: labelmanager keys create env --label-parent="organizations/456"
+  - progress_tracker:
+    - message: Waiting for LabelKey [env] to be created with [operations/clk.12345]
+    - status: SUCCESS
+  - stdout: |
+      displayName: env
+      name: labelKeys/123
+      parent: organizations/456
+      state: ACTIVE
+- execute:
+  - command: labelmanager keys create env --label-parent="organizations/789" --async
+  - error: '1: PERMISSION_DENIED: The caller does not have permission'
 
 actions:
 - execute_command:
@@ -45,7 +65,7 @@ actions:
         expect_request:
           uri: https://labelmanager.googleapis.com/v1alpha1/operations/clk.12345?alt=json
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             status: '200'
@@ -62,13 +82,13 @@ actions:
               }
             }
     - expect_progress_tracker:
-        message: Waiting for label [env] to be created with [operations/clk.12345]
+        message: Waiting for LabelKey [env] to be created with [operations/clk.12345]
         status: SUCCESS
     - api_call:
         expect_request:
           uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys/123?alt=json
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             status: '200'

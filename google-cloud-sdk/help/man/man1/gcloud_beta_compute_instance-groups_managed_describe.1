@@ -79,8 +79,9 @@ invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -91,15 +92,14 @@ regions, run:
 
 .RS 2m
 $ gcloud beta compute instance\-groups managed describe \e
-    \-\-region us\-central1
-.RE
-
+    \-\-region=us\-central1
 To get details about a zonal instance group in the \f5\fIus\-central1\-b\fR\fR
 zone, run:
+.RE
 
 .RS 2m
 $ gcloud beta compute instance\-groups managed describe \e
-    \-\-zone us\-central1\-b
+    \-\-zone=us\-central1\-b
 .RE
 
 

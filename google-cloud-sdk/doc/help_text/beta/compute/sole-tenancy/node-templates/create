@@ -1,17 +1,18 @@
 NAME
-    gcloud beta compute sole-tenancy node-templates create - creates a Google
-        Compute Engine node template
+    gcloud beta compute sole-tenancy node-templates create - create a Compute
+        Engine node template
 
 SYNOPSIS
     gcloud beta compute sole-tenancy node-templates create NAME
         (--node-requirements=[localSSD=LOCALSSD],[memory=MEMORY],[vCPU=VCPU]
-          | --node-type=NODE_TYPE) [--description=DESCRIPTION]
-        [--node-affinity-labels=[KEY=VALUE,...]] [--region=REGION]
+          | --node-type=NODE_TYPE) [--cpu-overcommit-type=CPU_OVERCOMMIT_TYPE]
+        [--description=DESCRIPTION] [--node-affinity-labels=[KEY=VALUE,...]]
+        [--region=REGION]
         [--server-binding=SERVER_BINDING; default="restart-node-on-any-server"]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Creates a Google Compute Engine node template.
+    (BETA) Create a Compute Engine node template.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -53,6 +54,16 @@ REQUIRED FLAGS
               $ gcloud alpha compute sole-tenancy node-types
 
 OPTIONAL FLAGS
+     --cpu-overcommit-type=CPU_OVERCOMMIT_TYPE
+        CPU overcommit type for nodes created based on this template. To
+        overcommit CPUs on a VM, set --cpu-overcommit-type equal to either
+        standard or none, and then when creating a VM, specify a value for the
+        --min-node-cpu flag. Lower values for --min-node-cpu specify a higher
+        overcommit ratio, that is, proportionally more vCPUs in relation to
+        physical CPUs. You can only overcommit CPUs on VMs that are scheduled
+        on nodes that support it. CPU_OVERCOMMIT_TYPE must be one of: enabled,
+        none.
+
      --description=DESCRIPTION
         An optional description of this resource.
 
@@ -108,8 +119,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a node template of type n1-node-96-624, run:
+
+        $ gcloud beta compute sole-tenancy node-templates create \
+            my-node-template --node-type=n1-node-96-624
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -31,7 +31,7 @@ class HealthChecksCreateSslTest(test_base.BaseTest, parameterized.TestCase):
     self._health_check_api = self.compute.healthChecks
 
   def RunCreate(self, command):
-    self.Run('compute health-checks create ssl ' + command)
+    self.Run('compute health-checks create ssl %s' % command)
 
   def testUseServingPortOption(self):
     self.RunCreate('my-health-check --use-serving-port')
@@ -389,17 +389,6 @@ class HealthChecksCreateSslBetaTest(HealthChecksCreateSslTest):
     self.SelectApi(self.track.prefix)
     self._health_check_api = self.compute_beta.healthChecks
 
-  def RunCreate(self, command):
-    self.Run('compute health-checks create ssl --global ' + command)
-
-
-class HealthChecksCreateSslAlphaTest(HealthChecksCreateSslBetaTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
-    self._health_check_api = self.compute_alpha.healthChecks
-
   @parameterized.named_parameters(
       ('DisableLogging', '--no-enable-logging', False),
       ('EnableLogging', '--enable-logging', True))
@@ -430,16 +419,22 @@ class HealthChecksCreateSslAlphaTest(HealthChecksCreateSslBetaTest):
               project='my-project'))],)
 
 
-class RegionHealthChecksCreateSslBetaTest(test_base.BaseTest,
-                                          parameterized.TestCase):
+class HealthChecksCreateSslAlphaTest(HealthChecksCreateSslBetaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
-    self._health_check_api = self.compute_alpha.regionHealthChecks
+    self._health_check_api = self.compute_alpha.healthChecks
+
+
+class RegionHealthChecksCreateSslTest(test_base.BaseTest,
+                                      parameterized.TestCase):
+
+  def SetUp(self):
+    self._health_check_api = self.compute.regionHealthChecks
 
   def RunCreate(self, command):
-    self.Run('compute health-checks create ssl --region us-west-1 ' + command)
+    self.Run('compute health-checks create ssl --region us-west-1 %s' % command)
 
   def testDefaultOptions(self):
     self.RunCreate('my-health-check')
@@ -746,6 +741,44 @@ class RegionHealthChecksCreateSslBetaTest(test_base.BaseTest,
                   timeoutSec=5,
                   healthyThreshold=2,
                   unhealthyThreshold=2),
+              project='my-project',
+              region='us-west-1'))],)
+
+
+class RegionHealthChecksCreateSslBetaTest(RegionHealthChecksCreateSslTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+    self._health_check_api = self.compute_beta.regionHealthChecks
+
+  @parameterized.named_parameters(
+      ('DisableLogging', '--no-enable-logging', False),
+      ('EnableLogging', '--enable-logging', True))
+  def testLogConfig(self, enable_logs_flag, enable_logs):
+
+    self.RunCreate("""my-health-check {0}""".format(enable_logs_flag))
+
+    expected_log_config = self.messages.HealthCheckLogConfig(enable=enable_logs)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Insert',
+          self.messages.ComputeRegionHealthChecksInsertRequest(
+              healthCheck=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      port=80,
+                      portSpecification=(
+                          self.messages.SSLHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
+                      proxyHeader=(self.messages.SSLHealthCheck
+                                   .ProxyHeaderValueValuesEnum.NONE)),
+                  checkIntervalSec=5,
+                  timeoutSec=5,
+                  healthyThreshold=2,
+                  unhealthyThreshold=2,
+                  logConfig=expected_log_config),
               project='my-project',
               region='us-west-1'))],)
 

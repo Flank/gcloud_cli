@@ -11,7 +11,13 @@ gcloud alpha compute os\-config patch\-jobs execute \- execute an OS patch on th
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute os\-config patch\-jobs execute\fR \fB\-\-instance\-filter\fR=\fIINSTANCE_FILTER\fR [\fB\-\-apt\-dist\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dry\-run\fR] [\fB\-\-duration\fR=\fIDURATION\fR] [\fB\-\-reboot\-config\fR=\fIREBOOT_CONFIG\fR] [\fB\-\-retry\fR] [\fB\-\-post\-patch\-linux\-executable\fR=\fIPOST_PATCH_LINUX_EXECUTABLE\fR\ \fB\-\-post\-patch\-linux\-success\-codes\fR=[\fIPOST_PATCH_LINUX_SUCCESS_CODES\fR,...]] [\fB\-\-post\-patch\-windows\-executable\fR=\fIPOST_PATCH_WINDOWS_EXECUTABLE\fR\ \fB\-\-post\-patch\-windows\-success\-codes\fR=[\fIPOST_PATCH_WINDOWS_SUCCESS_CODES\fR,...]] [\fB\-\-pre\-patch\-linux\-executable\fR=\fIPRE_PATCH_LINUX_EXECUTABLE\fR\ \fB\-\-pre\-patch\-linux\-success\-codes\fR=[\fIPRE_PATCH_LINUX_SUCCESS_CODES\fR,...]] [\fB\-\-pre\-patch\-windows\-executable\fR=\fIPRE_PATCH_WINDOWS_EXECUTABLE\fR\ \fB\-\-pre\-patch\-windows\-success\-codes\fR=[\fIPRE_PATCH_WINDOWS_SUCCESS_CODES\fR,...]] [\fB\-\-windows\-classifications\fR=[\fIWINDOWS_CLASSIFICATIONS\fR,...]\ \fB\-\-windows\-excludes\fR=[\fIWINDOWS_EXCLUDES\fR,...]] [\fB\-\-yum\-excludes\fR=[\fIYUM_EXCLUDES\fR,...]\ \fB\-\-yum\-minimal\fR\ \fB\-\-yum\-security\fR] [\fB\-\-zypper\-categories\fR=[\fIZYPPER_CATEGORIES\fR,...]\ \fB\-\-zypper\-severities\fR=[\fIZYPPER_SEVERITIES\fR,...]\ \fB\-\-zypper\-with\-optional\fR\ \fB\-\-zypper\-with\-update\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute os\-config patch\-jobs execute\fR (\fB\-\-instance\-filter\fR=\fIINSTANCE_FILTER\fR\ |\ \fB\-\-instance\-filter\-all\fR\ |\ \fB\-\-instance\-filter\-group\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-instance\-filter\-name\-prefixes\fR=[\fIINSTANCE_FILTER_NAME_PREFIXES\fR,...]\ \fB\-\-instance\-filter\-names\fR=[\fIINSTANCE_FILTER_NAMES\fR,...]\ \fB\-\-instance\-filter\-zones\fR=[\fIINSTANCE_FILTER_ZONES\fR,...]) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-dry\-run\fR] [\fB\-\-duration\fR=\fIDURATION\fR] [\fB\-\-reboot\-config\fR=\fIREBOOT_CONFIG\fR] [\fB\-\-retry\fR] [\fB\-\-apt\-dist\fR\ \fB\-\-apt\-excludes\fR=[\fIAPT_EXCLUDES\fR,...]\ |\ \fB\-\-apt\-exclusive\-packages\fR=[\fIAPT_EXCLUSIVE_PACKAGES\fR,...]] [\fB\-\-post\-patch\-linux\-executable\fR=\fIPOST_PATCH_LINUX_EXECUTABLE\fR\ \fB\-\-post\-patch\-linux\-success\-codes\fR=[\fIPOST_PATCH_LINUX_SUCCESS_CODES\fR,...]] [\fB\-\-post\-patch\-windows\-executable\fR=\fIPOST_PATCH_WINDOWS_EXECUTABLE\fR\ \fB\-\-post\-patch\-windows\-success\-codes\fR=[\fIPOST_PATCH_WINDOWS_SUCCESS_CODES\fR,...]] [\fB\-\-pre\-patch\-linux\-executable\fR=\fIPRE_PATCH_LINUX_EXECUTABLE\fR\ \fB\-\-pre\-patch\-linux\-success\-codes\fR=[\fIPRE_PATCH_LINUX_SUCCESS_CODES\fR,...]] [\fB\-\-pre\-patch\-windows\-executable\fR=\fIPRE_PATCH_WINDOWS_EXECUTABLE\fR\ \fB\-\-pre\-patch\-windows\-success\-codes\fR=[\fIPRE_PATCH_WINDOWS_SUCCESS_CODES\fR,...]] [\fB\-\-windows\-exclusive\-patches\fR=[\fIWINDOWS_EXCLUSIVE_PATCHES\fR,...]\ |\ \fB\-\-windows\-classifications\fR=[\fIWINDOWS_CLASSIFICATIONS\fR,...]\ \fB\-\-windows\-excludes\fR=[\fIWINDOWS_EXCLUDES\fR,...]] [\fB\-\-yum\-exclusive\-packages\fR=[\fIYUM_EXCLUSIVE_PACKAGES\fR,...]\ |\ \fB\-\-yum\-excludes\fR=[\fIYUM_EXCLUDES\fR,...]\ \fB\-\-yum\-minimal\fR\ \fB\-\-yum\-security\fR] [\fB\-\-zypper\-exclusive\-patches\fR=[\fIZYPPER_EXCLUSIVE_PATCHES\fR,...]\ |\ \fB\-\-zypper\-categories\fR=[\fIZYPPER_CATEGORIES\fR,...]\ \fB\-\-zypper\-severities\fR=[\fIZYPPER_SEVERITIES\fR,...]\ \fB\-\-zypper\-with\-optional\fR\ \fB\-\-zypper\-with\-update\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Execute an OS patch on the specified VM instances.
 
 
 
@@ -19,12 +25,62 @@ gcloud alpha compute os\-config patch\-jobs execute \- execute an OS patch on th
 
 .RS 2m
 .TP 2m
+
+Filters for selecting which instances to patch: Exactly one of these must be
+specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-instance\-filter\fR=\fIINSTANCE_FILTER\fR
-Filter for selecting the instances to patch. Patching supports the same filter
-mechanisms as \f5gcloud compute instances list\fR, allowing one to patch
-specific instances by name, zone, label, or other criteria.
+(DEPRECATED) Filter expression for selecting the instances to patch. Patching
+supports the same filter mechanisms as \f5gcloud compute instances list\fR,
+allowing one to patch specific instances by name, zone, label, or other
+criteria.
+
+.RS 2m
+\-\-instance\-filter is deprecated; use individual filter flags instead. See
+the command help text for more details.
+.RE
+
+.TP 2m
+\fB\-\-instance\-filter\-all\fR
+A filter that targets all instances in the project.
+
+.TP 2m
+
+Individual filters. The targeted instances must meet all criteria specified.
 
 
+.RS 2m
+.TP 2m
+\fB\-\-instance\-filter\-group\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A filter that represents a label set. Targeted instances must have all specified
+labels in this set. For example, "env=prod and app=web".
+
+This flag can be repeated. Targeted instances must have at least one of these
+label sets. This allows targeting of disparate groups, for example, "(env=prod
+and app=web) or (env=staging and app=web)".
+
+.TP 2m
+\fB\-\-instance\-filter\-name\-prefixes\fR=[\fIINSTANCE_FILTER_NAME_PREFIXES\fR,...]
+A filter that targets instances whose name starts with one of these prefixes.
+For example, "prod\-".
+
+.TP 2m
+\fB\-\-instance\-filter\-names\fR=[\fIINSTANCE_FILTER_NAMES\fR,...]
+A filter that targets instances of any of the specified names. Instances are
+specified by the URI in the form "zones/<ZONE>/instances/<INSTANCE_NAME>",
+"projects/<PROJECT_ID>/zones/<ZONE>/instances/<INSTANCE_NAME>", or
+"https://www.googleapis.com/compute/v1/projects/<PROJECT_ID>/zones/<ZONE>/instances/<INSTANCE_NAME>".
+
+.TP 2m
+\fB\-\-instance\-filter\-zones\fR=[\fIINSTANCE_FILTER_ZONES\fR,...]
+A filter that targets instances in any of the specified zones. Leave empty to
+target instances in any zone.
+
+
+.RE
+.RE
 .RE
 .sp
 
@@ -32,24 +88,16 @@ specific instances by name, zone, label, or other criteria.
 
 .RS 2m
 .TP 2m
-
-Settings for machines running Apt:
-
-.RS 2m
-.TP 2m
-\fB\-\-apt\-dist\fR
-If specified, machines running Apt use the \f5apt\-get dist\-upgrade\fR command;
-otherwise the \f5apt\-get upgrade\fR command is used.
-
-.RE
-.sp
-.TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Textual description of the patch job.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Display name for this patch job. This does not have to be unique.
 
 .TP 2m
 \fB\-\-dry\-run\fR
@@ -90,6 +138,33 @@ Never reboot the machine after the update completes.
 Specifies whether to attempt to retry, within the duration window, if patching
 initially fails. If omitted, the agent uses its default retry strategy.
 
+.TP 2m
+
+Settings for machines running Apt:
+
+.RS 2m
+.TP 2m
+\fB\-\-apt\-dist\fR
+If specified, machines running Apt use the \f5apt\-get dist\-upgrade\fR command;
+otherwise the \f5apt\-get upgrade\fR command is used.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-apt\-excludes\fR=[\fIAPT_EXCLUDES\fR,...]
+List of packages to exclude from update.
+
+.TP 2m
+\fB\-\-apt\-exclusive\-packages\fR=[\fIAPT_EXCLUSIVE_PACKAGES\fR,...]
+An exclusive list of packages to be updated. These are the only packages that
+will be updated. If these packages are not installed, they will be ignored.
+
+.RE
+.RE
+.sp
 .TP 2m
 
 Post\-patch step settings for Linux machines:
@@ -190,7 +265,17 @@ run. The default exit code for success is 0.
 .sp
 .TP 2m
 
-Settings for machines running Windows:
+Settings for machines running Windows: At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-windows\-exclusive\-patches\fR=[\fIWINDOWS_EXCLUSIVE_PATCHES\fR,...]
+An exclusive list of KBs to be updated. These are the only patches that will be
+updated.
+
+.TP 2m
+
+Windows patch options
 
 .RS 2m
 .TP 2m
@@ -208,10 +293,21 @@ must be one of: \fBcritical\fR, \fBsecurity\fR, \fBdefinition\fR, \fBdriver\fR,
 Optional list of KBs to exclude from the update operation.
 
 .RE
+.RE
 .sp
 .TP 2m
 
-Settings for machines running Yum:
+Settings for machines running Yum: At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-yum\-exclusive\-packages\fR=[\fIYUM_EXCLUSIVE_PACKAGES\fR,...]
+An exclusive list of packages to be updated. These are the only packages that
+will be updated. If these packages are not installed, they will be ignored.
+
+.TP 2m
+
+Yum patch options
 
 .RS 2m
 .TP 2m
@@ -231,10 +327,21 @@ If specified, machines running Yum append the \f5\-\-security\fR flag to the
 patch command.
 
 .RE
+.RE
 .sp
 .TP 2m
 
-Settings for machines running Zypper:
+Settings for machines running Zypper: At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-zypper\-exclusive\-patches\fR=[\fIZYPPER_EXCLUSIVE_PATCHES\fR,...]
+An exclusive list of patches to be updated. These are the only patches that will
+be installed using the 'zypper patch patch:<patch_name>' command.
+
+.TP 2m
+
+Zypper patch options
 
 .RS 2m
 .TP 2m
@@ -260,6 +367,7 @@ If specified, machines running Zypper add the \f5\-\-with\-update\fR flag to
 
 .RE
 .RE
+.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
@@ -267,50 +375,73 @@ If specified, machines running Zypper add the \f5\-\-with\-update\fR flag to
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To patch all instances in the current project, use \-\-instance\-filter="" (or
-equivalently, \-\-instance\-filter="id=\fB"):
+To start a patch job named \f5my patch job\fR that patches all instances in the
+current project, run:
 
 .RS 2m
 $ gcloud alpha compute os\-config patch\-jobs execute \e
-\-\-instance\-filter=""
+\-\-display\-name="my patch job" \-\-instance\-filter\-all
 .RE
 
-To patch the instances named 'my\-instance1' and 'my\-instance2', run:
-
-.RS 2m
-$ gcloud alpha compute os\-config patch\-jobs execute \e
-\-\-instance\-filter="name=my\-instance\-1 OR name=my\-instance\-2"
-.RE
-
-To patch all instances in the 'us\-central1\-b' and 'europe\-west1\-d' zones,
+To patch an instance named \f5my\-instance\-1\fR in the \f5us\-east1\-b\fR zone,
 run:
 
 .RS 2m
 $ gcloud alpha compute os\-config patch\-jobs execute \e
-\-\-instance\-filter="zone:(us\-central1\-b europe\-west1\-d)"
+\-\-instance\-filter\-names=          \e
+"zones/us\-east1\-b/instances/my\-instance\-1"
 .RE
 
-To patch all instances where their 'env' label is 'test', run:
+To patch all instances in the \f5us\-central1\-b\fR and \f5europe\-west1\-d\fR
+zones, run:
 
 .RS 2m
 $ gcloud alpha compute os\-config patch\-jobs execute \e
-\-\-instance\-filter="labels.env=test"
+\-\-instance\-filter\-zones="us\-central1\-b,europe\-west1\-d"
 .RE
 
-To apply security and critical patches to a Windows instance named
-\'my\-instance', run:
+To patch all instances where the \f5env\fR label is \f5test\fR and \f5app\fR
+label is \f5web\fR, run:
 
 .RS 2m
 $ gcloud alpha compute os\-config patch\-jobs execute \e
-\-\-instance\-filter="name=my\-instance" \e
+\-\-instance\-filter\-group\-labels="env=test,app=web"
+.RE
+
+To patch all instances where the \f5env\fR label is \f5test\fR and \f5app\fR
+label is \f5web\fR or where the \f5env\fR label is \f5staging\fR and \f5app\fR
+label is \f5web\fR, run:
+
+.RS 2m
+$ gcloud alpha compute os\-config patch\-jobs execute           \e
+\-\-instance\-filter\-group\-labels="env=test,app=web"           \e
+\-\-instance\-filter\-group\-labels="env=staging,app=web"
+.RE
+
+To apply security and critical patches to Windows instances with the prefix
+\f5windows\-\fR in the instance name, run:
+
+.RS 2m
+$ gcloud alpha compute os\-config patch\-jobs execute \e
+\-\-instance\-filter\-name\-prefixes="windows\-"           \e
 \-\-windows\-classifications=SECURITY,CRITICAL
+.RE
+
+To update only \f5KB4339284\fR on Windows instances with the prefix
+\f5windows\-\fR in the instance name, run:
+
+.RS 2m
+$ gcloud alpha compute os\-config patch\-jobs execute \e
+\-\-instance\-filter\-name\-prefixes="windows\-"           \e
+\-\-windows\-exclusive\-patches=KB4339284
 .RE
 
 To patch all instances in the current project and specify scripts to run
@@ -318,21 +449,28 @@ pre\-patch and post\-patch, run:
 
 .RS 2m
 $ gcloud alpha compute os\-config patch\-jobs execute \e
-\-\-instance\-filter="" \e
-\-\-pre\-patch\-linux\-executable="/bin/my\-script" \e
-\-\-pre\-patch\-linux\-success\-codes=0,200 \e
-\-\-pre\-patch\-windows\-executable="C:\e\eUsers\e\euser\e\etest\-script.ps1" \e
-\-\-post\-patch\-linux\-executable="gs://my\-bucket/my\-linux\-script#12345" \e
-\-\-post\-patch\-windows\-executable="gs://my\-bucket/my\-windows\-script#67890"
+\-\-instance\-filter\-all           \e
+\-\-pre\-patch\-linux\-executable="/bin/my\-script"           \e
+\-\-pre\-patch\-linux\-success\-codes=0,200           \e
+\-\-pre\-patch\-windows\-executable="C:\eUsers\euser\etest\-script.ps1" \e
+          \e
+\-\-post\-patch\-linux\-executable="gs://my\-bucket/my\-linux\-script#12\e
+345"           \e
+    \-\-post\-patch\-windows\-executable="gs://my\-bucket/my\-windows\-scrip\e
+t#67890"
 .RE
 
 
-\fR
 
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud compute os\-config patch\-jobs execute
+$ gcloud beta compute os\-config patch\-jobs execute
+.RE
 

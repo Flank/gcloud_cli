@@ -1,0 +1,90 @@
+
+.TH "GCLOUD_ALPHA_SCC_NOTIFICATIONS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha scc notifications delete \- delete a Cloud Security Command Center notification config
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha scc notifications delete\fR \fINOTIFICATION_CONFIG_ID\fR [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Delete a Cloud Security Command Center notification config.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINOTIFICATION_CONFIG_ID\fR
+The ID of the notification config. Formatted as
+"organizations/123/notificationConfigs/456" or just "456".
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The organization where the notification config resides. Formatted as
+"organizations/123" or just "123". Required if notificationConfigId does not
+contain organization information.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBsecuritycenter/v1\fR API. The full documentation for
+this API can be found at:
+https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview
+
+
+
+.SH "EXAMPLES"
+
+Delete notification config 'my\-config' from organization 123456
+
+.RS 2m
+$ gcloud alpha scc notifications delete my\-config \e
+    \-\-organization=123456
+.RE
+
+.RS 2m
+$ gcloud alpha scc notifications delete \e
+    organization/123456/notificationConfigs/my\-config
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

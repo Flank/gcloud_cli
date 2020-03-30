@@ -11,7 +11,7 @@ gcloud alpha run services update \- update Cloud Run environment variables and o
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha run services update\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-args\fR=[\fIARG\fR,...]] [\fB\-\-async\fR] [\fB\-\-command\fR=[\fICOMMAND\fR,...]] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-vpc\-connector\fR\ \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-cpu\fR=\fICPU\fR\ \fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR\ \fB\-\-[no\-]use\-http2\fR\ \fB\-\-clear\-config\-maps\fR\ |\ \fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]\ \fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-secrets\fR\ |\ \fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]\ \fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha run services update\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-args\fR=[\fIARG\fR,...]] [\fB\-\-async\fR] [\fB\-\-command\fR=[\fICOMMAND\fR,...]] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-vpc\-connector\fR\ \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-[no\-]use\-http2\fR\ \fB\-\-clear\-config\-maps\fR\ |\ \fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]\ \fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-secrets\fR\ |\ \fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]\ \fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -71,13 +71,22 @@ concurrency of 0 or unspecified indicates any number of concurrent requests are
 allowed. To unset this field, provide the special value \f5default\fR.
 
 .TP 2m
+\fB\-\-cpu\fR=\fICPU\fR
+Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
+
+.TP 2m
 \fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR
-The maximum number of container instances of the Service to run or 'default' to
-remove any maximum.
+The maximum number of container instances of the Service to run. Use 'default'
+to unset the limit and use the platform default.
 
 .TP 2m
 \fB\-\-memory\fR=\fIMEMORY\fR
 Set a memory limit. Ex: 1Gi, 512Mi.
+
+.TP 2m
+\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR
+The minimum number of container instances of the Service to run or 'default' to
+remove any minimum.
 
 .TP 2m
 \fB\-\-platform\fR=\fIPLATFORM\fR
@@ -109,6 +118,17 @@ connecting.
 Container port to receive requests at. Also sets the $PORT environment variable.
 Must be a number between 1 and 65535, inclusive. To unset this field, pass the
 special value "default".
+
+.TP 2m
+\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
+The service account associated with the revision of the service. The service
+account represents the identity of the running revision, and determines what
+permissions the revision has. For the managed platform, this is the email
+address of an IAM service account. For the Kubernetes\-based platforms (gke,
+kubernetes), this is the name of a Kubernetes service account in the same
+namespace as the service. If not provided, the revision will use the default
+service account of the project, or default Kubernetes namespace service account
+respectively.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR
@@ -173,6 +193,8 @@ $ gcloud alpha run services update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 .RE
 .sp
@@ -210,13 +232,6 @@ Specify the suffix of the revision name. Revision names always start with the
 service name automatically. For example, specifying [\-\-revision\-suffix=v1]
 for a service named 'helloworld', would lead to a revision named
 \'helloworld\-v1'.
-
-.TP 2m
-\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
-Email address of the IAM service account associated with the revision of the
-service. The service account represents the identity of the running revision,
-and determines what permissions the revision has. If not provided, the revision
-will use the project's default service account.
 
 .TP 2m
 \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR
@@ -272,15 +287,6 @@ Visible only within the cluster.
 .RE
 .sp
 
-
-.TP 2m
-\fB\-\-cpu\fR=\fICPU\fR
-Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
-
-.TP 2m
-\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR
-The minimum number of container instances of the Service to run or 'default' to
-remove any minimum.
 
 .TP 2m
 \fB\-\-[no\-]use\-http2\fR
@@ -444,8 +450,9 @@ $KUBECONFIG is unset, this defaults to \f5~/.kube/config\fR.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

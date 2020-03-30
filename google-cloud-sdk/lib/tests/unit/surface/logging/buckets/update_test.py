@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.logging import base
@@ -38,44 +39,40 @@ class BucketsUpdateTest(base.LoggingTestBase):
         expected_bucket)
     self.RunLogging(
         'buckets update my-bucket --location=global --retention-days=2',
-        calliope_base.ReleaseTrack.ALPHA)
+        calliope_base.ReleaseTrack.BETA)
 
   def testUpdateSuccessAllProperties(self):
     expected_bucket = self.msgs.LogBucket(
-        retentionDays=2, description='description',
-        displayName='displayName')
+        retentionDays=2, description='description')
     self.mock_client_v2.projects_locations_buckets.Patch.Expect(
         self.msgs.LoggingProjectsLocationsBucketsPatchRequest(
             name='projects/my-project/locations/global/buckets/my-bucket',
-            updateMask='retention_days,display_name,description',
-            logBucket=expected_bucket),
+            updateMask='retention_days,description', logBucket=expected_bucket),
         expected_bucket)
     self.RunLogging(
         'buckets update my-bucket --location=global --retention-days=2 '
-        '--description=description --display-name=displayName',
-        calliope_base.ReleaseTrack.ALPHA)
+        '--description=description',
+        calliope_base.ReleaseTrack.BETA)
 
   def testUpdateSuccessAllDefaultProperties(self):
     expected_bucket = self.msgs.LogBucket(
-        retentionDays=0, description='',
-        displayName='')
+        retentionDays=0, description='')
     self.mock_client_v2.projects_locations_buckets.Patch.Expect(
         self.msgs.LoggingProjectsLocationsBucketsPatchRequest(
             name='projects/my-project/locations/global/buckets/my-bucket',
-            updateMask='retention_days,display_name,description',
-            logBucket=expected_bucket),
+            updateMask='retention_days,description', logBucket=expected_bucket),
         expected_bucket)
     self.RunLogging(
         'buckets update my-bucket --location=global --retention-days=0 '
-        '--description= --display-name=',
-        calliope_base.ReleaseTrack.ALPHA)
+        '--description=',
+        calliope_base.ReleaseTrack.BETA)
 
   def testUpdateMissingRequiredFlag(self):
     with self.AssertRaisesExceptionRegexp(exceptions.MinimumArgumentException,
                                           r'Please specify.*'):
       self.RunLogging(
           'buckets update my-bucket --location=global',
-          calliope_base.ReleaseTrack.ALPHA)
+          calliope_base.ReleaseTrack.BETA)
 
   def testUpdateNoPerms(self):
     expected_bucket = self.msgs.LogBucket(retentionDays=2)
@@ -87,18 +84,40 @@ class BucketsUpdateTest(base.LoggingTestBase):
         exception=http_error.MakeHttpError(403))
     self.RunWithoutPerms(
         'buckets update my-bucket --location=global --retention-days=2',
-        calliope_base.ReleaseTrack.ALPHA)
+        calliope_base.ReleaseTrack.BETA)
 
   def testUpdateNoProject(self):
     self.RunWithoutProject(
         'buckets update my-bucket --location=global --retention-days=2',
-        calliope_base.ReleaseTrack.ALPHA)
+        calliope_base.ReleaseTrack.BETA)
 
   def testUpdateNoAuth(self):
     self.RunWithoutAuth(
         'buckets update my-bucket --location=global --retention-days=2',
+        calliope_base.ReleaseTrack.BETA)
+
+
+class BucketsUpdateTestAlpha(base.LoggingTestBase):
+
+  def testUpdateLockedSuccess(self):
+    expected_bucket = self.msgs.LogBucket(locked=True)
+    self.mock_client_v2.projects_locations_buckets.Patch.Expect(
+        self.msgs.LoggingProjectsLocationsBucketsPatchRequest(
+            name='projects/my-project/locations/global/buckets/my-bucket',
+            updateMask='locked',
+            logBucket=expected_bucket),
+        expected_bucket)
+    self.WriteInput('Y')
+    self.RunLogging(
+        'buckets update my-bucket --location=global --locked',
         calliope_base.ReleaseTrack.ALPHA)
 
+  def testUpdateLockedAborted(self):
+    with self.AssertRaisesExceptionMatches(console_io.OperationCancelledError,
+                                           'Aborted by user.'):
+      self.RunLogging(
+          'buckets update my-bucket --location=global --locked',
+          calliope_base.ReleaseTrack.ALPHA)
 
 if __name__ == '__main__':
   test_case.main()

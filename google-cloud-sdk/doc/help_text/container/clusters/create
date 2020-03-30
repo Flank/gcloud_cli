@@ -16,13 +16,15 @@ SYNOPSIS
         [--enable-cloud-monitoring] [--enable-cloud-run-alpha]
         [--enable-intra-node-visibility] [--enable-ip-alias]
         [--enable-kubernetes-alpha] [--enable-legacy-authorization]
-        [--enable-network-policy] [--enable-stackdriver-kubernetes]
-        [--enable-vertical-pod-autoscaling] [--image-type=IMAGE_TYPE]
-        [--issue-client-certificate] [--labels=[KEY=VALUE,...]]
-        [--local-ssd-count=LOCAL_SSD_COUNT]
+        [--enable-network-policy] [--enable-shielded-nodes]
+        [--enable-stackdriver-kubernetes] [--enable-vertical-pod-autoscaling]
+        [--image-type=IMAGE_TYPE] [--issue-client-certificate]
+        [--labels=[KEY=VALUE,...]] [--local-ssd-count=LOCAL_SSD_COUNT]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--max-nodes-per-pool=MAX_NODES_PER_POOL]
         [--max-pods-per-node=MAX_PODS_PER_NODE]
+        [--max-surge-upgrade=MAX_SURGE_UPGRADE]
+        [--max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
@@ -32,6 +34,8 @@ SYNOPSIS
         [--services-ipv4-cidr=CIDR] [--services-secondary-range-name=NAME]
         [--shielded-integrity-monitoring] [--shielded-secure-boot]
         [--subnetwork=SUBNETWORK] [--tags=TAG,[TAG,...]]
+        [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
+        [--workload-pool=WORKLOAD_POOL]
         [[--enable-autoprovisioning
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
           | [--max-cpu=MAX_CPU --max-memory=MAX_MEMORY
@@ -55,6 +59,7 @@ SYNOPSIS
         [--password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME]
         [--region=REGION | --zone=ZONE, -z ZONE]
+        [--reservation=RESERVATION --reservation-affinity=RESERVATION_AFFINITY]
         [--scopes=[SCOPE,...];
           default="gke-default" --service-account=SERVICE_ACCOUNT]
         [GCLOUD_WIDE_FLAG ...]
@@ -183,7 +188,7 @@ FLAGS
         resource ID in the format of
         projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
         For more information, see
-        <https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets>.
+        https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets.
 
      --default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE
         The default max number of pods per node for node pools in the cluster.
@@ -299,6 +304,12 @@ FLAGS
         first be enabled on the master by using
         --update-addons=NetworkPolicy=ENABLED flag.
 
+     --enable-shielded-nodes
+        Enable Shielded Nodes for this cluster. Enabling Shielded Nodes will
+        enable a more secure Node credential bootstrapping implementation.
+        Starting with version 1.18, clusters will have shielded GKE nodes by
+        default.
+
      --enable-stackdriver-kubernetes
         Enable Stackdriver Kubernetes monitoring and logging.
 
@@ -374,6 +385,34 @@ FLAGS
         --default-max-pods-per-node flag set at the cluster level.
 
         Must be used in conjunction with '--enable-ip-alias'.
+
+     --max-surge-upgrade=MAX_SURGE_UPGRADE
+        Number of extra (surge) nodes to be created on each upgrade of a node
+        pool.
+
+        Specifies the number of extra (surge) nodes to be created during this
+        node pool's upgrades. For example, running the following command will
+        result in creating an extra node each time the node pool is upgraded:
+
+            $ gcloud container clusters create example-cluster \
+                --max-surge-upgrade=1 --max-unavailable-upgrade=0
+
+        Must be used in conjunction with '--max-unavailable-upgrade'.
+
+     --max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE
+        Number of nodes that can be unavailable at the same time on each
+        upgrade of a node pool.
+
+        Specifies the number of nodes that can be unavailable at the same time
+        while this node pool is being upgraded. For example, running the
+        following command will result in having 3 nodes being upgraded in
+        parallel (1 + 2), but keeping always at least 3 (5 - 2) available each
+        time the node pool is upgraded:
+
+            $ gcloud container clusters create example-cluster --num-nodes=5 \
+               --max-surge-upgrade=1      --max-unavailable-upgrade=2
+
+        Must be used in conjunction with '--max-surge-upgrade'.
 
      --metadata=KEY=VALUE,[KEY=VALUE,...]
         Compute Engine metadata to be made available to the guest operating
@@ -552,6 +591,34 @@ FLAGS
         https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create
         for examples.
 
+     --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
+        Type of metadata server available to pods running in the node pool.
+        WORKLOAD_METADATA_FROM_NODE must be one of:
+
+         GCE_METADATA
+            Pods running in this node pool have access to the node's underlying
+            Compute Engine Metadata Server.
+         GKE_METADATA
+            Run the Kubernetes Engine Metadata Server on this node. The
+            Kubernetes Engine Metadata Server exposes a metadata API to
+            workloads that is compatible with the V1 Compute Metadata APIs
+            exposed by the Compute Engine and App Engine Metadata Servers. This
+            feature can only be enabled if Workload Identity is enabled at the
+            cluster level.
+
+     --workload-pool=WORKLOAD_POOL
+        Enable Workload Identity on the cluster.
+
+        When enabled, Kubernetes service accounts will be able to act as Cloud
+        IAM Service Accounts, through the provided workload pool.
+
+        Currently, the only accepted workload pool is the workload pool of the
+        Cloud project containing the cluster, PROJECT_NAME.svc.id.goog.
+
+        For more information on Workload Identity, see
+
+            https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+
      Node autoprovisioning
 
        --enable-autoprovisioning
@@ -567,7 +634,8 @@ FLAGS
             Path of the JSON/YAML file which contains information about the
             cluster's node autoprovisioning configuration. Currently it
             contains a list of resource limits, identity defaults for
-            autoprovisioning and node locations for autoprovisioning.
+            autoprovisioning, node upgrade settings, node management settings,
+            minimum cpu platform, and node locations for autoprovisioning.
 
             Resource limits are specified in the field 'resourceLimits'. Each
             resource limits definition contains three fields: resourceType,
@@ -580,12 +648,32 @@ FLAGS
 
             Identity default contains at most one of the below fields:
             serviceAccount: The Google Cloud Platform Service Account to be
-            used by node VMs in autoprovisioined node pools. If not specified,
-            the project default service account is used. scopes: A list of
-            scopes be used by node instances in autoprovisioined node pools.
+            used by node VMs in autoprovisioned node pools. If not specified,
+            the project's default service account is used. scopes: A list of
+            scopes to be used by node instances in autoprovisioned node pools.
             Multiple scopes can be specified, separated by commas. For
             information on defaults, look at:
             https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
+
+            Note: Node Upgrade settings are implemented only in Beta and Alpha.
+            Node Upgrade settings are specified under the field
+            'upgradeSettings', which has the following fields: maxSurgeUpgrade:
+            Number of extra (surge) nodes to be created on each upgrade of an
+            autoprovisioned node pool. maxUnavailableUpgrade: Number of nodes
+            that can be unavailable at the same time on each upgrade of an
+            autoprovisioned node pool.
+
+            Note: Node Management settings are implemented only in Beta and
+            Alpha. Node Management settings are specified under the field
+            'nodeManagement', which has the following fields:
+            enableAutoUpgrade: A boolean field that indicates if node
+            autoupgrade is enabled for autoprovisioned node pools.
+            enableAutoRepair: A boolean field that indicates if node autorepair
+            is enabled for autoprovisioned node pools.
+
+            minCpuPlatform: If specified, new autoprovisioned nodes will be
+            scheduled on host with specified CPU architecture or a newer one.
+            Note: Min CPU platform can only be specified in Beta and Alpha.
 
             Autoprovisioning locations is a set of zones where new node pools
             can be created by Autoprovisioning. Autoprovisioning locations are
@@ -628,14 +716,14 @@ FLAGS
            Flags to specify identity for autoprovisioned nodes:
 
              --autoprovisioning-scopes=[SCOPE,...]
-                The scopes be used by node instances in autoprovisioined node
+                The scopes be used by node instances in autoprovisioned node
                 pools. Multiple scopes can be specified, separated by commas.
                 For information on defaults, look at:
                 https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
 
              --autoprovisioning-service-account=AUTOPROVISIONING_SERVICE_ACCOUNT
                 The Google Cloud Platform Service Account to be used by node
-                VMs in autoprovisioined node pools. If not specified, the
+                VMs in autoprovisioned node pools. If not specified, the
                 project default service account is used.
 
            Arguments to set limits on accelerators:
@@ -878,6 +966,16 @@ FLAGS
           Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
+     Specifies the reservation for the default initial node pool.
+
+       --reservation=RESERVATION
+          The name of the reservation, required when
+          --reservation-affinity=specific.
+
+       --reservation-affinity=RESERVATION_AFFINITY
+          The type of the reservation for the default initial node pool.
+          RESERVATION_AFFINITY must be one of: any, none, specific.
+
      Options to specify the node identity.
 
        Scopes options.
@@ -950,8 +1048,14 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a cluster with the default configuration, run:
+
+        $ gcloud container clusters create sample-cluster
 
 NOTES
     These variants are also available:

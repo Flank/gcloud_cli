@@ -104,11 +104,7 @@ class HealthChecksUpdateHttpsTest(
               project='my-project'))],
     )
 
-    warning_msg = ('WARNING: The health-checks update https command will soon '
-                   'require either a --global or --region flag.\n'
-                  ) if self.track == calliope_base.ReleaseTrack.GA else ''
     self.AssertErrEquals(
-        warning_msg +
         'No change requested; skipping update for [my-health-check].\n',
         normalize_space=True)
 
@@ -1021,16 +1017,6 @@ class HealthChecksUpdateHttpsBetaTest(HealthChecksUpdateHttpsTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
-  def global_flag(self):
-    return ' --global'
-
-
-class HealthChecksUpdateHttpsAlphaTest(HealthChecksUpdateHttpsBetaTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
-
   @parameterized.named_parameters(
       ('DisableLogging', '--no-enable-logging', False),
       ('EnableLogging', '--enable-logging', True))
@@ -1105,11 +1091,18 @@ class HealthChecksUpdateHttpsAlphaTest(HealthChecksUpdateHttpsBetaTest):
     )
 
 
-class RegionHealthChecksCreateHttpsBetaTest(test_base.BaseTest):
+class HealthChecksUpdateHttpsAlphaTest(HealthChecksUpdateHttpsBetaTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
+
+
+class RegionHealthChecksCreateHttpsTest(test_base.BaseTest,
+                                        parameterized.TestCase):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testUriSupport(self):
     # This is the same as testHostOption, but uses a full URI.
@@ -1191,6 +1184,91 @@ class RegionHealthChecksCreateHttpsBetaTest(test_base.BaseTest):
 
     # By default, the resource should not be displayed
     self.assertFalse(self.GetOutput())
+
+
+class RegionHealthChecksCreateHttpsBetaTest(RegionHealthChecksCreateHttpsTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+
+  @parameterized.named_parameters(
+      ('DisableLogging', '--no-enable-logging', False),
+      ('EnableLogging', '--enable-logging', True))
+  def testLogConfig(self, enable_logs_flag, enable_logs):
+
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTPS,
+                httpsHealthCheck=self.messages.HTTPSHealthCheck(
+                    host='www.example.com', port=80))
+        ],
+        [],
+    ])
+
+    self.Run("""
+    compute health-checks update https my-health-check --region us-west-1 {0}"""
+             .format(enable_logs_flag))
+
+    expected_log_config = self.messages.HealthCheckLogConfig(enable=enable_logs)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTPS,
+                  httpsHealthCheck=self.messages.HTTPSHealthCheck(
+                      host='www.example.com', port=80),
+                  logConfig=expected_log_config),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testEnableToDisableLogConfig(self):
+    log_config = self.messages.HealthCheckLogConfig(enable=True)
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTPS,
+                httpsHealthCheck=self.messages.HTTPSHealthCheck(
+                    host='www.example.com', port=80),
+                logConfig=log_config)
+        ],
+        [],
+    ])
+
+    self.Run("""compute health-checks update https my-health-check
+              --region us-west-1 --no-enable-logging""")
+
+    expected_log_config = self.messages.HealthCheckLogConfig(enable=False)
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTPS,
+                  httpsHealthCheck=self.messages.HTTPSHealthCheck(
+                      host='www.example.com', port=80),
+                  logConfig=expected_log_config),
+              project='my-project',
+              region='us-west-1'))],
+    )
 
 
 class RegionHealthChecksCreateHttpsAlphaTest(

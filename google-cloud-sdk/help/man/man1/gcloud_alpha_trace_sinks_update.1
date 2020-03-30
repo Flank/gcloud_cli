@@ -1,0 +1,83 @@
+
+.TH "GCLOUD_ALPHA_TRACE_SINKS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha trace sinks update \- updates a sink
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha trace sinks update\fR \fISINK_NAME\fR \fIDESTINATION\fR [\fB\-\-project\fR=\fIPROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Changes the \fB[destination]\fR associated with a sink. The new
+destination must already exist and Stackdriver Trace must have permission to
+write to it.
+
+Trace spans are exported to the new destination in a few minutes.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISINK_NAME\fR
+The name of the sink to update.
+
+.TP 2m
+\fIDESTINATION\fR
+The new destination for the sink. The destination must be a fully qualified
+BigQuery resource name. The destination can be for the same Google Cloud project
+or for a different Google Cloud project in the same organization.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT\fR
+Update a sink associated with this project. This will override the default
+project.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+$ gcloud alpha trace sinks update my\-sink.RS 2m
+bigquery.googleapis.com/projects/my\-project/datasets/my_new_dataset
+
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

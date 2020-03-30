@@ -27,9 +27,10 @@ from tests.lib.surface.sql import base
 class _BaseUsersCreateTest(object):
 
   def testCreate(self):
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Insert.Expect(
         msgs.User(
+            kind='sql#user',
             project=self.Project(),
             instance='my_instance',
             name='my_username',
@@ -38,7 +39,8 @@ class _BaseUsersCreateTest(object):
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
-        msgs.Operation(name='op_name', status='DONE'))
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql users create --instance my_instance '
              'my_username --host my_host --password my_password')
     self.AssertOutputEquals('')
@@ -47,26 +49,28 @@ class _BaseUsersCreateTest(object):
 
   # TODO(b/110486599): Remove this when the argument is removed.
   def testPositionalHostError(self):
-    with self.assertRaisesRegex(cli_test_base.MockArgumentError,
-                                'Positional argument deprecated_host has been '
-                                'removed'):
+    with self.assertRaisesRegex(
+        cli_test_base.MockArgumentError,
+        'Positional argument deprecated_host has been '
+        'removed'):
       self.Run('sql users create --instance my_instance '
                'my_username my_host --password my_password')
 
   def testCreateWithNoHostArgument(self):
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Insert.Expect(
         msgs.User(
+            kind='sql#user',
             project=self.Project(),
             instance='my_instance',
             name='my_username',
             host=None,
-            password='my_password'),
-        msgs.Operation(name='op_name'))
+            password='my_password'), msgs.Operation(name='op_name'))
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
-        msgs.Operation(name='op_name', status='DONE'))
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql users create --instance my_instance '
              'my_username --password my_password')
     self.AssertOutputEquals('')
@@ -74,19 +78,20 @@ class _BaseUsersCreateTest(object):
     self.AssertErrContains('Created user [my_username].')
 
   def testCreateWithHostFlag(self):
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Insert.Expect(
         msgs.User(
+            kind='sql#user',
             project=self.Project(),
             instance='my_instance',
             name='my_username',
             host='my_host',
-            password='my_password'),
-        msgs.Operation(name='op_name'))
+            password='my_password'), msgs.Operation(name='op_name'))
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
-        msgs.Operation(name='op_name', status='DONE'))
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql users create --instance my_instance '
              'my_username --host my_host --password my_password')
     self.AssertOutputEquals('')
@@ -94,15 +99,15 @@ class _BaseUsersCreateTest(object):
     self.AssertErrContains('Created user [my_username].')
 
   def testCreateAsync(self):
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Insert.Expect(
         msgs.User(
+            kind='sql#user',
             project=self.Project(),
             instance='my_instance',
             name='my_username',
             host='my_host',
-            password='my_password'),
-        msgs.Operation(name='op_name'))
+            password='my_password'), msgs.Operation(name='op_name'))
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
@@ -123,7 +128,49 @@ class UsersCreateBetaTest(_BaseUsersCreateTest, base.SqlMockTestBeta):
 
 
 class UsersCreateAlphaTest(_BaseUsersCreateTest, base.SqlMockTestAlpha):
-  pass
+
+  def testCreateIamUser(self):
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
+    self.mocked_client.users.Insert.Expect(
+        msgs.User(
+            kind='sql#user',
+            project=self.Project(),
+            instance='my_instance',
+            name='test@google.com',
+            type=self.messages.User.TypeValueValuesEnum.CLOUD_IAM_USER),
+        msgs.Operation(name='op_name'))
+    self.mocked_client.operations.Get.Expect(
+        msgs.SqlOperationsGetRequest(
+            operation='op_name', project=self.Project()),
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
+    self.Run('sql users create --instance my_instance '
+             'test@google.com --type CLOUD_IAM_USER')
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Creating Cloud SQL user')
+    self.AssertErrContains('Created user [test@google.com].')
+
+  def testCreateIamServiceAccount(self):
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
+    self.mocked_client.users.Insert.Expect(
+        msgs.User(
+            kind='sql#user',
+            project=self.Project(),
+            instance='my_instance',
+            name='sa@iam',
+            type=self.messages.User.TypeValueValuesEnum
+            .CLOUD_IAM_SERVICE_ACCOUNT),
+        msgs.Operation(name='op_name'))
+    self.mocked_client.operations.Get.Expect(
+        msgs.SqlOperationsGetRequest(
+            operation='op_name', project=self.Project()),
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
+    self.Run('sql users create --instance my_instance '
+             'sa@iam --type CLOUD_IAM_SERVICE_ACCOUNT')
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Creating Cloud SQL user')
+    self.AssertErrContains('Created user [sa@iam].')
 
 
 if __name__ == '__main__':

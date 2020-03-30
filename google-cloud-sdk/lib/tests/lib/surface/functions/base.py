@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import encoding
 from apitools.base.py.testing import mock as apitools_mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -37,6 +38,12 @@ NO_PROJECT_RESOURCE_ARG_REGEXP = r'Failed to find attribute \[project\]'
 NO_AUTH_REGEXP = (r'Your current active account \[.*\] does not have any valid '
                   'credentials')
 OP_FAILED_REGEXP = r'OperationError: code=13, message=Operation has failed.'
+STACKDRIVER_LOG_STDERR_TEMPLATE = """\
+For Cloud Build Stackdriver Logs, visit: https://console.cloud.google.com/logs/\
+viewer?project={project}&advancedFilter=resource.type%3Dbuild%0A\
+resource.labels.build_id%3D{build_id}%0A\
+logName%3Dprojects%2F{project}%2Flogs%2Fcloudbuild
+"""
 
 
 class FunctionsTestBase(sdk_test_base.WithFakeAuth,
@@ -55,6 +62,8 @@ class FunctionsTestBase(sdk_test_base.WithFakeAuth,
     self.messages = core_apis.GetMessagesModule('cloudfunctions', 'v1')
     self.track = calliope_base.ReleaseTrack.GA
     self._region = 'us-central1'
+    self._operation_name = 'operations/operation'
+    self._build_id = 'build-123'
     self.StartPatch('time.sleep')
     self.mock_resource_manager_client = apitools_mock.Client(
         core_apis.GetClientClass('cloudresourcemanager', 'v1'),
@@ -88,15 +97,30 @@ class FunctionsTestBase(sdk_test_base.WithFakeAuth,
   def SetRegion(self, region):
     self._region = region
 
+  def GetOperationName(self):
+    return self._operation_name
+
+  def GetBuildId(self):
+    return self._build_id
+
   def _GenerateFailedStatus(self):
     failed_status = self.messages.Status()
     failed_status.code = 13
     failed_status.message = 'Operation has failed.'
     return failed_status
 
+  def _GenerateMetadata(self):
+    operation_metadata = self.messages.OperationMetadataV1()
+    operation_metadata.buildId = self.GetBuildId()
+
+    return encoding.PyValueToMessage(
+        self.messages.Operation.MetadataValue,
+        encoding.MessageToPyValue(operation_metadata))
+
   def _GenerateActiveOperation(self, name):
     operation = self.messages.Operation()
     operation.name = name
+    operation.metadata = self._GenerateMetadata()
     return operation
 
   def _GenerateFailedOperation(self, name):
@@ -104,12 +128,14 @@ class FunctionsTestBase(sdk_test_base.WithFakeAuth,
     operation.name = name
     operation.done = True
     operation.error = self._GenerateFailedStatus()
+    operation.metadata = self._GenerateMetadata()
     return operation
 
   def _GenerateSuccessfulOperation(self, name):
     operation = self.messages.Operation()
     operation.name = name
     operation.done = True
+    operation.metadata = self._GenerateMetadata()
     return operation
 
   def MockRemoveIamPolicy(self, function_name, region=None):

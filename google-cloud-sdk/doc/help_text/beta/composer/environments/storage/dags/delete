@@ -38,8 +38,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To delete the dags in the path path/to/dags, for the environment named
+    environmnet-1 in the location us-east1, run:
+
+        $ gcloud beta composer environments storage dags delete \
+            path/to/dags --environment=environment-1 --location=us-east1
 
 NOTES
     This command is currently in BETA and may change without notice. These

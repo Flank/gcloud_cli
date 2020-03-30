@@ -26,8 +26,9 @@ gcloud beta dataproc clusters \- create and manage Google Cloud Dataproc cluster
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -89,25 +90,29 @@ help\fR for details.
 To create a cluster, run:
 
 .RS 2m
-$ gcloud beta dataproc clusters create my_cluster
+$ gcloud beta dataproc clusters create my_cluster \e
+    \-\-region=us\-central1
 .RE
 
 To resize a cluster, run:
 
 .RS 2m
-$ gcloud beta dataproc clusters update my_cluster \-\-num_workers 5
+$ gcloud beta dataproc clusters update my_cluster \e
+    \-\-region=us\-central1 \-\-num_workers 5
 .RE
 
 To delete a cluster, run:
 
 .RS 2m
-$ gcloud beta dataproc clusters delete my_cluster
+$ gcloud beta dataproc clusters delete my_cluster \e
+    \-\-region=us\-central1
 .RE
 
 To view the details of a cluster, run:
 
 .RS 2m
-$ gcloud beta dataproc clusters describe my_cluster
+$ gcloud beta dataproc clusters describe my_cluster \e
+    \-\-region=us\-central1
 .RE
 
 To see the list of all clusters, run:

@@ -20,6 +20,27 @@ gcloud alpha monitoring channels delete \- delete a notification channel
 \fB(ALPHA)\fR Delete a notification channel.
 
 
+.SH "EXAMPLES"
+The following command will delete channel
+\f5projects/12345/notificationChannels/67890\fR, but only if the channel is not
+actively referenced by existing alerting policies:
+
+.RS 2m
+$ gcloud alpha monitoring channels delete \e
+    "projects/12345/notificationChannels/67890"
+.RE
+
+The following command will delete channel
+\f5projects/12345/notificationChannels/67890\fR, even if the channel is still
+actively referenced by alerting policies; if an existing policy references the
+channel, it will be modified as a side\-effect to remove the channel.
+
+.RS 2m
+$ gcloud alpha monitoring channels delete \e
+    "projects/12345/notificationChannels/67890" \-\-force
+.RE
+
+
 
 .SH "POSITIONAL ARGUMENTS"
 
@@ -61,8 +82,9 @@ alerting policies (the policies will be updated to remove the channel).
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -78,5 +100,9 @@ API can be found at: https://cloud.google.com/monitoring/api/
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta monitoring channels delete
+.RE
 

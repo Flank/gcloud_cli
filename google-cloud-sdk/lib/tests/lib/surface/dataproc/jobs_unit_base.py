@@ -256,29 +256,34 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
         'driverOutputResourceUri': self.DRIVER_URI})
     return self.MakeJob(**kwargs)
 
-  def ExpectGetJob(self, job=None, response=None, exception=None):
+  def ExpectGetJob(self, job=None, response=None, exception=None, region=None):
     if not job:
       job = self.MakeRunningJob()
+    if region is None:
+      region = self.REGION
     if not (response or exception):
       response = copy.deepcopy(job)
     self.mock_client.projects_regions_jobs.Get.Expect(
         self.messages.DataprocProjectsRegionsJobsGetRequest(
-            region=self.REGION,
+            region=region,
             jobId=job.reference.jobId,
             projectId=self.Project()),
         response=response,
         exception=exception)
     return response
 
-  def ExpectSubmitJob(self, job=None, response=None, exception=None):
+  def ExpectSubmitJob(
+      self, job=None, response=None, exception=None, region=None):
     if not job:
       job = self.MakeJob()
+    if region is None:
+      region = self.REGION
     if not (response or exception):
       response = copy.deepcopy(job)
       response.status = self.messages.JobStatus(state=self.STATE_ENUM.PENDING)
     self.mock_client.projects_regions_jobs.Submit.Expect(
         self.messages.DataprocProjectsRegionsJobsSubmitRequest(
-            region=self.REGION,
+            region=region,
             projectId=self.Project(),
             submitJobRequest=self.messages.SubmitJobRequest(
                 job=job,
@@ -287,22 +292,25 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
         exception=exception)
     return response
 
-  def ExpectWaitCalls(self, job=None, final_state=None, details=None):
+  def ExpectWaitCalls(
+      self, job=None, final_state=None, details=None, region=None):
     if not job:
       job = self.MakeSubmittedJob()
+    if region is None:
+      region = self.REGION
     if not final_state:
       final_state = self.STATE_ENUM.DONE
-    self.ExpectGetJob(job=job)
-    self.ExpectGetJob(job=job)
+    self.ExpectGetJob(job=job, region=region)
+    self.ExpectGetJob(job=job, region=region)
     job = copy.deepcopy(job)
     job.driverOutputResourceUri = self.DRIVER_URI
     job.status.state = self.STATE_ENUM.RUNNING
-    self.ExpectGetJob(job=job)
-    self.ExpectGetJob(job=job)
+    self.ExpectGetJob(job=job, region=region)
+    self.ExpectGetJob(job=job, region=region)
     job = copy.deepcopy(job)
     job.status.state = final_state
     job.status.details = details
-    self.ExpectGetJob(job=job)
+    self.ExpectGetJob(job=job, region=region)
     return job
 
   def ExpectSubmitCalls(self, job=None, **kwargs):

@@ -12,19 +12,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Declarative hooks for Cloud Identity Groups CLI."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
+
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.cloudresourcemanager import organizations
 from googlecloudsdk.api_lib.identity import cloudidentity_client as ci_client
+from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
-
-_CIG_API_VERSION = 'v1alpha1'
 
 
 # request hooks
@@ -35,6 +35,7 @@ def SetParent(unused_ref, args, request):
     unused_ref: unused.
     args: The argparse namespace.
     request: The request to modify.
+
   Returns:
     The updated request.
   """
@@ -56,13 +57,33 @@ def SetEntityKey(unused_ref, args, request):
     unused_ref: unused.
     args: The argparse namespace.
     request: The request to modify.
+
   Returns:
     The updated request.
   """
 
   if hasattr(args, 'email'):
-    messages = ci_client.GetMessages()
+    version = GetApiVersion(args)
+    messages = ci_client.GetMessages(version)
     request.group.groupKey = messages.EntityKey(id=args.email)
+
+  return request
+
+
+def SetLabels(unused_ref, args, request):
+  """Set Labels to request.group.labels.
+
+  Args:
+    unused_ref: unused.
+    args: The argparse namespace.
+    request: The request to modify.
+
+  Returns:
+    The updated request.
+  """
+
+  if args.IsSpecified('labels'):
+    request.group.labels = ReformatLabels(args, args.labels)
 
   return request
 
@@ -74,12 +95,14 @@ def SetResourceName(unused_ref, args, request):
     unused_ref: unused.
     args: The argparse namespace.
     request: The request to modify.
+
   Returns:
     The updated request.
   """
 
-  if hasattr(args, 'email') and args.IsSpecified('email'):
-    request.name = ConvertEmailToResourceName(args.email, 'email')
+  if args.IsSpecified('email'):
+    version = GetApiVersion(args)
+    request.name = ConvertEmailToResourceName(version, args.email, 'email')
 
   return request
 
@@ -91,11 +114,12 @@ def SetPageSize(unused_ref, args, request):
     unused_ref: unused.
     args: The argparse namespace.
     request: The request to modify.
+
   Returns:
     The updated request.
   """
 
-  if hasattr(args, 'page-size') and args.IsSpecified('page_size'):
+  if args.IsSpecified('page_size'):
     request.pageSize = int(args.page_size)
 
   return request
@@ -108,6 +132,7 @@ def SetGroupUpdateMask(unused_ref, args, request):
     unused_ref: unused.
     args: The argparse namespace.
     request: The request to modify.
+
   Returns:
     The updated request.
   Raises:
@@ -115,12 +140,11 @@ def SetGroupUpdateMask(unused_ref, args, request):
   """
   update_mask = []
 
-  if (args.IsSpecified('display_name')
-      or args.IsSpecified('clear_display_name')):
+  if (args.IsSpecified('display_name') or
+      args.IsSpecified('clear_display_name')):
     update_mask.append('display_name')
 
-  if (args.IsSpecified('description')
-      or args.IsSpecified('clear_description')):
+  if (args.IsSpecified('description') or args.IsSpecified('clear_description')):
     update_mask.append('description')
 
   # TODO(b/139939605): Add PosixGroups check once it is added.
@@ -141,12 +165,15 @@ def GenerateQuery(unused_ref, args, request):
     unused_ref: unused.
     args: The argparse namespace.
     request: The request to modify.
+
   Returns:
     The updated request.
   """
   customer_id = ConvertOrgIdToObfuscatedCustomerId(args.organization)
+  labels = FilterLabels(args.labels)
+  labels_str = ','.join(labels)
   request.query = 'parent==\"customerId/{0}\" && \"{1}\" in labels'.format(
-      customer_id, args.label)
+      customer_id, labels_str)
 
   return request
 
@@ -158,6 +185,7 @@ def UpdateDisplayName(unused_ref, args, request):
     unused_ref: unused.
     args: The argparse namespace.
     request: The request to modify.
+
   Returns:
     The updated request.
   """
@@ -177,6 +205,7 @@ def UpdateDescription(unused_ref, args, request):
     unused_ref: unused.
     args: The argparse namespace.
     request: The request to modify.
+
   Returns:
     The updated request.
   """
@@ -190,38 +219,72 @@ def UpdateDescription(unused_ref, args, request):
 
 
 # processor hooks
-def AddDynamicGroupUserQuery(arg_list):
+def SetDynamicUserQuery(unused_ref, args, request):
   """Add DynamicGroupUserQuery to DynamicGroupQueries object list.
 
   Args:
-    arg_list: dynamicGroupQuery whose resource type is USER.
+    unused_ref: unused.
+    args: The argparse namespace.
+    request: The request to modify.
+
   Returns:
     The updated dynamic group queries.
   """
 
   queries = []
 
-  if arg_list:
-    dg_user_query = ','.join(arg_list)
-    messages = ci_client.GetMessages()
+  if args.IsSpecified('dynamic_user_query'):
+    dg_user_query = args.dynamic_user_query
+
+    # TODO(b/147011481): Remove hard coded version info if necessary.
+    version = GetApiVersion(args)
+    messages = ci_client.GetMessages(version)
     resource_type = messages.DynamicGroupQuery.ResourceTypeValueValuesEnum
     new_dynamic_group_query = messages.DynamicGroupQuery(
         resourceType=resource_type.USER, query=dg_user_query)
     queries.append(new_dynamic_group_query)
+    request.group.dynamicGroupMetadata = messages.DynamicGroupMetadata(
+        queries=queries)
 
-  return queries
+  return request
 
 
-def ReformatLabels(labels_dict):
-  """Reformat labels string to labels map.
+def ReformatLabels(args, labels):
+  """Reformat label list to encoded labels message.
+
+  Reformatting labels will be done within following two steps,
+  1. Filter label strings in a label list.
+  2. Convert the filtered label list to OrderedDict.
+  3. Encode the OrderedDict format of labels to group.labels message.
 
   Args:
-    labels_dict: labels map.
+    args: The argparse namespace.
+    labels: list of label strings. e.g.
+      ["cloudidentity.googleapis.com/security=",
+      "cloudidentity.googleapis.com/groups.discussion_forum"]
+
   Returns:
-    Encoded label message.
+    Encoded labels message.
+
+  Raises:
+    InvalidArgumentException: If invalid labels string is input.
   """
 
-  messages = ci_client.GetMessages()
+  # Filter label strings in a label list.
+  filtered_labels = FilterLabels(labels)
+
+  # Convert the filtered label list to OrderedDict.
+  labels_dict = collections.OrderedDict()
+  for label in filtered_labels:
+    if '=' in label:
+      split_label = label.split('=')
+      labels_dict[split_label[0]] = split_label[1]
+    else:
+      labels_dict[label] = ''
+
+  # Encode the OrderedDict format of labels to group.labels message.
+  version = GetApiVersion(args)
+  messages = ci_client.GetMessages(version)
   return encoding.DictToMessage(labels_dict, messages.Group.LabelsValue)
 
 
@@ -249,10 +312,11 @@ def ConvertOrgIdToObfuscatedCustomerId(org_id):
   return organization_obj.owner.directoryCustomerId
 
 
-def ConvertEmailToResourceName(email, arg_name):
+def ConvertEmailToResourceName(version, email, arg_name):
   """Convert email to resource name.
 
   Args:
+    version: Release track information
     email: group email
     arg_name: argument/parameter name
 
@@ -260,7 +324,8 @@ def ConvertEmailToResourceName(email, arg_name):
     Group Id (e.g. groups/11zu0gzc3tkdgn2)
 
   """
-  lookup_group_name_resp = ci_client.LookupGroupName(email)
+
+  lookup_group_name_resp = ci_client.LookupGroupName(version, email)
 
   if 'name' in lookup_group_name_resp:
     return lookup_group_name_resp['name']
@@ -269,3 +334,76 @@ def ConvertEmailToResourceName(email, arg_name):
   # print out an error message.
   error_msg = 'There is no such a group associated with the specified argument:' + email
   raise exceptions.InvalidArgumentException(arg_name, error_msg)
+
+
+def FilterLabels(labels):
+  """Filter label strings in label list.
+
+  Filter labels (list of strings) with the following conditions,
+  1. If 'label' has 'key' and 'value' OR 'key' only, then add the label to
+  filtered label list. (e.g. 'label_key=label_value', 'label_key')
+  2. If 'label' has an equal sign but no 'value', then add the 'key' to filtered
+  label list. (e.g. 'label_key=' ==> 'label_key')
+  3. If 'label' has invalid format of string, throw an InvalidArgumentException.
+  (e.g. 'label_key=value1=value2')
+
+  Args:
+    labels: list of label strings.
+
+  Returns:
+    Filtered label list.
+
+  Raises:
+    InvalidArgumentException: If invalid labels string is input.
+  """
+
+  # Convert a comma separated string to a list of strings.
+  label_list = labels.split(',')
+
+  filtered_labels = []
+  for label in label_list:
+    if '=' in label:
+      split_label = label.split('=')
+
+      # Catch invalid format like 'key=value1=value2'
+      if len(split_label) > 2:
+        raise exceptions.InvalidArgumentException(
+            'labels',
+            'Invalid format of label string has been input. Label: ' + label)
+
+      if split_label[1]:
+        filtered_labels.append(label)  # Valid format #1: 'key=value'
+      else:
+        filtered_labels.append(split_label[0])  # Valid format #2: 'key'
+
+    else:
+      filtered_labels.append(label)
+
+  return filtered_labels
+
+
+def GetApiVersion(args):
+  """Return release track information.
+
+  Args:
+    args: The argparse namespace.
+
+  Returns:
+    Release track (e.g. ALPHA or BETA)
+
+  Raises:
+    UnsupportedReleaseTrackError: If invalid release track is input.
+  """
+
+  release_track = args.calliope_command.ReleaseTrack()
+
+  if release_track == base.ReleaseTrack.ALPHA:
+    return 'v1alpha1'
+  elif release_track == base.ReleaseTrack.BETA:
+    return 'v1beta1'
+  else:
+    raise UnsupportedReleaseTrackError(release_track)
+
+
+class UnsupportedReleaseTrackError(Exception):
+  """Raised when requesting an api for an unsupported release track."""

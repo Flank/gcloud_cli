@@ -7,7 +7,8 @@ SYNOPSIS
         [--file-format=FILE_FORMAT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Import security policy configs into your project.
+    gcloud compute security-policies import imports a security policy. The
+    command does not support updating rules for the policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -28,8 +29,14 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To import a security policy from a YAML file run this:
+
+        $ gcloud compute security-policies import --file-name=myFile
 
 NOTES
     These variants are also available:

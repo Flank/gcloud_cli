@@ -40,7 +40,7 @@ class CreateTestBeta(base.MembershipsTestBase):
     response = encoding.PyValueToMessage(
         self.messages.Operation.ResponseValue, {
             '@type': ('type.googleapis.com/google.cloud.gkehub.{}.LongRunning'
-                      'Membership').format(self.API_VERSION),
+                      'Membership').format(self.api_version),
             'results': [encoding.MessageToPyValue(membership)]
         })
     operation = self._MakeOperation(done=True, response=response)

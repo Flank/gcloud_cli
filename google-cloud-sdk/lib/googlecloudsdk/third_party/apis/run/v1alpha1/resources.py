@@ -31,6 +31,50 @@ class Collections(enum.Enum):
       [u'namespacesId'],
       True
   )
+  NAMESPACES_CLOUDAUDITLOGSSOURCES = (
+      'namespaces.cloudauditlogssources',
+      '{+name}',
+      {
+          '':
+              'namespaces/{namespacesId}/cloudauditlogssources/'
+              '{cloudauditlogssourcesId}',
+      },
+      [u'name'],
+      True
+  )
+  NAMESPACES_CLOUDPUBSUBSOURCES = (
+      'namespaces.cloudpubsubsources',
+      '{+name}',
+      {
+          '':
+              'namespaces/{namespacesId}/cloudpubsubsources/'
+              '{cloudpubsubsourcesId}',
+      },
+      [u'name'],
+      True
+  )
+  NAMESPACES_CLOUDSCHEDULERSOURCES = (
+      'namespaces.cloudschedulersources',
+      '{+name}',
+      {
+          '':
+              'namespaces/{namespacesId}/cloudschedulersources/'
+              '{cloudschedulersourcesId}',
+      },
+      [u'name'],
+      True
+  )
+  NAMESPACES_CLOUDSTORAGESOURCES = (
+      'namespaces.cloudstoragesources',
+      '{+name}',
+      {
+          '':
+              'namespaces/{namespacesId}/cloudstoragesources/'
+              '{cloudstoragesourcesId}',
+      },
+      [u'name'],
+      True
+  )
   NAMESPACES_CONFIGURATIONS = (
       'namespaces.configurations',
       '{+name}',
@@ -47,26 +91,6 @@ class Collections(enum.Enum):
       {
           '':
               'namespaces/{namespacesId}/domainmappings/{domainmappingsId}',
-      },
-      [u'name'],
-      True
-  )
-  NAMESPACES_EVENTTYPES = (
-      'namespaces.eventtypes',
-      '{+name}',
-      {
-          '':
-              'namespaces/{namespacesId}/eventtypes/{eventtypesId}',
-      },
-      [u'name'],
-      True
-  )
-  NAMESPACES_PUBSUBS = (
-      'namespaces.pubsubs',
-      '{+name}',
-      {
-          '':
-              'namespaces/{namespacesId}/pubsubs/{pubsubsId}',
       },
       [u'name'],
       True
@@ -125,6 +149,50 @@ class Collections(enum.Enum):
       [u'projectsId', u'locationsId'],
       True
   )
+  PROJECTS_LOCATIONS_CLOUDAUDITLOGSSOURCES = (
+      'projects.locations.cloudauditlogssources',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'cloudauditlogssources/{cloudauditlogssourcesId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS_LOCATIONS_CLOUDPUBSUBSOURCES = (
+      'projects.locations.cloudpubsubsources',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'cloudpubsubsources/{cloudpubsubsourcesId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS_LOCATIONS_CLOUDSCHEDULERSOURCES = (
+      'projects.locations.cloudschedulersources',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'cloudschedulersources/{cloudschedulersourcesId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS_LOCATIONS_CLOUDSTORAGESOURCES = (
+      'projects.locations.cloudstoragesources',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'cloudstoragesources/{cloudstoragesourcesId}',
+      },
+      [u'name'],
+      True
+  )
   PROJECTS_LOCATIONS_CONFIGURATIONS = (
       'projects.locations.configurations',
       '{+name}',
@@ -143,28 +211,6 @@ class Collections(enum.Enum):
           '':
               'projects/{projectsId}/locations/{locationsId}/domainmappings/'
               '{domainmappingsId}',
-      },
-      [u'name'],
-      True
-  )
-  PROJECTS_LOCATIONS_EVENTTYPES = (
-      'projects.locations.eventtypes',
-      '{+name}',
-      {
-          '':
-              'projects/{projectsId}/locations/{locationsId}/eventtypes/'
-              '{eventtypesId}',
-      },
-      [u'name'],
-      True
-  )
-  PROJECTS_LOCATIONS_PUBSUBS = (
-      'projects.locations.pubsubs',
-      '{+name}',
-      {
-          '':
-              'projects/{projectsId}/locations/{locationsId}/pubsubs/'
-              '{pubsubsId}',
       },
       [u'name'],
       True

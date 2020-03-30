@@ -23,10 +23,10 @@ from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-class ImportJobsListTestBeta(base.KmsMockTest):
+class ImportJobsListTestGA(base.KmsMockTest):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testList(self):
     ij_1 = self.project_name.ImportJob('global/my_kr1/my_ij1')
@@ -85,6 +85,12 @@ class ImportJobsListTestBeta(base.KmsMockTest):
 {0} EXPIRED RSA_OAEP_4096_SHA1_AES_256 HSM
 """.format(ij_1.RelativeName()),
         normalize_space=True)
+
+
+class ImportJobsListTestBeta(ImportJobsListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ImportJobsListTestAlpha(ImportJobsListTestBeta):

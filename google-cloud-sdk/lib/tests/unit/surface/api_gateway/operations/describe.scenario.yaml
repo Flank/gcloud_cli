@@ -1,0 +1,205 @@
+title: Cloud API Gateway operations describe test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway operations describe --location global missing-operation
+  - error: |-
+      1: NOT_FOUND: Resource 'projects/fake-project/locations/global/operations/missing-operation' was not found
+      - '@type': type.googleapis.com/google.rpc.ResourceInfo
+        resourceName: projects/fake-project/locations/global/operations/missing-operation
+- execute:
+  - command: |
+      api-gateway operations describe --location global fake-operation
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata
+        apiVersion: v1alpha1
+        createTime: '2019-11-20T21:52:32.718943571Z'
+        endTime: '2019-11-20T21:52:32.776152691Z'
+        requestedCancellation: false
+        target: projects/fake-project/locations/global/apis/fake-api/configs/fake-config
+        verb: create
+      name: projects/fake-project/locations/global/operations/fake-operation
+      response:
+        '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.ApiConfig
+        createTime: '2019-11-20T21:52:32.628719387Z'
+        name: projects/fake-project/locations/global/apis/fake-api/configs/fake-config
+        serviceRollout:
+          rolloutId: 2019-09-26r1
+        state: ACTIVE
+        updateTime: '2019-11-20T21:52:32.722246260Z'
+- execute:
+  - command: |
+      api-gateway operations describe projects/project/locations/global/operations/fake-operation
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata
+        apiVersion: v1alpha1
+        createTime: '2019-11-20T21:52:32.718943571Z'
+        endTime: '2019-11-20T21:52:32.776152691Z'
+        requestedCancellation: false
+        target: projects/fake-project/locations/global/apis/fake-api/configs/fake-config
+        verb: create
+      name: projects/fake-project/locations/global/operations/fake-operation
+      response:
+        '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.ApiConfig
+        createTime: '2019-11-20T21:52:32.628719387Z'
+        name: projects/fake-project/locations/global/apis/fake-api/configs/fake-config
+        serviceRollout:
+          rolloutId: 2019-09-26r1
+        state: ACTIVE
+        updateTime: '2019-11-20T21:52:32.722246260Z'
+actions:
+- execute_command:
+    command: |
+      api-gateway operations describe --location global missing-operation
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/missing-operation?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+          body: |
+            {
+              "error": {
+                "code": 404,
+                "message": "Resource 'projects/fake-project/locations/global/operations/missing-operation' was not found",
+                "status": "NOT_FOUND",
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.rpc.ResourceInfo",
+                    "resourceName": "projects/fake-project/locations/global/operations/missing-operation"
+                  }
+                ]
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: |-
+          NOT_FOUND: Resource 'projects/fake-project/locations/global/operations/missing-operation' was not found
+          - '@type': type.googleapis.com/google.rpc.ResourceInfo
+            resourceName: projects/fake-project/locations/global/operations/missing-operation
+- execute_command:
+    command: |
+      api-gateway operations describe --location global fake-operation
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/fake-operation?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/fake-operation",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata",
+                "createTime": "2019-11-20T21:52:32.718943571Z",
+                "endTime": "2019-11-20T21:52:32.776152691Z",
+                "target": "projects/fake-project/locations/global/apis/fake-api/configs/fake-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.ApiConfig",
+                "name": "projects/fake-project/locations/global/apis/fake-api/configs/fake-config",
+                "createTime": "2019-11-20T21:52:32.628719387Z",
+                "updateTime": "2019-11-20T21:52:32.722246260Z",
+                "serviceRollout": {
+                  "rolloutId": "2019-09-26r1"
+                },
+                "state": "ACTIVE"
+              }
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata
+          apiVersion: v1alpha1
+          createTime: '2019-11-20T21:52:32.718943571Z'
+          endTime: '2019-11-20T21:52:32.776152691Z'
+          requestedCancellation: false
+          target: projects/fake-project/locations/global/apis/fake-api/configs/fake-config
+          verb: create
+        name: projects/fake-project/locations/global/operations/fake-operation
+        response:
+          '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.ApiConfig
+          createTime: '2019-11-20T21:52:32.628719387Z'
+          name: projects/fake-project/locations/global/apis/fake-api/configs/fake-config
+          serviceRollout:
+            rolloutId: 2019-09-26r1
+          state: ACTIVE
+          updateTime: '2019-11-20T21:52:32.722246260Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      api-gateway operations describe projects/project/locations/global/operations/fake-operation
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/project/locations/global/operations/fake-operation?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/fake-operation",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata",
+                "createTime": "2019-11-20T21:52:32.718943571Z",
+                "endTime": "2019-11-20T21:52:32.776152691Z",
+                "target": "projects/fake-project/locations/global/apis/fake-api/configs/fake-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.ApiConfig",
+                "name": "projects/fake-project/locations/global/apis/fake-api/configs/fake-config",
+                "createTime": "2019-11-20T21:52:32.628719387Z",
+                "updateTime": "2019-11-20T21:52:32.722246260Z",
+                "serviceRollout": {
+                  "rolloutId": "2019-09-26r1"
+                },
+                "state": "ACTIVE"
+              }
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata
+          apiVersion: v1alpha1
+          createTime: '2019-11-20T21:52:32.718943571Z'
+          endTime: '2019-11-20T21:52:32.776152691Z'
+          requestedCancellation: false
+          target: projects/fake-project/locations/global/apis/fake-api/configs/fake-config
+          verb: create
+        name: projects/fake-project/locations/global/operations/fake-operation
+        response:
+          '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.ApiConfig
+          createTime: '2019-11-20T21:52:32.628719387Z'
+          name: projects/fake-project/locations/global/apis/fake-api/configs/fake-config
+          serviceRollout:
+            rolloutId: 2019-09-26r1
+          state: ACTIVE
+          updateTime: '2019-11-20T21:52:32.722246260Z'
+    - expect_exit:
+        code: 0

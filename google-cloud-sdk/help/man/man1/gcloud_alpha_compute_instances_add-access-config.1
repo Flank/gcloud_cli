@@ -155,8 +155,9 @@ the DNS name of the instance.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -167,7 +168,7 @@ To assign an public, externally accessible IP to a virtual machine named
 
 .RS 2m
 $ gcloud alpha compute instances add\-access\-config \e
-    example\-instance \-\-zone us\-central1\-a
+    example\-instance \-\-zone=us\-central1\-a
 .RE
 
 To assign the specific, reserved public IP address \f5\fI123.456.789.123\fR\fR
@@ -175,7 +176,7 @@ to the virtual machine, run:
 
 .RS 2m
 $ gcloud alpha compute instances add\-access\-config \e
-    example\-instance \-\-zone us\-central1\-a \-\-address=123.456.789.123
+    example\-instance \-\-zone=us\-central1\-a \-\-address=123.456.789.123
 .RE
 
 

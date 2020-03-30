@@ -21,12 +21,8 @@ from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
-
-from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.sql import base
-
-sqladmin_v1beta3 = core_apis.GetMessagesModule('sqladmin', 'v1beta3')
 
 
 class _BaseBackupsDescribeTest(object):
@@ -46,7 +42,8 @@ class _BaseBackupsDescribeTest(object):
                 0,
                 0,
                 802000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 8,
@@ -55,7 +52,8 @@ class _BaseBackupsDescribeTest(object):
                 27,
                 47,
                 910000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             enqueuedTime=datetime.datetime(
                 2014,
                 8,
@@ -64,7 +62,8 @@ class _BaseBackupsDescribeTest(object):
                 25,
                 12,
                 318000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             instance='clone-instance-7',
             kind='sql#backupRun',
@@ -76,11 +75,24 @@ class _BaseBackupsDescribeTest(object):
                 25,
                 12,
                 321000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            status='SUCCESSFUL',
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
+            status=self.messages.BackupRun.StatusValueValuesEnum.SUCCESSFUL,
         ))
 
     self.Run('sql backups describe --instance=clone-instance-7 42')
+    self.AssertOutputContains(
+        """\
+endTime: '2014-08-14T00:27:47.910000+00:00'
+enqueuedTime: '2014-08-14T00:25:12.318000+00:00'
+id: '42'
+instance: clone-instance-7
+kind: sql#backupRun
+startTime: '2014-08-14T00:25:12.321000+00:00'
+status: SUCCESSFUL
+windowStartTime: '2014-08-13T23:00:00.802000+00:00'
+""",
+        normalize_space=True)
 
 
 class BackupsDescribeGATest(_BaseBackupsDescribeTest, base.SqlMockTestGA):

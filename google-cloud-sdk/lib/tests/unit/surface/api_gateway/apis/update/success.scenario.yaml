@@ -1,0 +1,276 @@
+title: Cloud API Gateway API Update
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: api-gateway apis update test-api --display-name "New Name"
+  - progress_tracker:
+    - message: Waiting for API [test-api] to be updated
+    - status: SUCCESS
+- execute:
+  - command: api-gateway apis update test-api --clear-labels --async
+  - stderr: |+
+      Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+      gcloud api-gateway operations wait projects/fake-project/locations/global/operations/123456
+
+- execute:
+  - command: api-gateway apis update test-api --update-labels="label1=value" --async
+  - stderr: |+
+      Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+      gcloud api-gateway operations wait projects/fake-project/locations/global/operations/123456
+
+- execute:
+  - command: api-gateway apis update test-api --remove-labels="label1" --async
+  - stderr: |+
+      Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+      gcloud api-gateway operations wait projects/fake-project/locations/global/operations/123456
+
+actions:
+- execute_command:
+    command: api-gateway apis update test-api --display-name "New Name"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/global/apis/test-api
+            createTime: '2020-03-02T17:55:09.655774789Z'
+            updateTime: '2020-03-02T17:55:10.402425683Z'
+            displayName: test-me
+            apiController:
+              managedService: test-api.apigateway.fake-project.cloud.goog
+            state: ACTIVE
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api?alt=json&updateMask=displayName
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              apiController:
+                managedService: test-api.apigateway.fake-project.cloud.goog
+              createTime: '2020-03-02T17:55:09.655774789Z'
+              displayName: New Name
+              name: projects/fake-project/locations/global/apis/test-api
+              state: ACTIVE
+              updateTime: '2020-03-02T17:55:10.402425683Z'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/global/operations/123456
+            done: false
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/123456?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+            metadata:
+              '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata
+              apiVersion: v1alpha1
+              createTime: '2020-03-02T22:29:59.175195531Z'
+              endTime: '2020-03-02T22:29:59.483396352Z'
+              requestedCancellation: false
+              target: projects/fake-project/locations/global/apis/test-api
+              verb: update
+            name: projects/fake-project/locations/global/operations/123456
+            response:
+              '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.Api
+              apiController:
+                managedService: test-api.apigateway.test-project.cloud.goog
+              createTime: '2020-03-02T22:29:58.971037747Z'
+              displayName: New Name
+              name: projects/fake-project/locations/global/apis/test-api
+              state: ACTIVE
+              updateTime: '2020-03-02T22:29:59.208948206Z'
+    - expect_progress_tracker:
+        message: Waiting for API [test-api] to be updated
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            apiController:
+              managedService: test-api.apigateway.test-project.cloud.goog
+            createTime: '2020-03-02T22:29:58.971037747Z'
+            displayName: New Name
+            name: projects/fake-project/locations/global/apis/test-api
+            state: ACTIVE
+            updateTime: '2020-03-02T22:29:59.208948206Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: api-gateway apis update test-api --clear-labels --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/global/apis/test-api
+            createTime: '2020-03-02T17:55:09.655774789Z'
+            updateTime: '2020-03-02T17:55:10.402425683Z'
+            displayName: test-me
+            apiController:
+              managedService: test-api.apigateway.fake-project.cloud.goog
+            state: ACTIVE
+            labels:
+              someLabel: with value
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              apiController:
+                managedService: test-api.apigateway.fake-project.cloud.goog
+              createTime: '2020-03-02T17:55:09.655774789Z'
+              displayName: test-me
+              labels: {}
+              name: projects/fake-project/locations/global/apis/test-api
+              state: ACTIVE
+              updateTime: '2020-03-02T17:55:10.402425683Z'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/global/operations/123456
+            done: false
+    - expect_stderr: |+
+        Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+        gcloud api-gateway operations wait projects/fake-project/locations/global/operations/123456
+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: api-gateway apis update test-api --update-labels="label1=value" --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/global/apis/test-api
+            createTime: '2020-03-02T17:55:09.655774789Z'
+            updateTime: '2020-03-02T17:55:10.402425683Z'
+            displayName: test-me
+            apiController:
+              managedService: test-api.apigateway.fake-project.cloud.goog
+            state: ACTIVE
+            labels:
+              someLabel: with value
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              apiController:
+                managedService: test-api.apigateway.fake-project.cloud.goog
+              createTime: '2020-03-02T17:55:09.655774789Z'
+              displayName: test-me
+              labels:
+                label1: value
+                someLabel: with value
+              name: projects/fake-project/locations/global/apis/test-api
+              state: ACTIVE
+              updateTime: '2020-03-02T17:55:10.402425683Z'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/global/operations/123456
+            done: false
+    - expect_stderr: |+
+        Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+        gcloud api-gateway operations wait projects/fake-project/locations/global/operations/123456
+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: api-gateway apis update test-api --remove-labels="label1" --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/global/apis/test-api
+            createTime: '2020-03-02T17:55:09.655774789Z'
+            updateTime: '2020-03-02T17:55:10.402425683Z'
+            displayName: test-me
+            apiController:
+              managedService: test-api.apigateway.fake-project.cloud.goog
+            state: ACTIVE
+            labels:
+              label1: value
+              someLabel: with value
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/test-api?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              apiController:
+                managedService: test-api.apigateway.fake-project.cloud.goog
+              createTime: '2020-03-02T17:55:09.655774789Z'
+              displayName: test-me
+              labels:
+                someLabel: with value
+              name: projects/fake-project/locations/global/apis/test-api
+              state: ACTIVE
+              updateTime: '2020-03-02T17:55:10.402425683Z'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/global/operations/123456
+            done: false
+    - expect_stderr: |+
+        Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+        gcloud api-gateway operations wait projects/fake-project/locations/global/operations/123456
+
+    - expect_exit:
+        code: 0

@@ -23,6 +23,7 @@ import os
 
 from googlecloudsdk import calliope
 from googlecloudsdk.api_lib.dataproc import exceptions
+from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
@@ -38,11 +39,14 @@ class WorkflowTemplateImportUnitTest(unit_base.DataprocUnitTestBase,
                                    workflow_template=None,
                                    response=None,
                                    parent=None,
-                                   exception=None):
+                                   exception=None,
+                                   region=None):
+    if region is None:
+      region = self.REGION
     if not parent:
-      parent = self.WorkflowTemplateParentName()
+      parent = self.WorkflowTemplateParentName(region=region)
     if not workflow_template:
-      workflow_template = self.MakeWorkflowTemplate()
+      workflow_template = self.MakeWorkflowTemplate(region=region)
     if not (response or exception):
       response = workflow_template
     self.mock_client.projects_regions_workflowTemplates.Create.Expect(
@@ -54,17 +58,23 @@ class WorkflowTemplateImportUnitTest(unit_base.DataprocUnitTestBase,
   def ExpectUpdateWorkflowTemplate(self,
                                    workflow_template=None,
                                    response=None,
-                                   exception=None):
+                                   exception=None,
+                                   region=None):
+    if region is None:
+      region = self.REGION
     if not workflow_template:
-      workflow_template = self.MakeWorkflowTemplate()
+      workflow_template = self.MakeWorkflowTemplate(region=region)
     if not (response or exception):
       response = workflow_template
     self.mock_client.projects_regions_workflowTemplates.Update.Expect(
         workflow_template, response=response, exception=exception)
 
-  def testImportWorkflowTemplatesFromStdIn(self):
+  def _testImportWorkflowTemplatesFromStdIn(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+
     # Provided template does not have an id or a name.
-    provided_template = self.MakeWorkflowTemplate()
+    provided_template = self.MakeWorkflowTemplate(region=region)
     provided_template.id = None
     provided_template.name = None
 
@@ -74,15 +84,35 @@ class WorkflowTemplateImportUnitTest(unit_base.DataprocUnitTestBase,
 
     # The create response has the name populated.
     expected_response = copy.deepcopy(expected_request)
-    expected_response.name = self.WorkflowTemplateName()
+    expected_response.name = self.WorkflowTemplateName(region=region)
 
     self.WriteInput(export_util.Export(provided_template))
     self.ExpectGetWorkflowTemplate(
-        exception=self.MakeHttpError(status_code=404))
-    self.ExpectCreateWorkflowTemplate(expected_request, expected_response)
-    result = self.RunDataproc('workflow-templates import {0}'.format(
-        self.WORKFLOW_TEMPLATE))
+        exception=self.MakeHttpError(status_code=404),
+        region=region)
+    self.ExpectCreateWorkflowTemplate(
+        expected_request, expected_response, region=region)
+    result = self.RunDataproc('workflow-templates import {0} {1}'.format(
+        self.WORKFLOW_TEMPLATE, region_flag))
     self.AssertMessagesEqual(expected_response, result)
+
+  def testImportWorkflowTemplatesFromStdIn(self):
+    self._testImportWorkflowTemplatesFromStdIn()
+
+  def testImportWorkflowTemplates_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testImportWorkflowTemplatesFromStdIn(region='global')
+
+  def testImportWorkflowTemplates_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testImportWorkflowTemplatesFromStdIn(
+        region='us-central1', region_flag='--region=us-central1')
+
+  def testImportWorkflowTemplates_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('workflow-templates import foo', set_region=False)
 
   def testImportWorkflowTemplatesInvalid(self):
     self.WriteInput('foo: bar')

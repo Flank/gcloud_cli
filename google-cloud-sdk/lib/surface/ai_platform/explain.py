@@ -20,6 +20,8 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.ml_engine import predict
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.ml_engine import endpoint_util
+from googlecloudsdk.command_lib.ml_engine import flags
 from googlecloudsdk.command_lib.ml_engine import predict_utilities
 
 INPUT_INSTANCES_LIMIT = 100
@@ -51,6 +53,7 @@ class Explain(base.Command):
   def Args(parser):
     """Register flags for this command."""
     parser.add_argument('--model', required=True, help='Name of the model.')
+    flags.GetRegionArg('model').AddToParser(parser)
     parser.add_argument(
         '--version',
         help="""\
@@ -104,9 +107,10 @@ versions run
     instances = predict_utilities.ReadInstancesFromArgs(
         args.json_instances, args.text_instances, limit=INPUT_INSTANCES_LIMIT)
 
-    model_or_version_ref = predict_utilities.ParseModelOrVersionRef(
-        args.model, args.version)
-    results = predict.Explain(model_or_version_ref, instances)
+    with endpoint_util.MlEndpointOverrides(region=args.region):
+      model_or_version_ref = predict_utilities.ParseModelOrVersionRef(
+          args.model, args.version)
+      results = predict.Explain(model_or_version_ref, instances)
 
     if not args.IsSpecified('format'):
       # default format is based on the response.

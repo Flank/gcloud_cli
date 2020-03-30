@@ -4,11 +4,14 @@ NAME
 
 SYNOPSIS
     gcloud beta resource-manager folders remove-iam-policy-binding FOLDER
-        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+        --member=MEMBER --role=ROLE
+        [--all | --condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Removes a policy binding from the IAM policy of a folder, given a
-    folder ID and the binding.
+    (BETA) Removes a policy binding to the IAM policy of a folder, given a
+    folder ID and the binding. One binding consists of a member, a role, and an
+    optional condition.
 
 POSITIONAL ARGUMENTS
      Folder resource - The ID of the folder to remove the IAM binding. This
@@ -35,12 +38,46 @@ REQUIRED FLAGS
      --role=ROLE
         The role to remove the member from.
 
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --all
+          Remove all bindings with this role and member, irrespective of any
+          conditions.
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be removed. When condition is explicitly
+          specified as None (e.g. --condition=None), it matches a binding
+          without a condition. Otherwise, only the binding with a condition
+          which exactly matches the specified condition (including the optional
+          description) will be removed.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the cloudresourcemanager/v2 API. The full documentation
@@ -51,8 +88,29 @@ EXAMPLES
     'test-user@gmail.com' on the folder 'folder-id', run:
 
         $ gcloud beta resource-manager folders remove-iam-policy-binding \
-             folder-id --member='user:test-user@gmail.com' \
-             --role='roles/editor'
+            folder-id --member='user:test-user@gmail.com' \
+            --role='roles/editor'
+
+    To remove an IAM policy binding with a condition of
+    expression='request.time < timestamp("2019-01-01T00:00:00Z")',
+    title='expires_end_of_2018', and description='Expires at midnight on
+    2018-12-31' for the role of 'roles/storage.objectAdmin' for the user
+    'test-user@gmail.com' on the folder 'folder-id', run:
+
+        $ gcloud beta resource-manager folders remove-iam-policy-binding \
+            folder-id --member='user:test-user@gmail.com' \
+            --role='roles/storage.objectAdmin' \
+            --condition='expression=request.time <
+         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+        tion=Expires at midnight on 2018-12-31'
+
+    To remove all IAM policy bindings regardless of the condition for the role
+    of 'roles/storage.objectAdmin' and for the user 'test-user@gmail.com' on
+    the folder 'folder-id', run:
+
+        $ gcloud beta resource-manager folders remove-iam-policy-binding \
+            folder-id --member='user:test-user@gmail.com' \
+            --role='roles/storage.objectAdmin' --all
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

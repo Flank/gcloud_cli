@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import time
 
 from googlecloudsdk.api_lib.ml_engine import operations
+from googlecloudsdk.api_lib.ml_engine import versions_api
 from googlecloudsdk.command_lib.ml_engine import versions_util
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
@@ -119,6 +120,22 @@ class WaitForOpMaybeBetaTest(WaitForOpMaybeTestBase,
 
   def SetUp(self):
     super(WaitForOpMaybeBetaTest, self).SetUp()
+
+
+class ValidateFrameworkAndMachineTypeTest(base.MlGaPlatformTestBase):
+
+  def testValidateFrameworkAndMachineTypeGa(self):
+    frameworks_enum = (
+        versions_api.GetMessagesModule().GoogleCloudMlV1Version
+        .FrameworkValueValuesEnum)
+
+    versions_util.ValidateFrameworkAndMachineTypeGa(frameworks_enum.XGBOOST,
+                                                    'mls1-c1-m2')
+    versions_util.ValidateFrameworkAndMachineTypeGa(frameworks_enum.TENSORFLOW,
+                                                    'n1-standard-4')
+    with self.assertRaises(versions_util.InvalidArgumentCombinationError):
+      versions_util.ValidateFrameworkAndMachineTypeGa(frameworks_enum.XGBOOST,
+                                                      'n1-standard-4')
 
 
 if __name__ == '__main__':

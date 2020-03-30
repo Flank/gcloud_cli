@@ -186,6 +186,15 @@ class AuthProvider(_messages.Message):
       the issuer.  - can be inferred from the email domain of the issuer (e.g.
       a Google  service account).  Example:
       https://www.googleapis.com/oauth2/v1/certs
+    jwtLocations: Defines the locations to extract the JWT.  JWT locations can
+      be either from HTTP headers or URL query parameters. The rule is that
+      the first match wins. The checking order is: checking all headers first,
+      then URL query parameters.  If not specified,  default to use following
+      3 locations:    1) Authorization: Bearer    2) x-goog-iap-jwt-assertion
+      3) access_token query parameter  Default locations can be specified as
+      followings:    jwt_locations:    - header: Authorization
+      value_prefix: "Bearer "    - header: x-goog-iap-jwt-assertion    -
+      query: access_token
   """
 
   audiences = _messages.StringField(1)
@@ -193,6 +202,7 @@ class AuthProvider(_messages.Message):
   id = _messages.StringField(3)
   issuer = _messages.StringField(4)
   jwksUri = _messages.StringField(5)
+  jwtLocations = _messages.MessageField('JwtLocation', 6, repeated=True)
 
 
 class AuthRequirement(_messages.Message):
@@ -282,17 +292,40 @@ class BackendRule(_messages.Message):
     PathTranslationValueValuesEnum:
 
   Fields:
-    address: The address of the API backend.
-    deadline: The number of seconds to wait for a response from a request.
-      The default deadline for gRPC is infinite (no deadline) and HTTP
-      requests is 5 seconds.
-    jwtAudience: The JWT audience is used when generating a JWT id token for
-      the backend.
+    address: The address of the API backend.  The scheme is used to determine
+      the backend protocol and security. The following schemes are accepted:
+      SCHEME        PROTOCOL    SECURITY    http://       HTTP        None
+      https://      HTTP        TLS    grpc://       gRPC        None
+      grpcs://      gRPC        TLS  It is recommended to explicitly include a
+      scheme. Leaving out the scheme may cause constrasting behaviors across
+      platforms.  If the port is unspecified, the default is: - 80 for schemes
+      without TLS - 443 for schemes with TLS  For HTTP backends, use protocol
+      to specify the protocol version.
+    deadline: The number of seconds to wait for a response from a request. The
+      default varies based on the request protocol and deployment environment.
+    disableAuth: When disable_auth is true, a JWT ID token won't be generated
+      and the original "Authorization" HTTP header will be preserved. If the
+      header is used to carry the original token and is expected by the
+      backend, this field must be set to true to preserve the header.
+    jwtAudience: The JWT audience is used when generating a JWT ID token for
+      the backend. This ID token will be added in the HTTP "authorization"
+      header, and sent to the backend.
     minDeadline: Minimum deadline in seconds needed for this method. Calls
       having deadline value lower than this will be rejected.
     operationDeadline: The number of seconds to wait for the completion of a
       long running operation. The default is no deadline.
     pathTranslation: A PathTranslationValueValuesEnum attribute.
+    protocol: The protocol used for sending a request to the backend. The
+      supported values are "http/1.1" and "h2".  The default value is inferred
+      from the scheme in the address field:     SCHEME        PROTOCOL
+      http://       http/1.1    https://      http/1.1    grpc://       h2
+      grpcs://      h2  For secure HTTP backends (https://) that support
+      HTTP/2, set this field to "h2" for improved performance.  Configuring
+      this field to non-default values is only supported for secure HTTP
+      backends. This field will be ignored for all other backends.  See
+      https://www.iana.org/assignments/tls-extensiontype-values/tls-
+      extensiontype-values.xhtml#alpn-protocol-ids for more details on the
+      supported values.
     selector: Selects the methods to which this rule applies.  Refer to
       selector for syntax details.
   """
@@ -333,11 +366,13 @@ class BackendRule(_messages.Message):
 
   address = _messages.StringField(1)
   deadline = _messages.FloatField(2)
-  jwtAudience = _messages.StringField(3)
-  minDeadline = _messages.FloatField(4)
-  operationDeadline = _messages.FloatField(5)
-  pathTranslation = _messages.EnumField('PathTranslationValueValuesEnum', 6)
-  selector = _messages.StringField(7)
+  disableAuth = _messages.BooleanField(3)
+  jwtAudience = _messages.StringField(4)
+  minDeadline = _messages.FloatField(5)
+  operationDeadline = _messages.FloatField(6)
+  pathTranslation = _messages.EnumField('PathTranslationValueValuesEnum', 7)
+  protocol = _messages.StringField(8)
+  selector = _messages.StringField(9)
 
 
 class Billing(_messages.Message):
@@ -398,7 +433,7 @@ class Binding(_messages.Message):
       that represents a Google group.    For example, `admins@example.com`.  *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
-      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
       recovered, this value reverts to `user:{emailid}` and the recovered user
       retains the role in the binding.  *
       `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
@@ -588,8 +623,6 @@ class ConfigFile(_messages.Message):
     FileTypeValueValuesEnum: The type of configuration file this represents.
 
   Fields:
-    contents: DEPRECATED. The contents of the configuration file. Use
-      file_contents moving forward.
     fileContents: The bytes that constitute the file.
     filePath: The file name of the configuration file (full or relative path).
     fileType: The type of configuration file this represents.
@@ -621,10 +654,9 @@ class ConfigFile(_messages.Message):
     FILE_DESCRIPTOR_SET_PROTO = 4
     PROTO_FILE = 5
 
-  contents = _messages.StringField(1)
-  fileContents = _messages.BytesField(2)
-  filePath = _messages.StringField(3)
-  fileType = _messages.EnumField('FileTypeValueValuesEnum', 4)
+  fileContents = _messages.BytesField(1)
+  filePath = _messages.StringField(2)
+  fileType = _messages.EnumField('FileTypeValueValuesEnum', 3)
 
 
 class ConfigRef(_messages.Message):
@@ -986,13 +1018,16 @@ class EffectiveQuotaLimit2(_messages.Message):
       or if this limit is a project level one and there is an identical
       organizational limit.
     baseLimit: The service's configuration for this quota limit.
+    defaultLimit: The default quota limit based on the consumer's reputation
+      and billing status. Region and zone default limits are kept.
     quotaBuckets: Effective quota limit, maximum override allowed, and usage
       for each quota bucket.
   """
 
   allowAdminOverrides = _messages.BooleanField(1)
   baseLimit = _messages.MessageField('QuotaLimit', 2)
-  quotaBuckets = _messages.MessageField('QuotaBucket', 3, repeated=True)
+  defaultLimit = _messages.MessageField('QuotaLimit', 3)
+  quotaBuckets = _messages.MessageField('QuotaBucket', 4, repeated=True)
 
 
 class EffectiveQuotasForMetric(_messages.Message):
@@ -1145,21 +1180,33 @@ class EnumValue(_messages.Message):
 
 
 class Expr(_messages.Message):
-  r"""Represents an expression text. Example:      title: "User account
-  presence"     description: "Determines whether the request has a user
-  account"     expression: "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit"     description: "Determines if a summary is
+  less than 100 chars"     expression: "document.summary.size() < 100"
+  Example (Equality):      title: "Requestor is owner"     description:
+  "Determines if requestor is the document owner"     expression:
+  "document.owner == request.auth.claims.email"  Example (Logic):      title:
+  "Public documents"     description: "Determine whether the document should
+  be publicly visible"     expression: "document.type != 'private' &&
+  document.type != 'internal'"  Example (Data Manipulation):      title:
+  "Notification string"     description: "Create a notification string with a
+  timestamp."     expression: "'New message received at ' +
+  string(document.create_time)"  The exact variables and functions that may be
+  referenced within an expression are determined by the service that evaluates
+  it. See the service documentation for additional information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
@@ -1574,6 +1621,8 @@ class HttpRule(_messages.Message):
     additionalBindings: Additional HTTP bindings for the selector. Nested
       bindings must not contain an `additional_bindings` field themselves
       (that is, the nesting may only be one level deep).
+    allowHalfDuplex: When this flag is set to true, HTTP requests will be
+      allowed to invoke a half-duplex streaming method.
     body: The name of the request field whose value is mapped to the HTTP
       request body, or `*` for mapping all request fields not captured by the
       path pattern to the HTTP body, or omitted for not having any HTTP
@@ -1599,15 +1648,35 @@ class HttpRule(_messages.Message):
   """
 
   additionalBindings = _messages.MessageField('HttpRule', 1, repeated=True)
-  body = _messages.StringField(2)
-  custom = _messages.MessageField('CustomHttpPattern', 3)
-  delete = _messages.StringField(4)
-  get = _messages.StringField(5)
-  patch = _messages.StringField(6)
-  post = _messages.StringField(7)
-  put = _messages.StringField(8)
-  responseBody = _messages.StringField(9)
-  selector = _messages.StringField(10)
+  allowHalfDuplex = _messages.BooleanField(2)
+  body = _messages.StringField(3)
+  custom = _messages.MessageField('CustomHttpPattern', 4)
+  delete = _messages.StringField(5)
+  get = _messages.StringField(6)
+  patch = _messages.StringField(7)
+  post = _messages.StringField(8)
+  put = _messages.StringField(9)
+  responseBody = _messages.StringField(10)
+  selector = _messages.StringField(11)
+
+
+class JwtLocation(_messages.Message):
+  r"""Specifies a location to extract JWT from an API request.
+
+  Fields:
+    header: Specifies HTTP header name to extract JWT token.
+    query: Specifies URL query parameter name to extract JWT token.
+    valuePrefix: The value prefix. The value format is "value_prefix{token}"
+      Only applies to "in" header type. Must be empty for "in" query type. If
+      not empty, the header value has to match (case sensitive) this prefix.
+      If not matched, JWT will not be extracted. If matched, JWT will be
+      extracted after the prefix is removed.  For example, for "Authorization:
+      Bearer {JWT}", value_prefix="Bearer " with a space at the end.
+  """
+
+  header = _messages.StringField(1)
+  query = _messages.StringField(2)
+  valuePrefix = _messages.StringField(3)
 
 
 class LabelDescriptor(_messages.Message):
@@ -1871,32 +1940,61 @@ class MetricDescriptor(_messages.Message):
       "custom.googleapis.com/invoice/paid/amount"
       "external.googleapis.com/prometheus/up"
       "appengine.googleapis.com/http/server/response_latencies"
-    unit: The unit in which the metric value is reported. It is only
+    unit: The units in which the metric value is reported. It is only
       applicable if the `value_type` is `INT64`, `DOUBLE`, or `DISTRIBUTION`.
-      The supported units are a subset of [The Unified Code for Units of
-      Measure](http://unitsofmeasure.org/ucum.html) standard:  **Basic units
-      (UNIT)**  * `bit`   bit * `By`    byte * `s`     second * `min`   minute
-      * `h`     hour * `d`     day  **Prefixes (PREFIX)**  * `k`     kilo
-      (10**3) * `M`     mega    (10**6) * `G`     giga    (10**9) * `T`
-      tera    (10**12) * `P`     peta    (10**15) * `E`     exa     (10**18) *
-      `Z`     zetta   (10**21) * `Y`     yotta   (10**24) * `m`     milli
-      (10**-3) * `u`     micro   (10**-6) * `n`     nano    (10**-9) * `p`
-      pico    (10**-12) * `f`     femto   (10**-15) * `a`     atto
-      (10**-18) * `z`     zepto   (10**-21) * `y`     yocto   (10**-24) * `Ki`
-      kibi    (2**10) * `Mi`    mebi    (2**20) * `Gi`    gibi    (2**30) *
-      `Ti`    tebi    (2**40)  **Grammar**  The grammar also includes these
-      connectors:  * `/`    division (as an infix operator, e.g. `1/s`). * `.`
-      multiplication (as an infix operator, e.g. `GBy.d`)  The grammar for a
-      unit is as follows:      Expression = Component { "." Component } { "/"
-      Component } ;      Component = ( [ PREFIX ] UNIT | "%" ) [ Annotation ]
-      | Annotation               | "1"               ;      Annotation = "{"
-      NAME "}" ;  Notes:  * `Annotation` is just a comment if it follows a
-      `UNIT` and is    equivalent to `1` if it is used alone. For examples,
-      `{requests}/s == 1/s`, `By{transmitted}/s == By/s`. * `NAME` is a
-      sequence of non-blank printable ASCII characters not    containing '{'
-      or '}'. * `1` represents dimensionless value 1, such as in `1/s`. * `%`
-      represents dimensionless value 1/100, and annotates values giving    a
-      percentage.
+      The `unit` defines the representation of the stored metric values.
+      Different systems may scale the values to be more easily displayed (so a
+      value of `0.02KBy` _might_ be displayed as `20By`, and a value of
+      `3523KBy` _might_ be displayed as `3.5MBy`). However, if the `unit` is
+      `KBy`, then the value of the metric is always in thousands of bytes, no
+      matter how it may be displayed..  If you want a custom metric to record
+      the exact number of CPU-seconds used by a job, you can create an `INT64
+      CUMULATIVE` metric whose `unit` is `s{CPU}` (or equivalently `1s{CPU}`
+      or just `s`). If the job uses 12,005 CPU-seconds, then the value is
+      written as `12005`.  Alternatively, if you want a custom metric to
+      record data in a more granular way, you can create a `DOUBLE CUMULATIVE`
+      metric whose `unit` is `ks{CPU}`, and then write the value `12.005`
+      (which is `12005/1000`), or use `Kis{CPU}` and write `11.723` (which is
+      `12005/1024`).  The supported units are a subset of [The Unified Code
+      for Units of Measure](http://unitsofmeasure.org/ucum.html) standard:
+      **Basic units (UNIT)**  * `bit`   bit * `By`    byte * `s`     second *
+      `min`   minute * `h`     hour * `d`     day  **Prefixes (PREFIX)**  *
+      `k`     kilo    (10^3) * `M`     mega    (10^6) * `G`     giga    (10^9)
+      * `T`     tera    (10^12) * `P`     peta    (10^15) * `E`     exa
+      (10^18) * `Z`     zetta   (10^21) * `Y`     yotta   (10^24)  * `m`
+      milli   (10^-3) * `u`     micro   (10^-6) * `n`     nano    (10^-9) *
+      `p`     pico    (10^-12) * `f`     femto   (10^-15) * `a`     atto
+      (10^-18) * `z`     zepto   (10^-21) * `y`     yocto   (10^-24)  * `Ki`
+      kibi    (2^10) * `Mi`    mebi    (2^20) * `Gi`    gibi    (2^30) * `Ti`
+      tebi    (2^40) * `Pi`    pebi    (2^50)  **Grammar**  The grammar also
+      includes these connectors:  * `/`    division or ratio (as an infix
+      operator). For examples,          `kBy/{email}` or `MiBy/10ms` (although
+      you should almost never          have `/s` in a metric `unit`; rates
+      should always be computed at          query time from the underlying
+      cumulative or delta value). * `.`    multiplication or composition (as
+      an infix operator). For          examples, `GBy.d` or `k{watt}.h`.  The
+      grammar for a unit is as follows:      Expression = Component { "."
+      Component } { "/" Component } ;      Component = ( [ PREFIX ] UNIT | "%"
+      ) [ Annotation ]               | Annotation               | "1"
+      ;      Annotation = "{" NAME "}" ;  Notes:  * `Annotation` is just a
+      comment if it follows a `UNIT`. If the annotation    is used alone, then
+      the unit is equivalent to `1`. For examples,    `{request}/s == 1/s`,
+      `By{transmitted}/s == By/s`. * `NAME` is a sequence of non-blank
+      printable ASCII characters not    containing `{` or `}`. * `1`
+      represents a unitary [dimensionless
+      unit](https://en.wikipedia.org/wiki/Dimensionless_quantity) of 1, such
+      as in `1/s`. It is typically used when none of the basic units are
+      appropriate. For example, "new users per day" can be represented as
+      `1/d` or `{new-users}/d` (and a metric value `5` would mean "5 new
+      users). Alternatively, "thousands of page views per day" would be
+      represented as `1000/d` or `k1/d` or `k{page_views}/d` (and a metric
+      value of `5.3` would mean "5300 page views per day"). * `%` represents
+      dimensionless value of 1/100, and annotates values giving    a
+      percentage (so the metric values are typically in the range of 0..100,
+      and a metric value `3` means "3 percent"). * `10^2.%` indicates a metric
+      contains a ratio, typically in the range    0..1, that will be
+      multiplied by 100 and displayed as a percentage    (so a metric value
+      `0.03` means "3 percent").
     valueType: Whether the measurement is an integer, a floating-point number,
       etc. Some combinations of `metric_kind` and `value_type` might not be
       supported.
@@ -2534,15 +2632,16 @@ class Page(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.   A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**      {       "bindings": [         {
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.   A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**      {       "bindings": [         {
   "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-project-
@@ -2551,23 +2650,24 @@ class Policy(_messages.Message):
   ["user:eve@example.com"],           "condition": {             "title":
   "expirable access",             "description": "Does not grant access after
   Sep 2020",             "expression": "request.time <
-  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
-  **YAML Example**      bindings:     - members:       - user:mike@example.com
-  - group:admins@example.com       - domain:google.com       - serviceAccount
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
+  "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
+  bindings:     - members:       - user:mike@example.com       -
+  group:admins@example.com       - domain:google.com       - serviceAccount
   :my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
   grant access after Sep 2020         expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  timestamp('2020-10-01T00:00:00.000Z')     - etag: BwWWja0YfJA=     -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
     auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -2575,19 +2675,24 @@ class Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy   that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
   auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
@@ -3191,16 +3296,17 @@ class Rollout(_messages.Message):
 
   Fields:
     createTime: Creation time of the rollout. Readonly.
-    createdBy: The user who created the Rollout. Readonly.
+    createdBy: This field is deprecated and will be deleted. Please remove
+      usage of this field.
     deleteServiceStrategy: The strategy associated with a rollout to delete a
       `ManagedService`. Readonly.
-    rolloutId: Optional. Unique identifier of this Rollout. Only lower case
-      letters, digits  and '-' are allowed.  If not specified by client, the
-      server will generate one. The generated id will have the form of
-      <date><revision number>, where "date" is the create date in ISO 8601
-      format.  "revision number" is a monotonically increasing positive number
-      that is reset every day for each service. An example of the generated
-      rollout_id is '2016-02-16r1'
+    rolloutId: Optional. Unique identifier of this Rollout. Must be no longer
+      than 63 characters and only lower case letters, digits, '.', '_' and '-'
+      are allowed.  If not specified by client, the server will generate one.
+      The generated id will have the form of <date><revision number>, where
+      "date" is the create date in ISO 8601 format.  "revision number" is a
+      monotonically increasing positive number that is reset every day for
+      each service. An example of the generated rollout_id is '2016-02-16r1'
     serviceName: The name of the service associated with this Rollout.
     status: The status of this rollout. Readonly. In case of a failed rollout,
       the system will automatically rollback to the current Rollout version.
@@ -3269,7 +3375,7 @@ class Service(_messages.Message):
     configVersion: The semantic version of the service configuration. The
       config version affects the interpretation of the service configuration.
       For example, certain features are enabled by default for certain config
-      versions. The latest config version is `3`.
+      versions.  The latest config version is `3`.
     context: Context configuration.
     control: Configuration for the service control plane.
     customError: Custom error configuration.
@@ -3284,8 +3390,9 @@ class Service(_messages.Message):
       google.someapi.v1.SomeEnum
     http: HTTP configuration.
     id: A unique ID for a specific instance of this message, typically
-      assigned by the client for tracking purpose. If empty, the server may
-      choose to generate one instead. Must be no longer than 60 characters.
+      assigned by the client for tracking purpose. Must be no longer than 63
+      characters and only lower case letters, digits, '.', '_' and '-' are
+      allowed. If empty, the server may choose to generate one instead.
     logging: Logging configuration.
     logs: Defines the logs used by this service.
     metrics: Defines the metrics used by this service.
@@ -3343,6 +3450,28 @@ class Service(_messages.Message):
   title = _messages.StringField(25)
   types = _messages.MessageField('Type', 26, repeated=True)
   usage = _messages.MessageField('Usage', 27)
+
+
+class ServiceIdentity(_messages.Message):
+  r"""The per-product per-project service identity for a service.   Use this
+  field to configure per-product per-project service identity. Example of a
+  service identity configuration.      usage:       service_identity:       -
+  service_account_parent: "projects/123456789"         display_name: "Cloud
+  XXX Service Agent"         description: "Used as the identity of Cloud XXX
+  to access resources"
+
+  Fields:
+    description: Optional. A user-specified opaque description of the service
+      account. Must be less than or equal to 256 UTF-8 bytes.
+    displayName: Optional. A user-specified name for the service account. Must
+      be less than or equal to 100 UTF-8 bytes.
+    serviceAccountParent: A service account project that hosts the service
+      accounts.  An example name would be: `projects/123456789`
+  """
+
+  description = _messages.StringField(1)
+  displayName = _messages.StringField(2)
+  serviceAccountParent = _messages.StringField(3)
 
 
 class ServicemanagementOperationsGetRequest(_messages.Message):
@@ -3564,6 +3693,27 @@ class ServicemanagementServicesCustomerSettingsGetRequest(_messages.Message):
   view = _messages.EnumField('ViewValueValuesEnum', 4)
 
 
+class ServicemanagementServicesCustomerSettingsPatchRequest(_messages.Message):
+  r"""A ServicemanagementServicesCustomerSettingsPatchRequest object.
+
+  Fields:
+    customerId: ID for the customer. See the comment for
+      `CustomerSettings.customer_id` field of message for its format. This
+      field is required.
+    customerSettings: A CustomerSettings resource to be passed as the request
+      body.
+    serviceName: The name of the service.  See the [overview](/service-
+      management/overview) for naming requirements.  For example:
+      `example.googleapis.com`. This field is required.
+    updateMask: The field mask specifying which fields are to be updated.
+  """
+
+  customerId = _messages.StringField(1, required=True)
+  customerSettings = _messages.MessageField('CustomerSettings', 2)
+  serviceName = _messages.StringField(3, required=True)
+  updateMask = _messages.StringField(4)
+
+
 class ServicemanagementServicesDeleteRequest(_messages.Message):
   r"""A ServicemanagementServicesDeleteRequest object.
 
@@ -3724,24 +3874,6 @@ class ServicemanagementServicesListRequest(_messages.Message):
   producerProjectId = _messages.StringField(6)
 
 
-class ServicemanagementServicesPatchRequest(_messages.Message):
-  r"""A ServicemanagementServicesPatchRequest object.
-
-  Fields:
-    managedService: A ManagedService resource to be passed as the request
-      body.
-    serviceName: The name of the service.  See the [overview](/service-
-      management/overview) for naming requirements.  For example:
-      `example.googleapis.com`.
-    updateMask: A mask specifying which field to update - only one should be
-      set.
-  """
-
-  managedService = _messages.MessageField('ManagedService', 1)
-  serviceName = _messages.StringField(2, required=True)
-  updateMask = _messages.StringField(3)
-
-
 class ServicemanagementServicesProjectSettingsGetRequest(_messages.Message):
   r"""A ServicemanagementServicesProjectSettingsGetRequest object.
 
@@ -3804,12 +3936,6 @@ class ServicemanagementServicesRolloutsCreateRequest(_messages.Message):
   r"""A ServicemanagementServicesRolloutsCreateRequest object.
 
   Fields:
-    baseRolloutId: Unimplemented. Do not use this feature until this comment
-      is removed.  The rollout id that rollout to be created based on.
-      Rollout should be constructed based on current successful rollout, this
-      field indicates the current successful rollout id that new rollout based
-      on to construct, if current successful rollout changed when server
-      receives the request, request will be rejected for safety.
     force: This flag will skip safety checks for this rollout. The current
       safety check is whether to skip default quota limit validation.  Quota
       limit validation verifies that the default quota limits defined in the
@@ -3834,10 +3960,9 @@ class ServicemanagementServicesRolloutsCreateRequest(_messages.Message):
       `example.googleapis.com`.
   """
 
-  baseRolloutId = _messages.StringField(1)
-  force = _messages.BooleanField(2)
-  rollout = _messages.MessageField('Rollout', 3)
-  serviceName = _messages.StringField(4, required=True)
+  force = _messages.BooleanField(1)
+  rollout = _messages.MessageField('Rollout', 2)
+  serviceName = _messages.StringField(3, required=True)
 
 
 class ServicemanagementServicesRolloutsGetRequest(_messages.Message):
@@ -4366,11 +4491,14 @@ class Usage(_messages.Message):
       'serviceusage.googleapis.com/billing-enabled'.
     rules: A list of usage rules that apply to individual API methods.
       **NOTE:** All service configuration rules follow "last one wins" order.
+    serviceIdentity: The configuration of a per-product per-project service
+      identity.
   """
 
   producerNotificationChannel = _messages.StringField(1)
   requirements = _messages.StringField(2, repeated=True)
   rules = _messages.MessageField('UsageRule', 3, repeated=True)
+  serviceIdentity = _messages.MessageField('ServiceIdentity', 4)
 
 
 class UsageRule(_messages.Message):

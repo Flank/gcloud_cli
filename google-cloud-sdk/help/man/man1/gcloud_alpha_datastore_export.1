@@ -94,8 +94,45 @@ $ gcloud alpha datastore export \e
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To export all kinds in the \f5exampleNs\fR namespace in the \f5exampleProject\fR
+project to the \f5exampleBucket\fR, run:
+
+.RS 2m
+$ gcloud alpha datastore export gs://exampleBucket \e
+    \-\-namespaces='exampleNs' \-\-project='exampleProject'
+.RE
+
+To export the \f5exampleKind\fR and \f5otherKind\fR kinds in the \f5exampleNs\fR
+namespace in the \f5exampleProject\fR project to the \f5exampleBucket\fR, run:
+
+.RS 2m
+$ gcloud alpha datastore export gs://exampleBucket \e
+    \-\-kinds='exampleKind','otherKind' \-\-namespaces='exampleNs' \e
+    \-\-project='exampleProject'
+.RE
+
+To export all namespaces and kinds in the currently set project to the
+\f5exampleBucket\fR without waiting for the operation to complete, run:
+
+.RS 2m
+$ gcloud alpha datastore export gs://exampleBucket \-\-async
+.RE
+
+To export the \f5exampleKind\fR in all namespaces in the currently set project
+to the \f5exampleBucket\fR, and output the result in JSON, run:
+
+.RS 2m
+$ gcloud alpha datastore export gs://exampleBucket \e
+    \-\-kinds='exampleKind' \-\-format=json
+.RE
 
 
 

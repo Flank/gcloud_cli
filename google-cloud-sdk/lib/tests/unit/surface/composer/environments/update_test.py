@@ -1076,6 +1076,146 @@ class EnvironmentsUpdateBetaTest(EnvironmentsUpdateGATest):
           self.TEST_ENVIRONMENT_ID,
       )
 
+  def testUpdateWebServerAccessControl(self):
+    """Test updating web server access control."""
+    # Test is only valid in beta.
+    if self.track != calliope_base.ReleaseTrack.BETA:
+      return
+
+    self._SetTestMessages()
+
+    config = self.messages.EnvironmentConfig(
+        webServerNetworkAccessControl=self.messages
+        .WebServerNetworkAccessControl(allowedIpRanges=[
+            self.messages.AllowedIpRange(
+                value='192.168.35.0/28', description='description1'),
+            self.messages.AllowedIpRange(
+                value='2001:db8::/32', description='description2')
+        ]))
+
+    self.ExpectEnvironmentPatch(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        patch_environment=self.messages.Environment(config=config),
+        update_mask='config.web_server_network_access_control',
+        response=self.running_op)
+    self.RunEnvironments(
+        'update',
+        '--async',
+        '--update-web-server-allow-ip',
+        'ip_range=192.168.35.0/28,description=description1',
+        '--update-web-server-allow-ip',
+        'ip_range=2001:db8::/32,description=description2',
+        '--location',
+        self.TEST_LOCATION,
+        '--project',
+        self.TEST_PROJECT,
+        self.TEST_ENVIRONMENT_ID,
+    )
+    self.AssertErrMatches(r'^Update in progress for environment \[{}] '
+                          r'with operation \[{}]'.format(
+                              self.TEST_ENVIRONMENT_NAME,
+                              self.TEST_OPERATION_NAME))
+
+  def testWebServerAccessControlAllowAll(self):
+    """Test allowing everyone to access the web server."""
+    # Test is only valid in beta.
+    if self.track != calliope_base.ReleaseTrack.BETA:
+      return
+
+    self._SetTestMessages()
+
+    config = self.messages.EnvironmentConfig(
+        webServerNetworkAccessControl=self.messages
+        .WebServerNetworkAccessControl(allowedIpRanges=[
+            self.messages.AllowedIpRange(
+                value='0.0.0.0/0',
+                description='Allows access from all IPv4 addresses (default value)'
+            ),
+            self.messages.AllowedIpRange(
+                value='::0/0',
+                description='Allows access from all IPv6 addresses (default value)'
+            )
+        ]))
+
+    self.ExpectEnvironmentPatch(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        patch_environment=self.messages.Environment(config=config),
+        update_mask='config.web_server_network_access_control',
+        response=self.running_op)
+    self.RunEnvironments(
+        'update',
+        '--async',
+        '--web-server-allow-all',
+        '--location',
+        self.TEST_LOCATION,
+        '--project',
+        self.TEST_PROJECT,
+        self.TEST_ENVIRONMENT_ID,
+    )
+    self.AssertErrMatches(r'^Update in progress for environment \[{}] '
+                          r'with operation \[{}]'.format(
+                              self.TEST_ENVIRONMENT_NAME,
+                              self.TEST_OPERATION_NAME))
+
+  def testWebServerAccessControlDenyAll(self):
+    """Test denying everyone access to the web server."""
+    # Test is only valid in beta.
+    if self.track != calliope_base.ReleaseTrack.BETA:
+      return
+
+    self._SetTestMessages()
+
+    config = self.messages.EnvironmentConfig(
+        webServerNetworkAccessControl=self.messages
+        .WebServerNetworkAccessControl(allowedIpRanges=[]))
+
+    self.ExpectEnvironmentPatch(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        patch_environment=self.messages.Environment(config=config),
+        update_mask='config.web_server_network_access_control',
+        response=self.running_op)
+    self.RunEnvironments(
+        'update',
+        '--async',
+        '--web-server-deny-all',
+        '--location',
+        self.TEST_LOCATION,
+        '--project',
+        self.TEST_PROJECT,
+        self.TEST_ENVIRONMENT_ID,
+    )
+    self.AssertErrMatches(r'^Update in progress for environment \[{}] '
+                          r'with operation \[{}]'.format(
+                              self.TEST_ENVIRONMENT_NAME,
+                              self.TEST_OPERATION_NAME))
+
+  def testWebServerAccessControlFormatValidation(self):
+    """Test that IP range format validation fails fast."""
+    # Test is only valid in beta.
+    if self.track != calliope_base.ReleaseTrack.BETA:
+      return
+
+    self._SetTestMessages()
+    with self.AssertRaisesExceptionMatches(command_util.Error,
+                                           'Invalid IP range'):
+      self.RunEnvironments(
+          'update',
+          '--location',
+          self.TEST_LOCATION,
+          '--async',
+          '--update-web-server-allow-ip',
+          'ip_range=badIpRange',
+          '--project',
+          self.TEST_PROJECT,
+          self.TEST_ENVIRONMENT_ID,
+      )
+
 
 class EnvironmentsUpdateAlphaTest(EnvironmentsUpdateBetaTest):
 

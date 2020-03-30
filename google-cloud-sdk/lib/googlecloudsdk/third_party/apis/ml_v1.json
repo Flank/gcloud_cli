@@ -17,6 +17,7 @@
   "documentationLink": "https://cloud.google.com/ml/",
   "protocol": "rest",
   "rootUrl": "https://ml.googleapis.com/",
+  "mtlsRootUrl": "https://ml.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://ml.googleapis.com/",
   "batchPath": "batch",
@@ -104,6 +105,9 @@
       "scopes": {
         "https://www.googleapis.com/auth/cloud-platform": {
           "description": "View and manage your data across Google Cloud Platform services"
+        },
+        "https://www.googleapis.com/auth/cloud-platform.read-only": {
+          "description": "View your data across Google Cloud Platform services"
         }
       }
     }
@@ -201,7 +205,7 @@
     },
     "GoogleCloudMlV1__TrainingInput": {
       "id": "GoogleCloudMlV1__TrainingInput",
-      "description": "Represents input parameters for a training job. When using the\ngcloud command to submit your training job, you can specify\nthe input parameters as command-line arguments and\/or in a YAML configuration\nfile referenced from the --config command-line argument. For\ndetails, see the guide to\n<a href=\"\/ml-engine\/docs\/tensorflow\/training-jobs\">submitting a training\njob<\/a>.",
+      "description": "Represents input parameters for a training job. When using the gcloud command\nto submit your training job, you can specify the input parameters as\ncommand-line arguments and\/or in a YAML configuration file referenced from\nthe --config command-line argument. For details, see the guide to [submitting\na training job](\/ai-platform\/training\/docs\/training-jobs).",
       "type": "object",
       "properties": {
         "scaleTier": {
@@ -210,7 +214,7 @@
             "A single worker instance. This tier is suitable for learning how to use\nCloud ML, and for experimenting with new models using small datasets.",
             "Many workers and a few parameter servers.",
             "A large number of workers with many parameter servers.",
-            "A single worker instance [with a\nGPU](\/ml-engine\/docs\/tensorflow\/using-gpus).",
+            "A single worker instance [with a\nGPU](\/ai-platform\/training\/docs\/using-gpus).",
             "A single worker instance with a\n[Cloud TPU](\/ml-engine\/docs\/tensorflow\/using-tpus).",
             "The CUSTOM tier is not a set tier, but rather enables you to use your\nown cluster specification. When you use this tier, set values to\nconfigure your processing cluster according to these guidelines:\n\n*   You _must_ set `TrainingInput.masterType` to specify the type\n    of machine to use for your master node. This is the only required\n    setting.\n\n*   You _may_ set `TrainingInput.workerCount` to specify the number of\n    workers to use. If you specify one or more workers, you _must_ also\n    set `TrainingInput.workerType` to specify the type of machine to use\n    for your worker nodes.\n\n*   You _may_ set `TrainingInput.parameterServerCount` to specify the\n    number of parameter servers to use. If you specify one or more\n    parameter servers, you _must_ also set\n    `TrainingInput.parameterServerType` to specify the type of machine to\n    use for your parameter servers.\n\nNote that all of your workers must use the same machine type, which can\nbe different from your parameter server type and master type. Your\nparameter servers must likewise use the same machine type, which can be\ndifferent from your worker type and master type."
           ],
@@ -229,7 +233,7 @@
           "type": "string"
         },
         "masterConfig": {
-          "description": "Optional. The configuration for your master worker.\n\nYou should only set `masterConfig.acceleratorConfig` if `masterType` is set\nto a Compute Engine machine type. Learn about [restrictions on accelerator\nconfigurations for\ntraining.](\/ml-engine\/docs\/tensorflow\/using-gpus#compute-engine-machine-types-with-gpu)\n\nSet `masterConfig.imageUri` only if you build a custom image. Only one of\n`masterConfig.imageUri` and `runtimeVersion` should be set. Learn more about\n[configuring custom\ncontainers](\/ml-engine\/docs\/distributed-training-containers).",
+          "description": "Optional. The configuration for your master worker.\n\nYou should only set `masterConfig.acceleratorConfig` if `masterType` is set\nto a Compute Engine machine type. Learn about [restrictions on accelerator\nconfigurations for\ntraining.](\/ai-platform\/training\/docs\/using-gpus#compute-engine-machine-types-with-gpu)\n\nSet `masterConfig.imageUri` only if you build a custom image. Only one of\n`masterConfig.imageUri` and `runtimeVersion` should be set. Learn more\nabout [configuring custom\ncontainers](\/ai-platform\/training\/docs\/distributed-training-containers).",
           "$ref": "GoogleCloudMlV1__ReplicaConfig"
         },
         "workerType": {
@@ -237,7 +241,7 @@
           "type": "string"
         },
         "workerConfig": {
-          "description": "Optional. The configuration for workers.\n\nYou should only set `workerConfig.acceleratorConfig` if `workerType` is set\nto a Compute Engine machine type. [Learn about restrictions on accelerator\nconfigurations for\ntraining.](\/ml-engine\/docs\/tensorflow\/using-gpus#compute-engine-machine-types-with-gpu)\n\nSet `workerConfig.imageUri` only if you build a custom image for your\nworker. If `workerConfig.imageUri` has not been set, AI Platform uses\nthe value of `masterConfig.imageUri`. Learn more about\n[configuring custom\ncontainers](\/ml-engine\/docs\/distributed-training-containers).",
+          "description": "Optional. The configuration for workers.\n\nYou should only set `workerConfig.acceleratorConfig` if `workerType` is set\nto a Compute Engine machine type. [Learn about restrictions on accelerator\nconfigurations for\ntraining.](\/ai-platform\/training\/docs\/using-gpus#compute-engine-machine-types-with-gpu)\n\nSet `workerConfig.imageUri` only if you build a custom image for your\nworker. If `workerConfig.imageUri` has not been set, AI Platform uses\nthe value of `masterConfig.imageUri`. Learn more about\n[configuring custom\ncontainers](\/ai-platform\/training\/docs\/distributed-training-containers).",
           "$ref": "GoogleCloudMlV1__ReplicaConfig"
         },
         "parameterServerType": {
@@ -245,7 +249,15 @@
           "type": "string"
         },
         "parameterServerConfig": {
-          "description": "Optional. The configuration for parameter servers.\n\nYou should only set `parameterServerConfig.acceleratorConfig` if\n`parameterServerConfigType` is set to a Compute Engine machine type. [Learn\nabout restrictions on accelerator configurations for\ntraining.](\/ml-engine\/docs\/tensorflow\/using-gpus#compute-engine-machine-types-with-gpu)\n\nSet `parameterServerConfig.imageUri` only if you build a custom image for\nyour parameter server. If `parameterServerConfig.imageUri` has not been\nset, AI Platform uses the value of `masterConfig.imageUri`.\nLearn more about [configuring custom\ncontainers](\/ml-engine\/docs\/distributed-training-containers).",
+          "description": "Optional. The configuration for parameter servers.\n\nYou should only set `parameterServerConfig.acceleratorConfig` if\n`parameterServerType` is set to a Compute Engine machine type. [Learn\nabout restrictions on accelerator configurations for\ntraining.](\/ai-platform\/training\/docs\/using-gpus#compute-engine-machine-types-with-gpu)\n\nSet `parameterServerConfig.imageUri` only if you build a custom image for\nyour parameter server. If `parameterServerConfig.imageUri` has not been\nset, AI Platform uses the value of `masterConfig.imageUri`.\nLearn more about [configuring custom\ncontainers](\/ai-platform\/training\/docs\/distributed-training-containers).",
+          "$ref": "GoogleCloudMlV1__ReplicaConfig"
+        },
+        "evaluatorType": {
+          "description": "Optional. Specifies the type of virtual machine to use for your training\njob's evaluator nodes.\n\nThe supported values are the same as those described in the entry for\n`masterType`.\n\nThis value must be consistent with the category of machine type that\n`masterType` uses. In other words, both must be Compute Engine machine\ntypes or both must be legacy machine types.\n\nThis value must be present when `scaleTier` is set to `CUSTOM` and\n`evaluatorCount` is greater than zero.",
+          "type": "string"
+        },
+        "evaluatorConfig": {
+          "description": "Optional. The configuration for evaluators.\n\nYou should only set `evaluatorConfig.acceleratorConfig` if\n`evaluatorType` is set to a Compute Engine machine type. [Learn\nabout restrictions on accelerator configurations for\ntraining.](\/ai-platform\/training\/docs\/using-gpus#compute-engine-machine-types-with-gpu)\n\nSet `evaluatorConfig.imageUri` only if you build a custom image for\nyour evaluator. If `evaluatorConfig.imageUri` has not been\nset, AI Platform uses the value of `masterConfig.imageUri`.\nLearn more about [configuring custom\ncontainers](\/ai-platform\/training\/docs\/distributed-training-containers).",
           "$ref": "GoogleCloudMlV1__ReplicaConfig"
         },
         "workerCount": {
@@ -254,7 +266,12 @@
           "format": "int64"
         },
         "parameterServerCount": {
-          "description": "Optional. The number of parameter server replicas to use for the training\njob. Each replica in the cluster will be of the type specified in\n`parameter_server_type`.\n\nThis value can only be used when `scale_tier` is set to `CUSTOM`.If you\nset this value, you must also set `parameter_server_type`.\n\nThe default value is zero.",
+          "description": "Optional. The number of parameter server replicas to use for the training\njob. Each replica in the cluster will be of the type specified in\n`parameter_server_type`.\n\nThis value can only be used when `scale_tier` is set to `CUSTOM`. If you\nset this value, you must also set `parameter_server_type`.\n\nThe default value is zero.",
+          "type": "string",
+          "format": "int64"
+        },
+        "evaluatorCount": {
+          "description": "Optional. The number of evaluator replicas to use for the training job.\nEach replica in the cluster will be of the type specified in\n`evaluator_type`.\n\nThis value can only be used when `scale_tier` is set to `CUSTOM`. If you\nset this value, you must also set `evaluator_type`.\n\nThe default value is zero.",
           "type": "string",
           "format": "int64"
         },
@@ -285,7 +302,7 @@
           "$ref": "GoogleCloudMlV1__NasSpec"
         },
         "region": {
-          "description": "Required. The Google Compute Engine region to run the training job in.\nSee the <a href=\"\/ml-engine\/docs\/tensorflow\/regions\">available regions<\/a>\nfor AI Platform services.",
+          "description": "Required. The region to run the training job in. See the [available\nregions](\/ai-platform\/training\/docs\/regions) for AI Platform Training.",
           "type": "string"
         },
         "jobDir": {
@@ -293,15 +310,23 @@
           "type": "string"
         },
         "runtimeVersion": {
-          "description": "Optional. The AI Platform runtime version to use for training. If not\nset, AI Platform uses the default stable version, 1.0. For more\ninformation, see the\n<a href=\"\/ml-engine\/docs\/runtime-version-list\">runtime version list<\/a>\nand\n<a href=\"\/ml-engine\/docs\/versioning\">how to manage runtime versions<\/a>.",
+          "description": "Optional. The AI Platform runtime version to use for training. You must\neither specify this field or specify `masterConfig.imageUri`.\n\nFor more information, see the [runtime version\nlist](\/ai-platform\/training\/docs\/runtime-version-list) and learn [how to\nmanage runtime versions](\/ai-platform\/training\/docs\/versioning).",
           "type": "string"
         },
         "pythonVersion": {
-          "description": "Optional. The version of Python used in training. If not set, the default\nversion is '2.7'. Python '3.5' is available when `runtime_version` is set\nto '1.4' and above. Python '2.7' works with all supported\n<a href=\"\/ml-engine\/docs\/runtime-version-list\">runtime versions<\/a>.",
+          "description": "Optional. The version of Python used in training. You must either specify\nthis field or specify `masterConfig.imageUri`.\n\nThe following Python versions are available:\n\n* Python '3.7' is available when `runtime_version` is set to '1.15' or\n  later.\n* Python '3.5' is available when `runtime_version` is set to a version\n  from '1.4' to '1.14'.\n* Python '2.7' is available when `runtime_version` is set to '1.15' or\n  earlier.\n\nRead more about the Python versions available for [each runtime\nversion](\/ml-engine\/docs\/runtime-version-list).",
           "type": "string"
         },
+        "encryptionConfig": {
+          "description": "Custom encryption key options for a training job. If this is set,\nthen all resources created by the training job will be encrypted with the\nprovided encryption key.",
+          "$ref": "GoogleCloudMlV1__EncryptionConfig"
+        },
+        "scheduling": {
+          "description": "Optional. Scheduling options for a training job.",
+          "$ref": "GoogleCloudMlV1__Scheduling"
+        },
         "useChiefInTfConfig": {
-          "description": "Optional. Use 'chief' instead of 'master' in TF_CONFIG when Custom\nContainer is used and evaluator is not specified.\n\nDefaults to false.",
+          "description": "Optional. Use `chief` instead of `master` in the `TF_CONFIG` environment\nvariable when training with a custom container. Defaults to `false`. [Learn\nmore about this\nfield.](\/ai-platform\/training\/docs\/distributed-training-details#chief-versus-master)\n\nThis field has no effect for training jobs that don't use a custom\ncontainer.",
           "type": "boolean"
         }
       }
@@ -312,11 +337,11 @@
       "type": "object",
       "properties": {
         "acceleratorConfig": {
-          "description": "Represents the type and number of accelerators used by the replica.\n[Learn about restrictions on accelerator configurations for\ntraining.](\/ml-engine\/docs\/tensorflow\/using-gpus#compute-engine-machine-types-with-gpu)",
+          "description": "Represents the type and number of accelerators used by the replica.\n[Learn about restrictions on accelerator configurations for\ntraining.](\/ai-platform\/training\/docs\/using-gpus#compute-engine-machine-types-with-gpu)",
           "$ref": "GoogleCloudMlV1__AcceleratorConfig"
         },
         "imageUri": {
-          "description": "The Docker image to run on the replica. This image must be in Container\nRegistry. Learn more about [configuring custom\ncontainers](\/ml-engine\/docs\/distributed-training-containers).",
+          "description": "The Docker image to run on the replica. This image must be in Container\nRegistry. Learn more about [configuring custom\ncontainers](\/ai-platform\/training\/docs\/distributed-training-containers).",
           "type": "string"
         },
         "tpuTfVersion": {
@@ -423,13 +448,15 @@
           "enumDescriptions": [
             "The default algorithm used by the hyperparameter tuning service. This is\na Bayesian optimization algorithm.",
             "Simple grid search within the feasible space. To use grid search,\nall parameters must be `INTEGER`, `CATEGORICAL`, or `DISCRETE`.",
-            "Simple random search within the feasible space."
+            "Simple random search within the feasible space.",
+            "Population Based Training Algorithm."
           ],
           "type": "string",
           "enum": [
             "ALGORITHM_UNSPECIFIED",
             "GRID_SEARCH",
-            "RANDOM_SEARCH"
+            "RANDOM_SEARCH",
+            "POPULATION_BASED_TRAINING"
           ]
         }
       }
@@ -577,6 +604,29 @@
             "ONE_SHOT_ALGORITHM_UNSPECIFIED",
             "REINFORCEMENT_LEARNING"
           ]
+        }
+      }
+    },
+    "GoogleCloudMlV1__EncryptionConfig": {
+      "id": "GoogleCloudMlV1__EncryptionConfig",
+      "description": "Represents a custom encryption key configuration that can be applied to\na resource.",
+      "type": "object",
+      "properties": {
+        "kmsKeyName": {
+          "description": "The Cloud KMS resource identifier of the customer managed encryption key\nused to protect a resource, such as a training job. Has the form:\n`projects\/my-project\/locations\/my-region\/keyRings\/my-kr\/cryptoKeys\/my-key`.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudMlV1__Scheduling": {
+      "id": "GoogleCloudMlV1__Scheduling",
+      "description": "All parameters related to scheduling of training jobs.",
+      "type": "object",
+      "properties": {
+        "maxRunningTime": {
+          "description": "Optional. The maximum job running time, expressed in seconds. The field can\ncontain up to nine fractional digits, terminated by `s`. By default there\nis no limit to the running time.\n\nIf the training job is still running after this duration, AI Platform\nTraining cancels it.\n\nFor example, if you want to ensure your job runs for no more than 2 hours,\nset this field to `7200s` (2 hours * 60 minutes \/ hour * 60 seconds \/\nminute).\n\nIf you submit your training job using the `gcloud` tool, you can [provide\nthis field in a `config.yaml`\nfile](\/ai-platform\/training\/docs\/training-jobs#formatting_your_configuration_parameters).\nFor example:\n\n```yaml\ntrainingInput:\n  ...\n  scheduling:\n    maxRunningTime: 7200s\n  ...\n```",
+          "type": "string",
+          "format": "google-duration"
         }
       }
     },
@@ -834,34 +884,38 @@
     },
     "GoogleCloudMlV1__ExplanationConfig": {
       "id": "GoogleCloudMlV1__ExplanationConfig",
-      "description": "Message holding configuration options for explaining model predictions.\nCurrently, the only supported mechanism to explain a model's prediction is\nthrough attributing its output back to its inputs which is essentially a\ncredit assignment task. We support multiple attribution methods, some\nspecific to particular frameworks like Tensorflow and XGBoost.\nNext idx: 7.",
+      "description": "Message holding configuration options for explaining model predictions.\nThere are two feature attribution methods supported for TensorFlow models:\nintegrated gradients and sampled Shapley.\n[Learn more about feature\nattributions.](\/ml-engine\/docs\/ai-explanations\/overview)",
       "type": "object",
       "properties": {
         "ablationAttribution": {
-          "description": "Tensorflow framework explanation methods.",
+          "description": "TensorFlow framework explanation methods.\nAttributes credit to model inputs by ablating features (ie. setting them\nto their default\/missing values) and computing corresponding model score\ndelta per feature. The term \"ablation\" is in reference to running an\n\"ablation study\" to analyze input effects on the outcome of interest,\nwhich in this case is the model's output. This attribution method is\nsupported for TensorFlow and XGBoost models.",
           "$ref": "GoogleCloudMlV1__AblationAttribution"
         },
         "integratedGradientsAttribution": {
+          "description": "Attributes credit by computing the Aumann-Shapley value taking advantage\nof the model's fully differentiable structure. Refer to this paper for\nmore details: http:\/\/proceedings.mlr.press\/v70\/sundararajan17a.html",
           "$ref": "GoogleCloudMlV1__IntegratedGradientsAttribution"
         },
         "sampledShapleyAttribution": {
+          "description": "An attribution method that approximates Shapley values for features that\ncontribute to the label being predicted. A sampling strategy is used to\napproximate the value rather than considering all subsets of features.",
           "$ref": "GoogleCloudMlV1__SampledShapleyAttribution"
         },
-        "samplingShapAttribution": {
-          "$ref": "GoogleCloudMlV1__SamplingShapAttribution"
+        "xraiAttribution": {
+          "description": "Attributes credit by computing the XRAI taking advantage\nof the model's fully differentiable structure. Refer to this paper for\nmore details: https:\/\/arxiv.org\/abs\/1906.02825\nCurrently only implemented for models with natural image inputs.",
+          "$ref": "GoogleCloudMlV1__XraiAttribution"
         },
         "treeShapAttribution": {
-          "description": "XGBoost Framework explanation methods.",
+          "description": "XGBoost framework explanation methods.\nAttributes credit by computing the Shapley value taking advantage of the\nmodel's tree ensemble structure. Refer to this paper for more details:\nhttp:\/\/papers.nips.cc\/paper\/7062-a-unified-approach-to-interpreting-model-predictions.pdf.\nThis attribution method is supported for XGBoost models.",
           "$ref": "GoogleCloudMlV1__TreeShapAttribution"
         },
         "saabasAttribution": {
+          "description": "Attributes credit by running a faster aproximation to the TreeShap\nmethod. Please refer to this link for more details:\nhttps:\/\/blog.datadive.net\/interpreting-random-forests\/ This attribution\nmethod is only supported for XGBoost models.",
           "$ref": "GoogleCloudMlV1__SaabasAttribution"
         }
       }
     },
     "GoogleCloudMlV1__AblationAttribution": {
       "id": "GoogleCloudMlV1__AblationAttribution",
-      "description": "Attributes credit to model inputs by ablating features (ie. setting them to\ntheir default\/missing values) and computing corresponding model score delta\nper feature. The term \"ablation\" is in reference to running an\n\"ablation study\" to analyze input effects on the outcome of interest, which\nin this case is the model's output.\nThis attribution method is supported for Tensorflow and XGBoost models.",
+      "description": "Attributes credit to model inputs by ablating features (ie. setting them to\ntheir default\/missing values) and computing corresponding model score delta\nper feature. The term \"ablation\" is in reference to running an\n\"ablation study\" to analyze input effects on the outcome of interest, which\nin this case is the model's output.\nThis attribution method is supported for TensorFlow and XGBoost models.",
       "type": "object",
       "properties": {
         "numFeatureInteractions": {
@@ -889,18 +943,19 @@
       "type": "object",
       "properties": {
         "numPaths": {
-          "description": "The number of feature permutations to consider when approximating the\nshapley values.",
+          "description": "The number of feature permutations to consider when approximating the\nShapley values.",
           "type": "integer",
           "format": "int32"
         }
       }
     },
-    "GoogleCloudMlV1__SamplingShapAttribution": {
-      "id": "GoogleCloudMlV1__SamplingShapAttribution",
-      "description": "DEPRECATED - use SampledShapleyAttribution.",
+    "GoogleCloudMlV1__XraiAttribution": {
+      "id": "GoogleCloudMlV1__XraiAttribution",
+      "description": "Attributes credit by computing the XRAI taking advantage\nof the model's fully differentiable structure. Refer to this paper for\nmore details: https:\/\/arxiv.org\/abs\/1906.02825\nCurrently only implemented for models with natural image inputs.",
       "type": "object",
       "properties": {
-        "numPaths": {
+        "numIntegralSteps": {
+          "description": "Number of steps for approximating the path integral.\nA good value to start is 50 and gradually increase until the\nsum to diff property is met within the desired error range.",
           "type": "integer",
           "format": "int32"
         }
@@ -1439,11 +1494,11 @@
           "type": "string"
         },
         "defaultVersion": {
-          "description": "Output only. The default version of the model. This version will be used to\nhandle prediction requests that do not specify a version.\n\nYou can change the default version by calling\n[projects.methods.versions.setDefault](\/ml-engine\/reference\/rest\/v1\/projects.models.versions\/setDefault).",
+          "description": "Output only. The default version of the model. This version will be used to\nhandle prediction requests that do not specify a version.\n\nYou can change the default version by calling\nprojects.models.versions.setDefault.",
           "$ref": "GoogleCloudMlV1__Version"
         },
         "regions": {
-          "description": "Optional. The list of regions where the model is going to be deployed.\nCurrently only one region per model is supported.\nDefaults to 'us-central1' if nothing is set.\nSee the <a href=\"\/ml-engine\/docs\/tensorflow\/regions\">available regions<\/a>\nfor AI Platform services.\nNote:\n*   No matter where a model is deployed, it can always be accessed by\n    users from anywhere, both for online and batch prediction.\n*   The region for a batch prediction job is set by the region field when\n    submitting the batch prediction job and does not take its value from\n    this field.",
+          "description": "Optional. The list of regions where the model is going to be deployed.\nOnly one region per model is supported.\nDefaults to 'us-central1' if nothing is set.\nSee the <a href=\"\/ml-engine\/docs\/tensorflow\/regions\">available regions<\/a>\nfor AI Platform services.\nNote:\n*   No matter where a model is deployed, it can always be accessed by\n    users from anywhere, both for online and batch prediction.\n*   The region for a batch prediction job is set by the region field when\n    submitting the batch prediction job and does not take its value from\n    this field.",
           "type": "array",
           "items": {
             "type": "string"
@@ -1473,7 +1528,7 @@
     },
     "GoogleCloudMlV1__Version": {
       "id": "GoogleCloudMlV1__Version",
-      "description": "Represents a version of the model.\n\nEach version is a trained model deployed in the cloud, ready to handle\nprediction requests. A model can have multiple versions. You can get\ninformation about all of the versions of a given model by calling\n[projects.models.versions.list](\/ml-engine\/reference\/rest\/v1\/projects.models.versions\/list).",
+      "description": "Represents a version of the model.\n\nEach version is a trained model deployed in the cloud, ready to handle\nprediction requests. A model can have multiple versions. You can get\ninformation about all of the versions of a given model by calling\nprojects.models.versions.list.",
       "type": "object",
       "properties": {
         "name": {
@@ -1485,11 +1540,11 @@
           "type": "string"
         },
         "isDefault": {
-          "description": "Output only. If true, this version will be used to handle prediction\nrequests that do not specify a version.\n\nYou can change the default version by calling\n[projects.methods.versions.setDefault](\/ml-engine\/reference\/rest\/v1\/projects.models.versions\/setDefault).",
+          "description": "Output only. If true, this version will be used to handle prediction\nrequests that do not specify a version.\n\nYou can change the default version by calling\nprojects.methods.versions.setDefault.",
           "type": "boolean"
         },
         "deploymentUri": {
-          "description": "Required. The Cloud Storage location of the trained model used to\ncreate the version. See the\n[guide to model\ndeployment](\/ml-engine\/docs\/tensorflow\/deploying-models) for more\ninformation.\n\nWhen passing Version to\n[projects.models.versions.create](\/ml-engine\/reference\/rest\/v1\/projects.models.versions\/create)\nthe model service uses the specified location as the source of the model.\nOnce deployed, the model version is hosted by the prediction service, so\nthis location is useful only as a historical record.\nThe total number of model files can't exceed 1000.",
+          "description": "Required. The Cloud Storage location of the trained model used to\ncreate the version. See the\n[guide to model\ndeployment](\/ml-engine\/docs\/tensorflow\/deploying-models) for more\ninformation.\n\nWhen passing Version to\nprojects.models.versions.create\nthe model service uses the specified location as the source of the model.\nOnce deployed, the model version is hosted by the prediction service, so\nthis location is useful only as a historical record.\nThe total number of model files can't exceed 1000.",
           "type": "string"
         },
         "createTime": {
@@ -1503,7 +1558,7 @@
           "format": "google-datetime"
         },
         "runtimeVersion": {
-          "description": "Optional. The AI Platform runtime version to use for this deployment.\nIf not set, AI Platform uses the default stable version, 1.0. For more\ninformation, see the\n[runtime version list](\/ml-engine\/docs\/runtime-version-list) and\n[how to manage runtime versions](\/ml-engine\/docs\/versioning).",
+          "description": "Required. The AI Platform runtime version to use for this deployment.\n\nFor more information, see the\n[runtime version list](\/ml-engine\/docs\/runtime-version-list) and\n[how to manage runtime versions](\/ml-engine\/docs\/versioning).",
           "type": "string"
         },
         "machineType": {
@@ -1585,7 +1640,7 @@
           ]
         },
         "pythonVersion": {
-          "description": "Optional. The version of Python used in prediction. If not set, the default\nversion is '2.7'. Python '3.5' is available when `runtime_version` is set\nto '1.4' and above. Python '2.7' works with all supported runtime versions.",
+          "description": "Required. The version of Python used in prediction.\n\nThe following Python versions are available:\n\n* Python '3.7' is available when `runtime_version` is set to '1.15' or\n  later.\n* Python '3.5' is available when `runtime_version` is set to a version\n  from '1.4' to '1.14'.\n* Python '2.7' is available when `runtime_version` is set to '1.15' or\n  earlier.\n\nRead more about the Python versions available for [each runtime\nversion](\/ml-engine\/docs\/runtime-version-list).",
           "type": "string"
         },
         "acceleratorConfig": {
@@ -1601,12 +1656,18 @@
           "type": "string"
         },
         "requestLoggingConfig": {
-          "description": "Optional. Configures the request-response pair logging on predictions from\nthis Version.",
+          "description": "Optional. *Only* specify this field in a\nprojects.models.versions.patch\nrequest. Specifying it in a\nprojects.models.versions.create\nrequest has no effect.\n\nConfigures the request-response pair logging on predictions from this\nVersion.",
           "$ref": "GoogleCloudMlV1__RequestLoggingConfig"
         },
         "explanationConfig": {
           "description": "Optional. Configures explainability features on the model's version.\nSome explanation features require additional metadata to be loaded\nas part of the model payload.",
           "$ref": "GoogleCloudMlV1__ExplanationConfig"
+        },
+        "container": {
+          "$ref": "GoogleCloudMlV1__ContainerSpec"
+        },
+        "routes": {
+          "$ref": "GoogleCloudMlV1__RouteMap"
         }
       }
     },
@@ -1645,7 +1706,88 @@
           "format": "double"
         },
         "bigqueryTableName": {
-          "description": "Required. Fully qualified BigQuery table name in the following format:\n\"<var>project_id<\/var>.<var>dataset_name<\/var>.<var>table_name<\/var>\"\n\nThe specifcied table must already exist, and the \"Cloud ML Service Agent\"\nfor your project must have permission to write to it. The table must have\nthe following [schema](\/bigquery\/docs\/schemas):\n\n<table>\n  <tr><th>Field name<\/th><th style=\"display: table-cell\">Type<\/th>\n    <th style=\"display: table-cell\">Mode<\/th><\/tr>\n  <tr><td>model<\/td><td>STRING<\/td><td>REQUIRED<\/td><\/tr>\n  <tr><td>model_version<\/td><td>STRING<\/td><td>REQUIRED<\/td><\/tr>\n  <tr><td>time<\/td><td>TIMESTAMP<\/td><td>REQUIRED<\/td><\/tr>\n  <tr><td>raw_data<\/td><td>STRING<\/td><td>REQUIRED<\/td><\/tr>\n  <tr><td>raw_prediction<\/td><td>STRING<\/td><td>NULLABLE<\/td><\/tr>\n  <tr><td>groundtruth<\/td><td>STRING<\/td><td>NULLABLE<\/td><\/tr>\n<\/table>",
+          "description": "Required. Fully qualified BigQuery table name in the following format:\n\"<var>project_id<\/var>.<var>dataset_name<\/var>.<var>table_name<\/var>\"\n\nThe specified table must already exist, and the \"Cloud ML Service Agent\"\nfor your project must have permission to write to it. The table must have\nthe following [schema](\/bigquery\/docs\/schemas):\n\n<table>\n  <tr><th>Field name<\/th><th style=\"display: table-cell\">Type<\/th>\n    <th style=\"display: table-cell\">Mode<\/th><\/tr>\n  <tr><td>model<\/td><td>STRING<\/td><td>REQUIRED<\/td><\/tr>\n  <tr><td>model_version<\/td><td>STRING<\/td><td>REQUIRED<\/td><\/tr>\n  <tr><td>time<\/td><td>TIMESTAMP<\/td><td>REQUIRED<\/td><\/tr>\n  <tr><td>raw_data<\/td><td>STRING<\/td><td>REQUIRED<\/td><\/tr>\n  <tr><td>raw_prediction<\/td><td>STRING<\/td><td>NULLABLE<\/td><\/tr>\n  <tr><td>groundtruth<\/td><td>STRING<\/td><td>NULLABLE<\/td><\/tr>\n<\/table>",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudMlV1__ContainerSpec": {
+      "id": "GoogleCloudMlV1__ContainerSpec",
+      "description": "Specify a custom container to deploy.\nOur ContainerSpec is a subset of the Kubernetes Container specification.\nhttps:\/\/kubernetes.io\/docs\/reference\/generated\/kubernetes-api\/v1.10\/#container-v1-core",
+      "type": "object",
+      "properties": {
+        "image": {
+          "description": "Docker image name.\nMore info: https:\/\/kubernetes.io\/docs\/concepts\/containers\/images",
+          "type": "string"
+        },
+        "command": {
+          "description": "Immutable. Entrypoint array. Not executed within a shell.\nThe docker image's ENTRYPOINT is used if this is not provided.\nVariable references $(VAR_NAME) are expanded using the container's\nenvironment. If a variable cannot be resolved, the reference in the input\nstring will be unchanged. The $(VAR_NAME) syntax can be escaped with a\ndouble $$, ie: $$(VAR_NAME). Escaped references will never be expanded,\nregardless of whether the variable exists or not.\nMore info:\nhttps:\/\/kubernetes.io\/docs\/tasks\/inject-data-application\/define-command-argument-container\/#running-a-command-in-a-shell",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "args": {
+          "description": "Immutable. Arguments to the entrypoint.\nThe docker image's CMD is used if this is not provided.\nVariable references $(VAR_NAME) are expanded using the container's\nenvironment. If a variable cannot be resolved, the reference in the input\nstring will be unchanged. The $(VAR_NAME) syntax can be escaped with a\ndouble $$, ie: $$(VAR_NAME). Escaped references will never be expanded,\nregardless of whether the variable exists or not.\nMore info:\nhttps:\/\/kubernetes.io\/docs\/tasks\/inject-data-application\/define-command-argument-container\/#running-a-command-in-a-shell",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ports": {
+          "description": "Immutable. List of ports to expose from the container. Exposing a port here gives\nthe system additional information about the network connections a\ncontainer uses, but is primarily informational. Not specifying a port here\nDOES NOT prevent that port from being exposed. Any port which is\nlistening on the default \"0.0.0.0\" address inside a container will be\naccessible from the network.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1__ContainerPort"
+          }
+        },
+        "env": {
+          "description": "Immutable. List of environment variables to set in the container.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1__EnvVar"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1__ContainerPort": {
+      "id": "GoogleCloudMlV1__ContainerPort",
+      "description": "ContainerPort represents a network port in a single container.",
+      "type": "object",
+      "properties": {
+        "containerPort": {
+          "description": "Number of port to expose on the pod's IP address.\nThis must be a valid port number, 0 < x < 65536.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "GoogleCloudMlV1__EnvVar": {
+      "id": "GoogleCloudMlV1__EnvVar",
+      "description": "EnvVar represents an environment variable present in a Container.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Name of the environment variable. Must be a C_IDENTIFIER.",
+          "type": "string"
+        },
+        "value": {
+          "description": "Variable references $(VAR_NAME) are expanded\nusing the previous defined environment variables in the container and\nany service environment variables. If a variable cannot be resolved,\nthe reference in the input string will be unchanged. The $(VAR_NAME)\nsyntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped\nreferences will never be expanded, regardless of whether the variable\nexists or not.\nDefaults to \"\".",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudMlV1__RouteMap": {
+      "id": "GoogleCloudMlV1__RouteMap",
+      "description": "RouteMap is used to override HTTP paths sent to a Custom Container. If\nspecified, the HTTP server implemented in the ContainerSpec must support the\nroute. If unspecified, standard HTTP paths will be used.",
+      "type": "object",
+      "properties": {
+        "predict": {
+          "description": "HTTP path to send prediction requests.",
+          "type": "string"
+        },
+        "health": {
+          "description": "HTTP path to send health check requests.",
           "type": "string"
         }
       }
@@ -1699,7 +1841,7 @@
       "type": "object",
       "properties": {
         "httpBody": {
-          "description": "\nRequired. The prediction request body.",
+          "description": "\nRequired. The prediction request body. Refer to the [request body details\nsection](#request-body-details) for more information on how to structure\nyour request.",
           "$ref": "GoogleApi__HttpBody"
         }
       }
@@ -1771,6 +1913,545 @@
         }
       }
     },
+    "GoogleCloudMlV1__Study": {
+      "id": "GoogleCloudMlV1__Study",
+      "description": "A message representing a Study.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Output only. The name of a study.",
+          "type": "string"
+        },
+        "studyConfig": {
+          "description": "Required. Configuration of the study.",
+          "$ref": "GoogleCloudMlV1__StudyConfig"
+        },
+        "state": {
+          "description": "Output only. The detailed state of a study.",
+          "enumDescriptions": [
+            "The study state is unspecified.",
+            "The study is active.",
+            "The study is stopped due to an internal error.",
+            "The study is done when the service exhausts the parameter search space\nor max_trial_count is reached."
+          ],
+          "type": "string",
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "ACTIVE",
+            "INACTIVE",
+            "COMPLETED"
+          ]
+        },
+        "createTime": {
+          "description": "Output only. Time that the study was created.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "inactiveReason": {
+          "description": "Output only. A human readable reason why the Study is inactive.\nThis should be empty if a study is ACTIVE or COMPLETED.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudMlV1__StudyConfig": {
+      "id": "GoogleCloudMlV1__StudyConfig",
+      "description": "Represents configuration of a study.",
+      "type": "object",
+      "properties": {
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1_StudyConfig_MetricSpec"
+          }
+        },
+        "parameters": {
+          "description": "Required. The set of parameters to tune.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1_StudyConfig_ParameterSpec"
+          }
+        },
+        "algorithm": {
+          "description": "The search algorithm specified for the study.",
+          "enumDescriptions": [
+            "The default algorithm used by the Cloud AI Platform Optimization service.",
+            "Gaussian Process Bandit.",
+            "Simple grid search within the feasible space. To use grid search,\nall parameters must be `INTEGER`, `CATEGORICAL`, or `DISCRETE`.",
+            "Simple random search within the feasible space."
+          ],
+          "type": "string",
+          "enum": [
+            "ALGORITHM_UNSPECIFIED",
+            "GAUSSIAN_PROCESS_BANDIT",
+            "GRID_SEARCH",
+            "RANDOM_SEARCH"
+          ]
+        },
+        "automatedStoppingConfig": {
+          "description": "Configuration for automated stopping of unpromising Trials.",
+          "$ref": "GoogleCloudMlV1__AutomatedStoppingConfig"
+        }
+      }
+    },
+    "GoogleCloudMlV1_StudyConfig_MetricSpec": {
+      "id": "GoogleCloudMlV1_StudyConfig_MetricSpec",
+      "description": "Represents a metric to optimize.",
+      "type": "object",
+      "properties": {
+        "goal": {
+          "description": "Required. The optimization goal of the metric.",
+          "enumDescriptions": [
+            "Goal Type will default to maximize.",
+            "Maximize the goal metric.",
+            "Minimize the goal metric."
+          ],
+          "type": "string",
+          "enum": [
+            "GOAL_TYPE_UNSPECIFIED",
+            "MAXIMIZE",
+            "MINIMIZE"
+          ]
+        },
+        "metric": {
+          "description": "Required. The name of the metric.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudMlV1_StudyConfig_ParameterSpec": {
+      "id": "GoogleCloudMlV1_StudyConfig_ParameterSpec",
+      "description": "Represents a single parameter to optimize.",
+      "type": "object",
+      "properties": {
+        "parameter": {
+          "description": "Required. The parameter name must be unique amongst all ParameterSpecs.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Required. The type of the parameter.",
+          "enumDescriptions": [
+            "You must specify a valid type. Using this unspecified type will result\nin an error.",
+            "Type for real-valued parameters.",
+            "Type for integral parameters.",
+            "The parameter is categorical, with a value chosen from the categories\nfield.",
+            "The parameter is real valued, with a fixed set of feasible points. If\n`type==DISCRETE`, feasible_points must be provided, and\n{`min_value`, `max_value`} will be ignored."
+          ],
+          "type": "string",
+          "enum": [
+            "PARAMETER_TYPE_UNSPECIFIED",
+            "DOUBLE",
+            "INTEGER",
+            "CATEGORICAL",
+            "DISCRETE"
+          ]
+        },
+        "doubleValueSpec": {
+          "description": "The value spec for a 'DOUBLE' parameter.",
+          "$ref": "GoogleCloudMlV1_StudyConfigParameterSpec_DoubleValueSpec"
+        },
+        "integerValueSpec": {
+          "description": "The value spec for an 'INTEGER' parameter.",
+          "$ref": "GoogleCloudMlV1_StudyConfigParameterSpec_IntegerValueSpec"
+        },
+        "categoricalValueSpec": {
+          "description": "The value spec for a 'CATEGORICAL' parameter.",
+          "$ref": "GoogleCloudMlV1_StudyConfigParameterSpec_CategoricalValueSpec"
+        },
+        "discreteValueSpec": {
+          "description": "The value spec for a 'DISCRETE' parameter.",
+          "$ref": "GoogleCloudMlV1_StudyConfigParameterSpec_DiscreteValueSpec"
+        },
+        "scaleType": {
+          "description": "How the parameter should be scaled.\nLeave unset for categorical parameters.",
+          "enumDescriptions": [
+            "By default, no scaling is applied.",
+            "Scales the feasible space to (0, 1) linearly.",
+            "Scales the feasible space logarithmically to (0, 1). The entire\nfeasible space must be strictly positive.",
+            "Scales the feasible space \"reverse\" logarithmically to (0, 1). The\nresult is that values close to the top of the feasible space are spread\nout more than points near the bottom. The entire feasible space must be\nstrictly positive."
+          ],
+          "type": "string",
+          "enum": [
+            "SCALE_TYPE_UNSPECIFIED",
+            "UNIT_LINEAR_SCALE",
+            "UNIT_LOG_SCALE",
+            "UNIT_REVERSE_LOG_SCALE"
+          ]
+        },
+        "parentDiscreteValues": {
+          "$ref": "GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentDiscreteValueSpec"
+        },
+        "parentIntValues": {
+          "$ref": "GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentIntValueSpec"
+        },
+        "parentCategoricalValues": {
+          "$ref": "GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentCategoricalValueSpec"
+        },
+        "childParameterSpecs": {
+          "description": "A child node is active if the parameter's value matches the child node's\nmatching_parent_values.\n\nIf two items in child_parameter_specs have the same name, they must have\ndisjoint matching_parent_values.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1_StudyConfig_ParameterSpec"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1_StudyConfigParameterSpec_DoubleValueSpec": {
+      "id": "GoogleCloudMlV1_StudyConfigParameterSpec_DoubleValueSpec",
+      "type": "object",
+      "properties": {
+        "minValue": {
+          "description": "Must be specified if type is `DOUBLE`. Minimum value of the parameter.",
+          "type": "number",
+          "format": "double"
+        },
+        "maxValue": {
+          "description": "Must be specified if type is `DOUBLE`. Maximum value of the parameter.",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "GoogleCloudMlV1_StudyConfigParameterSpec_IntegerValueSpec": {
+      "id": "GoogleCloudMlV1_StudyConfigParameterSpec_IntegerValueSpec",
+      "type": "object",
+      "properties": {
+        "minValue": {
+          "description": "Must be specified if type is `INTEGER`. Minimum value of the parameter.",
+          "type": "string",
+          "format": "int64"
+        },
+        "maxValue": {
+          "description": "Must be specified if type is `INTEGER`. Maximum value of the parameter.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "GoogleCloudMlV1_StudyConfigParameterSpec_CategoricalValueSpec": {
+      "id": "GoogleCloudMlV1_StudyConfigParameterSpec_CategoricalValueSpec",
+      "type": "object",
+      "properties": {
+        "values": {
+          "description": "Must be specified if type is `CATEGORICAL`.\nThe list of possible categories.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1_StudyConfigParameterSpec_DiscreteValueSpec": {
+      "id": "GoogleCloudMlV1_StudyConfigParameterSpec_DiscreteValueSpec",
+      "type": "object",
+      "properties": {
+        "values": {
+          "description": "Must be specified if type is `DISCRETE`.\nA list of feasible points.\nThe list should be in strictly increasing order. For instance, this\nparameter might have possible settings of 1.5, 2.5, and 4.0. This list\nshould not contain more than 1,000 values.",
+          "type": "array",
+          "items": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentDiscreteValueSpec": {
+      "id": "GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentDiscreteValueSpec",
+      "description": "Represents the spec to match discrete values from parent parameter.",
+      "type": "object",
+      "properties": {
+        "values": {
+          "description": "Matches values of the parent parameter with type 'DISCRETE'.\nAll values must exist in `discrete_value_spec` of parent parameter.",
+          "type": "array",
+          "items": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentIntValueSpec": {
+      "id": "GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentIntValueSpec",
+      "description": "Represents the spec to match integer values from parent parameter.",
+      "type": "object",
+      "properties": {
+        "values": {
+          "description": "Matches values of the parent parameter with type 'INTEGER'.\nAll values must lie in `integer_value_spec` of parent parameter.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentCategoricalValueSpec": {
+      "id": "GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentCategoricalValueSpec",
+      "description": "Represents the spec to match categorical values from parent parameter.",
+      "type": "object",
+      "properties": {
+        "values": {
+          "description": "Matches values of the parent parameter with type 'CATEGORICAL'.\nAll values must exist in `categorical_value_spec` of parent parameter.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1__AutomatedStoppingConfig": {
+      "id": "GoogleCloudMlV1__AutomatedStoppingConfig",
+      "description": "Configuration for Automated Early Stopping of Trials. If no\nimplementation_config is set, automated early stopping will not be run.",
+      "type": "object",
+      "properties": {
+        "decayCurveStoppingConfig": {
+          "$ref": "GoogleCloudMlV1_AutomatedStoppingConfig_DecayCurveAutomatedStoppingConfig"
+        },
+        "medianAutomatedStoppingConfig": {
+          "$ref": "GoogleCloudMlV1_AutomatedStoppingConfig_MedianAutomatedStoppingConfig"
+        }
+      }
+    },
+    "GoogleCloudMlV1_AutomatedStoppingConfig_DecayCurveAutomatedStoppingConfig": {
+      "id": "GoogleCloudMlV1_AutomatedStoppingConfig_DecayCurveAutomatedStoppingConfig",
+      "type": "object",
+      "properties": {
+        "useElapsedTime": {
+          "description": "True if measurement.elapsed_time is used as the x-axis of each\nTrials Decay Curve. Otherwise, Measurement.steps will be used as the\nx-axis.",
+          "type": "boolean"
+        }
+      }
+    },
+    "GoogleCloudMlV1_AutomatedStoppingConfig_MedianAutomatedStoppingConfig": {
+      "id": "GoogleCloudMlV1_AutomatedStoppingConfig_MedianAutomatedStoppingConfig",
+      "description": "The median automated stopping rule stops a pending trial if the trial's\nbest objective_value is strictly below the median 'performance' of all\ncompleted trials reported up to the trial's last measurement.\nCurrently, 'performance' refers to the running average of the objective\nvalues reported by the trial in each measurement.",
+      "type": "object",
+      "properties": {
+        "useElapsedTime": {
+          "description": "True if median automated stopping rule applies on\nmeasurement.use_elapsed_time. it means that elapsed_time field of\nlatest measurement of current trial is used to compute median objective\nvalue for each completed trials.",
+          "type": "boolean"
+        }
+      }
+    },
+    "GoogleCloudMlV1__ListStudiesResponse": {
+      "id": "GoogleCloudMlV1__ListStudiesResponse",
+      "type": "object",
+      "properties": {
+        "studies": {
+          "description": "The Studies associated with the project.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1__Study"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1__SuggestTrialsRequest": {
+      "id": "GoogleCloudMlV1__SuggestTrialsRequest",
+      "description": "The request message for the SuggestTrial service method.",
+      "type": "object",
+      "properties": {
+        "suggestionCount": {
+          "description": "Required. The number of suggestions requested.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "clientId": {
+          "description": "Required. The identifier of the client that is requesting the suggestion.\n\nIf multiple SuggestTrialsRequests have the same `client_id`,\nthe service will return the identical suggested trial if the trial is\npending, and provide a new trial if the last suggested trial was completed.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudMlV1__Trial": {
+      "id": "GoogleCloudMlV1__Trial",
+      "description": "A message representing a Trial.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Output only. Name of the trial assigned by the service.",
+          "type": "string"
+        },
+        "state": {
+          "description": "The detailed state of a trial.",
+          "enumDescriptions": [
+            "The trial state is unspecified.",
+            "Indicates that a specific Trial has been requested, but it has not yet\nbeen suggested by the service.",
+            "Indicates that the Trial has been suggested.",
+            "Indicates that the Trial is done, and either has a final_measurement\nset, or is marked as trial_infeasible.",
+            "Indicates that the Trial should stop according to the service."
+          ],
+          "type": "string",
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "REQUESTED",
+            "ACTIVE",
+            "COMPLETED",
+            "STOPPING"
+          ]
+        },
+        "parameters": {
+          "description": "The parameters of the Trial.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1_Trial_Parameter"
+          }
+        },
+        "finalMeasurement": {
+          "description": "The final Measurement containing the objective value.",
+          "$ref": "GoogleCloudMlV1__Measurement"
+        },
+        "measurements": {
+          "description": "A list of measurements that are strictly lexicographically\nordered by their induced tuples (steps, elapsed_time).\nThese are used for early stopping computations.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1__Measurement"
+          }
+        },
+        "startTime": {
+          "description": "Output only. Time the Trial was started.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "endTime": {
+          "description": "Output only. Time the Trial's status changed to COMPLETED.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "clientId": {
+          "description": "Output only. The identifier of the client that originally requested this trial.",
+          "type": "string"
+        },
+        "trialInfeasible": {
+          "description": "Output only. True if the parameters in this trial should not be attempted again.",
+          "type": "boolean"
+        },
+        "infeasibleReason": {
+          "description": "Output only. A human readable string describing why the Trial is\ninfeasible. This should only be set if trial_infeasible is true.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudMlV1_Trial_Parameter": {
+      "id": "GoogleCloudMlV1_Trial_Parameter",
+      "description": "A message representing a parameter to be tuned.",
+      "type": "object",
+      "properties": {
+        "parameter": {
+          "description": "The name of the parameter.",
+          "type": "string"
+        },
+        "floatValue": {
+          "description": "Must be set if ParameterType is DOUBLE or DISCRETE.",
+          "type": "number",
+          "format": "double"
+        },
+        "intValue": {
+          "description": "Must be set if ParameterType is INTEGER",
+          "type": "string",
+          "format": "int64"
+        },
+        "stringValue": {
+          "description": "Must be set if ParameterTypeis CATEGORICAL",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudMlV1__Measurement": {
+      "id": "GoogleCloudMlV1__Measurement",
+      "description": "A message representing a Measurement.",
+      "type": "object",
+      "properties": {
+        "elapsedTime": {
+          "description": "Time that the Trial has been running at the point of this Measurement.",
+          "type": "string",
+          "format": "google-duration"
+        },
+        "stepCount": {
+          "description": "The number of steps a machine learning model has been trained for.\nMust be non-negative.",
+          "type": "string",
+          "format": "int64"
+        },
+        "metrics": {
+          "description": "Provides a list of metrics that act as inputs into the objective\nfunction.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1_Measurement_Metric"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1_Measurement_Metric": {
+      "id": "GoogleCloudMlV1_Measurement_Metric",
+      "description": "A message representing a metric in the measurement.",
+      "type": "object",
+      "properties": {
+        "metric": {
+          "description": "Required. Metric name.",
+          "type": "string"
+        },
+        "value": {
+          "description": "Required. The value for this metric.",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "GoogleCloudMlV1__ListTrialsResponse": {
+      "id": "GoogleCloudMlV1__ListTrialsResponse",
+      "description": "The response message for the ListTrials method.",
+      "type": "object",
+      "properties": {
+        "trials": {
+          "description": "The trials associated with the study.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1__Trial"
+          }
+        }
+      }
+    },
+    "GoogleCloudMlV1__AddTrialMeasurementRequest": {
+      "id": "GoogleCloudMlV1__AddTrialMeasurementRequest",
+      "description": "The request message for the AddTrialMeasurement service method.",
+      "type": "object",
+      "properties": {
+        "measurement": {
+          "description": "Required. The measurement to be added to a trial.",
+          "$ref": "GoogleCloudMlV1__Measurement"
+        }
+      }
+    },
+    "GoogleCloudMlV1__CompleteTrialRequest": {
+      "id": "GoogleCloudMlV1__CompleteTrialRequest",
+      "description": "The request message for the CompleteTrial service method.",
+      "type": "object",
+      "properties": {
+        "finalMeasurement": {
+          "description": "Optional. If provided, it will be used as the completed trial's\nfinal_measurement; Otherwise, the service will auto-select a\npreviously reported measurement as the final-measurement",
+          "$ref": "GoogleCloudMlV1__Measurement"
+        },
+        "trialInfeasible": {
+          "description": "Optional. True if the trial cannot be run with the given Parameter, and\nfinal_measurement will be ignored.",
+          "type": "boolean"
+        },
+        "infeasibleReason": {
+          "description": "Optional. A human readable reason why the Trial was infeasible. This should\nonly be provided if `trial_infeasible` is true.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudMlV1__CheckTrialEarlyStoppingStateRequest": {
+      "id": "GoogleCloudMlV1__CheckTrialEarlyStoppingStateRequest",
+      "description": "The request message for the CheckTrialEarlyStoppingState service method.",
+      "type": "object",
+      "properties": {
+      }
+    },
+    "GoogleCloudMlV1__StopTrialRequest": {
+      "id": "GoogleCloudMlV1__StopTrialRequest",
+      "type": "object",
+      "properties": {
+      }
+    },
     "GoogleIamV1__SetIamPolicyRequest": {
       "id": "GoogleIamV1__SetIamPolicyRequest",
       "description": "Request message for `SetIamPolicy` method.",
@@ -1789,16 +2470,16 @@
     },
     "GoogleIamV1__Policy": {
       "id": "GoogleIamV1__Policy",
-      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions (defined by IAM or configured by users). A `binding` can\noptionally specify a `condition`, which is a logic expression that further\nconstrains the role binding based on attributes about the request and\/or\ntarget resource.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time <\n            timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles\/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles\/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
+      "description": "An Identity and Access Management (IAM) policy, which specifies access\ncontrols for Google Cloud resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions; each `role` can be an IAM predefined role or a user-created\ncustom role.\n\nOptionally, a `binding` can specify a `condition`, which is a logical\nexpression that allows access to a resource only if the expression evaluates\nto `true`. A condition can add constraints based on attributes of the\nrequest, the resource, or both.\n\n**JSON example:**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ],\n      \"etag\": \"BwWWja0YfJA=\",\n      \"version\": 3\n    }\n\n**YAML example:**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles\/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles\/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n    - etag: BwWWja0YfJA=\n    - version: 3\n\nFor a description of IAM and its features, see the\n[IAM documentation](https:\/\/cloud.google.com\/iam\/docs\/).",
       "type": "object",
       "properties": {
         "version": {
-          "description": "Specifies the format of the policy.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nOperations affecting conditional bindings must specify version 3. This can\nbe either setting a conditional policy, modifying a conditional binding,\nor removing a conditional binding from the stored conditional policy.\nOperations on non-conditional policies may specify any valid value or\nleave the field unset.\n\nIf no etag is provided in the call to `setIamPolicy`, any version\ncompliance checks on the incoming and\/or stored policy is skipped.",
+          "description": "Specifies the format of the policy.\n\nValid values are `0`, `1`, and `3`. Requests that specify an invalid value\nare rejected.\n\nAny operation that affects conditional role bindings must specify version\n`3`. This requirement applies to the following operations:\n\n* Getting a policy that includes a conditional role binding\n* Adding a conditional role binding to a policy\n* Changing a conditional role binding in a policy\n* Removing any role binding, with or without a condition, from a policy\n  that includes conditions\n\n**Important:** If you use IAM Conditions, you must include the `etag` field\nwhenever you call `setIamPolicy`. If you omit this field, then IAM allows\nyou to overwrite a version `3` policy with a version `1` policy, and all of\nthe conditions in the version `3` policy are lost.\n\nIf a policy does not include any conditions, operations on that policy may\nspecify any valid version or leave the field unset.",
           "type": "integer",
           "format": "int32"
         },
         "bindings": {
-          "description": "Associates a list of `members` to a `role`. Optionally may specify a\n`condition` that determines when binding is in effect.\n`bindings` with no members will result in an error.",
+          "description": "Associates a list of `members` to a `role`. Optionally, may specify a\n`condition` that determines how and when the `bindings` are applied. Each\nof the `bindings` must contain at least one member.",
           "type": "array",
           "items": {
             "$ref": "GoogleIamV1__Binding"
@@ -1812,7 +2493,7 @@
           }
         },
         "etag": {
-          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten. Due to blind-set semantics of an etag-less policy,\n'setIamPolicy' will not fail even if either of incoming or stored policy\ndoes not meet the version requirements.",
+          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\n**Important:** If you use IAM Conditions, you must include the `etag` field\nwhenever you call `setIamPolicy`. If you omit this field, then IAM allows\nyou to overwrite a version `3` policy with a version `1` policy, and all of\nthe conditions in the version `3` policy are lost.",
           "type": "string",
           "format": "byte"
         }
@@ -1828,7 +2509,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n* `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a user that has been recently deleted. For\n   example,`alice@example.com?uid=123456789012345678901`. If the user is\n   recovered, this value reverts to `user:{emailid}` and the recovered user\n   retains the role in the binding.\n\n* `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus\n   unique identifier) representing a service account that has been recently\n   deleted. For example,\n   `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.\n   If the service account is undeleted, this value reverts to\n   `serviceAccount:{emailid}` and the undeleted service account retains the\n   role in the binding.\n\n* `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a Google group that has been recently\n   deleted. For example, `admins@example.com?uid=123456789012345678901`. If\n   the group is recovered, this value reverts to `group:{emailid}` and the\n   recovered group retains the role in the binding.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
+          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n* `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a user that has been recently deleted. For\n   example, `alice@example.com?uid=123456789012345678901`. If the user is\n   recovered, this value reverts to `user:{emailid}` and the recovered user\n   retains the role in the binding.\n\n* `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus\n   unique identifier) representing a service account that has been recently\n   deleted. For example,\n   `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.\n   If the service account is undeleted, this value reverts to\n   `serviceAccount:{emailid}` and the undeleted service account retains the\n   role in the binding.\n\n* `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a Google group that has been recently\n   deleted. For example, `admins@example.com?uid=123456789012345678901`. If\n   the group is recovered, this value reverts to `group:{emailid}` and the\n   recovered group retains the role in the binding.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
           "type": "array",
           "items": {
             "type": "string"
@@ -1842,23 +2523,23 @@
     },
     "GoogleType__Expr": {
       "id": "GoogleType__Expr",
-      "description": "Represents an expression text. Example:\n\n    title: \"User account presence\"\n    description: \"Determines whether the request has a user account\"\n    expression: \"size(request.user) > 0\"",
+      "description": "Represents a textual expression in the Common Expression Language (CEL)\nsyntax. CEL is a C-like expression language. The syntax and semantics of CEL\nare documented at https:\/\/github.com\/google\/cel-spec.\n\nExample (Comparison):\n\n    title: \"Summary size limit\"\n    description: \"Determines if a summary is less than 100 chars\"\n    expression: \"document.summary.size() < 100\"\n\nExample (Equality):\n\n    title: \"Requestor is owner\"\n    description: \"Determines if requestor is the document owner\"\n    expression: \"document.owner == request.auth.claims.email\"\n\nExample (Logic):\n\n    title: \"Public documents\"\n    description: \"Determine whether the document should be publicly visible\"\n    expression: \"document.type != 'private' && document.type != 'internal'\"\n\nExample (Data Manipulation):\n\n    title: \"Notification string\"\n    description: \"Create a notification string with a timestamp.\"\n    expression: \"'New message received at ' + string(document.create_time)\"\n\nThe exact variables and functions that may be referenced within an expression\nare determined by the service that evaluates it. See the service\ndocumentation for additional information.",
       "type": "object",
       "properties": {
         "expression": {
-          "description": "Textual representation of an expression in\nCommon Expression Language syntax.\n\nThe application context of the containing message determines which\nwell-known feature set of CEL is supported.",
+          "description": "Textual representation of an expression in Common Expression Language\nsyntax.",
           "type": "string"
         },
         "title": {
-          "description": "An optional title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
+          "description": "Optional. Title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
           "type": "string"
         },
         "description": {
-          "description": "An optional description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
+          "description": "Optional. Description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
           "type": "string"
         },
         "location": {
-          "description": "An optional string indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
+          "description": "Optional. String indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
           "type": "string"
         }
       }
@@ -2006,6 +2687,112 @@
           }
         }
       }
+    },
+    "GoogleCloudMlV1__SuggestTrialsMetadata": {
+      "id": "GoogleCloudMlV1__SuggestTrialsMetadata",
+      "description": "Metadata field of a google.longrunning.Operation associated\nwith a SuggestTrialsRequest.",
+      "type": "object",
+      "properties": {
+        "study": {
+          "description": "The name of the study that the trial belongs to.",
+          "type": "string"
+        },
+        "createTime": {
+          "description": "The time operation was submitted.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "suggestionCount": {
+          "description": "The number of suggestions requested.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "clientId": {
+          "description": "The identifier of the client that is requesting the suggestion.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudMlV1__SuggestTrialsResponse": {
+      "id": "GoogleCloudMlV1__SuggestTrialsResponse",
+      "description": "This message will be placed in the response field of a completed\ngoogle.longrunning.Operation associated with a SuggestTrials request.",
+      "type": "object",
+      "properties": {
+        "trials": {
+          "description": "A list of Trials.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudMlV1__Trial"
+          }
+        },
+        "studyState": {
+          "description": "The state of the study.",
+          "enumDescriptions": [
+            "The study state is unspecified.",
+            "The study is active.",
+            "The study is stopped due to an internal error.",
+            "The study is done when the service exhausts the parameter search space\nor max_trial_count is reached."
+          ],
+          "type": "string",
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "ACTIVE",
+            "INACTIVE",
+            "COMPLETED"
+          ]
+        },
+        "startTime": {
+          "description": "The time operation was started.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "endTime": {
+          "description": "The time operation processing completed.",
+          "type": "string",
+          "format": "google-datetime"
+        }
+      }
+    },
+    "GoogleCloudMlV1__CheckTrialEarlyStoppingStateMetatdata": {
+      "id": "GoogleCloudMlV1__CheckTrialEarlyStoppingStateMetatdata",
+      "description": "This message will be placed in the metadata field of a\ngoogle.longrunning.Operation associated with a CheckTrialEarlyStoppingState\nrequest.",
+      "type": "object",
+      "properties": {
+        "study": {
+          "description": "The name of the study that the trial belongs to.",
+          "type": "string"
+        },
+        "trial": {
+          "description": "The Trial name.",
+          "type": "string"
+        },
+        "createTime": {
+          "description": "The time operation was submitted.",
+          "type": "string",
+          "format": "google-datetime"
+        }
+      }
+    },
+    "GoogleCloudMlV1__CheckTrialEarlyStoppingStateResponse": {
+      "id": "GoogleCloudMlV1__CheckTrialEarlyStoppingStateResponse",
+      "description": "The message will be placed in the response field of a completed\ngoogle.longrunning.Operation associated with a CheckTrialEarlyStoppingState\nrequest.",
+      "type": "object",
+      "properties": {
+        "shouldStop": {
+          "description": "True if the Trial should stop.",
+          "type": "boolean"
+        },
+        "startTime": {
+          "description": "The time operation was started.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "endTime": {
+          "description": "The time operation processing completed.",
+          "type": "string",
+          "format": "google-datetime"
+        }
+      }
     }
   },
   "resources": {
@@ -2021,7 +2808,7 @@
               "description": "Required. The resource name of a model or a version.\n\nAuthorization: requires the `predict` permission on the specified resource.",
               "location": "path",
               "required": true,
-              "pattern": "^projects\/.+$",
+              "pattern": "^projects\/.*$",
               "type": "string"
             }
           },
@@ -2037,7 +2824,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Performs prediction on the data in the request.\nAI Platform implements a custom `predict` verb on top of an HTTP POST\nmethod. <p>For details of the request and response format, see the **guide\nto the [predict request format](\/ml-engine\/docs\/v1\/predict-request)**."
+          "description": "Performs online prediction on the data in the request.\n\n<div>{% dynamic include \"\/ai-platform\/includes\/___predict-request\" %}<\/div>"
         },
         "explain": {
           "id": "ml.projects.explain",
@@ -2049,7 +2836,7 @@
               "description": "Required. The resource name of a model or a version.\n\nAuthorization: requires the `predict` permission on the specified resource.",
               "location": "path",
               "required": true,
-              "pattern": "^projects\/.+$",
+              "pattern": "^projects\/.*$",
               "type": "string"
             }
           },
@@ -2065,7 +2852,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Performs explanation on the data in the request.\nAI Platform implements a custom `explain` verb on top of an HTTP POST\nmethod. <p>For details of the request and response format, see the **guide\nto the [explain request format](\/ml-engine\/docs\/v1\/explain-request)**."
+          "description": "Performs explanation on the data in the request.\nAI Platform implements a custom `explain` verb on top of an HTTP POST\nmethod."
         },
         "getConfig": {
           "id": "ml.projects.getConfig",
@@ -2162,7 +2949,8 @@
                 "$ref": "GoogleCloudMlV1__ListJobsResponse"
               },
               "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
               "description": "Lists the jobs in the project.\n\nIf there are no jobs that match the request parameters, the list\nrequest returns an empty response body: {}."
             },
@@ -2187,7 +2975,8 @@
                 "$ref": "GoogleCloudMlV1__Job"
               },
               "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
               "description": "Describes a job."
             },
@@ -2365,7 +3154,8 @@
                 "$ref": "GoogleCloudMlV1__Location"
               },
               "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
               "description": "Get the complete list of CMLE capabilities in a location, along with their\nlocation-specific properties."
             },
@@ -2401,9 +3191,429 @@
                 "$ref": "GoogleCloudMlV1__ListLocationsResponse"
               },
               "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
               "description": "List all locations that provides at least one type of CMLE capability."
+            }
+          }
+          ,
+          "resources": {
+            "operations": {
+              "methods": {
+                "get": {
+                  "id": "ml.projects.locations.operations.get",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/operations\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "GoogleLongrunning__Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets the latest state of a long-running operation.  Clients can use this\nmethod to poll the operation result at intervals as recommended by the API\nservice."
+                },
+                "cancel": {
+                  "id": "ml.projects.locations.operations.cancel",
+                  "path": "v1/{+name}:cancel",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource to be cancelled.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/operations\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "GoogleProtobuf__Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Starts asynchronous cancellation on a long-running operation.  The server\nmakes a best effort to cancel the operation, but success is not\nguaranteed.  If the server doesn't support this method, it returns\n`google.rpc.Code.UNIMPLEMENTED`.  Clients can use\nOperations.GetOperation or\nother methods to check whether the cancellation succeeded or whether the\noperation completed despite cancellation. On successful cancellation,\nthe operation is not deleted; instead, it becomes an operation with\nan Operation.error value with a google.rpc.Status.code of 1,\ncorresponding to `Code.CANCELLED`."
+                }
+              }
+            },
+            "studies": {
+              "methods": {
+                "create": {
+                  "id": "ml.projects.locations.studies.create",
+                  "path": "v1/{+parent}/studies",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. The project and location that the study belongs to.\nFormat: projects\/{project}\/locations\/{location}",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
+                      "type": "string"
+                    },
+                    "studyId": {
+                      "description": "Required. The ID to use for the study, which will become the final component of\nthe study's resource name.",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "request": {
+                    "$ref": "GoogleCloudMlV1__Study"
+                  },
+                  "response": {
+                    "$ref": "GoogleCloudMlV1__Study"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Creates a study."
+                },
+                "get": {
+                  "id": "ml.projects.locations.studies.get",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies/{studiesId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. The study name.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/studies\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "GoogleCloudMlV1__Study"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets a study."
+                },
+                "list": {
+                  "id": "ml.projects.locations.studies.list",
+                  "path": "v1/{+parent}/studies",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. The project and location that the study belongs to.\nFormat: projects\/{project}\/locations\/{location}",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "GoogleCloudMlV1__ListStudiesResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists all the studies in a region for an associated project."
+                },
+                "delete": {
+                  "id": "ml.projects.locations.studies.delete",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies/{studiesId}",
+                  "httpMethod": "DELETE",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. The study name.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/studies\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "GoogleProtobuf__Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Deletes a study."
+                }
+              }
+              ,
+              "resources": {
+                "trials": {
+                  "methods": {
+                    "suggest": {
+                      "id": "ml.projects.locations.studies.trials.suggest",
+                      "path": "v1/{+parent}/trials:suggest",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies/{studiesId}/trials:suggest",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "parent": {
+                          "description": "Required. The name of the study that the trial belongs to.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/studies\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "request": {
+                        "$ref": "GoogleCloudMlV1__SuggestTrialsRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleLongrunning__Operation"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Returns a long-running operation associated with the generation of trial\nsuggestions."
+                    },
+                    "create": {
+                      "id": "ml.projects.locations.studies.trials.create",
+                      "path": "v1/{+parent}/trials",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies/{studiesId}/trials",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "parent": {
+                          "description": "Required. The name of the study that the trial belongs to.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/studies\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "request": {
+                        "$ref": "GoogleCloudMlV1__Trial"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudMlV1__Trial"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Adds a user provided trial to a Study."
+                    },
+                    "get": {
+                      "id": "ml.projects.locations.studies.trials.get",
+                      "path": "v1/{+name}",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies/{studiesId}/trials/{trialsId}",
+                      "httpMethod": "GET",
+                      "parameters": {
+                        "name": {
+                          "description": "Required. The trial name.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/studies\/[^\/]+\/trials\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "response": {
+                        "$ref": "GoogleCloudMlV1__Trial"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Gets a Trial."
+                    },
+                    "list": {
+                      "id": "ml.projects.locations.studies.trials.list",
+                      "path": "v1/{+parent}/trials",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies/{studiesId}/trials",
+                      "httpMethod": "GET",
+                      "parameters": {
+                        "parent": {
+                          "description": "Required. The name of the study that the trial belongs to.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/studies\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "response": {
+                        "$ref": "GoogleCloudMlV1__ListTrialsResponse"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Lists the trials associated with a Study."
+                    },
+                    "addMeasurement": {
+                      "id": "ml.projects.locations.studies.trials.addMeasurement",
+                      "path": "v1/{+name}:addMeasurement",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies/{studiesId}/trials/{trialsId}:addMeasurement",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "name": {
+                          "description": "Required. The trial name.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/studies\/[^\/]+\/trials\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "request": {
+                        "$ref": "GoogleCloudMlV1__AddTrialMeasurementRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudMlV1__Trial"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Adds a measurement of the objective metrics to a Trial. This measurement\nis assumed to have been taken before the Trial is complete."
+                    },
+                    "complete": {
+                      "id": "ml.projects.locations.studies.trials.complete",
+                      "path": "v1/{+name}:complete",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies/{studiesId}/trials/{trialsId}:complete",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "name": {
+                          "description": "Required. The trial name.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/studies\/[^\/]+\/trials\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "request": {
+                        "$ref": "GoogleCloudMlV1__CompleteTrialRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudMlV1__Trial"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Marks a Trial as complete."
+                    },
+                    "delete": {
+                      "id": "ml.projects.locations.studies.trials.delete",
+                      "path": "v1/{+name}",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies/{studiesId}/trials/{trialsId}",
+                      "httpMethod": "DELETE",
+                      "parameters": {
+                        "name": {
+                          "description": "Required. The trial name.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/studies\/[^\/]+\/trials\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "response": {
+                        "$ref": "GoogleProtobuf__Empty"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Deletes a Trial."
+                    },
+                    "checkEarlyStoppingState": {
+                      "id": "ml.projects.locations.studies.trials.checkEarlyStoppingState",
+                      "path": "v1/{+name}:checkEarlyStoppingState",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies/{studiesId}/trials/{trialsId}:checkEarlyStoppingState",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "name": {
+                          "description": "Required. The trial name.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/studies\/[^\/]+\/trials\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "request": {
+                        "$ref": "GoogleCloudMlV1__CheckTrialEarlyStoppingStateRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleLongrunning__Operation"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Checks whether a trial should stop or not."
+                    },
+                    "stop": {
+                      "id": "ml.projects.locations.studies.trials.stop",
+                      "path": "v1/{+name}:stop",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/studies/{studiesId}/trials/{trialsId}:stop",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "name": {
+                          "description": "Required. The trial name.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/studies\/[^\/]+\/trials\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "request": {
+                        "$ref": "GoogleCloudMlV1__StopTrialRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudMlV1__Trial"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Stops a trial."
+                    }
+                  }
+                }
+              }
             }
           }
         },
@@ -2530,7 +3740,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Creates a model which will later contain one or more versions.\n\nYou must add at least one version before you can request predictions from\nthe model. Add versions by calling\n[projects.models.versions.create](\/ml-engine\/reference\/rest\/v1\/projects.models.versions\/create)."
+              "description": "Creates a model which will later contain one or more versions.\n\nYou must add at least one version before you can request predictions from\nthe model. Add versions by calling\nprojects.models.versions.create."
             },
             "list": {
               "id": "ml.projects.models.list",
@@ -2569,7 +3779,8 @@
                 "$ref": "GoogleCloudMlV1__ListModelsResponse"
               },
               "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
               "description": "Lists the models in a project.\n\nEach project can contain multiple models, and each model can have multiple\nversions.\n\nIf there are no models that match the request parameters, the list request\nreturns an empty response body: {}."
             },
@@ -2594,7 +3805,8 @@
                 "$ref": "GoogleCloudMlV1__Model"
               },
               "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
               "description": "Gets information about a model, including its name, the description (if\nset), and the default version (if at least one version of the model has\nbeen deployed)."
             },
@@ -2621,7 +3833,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Deletes a model.\n\nYou can only delete a model if there are no versions in it. You can delete\nversions by calling\n[projects.models.versions.delete](\/ml-engine\/reference\/rest\/v1\/projects.models.versions\/delete)."
+              "description": "Deletes a model.\n\nYou can only delete a model if there are no versions in it. You can delete\nversions by calling\nprojects.models.versions.delete."
             },
             "patch": {
               "id": "ml.projects.models.patch",
@@ -2775,7 +3987,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Creates a new version of a model from a trained TensorFlow model.\n\nIf the version created in the cloud by this call is the first deployed\nversion of the specified model, it will be made the default version of the\nmodel. When you add a version to a model that already has one or more\nversions, the default version does not automatically change. If you want a\nnew version to be the default, you must call\n[projects.models.versions.setDefault](\/ml-engine\/reference\/rest\/v1\/projects.models.versions\/setDefault)."
+                  "description": "Creates a new version of a model from a trained TensorFlow model.\n\nIf the version created in the cloud by this call is the first deployed\nversion of the specified model, it will be made the default version of the\nmodel. When you add a version to a model that already has one or more\nversions, the default version does not automatically change. If you want a\nnew version to be the default, you must call\nprojects.models.versions.setDefault."
                 },
                 "patch": {
                   "id": "ml.projects.models.versions.patch",
@@ -2791,7 +4003,7 @@
                       "type": "string"
                     },
                     "updateMask": {
-                      "description": "Required. Specifies the path, relative to `Version`, of the field to\nupdate. Must be present and non-empty.\n\nFor example, to change the description of a version to \"foo\", the\n`update_mask` parameter would be specified as `description`, and the\n`PATCH` request body would specify the new value, as follows:\n\n```\n{\n  \"description\": \"foo\"\n}\n```\n\nCurrently the only supported update mask fields are `description`,\n`autoScaling.minNodes`, and `manualScaling.nodes`. However, you can only\nupdate `manualScaling.nodes` if the version uses a [Compute Engine (N1)\nmachine type](\/ml-engine\/docs\/machine-types-online-prediction).",
+                      "description": "Required. Specifies the path, relative to `Version`, of the field to\nupdate. Must be present and non-empty.\n\nFor example, to change the description of a version to \"foo\", the\n`update_mask` parameter would be specified as `description`, and the\n`PATCH` request body would specify the new value, as follows:\n\n```\n{\n  \"description\": \"foo\"\n}\n```\n\nCurrently the only supported update mask fields are `description`,\n`requestLoggingConfig`, `autoScaling.minNodes`, and `manualScaling.nodes`.\nHowever, you can only update `manualScaling.nodes` if the version uses a\n[Compute Engine (N1)\nmachine type](\/ml-engine\/docs\/machine-types-online-prediction).",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"
@@ -2809,7 +4021,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Updates the specified Version resource.\n\nCurrently the only update-able fields are `description` and\n`autoScaling.minNodes`."
+                  "description": "Updates the specified Version resource.\n\nCurrently the only update-able fields are `description`,\n`requestLoggingConfig`, `autoScaling.minNodes`, and `manualScaling.nodes`."
                 },
                 "list": {
                   "id": "ml.projects.models.versions.list",
@@ -2848,7 +4060,8 @@
                     "$ref": "GoogleCloudMlV1__ListVersionsResponse"
                   },
                   "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ],
                   "description": "Gets basic information about all the versions of a model.\n\nIf you expect that a model has many versions, or if you need to handle\nonly a limited number of results at a time, you can request that the list\nbe retrieved in batches (called pages).\n\nIf there are no versions that match the request parameters, the list\nrequest returns an empty response body: {}."
                 },
@@ -2875,7 +4088,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Gets information about a model version.\n\nModels can have multiple versions. You can call\n[projects.models.versions.list](\/ml-engine\/reference\/rest\/v1\/projects.models.versions\/list)\nto get the same information that this method returns for all of the\nversions of a model."
+                  "description": "Gets information about a model version.\n\nModels can have multiple versions. You can call\nprojects.models.versions.list\nto get the same information that this method returns for all of the\nversions of a model."
                 },
                 "delete": {
                   "id": "ml.projects.models.versions.delete",
@@ -2884,7 +4097,7 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "Required. The name of the version. You can get the names of all the\nversions of a model by calling\n[projects.models.versions.list](\/ml-engine\/reference\/rest\/v1\/projects.models.versions\/list).",
+                      "description": "Required. The name of the version. You can get the names of all the\nversions of a model by calling\nprojects.models.versions.list.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/models\/[^\/]+\/versions\/[^\/]+$",
@@ -2909,7 +4122,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "name": {
-                      "description": "Required. The name of the version to make the default for the model. You\ncan get the names of all the versions of a model by calling\n[projects.models.versions.list](\/ml-engine\/reference\/rest\/v1\/projects.models.versions\/list).",
+                      "description": "Required. The name of the version to make the default for the model. You\ncan get the names of all the versions of a model by calling\nprojects.models.versions.list.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/models\/[^\/]+\/versions\/[^\/]+$",

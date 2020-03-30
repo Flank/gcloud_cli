@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute packet-mirrorings list - list Google Compute Engine
-        packet mirrorings
+        packet mirroring policies
 
 SYNOPSIS
     gcloud alpha compute packet-mirrorings list [NAME ...]
@@ -10,10 +10,11 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute packet-mirrorings list displays all Google
-    Compute Engine packet mirrorings in a project.
+    Compute Engine packet mirroring policies in a project.
 
-    By default, packet mirrorings from all regions are listed. The results can
-    be narrowed down using a filter: --filter="region:( REGION ... )".
+    By default, packet mirroring policies from all regions are listed. The
+    results can be narrowed down using a filter: --filter="region:( REGION ...
+    )".
 
 POSITIONAL ARGUMENTS
      [NAME ...]
@@ -71,20 +72,21 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To list all packet mirrorings in a project in table form, run:
+    To list all packet mirroring policies in a project in table form, run:
 
         $ gcloud alpha compute packet-mirrorings list
 
-    To list the URIs of all packet mirrorings in a project, run:
+    To list the URIs of all packet mirroring policies in a project, run:
 
         $ gcloud alpha compute packet-mirrorings list --uri
 
-    To list all packet mirrorings in the us-central1 and europe-west1 regions,
-    run:
+    To list all packet mirroring policies in the us-central1 and europe-west1
+    regions, run:
 
         $ gcloud alpha compute packet-mirrorings list \
             --filter="region:( us-central1 europe-west1 )"
@@ -93,7 +95,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud compute packet-mirrorings list
         $ gcloud beta compute packet-mirrorings list
 

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute os\-config \- manage OS Config tasks for Compute Engine VMs
+gcloud alpha compute os\-config \- manage OS Config tasks for Compute Engine VM instances
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha compute os\-config \- manage OS Config tasks for Compute Engine VMs
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Manage OS Config tasks for Compute Engine VMs.
+\fB(ALPHA)\fR Manage OS Config tasks for Compute Engine VM instances.
 
 
 
@@ -26,8 +26,9 @@ gcloud alpha compute os\-config \- manage OS Config tasks for Compute Engine VMs
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -38,7 +39,11 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBguest\-policies\fR
-\fB(ALPHA)\fR Manage guest OS policies for Compute Engine VMs.
+\fB(ALPHA)\fR Manage guest OS policies for Compute Engine VM instances.
+
+.TP 2m
+\fBpatch\-deployments\fR
+\fB(ALPHA)\fR Manage guest OS patch deployments for Compute Engine VM instances.
 
 .TP 2m
 \fBpatch\-jobs\fR
@@ -53,5 +58,10 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud compute os\-config
+$ gcloud beta compute os\-config
+.RE
 

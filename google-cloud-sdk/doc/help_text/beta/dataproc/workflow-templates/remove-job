@@ -24,14 +24,10 @@ POSITIONAL ARGUMENTS
           this group are specified.
 
        --region=REGION
-          Cloud Dataproc region for the template. Each Cloud Dataproc region
-          constitutes an independent resource namespace constrained to
-          deploying instances into Google Compute Engine zones inside the
-          region. The default value of global is a special multi-region
-          namespace which is capable of deploying instances into all Google
-          Compute Engine zones globally, and is disjoint from other Cloud
-          Dataproc regions. Overrides the default dataproc/region property
-          value for this command invocation.
+          Dataproc region for the template. Each Dataproc region constitutes an
+          independent resource namespace constrained to deploying instances
+          into Compute Engine zones inside the region. Overrides the default
+          dataproc/region property value for this command invocation.
 
 FLAGS
      --step-id=STEP_ID
@@ -41,8 +37,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To remove a job with step ID 'step-id' from a workflow template
+    'workflow-template' in region 'us-central1', run:
+
+        $ gcloud beta dataproc workflow-templates remove-job \
+            workflow-template --region=us-central1 --step-id=step-id
 
 NOTES
     This command is currently in BETA and may change without notice. These

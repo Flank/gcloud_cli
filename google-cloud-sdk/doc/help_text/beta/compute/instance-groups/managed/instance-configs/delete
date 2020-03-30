@@ -1,0 +1,91 @@
+NAME
+    gcloud beta compute instance-groups managed instance-configs delete -
+        delete per instance configs from managed instance group
+
+SYNOPSIS
+    gcloud beta compute instance-groups managed instance-configs delete NAME
+        --instances=INSTANCE,[INSTANCE,...] [--no-update-instance]
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute instance-groups managed instance-configs delete
+    deletes one or more per instance configs from a Google Compute Engine
+    managed instance group.
+
+    Changes are applied immediately to the corresponding instances, by
+    performing the necessary action (for example, REFRESH), unless overridden
+    by providing the --no-update-instance flag.
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the managed instance group to delete.
+
+REQUIRED FLAGS
+     --instances=INSTANCE,[INSTANCE,...]
+        Names of instances to delete instance-configs from.
+
+OPTIONAL FLAGS
+     --update-instance
+        Apply the configuration changes immediately to the instance. If you
+        disable this flag, the managed instance group will apply the config
+        update when you next recreate or update the instance.
+
+        Example: say you have an instance with a disk attached to it and you
+        created a stateful config for the disk. If you decide to delete the
+        stateful config for the disk and you provide this flag, the MIG
+        immediately refreshes the instance and removes the stateful config for
+        the disk. Similarly if you have attached a new disk or changed its
+        definition, with this flag the MIG immediately refreshes the instance
+        with the new config.
+
+        Enabled by default, use --no-update-instance to disable.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          Region of the managed instance group to delete. If not specified, you
+          may be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          Zone of the managed instance group to delete. If not specified, you
+          may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To delete the per-instance config from my-instance, run:
+
+        $ gcloud beta compute instance-groups managed instance-configs \
+            delete my-group --region=europe-west4 --instances=my-instance
+
+    This will remove all metadata and detach all disks that were defined in
+    per-instance config (unless also defined in the instance template, in which
+    case it remains attached).
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha compute instance-groups managed instance-configs \
+            delete
+

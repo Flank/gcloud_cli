@@ -40,7 +40,8 @@ class CreateTest(base.DnsMockBetaTest):
         networks=test_networks,
         forwarding=True,
         logging=True,
-        name_server_config=util_beta.GetAltNameServerConfig(test_nameservers),
+        name_server_config=util_beta.GetAltNameServerConfig(
+            target_servers=test_nameservers),
         num=1).pop()
     create_req = self.messages.DnsPoliciesCreateRequest(
         project=self.Project(), policy=expected_output)
@@ -49,6 +50,57 @@ class CreateTest(base.DnsMockBetaTest):
     actual_output = self.Run('dns policies create mypolicy0 --description '
                              '"My policy 0" --networks default,network1 '
                              '--alternative-name-servers 1.0.1.1,1.0.1.2 '
+                             '--enable-inbound-forwarding '
+                             '--enable-logging ')
+    self.assertEqual(expected_output, actual_output)
+
+  def testCreateWithBothAlternativeNameServers(self):
+    test_networks = [
+        util_beta.GetNetworkURI('default', self.Project()),
+        util_beta.GetNetworkURI('network1', self.Project())
+    ]
+    test_nameservers = ['1.0.1.1', '1.0.1.2']
+    private_nameservers = ['8.8.8.8']
+    expected_output = util_beta.GetPolicies(
+        networks=test_networks,
+        forwarding=True,
+        logging=True,
+        name_server_config=util_beta.GetAltNameServerConfig(
+            target_servers=test_nameservers,
+            private_target_servers=private_nameservers),
+        num=1).pop()
+    create_req = self.messages.DnsPoliciesCreateRequest(
+        project=self.Project(), policy=expected_output)
+    self.client.policies.Create.Expect(
+        request=create_req, response=expected_output)
+    actual_output = self.Run('dns policies create mypolicy0 --description '
+                             '"My policy 0" --networks default,network1 '
+                             '--alternative-name-servers 1.0.1.1,1.0.1.2 '
+                             '--private-alternative-name-servers 8.8.8.8 '
+                             '--enable-inbound-forwarding '
+                             '--enable-logging ')
+    self.assertEqual(expected_output, actual_output)
+
+  def testCreateWithOnlyPrivateAlternativeNameServers(self):
+    test_networks = [
+        util_beta.GetNetworkURI('default', self.Project()),
+        util_beta.GetNetworkURI('network1', self.Project())
+    ]
+    private_nameservers = ['8.8.8.8']
+    expected_output = util_beta.GetPolicies(
+        networks=test_networks,
+        forwarding=True,
+        logging=True,
+        name_server_config=util_beta.GetAltNameServerConfig(
+            target_servers=[], private_target_servers=private_nameservers),
+        num=1).pop()
+    create_req = self.messages.DnsPoliciesCreateRequest(
+        project=self.Project(), policy=expected_output)
+    self.client.policies.Create.Expect(
+        request=create_req, response=expected_output)
+    actual_output = self.Run('dns policies create mypolicy0 --description '
+                             '"My policy 0" --networks default,network1 '
+                             '--private-alternative-name-servers 8.8.8.8 '
                              '--enable-inbound-forwarding '
                              '--enable-logging ')
     self.assertEqual(expected_output, actual_output)

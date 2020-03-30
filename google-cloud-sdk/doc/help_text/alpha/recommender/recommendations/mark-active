@@ -40,11 +40,12 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
-    This command uses the recommender/v1alpha1 API. The full documentation for
+    This command uses the recommender/v1alpha2 API. The full documentation for
     this API can be found at: https://cloud.google.com/recommender/docs/
 
 EXAMPLES
@@ -52,7 +53,8 @@ EXAMPLES
 
         $ gcloud alpha recommender recommendations mark-active abcd-1234 \
             --project=project-name --location=global \
-            --recommender=google.iam.policy.RoleRecommender --etag=abc123
+            --recommender=google.compute.instance.MachineTypeRecommender \
+            --etag=abc123
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

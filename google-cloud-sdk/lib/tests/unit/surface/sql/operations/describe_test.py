@@ -45,7 +45,8 @@ class _BaseOperationsDescribeTest(object):
                 23,
                 12,
                 672000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 7,
@@ -54,7 +55,8 @@ class _BaseOperationsDescribeTest(object):
                 23,
                 13,
                 672000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 7,
@@ -63,41 +65,43 @@ class _BaseOperationsDescribeTest(object):
                 23,
                 16,
                 342000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='integration-test',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='1cb8a924-898d-41ec-b695-39a6dc018d16',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'.
-            format(self.Project()),
-            operationType='CREATE_USER',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CREATE_USER,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
     self.Run('sql operations describe 1cb8a924-898d-41ec-b695-39a6dc018d16')
     # pylint: disable=line-too-long
-    self.AssertOutputContains("""\
+    self.AssertOutputContains(
+        """\
 endTime: '2014-07-10T17:23:16.342000+00:00'
 insertTime: '2014-07-10T17:23:12.672000+00:00'
 kind: sql#operation
 name: 1cb8a924-898d-41ec-b695-39a6dc018d16
 operationType: CREATE_USER
-selfLink: https://www.googleapis.com/sql/v1beta4/projects/fake-project/operations/1cb8a924-898d-41ec-b695-39a6dc018d16
+selfLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/fake-project/operations/1cb8a924-898d-41ec-b695-39a6dc018d16
 startTime: '2014-07-10T17:23:13.672000+00:00'
 status: DONE
 targetId: integration-test
-targetLink: https://www.googleapis.com/sql/v1beta4/projects/fake-project/instances/integration-test
+targetLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/fake-project/instances/integration-test
 targetProject: fake-project
 user: 170350250316@developer.gserviceaccount.com
-""", normalize_space=True)
+""",
+        normalize_space=True)
 
 
 class OperationsDescribeGATest(_BaseOperationsDescribeTest, base.SqlMockTestGA):

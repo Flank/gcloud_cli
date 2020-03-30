@@ -1,0 +1,123 @@
+title: pubsub topics update scenario test
+release_tracks: [ALPHA, BETA, GA]
+
+actions:
+# set a KMS key on topic creation using full resource path to kms key
+- execute_command:
+    command: |
+      pubsub topics update mytopic --topic-encryption-key
+      projects/p/locations/g/keyRings/r/cryptoKeys/k
+    events:
+    - api_call:
+        expect_request:
+          uri: https://pubsub.googleapis.com/v1/projects/fake-project/topics/mytopic?alt=json
+          method: PATCH
+          body:
+            json:
+              topic:
+                name: 'projects/fake-project/topics/mytopic'
+                kmsKeyName: 'projects/p/locations/g/keyRings/r/cryptoKeys/k'
+              updateMask: 'kmsKeyName'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              topic:
+                name: 'projects/fake-project/topics/mytopic'
+                kmsKeyName: 'projects/p/locations/g/keyRings/r/cryptoKeys/k'
+              updateMask: 'kmsKeyName'
+    - expect_stderr: |
+        Updated topic [projects/fake-project/topics/mytopic].
+    - expect_exit:
+        code: 0
+# set a KMS key on topic creation using resource argument flags, use project fallthru
+- execute_command:
+    command: |
+      pubsub topics update mytopic --topic-encryption-key k --topic-encryption-key-keyring r
+      --topic-encryption-key-location g
+    events:
+    - api_call:
+        expect_request:
+          uri: https://pubsub.googleapis.com/v1/projects/fake-project/topics/mytopic?alt=json
+          method: PATCH
+          body:
+            json:
+              topic:
+                name: 'projects/fake-project/topics/mytopic'
+                kmsKeyName: 'projects/fake-project/locations/g/keyRings/r/cryptoKeys/k'
+              updateMask: 'kmsKeyName'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              topic:
+                name: 'projects/fake-project/topics/mytopic'
+                kmsKeyName: 'projects/fake-project/locations/g/keyRings/r/cryptoKeys/k'
+              updateMask: 'kmsKeyName'
+    - expect_stderr: |
+        Updated topic [projects/fake-project/topics/mytopic].
+    - expect_exit:
+        code: 0
+# set a KMS key on topic creation using resource argument flags, different project
+- execute_command:
+    command: |
+      pubsub topics update mytopic --topic-encryption-key k --topic-encryption-key-keyring r
+      --topic-encryption-key-location g --topic-encryption-key-project p-other
+    events:
+    - api_call:
+        expect_request:
+          uri: https://pubsub.googleapis.com/v1/projects/fake-project/topics/mytopic?alt=json
+          method: PATCH
+          body:
+            json:
+              topic:
+                name: 'projects/fake-project/topics/mytopic'
+                kmsKeyName: 'projects/p-other/locations/g/keyRings/r/cryptoKeys/k'
+              updateMask: 'kmsKeyName'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              topic:
+                name: 'projects/fake-project/topics/mytopic'
+                kmsKeyName: 'projects/p-pther/locations/g/keyRing/r/cryptoKeys/k'
+              updateMask: 'kmsKeyName'
+    - expect_stderr: |
+        Updated topic [projects/fake-project/topics/mytopic].
+    - expect_exit:
+        code: 0
+# incomplete kms key, no key
+- execute_command:
+    command: |
+      pubsub topics update mytopic --topic-encryption-key-keyring r
+      --topic-encryption-key-location g --topic-encryption-key-project p-other
+    events:
+    - expect_stderr:
+        matches: .*topic-encryption-key must be specified.*
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*topic-encryption-key must be specified.*
+# incomplete kms key, no location
+- execute_command:
+    command: |
+      pubsub topics update mytopic --topic-encryption-key k --topic-encryption-key-keyring r
+      --topic-encryption-key-project p-other
+    events:
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*topic-encryption-key was not fully specified.*
+# incomplete kms key, no keyring
+- execute_command:
+    command: |
+      pubsub topics update mytopic --topic-encryption-key k
+      --topic-encryption-key-location g --topic-encryption-key-project p-other
+    events:
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*topic-encryption-key was not fully specified.*

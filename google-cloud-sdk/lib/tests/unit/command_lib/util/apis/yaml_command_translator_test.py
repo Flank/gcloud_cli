@@ -13,19 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 """Tests for the yaml command translator."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import os
+import tempfile
+import textwrap
 
 from apitools.base.py import encoding
+from apitools.base.py import exceptions as apitools_exceptions
 from apitools.base.py.testing import mock as apitools_mock
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as gcloud_exceptions
+from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.command_lib.util.apis import arg_marshalling
 from googlecloudsdk.command_lib.util.apis import registry
@@ -36,8 +42,8 @@ from tests.lib import parameterized
 from tests.lib.command_lib.util.apis import base
 from tests.lib.command_lib.util.apis import yaml_command_base
 
-
 import mock
+
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
@@ -101,6 +107,24 @@ class CommandBuilderTests(base.Base):
          'API REFERENCE': 'This command uses the *foo/v1* API. The full '
                           'documentation for this API can be found at: '
                           'https://cloud.google.com/docs'})
+
+  def testCommandBuilerWithGoogleAuth(self):
+    # google-auth is not used by default.
+    cd = self.MakeCommandData()
+    yaml_command_translator.CommandBuilder(
+        yaml_command_schema.CommandData('describe', cd),
+        ['abc', 'xyz', 'describe'])
+    self.methods_mock.assert_called_once_with(
+        'foo.instances', api_version=None, use_google_auth=False)
+    self.methods_mock.reset_mock()
+
+    # google-auth will be used if the command data demands so.
+    cd['request']['use_google_auth'] = True
+    yaml_command_translator.CommandBuilder(
+        yaml_command_schema.CommandData('describe', cd),
+        ['abc', 'xyz', 'describe'])
+    self.methods_mock.assert_called_once_with(
+        'foo.instances', api_version=None, use_google_auth=True)
 
   def testUnknownCommandType(self):
     cb = yaml_command_translator.CommandBuilder(
@@ -166,13 +190,16 @@ class DescribeCommandTests(yaml_command_base.CommandTestsBase,
     d = yaml_command_schema.CommandData('describe', self.MakeCommandData())
     modify_request_mock1 = mock.MagicMock()
     modify_request_mock2 = mock.MagicMock()
+
     def augment(unused_ref, unused_args, req):
       req.instance += 'iii'
       return req
+
     modify_request_mock1.side_effect = augment
     modify_request_mock2.side_effect = augment
-    d.request.modify_request_hooks = [modify_request_mock1,
-                                      modify_request_mock2]
+    d.request.modify_request_hooks = [
+        modify_request_mock1, modify_request_mock2
+    ]
 
     cli = self.MakeCLI(d)
     result = cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
@@ -180,11 +207,13 @@ class DescribeCommandTests(yaml_command_base.CommandTestsBase,
     self.AssertOutputEquals('foo: bar\n')
     self.assertEqual(
         str(modify_request_mock1.call_args[0][0]),
-        'https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/i')
+        'https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/i'
+    )
     self.assertEqual(modify_request_mock1.call_args[0][1].instance, 'i')
     self.assertEqual(
         str(modify_request_mock2.call_args[0][0]),
-        'https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/i')
+        'https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/i'
+    )
     self.assertEqual(modify_request_mock2.call_args[0][1].instance, 'i')
 
   def testRunWithParseResourceFalse(self):
@@ -1037,6 +1066,328 @@ selfLink: https://www.googleapis.com/compute/v1/projects/p/zones/z/operations/op
 status: RUNNING
 """.lstrip('\n'), normalize_space=True)
     self.assertEqual(result, running_response)
+
+
+class ImportCommandTests(yaml_command_base.CommandTestsBase):
+  """Tests for import declarative command type."""
+
+  def SetUp(self):
+    client = apis.GetClientClass('compute', 'alpha')
+    self.mocked_client = apitools_mock.Client(client)
+    self.messages = client.MESSAGES_MODULE
+    self.mocked_client.Mock()
+    self.addCleanup(self.mocked_client.Unmock)
+    self.test_instance = self.messages.Instance(
+        canIpForward=None,
+        confidentialInstanceConfig=None,
+        cpuPlatform=None,
+        creationTimestamp=None,
+        deletionProtection=None,
+        description=None,
+        disks=[],
+        displayDevice=None,
+        eraseWindowsVssSignature=None,
+        fingerprint=None,
+        guestAccelerators=[],
+        hostname=None,
+        id=None,
+        instanceEncryptionKey=None,
+        kind='compute#instance',
+        labelFingerprint=None,
+        labels=None,
+        machineType=None,
+        metadata=None,
+        minCpuPlatform=None,
+        name='test',
+        networkInterfaces=[],
+        postKeyRevocationActionType=None,
+        preservedStateSizeGb=None,
+        privateIpv6GoogleAccess=None,
+        reservationAffinity=None,
+        resourcePolicies=[],
+        scheduling=None,
+        selfLink=None,
+        selfLinkWithId=None,
+        serviceAccounts=[],
+        shieldedInstanceConfig=None,
+        shieldedInstanceIntegrityPolicy=None,
+        shieldedVmConfig=None,
+        shieldedVmIntegrityPolicy=None,
+        sourceMachineImage=None,
+        sourceMachineImageEncryptionKey=None,
+        startRestricted=None,
+        status=None,
+        statusMessage=None,
+        tags=None,
+        zone=None,
+    )
+    self.test_running_operation = self.messages.Operation(
+        id=12345,
+        name='operation-12345',
+        selfLink='https://compute.googleapis.com/compute/v1/projects/p/zones/z/'
+        'operations/operation-12345',
+        error=None,
+        status=self.messages.Operation.StatusValueValuesEnum.RUNNING)
+
+    # Set up input file for command to import from.
+    temp_path = tempfile.mkdtemp(dir=self.root_path)
+    self.Touch(temp_path, 'test.yaml', 'name: test')
+    self.input_path = os.path.join(temp_path, 'test.yaml')
+
+  def SetUpMocking(self,
+                   is_update=False,
+                   is_insert=False,
+                   is_async=False,
+                   abort_early=False):
+    """Sets client mock to expect Get request and return compute instance."""
+
+    # Mock schema path to avoid validation testing which is handled elsewhere.
+    get_schema_mock = self.StartObjectPatch(export_util, 'GetSchemaPath')
+    get_schema_mock.side_effect = [None]
+
+    # Mock _GetExistingResource to return matching resource or 404 not found.
+    get_existing_resource_mock = self.StartObjectPatch(
+        yaml_command_translator.CommandBuilder, '_GetExistingResource')
+    if abort_early:
+      get_existing_resource_mock.side_effect = [
+          self.messages.Instance(name='test')
+      ]
+    else:
+      get_existing_resource_mock.side_effect = apitools_exceptions.HttpError(
+          {'status': '404'}, content='not found', url='test')
+
+    # Set up mocking to expect an update request.
+    if is_update:
+      self.MockUpdate()
+
+    # Set up mocking to expect an insert request.
+    if is_insert:
+      self.MockInsert()
+
+    # Set up mocking to expect asynchronous behavior.
+    if is_async:
+      self.MockAsync()
+
+  def MockUpdate(self):
+    """Mocks to expect an update request."""
+    self.mocked_client.instances.Update.Expect(
+        self.messages.ComputeInstancesUpdateRequest(
+            instance='test',
+            instanceResource=self.test_instance,
+            minimalAction=None,
+            mostDisruptiveAllowedAction=None,
+            project='p',
+            requestId=None,
+            zone='z',
+        ),
+        response=self.test_running_operation,
+        enable_type_checking=False)
+
+  def MockInsert(self):
+    """Mocks to expect an insert request."""
+    self.mocked_client.instances.Insert.Expect(
+        self.messages.ComputeInstancesInsertRequest(
+            instance=self.test_instance,
+            project='p',
+            requestId=None,
+            zone='z',
+        ),
+        response=self.test_running_operation,
+        enable_type_checking=False)
+
+  def MockAsync(self):
+    """Mocks to expect asynchronous requests."""
+    self.mocked_client.zoneOperations.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
+            operation='operation-12345',
+            project='p',
+            zone='z',
+        ),
+        self.messages.Operation(
+            id=12345,
+            name='operation-12345',
+            selfLink='https://compute.googleapis.com/compute/v1/projects/p/zones/z/'
+            'operations/operation-12345',
+            error=None,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
+    self.mocked_client.instances.Get.Expect(
+        self.messages.ComputeInstancesGetRequest(
+            instance='test',
+            project='p',
+            zone='z',
+        ), self.messages.Instance(name='test', zone='z'))
+
+  def AssertArgsAndExecute(self, d, is_async=False):
+    """Asserts that args exist in command and executes command."""
+    cli = self.MakeCLI(d)
+    args = ['INSTANCE', '--zone', '--source']
+    if is_async:
+      args.extend(['--async', '--no-async'])
+    self.AssertArgs(cli, *args)
+    cli.Execute([
+        'command', '--project', 'p', '--zone', 'z', '--source', self.input_path,
+        'test'
+    ])
+
+  def testRunUpdate(self):
+    """Tests generic import update command execution."""
+    self.SetUpMocking(is_update=True)
+    data = self.MakeCommandData()
+    d = yaml_command_schema.CommandData('import', data)
+    d.request.api_version = 'alpha'
+    d.request.method = 'update'
+    self.AssertArgsAndExecute(d)
+    self.AssertOutputContains(
+        textwrap.dedent("""\
+          id: '12345'
+          name: operation-12345
+          selfLink: https://compute.googleapis.com/compute/v1/projects/p/zones/z/operations/operation-12345
+          status: RUNNING
+          """))
+
+  def testRunCreate(self):
+    """Tests import create command execution when resource doesn't exist."""
+    self.SetUpMocking(is_insert=True)
+    data = self.MakeCommandData()
+    import_spec = {
+        'create_if_not_exists': True,
+        'create_request': {
+            'method': 'insert',
+            'api_version': 'alpha',
+        },
+        'create_async': None
+    }
+    data['import'] = import_spec
+    d = yaml_command_schema.CommandData('import', data)
+    d.request.api_version = 'alpha'
+    d.request.method = 'update'
+    d.import_.create_request.method = 'insert'
+    self.AssertArgsAndExecute(d)
+    self.AssertOutputContains(
+        textwrap.dedent("""\
+          id: '12345'
+          name: operation-12345
+          selfLink: https://compute.googleapis.com/compute/v1/projects/p/zones/z/operations/operation-12345
+          status: RUNNING
+          """))
+
+  def testEarlyAbort(self):
+    """Tests early exit behavior if command detects no changes."""
+    self.SetUpMocking(abort_early=True)
+    data = self.MakeCommandData()
+    import_spec = {
+        'abort_if_equivalent': True,
+    }
+    data['import'] = import_spec
+    d = yaml_command_schema.CommandData('import', data)
+    d.request.api_version = 'alpha'
+    d.request.method = 'update'
+    self.AssertArgsAndExecute(d)
+    self.AssertErrContains('Request not sent for [test]: No changes detected.')
+
+  def testAsync(self):
+    """Tests asynchronous calls for update import commands."""
+    self.SetUpMocking(is_update=True, is_async=True)
+    data = self.MakeCommandData(is_async='zoneOperations')
+    d = yaml_command_schema.CommandData('import', data)
+    d.async_.state.field = 'status'
+    d.async_.state.success_values = ['DONE']
+    d.async_.api_version = 'alpha'
+    d.async_.method = 'wait'
+    d.async_.response_name_field = 'selfLink'
+    d.request.api_version = 'alpha'
+    d.request.method = 'update'
+    self.AssertArgsAndExecute(d, is_async=True)
+    self.AssertOutputContains('name: test\nzone: z')
+
+  def testCreateAsync(self):
+    """Tests asynchronous behavior for create import commands."""
+    self.SetUpMocking(is_insert=True, is_async=True)
+    data = self.MakeCommandData(is_async='zoneOperations')
+    import_spec = {
+        'create_if_not_exists': True,
+        'create_request': {
+            'method': 'insert',
+            'api_version': 'alpha',
+        },
+        'create_async': {
+            'collection': 'compute.zoneOperations',
+            'state': {
+                'field': 'status',
+                'success_values': ['DONE']
+            },
+            'api_version': 'alpha',
+            'method': 'wait',
+            'response_name_field': 'selfLink'
+        }
+    }
+    data['import'] = import_spec
+    d = yaml_command_schema.CommandData('import', data)
+    d.request.api_version = 'alpha'
+    d.request.method = 'update'
+    self.AssertArgsAndExecute(d, is_async=True)
+    self.AssertOutputEquals('name: test\nzone: z\n')
+
+
+class ExportCommandTests(yaml_command_base.CommandTestsBase):
+
+  def Expect(self, instance='i', response=None):
+    """Sets client mock to expect Get request and return compute instance."""
+    self.mocked_client.instances.Get.Expect(
+        self.messages.ComputeInstancesGetRequest(
+            instance=instance, zone='z', project='p'),
+        response=self.messages.Instance(name='test'),
+        enable_type_checking=False)
+
+  def StartExportMocking(self):
+    """Mocks GetSchemaPath method to prevent not finding file."""
+    get_schema_mock = self.StartObjectPatch(export_util, 'GetSchemaPath')
+    get_schema_mock.side_effect = [None]
+
+  def testGeneration(self):
+    """Tests export command generation."""
+    global_mock = self.StartObjectPatch(yaml_command_translator.CommandBuilder,
+                                        '_ConfigureGlobalAttributes')
+    command = yaml_command_translator.Translator().Translate(
+        ['foo', 'export'], self.MakeCommandData())
+    self.assertTrue(issubclass(command, calliope_base.ExportCommand))
+    global_mock.assert_called_once_with(command)
+
+  def testRunNoDestination(self):
+    """Tests command exporting to stdout."""
+    self.Expect()
+    self.StartExportMocking()
+
+    data = self.MakeCommandData('compute.instances')
+    d = yaml_command_schema.CommandData('export', data)
+
+    cli = self.MakeCLI(d)
+    self.AssertArgs(cli, 'INSTANCE', '--zone', '--destination')
+
+    cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
+    self.AssertOutputEquals('name: test\n')
+
+  def testRunWithDestination(self):
+    """Tests command using --destinatoin flag."""
+    self.Expect()
+    self.StartExportMocking()
+    data = self.MakeCommandData('compute.instances')
+    d = yaml_command_schema.CommandData('export', data)
+
+    # Set up output file for command to export to.
+    temp_path = tempfile.mkdtemp(dir=self.root_path)
+    self.Touch(temp_path, 'test.yaml')
+    output_path = os.path.join(temp_path, 'test.yaml')
+
+    cli = self.MakeCLI(d)
+    self.AssertArgs(cli, 'INSTANCE', '--zone', '--destination')
+
+    cli.Execute([
+        'command', '--project', 'p', '--zone', 'z', '--destination',
+        output_path, 'i'
+    ])
+    self.AssertErrContains('Exported [test] to \'{}\''.format(output_path))
+    self.AssertFileContains('name: test', output_path)
 
 
 class AsyncPollerTests(yaml_command_base.CommandTestsBase):

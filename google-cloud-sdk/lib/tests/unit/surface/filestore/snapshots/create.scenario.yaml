@@ -17,7 +17,7 @@ summary:
 - execute:
   - command: |
       filestore snapshots create snap --instance inst --instance-zone us-central1-c --file-share
-          fs --local
+          fs
   - stderr: |
       Create request issued
   - progress_tracker:
@@ -104,7 +104,7 @@ actions:
 - execute_command:
     command: |
       filestore snapshots create snap --instance inst --instance-zone us-central1-c --file-share
-          fs --local
+          fs
     events:
     - api_call:
         expect_request:
@@ -115,7 +115,6 @@ actions:
             json:
               sourceFileShare: fs
               sourceInstance: projects/fake-project/locations/us-central1-c/instances/inst
-              local: true
         return_response:
           headers:
             status: '200'
@@ -167,7 +166,6 @@ actions:
               "storageBytes": "1024000000000",
               "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/test",
               "sourceFileShare": "my_vol",
-              "local": true,
               "sourceInstanceTier": "STANDARD"
               }
             }

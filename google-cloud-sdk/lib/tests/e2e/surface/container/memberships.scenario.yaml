@@ -12,6 +12,8 @@ actions:
 - execute_command:
     command: container memberships list --format text(name)
     events:
+    - expect_stderr: |
+        WARNING: This command group is deprecated. Please use `gcloud container hub memberships` command group instead.
     - api_call:
         expect_request:
           uri: https://gkehub.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/global/memberships?alt=json

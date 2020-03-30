@@ -24,6 +24,7 @@ android-instr:
   auto-google-login: off
   use-orchestrator: false
   device: [{model: Universe3, orientation: askew, locale: ro}]
+  other-files: {/sdcard/dir1/file.txt: path/to/other-file.txt}
 
 ios-group:
   type: xctest
@@ -113,10 +114,18 @@ additional-apks.two:
 
 other-files.good:
   other-files:
-    local/dir/file1: /sdcard/dir1
-    'gs://bucket/file2': '/sdcard/dir2'
+    /sdcard/dir1/file.txt: local/dir/file1.txt
+    '/sdcard/dir2/file.txt': 'gs://bucket/file2.txt'
 
 client-details.good:
   client-details:
     k1: v1
     k2: v2
+
+test-targets-for-shard.good:
+  test-targets-for-shard:
+    - class com.ClassForShard1#flakyTest1;class com.ClassForShard1#flakyTest2
+    - class com.ClassForShard2#flakyTest3,com.ClassForShard2#flakyTest4
+
+num-uniform-shards.good:
+  num-uniform-shards: 2

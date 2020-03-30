@@ -45,6 +45,7 @@ class DomainMappingCreateTestBeta(base.ServerlessSurfaceBase):
         self.mock_serverless_client, self.domain_ref.namespacesId)
     self.domain_mapping.name = self.domain_ref.domainmappingsId
     self.domain_mapping.route_name = 'myapp'
+
     messages = self.mock_serverless_client.MESSAGES_MODULE
     self.domain_mapping.status.resourceRecords.append(
         messages.ResourceRecord(
@@ -71,7 +72,7 @@ class DomainMappingCreateTestBeta(base.ServerlessSurfaceBase):
                  '--service myapp --domain www.example.com')
 
         self.operations.CreateDomainMapping.assert_called_once_with(
-            self.domain_ref, 'myapp')
+            self.domain_ref, 'myapp', False)
         self.AssertOutputContains(
             """NAME RECORD TYPE CONTENTS
             myapp A 216.239.32.21""",
@@ -112,7 +113,7 @@ class DomainMappingCreateTestBeta(base.ServerlessSurfaceBase):
              '--service myapp --domain www.example.com')
 
     self.operations.CreateDomainMapping.assert_called_once_with(
-        self.domain_ref, 'myapp')
+        self.domain_ref, 'myapp', False)
     self.AssertOutputContains(
         """NAME RECORD TYPE CONTENTS
         myapp A 216.239.32.21""",

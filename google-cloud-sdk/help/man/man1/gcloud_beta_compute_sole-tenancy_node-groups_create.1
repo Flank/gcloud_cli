@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute sole\-tenancy node\-groups create \- creates a Google Compute Engine node group
+gcloud beta compute sole\-tenancy node\-groups create \- create a Compute Engine node group
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute sole\-tenancy node\-groups create\fR \fINAME\fR \fB\-\-node\-template\fR=\fINODE_TEMPLATE\fR \fB\-\-target\-size\fR=\fITARGET_SIZE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute sole\-tenancy node\-groups create\fR \fINAME\fR \fB\-\-node\-template\fR=\fINODE_TEMPLATE\fR \fB\-\-target\-size\fR=\fITARGET_SIZE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-autoscaler\-mode\fR=\fIAUTOSCALER_MODE\fR\ :\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Creates a Google Compute Engine node group.
+\fB(BETA)\fR Create a Compute Engine node group.
 
 
 
@@ -55,6 +55,27 @@ The target initial number of nodes in the node group.
 An optional description of this resource.
 
 .TP 2m
+\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR
+Determines the maintenance behavior during host maintenance events.
+\fIMAINTENANCE_POLICY\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBdefault\fR
+VM instances on the host are live migrated to a new physical server.
+.TP 2m
+\fBmigrate\-within\-node\-group\fR
+VM instances on the host are live migrated to another node within the same node
+group.
+.TP 2m
+\fBrestart\-in\-place\fR
+VM instances on the host are terminated and then restarted on the same physical
+server after the maintenance event has completed.
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 Zone of the node group to operate on. If not specified and the
 \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
@@ -82,7 +103,45 @@ $ gcloud config unset compute/zone
 Alternatively, the zone can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
 
+.TP 2m
 
+Autoscaling policy for node groups.
+
+.RS 2m
+.TP 2m
+\fB\-\-autoscaler\-mode\fR=\fIAUTOSCALER_MODE\fR
+Set the mode of an autoscaler for a node group. \fIAUTOSCALER_MODE\fR must be
+one of:
+
+.RS 2m
+.TP 2m
+\fBoff\fR
+to turn off autoscaling.
+.TP 2m
+\fBon\fR
+to permit autoscaling to scale in and out.
+.TP 2m
+\fBonly\-scale\-out\fR
+to permit autoscaling to scale only out and not in.
+.RE
+.sp
+
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR
+The maximum size of the node group. Must be smaller or equal to 100 and larger
+than or equal to \f5\-\-min\-nodes\fR. Must be specified if
+\f5\-\-autoscaler\-mode\fR is not \f5\fIoff\fR\fR.
+
+.TP 2m
+\fB\-\-min\-nodes\fR=\fIMIN_NODES\fR
+The minimum size of the node group. Default is 0 and must be an integer value
+smaller than or equal to \f5\-\-max\-nodes\fR.
+
+
+.RE
 .RE
 .sp
 
@@ -91,8 +150,20 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a node group, run:
+
+.RS 2m
+$ gcloud beta compute sole\-tenancy node\-groups create \e
+    my\-node\-group \-\-node\-template=example\-template \-\-target\-size=4
+.RE
 
 
 

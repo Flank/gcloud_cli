@@ -9,6 +9,10 @@ DESCRIPTION
     gcloud compute instances describe displays all data associated with a
     Google Compute Engine virtual machine instance.
 
+    It's possible to limit the the scope of the description by using the
+    '--format' flag. For details, see Filtering and formatting fun with gcloud
+    (https://cloud.google.com/blog/products/gcp/filtering-and-formatting-fun-with).
+
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
         Name of the instance to describe. For details on valid instance names,
@@ -43,8 +47,20 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To describe an instance named test-instance, run:
+
+        $ gcloud compute instances describe test-instance
+
+    To output only a set of fields from the available information, specify it
+    using the '--format' flag:
+
+        $ gcloud compute instances describe test-instance \
+            --format='yaml(name,status,disks)'
 
 NOTES
     These variants are also available:

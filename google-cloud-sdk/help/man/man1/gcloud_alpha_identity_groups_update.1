@@ -73,8 +73,9 @@ Replace existing display name on group being updated.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -87,12 +88,12 @@ for this API can be found at: https://cloud.google.com/identity/
 
 .SH "EXAMPLES"
 
-To update a group.
+To update a group:
 
-$ gcloud alpha identity groups update eng\-discuss@foo.com.RS 2m
-\-\-display\-name "New Engineer Discuss"
-\-\-description "Group for engineering discussions"
-
+.RS 2m
+$ gcloud alpha identity groups update eng\-discuss@foo.com  \e
+    \-\-display\-name="New Engineer Discuss"  \e
+    \-\-description="Group for engineering discussions"
 .RE
 
 
@@ -102,5 +103,9 @@ $ gcloud alpha identity groups update eng\-discuss@foo.com.RS 2m
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta identity groups update
+.RE
 

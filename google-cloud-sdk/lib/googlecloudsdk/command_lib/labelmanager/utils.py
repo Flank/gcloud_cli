@@ -56,7 +56,7 @@ def GetLabelKeyFromDisplayName(display_name, label_parent):
       return key.name
 
   raise InvalidInputError(
-      'Invalid display_name for label key [{}] in parent [{}]'.format(
+      'Invalid display_name for LabelKey [{}] in parent [{}]'.format(
           display_name, label_parent))
 
 
@@ -86,5 +86,69 @@ def GetLabelValueFromDisplayName(display_name, label_key):
       return value.name
 
   raise InvalidInputError(
-      'Invalid display_name for label value [{}] in parent [{}]'.format(
+      'Invalid display_name for LabelValue [{}] in parent [{}]'.format(
           display_name, label_key))
+
+
+def GetLabelBindingNameFromLabelValueAndResource(label_value, resource):
+  """Returns the LabelBinding name for the LabelValue and resource if it exists.
+
+  Args:
+    label_value: String, numeric id of the LabelValue
+    resource: String, full resource name of the resource
+
+  Raises:
+    InvalidInputError: if the specified LabelValue and resource are not bound.
+
+  Returns:
+    The LabelBinding name of the LabelValue bound to the resource.
+  """
+  labelbindings_service = labelmanager.LabelBindingsService()
+  labelmanager_messages = labelmanager.LabelManagerMessages()
+
+  list_request = (
+      labelmanager_messages.LabelmanagerLabelBindingsListRequest(
+          filter='resource:'+resource))
+  response = labelbindings_service.List(list_request)
+
+  for binding in response.bindings:
+    if binding.labelValue == label_value:
+      return binding.name
+
+  raise InvalidInputError(
+      'Invalid LabelBinding for LabelValue [{}] and resource [{}]'.format(
+          label_value, resource))
+
+
+def GetLabelValueIfArgsAreValid(args):
+  """Returns the LabelValue if valid arguments are passed and it exists.
+
+  Args:
+    args: Command line arguments for a gcloud LabelValue command.
+
+  Raises:
+    InvalidInputError: - if --label-parent is given but --label-key is not
+                         given
+                       - if the specified --label-key as a display name does not
+                         exist under the --label-parent
+                       - if LABEL_VALUE_ID as a display_name does not exist
+                         under --label-key.
+
+  Returns:
+    The resource name of the LabelValue associated with the LABEL_VALUE_ID
+    determined from args in the form labelValues/{numeric_id}.
+  """
+  label_value_id = args.LABEL_VALUE_ID
+
+  if args.IsSpecified('label_parent') and not args.IsSpecified('label_key'):
+    raise InvalidInputError(
+        '--label-key must be specified if --label-parent is set.')
+
+  if args.IsSpecified('label_key'):
+    if args.IsSpecified('label_parent'):
+      label_key = GetLabelKeyFromDisplayName(args.label_key, args.label_parent)
+    else:
+      label_key = args.label_key
+    return GetLabelValueFromDisplayName(label_value_id, label_key)
+
+  return label_value_id

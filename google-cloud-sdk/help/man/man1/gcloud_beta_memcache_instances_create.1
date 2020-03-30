@@ -1,0 +1,239 @@
+
+.TH "GCLOUD_BETA_MEMCACHE_INSTANCES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta memcache instances create \- create a Memorystore Memcached instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta memcache instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fB\-\-node\-count\fR=\fINODE_COUNT\fR \fB\-\-node\-cpu\fR=\fINODE_CPU\fR \fB\-\-node\-memory\fR=\fINODE_MEMORY\fR [\fB\-\-async\fR] [\fB\-\-authorized\-network\fR=\fIAUTHORIZED_NETWORK\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-memcached\-version\fR=\fIMEMCACHED_VERSION\fR] [\fB\-\-parameters\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-zones\fR=[\fIZONES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create a new Memorystore Memcached instance with the given name.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Instance resource \- Arguments and flags that specify the Memcached instance you
+want to create. The arguments in this group can be used to specify the
+attributes of this resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: provide
+the argument [instance] on the command line with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance or fully qualified identifier for the instance. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The name of the Memcached region of the instance.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-node\-count\fR=\fINODE_COUNT\fR
+Number of memcache nodes in this instance.
+
+.TP 2m
+\fB\-\-node\-cpu\fR=\fINODE_CPU\fR
+Number of cpus per node in this instance. Valid values are 1 or even number
+between 2\-16.
+
+.TP 2m
+\fB\-\-node\-memory\fR=\fINODE_MEMORY\fR
+A whole number value indicating how much memory is desired per node. The value
+must be a whole number followed by a size unit of 'MB' for megabyte, or 'GB' for
+gigabyte, ie '3072MB' or '9GB'. The value must be between 1,024MB and 307,200MB.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-authorized\-network\fR=\fIAUTHORIZED_NETWORK\fR
+The full name of the Google Compute Engine network to which the instance is
+connected. If unspecified, the default network will be used.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+An arbitrary and optional user provided name for the instance.
+
+.TP 2m
+\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR
+A list of label KEY=VALUE pairs to add.
+
+.TP 2m
+\fB\-\-memcached\-version\fR=\fIMEMCACHED_VERSION\fR
+Optional major version of Memcached software to use with the instance. If not
+provided, default of "1.5" will be used. \fIMEMCACHED_VERSION\fR must be
+(currently only one value is supported):
+
+.RS 2m
+.TP 2m
+\fB1.5\fR
+Memcached major version 1.5
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-parameters\fR=\fIKEY\fR=\fIVALUE\fR
+User defined parameters to apply to the memcached process on each node. Possible
+attributes include:
+
+.RS 2m
+.TP 2m
+\fBlisten\-backlog\fR
+The backlog queue limit for the instance.
+
+.TP 2m
+\fBdisable\-flush\-all\fR
+If enabled, flush_all command will be disabled. Applicable to 1.4.24 and higher.
+
+.TP 2m
+\fBmax\-item\-size\fR
+Max bytes of the instnace. Must at least be equal to slab_chunk_max (which
+defaults to 524288 bytes) and less than 134217728 bytes. Additionally it must be
+a multiple of slab_chunk_max.
+
+.TP 2m
+\fBslab\-min\-size\fR
+This is an integer in the range [1, 1024].
+
+.TP 2m
+\fBslab\-growth\-factor\fR
+This is a float in the range [1.01, 100].
+
+.TP 2m
+\fBprotocol\fR
+This is an enum with acceptable values of ["ascii", "auto"].
+
+.TP 2m
+\fBdisable\-cas\fR
+This is a boolean value.
+
+.TP 2m
+\fBdisable\-evictions\fR
+This is a boolean value.
+
+.TP 2m
+\fBmax\-reqs\-per\-event\fR
+This is an integer in the range [1, 1000].
+
+.TP 2m
+\fBtrack\-sizes\fR
+This is a boolean value.
+
+.TP 2m
+\fBworker\-logbuf\-size\fR
+This is an integer in the range [48, 524288].
+
+.TP 2m
+\fBwatcher\-logbuf\-size\fR
+This is an integer in the range [0, 2097151].
+
+.TP 2m
+\fBlru\-crawler\fR
+This is a boolean value.
+
+.TP 2m
+\fBidle\-timeout\fR
+This is an integer in the range [1,86400].
+
+.TP 2m
+\fBlru\-maintainer\fR
+This is a boolean value.
+
+.TP 2m
+\fBmaxconns\-fast\fR
+This is a boolean value.
+
+.TP 2m
+\fBhash\-algorithm\fR
+This is an enum with accepted values of ["jenkins", "murmur3"].
+.RE
+.sp
+.TP 2m
+\fB\-\-zones\fR=[\fIZONES\fR,...]
+List of zones for the memcache nodes. The nodes will be divided equally across
+the given zones up to \-\-node\-count value. If not provided, the service will
+by default create nodes in all zones in the region specified by \-\-region flag.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBmemcache/v1beta2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/memorystore/
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a Memcached instance with the name
+\'my\-memcache\-instance' in region 'us\-central1' using a non default network,
+requesting 3 nodes each with 2 CPUs and 2GB of RAM.
+
+.RS 2m
+$ gcloud beta memcache instances create my\-memcache\-instance \e
+    \-\-display\-name="Example MC Instance" \e
+    \-\-authorized\-network=projects/project1/global/networks/network_mc \e
+    \-\-node\-count=3 \-\-node\-cpu=2 \-\-node\-memory=2GB \e
+    \-\-region=us\-central1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha memcache instances create
+.RE
+

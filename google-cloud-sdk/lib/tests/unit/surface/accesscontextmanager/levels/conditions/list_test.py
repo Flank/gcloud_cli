@@ -28,6 +28,7 @@ from tests.lib.surface import accesscontextmanager
 class LevelConditionsListTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -46,7 +47,7 @@ class LevelConditionsListTestGA(accesscontextmanager.Base):
         level)
 
   def testList_MissingRequired(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run('access-context-manager levels conditions list '
@@ -75,7 +76,7 @@ class LevelConditionsListTestGA(accesscontextmanager.Base):
         name=name)
 
   def testList(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     level = self._MakeBasicLevel('my_level')
     self._ExpectGet(level, 'my_policy')
 
@@ -102,12 +103,14 @@ class LevelConditionsListTestGA(accesscontextmanager.Base):
 class LevelConditionsListTestBeta(LevelConditionsListTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class LevelConditionsListTestAlpha(LevelConditionsListTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 

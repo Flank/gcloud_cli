@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute sole\-tenancy node\-templates create \- creates a Google Compute Engine node template
+gcloud alpha compute sole\-tenancy node\-templates create \- create a Compute Engine node template
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute sole\-tenancy node\-templates create\fR \fINAME\fR (\fB\-\-node\-requirements\fR=[\fIlocalSSD\fR=\fILOCALSSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvCPU\fR=\fIVCPU\fR]\ |\ \fB\-\-node\-type\fR=\fINODE_TYPE\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIcount\fR=\fICOUNT\fR],[\fIsize\fR=\fISIZE\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-server\-binding\fR=\fISERVER_BINDING\fR;\ default="restart\-node\-on\-any\-server"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute sole\-tenancy node\-templates create\fR \fINAME\fR (\fB\-\-node\-requirements\fR=[\fIlocalSSD\fR=\fILOCALSSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvCPU\fR=\fIVCPU\fR]\ |\ \fB\-\-node\-type\fR=\fINODE_TYPE\fR) [\fB\-\-cpu\-overcommit\-type\fR=\fICPU_OVERCOMMIT_TYPE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIcount\fR=\fICOUNT\fR],[\fIsize\fR=\fISIZE\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-server\-binding\fR=\fISERVER_BINDING\fR;\ default="restart\-node\-on\-any\-server"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Creates a Google Compute Engine node template.
+\fB(ALPHA)\fR Create a Compute Engine node template.
 
 
 
@@ -87,6 +87,16 @@ $ gcloud alpha compute sole\-tenancy node\-types
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-cpu\-overcommit\-type\fR=\fICPU_OVERCOMMIT_TYPE\fR
+CPU overcommit type for nodes created based on this template. To overcommit CPUs
+on a VM, set \-\-cpu\-overcommit\-type equal to either standard or none, and
+then when creating a VM, specify a value for the \-\-min\-node\-cpu flag. Lower
+values for \-\-min\-node\-cpu specify a higher overcommit ratio, that is,
+proportionally more vCPUs in relation to physical CPUs. You can only overcommit
+CPUs on VMs that are scheduled on nodes that support it.
+\fICPU_OVERCOMMIT_TYPE\fR must be one of: \fBenabled\fR, \fBnone\fR.
+
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional description of this resource.
@@ -184,8 +194,20 @@ new physical server and assigned a new sole tenant physical server ID.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a node template of type \f5n1\-node\-96\-624\fR, run:
+
+.RS 2m
+$ gcloud alpha compute sole\-tenancy node\-templates create \e
+    my\-node\-template \-\-node\-type=n1\-node\-96\-624
+.RE
 
 
 

@@ -23,9 +23,11 @@ from googlecloudsdk.api_lib.compute import org_security_policy_rule_utils as rul
 from googlecloudsdk.api_lib.compute.org_security_policies import client
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.org_security_policies import flags
+from googlecloudsdk.command_lib.compute.org_security_policies import org_security_policies_utils
+import six
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Describe(base.DescribeCommand):
   """Describe a Google Compute Engine organization security policy rule.
 
@@ -39,6 +41,7 @@ class Describe(base.DescribeCommand):
     cls.ORG_SECURITY_POLICY_ARG = flags.OrgSecurityPolicyRuleArgument(
         required=True, operation="describe")
     cls.ORG_SECURITY_POLICY_ARG.AddArgument(parser)
+    flags.AddOrganization(parser, required=False)
     flags.AddSecurityPolicyId(parser, operation="described")
 
   def Run(self, args):
@@ -46,8 +49,26 @@ class Describe(base.DescribeCommand):
     ref = self.ORG_SECURITY_POLICY_ARG.ResolveAsResource(
         args, holder.resources, with_project=False)
     security_policy_rule_client = client.OrgSecurityPolicyRule(
-        ref=ref, compute_client=holder.client)
+        ref=ref,
+        compute_client=holder.client,
+        resources=holder.resources,
+        version=six.text_type(self.ReleaseTrack()).lower())
+    security_policy_id = org_security_policies_utils.GetSecurityPolicyId(
+        security_policy_rule_client,
+        args.security_policy,
+        organization=args.organization)
     return security_policy_rule_client.Describe(
         priority=rule_utils.ConvertPriorityToInt(ref.Name()),
-        security_policy_id=args.security_policy,
+        security_policy_id=security_policy_id,
         only_generate_request=False)
+
+
+Describe.detailed_help = {
+    "EXAMPLES":
+        """\
+    To describe a rule with priority ``10" in an organization security policy
+    with ID ``123456789", run:
+
+      $ {command} describe 10 --security-policy=123456789
+    """,
+}

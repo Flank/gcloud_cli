@@ -1,0 +1,133 @@
+
+.TH "GCLOUD_DATA\-CATALOG_TAG\-TEMPLATES_FIELDS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud data\-catalog tag\-templates fields create \- create a Cloud Data Catalog tag template field
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud data\-catalog tag\-templates fields create\fR (\fIFIELD\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-tag\-template\fR=\fITAG_TEMPLATE\fR) \fB\-\-type\fR=\fITYPE\fR [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Create a Cloud Data Catalog tag template field.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Tag template field resource \- Tag template field to create. The arguments in
+this group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [field] on the command line
+with a fully specified name; set the property [core/project]; provide the
+argument [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIFIELD\fR
+ID of the tag template field or fully qualified identifier for the tag template
+field. This positional must be specified if any of the other arguments in this
+group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the tag template field.
+
+.TP 2m
+\fB\-\-tag\-template\fR=\fITAG_TEMPLATE\fR
+Tag template of the tag template field.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-type\fR=\fITYPE\fR
+Type of the tag template field. Choices are double, string, bool, timestamp, and
+enum.
+
+.RS 2m
+To specify a string field:
+  `type=string`
+.RE
+
+.RS 2m
+To specify an enum field with values 'A' and 'B':
+  `type="enum(A|B)"`
+.RE
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Display name of the tag template field.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdatacatalog/v1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/data\-catalog/docs/
+
+
+
+.SH "EXAMPLES"
+
+Create a string tag template field:
+
+.RS 2m
+$ gcloud data\-catalog tag\-templates fields create create FIELD \e
+    \-\-display\-name=DISPLAY \-\-type=string
+.RE
+
+Create an enum tag template field with values 'A' and 'B':
+
+.RS 2m
+$ gcloud data\-catalog tag\-templates fields create FIELD \e
+    \-\-display\-name=DISPLAY \-\-type="enum(A|B)"
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha data\-catalog tag\-templates fields create
+$ gcloud beta data\-catalog tag\-templates fields create
+.RE
+

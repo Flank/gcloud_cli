@@ -71,6 +71,8 @@ $ gcloud ai\-platform jobs update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 
 .RE
@@ -82,8 +84,19 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To remove all labels in the AI Platform job named \f5\fImy\-job\fR\fR, run:
+
+.RS 2m
+$ gcloud ai\-platform jobs update my\-job \-\-clear\-labels
+.RE
 
 
 

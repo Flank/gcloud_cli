@@ -11,7 +11,7 @@ gcloud compute instances set\-scheduling \- set scheduling options for Google Co
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instances set\-scheduling\fR \fIINSTANCE_NAME\fR [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-[no\-]restart\-on\-failure\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instances set\-scheduling\fR \fIINSTANCE_NAME\fR [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-[no\-]restart\-on\-failure\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-clear\-node\-affinities\fR\ |\ \fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -91,7 +91,49 @@ $ gcloud config unset compute/zone
 Alternatively, the zone can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
 
+.TP 2m
 
+Sole Tenancy. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-node\-affinities\fR
+Removes the node affinities field from the instance. If specified, the instance
+node settings will be cleared. The instance will not be scheduled onto a
+sole\-tenant node.
+
+.TP 2m
+\fB\-\-node\fR=\fINODE\fR
+The name of the node to schedule this instance on.
+
+.TP 2m
+\fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR
+The JSON/YAML file containing the configuration of desired nodes onto which this
+instance could be scheduled. These rules filter the nodes according to their
+node affinity labels. A node's affinity labels come from the node template of
+the group the node is in.
+
+The file should contain a list of a JSON/YAML objects with the following fields:
+
+.TP 2m
+\fBkey\fR
+Corresponds to the node affinity label keys of the Node resource.
+.TP 2m
+\fBoperator\fR
+Specifies the node selection type. Must be one of: \f5IN\fR: Requires Compute
+Engine to seek for matched nodes. \f5NOT_IN\fR: Requires Compute Engine to avoid
+certain nodes.
+.TP 2m
+\fBvalues\fR
+Optional. A list of values which correspond to the node affinity label values of
+the Node resource.
+
+.TP 2m
+\fB\-\-node\-group\fR=\fINODE_GROUP\fR
+The name of the node group to schedule this instance on.
+
+
+.RE
 .RE
 .sp
 
@@ -100,8 +142,20 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To set instance to be terminated during maintenance, run:
+
+.RS 2m
+$ gcloud compute instances set\-scheduling example\-instance  \e
+    \-\-maintenance\-policy=TERMINATE \-\-zone=us\-central1\-b
+.RE
 
 
 

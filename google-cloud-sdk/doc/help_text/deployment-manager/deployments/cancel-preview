@@ -32,8 +32,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To cancel a running operation on a deployment, run:
@@ -49,7 +50,7 @@ EXAMPLES
     To cancel a preview command providing a fingerprint:
 
         $ gcloud deployment-manager deployments cancel-preview \
-            my-deployment --fingerprint deployment-fingerprint
+            my-deployment --fingerprint=deployment-fingerprint
 
     When a deployment preview is cancelled, the deployment itself is not
     deleted.

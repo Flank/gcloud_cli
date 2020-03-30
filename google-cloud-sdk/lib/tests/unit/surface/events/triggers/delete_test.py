@@ -18,8 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.events import custom_resource_definition
+from googlecloudsdk.api_lib.events import source
+from googlecloudsdk.api_lib.events import trigger
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.command_lib.events import exceptions
 from googlecloudsdk.core.console import console_io
 from tests.lib.surface.run import base
 
@@ -29,23 +31,68 @@ class TriggersDeleteTestAlpha(base.ServerlessSurfaceBase):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def testTriggersFailNonGKE(self):
-    """Triggers are not yet supported on managed Cloud Run."""
-    with self.assertRaises(exceptions.UnsupportedArgumentError):
-      self.Run('events triggers delete my-trigger --region=us-central1')
-    self.AssertErrContains(
-        'Events are only available with Cloud Run for Anthos.')
+  def _MakeSourceCrd(self):
+    """Creates a source CRD and assigns it as output to ListSourceCRD."""
+    self.source_crd = (
+        custom_resource_definition.SourceCustomResourceDefinition.New(
+            self.mock_crd_client, 'fake-project'))
+    self.source_crd.spec.names = (
+        self.crd_messages.CustomResourceDefinitionNames(
+            kind='CloudPubSubSource', plural='cloudpubsubsources'))
+    self.operations.ListSourceCustomResourceDefinitions.return_value = [
+        self.source_crd
+    ]
 
-  def testTriggersDelete(self):
+  def _MakeSource(self):
+    """Creates a source and assigns it as output to GetSource."""
+    self.source = source.Source.New(self.mock_serverless_client, 'fake-project',
+                                    'CloudPubSubSource',
+                                    'sources.eventing.knative.dev')
+    self.source.name = 'my-source'
+    self.source.sink = 'my-broker'
+    self.source.spec.project = 'fake-project'
+    self.source.spec.topic = 'my-topic'
+    self.operations.GetSource.return_value = self.source
+
+  def _MakeTrigger(self, source_obj):
+    """Creates a trigger and assigns it as output to GetTrigger."""
+    self.trigger = trigger.Trigger.New(self.mock_serverless_client, 'default')
+    self.trigger.name = 'my-trigger'
+    self.trigger.status.conditions = [
+        self.serverless_messages.TriggerCondition(type='Ready', status='True')
+    ]
+    self.trigger.dependency = source_obj
+    self.trigger.filter_attributes[
+        trigger.EVENT_TYPE_FIELD] = 'com.google.event.type'
+    self.trigger.subscriber = 'my-service'
+    self.operations.GetTrigger.return_value = self.trigger
+
+  def testDeleteManaged(self):
+    """Tests the source is manually deleted for requests against managed."""
+    self._MakeSourceCrd()
+    self._MakeSource()
+    self._MakeTrigger(self.source)
+    self.WriteInput('Y\n')
+    self.Run('events triggers delete my-trigger --region=us-central1')
+
+    self.operations.DeleteSource.assert_called_once_with(
+        self._SourceRef('my-source', 'cloudpubsubsources', 'fake-project'),
+        self.source_crd)
+    self.operations.DeleteTrigger.assert_called_once_with(
+        self._TriggerRef('my-trigger', 'fake-project'))
+    self.AssertErrContains('Deleted trigger [my-trigger].')
+
+  def testDeleteGke(self):
     """Tests successful delete with default output format."""
     self.WriteInput('Y\n')
     self.Run('events triggers delete my-trigger --platform=gke '
              '--cluster=cluster-1 --cluster-location=us-central1-a')
+
     self.operations.DeleteTrigger.assert_called_once_with(
         self._TriggerRef('my-trigger', 'default'))
     self.AssertErrContains('Deleted trigger [my-trigger].')
 
-  def testTriggersFailsIfUnattended(self):
+  def testDeleteFailsIfUnattended(self):
     """Tests that delete fails if console is unattended."""
     self.is_interactive.return_value = False
     with self.assertRaises(console_io.UnattendedPromptError):

@@ -44,9 +44,8 @@ class RevokeTest(cli_test_base.CliTestBase):
   def testRevokeNoADCFile(self):
     self.mock_get_wkf.return_value = 'NON_EXISTENT_FILE'
 
-    with self.assertRaises(c_exc.BadFileException):
-      self.Run('beta auth application-default revoke')
-    self.AssertErrContains('nothing was revoked.')
+    self.Run('beta auth application-default revoke')
+    self.AssertErrContains('nothing to revoke')
 
   def testRevokeServiceAccount(self):
     adcfilename = self.TempADCFile('adc_service_account.json')

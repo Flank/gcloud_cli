@@ -1,4 +1,4 @@
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 
 help_text:
   brief: Set the IAM policy for a Google Compute Engine machine image.
@@ -6,8 +6,8 @@ help_text:
     Sets the IAM policy for the given machine image as defined in a JSON or YAML file.
 
   examples: |
-    The following command will read am IAM policy defined in a JSON file
-    'policy.json' and set it for the machine image `my-image`:
+    The following command reads an IAM policy defined in a `policy.json` file
+     and sets the policy for the machine image `my-image`:
 
       $ {command} my-image policy.json
 
@@ -19,8 +19,9 @@ request:
   use_relative_name: false
   modify_request_hooks:
   - googlecloudsdk.command_lib.iam.hooks:UseMaxRequestedPolicyVersion:api_field=globalSetPolicyRequest.policy.version
-  api_version: alpha
-
+  api_version: beta
+  ALPHA:
+    api_version: alpha
 arguments:
   resource:
     help_text: The machine image to set the IAM policy for.

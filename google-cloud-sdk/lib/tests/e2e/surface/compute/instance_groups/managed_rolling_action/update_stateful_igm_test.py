@@ -24,13 +24,13 @@ from tests.lib.surface.compute import e2e_managers_stateful_test_base
 from tests.lib.surface.compute import e2e_test_base
 
 
-class UpdateStatefulIgmZonalAlphaTest(
+class UpdateStatefulIgmZonalBetaTest(
     e2e_managers_stateful_test_base.ManagedStatefulTestBase):
 
   def SetUp(self):
     self.prefix = 'mig-update-stateful-igm-zonal'
     self.scope = e2e_test_base.ZONAL
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _CreateStatefulIgm(self):
     instance_template_name = self.CreateInstanceTemplate(
@@ -120,8 +120,7 @@ class UpdateStatefulIgmZonalAlphaTest(
     self.AssertNewErrContains('--max-surge has to be 0')
 
 
-class UpdateStatefulIgmRegionalAlphaTest(
-    UpdateStatefulIgmZonalAlphaTest):
+class UpdateStatefulIgmRegionalBetaTest(UpdateStatefulIgmZonalBetaTest):
 
   def SetUp(self):
     self.prefix = 'mig-update-stateful-igm-regional'

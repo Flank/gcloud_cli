@@ -11,7 +11,7 @@ gcloud alpha spanner operations cancel \- cancel a Cloud Spanner operation
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha spanner operations cancel\fR \fIOPERATION\-ID\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-database\fR=\fIDATABASE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha spanner operations cancel\fR \fIOPERATION\-ID\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-backup\fR=\fIBACKUP\fR] [\fB\-\-database\fR=\fIDATABASE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -47,6 +47,10 @@ The ID of the instance the operation is executing on.
 
 .RS 2m
 .TP 2m
+\fB\-\-backup\fR=\fIBACKUP\fR
+For a backup operation, the name of the backup the operation is executing on.
+
+.TP 2m
 \fB\-\-database\fR=\fIDATABASE\fR
 For a database operation, the name of the database the operation is executing
 on.
@@ -60,8 +64,9 @@ on.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -82,7 +87,16 @@ $ gcloud alpha spanner operations cancel  _auto_12345 \e
     \-\-database=my\-database\-id
 .RE
 
+To cancel a backup operation with ID \fIauto_12345, run:
 
+.RS 2m
+$ gcloud alpha spanner operations cancel  _auto_12345 \e
+    \-\-instance=my\-instance\-id
+    \-\-backup=my\-backup\-id
+.RE
+
+
+\fR
 
 .SH "NOTES"
 

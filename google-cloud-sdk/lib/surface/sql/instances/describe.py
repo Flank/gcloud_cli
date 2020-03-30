@@ -48,16 +48,15 @@ class Get(base.DescribeCommand):
     """Args is called by calliope to gather arguments for this command.
 
     Args:
-      parser: An argparse parser that you can use it to add arguments that go
-          on the command line after this command. Positional arguments are
-          allowed.
+      parser: An argparse parser that you can use it to add arguments that go on
+        the command line after this command. Positional arguments are allowed.
     """
     parser.add_argument(
         'instance',
         completer=flags.InstanceCompleter,
         help='Cloud SQL instance ID.')
-    parser.display_info.AddFormat(
-        '{0} default'.format(flags.INSTANCES_USERLABELS_FORMAT))
+    parser.display_info.AddFormat('{0} default'.format(
+        flags.INSTANCES_USERLABELS_FORMAT))
 
   def Run(self, args):
     """Displays configuration and metadata about a Cloud SQL instance.
@@ -67,11 +66,11 @@ class Get(base.DescribeCommand):
 
     Args:
       args: argparse.Namespace, The arguments that this command was invoked
-          with.
+        with.
 
     Returns:
-      A dict object representing the instance resource if fetching the instance
-      was successful.
+      A DatabaseInstancePresentation object representing the instance resource
+      if fetching the instance was successful.
     Raises:
       HttpException: A http error response was received while executing api
           request.
@@ -91,11 +90,10 @@ class Get(base.DescribeCommand):
       instance = sql_client.instances.Get(
           sql_messages.SqlInstancesGetRequest(
               project=instance_ref.project, instance=instance_ref.instance))
-      instance.state = instance_api_util.GetInstanceState(instance)
       # TODO(b/122660263): Remove when V1 instances are no longer supported.
-      if instance_api_util.IsInstanceV1(instance):
+      if instance_api_util.IsInstanceV1(sql_messages, instance):
         instance_command_util.ShowV1DeprecationWarning()
-      return instance
+      return instance_api_util.DatabaseInstancePresentation(instance)
     except apitools_exceptions.HttpError as error:
       if error.status_code == six.moves.http_client.FORBIDDEN:
         raise exceptions.ResourceNotFoundError(

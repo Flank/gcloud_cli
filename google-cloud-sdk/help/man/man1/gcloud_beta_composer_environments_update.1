@@ -11,7 +11,7 @@ gcloud beta composer environments update \- update properties of a Cloud Compose
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta composer environments update\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) (\fB\-\-node\-count\fR=\fINODE_COUNT\fR\ |\ \fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR\ |\ \fB\-\-update\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-airflow\-configs\fR\ |\ \fB\-\-remove\-airflow\-configs\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-env\-variables\fR\ |\ \fB\-\-remove\-env\-variables\fR=[\fINAME\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-pypi\-packages\-from\-file\fR=\fIUPDATE_PYPI_PACKAGES_FROM_FILE\fR\ |\ \fB\-\-update\-pypi\-package\fR=\fIPACKAGE\fR[\fIEXTRAS_LIST\fR]\fIVERSION_SPECIFIER\fR\ \fB\-\-clear\-pypi\-packages\fR\ |\ \fB\-\-remove\-pypi\-packages\fR=[\fIPACKAGE\fR,...]) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta composer environments update\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) (\fB\-\-node\-count\fR=\fINODE_COUNT\fR\ |\ \fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR\ |\ \fB\-\-update\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-airflow\-configs\fR\ |\ \fB\-\-remove\-airflow\-configs\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-env\-variables\fR\ |\ \fB\-\-remove\-env\-variables\fR=[\fINAME\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-update\-pypi\-packages\-from\-file\fR=\fIUPDATE_PYPI_PACKAGES_FROM_FILE\fR\ |\ \fB\-\-update\-pypi\-package\fR=\fIPACKAGE\fR[\fIEXTRAS_LIST\fR]\fIVERSION_SPECIFIER\fR\ \fB\-\-clear\-pypi\-packages\fR\ |\ \fB\-\-remove\-pypi\-packages\fR=[\fIPACKAGE\fR,...]\ |\ \fB\-\-update\-web\-server\-allow\-ip\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIip_range\fR=\fIIP_RANGE\fR]\ |\ \fB\-\-web\-server\-allow\-all\fR\ |\ \fB\-\-web\-server\-deny\-all\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -207,6 +207,8 @@ $ gcloud beta composer environments update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 .RE
 .RE
@@ -264,8 +266,38 @@ PyPI packages that are required by the environment's core software cannot be
 uninstalled with the \f5\-\-remove\-pypi\-packages\fR or
 \f5\-\-clear\-pypi\-packages\fR flags.
 
+.RE
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-update\-web\-server\-allow\-ip\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIip_range\fR=\fIIP_RANGE\fR]
+Specifies a list of IPv4 or IPv6 ranges that will be allowed to access the
+Airflow web server. By default, all IPs are allowed to access the web server.
 
 .RE
+.sp
+.TP 2m
+\fBip_range\fR
+IPv4 or IPv6 range of addresses allowed to access the Airflow web server.
+
+.TP 2m
+\fBdescription\fR
+An optional description of the IP range.
+.RS 2m
+.TP 2m
+\fB\-\-web\-server\-allow\-all\fR
+Allows all IP addresses to access the Airflow web server.
+
+.TP 2m
+\fB\-\-web\-server\-deny\-all\fR
+Denies all incoming traffic to the Airflow web server.
+
+
 .RE
 .RE
 .RE
@@ -287,8 +319,21 @@ Return immediately, without waiting for the operation in progress to complete.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update the Cloud Composer environment named \f5\fIenv\-1\fR\fR to have 8
+Airflow workers, and not have the \f5\fIproduction\fR\fR label, run:
+
+.RS 2m
+$ gcloud beta composer environments update env\-1 \-\-node\-count=8 \e
+    \-\-remove\-labels=production
+.RE
 
 
 

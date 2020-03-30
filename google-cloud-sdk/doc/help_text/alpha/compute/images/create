@@ -87,8 +87,9 @@ OPTIONAL FLAGS
         used.
 
      --forbidden-database-file=[DBX_VALUE,...]
-        List of revoked certificates file paths used when booting up shieled
-        instance from this image.
+        Comma-separated list of file paths pointing to revoked X.509
+        certificates or raw binary files to be added to the forbidden signature
+        database (dbx) when creating a shielded instance from this image.
 
      --force
         By default, image creation fails when it is created from a disk that is
@@ -110,10 +111,6 @@ OPTIONAL FLAGS
         * MULTI_IP_SUBNET - For configuring interfaces with a netmask other
           than /32.
 
-        * SECURE_BOOT - Enables UEFI secure boot, which restrics unsigned
-          software from booting or unsigned drivers from loading on the VM
-          instance.
-
         * UEFI_COMPATIBLE - Enables UEFI booting, which is an alternative
           system boot method. Most public images use the GRUB bootloader as
           their primary boot method.
@@ -129,12 +126,13 @@ OPTIONAL FLAGS
           for Windows server include the WINDOWS parameter to indicate that it
           is a Windows image.
 
-    GUEST_OS_FEATURE must be one of: MULTI_IP_SUBNET, SECURE_BOOT,
-    UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS, GVNIC.
+    GUEST_OS_FEATURE must be one of: MULTI_IP_SUBNET, UEFI_COMPATIBLE,
+    VIRTIO_SCSI_MULTIQUEUE, WINDOWS, GVNIC.
 
      --key-exchange-key-file=[KEK_VALUE,...]
-        List of key exchange key file paths used when booting up shieled
-        instance from this image.
+        Comma-separated list of file paths pointing to X.509 certificates or
+        raw binary files to be used as key exchange keys (KEK) when creating a
+        shielded instance from this image.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -148,8 +146,9 @@ OPTIONAL FLAGS
         Comma-separated list of URIs to license resources.
 
      --platform-key-file=PLATFORM_KEY_FILE
-        Single Platform Key file path used when booting up shielded instance
-        from this image.
+        File path pointing to an X.509 certificate or raw binary file to be
+        used as the platform key (PK) when creating a shielded instance from
+        this image.
 
      --require-csek-key-create
         Refuse to create images not protected by a user managed key in the key
@@ -163,8 +162,9 @@ OPTIONAL FLAGS
         to disable.
 
      --signature-database-file=[DB_VALUE,...]
-        List of valid public certificates file paths used when booting up
-        shieled instance from this image.
+        Comma-separated list of file paths pointing to valid X.509 certificates
+        or raw binary files to be added to the signature database (db) when
+        creating a shielded instance from this image.
 
      --source-disk-zone=SOURCE_DISK_ZONE
         Zone of the source disk to operate on. If not specified and the
@@ -217,8 +217,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create an image 'my-image' from a disk 'my-disk' in zone 'us-east1-a',

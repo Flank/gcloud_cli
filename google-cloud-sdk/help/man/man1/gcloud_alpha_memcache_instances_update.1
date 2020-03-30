@@ -1,0 +1,217 @@
+
+.TH "GCLOUD_ALPHA_MEMCACHE_INSTANCES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha memcache instances update \- update a Memorystore Memcached instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha memcache instances update\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) (\fB\-\-parameters\fR=\fIKEY\fR=\fIVALUE\fR\ |\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR\ \fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR\ \fB\-\-node\-count\fR=\fINODE_COUNT\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update the metadata and/or configuration parameters of a Memcached
+instance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Instance resource \- Arguments and flags that specify the Memcached instance you
+want to update. The arguments in this group can be used to specify the
+attributes of this resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: provide
+the argument [instance] on the command line with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance or fully qualified identifier for the instance. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The name of the Memcached region of the instance.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-parameters\fR=\fIKEY\fR=\fIVALUE\fR
+User defined parameters to apply to the memcached process on each node. Possible
+attributes include:
+
+.TP 2m
+\fBlisten\-backlog\fR
+The backlog queue limit for the instance.
+
+.TP 2m
+\fBdisable\-flush\-all\fR
+If enabled, flush_all command will be disabled. Applicable to 1.4.24 and higher.
+
+.TP 2m
+\fBmax\-item\-size\fR
+Max bytes of the instnace. Must at least be equal to slab_chunk_max (which
+defaults to 524288 bytes) and less than 134217728 bytes. Additionally it must be
+a multiple of slab_chunk_max.
+
+.TP 2m
+\fBslab\-min\-size\fR
+This is an integer in the range [1, 1024].
+
+.TP 2m
+\fBslab\-growth\-factor\fR
+This is a float in the range [1.01, 100].
+
+.TP 2m
+\fBprotocol\fR
+This is an enum with acceptable values of ["ascii", "auto"].
+
+.TP 2m
+\fBdisable\-cas\fR
+This is a boolean value.
+
+.TP 2m
+\fBdisable\-evictions\fR
+This is a boolean value.
+
+.TP 2m
+\fBmax\-reqs\-per\-event\fR
+This is an integer in the range [1, 1000].
+
+.TP 2m
+\fBtrack\-sizes\fR
+This is a boolean value.
+
+.TP 2m
+\fBworker\-logbuf\-size\fR
+This is an integer in the range [48, 524288].
+
+.TP 2m
+\fBwatcher\-logbuf\-size\fR
+This is an integer in the range [0, 2097151].
+
+.TP 2m
+\fBlru\-crawler\fR
+This is a boolean value.
+
+.TP 2m
+\fBidle\-timeout\fR
+This is an integer in the range [1,86400].
+
+.TP 2m
+\fBlru\-maintainer\fR
+This is a boolean value.
+
+.TP 2m
+\fBmaxconns\-fast\fR
+This is a boolean value.
+
+.TP 2m
+\fBhash\-algorithm\fR
+This is an enum with accepted values of ["jenkins", "murmur3"].
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+An arbitrary and optional user provided name for the instance.
+
+.TP 2m
+\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR
+A list of label KEY=VALUE pairs to add.
+
+.TP 2m
+\fB\-\-node\-count\fR=\fINODE_COUNT\fR
+Number of memcache nodes in this instance.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBmemcache/v1beta2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/memorystore/
+
+
+
+.SH "EXAMPLES"
+
+The following command updates a Memcached instance with the name
+\'my\-memcache\-instance' in region 'us\-central1' to have the display name
+"Cache for Foo Service", and the two labels, 'env' and 'service'.
+
+.RS 2m
+$ gcloud alpha memcache instances update my\-memcache\-instance \e
+    \-\-display\-name="Cache for Foo Service" \e
+    \-\-labels=env=test,service=foo
+.RE
+
+The following command updates a Memcached instance with the name
+\'my\-memcache\-instance' in region 'us\-central1' to have parameters 'protocol'
+and 'track\-sizes'.
+
+.RS 2m
+$ gcloud alpha memcache instances update my\-memcache\-instance \e
+    \-\-parameters=protocol=ascii,track\-sizes=true \e
+    \-\-region=us\-central1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta memcache instances update
+.RE
+

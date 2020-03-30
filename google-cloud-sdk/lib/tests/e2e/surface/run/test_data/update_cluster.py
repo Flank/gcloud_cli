@@ -50,7 +50,10 @@ def GetLatestVersion():
     print(err, file=sys.stderr)
     raise Exception(err)
 
-  for version in out.strip().split(';'):
+  if sys.version_info.major >= 3:
+    out = out.decode('utf-8')
+  versions = out.strip().split(';')
+  for version in versions:
     if version not in VERSION_BLACKLIST:
       return version
 

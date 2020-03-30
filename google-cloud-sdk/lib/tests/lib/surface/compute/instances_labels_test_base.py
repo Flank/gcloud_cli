@@ -99,6 +99,17 @@ class InstancesLabelsTestBase(sdk_test_base.WithFakeAuth,
             project=self.Project()),
         operation)
 
+  def _ExpectOperationWaitRequest(self, operation_ref, operation):
+    self.zone_operations.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
+            operation=operation_ref.operation,
+            zone=operation_ref.zone,
+            project=self.Project()),
+        operation)
+
+  def _ExpectOperationPollingRequest(self, operation_ref, operation):
+    self._ExpectOperationWaitRequest(operation_ref, operation)
+
   def _ExpectLabelsSetRequest(
       self, instance_ref, labels, fingerprint, response=None, exception=None):
     labels_value = self._MakeLabelsProto(labels)

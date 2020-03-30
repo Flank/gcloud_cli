@@ -63,7 +63,7 @@ class SecurityPoliciesTest(e2e_test_base.BaseTest):
       # Update the security policy
       self.result_file_path = os.path.join(self.temp_path, 'exported')
       self.Run('compute security-policies export {0}'
-               ' --file-name {1} --file-format yaml'.format(
+               ' --file-name "{1}" --file-format yaml'.format(
                    security_policy_name, self.result_file_path))
       security_policy = yaml.load_path(self.result_file_path)
 
@@ -85,10 +85,10 @@ class SecurityPoliciesTest(e2e_test_base.BaseTest):
                                             'json')
 
       self.Run('compute security-policies import {0}'
-               ' --file-name {1} --file-format yaml'.format(
+               ' --file-name "{1}" --file-format yaml'.format(
                    security_policy_name, self.result_file_path))
       self.Run('compute security-policies export {0}'
-               ' --file-name {1} --file-format json'.format(
+               ' --file-name "{1}" --file-format json'.format(
                    security_policy_name, self.result_file_path))
       security_policy = yaml.load_path(self.result_file_path)
 

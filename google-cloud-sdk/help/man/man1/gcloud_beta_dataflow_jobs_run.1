@@ -11,7 +11,7 @@ gcloud beta dataflow jobs run \- runs a job from the specified path
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta dataflow jobs run\fR \fIJOB_NAME\fR \fB\-\-gcs\-location\fR=\fIGCS_LOCATION\fR [\fB\-\-dataflow\-kms\-key\fR=\fIDATAFLOW_KMS_KEY\fR] [\fB\-\-disable\-public\-ips\fR] [\fB\-\-max\-workers\fR=\fIMAX_WORKERS\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fB\-\-parameters\fR=[\fIPARAMETERS\fR,...]] [\fB\-\-region\fR=\fIREGION_ID\fR] [\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-staging\-location\fR=\fISTAGING_LOCATION\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta dataflow jobs run\fR \fIJOB_NAME\fR \fB\-\-gcs\-location\fR=\fIGCS_LOCATION\fR [\fB\-\-dataflow\-kms\-key\fR=\fIDATAFLOW_KMS_KEY\fR] [\fB\-\-disable\-public\-ips\fR] [\fB\-\-max\-workers\fR=\fIMAX_WORKERS\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fB\-\-parameters\fR=[\fIPARAMETERS\fR,...]] [\fB\-\-region\fR=\fIREGION_ID\fR] [\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-staging\-location\fR=\fISTAGING_LOCATION\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fB\-\-worker\-region\fR=\fIWORKER_REGION\fR\ |\ \fB\-\-worker\-zone\fR=\fIWORKER_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -95,10 +95,27 @@ The Compute Engine subnetwork for launching instances to run your pipeline.
 The type of machine to use for workers. Defaults to server\-specified.
 
 .TP 2m
-\fB\-\-zone\fR=\fIZONE\fR
+
+Worker location options. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-worker\-region\fR=\fIWORKER_REGION\fR
+The region to run the workers in.
+
+.TP 2m
+\fB\-\-worker\-zone\fR=\fIWORKER_ZONE\fR
 The zone to run the workers in.
 
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+(DEPRECATED) The zone to run the workers in.
 
+The \-\-zone option is deprecated; use \-\-worker\-region or \-\-worker\-zone
+instead.
+
+
+.RE
 .RE
 .sp
 
@@ -107,8 +124,9 @@ The zone to run the workers in.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

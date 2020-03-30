@@ -54,7 +54,10 @@ IMPORT_PROTECTION_LEVEL_MAPPER = arg_utils.ChoiceEnumMapper(
 
 # Add new algorithms according to their purposes here.
 VALID_ALGORITHMS_MAP = {
-    PURPOSE_ENUM.ENCRYPT_DECRYPT: ['google-symmetric-encryption'],
+    PURPOSE_ENUM.ENCRYPT_DECRYPT: [
+        'google-symmetric-encryption',
+        'external-symmetric-encryption',
+    ],
     PURPOSE_ENUM.ASYMMETRIC_SIGN: [
         'ec-sign-p256-sha256',
         'ec-sign-p384-sha384',
@@ -76,7 +79,14 @@ VALID_ALGORITHMS_MAP = {
 }
 
 # Derive available algorithms from VALID_ALGORITHMS_MAP.
-ALL_ALGORITHMS = {
+ALL_ALGORITHMS = frozenset({
+    # pylint: disable=g-complex-comprehension
     algorithm for algorithms in VALID_ALGORITHMS_MAP.values()
     for algorithm in algorithms
-}
+})
+
+ALGORITHMS_FOR_IMPORT = ALL_ALGORITHMS - {'external-symmetric-encryption'}
+
+CRYPTO_KEY_VERSION_STATE_ENUM = MESSAGES.CryptoKeyVersion.StateValueValuesEnum
+CRYPTO_KEY_VERSION_STATE_MAPPER = arg_utils.ChoiceEnumMapper(
+    'crypto_key_version_state_enum', CRYPTO_KEY_VERSION_STATE_ENUM)

@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud ai-platform local train --module-name=MODULE_NAME [--distributed]
-        [--job-dir=JOB_DIR] [--package-path=PACKAGE_PATH]
+        [--evaluator-count=EVALUATOR_COUNT] [--job-dir=JOB_DIR]
+        [--package-path=PACKAGE_PATH]
         [--parameter-server-count=PARAMETER_SERVER_COUNT]
         [--start-port=START_PORT; default=27182] [--worker-count=WORKER_COUNT]
         [GCLOUD_WIDE_FLAG ...] [-- USER_ARGS ...]
@@ -46,6 +47,10 @@ OPTIONAL FLAGS
         Runs the provided code in distributed mode by providing cluster
         configurations as environment variables to subprocesses
 
+     --evaluator-count=EVALUATOR_COUNT
+        Number of evaluators with which to run. Ignored if --distributed is not
+        specified. Default: 0
+
      --job-dir=JOB_DIR
         Google Cloud Storage path or local_directory in which to store training
         outputs and other data needed for training.
@@ -80,8 +85,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     These variants are also available:

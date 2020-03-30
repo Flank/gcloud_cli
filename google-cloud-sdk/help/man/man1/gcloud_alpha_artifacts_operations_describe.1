@@ -1,0 +1,103 @@
+
+.TH "GCLOUD_ALPHA_ARTIFACTS_OPERATIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha artifacts operations describe \- describe an Artifact Registry operation
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha artifacts operations describe\fR (\fIOPERATION\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Describe an Artifact Registry operation given the operation id.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The operation specified does not exist.
+.IP "\(bu" 2m
+The active account does not have permission to access the given operation.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Operation resource \- The Artifact Registry operation to describe. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [operation] on the
+command line with a fully specified name; set the property [core/project];
+provide the argument [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIOPERATION\fR
+ID of the operation or fully qualified identifier for the operation. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the operation. Overrides the default artifacts/location property
+value for this command invocation. To configure the default location, use the
+command: gcloud config set artifacts/location.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBartifactregistry/v1beta1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/artifacts/docs/
+
+
+
+.SH "EXAMPLES"
+
+The following command describes an operation with id
+\f506d2817d\-6566\-47c3\-88a0\-295ef51eb434\fR:
+
+.RS 2m
+$ gcloud alpha artifacts operations describe \e
+    06d2817d\-6566\-47c3\-88a0\-295ef51eb434
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta artifacts operations describe
+.RE
+

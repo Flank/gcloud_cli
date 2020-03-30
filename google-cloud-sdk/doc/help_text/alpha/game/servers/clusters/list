@@ -2,30 +2,35 @@ NAME
     gcloud alpha game servers clusters list - list Game Server Clusters
 
 SYNOPSIS
-    gcloud alpha game servers clusters list
-        (--realm=REALM : --location=LOCATION) [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha game servers clusters list [--location=LOCATION --realm=REALM]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) List Cloud Game Server Clusters.
 
-REQUIRED FLAGS
-     Realm resource - Cloud Game Servers Location of the Game Server Cluster to
+EXAMPLES
+    To see the list of all Game Server Clusters in project 'my-project', realm
+    'my-realm', and location 'my-location', run:
+
+        $ gcloud alpha game servers clusters list --project=my-project \
+            --realm=my-realm --location=my-location
+
+FLAGS
+     Realm resource - Cloud Game Servers Realm of the Game Server Cluster to
      list. The arguments in this group can be used to specify the attributes of
      this resource. (NOTE) Some attributes are not given arguments in this
      group but can be set in other ways. To set the [project] attribute:
      provide the argument [--realm] on the command line with a fully specified
-     name; set the property [core/project]; provide the argument [--project] on
-     the command line. This must be specified.
-
-       --realm=REALM
-          ID of the realm or fully qualified identifier for the realm. This
-          flag must be specified if any of the other arguments in this group
-          are specified.
+     name; set the property [game_services/default_realm] with a fully
+     specified name; set the property [core/project]; provide the argument
+     [--project] on the command line.
 
        --location=LOCATION
           Google Cloud location.
+
+       --realm=REALM
+          ID of the realm or fully qualified identifier for the realm.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -60,8 +65,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the gameservices/v1alpha API. The full documentation for
@@ -71,5 +77,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta game servers clusters list
 

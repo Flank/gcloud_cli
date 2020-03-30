@@ -55,7 +55,7 @@ class _BaseServerCaCertsRotateTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0)))),
+                            datetime.timedelta(0))).isoformat()),
                 data.GetSslCert(
                     instance_name, 'two',
                     datetime.datetime(
@@ -67,7 +67,7 @@ class _BaseServerCaCertsRotateTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))))
+                            datetime.timedelta(0))).isoformat())
             ],
             kind='sql#sslCertsList',
         ))
@@ -79,16 +79,18 @@ class _BaseServerCaCertsRotateTest(object):
         ),
         data.GetOperation(
             self.Project(),
-            self.messages.DatabaseInstance(name=instance_name),
-            'UPDATE',
-            'PENDING'))
+            self.messages.DatabaseInstance(
+                kind='sql#instance', name=instance_name),
+            self.messages.Operation.OperationTypeValueValuesEnum.UPDATE,
+            self.messages.Operation.StatusValueValuesEnum.PENDING))
     self.mocked_client.operations.Get.Expect(
         data.GetOperationGetRequest(self.Project()),
         data.GetOperation(
             self.Project(),
-            self.messages.DatabaseInstance(name=instance_name),
-            'UPDATE',
-            'DONE'))
+            self.messages.DatabaseInstance(
+                kind='sql#instance', name=instance_name),
+            self.messages.Operation.OperationTypeValueValuesEnum.UPDATE,
+            self.messages.Operation.StatusValueValuesEnum.DONE))
     self.Run(
         'sql ssl server-ca-certs rotate --instance={}'.format(instance_name))
     self.AssertOutputContains(
@@ -122,7 +124,7 @@ two              2024-04-04T21:10:29.402000+00:00
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))))
+                            datetime.timedelta(0))).isoformat())
             ],
             kind='sql#sslCertsList',
         ))

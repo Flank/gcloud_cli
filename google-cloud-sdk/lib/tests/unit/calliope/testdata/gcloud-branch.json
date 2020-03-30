@@ -58,7 +58,7 @@
       "attr": {},
       "category": "GLOBAL",
       "choices": [],
-      "description": "The configuration to use for this command invocation. For more\ninformation on how to use configurations, run:\n`gcloud topic configurations`.  You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME] environment\nvariable to set the equivalent of this flag for a terminal\nsession.",
+      "description": "The configuration to use for this command invocation. For more\ninformation on how to use configurations, run:\n`gcloud topic configurations`.  You can also use the CLOUDSDK_ACTIVE_CONFIG_NAME environment\nvariable to set the equivalent of this flag for a terminal\nsession.",
       "is_global": true,
       "is_group": false,
       "is_hidden": false,

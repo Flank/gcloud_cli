@@ -2,13 +2,17 @@ NAME
     gcloud alpha kms keys versions create - create a new version
 
 SYNOPSIS
-    gcloud alpha kms keys versions create [--key=KEY] [--keyring=KEYRING]
-        [--location=LOCATION] [--primary] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha kms keys versions create [--external-key-uri=EXTERNAL_KEY_URI]
+        [--key=KEY] [--keyring=KEYRING] [--location=LOCATION] [--primary]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Creates a new version within the given key.
 
 FLAGS
+     --external-key-uri=EXTERNAL_KEY_URI
+        The URI of the external key for keys with protection level "external".
+
      --key=KEY
         The containing key.
 
@@ -25,8 +29,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     The following command creates a new version within the frodo key,
@@ -35,6 +40,17 @@ EXAMPLES
         $ gcloud alpha kms keys versions create --location=global \
             --keyring=fellowship \
             --key=frodo --primary
+
+    The following command creates a new version within the legolas key,
+    fellowship keyring, us-central1 location,
+    https://example.kms/v0/some/key/path as the address for its external key,
+    and sets it as the key's primary version:
+
+        $ gcloud alpha kms keys versions create --location=us-central1 \
+            --keyring=fellowship \
+            --key=legolas \
+            --external-key-uri=https://example.kms/v0/some/key/path \
+            --primary
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

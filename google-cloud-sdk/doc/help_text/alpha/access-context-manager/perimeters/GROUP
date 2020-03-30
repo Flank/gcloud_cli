@@ -3,7 +3,7 @@ NAME
         Manager service perimeters
 
 SYNOPSIS
-    gcloud alpha access-context-manager perimeters COMMAND
+    gcloud alpha access-context-manager perimeters GROUP | COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -17,8 +17,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     dry-run
+        (ALPHA) Enable management of dry-run mode configuration for Service
+        Perimeters.
 
 COMMANDS
     COMMAND is one of the following:

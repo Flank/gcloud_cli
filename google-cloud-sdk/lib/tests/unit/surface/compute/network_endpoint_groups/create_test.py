@@ -34,11 +34,20 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
     self.endpoint_type_enum = (
         self.messages.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum)
 
-  def _ExpectCreate(self, network_endpoint_group, project=None, zone=None):
+  def _ExpectCreate(self,
+                    network_endpoint_group,
+                    project=None,
+                    zone=None,
+                    region=None):
     if zone:
       request = self.messages.ComputeNetworkEndpointGroupsInsertRequest(
           project=project or self.Project(),
           zone=zone,
+          networkEndpointGroup=network_endpoint_group)
+    elif region:
+      request = self.messages.ComputeRegionNetworkEndpointGroupsInsertRequest(
+          project=project or self.Project(),
+          region=region,
           networkEndpointGroup=network_endpoint_group)
     else:
       request = self.messages.ComputeGlobalNetworkEndpointGroupsInsertRequest(
@@ -47,7 +56,6 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
     self.make_requests.side_effect = [[network_endpoint_group]]
     return request
 
-  # if region is None, this NEG is considered global
   def _CreateNetworkEndpointGroup(self,
                                   name,
                                   default_port=None,
@@ -55,8 +63,18 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
                                   subnetwork=None,
                                   project=None,
                                   region=None,
-                                  network_endpoint_type=None):
+                                  network_endpoint_type=None,
+                                  cloud_run_service=None,
+                                  cloud_run_tag=None,
+                                  cloud_run_url_mask=None,
+                                  app_engine_app=False,
+                                  app_engine_service=None,
+                                  app_engine_version=None,
+                                  app_engine_url_mask=None,
+                                  cloud_function_name=None,
+                                  cloud_function_url_mask=None):
     project = project or self.Project()
+    region = region or self.region
     network_endpoint_type = network_endpoint_type or self.endpoint_type_enum.GCE_VM_IP_PORT
 
     network_uri, subnetwork_uri = None, None
@@ -71,12 +89,43 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
           '{region}/subnetworks/{name}'.format(
               project=project, region=region, name=subnetwork))
 
-    network_endpoint_group = self.messages.NetworkEndpointGroup(
-        name=name,
-        networkEndpointType=network_endpoint_type,
-        defaultPort=default_port,
-        network=network_uri,
-        subnetwork=subnetwork_uri)
+    cloud_run = None
+    if cloud_run_service or cloud_run_tag or cloud_run_url_mask:
+      cloud_run = self.messages.NetworkEndpointGroupCloudRun(
+          service=cloud_run_service,
+          tag=cloud_run_tag,
+          urlMask=cloud_run_url_mask)
+    app_engine = None
+    if (app_engine_app or app_engine_service or app_engine_version or
+        app_engine_url_mask):
+      app_engine = self.messages.NetworkEndpointGroupAppEngine(
+          service=app_engine_service,
+          version=app_engine_version,
+          urlMask=app_engine_url_mask)
+    cloud_function = None
+    if cloud_function_name or cloud_function_url_mask:
+      cloud_function = self.messages.NetworkEndpointGroupCloudFunction(
+          function=cloud_function_name, urlMask=cloud_function_url_mask)
+
+    # TODO(b/137663401): remove the check below after all Serverless flags go
+    # to GA.
+    if cloud_run or app_engine or cloud_function:
+      network_endpoint_group = self.messages.NetworkEndpointGroup(
+          name=name,
+          networkEndpointType=network_endpoint_type,
+          defaultPort=default_port,
+          network=network_uri,
+          subnetwork=subnetwork_uri,
+          cloudRun=cloud_run,
+          appEngine=app_engine,
+          cloudFunction=cloud_function)
+    else:
+      network_endpoint_group = self.messages.NetworkEndpointGroup(
+          name=name,
+          networkEndpointType=network_endpoint_type,
+          defaultPort=default_port,
+          network=network_uri,
+          subnetwork=subnetwork_uri)
 
     return network_endpoint_group
 
@@ -138,17 +187,6 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
     self.CheckRequests(
         [(self.compute.networkEndpointGroups, 'Insert', request)])
     self.assertEqual(result, network_endpoint_group)
-
-
-class AlphaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
-    self.region = 'us-central1'
-    self.zone = 'us-central1-a'
-    self.endpoint_type_enum = (
-        self.messages.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum)
 
   def testCreateGlobal_Default(self):
     network_endpoint_group = self._CreateNetworkEndpointGroup(
@@ -223,8 +261,7 @@ class AlphaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only '
-        r'support network endpoint types of gce-vm-ip-port or '
-        r'non-gcp-private-ip-port.'):
+        r'support network endpoint types of gce-vm-ip-port.'):
       self.Run("""
       compute network-endpoint-groups create my-neg1 --zone {0}
         --network-endpoint-type INTERNET_IP_PORT
@@ -234,8 +271,7 @@ class AlphaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only '
-        r'support network endpoint types of gce-vm-ip-port or '
-        r'non-gcp-private-ip-port.'):
+        r'support network endpoint types of gce-vm-ip-port.'):
       self.Run("""
       compute network-endpoint-groups create my-neg1 --zone {0}
         --network-endpoint-type INTERNET_FQDN_PORT
@@ -251,6 +287,15 @@ class AlphaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
         --network-endpoint-type INTERNET_IP_PORT
         --network default
       """)
+
+
+class AlphaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.endpoint_type_enum = (
+        self.messages.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum)
 
   def testCreateZonal_NonGcpPrivateIpPortType_AllOptions(self):
     network_endpoint_group = self._CreateNetworkEndpointGroup(
@@ -287,6 +332,128 @@ class AlphaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
     self.CheckRequests([(self.compute.networkEndpointGroups, 'Insert', request)
                        ])
     self.assertEqual(result, network_endpoint_group)
+
+  def testCreateRegional_CloudRun(self):
+    network_endpoint_group = self._CreateNetworkEndpointGroup(
+        name='my-cloud-run-neg',
+        network_endpoint_type=self.endpoint_type_enum.SERVERLESS,
+        cloud_run_service='run-service',
+        cloud_run_tag='run-tag')
+    request = self._ExpectCreate(network_endpoint_group, region=self.region)
+
+    result = self.Run(
+        'compute network-endpoint-groups create my-cloud-run-neg --region ' +
+        self.region + ' --network-endpoint-type=serverless '
+        '--cloud-run-service=run-service --cloud-run-tag=run-tag')
+
+    self.CheckRequests([(self.compute.regionNetworkEndpointGroups, 'Insert',
+                         request)])
+    self.assertEqual(result, network_endpoint_group)
+
+  def testCreateRegional_CloudRunWithUrlMask(self):
+    network_endpoint_group = self._CreateNetworkEndpointGroup(
+        name='my-cloud-run-neg-url-mask',
+        network_endpoint_type=self.endpoint_type_enum.SERVERLESS,
+        cloud_run_url_mask='<service>')
+    request = self._ExpectCreate(network_endpoint_group, region=self.region)
+
+    result = self.Run(
+        'compute network-endpoint-groups create my-cloud-run-neg-url-mask '
+        '--region ' + self.region + ' --network-endpoint-type=serverless '
+        '--cloud-run-url-mask="<service>"')
+
+    self.CheckRequests([(self.compute.regionNetworkEndpointGroups, 'Insert',
+                         request)])
+    self.assertEqual(result, network_endpoint_group)
+
+  def testCreateRegional_AppEngineAppOnly(self):
+    network_endpoint_group = self._CreateNetworkEndpointGroup(
+        name='my-app-engine-neg-app-only',
+        network_endpoint_type=self.endpoint_type_enum.SERVERLESS,
+        app_engine_app=True)
+    request = self._ExpectCreate(network_endpoint_group, region=self.region)
+
+    result = self.Run(
+        'compute network-endpoint-groups create my-app-engine-neg-app-only '
+        '--region ' + self.region + ' --network-endpoint-type=serverless '
+        '--app-engine-app')
+
+    self.CheckRequests([(self.compute.regionNetworkEndpointGroups, 'Insert',
+                         request)])
+    self.assertEqual(result, network_endpoint_group)
+
+  def testCreateRegional_AppEngine(self):
+    network_endpoint_group = self._CreateNetworkEndpointGroup(
+        name='my-app-engine-neg',
+        network_endpoint_type=self.endpoint_type_enum.SERVERLESS,
+        app_engine_service='app-service',
+        app_engine_version='app-version')
+    request = self._ExpectCreate(network_endpoint_group, region=self.region)
+
+    result = self.Run(
+        'compute network-endpoint-groups create my-app-engine-neg --region ' +
+        self.region + ' --network-endpoint-type=serverless '
+        '--app-engine-service=app-service --app-engine-version=app-version')
+
+    self.CheckRequests([(self.compute.regionNetworkEndpointGroups, 'Insert',
+                         request)])
+    self.assertEqual(result, network_endpoint_group)
+
+  def testCreateRegional_AppEngineWithUrlMask(self):
+    network_endpoint_group = self._CreateNetworkEndpointGroup(
+        name='my-app-engine-neg-url-mask',
+        network_endpoint_type=self.endpoint_type_enum.SERVERLESS,
+        app_engine_url_mask='<service>')
+    request = self._ExpectCreate(network_endpoint_group, region=self.region)
+
+    result = self.Run(
+        'compute network-endpoint-groups create my-app-engine-neg-url-mask '
+        '--region ' + self.region + ' --network-endpoint-type=serverless '
+        '--app-engine-url-mask="<service>"')
+
+    self.CheckRequests([(self.compute.regionNetworkEndpointGroups, 'Insert',
+                         request)])
+    self.assertEqual(result, network_endpoint_group)
+
+  def testCreateRegional_CloudFunction(self):
+    network_endpoint_group = self._CreateNetworkEndpointGroup(
+        name='my-cloud-function-neg',
+        network_endpoint_type=self.endpoint_type_enum.SERVERLESS,
+        cloud_function_name='function-name')
+    request = self._ExpectCreate(network_endpoint_group, region=self.region)
+
+    result = self.Run(
+        'compute network-endpoint-groups create my-cloud-function-neg '
+        '--region ' + self.region + ' --network-endpoint-type=serverless '
+        '--cloud-function-name=function-name')
+
+    self.CheckRequests([(self.compute.regionNetworkEndpointGroups, 'Insert',
+                         request)])
+    self.assertEqual(result, network_endpoint_group)
+
+  def testCreateRegional_CloudFunctionWithUrlMask(self):
+    network_endpoint_group = self._CreateNetworkEndpointGroup(
+        name='my-cloud-function-neg-url-mask',
+        network_endpoint_type=self.endpoint_type_enum.SERVERLESS,
+        cloud_function_url_mask='<function>')
+    request = self._ExpectCreate(network_endpoint_group, region=self.region)
+
+    result = self.Run(
+        'compute network-endpoint-groups create my-cloud-function-neg-url-mask '
+        '--region ' + self.region + ' --network-endpoint-type=serverless '
+        '--cloud-function-url-mask="<function>"')
+
+    self.CheckRequests([(self.compute.regionNetworkEndpointGroups, 'Insert',
+                         request)])
+    self.assertEqual(result, network_endpoint_group)
+
+  def testCreateRegional_InternetType_fails(self):
+    with self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        r'Invalid value for \[--network-endpoint-type\]: Regional NEGs only '
+        r'support network endpoint types of serverless.'):
+      self.Run('compute network-endpoint-groups create my-neg1 --region ' +
+               self.region + ' --network-endpoint-type=internet-ip-port')
 
 
 if __name__ == '__main__':

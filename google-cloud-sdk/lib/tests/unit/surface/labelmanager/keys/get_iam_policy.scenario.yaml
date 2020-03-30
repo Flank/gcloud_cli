@@ -1,5 +1,18 @@
 title: LabelManager - LabelKeys - GetIamPolicy test
 release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: labelmanager keys get-iam-policy env --label-parent="organizations/456"
+  - stdout: |
+      etag: BwWUlZ6XEfY=
+      version: 1
+- execute:
+  - command: labelmanager keys get-iam-policy env --label-parent="organizations/456"
+  - error: '1: Invalid display_name for LabelKey [env] in parent [organizations/456]'
+- execute:
+  - command: labelmanager keys get-iam-policy env --label-parent="organizations/456"
+  - error: '1: PERMISSION_DENIED: The caller does not have permission'
 
 actions:
 - execute_command:
@@ -54,7 +67,7 @@ actions:
               name: labelKeys/789
     - expect_exit:
         code: 1
-        message: 'Invalid display_name for label key [env] in parent [organizations/456]'
+        message: Invalid display_name for LabelKey [env] in parent [organizations/456]
 - execute_command:
     command: labelmanager keys get-iam-policy env --label-parent="organizations/456"
     events:

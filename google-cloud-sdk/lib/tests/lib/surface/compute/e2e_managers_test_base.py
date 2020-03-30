@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_test_base
 
@@ -40,6 +41,8 @@ class ManagedTestBase(e2e_test_base.BaseTest):
     self.region_instance_group_manager_names = []
     self.target_pool_names = []
     self.instance_uris = []
+    # self.stateful_disk_names = []
+    self.potential_stateful_disk_urls = set()
 
   def TearDown(self):
     self.DeleteResources(self.instance_group_manager_names,
@@ -58,22 +61,32 @@ class ManagedTestBase(e2e_test_base.BaseTest):
                          'target pool')
     self.DeleteResources(self.instance_uris, self.DeleteInstanceByUri,
                          'instance')
+    self.CleanUpStatefulDisks(self.potential_stateful_disk_urls)
 
   def GetScopeFlag(self, plural=False):
+    flag_value = ''
     if self.scope == e2e_test_base.ZONAL:
-      flag_name = 'zone'
       flag_value = self.zone
     elif self.scope == e2e_test_base.REGIONAL:
-      flag_name = 'region'
       flag_value = self.region
     elif self.scope == e2e_test_base.EXPLICIT_GLOBAL:
-      flag_name = 'global'
       flag_value = ''
+    return ManagedTestBase.GetScopeFlagForScopeTypeAndName(
+        self.scope, flag_value, plural=plural)
+
+  @staticmethod
+  def GetScopeFlagForScopeTypeAndName(scope_type, scope_name, plural=False):
+    if scope_type == e2e_test_base.ZONAL:
+      scope_flag_name = 'zone'
+    elif scope_type == e2e_test_base.REGIONAL:
+      scope_flag_name = 'region'
+    elif scope_type == e2e_test_base.EXPLICIT_GLOBAL:
+      scope_flag_name = 'global'
     else:
       return ''
     if plural:
-      flag_name += 's'
-    return '--' + flag_name + ' ' + flag_value
+      scope_flag_name += 's'
+    return '--' + scope_flag_name + ' ' + scope_name
 
   def CreateInstanceTemplate(self,
                              machine_type='n1-standard-1',
@@ -135,11 +148,44 @@ class ManagedTestBase(e2e_test_base.BaseTest):
     output = self.GetNewOutput()
     return re.findall(r'\S+', output)
 
+  @staticmethod
+  def ExtractInstanceNameFromUri(uri):
+    return re.search(r'/instances/([^/]+)', uri).group(1)
+
   def WaitUntilStable(self, igm_name):
-    self.Run('compute instance-groups managed wait-until-stable {0} '
+    self.Run('compute instance-groups managed wait-until --stable {0} '
              '--timeout 600 '
              '{1}'.format(igm_name, self.GetScopeFlag()))
     self.AssertNewErrNotContains('Timeout')
+
+  def CleanUpStatefulDisks(self, stateful_disks):
+    """Cleanup potential stateful disks, since they may have auto-delete set to false."""
+    for disk_uri in stateful_disks:
+      disk_name = self._ExtractDiskNameFromUri(disk_uri)
+      disk_zone = self.ExtractZoneFromUri(disk_uri)
+      if not disk_zone:
+        raise ValueError(
+            'Unsupported disk URI for cleanup: {0}'.format(disk_uri))
+      self.CleanUpDisk(
+          disk_name, scope=e2e_test_base.ZONAL, scope_name=disk_zone)
+
+  def CleanUpDisk(self, name, scope=e2e_test_base.ZONAL, scope_name=None):
+    """Attempt to clean up a disk, without signaling an error on failure."""
+    scope_flag = self.scope_flag[scope]
+    if scope_name:
+      scope_flag = self.GetScopeFlagForScopeTypeAndName(scope, scope_name)
+    try:
+      self.Run('compute disks delete {0} {1} --quiet'.format(name, scope_flag))
+    except exceptions.ToolException:
+      pass
+
+  @staticmethod
+  def ExtractZoneFromUri(uri):
+    return re.search(r'/zones/([^/]+)/', uri).group(1)
+
+  @staticmethod
+  def _ExtractDiskNameFromUri(uri):
+    return re.search(r'/disks/([^/]+)', uri).group(1)
 
 
 if __name__ == '__main__':

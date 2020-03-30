@@ -1,0 +1,116 @@
+
+.TH "GCLOUD_BETA_SERVICE\-DIRECTORY_ENDPOINTS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta service\-directory endpoints update \- update an endpoint
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta service\-directory endpoints update\fR (\fIENDPOINT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-namespace\fR=\fINAMESPACE\fR\ \fB\-\-service\fR=\fISERVICE\fR) [\fB\-\-address\fR=\fIADDRESS\fR] [\fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-port\fR=\fIPORT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Update an endpoint.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Endpoint resource \- The Service Directory endpoint to update. The arguments in
+this group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [endpoint] on the command
+line with a fully specified name; set the property [core/project]. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fIENDPOINT\fR
+ID of the endpoint or fully qualified identifier for the endpoint. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The name of the region for the endpoint.
+
+.TP 2m
+\fB\-\-namespace\fR=\fINAMESPACE\fR
+The name of the namespace for the endpoint.
+
+.TP 2m
+\fB\-\-service\fR=\fISERVICE\fR
+The name of the service for the endpoint.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-address\fR=\fIADDRESS\fR
+IPv4 or IPv6 address of the endpoint. If unspecified, the default is empty
+string.
+
+.TP 2m
+\fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+Metadata for the endpoint.
+
+Metadata takes the form of key/value string pairs. The total dictionary is
+limited to 512 characters.
+
+.TP 2m
+\fB\-\-port\fR=\fIPORT\fR
+Port that the endpoint is running on, must be in the range of [0, 65535]. If
+unspecified, the default is 0.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update a Service Directory endpoint, run:
+
+.RS 2m
+$ gcloud beta service\-directory endpoints update my\-endpoint \e
+    \-\-service=my\-service \-\-namespace=my\-namespace \e
+    \-\-location=us\-east1 \-\-address=1.2.3.4 \-\-port=5 \e
+    \-\-metadata=a=b,c=d
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha service\-directory endpoints update
+.RE
+

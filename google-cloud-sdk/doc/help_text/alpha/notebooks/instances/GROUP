@@ -1,0 +1,67 @@
+NAME
+    gcloud alpha notebooks instances - notebooks Instances command group
+
+SYNOPSIS
+    gcloud alpha notebooks instances COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Notebooks Instances command group.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding for an instance.
+
+     create
+        (ALPHA) Request for creating an instance.
+
+     delete
+        (ALPHA) Request for deleting instance.
+
+     describe
+        (ALPHA) Request for describing instances.
+
+     get-iam-policy
+        (ALPHA) Get IAM policy for an instance.
+
+     list
+        (ALPHA) Request for listing instances.
+
+     register
+        (ALPHA) Request for registering instances.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove IAM policy binding for an instance.
+
+     reset
+        (ALPHA) Request for resetting instances.
+
+     set-iam-policy
+        (ALPHA) Set the IAM policy for an Instance.
+
+     start
+        (ALPHA) Request for starting instances.
+
+     stop
+        (ALPHA) Request for stoping instances.
+
+     update
+        (ALPHA) Request for updating instances.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta notebooks instances
+

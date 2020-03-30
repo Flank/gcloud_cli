@@ -31,19 +31,21 @@ from tests.lib import test_case
 from tests.lib.surface.container import base as testbase
 
 
-@test_case.Filters.skipAlways('Failing', 'b/143631184')
 class NodePoolsTestGA(testbase.IntegrationTestBase, parameterized.TestCase):
 
   def SetUp(self):
     self.releasetrack = calliope_base.ReleaseTrack.GA
     self.cluster_name = next(
         e2e_utils.GetResourceNameGenerator(prefix='update-test'))
+    self.network = 'do-not-delete-node-pools-ga'
+    self.cluster_creation_timeout = 18 * 60  # leave 2 minutes for enabling
+    # autoupgrade
 
   def _FormatNameAndLocation(self, location):
     """Helper function.
 
     Args:
-      location: pre-formatted '--zone|region=<zone|region name>' string
+      location: pre-formatted '--(zone|region)=<(zone|region) name>' string
 
     Returns:
       str: a string formatted with the provided values.
@@ -53,19 +55,29 @@ class NodePoolsTestGA(testbase.IntegrationTestBase, parameterized.TestCase):
   @contextlib.contextmanager
   def _CreateCluster(self, location, track):
     try:
-      log.status.Print('Creating cluster {}'.format(self.cluster_name))
+      log.status.Print('Creating cluster {0}'.format(self.cluster_name))
       result = self.Run(
           'container clusters create {0} '
-          '--create-subnetwork range=/28 '
-          '--enable-ip-alias '
-          '--network do-not-delete-node-pools-test '
-          '--no-enable-autoupgrade '  # explicit since the default will soon
-          # become --enable-autoupgrade
-          '--num-nodes=1'.format(
-              self._FormatNameAndLocation(location)
+          '--network {1} '
+          '--no-enable-autoupgrade '  # explicit since the default is
+          # `--enable-autoupgrade`
+          '--num-nodes=1 '
+          '--timeout {2}'.format(
+              self._FormatNameAndLocation(location),
+              self.network,
+              self.cluster_creation_timeout
           ), track=track
       )
       yield result
+    except core_exceptions.Error as e:
+      if 'is still running' in e.args[0]:
+        raise core_exceptions.Error(
+            'Creation of cluster {0} took longer than {1} minutes.'.format(
+                self.cluster_name,
+                int(self.cluster_creation_timeout / 60))
+        )
+      else:
+        raise
 
     finally:
       try:
@@ -117,13 +129,13 @@ class NodePoolsTestGA(testbase.IntegrationTestBase, parameterized.TestCase):
       self.assertTrue(node_pool.management.autoUpgrade)
 
 
-@test_case.Filters.skipAlways('Failing', 'b/143631184')
 class NodePoolsTestBeta(NodePoolsTestGA):
 
   def SetUp(self):
     self.releasetrack = calliope_base.ReleaseTrack.BETA
     self.ZONE = 'us-east1-d'  # pylint: disable=invalid-name
     self.REGION = 'us-east1'  # pylint: disable=invalid-name
+    self.network = 'do-not-delete-node-pools-beta'
 
 
 if __name__ == '__main__':

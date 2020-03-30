@@ -211,7 +211,8 @@ class AndroidArgValidateTests(unit_base.AndroidUnitTestBase):
     environment_vars = {
         'coverage': 'true',
         'coverageFile': '/sdcard/tempDir',
-        'not_a_real_env_var': 'true'
+        'not_a_real_env_var': 'true',
+        'androidx.benchmark.output.enable': 'true'
     }
     args = argparse.Namespace(environment_variables=environment_vars)
     arg_validate.ValidateEnvironmentVariablesList(args)
@@ -292,6 +293,28 @@ class AndroidArgValidateTests(unit_base.AndroidUnitTestBase):
     arg_validate.NormalizeAndValidateDirectoriesToPullList(dirs_orig)
     self.assertEqual(dirs_expect, dirs_orig)
 
+  def testValidateTestTargetsForShard_WithValidTestTargets(self):
+    args = argparse.Namespace(test_targets_for_shard=[
+        'class com.ClassForShard1#flakyTest1;package com.package.for.shard1',
+        'class com.ClassForShard2#flakyTest2,com.ClassForShard2#flakyTest3'
+    ])
+    arg_validate.ValidateTestTargetsForShard(args)
+
+  def testValidateTestTargetsForShard_FailsWithWhiteSpaceAfterComma(self):
+    args = argparse.Namespace(test_targets_for_shard=[
+        'class com.ClassForShard1#flakyTest1, com.ClassForShard1#flakyTest2',
+        'class com.ClassForShard2#flakyTest3'
+    ])
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      arg_validate.ValidateTestTargetsForShard(args)
+
+  def testValidateTestTargetsForShard_FailsWithWrongDelimiter(self):
+    args = argparse.Namespace(test_targets_for_shard=[
+        'class com.ClassForShard1#flakyTest1,class com.ClassForShard1#flakyTest2',
+        'class com.ClassForShard2#flakyTest3'
+    ])
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      arg_validate.ValidateTestTargetsForShard(args)
 
 if __name__ == '__main__':
   test_case.main()

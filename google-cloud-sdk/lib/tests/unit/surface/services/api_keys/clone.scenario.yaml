@@ -1,0 +1,58 @@
+title: api-keys clone test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      services api-keys clone projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5
+  - stderr: |
+      Operation [operations/akmf.fc5c5565-57a2-4ffc-8c7f-ed916023cdb0] complete. Result: {
+          "@type":"type.googleapis.com/google.api.apikeys.v2alpha1.ApiKey",
+          "createTime":"2020-03-02T23:17:42.176Z",
+          "displayName":"prober key update",
+          "keyString":"RETRACTED_KEY_STRING",
+          "name":"projects/fake-project/keys/4ad627b4-31f5-4af2-940b-6148a77d5d41",
+          "state":"ACTIVE",
+          "updateTime":"2020-03-02T23:17:42.311911Z"
+      }
+actions:
+- execute_command:
+    command: |
+      services api-keys clone projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5:clone?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {name: operations/akmf.fc5c5565-57a2-4ffc-8c7f-ed916023cdb0}
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/operations/akmf.fc5c5565-57a2-4ffc-8c7f-ed916023cdb0?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {name: operations/akmf.fc5c5565-57a2-4ffc-8c7f-ed916023cdb0, done: true,
+            response: {'@type': type.googleapis.com/google.api.apikeys.v2alpha1.ApiKey,
+              name: projects/fake-project/keys/4ad627b4-31f5-4af2-940b-6148a77d5d41,
+              displayName: prober key update, keyString: RETRACTED_KEY_STRING, createTime: '2020-03-02T23:17:42.176Z',
+              updateTime: '2020-03-02T23:17:42.311911Z', state: ACTIVE}}
+    - expect_stderr: |
+        Operation [operations/akmf.fc5c5565-57a2-4ffc-8c7f-ed916023cdb0] complete. Result: {
+            "@type":"type.googleapis.com/google.api.apikeys.v2alpha1.ApiKey",
+            "createTime":"2020-03-02T23:17:42.176Z",
+            "displayName":"prober key update",
+            "keyString":"RETRACTED_KEY_STRING",
+            "name":"projects/fake-project/keys/4ad627b4-31f5-4af2-940b-6148a77d5d41",
+            "state":"ACTIVE",
+            "updateTime":"2020-03-02T23:17:42.311911Z"
+        }
+    - expect_exit:
+        code: 0

@@ -30,14 +30,14 @@ from tests.lib.surface.compute import test_base
 import mock
 
 
-class ListTestBeta(test_base.BaseTest, completer_test_base.CompleterBase):
+class ListTest(test_base.BaseTest, completer_test_base.CompleterBase):
 
   def SetUp(self):
-    self.SelectApi('beta')
+    self.SelectApi('v1')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
-    self.messages = core_apis.GetMessagesModule('compute', 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.resources.RegisterApiByName('compute', 'v1')
+    self.messages = core_apis.GetMessagesModule('compute', 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
     lister_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.lister.GetRegionalResourcesDicts',
@@ -53,9 +53,9 @@ class ListTestBeta(test_base.BaseTest, completer_test_base.CompleterBase):
     """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME REGION NETWORK PRIORITY ENABLE
-            pm-1 us-central1 default 1000 TRUE
-            pm-2 us-central2 default 999 FALSE
+            NAME REGION NETWORK ENABLE
+            pm-1 us-central1 default TRUE
+            pm-2 us-central2 default FALSE
             """),
         normalize_space=True)
 
@@ -72,7 +72,6 @@ class ListTestBeta(test_base.BaseTest, completer_test_base.CompleterBase):
         self.messages.PacketMirroring(
             name='pm-1',
             region='us-central1',
-            priority=1000,
             network=self.messages.PacketMirroringNetworkInfo(
                 url=network_ref.SelfLink()),
             collectorIlb=self.messages.PacketMirroringForwardingRuleInfo(
@@ -83,7 +82,6 @@ class ListTestBeta(test_base.BaseTest, completer_test_base.CompleterBase):
         self.messages.PacketMirroring(
             name='pm-2',
             region='us-central2',
-            priority=999,
             network=self.messages.PacketMirroringNetworkInfo(
                 url=network_ref.SelfLink()),
             collectorIlb=self.messages.PacketMirroringForwardingRuleInfo(
@@ -92,6 +90,16 @@ class ListTestBeta(test_base.BaseTest, completer_test_base.CompleterBase):
             .PacketMirroringMirroredResourceInfo(tags=['tag-1']),
             enable=self.messages.PacketMirroring.EnableValueValuesEnum.FALSE)
     ]
+
+
+class ListTestBeta(ListTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
+    self.messages = core_apis.GetMessagesModule('compute', 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ListTestAlpha(ListTestBeta):

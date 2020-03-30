@@ -68,6 +68,33 @@ class FieldMappingTest(sdk_test_base.WithTempCWD):
           cloudbuild_util.SnakeToCamel(
               input_string, skip=['secretEnv', 'secret_env']), expected)
 
+  def testMessageToFieldPaths_EmptyMessage(self):
+    messages = cloudbuild_util.GetMessagesModuleAlpha()
+
+    self.assertEqual(
+        len(cloudbuild_util.MessageToFieldPaths(messages.WorkerPool())),
+        0)
+
+  def testMessageToFieldPaths_WorkerPool(self):
+    messages = cloudbuild_util.GetMessagesModuleAlpha()
+
+    wp = messages.WorkerPool()
+    wp.name = 'name'
+    wp.networkConfig = messages.NetworkConfig()
+    wp.networkConfig.peeredNetwork = 'network'
+    wp.region = 'region'
+    worker_config = messages.WorkerConfig()
+    worker_config.machineType = 'machine_type'
+    worker_config.diskSizeGb = 100
+    wp.workerConfig = worker_config
+
+    self.assertEqual(
+        set(cloudbuild_util.MessageToFieldPaths(wp)),
+        set([
+            'name', 'network_config.peered_network', 'region',
+            'worker_config.machine_type', 'worker_config.disk_size_gb'
+        ]))
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -30,7 +30,7 @@ REQUIRED FLAGS
 
        --pipeline-file=PIPELINE_FILE
           A YAML or JSON file containing a Pipeline object. See
-          https://cloud.google.com/life-sciences/reference/rest/v2beta/workflows#Pipeline
+          https://cloud.google.com/life-sciences/docs/reference/rest/v2beta/projects.locations.pipelines/run#pipeline
 
 COMMONLY USED FLAGS
      --disk-size=DISK_SIZE
@@ -171,8 +171,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To run a pipeline described in the pipeline.json file, run:

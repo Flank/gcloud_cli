@@ -11,7 +11,7 @@ gcloud alpha sql users create \- creates a user in a given instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha sql users create\fR \fIUSERNAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-password\fR=\fIPASSWORD\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha sql users create\fR \fIUSERNAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-password\fR=\fIPASSWORD\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -64,6 +64,12 @@ https://cloud.google.com/sql/docs/mysql/configure\-ip
 \fB\-\-password\fR=\fIPASSWORD\fR
 Cloud SQL user's password.
 
+.TP 2m
+\fB\-\-type\fR=\fITYPE\fR
+Cloud SQL user's type. It determines the method to authenticate the user during
+login. See the list of user types at
+https://cloud.google.com/sql/docs/postgres/admin\-api/v1beta4/users#type
+
 
 .RE
 .sp
@@ -73,8 +79,9 @@ Cloud SQL user's password.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

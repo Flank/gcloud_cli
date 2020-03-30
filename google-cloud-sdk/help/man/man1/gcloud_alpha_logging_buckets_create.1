@@ -11,7 +11,7 @@ gcloud alpha logging buckets create \- creates a bucket
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha logging buckets create\fR \fIBUCKET_ID\fR \fB\-\-location\fR=\fILOCATION\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-retention\-days\fR=\fIRETENTION_DAYS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha logging buckets create\fR \fIBUCKET_ID\fR \fB\-\-location\fR=\fILOCATION\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-retention\-days\fR=\fIRETENTION_DAYS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -52,10 +52,6 @@ cannot be changed.
 A textual description for the bucket.
 
 .TP 2m
-\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
-A textual name to display for the bucket.
-
-.TP 2m
 \fB\-\-retention\-days\fR=\fIRETENTION_DAYS\fR
 The period logs will be retained, after which logs will automatically be
 deleted. The default is 30 days.
@@ -69,8 +65,9 @@ deleted. The default is 30 days.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

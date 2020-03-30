@@ -39,14 +39,21 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To remove all labels in the AI Platform job named my-job, run:
+
+        $ gcloud beta ai-platform jobs update my-job --clear-labels
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -78,6 +78,7 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
                             '"labelValues/456")')
   CONDITION_EXPRESSION_B = ('resource.matchLabels("labelKeys/234", '
                             '"labelValues/567")')
+  CONDITION_EXPRESSION_ALIAS = ('resource.matchLabels("env", "dev")')
 
   ETAG_A = '12345678'
   ETAG_B = '23456789'
@@ -131,8 +132,8 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
       rules = list(map(self._GetRuleFromRuleDatum, rule_data))
 
     return self.org_policy_messages.GoogleCloudOrgpolicyV2alpha1Policy(
+        name=name,
         spec=self.org_policy_messages.GoogleCloudOrgpolicyV2alpha1PolicySpec(
-            name=name,
             etag=etag,
             updateTime=update_time,
             inheritFromParent=inherit_from_parent,
@@ -187,7 +188,7 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
         object to be returned as part of the response from the service.
     """
     request = self.org_policy_messages.OrgpolicyPoliciesGetRequest(
-        name=response_policy.spec.name)
+        name=response_policy.name)
 
     self.mock_policy_service.Get.Expect(
         request=request, response=response_policy)
@@ -214,7 +215,7 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
         object to be returned as part of the response from the service.
     """
     request = self.org_policy_messages.OrgpolicyPoliciesGetEffectivePolicyRequest(
-        name=response_policy.spec.name)
+        name=response_policy.name)
 
     self.mock_policy_service.GetEffectivePolicy.Expect(
         request=request, response=response_policy)
@@ -282,7 +283,7 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
       The policy object returned from the service.
     """
     request = self.org_policy_messages.OrgpolicyPoliciesPatchRequest(
-        name=request_policy.spec.name,
+        name=request_policy.name,
         forceUnconditionalWrite=request_force_unconditional_write,
         googleCloudOrgpolicyV2alpha1Policy=request_policy)
 

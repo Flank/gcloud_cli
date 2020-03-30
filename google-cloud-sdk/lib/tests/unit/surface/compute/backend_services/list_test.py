@@ -115,10 +115,8 @@ class BackendServicesListGATest(test_base.BaseTest,
     ]
     self.Run(self._RELEASE_TRACK + ' compute backend-services list')
     self.list_json.assert_called_once_with(
-        requests=[(self.compute.backendServices,
-                   self._DEFAULT_LIST_METHOD,
-                   self.default_list_request(
-                       project='my-project'))],
+        requests=[(self.compute.backendServices, self._DEFAULT_LIST_METHOD,
+                   self._getListRequestMessage('my-project'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -193,6 +191,9 @@ class BackendServicesListGATest(test_base.BaseTest,
         cli=self.cli,
     )
 
+  def _getListRequestMessage(self, project):
+    return self.default_list_request(project=project, includeAllScopes=True)
+
 
 class BackendServicesListAlphaTest(BackendServicesListGATest):
   _API_VERSION = 'alpha'
@@ -201,6 +202,9 @@ class BackendServicesListAlphaTest(BackendServicesListGATest):
 
   def SetUp(self):
     self.SelectApi(self._API_VERSION)
+
+  def _getListRequestMessage(self, project):
+    return self.default_list_request(project=project, includeAllScopes=True)
 
 
 if __name__ == '__main__':

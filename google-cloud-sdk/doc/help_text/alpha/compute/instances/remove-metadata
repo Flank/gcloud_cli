@@ -51,8 +51,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To remove metadata keys important-data and useless-data along with their
+    data from an instance named test-instance, run:
+
+        $ gcloud alpha compute instances remove-metadata test-instance \
+            --keys=important-data,useless-data
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

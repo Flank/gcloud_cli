@@ -53,7 +53,7 @@ class _BaseSslCertsDeleteTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     expirationTime=datetime.datetime(
                         2024,
                         2,
@@ -63,7 +63,7 @@ class _BaseSslCertsDeleteTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     instance='integration-test',
                     kind='sql#sslCert',
                     sha1Fingerprint='77299aad4c8136911c1f0b07dd9802a9a72124e8',
@@ -81,7 +81,7 @@ class _BaseSslCertsDeleteTest(object):
                         52,
                         170000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     expirationTime=datetime.datetime(
                         2024,
                         7,
@@ -91,7 +91,7 @@ class _BaseSslCertsDeleteTest(object):
                         52,
                         170000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     instance='integration-test',
                     kind='sql#sslCert',
                     sha1Fingerprint='d926e1fb26e4dba2f73a14bea4ee9554577deda9',
@@ -114,7 +114,8 @@ class _BaseSslCertsDeleteTest(object):
                 51,
                 57,
                 293000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 7,
@@ -123,7 +124,8 @@ class _BaseSslCertsDeleteTest(object):
                 51,
                 57,
                 353000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 7,
@@ -132,22 +134,22 @@ class _BaseSslCertsDeleteTest(object):
                 51,
                 57,
                 353000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='integration-test',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='0163a566-7103-4ebf-98a9-64673b60359b',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/0163a566-7103-4ebf-98a9-64673b60359b'.
-            format(self.Project()),
-            operationType='UPDATE',
-            status='RUNNING',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/0163a566-7103-4ebf-98a9-64673b60359b'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .UPDATE,
+            status=self.messages.Operation.StatusValueValuesEnum.RUNNING,
             user='170350250316@developer.gserviceaccount.com',
         ))
     self.mocked_client.operations.Get.Expect(
@@ -165,7 +167,8 @@ class _BaseSslCertsDeleteTest(object):
                 51,
                 57,
                 293000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 7,
@@ -174,7 +177,8 @@ class _BaseSslCertsDeleteTest(object):
                 51,
                 57,
                 353000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 7,
@@ -183,28 +187,28 @@ class _BaseSslCertsDeleteTest(object):
                 51,
                 57,
                 353000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='integration-test',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='0163a566-7103-4ebf-98a9-64673b60359b',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/0163a566-7103-4ebf-98a9-64673b60359b'.
-            format(self.Project()),
-            operationType='UPDATE',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/0163a566-7103-4ebf-98a9-64673b60359b'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .UPDATE,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
     self.Run('sql ssl-certs delete --instance=integration-test newcert')
     self.AssertErrContains(
-        'Deleted [https://www.googleapis.com/sql/v1beta4/projects/'
+        'Deleted [https://sqladmin.googleapis.com/sql/v1beta4/projects/'
         '{0}/instances/integration-test/sslCerts'
         '/d926e1fb26e4dba2f73a14bea4ee9554577deda9].'.format(self.Project()))
     self.assertEqual(prompt_mock.call_count, 1)
@@ -233,7 +237,7 @@ class _BaseSslCertsDeleteTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     expirationTime=datetime.datetime(
                         2024,
                         2,
@@ -243,7 +247,7 @@ class _BaseSslCertsDeleteTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     instance='integration-test',
                     kind='sql#sslCert',
                     sha1Fingerprint='77299aad4c8136911c1f0b07dd9802a9a72124e8',
@@ -261,7 +265,7 @@ class _BaseSslCertsDeleteTest(object):
                         52,
                         170000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     expirationTime=datetime.datetime(
                         2024,
                         7,
@@ -271,7 +275,7 @@ class _BaseSslCertsDeleteTest(object):
                         52,
                         170000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     instance='integration-test',
                     kind='sql#sslCert',
                     sha1Fingerprint='d926e1fb26e4dba2f73a14bea4ee9554577deda9',
@@ -282,7 +286,7 @@ class _BaseSslCertsDeleteTest(object):
     with self.assertRaisesRegex(
         exceptions.ResourceNotFoundError,
         r'no ssl cert named \[noncert\] for instance \[https://'
-        r'www.googleapis.com/sql/v1beta4/projects/{0}/'
+        r'sqladmin.googleapis.com/sql/v1beta4/projects/{0}/'
         r'instances/integration-test\]'.format(self.Project())):
       self.Run('sql ssl-certs delete --instance=integration-test noncert')
 

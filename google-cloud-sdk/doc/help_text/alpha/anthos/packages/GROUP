@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha anthos packages - anthos packages command group
+
+SYNOPSIS
+    gcloud alpha anthos packages COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Anthos configuration file packages using git.
+
+    Fetch, update, and publish packages of Resource configuration as
+    subdirectories of git repositories.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describe local Anthos package.
+
+     get
+        (ALPHA) Fetch Anthos package from a git repository.
+
+     update
+        (ALPHA) Update a local package with changes from a remote source repo.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

@@ -8,8 +8,9 @@ SYNOPSIS
         [--num-workers=NUM_WORKERS] [--parameters=[PARAMETERS,...]]
         [--region=REGION_ID] [--service-account-email=SERVICE_ACCOUNT_EMAIL]
         [--staging-location=STAGING_LOCATION] [--subnetwork=SUBNETWORK]
-        [--worker-machine-type=WORKER_MACHINE_TYPE] [--zone=ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+        [--worker-machine-type=WORKER_MACHINE_TYPE]
+        [--worker-region=WORKER_REGION | --worker-zone=WORKER_ZONE
+          | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Runs a job from the specified path.
@@ -63,15 +64,27 @@ OPTIONAL FLAGS
      --worker-machine-type=WORKER_MACHINE_TYPE
         The type of machine to use for workers. Defaults to server-specified.
 
-     --zone=ZONE
-        The zone to run the workers in.
+     Worker location options. At most one of these may be specified:
+
+       --worker-region=WORKER_REGION
+          The region to run the workers in.
+
+       --worker-zone=WORKER_ZONE
+          The zone to run the workers in.
+
+       --zone=ZONE
+          (DEPRECATED) The zone to run the workers in.
+
+          The --zone option is deprecated; use --worker-region or --worker-zone
+          instead.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in BETA and may change without notice. This

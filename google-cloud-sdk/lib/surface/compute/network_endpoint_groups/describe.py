@@ -24,28 +24,36 @@ from googlecloudsdk.command_lib.compute import flags as compute_flags
 from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.compute.network_endpoint_groups import flags
 
+DETAILED_HELP = {
+    'EXAMPLES': """
+To describe a network endpoint group:
+
+  $ {command} my-neg --zone=us-central1-a
+""",
+}
+
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class Describe(base.DescribeCommand):
-  r"""Describe a Google Compute Engine network endpoint group.
+  """Describe a Google Compute Engine network endpoint group."""
 
-  ## EXAMPLES
+  detailed_help = DETAILED_HELP
+  support_global_scope = True
+  support_regional_scope = False
 
-  To describe a network endpoint group:
+  @classmethod
+  def Args(cls, parser):
+    flags.MakeNetworkEndpointGroupsArg(
+        support_global_scope=cls.support_global_scope,
+        support_regional_scope=cls.support_regional_scope).AddArgument(parser)
 
-    $ {command} my-neg --zone=us-central1-a
-  """
-
-  @staticmethod
-  def Args(parser):
-    flags.MakeNetworkEndpointGroupsArg().AddArgument(parser)
-
-  def _Run(self, args, support_global_scope=False):
+  def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     client = holder.client
 
     neg_ref = flags.MakeNetworkEndpointGroupsArg(
-        support_global_scope=support_global_scope).ResolveAsResource(
+        support_global_scope=self.support_global_scope,
+        support_regional_scope=self.support_regional_scope).ResolveAsResource(
             args,
             holder.resources,
             default_scope=compute_scope.ScopeEnum.ZONE,
@@ -57,8 +65,13 @@ class Describe(base.DescribeCommand):
           networkEndpointGroup=neg_ref.Name(),
           project=neg_ref.project,
           zone=neg_ref.zone)
-
       service = holder.client.apitools_client.networkEndpointGroups
+    elif hasattr(neg_ref, 'region'):
+      request = messages.ComputeRegionNetworkEndpointGroupsGetRequest(
+          networkEndpointGroup=neg_ref.Name(),
+          project=neg_ref.project,
+          region=neg_ref.region)
+      service = holder.client.apitools_client.regionNetworkEndpointGroups
     else:
       request = messages.ComputeGlobalNetworkEndpointGroupsGetRequest(
           networkEndpointGroup=neg_ref.Name(), project=neg_ref.project)
@@ -66,25 +79,9 @@ class Describe(base.DescribeCommand):
 
     return client.MakeRequests([(service, 'Get', request)])[0]
 
-  def Run(self, args):
-    return self._Run(args)
-
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class DescribeAlpha(Describe):
-  r"""Describe a Google Compute Engine network endpoint group.
+  """Describe a Google Compute Engine network endpoint group."""
 
-  ## EXAMPLES
-
-  To describe a network endpoint group:
-
-    $ {command} my-neg --zone=us-central1-a
-  """
-
-  @staticmethod
-  def Args(parser):
-    flags.MakeNetworkEndpointGroupsArg(
-        support_global_scope=True).AddArgument(parser)
-
-  def Run(self, args):
-    return self._Run(args, support_global_scope=True)
+  support_regional_scope = True

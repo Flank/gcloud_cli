@@ -1,6 +1,6 @@
 NAME
-    gcloud compute sole-tenancy node-groups create - creates a Google Compute
-        Engine node group
+    gcloud compute sole-tenancy node-groups create - create a Compute Engine
+        node group
 
 SYNOPSIS
     gcloud compute sole-tenancy node-groups create NAME
@@ -8,7 +8,7 @@ SYNOPSIS
         [--description=DESCRIPTION] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Creates a Google Compute Engine node group.
+    Create a Compute Engine node group.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -49,8 +49,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a node group, run:
+
+        $ gcloud compute sole-tenancy node-groups create my-node-group \
+            --node-template=example-template --target-size=4
 
 NOTES
     These variants are also available:

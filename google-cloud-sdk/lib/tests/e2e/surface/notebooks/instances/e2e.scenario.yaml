@@ -1,0 +1,125 @@
+title: Create and delete a notebooks instance
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: notebooks instances create $$my-instance$$ --container-repository=gcr.io/deeplearning-platform-release/base-cpu
+      --container-tag=test-tag --machine-type=n1-standard-4 --location=us-central1-b
+      --async
+  - stderr: |
+      Create in progress for notebooks instance $$my-instance$$ [https://notebooks.googleapis.com/v1beta1/$$operation$$].
+- execute:
+  - command: notebooks instances describe $$my-instance$$ --location=us-central1-b
+  - stdout: .*$$my-instance$$.*$
+- execute:
+  - command: notebooks instances delete $$my-instance$$ --location=us-central1-b --async
+  - stderr: |
+      Delete in progress for notebooks instance $$my-instance$$ [https://notebooks.googleapis.com/v1beta1/$$operation$$].
+actions:
+
+- generate_resource_id:
+    reference: my-instance
+    prefix: notebooks
+
+- execute_command:
+    command: notebooks instances create $$my-instance$$ --container-repository=gcr.io/deeplearning-platform-release/base-cpu
+      --container-tag=test-tag --machine-type=n1-standard-4 --location=us-central1-b
+      --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-b/instances?alt=json&instanceId=$$my-instance$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              acceleratorConfig: {}
+              containerImage:
+                repository: gcr.io/deeplearning-platform-release/base-cpu
+                tag: test-tag
+              installGpuDriver: false
+              machineType: n1-standard-4
+              name: $$my-instance$$
+              noProxyAccess: false
+              noPublicIp: false
+        return_response:
+          omit_fields:
+          - metadata
+          headers:
+            cache-control: private
+            content-length: '528'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-b/operations/operation-1581607146919-59e769c2a9745-2a647648-adfdd5ee
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Create in progress for notebooks instance $$my-instance$$ [https://notebooks.googleapis.com/v1beta1/$$operation$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: notebooks instances describe $$my-instance$$ --location=us-central1-b
+    events:
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-b/instances/$$my-instance$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          omit_fields:
+          - createTime
+          - updateTime
+          headers:
+            cache-control: private
+            content-length: '1002'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-b/instances/$$my-instance$$
+            containerImage:
+              repository: gcr.io/deeplearning-platform-release/base-cpu
+              tag: test-tag
+            serviceAccount: 462803083913-compute@developer.gserviceaccount.com
+            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-b/machineTypes/n1-standard-4
+            state: STARTING
+            network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+            metadata:
+              shutdown-script: timeout 30 gcloud compute instances remove-metadata
+                $$my-instance$$ --keys=proxy-url --zone us-central1-b
+              notebooks-api: PROD
+              container: gcr.io/deeplearning-platform-release/base-cpu:test-tag
+              proxy-mode: service_account
+        repeatable: true
+    - expect_stdout:
+        matches: .*$$my-instance$$.*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: notebooks instances delete $$my-instance$$ --location=us-central1-b --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-b/instances/$$my-instance$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          omit_fields:
+          - metadata
+          headers:
+            cache-control: private
+            content-length: '528'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-b/operations/operation-1581607151879-59e769c7646f3-bd3b4b3b-884046d7
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Delete in progress for notebooks instance $$my-instance$$ [https://notebooks.googleapis.com/v1beta1/$$operation$$].
+    - expect_exit:
+        code: 0
+    cleanup_for: my-instance

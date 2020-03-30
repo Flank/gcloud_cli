@@ -11,13 +11,15 @@ gcloud beta compute images add\-iam\-policy\-binding \- add IAM policy binding t
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute images add\-iam\-policy\-binding\fR \fIIMAGE\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute images add\-iam\-policy\-binding\fR \fIIMAGE\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Add an IAM policy binding to a Google Compute Engine image.
+\fB(BETA)\fR Add an IAM policy binding to the IAM policy of a Google Compute
+Engine image. One binding consists of a member, a role, and an optional
+condition.
 
 
 
@@ -76,13 +78,57 @@ Define the role of the member.
 .RE
 .sp
 
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+
+Condition of the binding to be added. When condition is explicitly specified as
+\f5None\fR (e.g. \-\-condition=None), a binding without a condition is added.
+When \-\-condition is specified and is not a \f5None\fR condition,
+\f5\-\-role\fR cannot be a primitive role. Primitive roles are
+\f5roles/editor\fR, \f5roles/owner\fR, and \f5roles/viewer\fR.
+
+.TP 2m
+\fBexpression\fR
+(Required) Expression of the condition which evaluates to True or False. This
+uses a subset of Common Expression Language syntax.
+
+.TP 2m
+\fBtitle\fR
+(Required) Title for the expression, i.e. a short string describing its purpose.
+
+.TP 2m
+\fBdescription\fR
+(Optional) Description for the expression. This is a longer text which describes
+the expression.
+
+NOTE: An unsatisfied condition will not allow access via this binding.
+
+.TP 2m
+\fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR
+Path to a local JSON or YAML file that defines the condition. To see available
+fields, see the help for \f5\-\-condition\fR.
+
+
+.RE
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -101,8 +147,20 @@ the user 'test\-user@gmail.com' with image 'my\-image', run:
 
 .RS 2m
 $ gcloud beta compute images add\-iam\-policy\-binding my\-image \e
+    \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
+.RE
+
+To add an IAM policy binding which expires at the end of the year 2018 for the
+role of 'roles/compute.securityAdmin' and the user 'test\-user@gmail.com' with
+image 'my\-image', run:
+
+.RS 2m
+$ gcloud beta compute images add\-iam\-policy\-binding my\-image \e
     \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/compute.securityAdmin'
+    \-\-role='roles/compute.securityAdmin' \e
+    \-\-condition='expression=request.time <
+ timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
+tion=Expires at midnight on 2018\-12\-31'
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy

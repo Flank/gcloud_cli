@@ -1,0 +1,31 @@
+title: Cloud Game Services deployments crud test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers deployments update my-deployment --location global
+  - error: '1: Must specify at least one parameter to update.'
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha
+      BETA: v1beta
+- execute_command:
+    command: |
+      game servers deployments update my-deployment --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_exit:
+        code: 1
+        message: Must specify at least one parameter to update.

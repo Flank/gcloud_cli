@@ -1,0 +1,128 @@
+
+.TH "GCLOUD_BETA_ARTIFACTS_REPOSITORIES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta artifacts repositories \- manage Artifact Registry repositories
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta artifacts repositories\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBadd\-iam\-policy\-binding\fR
+\fB(BETA)\fR Add an IAM policy binding to the IAM policy of an Artifact Registry
+repository.
+
+.TP 2m
+\fBcreate\fR
+\fB(BETA)\fR Create an Artifact Registry repository.
+
+.TP 2m
+\fBdelete\fR
+\fB(BETA)\fR Delete an Artifact Registry repository.
+
+.TP 2m
+\fBget\-iam\-policy\fR
+\fB(BETA)\fR Get IAM policy for an Artifact Registry repository.
+
+.TP 2m
+\fBlist\fR
+\fB(BETA)\fR List repositories in the specified project.
+
+.TP 2m
+\fBremove\-iam\-policy\-binding\fR
+\fB(BETA)\fR Remove an IAM policy binding from the IAM policy of an Artifact
+Registry repository.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+\fB(BETA)\fR Set the IAM policy for an Artifact Registry repository.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To create a repository with the name \f5my\-repo\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts repositories create my\-repo
+.RE
+
+To delete a repository with the name \f5my\-repo\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts repositories delete my\-repo
+.RE
+
+To list all Artifact Registry repositories, run:
+
+.RS 2m
+$ gcloud beta artifacts repositories list
+.RE
+
+To set an IAM policy for repository \f5my\-repo\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts repositories set\-iam\-policy my\-repo \e
+    policy.json
+.RE
+
+To get an IAM policy for repository \f5my\-repo\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts repositories get\-iam\-policy my\-repo
+.RE
+
+To add an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' on repository \f5my\-repo\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts repositories add\-iam\-policy\-binding my\-repo
+\-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
+.RE
+
+To remove an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' on repository \f5my\-repo\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts repositories remove\-iam\-policy\-binding \e
+    my\-repo
+\-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha artifacts repositories
+.RE
+

@@ -4,6 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud compute instance-groups managed update NAME
+        [--instance-redistribution-type=TYPE]
         [--clear-autohealing
           | --initial-delay=INITIAL_DELAY --health-check=HEALTH_CHECK
           | --http-health-check=HTTP_HEALTH_CHECK
@@ -30,6 +31,27 @@ POSITIONAL ARGUMENTS
         Name of the managed instance group to update.
 
 FLAGS
+     --instance-redistribution-type=TYPE
+        Specifies the type of the instance redistribution policy. An instance
+        redistribution type lets you enable or disable automatic instance
+        redistribution across zones to meet the target distribution. The target
+        distribution is a state of a regional managed instance group where all
+        instances are spread out evenly across all target zones.
+
+        An instance redistribution type can be specified only for a
+        non-autoscaled regional managed instance group. By default it is set to
+        PROACTIVE.
+
+        The following types are available:
+
+        * NONE - The managed instance group does not redistribute instances
+          across zones.
+
+        * PROACTIVE - The managed instance group proactively redistributes
+          instances to meet its target distribution.
+
+    TYPE must be one of: NONE, PROACTIVE.
+
      At most one of these may be specified:
 
        --clear-autohealing
@@ -86,8 +108,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     These variants are also available:

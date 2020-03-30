@@ -23,13 +23,24 @@ summary:
 - execute:
   - command: healthcare fhir-stores describe $$test-fhir-store$$ --dataset $$test-dataset$$
       --location us-central1
-  - stdout: |
-      name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/fhirStores/$$test-fhir-store$$
+  - stdout: |-
+      name: .*projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/fhirStores/$$test-fhir-store$$.*
+      $
 - execute:
   - command: healthcare fhir-stores list --dataset $$test-dataset$$ --location us-central1
   - stdout: |
       ID                                           LOCATION     REF_INT  RES_VER  UPDATE_CREATE  TOPIC
       $$test-fhir-store$$  us-central1
+- execute:
+  - command: healthcare fhir-stores update $$test-fhir-store$$ --pubsub-topic projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
+      --dataset $$test-dataset$$ --location us-central1
+  - stderr: |
+      Updated fhirStore [$$test-fhir-store$$].
+  - stdout: |-
+      name: .*projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/fhirStores/$$test-fhir-store$$
+      notificationConfig:
+        pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$.*
+      $
 - execute:
   - command: healthcare fhir-stores delete $$test-fhir-store$$ --dataset $$test-dataset$$
       --location us-central1
@@ -89,7 +100,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190821-215744-rjaj/operations/8590371710149066753
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200317-145215-8jm3/operations/6530669428378435585
     - expect_stderr: |
         Create request issued for: [$$test-dataset$$]
     - expect_progress_tracker:
@@ -130,11 +141,12 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '182'
+            content-length: '203'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/fhirStores/$$test-fhir-store$$
+            version: STU3
     - expect_stderr: |
         Created fhirStore [$$test-fhir-store$$].
     - expect_exit:
@@ -152,13 +164,15 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '182'
+            content-length: '203'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/fhirStores/$$test-fhir-store$$
-    - expect_stdout: |
-        name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/fhirStores/$$test-fhir-store$$
+            version: STU3
+    - expect_stdout:
+        matches: |
+          name: .*projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/fhirStores/$$test-fhir-store$$.*
     - expect_exit:
         code: 0
 - execute_command:
@@ -173,15 +187,50 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '220'
+            content-length: '245'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             fhirStores:
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/fhirStores/$$test-fhir-store$$
+              version: STU3
     - expect_stdout: |
         ID                                           LOCATION     REF_INT  RES_VER  UPDATE_CREATE  TOPIC
         $$test-fhir-store$$  us-central1
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: healthcare fhir-stores update $$test-fhir-store$$ --pubsub-topic projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
+      --dataset $$test-dataset$$ --location us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/fhirStores/$$test-fhir-store$$?alt=json&updateMask=notificationConfig.pubsubTopic
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              enableUpdateCreate: false
+              notificationConfig:
+                pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '347'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/fhirStores/$$test-fhir-store$$
+            notificationConfig:
+              pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
+            version: STU3
+    - expect_stderr: |
+        Updated fhirStore [$$test-fhir-store$$].
+    - expect_stdout:
+        matches: |
+          name: .*projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/fhirStores/$$test-fhir-store$$
+          notificationConfig:
+            pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$.*
     - expect_exit:
         code: 0
 - execute_command:

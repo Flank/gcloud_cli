@@ -1,5 +1,5 @@
 title: Test disable backend_services IAP
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -36,8 +36,8 @@ actions:
     reference: api-version
     track_values:
       GA: v1
-      BETA: v1beta1
-      ALPHA: v1beta1
+      BETA: v1
+      ALPHA: v1
 
 - execute_command:
     command: iap web disable --resource-type=backend-services --service=backend-service
@@ -120,8 +120,8 @@ actions:
             selfLink: https://compute.googleapis.com/compute/v1/projects/cloudsdktest/global/operations/operation-1548782761704-5809c16587c30-13a6a243-53ea7212
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/v1/projects/fake-project/global/operations/operation-1548782761704-5809c16587c30-13a6a243-53ea7212?alt=json
-          method: GET
+          uri: https://compute.googleapis.com/compute/v1/projects/fake-project/global/operations/operation-1548782761704-5809c16587c30-13a6a243-53ea7212/wait?alt=json
+          method: POST
           headers: {}
           body: null
         return_response:

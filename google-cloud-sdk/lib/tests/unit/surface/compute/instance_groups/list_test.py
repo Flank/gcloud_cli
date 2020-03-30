@@ -99,10 +99,9 @@ class InstanceGroupsListTest(InstanceGroupsListTestBase,
   def testAggregatedTableOutput(self):
     self.Run('compute instance-groups list')
     self.list_json.assert_called_once_with(
-        requests=[(self.compute.instanceGroups,
-                   'AggregatedList',
+        requests=[(self.compute.instanceGroups, 'AggregatedList',
                    self.messages.ComputeInstanceGroupsAggregatedListRequest(
-                       project='my-project'))],
+                       project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -136,10 +135,9 @@ class InstanceGroupsListTest(InstanceGroupsListTestBase,
   def testAggregatedTableOutputWithFilter(self):
     self.Run("""compute instance-groups list --filter=MANAGED:yes""")
     self.list_json.assert_called_once_with(
-        requests=[(self.compute.instanceGroups,
-                   'AggregatedList',
+        requests=[(self.compute.instanceGroups, 'AggregatedList',
                    self.messages.ComputeInstanceGroupsAggregatedListRequest(
-                       project='my-project'))],
+                       project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])

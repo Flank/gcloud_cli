@@ -32,8 +32,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the compute/beta API. The full documentation for this API
@@ -41,7 +42,7 @@ API REFERENCE
     https://developers.google.com/compute/docs/reference/latest/
 
 EXAMPLES
-    The following command will read am IAM policy defined in a JSON file
+    The following command will read an IAM policy defined in a JSON file
     'policy.json' and set it for the image my-image:
 
         $ gcloud beta compute images set-iam-policy my-image policy.json

@@ -22,10 +22,10 @@ import datetime
 from apitools.base.protorpclite import util as protorpc_util
 from googlecloudsdk.api_lib.util import apis as core_apis
 
-sqladmin_v1beta4 = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
+sqladmin_v1beta4 = core_apis.GetMessagesModule('sql', 'v1beta4')
 
 DEFAULT_INSTANCE_NAME = 'test-instance'
-DEFAULT_INSTANCE_DATABASE_VERSION = 'MYSQL_5_7'
+DEFAULT_INSTANCE_DATABASE_VERSION = sqladmin_v1beta4.DatabaseInstance.DatabaseVersionValueValuesEnum.MYSQL_5_7
 DEFAULT_BACKUP_ID = 1234
 
 DEFAULT_CERT_CREATE_TIME = datetime.datetime(
@@ -36,7 +36,7 @@ DEFAULT_CERT_CREATE_TIME = datetime.datetime(
     55,
     28,
     96000,
-    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0)))
+    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
 
 # Factory functions to generate sample DatabaseInstance instances.
 
@@ -46,7 +46,8 @@ def GetDatabaseInstancesListOfTwo():
   return [
       sqladmin_v1beta4.DatabaseInstance(
           currentDiskSize=52690837,
-          databaseVersion='MYSQL_5_5',
+          databaseVersion=sqladmin_v1beta4.DatabaseInstance
+          .DatabaseVersionValueValuesEnum.MYSQL_5_5,
           etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/MQ"',
           name='testinstance',
           ipAddresses=[],
@@ -57,7 +58,8 @@ def GetDatabaseInstancesListOfTwo():
           region='us-central',
           serverCaCert=None,
           settings=sqladmin_v1beta4.Settings(
-              activationPolicy='ON_DEMAND',
+              activationPolicy=sqladmin_v1beta4.Settings
+              .ActivationPolicyValueValuesEnum.ON_DEMAND,
               authorizedGaeApplications=[],
               backupConfiguration=sqladmin_v1beta4.BackupConfiguration(
                   binaryLogEnabled=False,
@@ -72,17 +74,21 @@ def GetDatabaseInstancesListOfTwo():
               ),
               kind='sql#settings',
               locationPreference=None,
-              pricingPlan='PER_USE',
-              replicationType='SYNCHRONOUS',
+              pricingPlan=sqladmin_v1beta4.Settings.PricingPlanValueValuesEnum
+              .PER_USE,
+              replicationType=sqladmin_v1beta4.Settings
+              .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
               settingsVersion=1,
               tier='D0',
           ),
-          state='RUNNABLE',
-          instanceType='CLOUD_SQL_INSTANCE',
+          state=sqladmin_v1beta4.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
+          instanceType=sqladmin_v1beta4.DatabaseInstance
+          .InstanceTypeValueValuesEnum.CLOUD_SQL_INSTANCE,
       ),
       sqladmin_v1beta4.DatabaseInstance(
           currentDiskSize=287571860,
-          databaseVersion='MYSQL_5_5',
+          databaseVersion=sqladmin_v1beta4.DatabaseInstance
+          .DatabaseVersionValueValuesEnum.MYSQL_5_5,
           etag='"yGhHGJDUk5hWK-gppo_8C-KD7iU/QWyUhySo75iWP2WEOzCGc"',
           gceZone='us-central1-a',
           name='backupless-instance1',
@@ -104,7 +110,8 @@ def GetDatabaseInstancesListOfTwo():
                   43,
                   9,
                   329000,
-                  tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                  tzinfo=protorpc_util.TimeZoneOffset(
+                      datetime.timedelta(0))).isoformat(),
               expirationTime=datetime.datetime(
                   2024,
                   8,
@@ -113,13 +120,15 @@ def GetDatabaseInstancesListOfTwo():
                   43,
                   9,
                   329000,
-                  tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                  tzinfo=protorpc_util.TimeZoneOffset(
+                      datetime.timedelta(0))).isoformat(),
               instance='backupless-instance1',
               kind='sql#sslCert',
               sha1Fingerprint='70bd50bd905e822ce428b8a1345ffc68d5aa',
           ),
           settings=sqladmin_v1beta4.Settings(
-              activationPolicy='ON_DEMAND',
+              activationPolicy=sqladmin_v1beta4.Settings
+              .ActivationPolicyValueValuesEnum.ON_DEMAND,
               authorizedGaeApplications=[],
               backupConfiguration=sqladmin_v1beta4.BackupConfiguration(
                   binaryLogEnabled=True,
@@ -134,13 +143,16 @@ def GetDatabaseInstancesListOfTwo():
               ),
               kind='sql#settings',
               locationPreference=None,
-              pricingPlan='PER_USE',
-              replicationType='SYNCHRONOUS',
+              pricingPlan=sqladmin_v1beta4.Settings.PricingPlanValueValuesEnum
+              .PER_USE,
+              replicationType=sqladmin_v1beta4.Settings
+              .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
               settingsVersion=1,
               tier='D1',
           ),
-          state='RUNNABLE',
-          instanceType='CLOUD_SQL_INSTANCE',
+          state=sqladmin_v1beta4.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
+          instanceType=sqladmin_v1beta4.DatabaseInstance
+          .InstanceTypeValueValuesEnum.CLOUD_SQL_INSTANCE,
       )
   ]
 
@@ -150,7 +162,8 @@ def GetDatabaseInstancesListOfOne():
   return [
       sqladmin_v1beta4.DatabaseInstance(
           currentDiskSize=287571860,
-          databaseVersion='MYSQL_5_5',
+          databaseVersion=sqladmin_v1beta4.DatabaseInstance
+          .DatabaseVersionValueValuesEnum.MYSQL_5_5,
           etag='"yGhHGJDUk5hWK-gppo_8C-KD7iU/nbMj8WWUtdJPpSjOHUxEh"',
           name='backupless-instance2',
           ipAddresses=[],
@@ -171,7 +184,8 @@ def GetDatabaseInstancesListOfOne():
                   47,
                   10,
                   788000,
-                  tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                  tzinfo=protorpc_util.TimeZoneOffset(
+                      datetime.timedelta(0))).isoformat(),
               expirationTime=datetime.datetime(
                   2024,
                   8,
@@ -180,13 +194,15 @@ def GetDatabaseInstancesListOfOne():
                   47,
                   10,
                   788000,
-                  tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                  tzinfo=protorpc_util.TimeZoneOffset(
+                      datetime.timedelta(0))).isoformat(),
               instance='backupless-instance',
               kind='sql#sslCert',
               sha1Fingerprint='a691db45f7dee0827650fd2eb277d2ca81b9',
           ),
           settings=sqladmin_v1beta4.Settings(
-              activationPolicy='NEVER',
+              activationPolicy=sqladmin_v1beta4.Settings
+              .ActivationPolicyValueValuesEnum.NEVER,
               authorizedGaeApplications=[],
               backupConfiguration=sqladmin_v1beta4.BackupConfiguration(
                   binaryLogEnabled=False,
@@ -206,13 +222,16 @@ def GetDatabaseInstancesListOfOne():
                   kind='sql#locationPreference',
                   zone=None,
               ),
-              pricingPlan='PER_USE',
-              replicationType='SYNCHRONOUS',
+              pricingPlan=sqladmin_v1beta4.Settings.PricingPlanValueValuesEnum
+              .PER_USE,
+              replicationType=sqladmin_v1beta4.Settings
+              .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
               settingsVersion=1,
               tier='D1',
           ),
-          state='RUNNABLE',
-          instanceType='CLOUD_SQL_INSTANCE',
+          state=sqladmin_v1beta4.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
+          instanceType=sqladmin_v1beta4.DatabaseInstance
+          .InstanceTypeValueValuesEnum.CLOUD_SQL_INSTANCE,
       )
   ]
 
@@ -255,8 +274,10 @@ def GetRequestInstance(project, instance_name):
           kind='sql#settings',
           locationPreference=None,
           maintenanceWindow=None,
-          pricingPlan='PER_USE',
-          replicationType='SYNCHRONOUS',
+          pricingPlan=sqladmin_v1beta4.Settings.PricingPlanValueValuesEnum
+          .PER_USE,
+          replicationType=sqladmin_v1beta4.Settings
+          .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
           settingsVersion=None,
           storageAutoResize=None,
           storageAutoResizeLimit=None,
@@ -356,13 +377,15 @@ def GetPatchRequestInstance(project, instance_name):
 def GetV1Instance(project, instance_name):
   """Returns a sample MySQL V1 DatabaseInstance named instance_name."""
   return sqladmin_v1beta4.DatabaseInstance(
-      backendType='FIRST_GEN',
+      backendType=sqladmin_v1beta4.DatabaseInstance.BackendTypeValueValuesEnum
+      .FIRST_GEN,
       connectionName='test-connection-name',
       currentDiskSize=281811817,
       databaseVersion=DEFAULT_INSTANCE_DATABASE_VERSION,
       etag='"7nzH-h2yIa307nzH-h2nzH-h2g/MQ"',
       failoverReplica=None,
-      instanceType='CLOUD_SQL_INSTANCE',
+      instanceType=sqladmin_v1beta4.DatabaseInstance.InstanceTypeValueValuesEnum
+      .CLOUD_SQL_INSTANCE,
       ipAddresses=[],
       ipv6Address='2000:3000:4000:1:92cd:7afd:2e22:9fa3',
       kind='sql#instance',
@@ -374,7 +397,7 @@ def GetV1Instance(project, instance_name):
       region='us-central',
       replicaConfiguration=None,
       replicaNames=[],
-      selfLink='https://www.googleapis.com/sql/v1beta4/projects/sample-link',
+      selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/sample-link',
       serverCaCert=sqladmin_v1beta4.SslCert(
           cert='-----BEGIN CERTIFICATE-----\ntestcert',
           certSerialNumber='0',
@@ -387,7 +410,8 @@ def GetV1Instance(project, instance_name):
               0,
               0,
               92000,
-              tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+              tzinfo=protorpc_util.TimeZoneOffset(
+                  datetime.timedelta(0))).isoformat(),
           expirationTime=datetime.datetime(
               2019,
               7,
@@ -396,7 +420,8 @@ def GetV1Instance(project, instance_name):
               1,
               0,
               92000,
-              tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+              tzinfo=protorpc_util.TimeZoneOffset(
+                  datetime.timedelta(0))).isoformat(),
           instance='create-instance1',
           kind='sql#sslCert',
           selfLink=None,
@@ -404,7 +429,8 @@ def GetV1Instance(project, instance_name):
       ),
       serviceAccountEmailAddress=None,
       settings=sqladmin_v1beta4.Settings(
-          activationPolicy='ON_DEMAND',
+          activationPolicy=sqladmin_v1beta4.Settings
+          .ActivationPolicyValueValuesEnum.ON_DEMAND,
           authorizedGaeApplications=[],
           availabilityType=None,
           backupConfiguration=sqladmin_v1beta4.BackupConfiguration(
@@ -426,15 +452,17 @@ def GetV1Instance(project, instance_name):
           kind='sql#settings',
           locationPreference=None,
           maintenanceWindow=None,
-          pricingPlan='PER_USE',
-          replicationType='SYNCHRONOUS',
+          pricingPlan=sqladmin_v1beta4.Settings.PricingPlanValueValuesEnum
+          .PER_USE,
+          replicationType=sqladmin_v1beta4.Settings
+          .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
           settingsVersion=1,
           storageAutoResize=None,
           storageAutoResizeLimit=None,
           tier='D1',
           userLabels=None,
       ),
-      state='RUNNABLE',
+      state=sqladmin_v1beta4.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
       suspensionReason=[],
   )
 
@@ -442,18 +470,20 @@ def GetV1Instance(project, instance_name):
 def GetV2Instance(project, instance_name):
   """Returns a sample MySQL V2 DatabaseInstance named instance_name."""
   return sqladmin_v1beta4.DatabaseInstance(
-      backendType='SECOND_GEN',
+      backendType=sqladmin_v1beta4.DatabaseInstance.BackendTypeValueValuesEnum
+      .SECOND_GEN,
       connectionName='test-connection-name',
       currentDiskSize=None,
       databaseVersion=DEFAULT_INSTANCE_DATABASE_VERSION,
       etag='"7nzH-h2yIa30FGKFRs9YFu88s0g/MQ"',
       failoverReplica=None,
-      instanceType='CLOUD_SQL_INSTANCE',
+      instanceType=sqladmin_v1beta4.DatabaseInstance.InstanceTypeValueValuesEnum
+      .CLOUD_SQL_INSTANCE,
       ipAddresses=[
           sqladmin_v1beta4.IpMapping(
               ipAddress='0.0.0.0',
               timeToRetire=None,
-              type='PRIMARY',
+              type=sqladmin_v1beta4.IpMapping.TypeValueValuesEnum.PRIMARY,
           ),
       ],
       ipv6Address=None,
@@ -466,7 +496,7 @@ def GetV2Instance(project, instance_name):
       region='us-central',
       replicaConfiguration=None,
       replicaNames=[],
-      selfLink='https://www.googleapis.com/sql/v1beta4/projects/sample-link',
+      selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/sample-link',
       serverCaCert=sqladmin_v1beta4.SslCert(
           cert='-----BEGIN CERTIFICATE-----\ntestcert',
           certSerialNumber='0',
@@ -479,7 +509,8 @@ def GetV2Instance(project, instance_name):
               11,
               41,
               694000,
-              tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+              tzinfo=protorpc_util.TimeZoneOffset(
+                  datetime.timedelta(0))).isoformat(),
           expirationTime=datetime.datetime(
               2019,
               7,
@@ -488,7 +519,8 @@ def GetV2Instance(project, instance_name):
               12,
               41,
               694000,
-              tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+              tzinfo=protorpc_util.TimeZoneOffset(
+                  datetime.timedelta(0))).isoformat(),
           instance='create-instance1-v1',
           kind='sql#sslCert',
           selfLink=None,
@@ -496,7 +528,8 @@ def GetV2Instance(project, instance_name):
       ),
       serviceAccountEmailAddress='test@sample.iam.gserviceaccount.com',
       settings=sqladmin_v1beta4.Settings(
-          activationPolicy='ALWAYS',
+          activationPolicy=sqladmin_v1beta4.Settings
+          .ActivationPolicyValueValuesEnum.ALWAYS,
           authorizedGaeApplications=[],
           availabilityType=None,
           backupConfiguration=sqladmin_v1beta4.BackupConfiguration(
@@ -507,7 +540,8 @@ def GetV2Instance(project, instance_name):
           ),
           crashSafeReplicationEnabled=None,
           dataDiskSizeGb=10,
-          dataDiskType='PD_SSD',
+          dataDiskType=sqladmin_v1beta4.Settings.DataDiskTypeValueValuesEnum
+          .PD_SSD,
           databaseFlags=[],
           databaseReplicationEnabled=None,
           ipConfiguration=sqladmin_v1beta4.IpConfiguration(
@@ -518,15 +552,17 @@ def GetV2Instance(project, instance_name):
           kind='sql#settings',
           locationPreference=None,
           maintenanceWindow=None,
-          pricingPlan='PER_USE',
-          replicationType='SYNCHRONOUS',
+          pricingPlan=sqladmin_v1beta4.Settings.PricingPlanValueValuesEnum
+          .PER_USE,
+          replicationType=sqladmin_v1beta4.Settings
+          .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
           settingsVersion=1,
           storageAutoResize=True,
           storageAutoResizeLimit=0,
           tier='db-n1-standard-1',
           userLabels=None,
       ),
-      state='RUNNABLE',
+      state=sqladmin_v1beta4.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
       suspensionReason=[],
   )
 
@@ -534,18 +570,21 @@ def GetV2Instance(project, instance_name):
 def GetPostgresInstance(project, instance_name):
   """Returns a sample Postgres DatabaseInstance named instance_name."""
   return sqladmin_v1beta4.DatabaseInstance(
-      backendType='SECOND_GEN',
+      backendType=sqladmin_v1beta4.DatabaseInstance.BackendTypeValueValuesEnum
+      .SECOND_GEN,
       connectionName='test-connection-name',
       currentDiskSize=None,
-      databaseVersion='POSTGRES_9_6',
+      databaseVersion=sqladmin_v1beta4.DatabaseInstance
+      .DatabaseVersionValueValuesEnum.POSTGRES_9_6,
       etag='"7nzH-7nzH-h2yIKFRs9YFu88s0g/MA"',
       failoverReplica=None,
-      instanceType='CLOUD_SQL_INSTANCE',
+      instanceType=sqladmin_v1beta4.DatabaseInstance.InstanceTypeValueValuesEnum
+      .CLOUD_SQL_INSTANCE,
       ipAddresses=[
           sqladmin_v1beta4.IpMapping(
               ipAddress='0.0.0.0',
               timeToRetire=None,
-              type='PRIMARY',
+              type=sqladmin_v1beta4.IpMapping.TypeValueValuesEnum.PRIMARY,
           ),
       ],
       ipv6Address=None,
@@ -558,22 +597,24 @@ def GetPostgresInstance(project, instance_name):
       region='us-central',
       replicaConfiguration=None,
       replicaNames=[],
-      selfLink='https://www.googleapis.com/sql/v1beta4/projects/sample-link',
+      selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/sample-link',
       serverCaCert=None,
       serviceAccountEmailAddress='test@sample.iam.gserviceaccount.com',
       settings=sqladmin_v1beta4.Settings(
-          activationPolicy='ALWAYS',
+          activationPolicy=sqladmin_v1beta4.Settings
+          .ActivationPolicyValueValuesEnum.ALWAYS,
           authorizedGaeApplications=[],
           availabilityType=None,
           backupConfiguration=sqladmin_v1beta4.BackupConfiguration(
               binaryLogEnabled=None,
-              enabled=False,
+              enabled=True,
               kind='sql#backupConfiguration',
               startTime='06:00',
           ),
           crashSafeReplicationEnabled=None,
           dataDiskSizeGb=10,
-          dataDiskType='PD_SSD',
+          dataDiskType=sqladmin_v1beta4.Settings.DataDiskTypeValueValuesEnum
+          .PD_SSD,
           databaseFlags=[],
           databaseReplicationEnabled=None,
           ipConfiguration=sqladmin_v1beta4.IpConfiguration(
@@ -584,15 +625,17 @@ def GetPostgresInstance(project, instance_name):
           kind='sql#settings',
           locationPreference=None,
           maintenanceWindow=None,
-          pricingPlan='PER_USE',
-          replicationType='SYNCHRONOUS',
+          pricingPlan=sqladmin_v1beta4.Settings.PricingPlanValueValuesEnum
+          .PER_USE,
+          replicationType=sqladmin_v1beta4.Settings
+          .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
           settingsVersion=0,
           storageAutoResize=True,
           storageAutoResizeLimit=0,
           tier='db-custom-1-3840',
           userLabels=None,
       ),
-      state='RUNNABLE',
+      state=sqladmin_v1beta4.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
       suspensionReason=[],
   )
 
@@ -600,18 +643,21 @@ def GetPostgresInstance(project, instance_name):
 def GetSqlServerInstance(project, instance_name):
   """Returns a sample SQL Server DatabaseInstance named instance_name."""
   return sqladmin_v1beta4.DatabaseInstance(
-      backendType='SECOND_GEN',
+      backendType=sqladmin_v1beta4.DatabaseInstance.BackendTypeValueValuesEnum
+      .SECOND_GEN,
       connectionName='test-connection-name',
       currentDiskSize=None,
-      databaseVersion='SQLSERVER_2017_STANDARD',
+      databaseVersion=sqladmin_v1beta4.DatabaseInstance
+      .DatabaseVersionValueValuesEnum.SQLSERVER_2017_STANDARD,
       etag='"7nzH-7nzH-h2yIKFRs9YFu88s0g/MA"',
       failoverReplica=None,
-      instanceType='CLOUD_SQL_INSTANCE',
+      instanceType=sqladmin_v1beta4.DatabaseInstance.InstanceTypeValueValuesEnum
+      .CLOUD_SQL_INSTANCE,
       ipAddresses=[
           sqladmin_v1beta4.IpMapping(
               ipAddress='0.0.0.0',
               timeToRetire=None,
-              type='PRIMARY',
+              type=sqladmin_v1beta4.IpMapping.TypeValueValuesEnum.PRIMARY,
           ),
       ],
       ipv6Address=None,
@@ -624,11 +670,12 @@ def GetSqlServerInstance(project, instance_name):
       region='us-central',
       replicaConfiguration=None,
       replicaNames=[],
-      selfLink='https://www.googleapis.com/sql/v1beta4/projects/sample-link',
+      selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/sample-link',
       serverCaCert=None,
       serviceAccountEmailAddress='test@sample.iam.gserviceaccount.com',
       settings=sqladmin_v1beta4.Settings(
-          activationPolicy='ALWAYS',
+          activationPolicy=sqladmin_v1beta4.Settings
+          .ActivationPolicyValueValuesEnum.ALWAYS,
           authorizedGaeApplications=[],
           availabilityType=None,
           backupConfiguration=sqladmin_v1beta4.BackupConfiguration(
@@ -639,7 +686,8 @@ def GetSqlServerInstance(project, instance_name):
           ),
           crashSafeReplicationEnabled=None,
           dataDiskSizeGb=10,
-          dataDiskType='PD_SSD',
+          dataDiskType=sqladmin_v1beta4.Settings.DataDiskTypeValueValuesEnum
+          .PD_SSD,
           databaseFlags=[],
           databaseReplicationEnabled=None,
           ipConfiguration=sqladmin_v1beta4.IpConfiguration(
@@ -650,15 +698,17 @@ def GetSqlServerInstance(project, instance_name):
           kind='sql#settings',
           locationPreference=None,
           maintenanceWindow=None,
-          pricingPlan='PER_USE',
-          replicationType='SYNCHRONOUS',
+          pricingPlan=sqladmin_v1beta4.Settings.PricingPlanValueValuesEnum
+          .PER_USE,
+          replicationType=sqladmin_v1beta4.Settings
+          .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
           settingsVersion=0,
           storageAutoResize=True,
           storageAutoResizeLimit=0,
           tier='db-custom-1-3840',
           userLabels=None,
       ),
-      state='RUNNABLE',
+      state=sqladmin_v1beta4.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
       suspensionReason=[],
   )
 
@@ -666,14 +716,16 @@ def GetSqlServerInstance(project, instance_name):
 def GetExternalMasterInstance(project, instance_name):
   """Returns a sample external master DatabaseInstance named instance_name."""
   return sqladmin_v1beta4.DatabaseInstance(
-      backendType='EXTERNAL',
+      backendType=sqladmin_v1beta4.DatabaseInstance.BackendTypeValueValuesEnum
+      .EXTERNAL,
       connectionName=None,
       currentDiskSize=None,
       databaseVersion=DEFAULT_INSTANCE_DATABASE_VERSION,
       etag='"7nzH-7nzH-h2yIKFRs9YFu88s0g/MA"',
       failoverReplica=None,
       gceZone=None,
-      instanceType='ON_PREMISES_INSTANCE',
+      instanceType=sqladmin_v1beta4.DatabaseInstance.InstanceTypeValueValuesEnum
+      .ON_PREMISES_INSTANCE,
       ipAddresses=[],
       ipv6Address=None,
       kind='sql#instance',
@@ -724,7 +776,8 @@ def GetBackup(instance, backup_id, status):
           0,
           0,
           802000,
-          tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+          tzinfo=protorpc_util.TimeZoneOffset(
+              datetime.timedelta(0))).isoformat(),
       endTime=datetime.datetime(
           2014,
           8,
@@ -733,7 +786,8 @@ def GetBackup(instance, backup_id, status):
           27,
           47,
           910000,
-          tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+          tzinfo=protorpc_util.TimeZoneOffset(
+              datetime.timedelta(0))).isoformat(),
       enqueuedTime=datetime.datetime(
           2014,
           8,
@@ -742,7 +796,8 @@ def GetBackup(instance, backup_id, status):
           25,
           12,
           318000,
-          tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+          tzinfo=protorpc_util.TimeZoneOffset(
+              datetime.timedelta(0))).isoformat(),
       error=None,
       instance=instance.name,
       kind='sql#backupRun',
@@ -754,7 +809,8 @@ def GetBackup(instance, backup_id, status):
           25,
           12,
           321000,
-          tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+          tzinfo=protorpc_util.TimeZoneOffset(
+              datetime.timedelta(0))).isoformat(),
       status=status,
   )
 
@@ -764,7 +820,8 @@ def GetBackupDeleteRequest(project, backup):
   return sqladmin_v1beta4.SqlBackupRunsDeleteRequest(
       project=project,
       id=backup.id,
-      instance=backup.instance,)
+      instance=backup.instance,
+  )
 
 
 # Factory functions to generate sample Operation instances.
@@ -782,7 +839,8 @@ def GetOperation(project, instance, op_type, op_status, error=None):
           38,
           39,
           415000,
-          tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+          tzinfo=protorpc_util.TimeZoneOffset(
+              datetime.timedelta(0))).isoformat(),
       startTime=datetime.datetime(
           2014,
           8,
@@ -791,7 +849,8 @@ def GetOperation(project, instance, op_type, op_status, error=None):
           38,
           39,
           525000,
-          tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+          tzinfo=protorpc_util.TimeZoneOffset(
+              datetime.timedelta(0))).isoformat(),
       endTime=datetime.datetime(
           2014,
           8,
@@ -800,17 +859,18 @@ def GetOperation(project, instance, op_type, op_status, error=None):
           39,
           26,
           601000,
-          tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+          tzinfo=protorpc_util.TimeZoneOffset(
+              datetime.timedelta(0))).isoformat(),
       error=error,
       exportContext=None,
       importContext=None,
       targetId=instance.name,
-      targetLink='https://www.googleapis.com/sql/v1beta4/projects/{0}'.format(
-          project),
+      targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}'
+      .format(project),
       targetProject=project,
       kind='sql#operation',
       name='344acb84-0000-1111-2222-1e71c6077b34',
-      selfLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/sample'
+      selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/sample'
       .format(project),
       operationType=op_type,
       status=op_status,

@@ -120,8 +120,23 @@ A Google Cloud Pub/Sub topic name for state notifications.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command updates the device registry 'my\-registry' in region
+\'us\-central1'. It enables MQTT and HTTP connections and sets
+\'pubsub\-topic\-name' as the Cloud Pub/Sub topic for state notifications.
+
+.RS 2m
+$ gcloud iot registries update my\-registry \-\-region=us\-central1 \e
+    \-\-enable\-http\-config \-\-enable\-mqtt\-config \e
+    \-\-state\-pubsub\-topic=pubsub\-topic\-name
+.RE
 
 
 

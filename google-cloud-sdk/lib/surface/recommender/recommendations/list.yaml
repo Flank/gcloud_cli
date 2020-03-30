@@ -1,27 +1,23 @@
-- release_tracks: [ALPHA, BETA]
+- release_tracks: [ALPHA, BETA, GA]
   help_text:
     brief: |
       Lists recommendations for a Cloud project.
     description: |
       Lists recommendations for a Cloud project.
-    ALPHA:
-      examples: |
-        To list recommendations:
+    examples: |
+      To list recommendations:
 
-          $ {command} --project=project-name --location=global --recommender=google.iam.policy.RoleRecommender
-    BETA:
-      examples: |
-        To list recommendations:
-
-          $ {command} --project=project-name --location=global --recommender=google.iam.policy.Recommender
+        $ {command} --project=project-name --location=global --recommender=google.iam.policy.google.compute.instance.MachineTypeRecommender
 
   request:
     collection: recommender.projects.locations.recommenders.recommendations
     method: list
     ALPHA:
-      api_version: v1alpha1
+      api_version: v1alpha2
     BETA:
       api_version: v1beta1
+    GA:
+      api_version: v1
 
   response:
     id_field: name

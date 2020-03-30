@@ -22,9 +22,11 @@ from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute.org_security_policies import client
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.org_security_policies import flags
+from googlecloudsdk.command_lib.compute.org_security_policies import org_security_policies_utils
+import six
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Delete(base.DeleteCommand):
   """Delete a Google Compute Engine organization security policy.
 
@@ -39,6 +41,10 @@ class Delete(base.DeleteCommand):
     cls.ORG_SECURITY_POLICY_ARG = flags.OrgSecurityPolicyArgument(
         required=True, operation='delete')
     cls.ORG_SECURITY_POLICY_ARG.AddArgument(parser, operation_type='delete')
+    parser.add_argument(
+        '--organization',
+        help=('Organization in which the organization security policy is to be'
+              ' deleted. Must be set if SECURITY_POLICY is display name.'))
     parser.display_info.AddCacheUpdater(flags.OrgSecurityPoliciesCompleter)
 
   def Run(self, args):
@@ -46,5 +52,20 @@ class Delete(base.DeleteCommand):
     ref = self.ORG_SECURITY_POLICY_ARG.ResolveAsResource(
         args, holder.resources, with_project=False)
     org_security_policy = client.OrgSecurityPolicy(
-        ref=ref, compute_client=holder.client)
-    return org_security_policy.Delete(only_generate_request=False)
+        ref=ref,
+        compute_client=holder.client,
+        resources=holder.resources,
+        version=six.text_type(self.ReleaseTrack()).lower())
+    sp_id = org_security_policies_utils.GetSecurityPolicyId(
+        org_security_policy, ref.Name(), organization=args.organization)
+    return org_security_policy.Delete(sp_id=sp_id, only_generate_request=False)
+
+
+Delete.detailed_help = {
+    'EXAMPLES':
+        """\
+    To delete an organization security policy with ID ``123456789", run:
+
+      $ {command} delete 123456789
+    """,
+}

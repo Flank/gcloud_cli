@@ -1,0 +1,34 @@
+title: billing budgets delete test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      billing budgets delete my-budget1 --billing-account=fake-account
+  - prompt:
+    - message: You are about to delete budget [my-budget1]
+    - input: y
+  - stderr: |
+      Deleted budget [my-budget1].
+actions:
+- execute_command:
+    command: |
+      billing budgets delete my-budget1 --billing-account=fake-account
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete budget [my-budget1]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://billingbudgets.googleapis.com/v1beta1/billingAccounts/fake-account/budgets/my-budget1?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Deleted budget [my-budget1].
+    - expect_exit:
+        code: 0

@@ -1,0 +1,41 @@
+NAME
+    gcloud beta compute org-security-policies associations - read and
+        manipulate Google Compute Engine organization security policy
+        associations
+
+SYNOPSIS
+    gcloud beta compute org-security-policies associations COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Read and manipulate Google Compute Engine organization security
+    policy associations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a new association between a security policy and an
+        organization or folder resource.
+
+     delete
+        (BETA) Delete a Google Compute Engine organization security policy
+        association.
+
+     list
+        (BETA) List the associations of an organization or folder resource.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha compute org-security-policies associations
+

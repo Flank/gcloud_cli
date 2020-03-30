@@ -81,8 +81,9 @@ The minimum required number of success variables.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -93,11 +94,11 @@ To create a waiter in "my\-config" with success and failure paths nested under
 
 .RS 2m
 $ gcloud beta runtime\-config configs waiters create my\-waiter \e
-    \-\-config\-name my\-config \-\-timeout 15m \e
-    \-\-success\-cardinality\-path /status/success \e
-    \-\-success\-cardinality\-number 5 \e
-    \-\-failure\-cardinality\-path /status/failure \e
-    \-\-failure\-cardinality\-number 1
+    \-\-config\-name=my\-config \-\-timeout=15m \e
+    \-\-success\-cardinality\-path=/status/success \e
+    \-\-success\-cardinality\-number=5 \e
+    \-\-failure\-cardinality\-path=/status/failure \e
+    \-\-failure\-cardinality\-number=1
 .RE
 
 This waiter will wait for at most 15 minutes for the first of two possible
@@ -108,9 +109,9 @@ To create a waiter without a failure path, run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs waiters create my\-waiter \e
-    \-\-config\-name my\-config \-\-timeout 15m \e
-    \-\-success\-cardinality\-path /status/success \e
-    \-\-success\-cardinality\-number 5
+    \-\-config\-name=my\-config \-\-timeout=15m \e
+    \-\-success\-cardinality\-path=/status/success \e
+    \-\-success\-cardinality\-number=5
 .RE
 
 This waiter will wait until 5 or more success variables are written, or the 15

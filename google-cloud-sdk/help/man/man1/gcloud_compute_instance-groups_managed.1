@@ -26,8 +26,9 @@ Read and manipulate Google Compute Engine managed instance groups.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -56,6 +57,11 @@ Abandon instances owned by a managed instance group.
 .TP 2m
 \fBcreate\fR
 Create a Compute Engine managed instance group.
+
+.TP 2m
+\fBcreate\-instance\fR
+Create a new virtual machine instance in a managed instance group with a defined
+name.
 
 .TP 2m
 \fBdelete\fR
@@ -114,8 +120,21 @@ Stop autoscaling a managed instance group.
 Update Google Compute Engine managed instance groups.
 
 .TP 2m
+\fBupdate\-autoscaling\fR
+Update autoscaling parameters of a managed instance group.
+
+.TP 2m
+\fBupdate\-instances\fR
+Immediately update selected instances in a Google Compute Engine managed
+instance group.
+
+.TP 2m
+\fBwait\-until\fR
+Wait until the managed instance group reaches the desired state.
+
+.TP 2m
 \fBwait\-until\-stable\fR
-Waits until state of managed instance group is stable.
+\fB(DEPRECATED)\fR Waits until state of managed instance group is stable.
 
 
 .RE

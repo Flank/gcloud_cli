@@ -11,7 +11,7 @@ gcloud compute backend\-services update \- update a backend service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-[no\-]enable\-cdn\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR\ |\ \fB\-\-no\-custom\-request\-headers\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-drain\-on\-failover\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-drop\-traffic\-if\-unhealthy\fR] [\fB\-\-[no\-]enable\-cdn\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-no\-health\-checks\fR] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-logging\-sample\-rate\fR=\fILOGGING_SAMPLE_RATE\fR] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR\ |\ \fB\-\-no\-custom\-request\-headers\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-health\-checks\fR\ |\ \fB\-\-health\-checks\-region\fR=\fIHEALTH_CHECKS_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -64,6 +64,15 @@ blacklist to the empty list) to include the entire query string. Can only be
 applied for global resources.
 
 .TP 2m
+\fB\-\-connection\-drain\-on\-failover\fR
+Connection drain is enabled by default and on failover or failback connections
+will be drained. If connection drain is disabled, the existing connection state
+will be cleared immediately on a best effort basis on failover or failback, all
+connections will then be served by the active pool of instances. Not compatible
+with the \-\-global flag, load balancing scheme must be INTERNAL, and the
+protocol must be TCP.
+
+.TP 2m
 \fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR
 Connection draining timeout to be used during removal of VMs from instance
 groups. This guarantees that for the specified time all existing connections to
@@ -77,6 +86,12 @@ See $ gcloud topic datetimes for information on duration formats.
 An optional, textual description for the backend service.
 
 .TP 2m
+\fB\-\-drop\-traffic\-if\-unhealthy\fR
+Enable dropping of traffic if there are no healthy VMs detected in both the
+primary and backup instance groups. Not compatible with the \-\-global flag and
+load balancing scheme must be INTERNAL.
+
+.TP 2m
 \fB\-\-[no\-]enable\-cdn\fR
 Enable or disable Cloud CDN for the backend service. Only available for backend
 services with \-\-load\-balancing\-scheme=EXTERNAL that use a \-\-protocol of
@@ -85,10 +100,26 @@ network. Cloud CDN is disabled by default. Use \fB\-\-enable\-cdn\fR to enable
 and \fB\-\-no\-enable\-cdn\fR to disable.
 
 .TP 2m
+\fB\-\-enable\-logging\fR
+The logging options for the load balancer traffic served by this backend
+service. If logging is enabled, logs will be exported to Stackdriver. Enabled by
+default.
+
+.TP 2m
+\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR
+If the ratio of the healthy VMs in the primary backend is at or below this
+number, traffic arriving at the load\-balanced IP will be directed to the
+failover backend(s). Not compatible with the \-\-global flag.
+
+.TP 2m
 \fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]
 Specifies a list of health check objects for checking the health of the backend
 service. Currently at most one health check can be specified. Health checks need
 not be for the same protocol as that of the backend service.
+
+.TP 2m
+\fB\-\-no\-health\-checks\fR
+Removes all health checks for the backend service.
 
 .TP 2m
 \fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]
@@ -99,7 +130,7 @@ Legacy health checks are not recommended for backend services. It is possible to
 use a legacy health check on a backend service for a HTTP(S) load balancer if
 that backend service uses instance groups. For more information, refer to this
 guide:
-https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide.
 
 .TP 2m
 \fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]
@@ -110,7 +141,7 @@ Legacy health checks are not recommended for backend services. It is possible to
 use a legacy health check on a backend service for a HTTP(S) load balancer if
 that backend service uses instance groups. For more information, refer to this
 guide:
-https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide.
 
 .TP 2m
 \fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]
@@ -122,6 +153,14 @@ IAP is enabled, '\-\-iap=disabled' will disable IAP, and a subsequent
 \'\-\-iap=enabled' will then enable it with the same OAuth2 client configuration
 as the first time it was enabled. See https://cloud.google.com/iap/ for more
 information about this feature.
+
+.TP 2m
+\fB\-\-logging\-sample\-rate\fR=\fILOGGING_SAMPLE_RATE\fR
+This field can only be specified if logging is enabled for the backend service.
+The value of the field must be a float in the range [0, 1]. This configures the
+sampling rate of requests to the load balancer where 1.0 means all logged
+requests are reported and 0.0 means no logged requests are reported. The default
+value is 1.0.
 
 .TP 2m
 \fB\-\-port\-name\fR=\fIPORT_NAME\fR
@@ -140,11 +179,18 @@ INTERNAL.
 \fB\-\-protocol\fR=\fIPROTOCOL\fR
 Protocol for incoming requests.
 
-If the load\-balancing\-scheme is \f5INTERNAL\fR, the protocol must be one of:
-\f5TCP\fR, \f5UDP\fR.
+If the \f5load\-balancing\-scheme\fR is \f5INTERNAL\fR (internal TCP/UDP load
+balancers), the protocol must be one of: TCP, UDP.
 
-If the load\-balancing\-scheme is \f5EXTERNAL\fR, the protocol must be one of:
-\f5HTTP\fR, \f5HTTPS\fR, \f5HTTP2\fR, \f5SSL\fR, \f5TCP\fR.
+If the \f5load\-balancing\-scheme\fR is \f5INTERNAL_SELF_MANAGED\fR (Traffic
+Director), the protocol must be one of: HTTP, HTTPS, HTTP2.
+
+If the \f5load\-balancing\-scheme\fR is \f5INTERNAL_MANAGED\fR (internal HTTP(S)
+load balancers), the protocol must be one of: HTTP, HTTPS, HTTP2.
+
+If the \f5load\-balancing\-scheme\fR is \f5EXTERNAL\fR (HTTP(S), SSL proxy, or
+TCP proxy load balancers), the protocol must be one of: HTTP, HTTPS, HTTP2, SSL,
+TCP.
 
 .TP 2m
 \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR
@@ -307,6 +353,44 @@ If set, the backend service is global.
 Region of the backend service to update. Overrides the default
 \fBcompute/region\fR property value for this command invocation.
 
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\-health\-checks\fR
+If set, the health checks are global.
+
+.TP 2m
+\fB\-\-health\-checks\-region\fR=\fIHEALTH_CHECKS_REGION\fR
+Region of the health checks to operate on. If not specified, you may be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
 
 .RE
 .RE
@@ -317,8 +401,9 @@ Region of the backend service to update. Overrides the default
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

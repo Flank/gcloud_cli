@@ -140,12 +140,28 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the cloudiot/v1 API. The full documentation for this API
     can be found at: https://cloud.google.com/iot
+
+EXAMPLES
+    To create a new device 'my-device' in device registry 'my-registry' and
+    region 'us-central1', run:
+
+        $ gcloud beta iot devices create my-device --region=us-central1 \
+            --registry=my-registry
+
+    The following command creates a new non-gateway device 'my-device' in
+    device registry 'my-registry' and region 'us-central1', blocks the device,
+    and sets metadata values.
+
+        $ gcloud beta iot devices create my-device --region=us-central1 \
+            --registry=my-registry --blocked --device-type=non-gateway \
+            --metadata=key1=value1,key2=value2
 
 NOTES
     This command is currently in BETA and may change without notice. These

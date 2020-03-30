@@ -1,0 +1,383 @@
+title: dataproc clusters import, export
+release_tracks: [GA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: dataproc clusters import $$my-cluster-2$$ --region=us-central1 --source=cluster_import.yaml
+  - stderr: |
+      Waiting on operation [$$operation$$].
+  - stderr: |
+      WARNING: For PD-Standard without local SSDs, we strongly recommend provisioning 1TB or larger to ensure consistently high I/O performance. See https://cloud.google.com/compute/docs/disks/performance for information on disk I/O performance.
+      WARNING: Property 'dataproc:fake.property' is not a supported property
+  - progress_tracker:
+    - message: Waiting for cluster creation operation
+    - status: SUCCESS
+  - stderr: |
+      Created [https://dataproc.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/clusters/$$my-cluster-2$$] Cluster placed in zone [us-central1-f].
+- execute:
+  - command: dataproc clusters export $$my-cluster-2$$ --destination=cluster_export.yaml
+      --region=us-central1
+  - write_file: cluster_export.yaml
+- execute:
+  - command: dataproc clusters delete $$my-cluster-2$$ -q --region=us-central1
+  - stderr: |
+      Waiting on operation [$$operation$$].
+  - progress_tracker:
+    - message: Waiting for cluster deletion operation
+    - status: SUCCESS
+  - stderr: |
+      Deleted [https://dataproc.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/clusters/$$my-cluster-2$$].
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1beta2
+      BETA: v1beta2
+      GA: v1
+- generate_resource_id:
+    reference: my-cluster-2
+    prefix: test-cluster-import-export
+- write_file:
+    path: cluster_import.yaml
+    contents: |
+      config:
+        gceClusterConfig:
+          zoneUri: us-central1-f
+        softwareConfig:
+          properties:
+            dataproc:fake.property: "fake-value"
+- execute_command:
+    command: dataproc clusters import $$my-cluster-2$$ --region=us-central1 --source=cluster_import.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://dataproc.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/clusters.alt=json&requestId=.*
+          method: POST
+          headers: {}
+          body:
+            json:
+              clusterName: $$my-cluster-2$$
+              config:
+                gceClusterConfig:
+                  zoneUri: us-central1-f
+                softwareConfig:
+                  properties:
+                    dataproc:fake.property: fake-value
+              projectId: cloud-sdk-integration-testing
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '907'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/regions/us-central1/operations/9b2305ea-7a45-306b-b559-7e44249d096f
+            metadata:
+              '@type': type.googleapis.com/google.cloud.dataproc.$$api-version$$.ClusterOperationMetadata
+              clusterName: $$my-cluster-2$$
+              clusterUuid: b6ec66b9-5f00-4f76-83ec-eb4c9359a5ee
+              status:
+                state: PENDING
+                innerState: PENDING
+                stateStartTime: '2020-02-03T19:40:25.572Z'
+              operationType: CREATE
+              description: Create cluster with 2 workers
+              warnings:
+              - For PD-Standard without local SSDs, we strongly recommend provisioning
+                1TB or larger to ensure consistently high I/O performance. See https://cloud.google.com/compute/docs/disks/performance
+                for information on disk I/O performance.
+              - Property 'dataproc:fake.property' is not a supported property
+        poll_operation: true
+    - expect_stderr: |
+        Waiting on operation [$$operation$$].
+    - expect_stderr: |
+        WARNING: For PD-Standard without local SSDs, we strongly recommend provisioning 1TB or larger to ensure consistently high I/O performance. See https://cloud.google.com/compute/docs/disks/performance for information on disk I/O performance.
+        WARNING: Property 'dataproc:fake.property' is not a supported property
+    - expect_progress_tracker:
+        message: Waiting for cluster creation operation
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://dataproc.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/clusters/$$my-cluster-2$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '5794'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            projectId: cloud-sdk-integration-testing
+            clusterName: $$my-cluster-2$$
+            config:
+              configBucket: dataproc-a198f4d8-c37b-42d7-8750-850b470ce6b4-us-central1
+              gceClusterConfig:
+                zoneUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+                networkUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
+                serviceAccountScopes:
+                - https://www.googleapis.com/auth/bigquery
+                - https://www.googleapis.com/auth/bigtable.admin.table
+                - https://www.googleapis.com/auth/bigtable.data
+                - https://www.googleapis.com/auth/cloud.useraccounts.readonly
+                - https://www.googleapis.com/auth/devstorage.full_control
+                - https://www.googleapis.com/auth/devstorage.read_write
+                - https://www.googleapis.com/auth/logging.write
+              masterConfig:
+                numInstances: 1
+                instanceNames:
+                - $$my-cluster-2$$-m
+                imageUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-dataproc/global/images/dataproc-1-3-deb9-20200117-000000-rc01
+                machineTypeUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-4
+                diskConfig:
+                  bootDiskSizeGb: 500
+                  bootDiskType: pd-standard
+                minCpuPlatform: AUTOMATIC
+              workerConfig:
+                numInstances: 2
+                instanceNames:
+                - $$my-cluster-2$$-w-0
+                - $$my-cluster-2$$-w-1
+                imageUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-dataproc/global/images/dataproc-1-3-deb9-20200117-000000-rc01
+                machineTypeUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-4
+                diskConfig:
+                  bootDiskSizeGb: 500
+                  bootDiskType: pd-standard
+                minCpuPlatform: AUTOMATIC
+              softwareConfig:
+                imageVersion: 1.3.50-debian9
+                properties:
+                  capacity-scheduler:yarn.scheduler.capacity.root.default.ordering-policy: fair
+                  core:fs.gs.block.size: '134217728'
+                  core:fs.gs.metadata.cache.enable: 'false'
+                  core:hadoop.ssl.enabled.protocols: TLS$$api-version$$,TLS$$api-version$$.1,TLS$$api-version$$.2
+                  dataproc:fake.property: fake-value
+                  distcp:mapreduce.map.java.opts: -Xmx768m
+                  distcp:mapreduce.map.memory.mb: '1024'
+                  distcp:mapreduce.reduce.java.opts: -Xmx768m
+                  distcp:mapreduce.reduce.memory.mb: '1024'
+                  hdfs:dfs.datanode.address: 0.0.0.0:9866
+                  hdfs:dfs.datanode.http.address: 0.0.0.0:9864
+                  hdfs:dfs.datanode.https.address: 0.0.0.0:9865
+                  hdfs:dfs.datanode.ipc.address: 0.0.0.0:9867
+                  hdfs:dfs.namenode.handler.count: '20'
+                  hdfs:dfs.namenode.http-address: 0.0.0.0:9870
+                  hdfs:dfs.namenode.https-address: 0.0.0.0:9871
+                  hdfs:dfs.namenode.lifeline.rpc-address: $$my-cluster-2$$-m:8050
+                  hdfs:dfs.namenode.secondary.http-address: 0.0.0.0:9868
+                  hdfs:dfs.namenode.secondary.https-address: 0.0.0.0:9869
+                  hdfs:dfs.namenode.service.handler.count: '10'
+                  hdfs:dfs.namenode.servicerpc-address: $$my-cluster-2$$-m:8051
+                  mapred-env:HADOOP_JOB_HISTORYSERVER_HEAPSIZE: '3840'
+                  mapred:mapreduce.job.maps: '21'
+                  mapred:mapreduce.job.reduce.slowstart.completedmaps: '0.95'
+                  mapred:mapreduce.job.reduces: '7'
+                  mapred:mapreduce.map.cpu.vcores: '1'
+                  mapred:mapreduce.map.java.opts: -Xmx2457m
+                  mapred:mapreduce.map.memory.mb: '3072'
+                  mapred:mapreduce.reduce.cpu.vcores: '1'
+                  mapred:mapreduce.reduce.java.opts: -Xmx2457m
+                  mapred:mapreduce.reduce.memory.mb: '3072'
+                  mapred:mapreduce.task.io.sort.mb: '256'
+                  mapred:yarn.app.mapreduce.am.command-opts: -Xmx2457m
+                  mapred:yarn.app.mapreduce.am.resource.cpu-vcores: '1'
+                  mapred:yarn.app.mapreduce.am.resource.mb: '3072'
+                  spark-env:SPARK_DAEMON_MEMORY: 3840m
+                  spark:spark.driver.maxResultSize: 1920m
+                  spark:spark.driver.memory: 3840m
+                  spark:spark.executor.cores: '2'
+                  spark:spark.executor.instances: '2'
+                  spark:spark.executor.memory: 5586m
+                  spark:spark.executorEnv.OPENBLAS_NUM_THREADS: '1'
+                  spark:spark.scheduler.mode: FAIR
+                  spark:spark.sql.cbo.enabled: 'true'
+                  spark:spark.yarn.am.memory: 640m
+                  yarn-env:YARN_NODEMANAGER_HEAPSIZE: '3840'
+                  yarn-env:YARN_RESOURCEMANAGER_HEAPSIZE: '3840'
+                  yarn-env:YARN_TIMELINESERVER_HEAPSIZE: '3840'
+                  yarn:yarn.nodemanager.resource.memory-mb: '12288'
+                  yarn:yarn.resourcemanager.nodemanager-graceful-decommission-timeout-secs: '86400'
+                  yarn:yarn.scheduler.maximum-allocation-mb: '12288'
+                  yarn:yarn.scheduler.minimum-allocation-mb: '1024'
+            status:
+              state: RUNNING
+              stateStartTime: '2020-02-03T19:41:47.353Z'
+            clusterUuid: b6ec66b9-5f00-4f76-83ec-eb4c9359a5ee
+            statusHistory:
+            - state: CREATING
+              stateStartTime: '2020-02-03T19:40:25.372Z'
+            labels:
+              goog-dataproc-cluster-name: $$my-cluster-2$$
+              goog-dataproc-cluster-uuid: b6ec66b9-5f00-4f76-83ec-eb4c9359a5ee
+              goog-dataproc-location: us-central1
+    - expect_stderr: |
+        Created [https://dataproc.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/clusters/$$my-cluster-2$$] Cluster placed in zone [us-central1-f].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: dataproc clusters export $$my-cluster-2$$ --destination=cluster_export.yaml
+      --region=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://dataproc.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/clusters/$$my-cluster-2$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '5794'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            projectId: cloud-sdk-integration-testing
+            clusterName: $$my-cluster-2$$
+            config:
+              configBucket: dataproc-a198f4d8-c37b-42d7-8750-850b470ce6b4-us-central1
+              gceClusterConfig:
+                zoneUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+                networkUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
+                serviceAccountScopes:
+                - https://www.googleapis.com/auth/bigquery
+                - https://www.googleapis.com/auth/bigtable.admin.table
+                - https://www.googleapis.com/auth/bigtable.data
+                - https://www.googleapis.com/auth/cloud.useraccounts.readonly
+                - https://www.googleapis.com/auth/devstorage.full_control
+                - https://www.googleapis.com/auth/devstorage.read_write
+                - https://www.googleapis.com/auth/logging.write
+              masterConfig:
+                numInstances: 1
+                instanceNames:
+                - $$my-cluster-2$$-m
+                imageUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-dataproc/global/images/dataproc-1-3-deb9-20200117-000000-rc01
+                machineTypeUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-4
+                diskConfig:
+                  bootDiskSizeGb: 500
+                  bootDiskType: pd-standard
+                minCpuPlatform: AUTOMATIC
+              workerConfig:
+                numInstances: 2
+                instanceNames:
+                - $$my-cluster-2$$-w-0
+                - $$my-cluster-2$$-w-1
+                imageUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-dataproc/global/images/dataproc-1-3-deb9-20200117-000000-rc01
+                machineTypeUri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-4
+                diskConfig:
+                  bootDiskSizeGb: 500
+                  bootDiskType: pd-standard
+                minCpuPlatform: AUTOMATIC
+              softwareConfig:
+                imageVersion: 1.3.50-debian9
+                properties:
+                  capacity-scheduler:yarn.scheduler.capacity.root.default.ordering-policy: fair
+                  core:fs.gs.block.size: '134217728'
+                  core:fs.gs.metadata.cache.enable: 'false'
+                  core:hadoop.ssl.enabled.protocols: TLS$$api-version$$,TLS$$api-version$$.1,TLS$$api-version$$.2
+                  dataproc:fake.property: fake-value
+                  distcp:mapreduce.map.java.opts: -Xmx768m
+                  distcp:mapreduce.map.memory.mb: '1024'
+                  distcp:mapreduce.reduce.java.opts: -Xmx768m
+                  distcp:mapreduce.reduce.memory.mb: '1024'
+                  hdfs:dfs.datanode.address: 0.0.0.0:9866
+                  hdfs:dfs.datanode.http.address: 0.0.0.0:9864
+                  hdfs:dfs.datanode.https.address: 0.0.0.0:9865
+                  hdfs:dfs.datanode.ipc.address: 0.0.0.0:9867
+                  hdfs:dfs.namenode.handler.count: '20'
+                  hdfs:dfs.namenode.http-address: 0.0.0.0:9870
+                  hdfs:dfs.namenode.https-address: 0.0.0.0:9871
+                  hdfs:dfs.namenode.lifeline.rpc-address: $$my-cluster-2$$-m:8050
+                  hdfs:dfs.namenode.secondary.http-address: 0.0.0.0:9868
+                  hdfs:dfs.namenode.secondary.https-address: 0.0.0.0:9869
+                  hdfs:dfs.namenode.service.handler.count: '10'
+                  hdfs:dfs.namenode.servicerpc-address: $$my-cluster-2$$-m:8051
+                  mapred-env:HADOOP_JOB_HISTORYSERVER_HEAPSIZE: '3840'
+                  mapred:mapreduce.job.maps: '21'
+                  mapred:mapreduce.job.reduce.slowstart.completedmaps: '0.95'
+                  mapred:mapreduce.job.reduces: '7'
+                  mapred:mapreduce.map.cpu.vcores: '1'
+                  mapred:mapreduce.map.java.opts: -Xmx2457m
+                  mapred:mapreduce.map.memory.mb: '3072'
+                  mapred:mapreduce.reduce.cpu.vcores: '1'
+                  mapred:mapreduce.reduce.java.opts: -Xmx2457m
+                  mapred:mapreduce.reduce.memory.mb: '3072'
+                  mapred:mapreduce.task.io.sort.mb: '256'
+                  mapred:yarn.app.mapreduce.am.command-opts: -Xmx2457m
+                  mapred:yarn.app.mapreduce.am.resource.cpu-vcores: '1'
+                  mapred:yarn.app.mapreduce.am.resource.mb: '3072'
+                  spark-env:SPARK_DAEMON_MEMORY: 3840m
+                  spark:spark.driver.maxResultSize: 1920m
+                  spark:spark.driver.memory: 3840m
+                  spark:spark.executor.cores: '2'
+                  spark:spark.executor.instances: '2'
+                  spark:spark.executor.memory: 5586m
+                  spark:spark.executorEnv.OPENBLAS_NUM_THREADS: '1'
+                  spark:spark.scheduler.mode: FAIR
+                  spark:spark.sql.cbo.enabled: 'true'
+                  spark:spark.yarn.am.memory: 640m
+                  yarn-env:YARN_NODEMANAGER_HEAPSIZE: '3840'
+                  yarn-env:YARN_RESOURCEMANAGER_HEAPSIZE: '3840'
+                  yarn-env:YARN_TIMELINESERVER_HEAPSIZE: '3840'
+                  yarn:yarn.nodemanager.resource.memory-mb: '12288'
+                  yarn:yarn.resourcemanager.nodemanager-graceful-decommission-timeout-secs: '86400'
+                  yarn:yarn.scheduler.maximum-allocation-mb: '12288'
+                  yarn:yarn.scheduler.minimum-allocation-mb: '1024'
+            status:
+              state: RUNNING
+              stateStartTime: '2020-02-03T19:41:47.353Z'
+            clusterUuid: b6ec66b9-5f00-4f76-83ec-eb4c9359a5ee
+            statusHistory:
+            - state: CREATING
+              stateStartTime: '2020-02-03T19:40:25.372Z'
+            labels:
+              goog-dataproc-cluster-name: $$my-cluster-2$$
+              goog-dataproc-cluster-uuid: b6ec66b9-5f00-4f76-83ec-eb4c9359a5ee
+              goog-dataproc-location: us-central1
+    - expect_file_written:
+        path: cluster_export.yaml
+        contents:
+          matches: |
+            config:.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: dataproc clusters delete $$my-cluster-2$$ -q --region=us-central1
+    cleanup_for: my-cluster-2
+    events:
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://dataproc.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/clusters/$$my-cluster-2$$.alt=json&requestId=.*
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '557'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/regions/us-central1/operations/2851ba41-dc7f-329b-9108-7de0dedbb9bc
+            metadata:
+              '@type': type.googleapis.com/google.cloud.dataproc.$$api-version$$.ClusterOperationMetadata
+              clusterName: $$my-cluster-2$$
+              clusterUuid: b6ec66b9-5f00-4f76-83ec-eb4c9359a5ee
+              status:
+                state: PENDING
+                innerState: PENDING
+                stateStartTime: '2020-02-03T19:41:52.834Z'
+              operationType: DELETE
+              description: Delete cluster
+        poll_operation: true
+    - expect_stderr: |
+        Waiting on operation [$$operation$$].
+    - expect_progress_tracker:
+        message: Waiting for cluster deletion operation
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted [https://dataproc.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/clusters/$$my-cluster-2$$].
+    - expect_exit:
+        code: 0

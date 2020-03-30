@@ -19,7 +19,8 @@ gcloud beta compute ssl\-certificates delete \- delete Google Compute Engine SSL
 
 \fB(BETA)\fR \fBgcloud beta compute ssl\-certificates delete\fR deletes one or
 more Google Compute Engine SSL certificates. SSL certificates can only be
-deleted when no other resources (e.g., target HTTPS proxies) refer to them.
+deleted when no other resources (for example, target HTTPS proxies) refer to
+them.
 
 
 
@@ -83,8 +84,26 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a certificate 'my\-cert', run:
+
+.RS 2m
+$ gcloud beta compute ssl\-certificates delete my\-cert
+.RE
+
+To delete certificates 'my\-cert1', 'my\-cert2' and 'my\-cert3', run:
+
+.RS 2m
+$ gcloud beta compute ssl\-certificates delete my\-cert1 my\-cert2 \e
+  my\-cert3
+.RE
 
 
 

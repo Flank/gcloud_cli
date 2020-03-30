@@ -58,7 +58,7 @@ class CreateVmMaintenanceAlphaTest(resource_policies_base.TestBase,
 
     result = self.Run(
         'compute resource-policies create vm-maintenance maintenance-window '
-        'pol1 --start-time 04:00Z --region {} --daily-window '
+        'pol1 --start-time 04:00 --region {} --daily-window '
         .format(self.region))
 
     self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
@@ -80,7 +80,7 @@ class CreateVmMaintenanceAlphaTest(resource_policies_base.TestBase,
 
     result = self.Run(
         'compute resource-policies create vm-maintenance maintenance-window '
-        'pol1 --start-time 04:00Z --region {} --description "{}" '
+        'pol1 --start-time 04:00 --region {} --description "{}" '
         '--daily-window '.format(self.region, description))
 
     self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
@@ -112,7 +112,7 @@ class CreateVmMaintenanceAlphaTest(resource_policies_base.TestBase,
         'cannot request a non-daily cycle.'):
       self.Run(
           'compute resource-policies create vm-maintenance maintenance-window '
-          'pol1 --region {0} --no-daily-window  --start-time 04:00Z'
+          'pol1 --region {0} --no-daily-window  --start-time 04:00'
           .format(self.region))
 
   def testCreate_StartTimeIsRequired(self):

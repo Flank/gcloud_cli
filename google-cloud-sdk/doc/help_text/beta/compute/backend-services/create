@@ -134,7 +134,7 @@ FLAGS
         possible to use a legacy health check on a backend service for a
         HTTP(S) load balancer if that backend service uses instance groups. For
         more information, refer to this guide:
-        https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide
+        https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide.
 
      --https-health-checks=HTTPS_HEALTH_CHECK,[...]
         Specifies a list of legacy HTTPS health check objects for checking the
@@ -144,7 +144,7 @@ FLAGS
         possible to use a legacy health check on a backend service for a
         HTTP(S) load balancer if that backend service uses instance groups. For
         more information, refer to this guide:
-        https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide
+        https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide.
 
      --iap=disabled|enabled,[oauth2-client-id=OAUTH2-CLIENT-ID,oauth2-client-secret=OAUTH2-CLIENT-SECRET]
         Configure Identity Aware Proxy (IAP) service. You can configure IAP to
@@ -190,11 +190,18 @@ FLAGS
      --protocol=PROTOCOL
         Protocol for incoming requests.
 
-        If the load-balancing-scheme is INTERNAL, the protocol must be one of:
-        TCP, UDP.
+        If the load-balancing-scheme is INTERNAL (internal TCP/UDP load
+        balancers), the protocol must be one of: TCP, UDP.
 
-        If the load-balancing-scheme is EXTERNAL, the protocol must be one of:
-        HTTP, HTTPS, HTTP2, SSL, TCP.
+        If the load-balancing-scheme is INTERNAL_SELF_MANAGED (Traffic
+        Director), the protocol must be one of: HTTP, HTTPS, HTTP2.
+
+        If the load-balancing-scheme is INTERNAL_MANAGED (internal HTTP(S) load
+        balancers), the protocol must be one of: HTTP, HTTPS, HTTP2.
+
+        If the load-balancing-scheme is EXTERNAL (HTTP(S), SSL proxy, or TCP
+        proxy load balancers), the protocol must be one of: HTTP, HTTPS, HTTP2,
+        SSL, TCP.
 
      --session-affinity=SESSION_AFFINITY
         The type of TCP session affinity to use. Not supported for UDP.
@@ -340,8 +347,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

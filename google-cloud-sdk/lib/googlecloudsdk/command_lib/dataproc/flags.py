@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope.concepts import concepts
@@ -28,24 +27,15 @@ from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.core import properties
 
 
-# TODO(b/137899555) remove ReturnDefaultRegionAndWarn fallthrough
-def _RegionAttributeConfig(api_version):
-  fallback_to_beta = api_version == 'v1'
+def _RegionAttributeConfig():
   fallthroughs = [deps.PropertyFallthrough(properties.VALUES.dataproc.region)]
-  if fallback_to_beta:
-    fallthroughs += [
-        deps.Fallthrough(util.ReturnDefaultRegionAndWarn, hint='N/A')
-    ]
   return concepts.ResourceParameterAttributeConfig(
       name='region',
       help_text=(
-          'Cloud Dataproc region for the {resource}. Each Cloud Dataproc '
+          'Dataproc region for the {resource}. Each Dataproc '
           'region constitutes an independent resource namespace constrained to '
-          'deploying instances into Google Compute Engine zones inside the '
-          'region. The default value of `global` is a special multi-region '
-          'namespace which is capable of deploying instances into all Google '
-          'Compute Engine zones globally, and is disjoint from other Cloud '
-          'Dataproc regions. Overrides the default `dataproc/region` property '
+          'deploying instances into Compute Engine zones inside the '
+          'region. Overrides the default `dataproc/region` property '
           'value for this command invocation.'),
       fallthroughs=fallthroughs)
 
@@ -73,7 +63,7 @@ def _GetClusterResourceSpec(api_version):
       resource_name='cluster',
       disable_auto_completers=True,
       projectId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
-      region=_RegionAttributeConfig(api_version),
+      region=_RegionAttributeConfig(),
       clusterName=ClusterConfig(),
   )
 
@@ -126,7 +116,7 @@ def _GetJobResourceSpec(api_version):
       resource_name='job',
       disable_auto_completers=True,
       projectId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
-      region=_RegionAttributeConfig(api_version),
+      region=_RegionAttributeConfig(),
       jobId=JobConfig(),
   )
 
@@ -153,7 +143,7 @@ def _GetOperationResourceSpec(api_version):
       resource_name='operation',
       disable_auto_completers=True,
       projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
-      regionsId=_RegionAttributeConfig(api_version),
+      regionsId=_RegionAttributeConfig(),
       operationsId=OperationConfig(),
   )
 
@@ -252,7 +242,7 @@ def _GetTemplateResourceSpec(api_version):
       resource_name='template',
       disable_auto_completers=True,
       projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
-      regionsId=_RegionAttributeConfig(api_version),
+      regionsId=_RegionAttributeConfig(),
       workflowTemplatesId=TemplateAttributeConfig(),
   )
 
@@ -282,7 +272,7 @@ def _AutoscalingPolicyResourceSpec(api_version):
       resource_name='autoscaling policy',
       disable_auto_completers=True,
       projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
-      regionsId=_RegionAttributeConfig(api_version),
+      regionsId=_RegionAttributeConfig(),
       autoscalingPoliciesId=concepts.ResourceParameterAttributeConfig(
           name='autoscaling_policy',
           help_text='The autoscaling policy id.',

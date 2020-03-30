@@ -29,6 +29,7 @@ class DescribeTest(base.FeaturesTestBase):
   """
 
   FEATURE_NAME = 'multiclusteringress'
+  FEATURE_DISPLAY_NAME = 'MultiClusterIngress'
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

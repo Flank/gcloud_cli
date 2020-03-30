@@ -11,15 +11,20 @@ gcloud beta container memberships register \- registers a cluster with Google Cl
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container memberships register\fR \fICLUSTER_NAME\fR \fB\-\-context\fR=\fICONTEXT\fR \fB\-\-service\-account\-key\-file\fR=\fISERVICE_ACCOUNT_KEY_FILE\fR [\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-manifest\-output\-file\fR=\fIMANIFEST_OUTPUT_FILE\fR] [\fB\-\-proxy\fR=\fIPROXY\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container memberships register\fR \fICLUSTER_NAME\fR \fB\-\-service\-account\-key\-file\fR=\fISERVICE_ACCOUNT_KEY_FILE\fR [\fB\-\-context\fR=\fICONTEXT\fR] [\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-manifest\-output\-file\fR=\fIMANIFEST_OUTPUT_FILE\fR] [\fB\-\-proxy\fR=\fIPROXY\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR This command registers a cluster referenced from a kubeconfig file
-with Google Cloud Platform. It also installs the Connect agent into this
-cluster, or updates the Connect agent in a previously\-registered cluster.
+\fB(BETA)\fR \fB(DEPRECATED)\fR Registers a cluster with Google Cloud Platform.
+
+This command group is deprecated. Please use \f5gcloud container hub
+memberships\fR command group instead.
+
+This command registers a cluster referenced from a kubeconfig file with Google
+Cloud Platform. It also installs the Connect agent into this cluster, or updates
+the Connect agent in a previously\-registered cluster.
 
 
 
@@ -38,10 +43,6 @@ The name of the cluster being registered.
 
 .RS 2m
 .TP 2m
-\fB\-\-context\fR=\fICONTEXT\fR
-The context in the kubeconfig file that specifies the cluster.
-
-.TP 2m
 \fB\-\-service\-account\-key\-file\fR=\fISERVICE_ACCOUNT_KEY_FILE\fR
 The JSON file of a Google Cloud service account private key.
 
@@ -52,6 +53,10 @@ The JSON file of a Google Cloud service account private key.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-context\fR=\fICONTEXT\fR
+The context in the kubeconfig file that specifies the cluster.
+
 .TP 2m
 \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR
 The kubeconfig file containing an entry for the cluster. Defaults to $KUBECONFIG
@@ -83,8 +88,9 @@ connect version.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

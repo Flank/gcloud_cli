@@ -1,0 +1,53 @@
+title: gcloud workflows describe test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      workflows describe test-workflow --location us-central1
+  - stdout: |
+      createTime: '2019-05-17T13:13:08.760823862Z'
+      description: This is a description
+      name: projects/fake-project/locations/us-central1/workflows/test-workflow
+      sourceContents: |
+        - return:
+                Return: "1"
+      state: ACTIVE
+      updateTime: '2019-05-30T08:58:28.271930330Z'
+      versionId: '7'
+actions:
+- execute_command:
+    command: |
+      workflows describe test-workflow --location us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://workflows.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/workflows/test-workflow?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            createTime: '2019-05-17T13:13:08.760823862Z'
+            description: This is a description
+            name: projects/fake-project/locations/us-central1/workflows/test-workflow
+            sourceContents: |
+              - return:
+                      Return: "1"
+            state: ACTIVE
+            updateTime: '2019-05-30T08:58:28.271930330Z'
+            versionId: '7'
+    - expect_stdout: |
+        createTime: '2019-05-17T13:13:08.760823862Z'
+        description: This is a description
+        name: projects/fake-project/locations/us-central1/workflows/test-workflow
+        sourceContents: |
+          - return:
+                  Return: "1"
+        state: ACTIVE
+        updateTime: '2019-05-30T08:58:28.271930330Z'
+        versionId: '7'
+    - expect_exit:
+        code: 0

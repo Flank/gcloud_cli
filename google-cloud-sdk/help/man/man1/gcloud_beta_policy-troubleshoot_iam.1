@@ -29,7 +29,7 @@ effective IAM policy interpretation.
 .TP 2m
 \fIRESOURCE\fR
 Full resource name that access is checked against. See:
-https://cloud.google.com/apis/design/resource_names#full_resource_name.
+https://cloud.google.com/iam/docs/resource\-names.
 
 
 .RE
@@ -44,9 +44,8 @@ Cloud IAM permission to check, e.g. "resourcemanager.projects.get".
 
 .TP 2m
 \fB\-\-principal\-email\fR=\fIPRINCIPAL_EMAIL\fR
-Principal email address of the member to check against. The format is the email
-addresses associated with its gaia account and it must be either a user account
-or a service account, other principal types are not supported.
+Email address that identifies the member to check. Only Google Accounts and
+service accounts are supported.
 
 
 .RE
@@ -57,15 +56,16 @@ or a service account, other principal types are not supported.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "API REFERENCE"
 
-This command uses the \fBpolicytroubleshooter/v1beta\fR API. The full
-documentation for this API can be found at: https://cloud.google.com/iam/
+This command uses the \fBpolicytroubleshooter/v1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/iam/
 
 
 
@@ -74,22 +74,24 @@ documentation for this API can be found at: https://cloud.google.com/iam/
 To troubleshoot a permission of a member on a resource, run:
 
 .RS 2m
-$ gcloud beta policy\-troubleshoot iam projects/project\-id
+$ gcloud beta policy\-troubleshoot iam \e
+    //cloudresourcemanager.googleapis.com/projects/project\-id
 \-\-principal\-email=my\-iam\-account@somedomain.com
-\-\-permission=iam.roles.list
+\-\-permission=resourcemanager.projects.get
 .RE
 
-See https://cloud.google.com/iam/docs/managing\-policies for details of policy
-role and member types.
+See https://cloud.google.com/iam/docs/policies for more information about IAM
+policies.
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud policy\-troubleshoot iam
 $ gcloud alpha policy\-troubleshoot iam
 .RE
 

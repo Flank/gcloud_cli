@@ -22,8 +22,8 @@ from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import health_checks_utils
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute import completers
+from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.compute.health_checks import flags
-from googlecloudsdk.core import log
 
 
 def _DetailedHelp():
@@ -68,7 +68,8 @@ def _Run(args, holder, include_l7_internal_load_balancing, include_log_config):
   health_check_ref = flags.HealthCheckArgument(
       'HTTP',
       include_l7_internal_load_balancing=include_l7_internal_load_balancing
-  ).ResolveAsResource(args, holder.resources)
+  ).ResolveAsResource(
+      args, holder.resources, default_scope=compute_scope.ScopeEnum.GLOBAL)
   proxy_header = messages.HTTPHealthCheck.ProxyHeaderValueValuesEnum(
       args.proxy_header)
   http_health_check = messages.HTTPHealthCheck(
@@ -123,7 +124,7 @@ class Create(base.CreateCommand):
 
   detailed_help = _DetailedHelp()
 
-  _include_l7_internal_load_balancing = False
+  _include_l7_internal_load_balancing = True
   _include_log_config = False
 
   @classmethod
@@ -132,9 +133,6 @@ class Create(base.CreateCommand):
           cls._include_log_config)
 
   def Run(self, args):
-    if self.ReleaseTrack() == base.ReleaseTrack.GA:
-      log.warning('The health-checks create http command will soon require '
-                  'either a --global or --region flag.')
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     return _Run(args, holder, self._include_l7_internal_load_balancing,
                 self._include_log_config)
@@ -143,10 +141,10 @@ class Create(base.CreateCommand):
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(Create):
 
-  _include_l7_internal_load_balancing = True
+  _include_log_config = True
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CreateAlpha(CreateBeta):
 
-  _include_log_config = True
+  pass

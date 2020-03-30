@@ -85,19 +85,20 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To submit a PySpark job with a local script and custom flags, run:
 
-        $ gcloud beta dataproc jobs submit pyspark --cluster my_cluster \
+        $ gcloud beta dataproc jobs submit pyspark --cluster=my_cluster \
             my_script.py -- --custom-flag
 
     To submit a Spark job that runs a script that is already on the cluster,
     run:
 
-        $ gcloud beta dataproc jobs submit pyspark --cluster my_cluster \
+        $ gcloud beta dataproc jobs submit pyspark --cluster=my_cluster \
             file:///usr/lib/spark/examples/src/main/python/pi.py 100
 
 NOTES

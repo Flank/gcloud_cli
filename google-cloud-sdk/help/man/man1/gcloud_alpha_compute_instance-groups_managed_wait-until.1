@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute instance\-groups managed wait\-until \- wait until managed instance group reaches desired state
+gcloud alpha compute instance\-groups managed wait\-until \- wait until the managed instance group reaches the desired state
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha compute instance\-groups managed wait\-until \- wait until managed 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Wait until managed instance group reaches desired state.
+\fB(ALPHA)\fR Wait until the managed instance group reaches the desired state.
 
 
 
@@ -58,7 +58,7 @@ Wait until version target is reached.
 .RS 2m
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR
-Waiting time in seconds for group to reach desired state.
+Waiting time in seconds for the group to reach the desired state.
 
 .TP 2m
 
@@ -103,8 +103,21 @@ invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To wait until the managed instance group \f5\fIinstance\-group\-1\fR\fR is
+stable, run:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed wait\-until \e
+    \-\-stable instance\-group\-1
+.RE
 
 
 
@@ -113,9 +126,10 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud compute instance\-groups managed wait\-until
 $ gcloud beta compute instance\-groups managed wait\-until
 .RE
 

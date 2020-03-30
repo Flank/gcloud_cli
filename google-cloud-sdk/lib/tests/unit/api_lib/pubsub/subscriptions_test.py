@@ -64,6 +64,8 @@ class SubscriptionsTest(base.CloudPubsubTestBase):
         enableMessageOrdering=True,
         deadLetterPolicy=self.msgs.DeadLetterPolicy(
             deadLetterTopic='topic2', maxDeliveryAttempts=5),
+        retryPolicy=self.msgs.RetryPolicy(
+            minimumBackoff='20s', maximumBackoff='500s'),
         labels=labels)
     self.subscriptions_service.Create.Expect(subscription, subscription)
     result = self.subscriptions_client.Create(
@@ -73,7 +75,9 @@ class SubscriptionsTest(base.CloudPubsubTestBase):
         labels=labels,
         enable_message_ordering=True,
         dead_letter_topic='topic2',
-        max_delivery_attempts=5)
+        max_delivery_attempts=5,
+        min_retry_delay='20s',
+        max_retry_delay='500s')
     self.assertEqual(result, subscription)
 
   def testDelete(self):
@@ -238,6 +242,20 @@ class SubscriptionsTest(base.CloudPubsubTestBase):
             name=sub_ref.RelativeName()), subscription)
     result = self.subscriptions_client.Patch(
         sub_ref, clear_dead_letter_policy=True)
+    self.assertEqual(result, subscription)
+
+  def testPatch_ClearRetryPolicy(self):
+    sub_ref = util.ParseSubscription('sub1', self.Project())
+    args = MockArgs()
+    args.push_endpoint = 'endpoint'
+    subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(), retryPolicy=None)
+    self.subscriptions_service.Patch.Expect(
+        self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+            updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+                subscription=subscription, updateMask=('retryPolicy')),
+            name=sub_ref.RelativeName()), subscription)
+    result = self.subscriptions_client.Patch(sub_ref, clear_retry_policy=True)
     self.assertEqual(result, subscription)
 
 

@@ -97,21 +97,22 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To assign an public, externally accessible IP to a virtual machine named
     example-instance in zone us-central1-a, run:
 
         $ gcloud compute instances add-access-config example-instance \
-            --zone us-central1-a
+            --zone=us-central1-a
 
     To assign the specific, reserved public IP address 123.456.789.123 to the
     virtual machine, run:
 
         $ gcloud compute instances add-access-config example-instance \
-            --zone us-central1-a --address=123.456.789.123
+            --zone=us-central1-a --address=123.456.789.123
 
 NOTES
     These variants are also available:

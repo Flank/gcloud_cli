@@ -11,7 +11,7 @@ gcloud alpha access\-context\-manager perimeters replace\-all \- replace all exi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha access\-context\-manager perimeters replace\-all\fR [\fIPOLICY\fR] \fB\-\-source\-file\fR=\fISOURCE_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha access\-context\-manager perimeters replace\-all\fR [\fIPOLICY\fR] \fB\-\-source\-file\fR=\fISOURCE_FILE\fR [\fB\-\-etag\fR=\fIETAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -19,6 +19,25 @@ gcloud alpha access\-context\-manager perimeters replace\-all \- replace all exi
 
 \fB(ALPHA)\fR Replace all existing service perimeter in specified access policy
 with service perimeters specified in a file.
+
+
+.SH "EXAMPLES"
+
+.RS 2m
+To replace all perimeters within a policy, using etag:
+$ gcloud alpha access\-context\-manager perimeters replace\-all \e
+    my\-policy\-number \e
+    \-\-source\-file=path\-to\-file\-containing\-all\-replacement\-service\-pe\e
+rimeters.yaml \-\-etag=optional\-latest\-etag\-of\-policy
+.RE
+
+.RS 2m
+To replace all perimeters within a policy, without using etag:
+$ gcloud alpha access\-context\-manager perimeters replace\-all \e
+    my\-policy\-number \e
+    \-\-source\-file=path\-to\-file\-containing\-all\-replacement\-service\-pe\e
+rimeters.yaml
+.RE
 
 
 
@@ -61,14 +80,26 @@ example:
     \- projects/0123456789
     accessLevels:
     \- accessPolicies/my_policy/accessLevels/my_level
-    unrestrictedServices:
-    \- "*"
     restrictedServices:
     \- storage.googleapis.com
 .RE
 
-For more information, see:
-https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1beta/accessPolicies.servicePerimeters
+For more information about the alpha version, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+For more information about the beta version, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1/accessPolicies.servicePerimeters
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-etag\fR=\fIETAG\fR
+An etag which specifies the version of the Access Policy. Only etags that
+represent the latest version of the Access Policy will be accepted.
 
 
 .RE
@@ -79,14 +110,15 @@ https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1beta/acc
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "API REFERENCE"
 
-This command uses the \fBaccesscontextmanager/v1beta\fR API. The full
+This command uses the \fBaccesscontextmanager/v1alpha\fR API. The full
 documentation for this API can be found at:
 https://cloud.google.com/access\-context\-manager/docs/reference/rest/
 
@@ -97,5 +129,9 @@ https://cloud.google.com/access\-context\-manager/docs/reference/rest/
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta access\-context\-manager perimeters replace\-all
+.RE
 

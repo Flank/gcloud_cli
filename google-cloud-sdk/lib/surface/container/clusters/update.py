@@ -69,7 +69,7 @@ def _AddCommonArgs(parser):
 
 def _AddMutuallyExclusiveArgs(mutex_group, release_track):
   """Add all arguments that need to be mutually exclusive from each other."""
-  if release_track in [base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA]:
+  if release_track == base.ReleaseTrack.ALPHA:
     mutex_group.add_argument(
         '--update-addons',
         type=arg_parsers.ArgDict(
@@ -81,6 +81,10 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
                 api_adapter.ISTIO: _ParseAddonDisabled,
                 api_adapter.CLOUDRUN: _ParseAddonDisabled,
                 api_adapter.APPLICATIONMANAGER: _ParseAddonDisabled,
+                api_adapter.CLOUDBUILD: _ParseAddonDisabled,
+                api_adapter.NODELOCALDNS: _ParseAddonDisabled,
+                api_adapter.GCEPDCSIDRIVER: _ParseAddonDisabled,
+                api_adapter.CONFIGCONNECTOR: _ParseAddonDisabled,
             }),
         dest='disable_addons',
         metavar='ADDON=ENABLED|DISABLED',
@@ -91,7 +95,11 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
 {istio}=ENABLED|DISABLED
 {application_manager}=ENABLED|DISABLED
 {network_policy}=ENABLED|DISABLED
-{cloudrun}=ENABLED|DISABLED""".format(
+{cloudrun}=ENABLED|DISABLED
+{cloudbuild}=ENABLED|DISABLED
+{configconnector}=ENABLED|DISABLED
+{nodelocaldns}=ENABLED|DISABLED
+{gcepdcsidriver}=ENABLED|DISABLED""".format(
     hpa=api_adapter.HPA,
     ingress=api_adapter.INGRESS,
     dashboard=api_adapter.DASHBOARD,
@@ -99,6 +107,48 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
     istio=api_adapter.ISTIO,
     application_manager=api_adapter.APPLICATIONMANAGER,
     cloudrun=api_adapter.CLOUDRUN,
+    cloudbuild=api_adapter.CLOUDBUILD,
+    configconnector=api_adapter.CONFIGCONNECTOR,
+    nodelocaldns=api_adapter.NODELOCALDNS,
+    gcepdcsidriver=api_adapter.GCEPDCSIDRIVER,
+    ))
+
+  elif release_track == base.ReleaseTrack.BETA:
+    mutex_group.add_argument(
+        '--update-addons',
+        type=arg_parsers.ArgDict(
+            spec={
+                api_adapter.INGRESS: _ParseAddonDisabled,
+                api_adapter.HPA: _ParseAddonDisabled,
+                api_adapter.DASHBOARD: _ParseAddonDisabled,
+                api_adapter.NETWORK_POLICY: _ParseAddonDisabled,
+                api_adapter.ISTIO: _ParseAddonDisabled,
+                api_adapter.CLOUDRUN: _ParseAddonDisabled,
+                api_adapter.APPLICATIONMANAGER: _ParseAddonDisabled,
+                api_adapter.NODELOCALDNS: _ParseAddonDisabled,
+                api_adapter.GCEPDCSIDRIVER: _ParseAddonDisabled,
+            }),
+        dest='disable_addons',
+        metavar='ADDON=ENABLED|DISABLED',
+        help="""Cluster addons to enable or disable. Options are
+{hpa}=ENABLED|DISABLED
+{ingress}=ENABLED|DISABLED
+{dashboard}=ENABLED|DISABLED
+{istio}=ENABLED|DISABLED
+{application_manager}=ENABLED|DISABLED
+{network_policy}=ENABLED|DISABLED
+{cloudrun}=ENABLED|DISABLED
+{nodelocaldns}=ENABLED|DISABLED
+{gcepdcsidriver}=ENABLED|DISABLED""".format(
+    hpa=api_adapter.HPA,
+    ingress=api_adapter.INGRESS,
+    dashboard=api_adapter.DASHBOARD,
+    network_policy=api_adapter.NETWORK_POLICY,
+    istio=api_adapter.ISTIO,
+    application_manager=api_adapter.APPLICATIONMANAGER,
+    cloudrun=api_adapter.CLOUDRUN,
+    nodelocaldns=api_adapter.NODELOCALDNS,
+    gcepdcsidriver=api_adapter.GCEPDCSIDRIVER,
     ))
 
   else:
@@ -110,6 +160,7 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
                 api_adapter.HPA: _ParseAddonDisabled,
                 api_adapter.DASHBOARD: _ParseAddonDisabled,
                 api_adapter.NETWORK_POLICY: _ParseAddonDisabled,
+                api_adapter.CLOUDRUN: _ParseAddonDisabled,
             }),
         dest='disable_addons',
         metavar='ADDON=ENABLED|DISABLED',
@@ -117,11 +168,13 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
 {hpa}=ENABLED|DISABLED
 {ingress}=ENABLED|DISABLED
 {dashboard}=ENABLED|DISABLED
-{network_policy}=ENABLED|DISABLED""".format(
+{network_policy}=ENABLED|DISABLED
+{cloudrun}=ENABLED|DISABLED""".format(
     hpa=api_adapter.HPA,
     ingress=api_adapter.INGRESS,
     dashboard=api_adapter.DASHBOARD,
     network_policy=api_adapter.NETWORK_POLICY,
+    cloudrun=api_adapter.CLOUDRUN,
     ))
 
   mutex_group.add_argument(
@@ -175,6 +228,17 @@ to the flag. For example:
 class Update(base.UpdateCommand):
   """Update cluster settings for an existing container cluster."""
 
+  detailed_help = {
+      'DESCRIPTION':
+          '{description}',
+      'EXAMPLES':
+          """\
+          To enable autoscaling for an existing cluster, run:
+
+            $ {command} sample-cluster --enable-autoscaling
+          """,
+  }
+
   @staticmethod
   def Args(parser):
     """Register flags for this command.
@@ -206,13 +270,15 @@ class Update(base.UpdateCommand):
     flags.AddEnableBinAuthzFlag(group)
     flags.AddEnableStackdriverKubernetesFlag(group)
     flags.AddDailyMaintenanceWindowFlag(group, add_unset_text=True)
-    flags.AddRecurringMaintenanceWindowFlags(
-        group, hidden=False, is_update=True)
+    flags.AddRecurringMaintenanceWindowFlags(group, is_update=True)
     flags.AddResourceUsageExportFlags(group, is_update=True)
+    flags.AddWorkloadIdentityFlags(group)
+    flags.AddWorkloadIdentityUpdateFlags(group)
     flags.AddDatabaseEncryptionFlag(group)
     flags.AddDisableDatabaseEncryptionFlag(group)
     flags.AddVerticalPodAutoscalingFlag(group)
-    flags.AddAutoprovisioningFlags(group)
+    flags.AddAutoprovisioningFlags(group, ga=True)
+    flags.AddEnableShieldedNodesFlags(group)
 
   def ParseUpdateOptions(self, args, locations):
     opts = container_command_util.ParseUpdateOptionsBase(args, locations)
@@ -223,6 +289,7 @@ class Update(base.UpdateCommand):
     opts.enable_resource_consumption_metering = \
         args.enable_resource_consumption_metering
     opts.enable_intra_node_visibility = args.enable_intra_node_visibility
+    opts.enable_shielded_nodes = args.enable_shielded_nodes
     return opts
 
   def Run(self, args):
@@ -437,7 +504,7 @@ to completion."""
 
     if not args.async_:
       adapter.WaitForOperation(
-          op_ref, 'Updating {0}'.format(cluster_ref.clusterId), timeout_s=1800)
+          op_ref, 'Updating {0}'.format(cluster_ref.clusterId), timeout_s=3600)
 
       log.UpdatedResource(cluster_ref)
       cluster_url = util.GenerateClusterUrl(cluster_ref)
@@ -478,6 +545,7 @@ class UpdateBeta(Update):
     flags.AddLoggingServiceFlag(group_logging_monitoring)
     flags.AddMonitoringServiceFlag(group_logging_monitoring)
     flags.AddEnableStackdriverKubernetesFlag(group)
+    flags.AddEnableLoggingMonitoringSystemOnlyFlag(group)
     flags.AddMasterAuthorizedNetworksFlags(
         parser, enable_group_for_update=group)
     flags.AddEnableLegacyAuthorizationFlag(group)
@@ -489,21 +557,23 @@ class UpdateBeta(Update):
     flags.AddRemoveLabelsFlag(group)
     flags.AddNetworkPolicyFlags(group)
     flags.AddDailyMaintenanceWindowFlag(group, add_unset_text=True)
-    flags.AddRecurringMaintenanceWindowFlags(
-        group, hidden=False, is_update=True)
+    flags.AddRecurringMaintenanceWindowFlags(group, is_update=True)
     flags.AddPodSecurityPolicyFlag(group)
     flags.AddEnableBinAuthzFlag(group)
     flags.AddAutoprovisioningFlags(group)
+    flags.AddAutoscalingProfilesFlag(group)
     flags.AddVerticalPodAutoscalingFlag(group)
     flags.AddResourceUsageExportFlags(group, is_update=True)
     flags.AddIstioConfigFlag(parser)
     flags.AddEnableIntraNodeVisibilityFlag(group)
-    flags.AddWorkloadIdentityFlags(group)
+    flags.AddWorkloadIdentityFlags(group, use_workload_pool=False)
     flags.AddWorkloadIdentityUpdateFlags(group)
-    flags.AddEnableShieldedNodesFlags(group)
     flags.AddDatabaseEncryptionFlag(group)
     flags.AddDisableDatabaseEncryptionFlag(group)
-    flags.AddReleaseChannelFlag(group, is_update=True)
+    flags.AddReleaseChannelFlag(group, is_update=True, hidden=False)
+    flags.AddEnableShieldedNodesFlags(group)
+    flags.AddTpuFlags(group, enable_tpu_service_networking=True)
+    flags.AddMasterGlobalAccessFlag(group)
 
   def ParseUpdateOptions(self, args, locations):
     opts = container_command_util.ParseUpdateOptionsBase(args, locations)
@@ -516,14 +586,39 @@ class UpdateBeta(Update):
     opts.enable_network_egress_metering = args.enable_network_egress_metering
     opts.enable_resource_consumption_metering = args.enable_resource_consumption_metering
     flags.ValidateIstioConfigUpdateArgs(args.istio_config, args.disable_addons)
+    if args.disable_addons and api_adapter.NODELOCALDNS in args.disable_addons:
+      # NodeLocalDNS is being enabled or disabled
+      console_io.PromptContinue(
+          message='Enabling/Disabling NodeLocal DNSCache causes a re-creation '
+          'of all cluster nodes at versions 1.15 or above. '
+          'This operation is long-running and will block other '
+          'operations on the cluster (including delete) until it has run '
+          'to completion.',
+          cancel_on_no=True)
+    if args.disable_addons and api_adapter.GCEPDCSIDRIVER in args.disable_addons:
+      pdcsi_disabled = args.disable_addons[api_adapter.GCEPDCSIDRIVER]
+      if pdcsi_disabled:
+        # GCE Persistent Disk CSI Driver is being disabled
+        console_io.PromptContinue(
+            message='If the GCE Persistent Disk CSI Driver is disabled, then any '
+            'pods currently using PersistentVolumes owned by the driver '
+            'will fail to terminate. Any new pods that try to use those '
+            'PersistentVolumes will also fail to start.',
+            cancel_on_no=True)
+
     opts.enable_stackdriver_kubernetes = args.enable_stackdriver_kubernetes
+    opts.enable_logging_monitoring_system_only = args.enable_logging_monitoring_system_only
     opts.release_channel = args.release_channel
+    opts.autoscaling_profile = args.autoscaling_profile
 
     # Top-level update options are automatically forced to be
     # mutually-exclusive, so we don't need special handling for these two.
     opts.identity_namespace = args.identity_namespace
-    opts.disable_workload_identity = args.disable_workload_identity
     opts.enable_shielded_nodes = args.enable_shielded_nodes
+    opts.enable_tpu = args.enable_tpu
+    opts.tpu_ipv4_cidr = args.tpu_ipv4_cidr
+    opts.enable_tpu_service_networking = args.enable_tpu_service_networking
+    opts.enable_master_global_access = args.enable_master_global_access
 
     return opts
 
@@ -545,6 +640,7 @@ class UpdateAlpha(Update):
     flags.AddLoggingServiceFlag(group_logging_monitoring)
     flags.AddMonitoringServiceFlag(group_logging_monitoring)
     flags.AddEnableStackdriverKubernetesFlag(group)
+    flags.AddEnableLoggingMonitoringSystemOnlyFlag(group)
     flags.AddMasterAuthorizedNetworksFlags(
         parser, enable_group_for_update=group)
     flags.AddEnableLegacyAuthorizationFlag(group)
@@ -556,10 +652,9 @@ class UpdateAlpha(Update):
     flags.AddRemoveLabelsFlag(group)
     flags.AddNetworkPolicyFlags(group)
     flags.AddAutoprovisioningFlags(group, hidden=False)
-    flags.AddAutoscalingProfilesFlag(group, hidden=True)
+    flags.AddAutoscalingProfilesFlag(group)
     flags.AddDailyMaintenanceWindowFlag(group, add_unset_text=True)
-    flags.AddRecurringMaintenanceWindowFlags(
-        group, hidden=False, is_update=True)
+    flags.AddRecurringMaintenanceWindowFlags(group, is_update=True)
     flags.AddPodSecurityPolicyFlag(group)
     flags.AddEnableBinAuthzFlag(group)
     flags.AddResourceUsageExportFlags(group, is_update=True)
@@ -567,15 +662,16 @@ class UpdateAlpha(Update):
     flags.AddSecurityProfileForUpdateFlag(group)
     flags.AddIstioConfigFlag(parser)
     flags.AddEnableIntraNodeVisibilityFlag(group)
-    flags.AddPeeringRouteSharingFlag(group)
-    flags.AddWorkloadIdentityFlags(group)
+    flags.AddWorkloadIdentityFlags(group, use_workload_pool=False)
     flags.AddWorkloadIdentityUpdateFlags(group)
-    flags.AddEnableShieldedNodesFlags(group)
     flags.AddDisableDefaultSnatFlag(group, for_cluster_create=False)
     flags.AddDatabaseEncryptionFlag(group)
     flags.AddDisableDatabaseEncryptionFlag(group)
     flags.AddCostManagementConfigFlag(group, is_update=True)
-    flags.AddReleaseChannelFlag(group, is_update=True)
+    flags.AddReleaseChannelFlag(group, is_update=True, hidden=False)
+    flags.AddEnableShieldedNodesFlags(group)
+    flags.AddTpuFlags(group, enable_tpu_service_networking=True)
+    flags.AddMasterGlobalAccessFlag(group)
 
   def ParseUpdateOptions(self, args, locations):
     opts = container_command_util.ParseUpdateOptionsBase(args, locations)
@@ -590,16 +686,38 @@ class UpdateAlpha(Update):
     opts.enable_network_egress_metering = args.enable_network_egress_metering
     opts.enable_resource_consumption_metering = args.enable_resource_consumption_metering
     flags.ValidateIstioConfigUpdateArgs(args.istio_config, args.disable_addons)
-    opts.enable_peering_route_sharing = args.enable_peering_route_sharing
+    if args.disable_addons and api_adapter.NODELOCALDNS in args.disable_addons:
+      # NodeLocalDNS is being enabled or disabled
+      console_io.PromptContinue(
+          message='Enabling/Disabling NodeLocal DNSCache causes a re-creation '
+          'of all cluster nodes at versions 1.15 or above. '
+          'This operation is long-running and will block other '
+          'operations on the cluster (including delete) until it has run '
+          'to completion.',
+          cancel_on_no=True)
+    if args.disable_addons and api_adapter.GCEPDCSIDRIVER in args.disable_addons:
+      pdcsi_disabled = args.disable_addons[api_adapter.GCEPDCSIDRIVER]
+      if pdcsi_disabled:
+        # GCE Persistent Disk CSI Driver is being disabled
+        console_io.PromptContinue(
+            message='If the GCE Persistent Disk CSI Driver is disabled, then any '
+            'pods currently using PersistentVolumes owned by the driver '
+            'will fail to terminate. Any new pods that try to use those '
+            'PersistentVolumes will also fail to start.',
+            cancel_on_no=True)
     opts.enable_stackdriver_kubernetes = args.enable_stackdriver_kubernetes
+    opts.enable_logging_monitoring_system_only = args.enable_logging_monitoring_system_only
     opts.release_channel = args.release_channel
+    opts.enable_tpu = args.enable_tpu
+    opts.tpu_ipv4_cidr = args.tpu_ipv4_cidr
+    opts.enable_tpu_service_networking = args.enable_tpu_service_networking
 
     # Top-level update options are automatically forced to be
     # mutually-exclusive, so we don't need special handling for these two.
     opts.identity_namespace = args.identity_namespace
-    opts.disable_workload_identity = args.disable_workload_identity
     opts.enable_shielded_nodes = args.enable_shielded_nodes
     opts.disable_default_snat = args.disable_default_snat
     opts.enable_cost_management = args.enable_cost_management
+    opts.enable_master_global_access = args.enable_master_global_access
 
     return opts

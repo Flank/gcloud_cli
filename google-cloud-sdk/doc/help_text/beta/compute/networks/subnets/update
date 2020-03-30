@@ -10,6 +10,7 @@ SYNOPSIS
         [--logging-metadata=LOGGING_METADATA] [--region=REGION]
         [--add-secondary-ranges=PROPERTY=VALUE,[...] | --[no-]enable-flow-logs
           | --[no-]enable-private-ip-google-access
+          | --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
           | --remove-secondary-ranges=PROPERTY=VALUE,[...] | --role=ROLE]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -95,6 +96,11 @@ FLAGS
             --enable-private-ip-google-access to enable and
             --no-enable-private-ip-google-access to disable.
 
+         --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
+            The private IPv6 google access type for the VMs in this subnet.
+            PRIVATE_IPV6_GOOGLE_ACCESS_TYPE must be one of: disable,
+            enable-bidirectional-access, enable-outbound-vm-access.
+
          --remove-secondary-ranges=PROPERTY=VALUE,[...]
             Removes secondary ranges from the subnetwork.
 
@@ -119,8 +125,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

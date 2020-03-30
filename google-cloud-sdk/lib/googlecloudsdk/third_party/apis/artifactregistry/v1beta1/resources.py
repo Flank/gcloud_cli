@@ -18,7 +18,7 @@ import enum
 
 
 BASE_URL = 'https://artifactregistry.googleapis.com/v1beta1/'
-DOCS_URL = 'https://cloud.google.com/artifact-registry'
+DOCS_URL = 'https://cloud.google.com/artifacts/docs/'
 
 
 class Collections(enum.Enum):
@@ -33,9 +33,12 @@ class Collections(enum.Enum):
   )
   PROJECTS_LOCATIONS = (
       'projects.locations',
-      'projects/{projectsId}/locations/{locationsId}',
-      {},
-      [u'projectsId', u'locationsId'],
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}',
+      },
+      [u'name'],
       True
   )
   PROJECTS_LOCATIONS_OPERATIONS = (
@@ -51,10 +54,13 @@ class Collections(enum.Enum):
   )
   PROJECTS_LOCATIONS_REPOSITORIES = (
       'projects.locations.repositories',
-      'projects/{projectsId}/locations/{locationsId}/repositories/'
-      '{repositoriesId}',
-      {},
-      [u'projectsId', u'locationsId', u'repositoriesId'],
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/repositories/'
+              '{repositoriesId}',
+      },
+      [u'name'],
       True
   )
   PROJECTS_LOCATIONS_REPOSITORIES_FILES = (
@@ -97,24 +103,6 @@ class Collections(enum.Enum):
           '':
               'projects/{projectsId}/locations/{locationsId}/repositories/'
               '{repositoriesId}/packages/{packagesId}/versions/{versionsId}',
-      },
-      [u'name'],
-      True
-  )
-  PROJECTS_REPOSITORIES = (
-      'projects.repositories',
-      'projects/{projectsId}/repositories/{repositoriesId}',
-      {},
-      [u'projectsId', u'repositoriesId'],
-      True
-  )
-  PROJECTS_REPOSITORIES_LOCATIONS = (
-      'projects.repositories.locations',
-      '{+name}',
-      {
-          '':
-              'projects/{projectsId}/repositories/{repositoriesId}/locations/'
-              '{locationsId}',
       },
       [u'name'],
       True

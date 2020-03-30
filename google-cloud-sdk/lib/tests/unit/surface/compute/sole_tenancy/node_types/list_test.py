@@ -41,10 +41,9 @@ class NodeTypesListTest(test_base.BaseTest,
     self.list_json.side_effect = iter([test_resources.NODE_TYPES])
     result = list(self.Run('compute sole-tenancy node-types list'))
     self.list_json.assert_called_once_with(
-        requests=[(self.compute.nodeTypes,
-                   'AggregatedList',
+        requests=[(self.compute.nodeTypes, 'AggregatedList',
                    self.messages.ComputeNodeTypesAggregatedListRequest(
-                       project='my-project'))],
+                       project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -52,10 +51,11 @@ class NodeTypesListTest(test_base.BaseTest,
     self.assertEqual(test_resources.NODE_TYPES, result)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME           ZONE   CPUs MEMORY_MB LOCAL_SSD_GB DEPRECATED
-            iAPX-286       zone-1 1    256       0            OBSOLETE
-            n1-node-96-624 zone-1 96   416000    46
-            """), normalize_space=True)
+            NAME           ZONE   CPUs MEMORY_MB DEPRECATED
+            iAPX-286       zone-1 1    256       OBSOLETE
+            n1-node-96-624 zone-1 96   416000
+            """),
+        normalize_space=True)
 
   def testNodeTypesCompleter(self):
     self.list_json.side_effect = iter([test_resources.NODE_TYPES])
@@ -78,10 +78,9 @@ class NodeTypesListTest(test_base.BaseTest,
     )
 
     self.list_json.assert_called_once_with(
-        requests=[(self.compute.nodeTypes,
-                   'AggregatedList',
+        requests=[(self.compute.nodeTypes, 'AggregatedList',
                    self.messages.ComputeNodeTypesAggregatedListRequest(
-                       project='my-project'))],
+                       project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])

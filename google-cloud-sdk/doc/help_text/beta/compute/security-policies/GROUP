@@ -14,8 +14,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -44,6 +45,9 @@ COMMANDS
 
      list
         (BETA) List Google Compute Engine security policies.
+
+     list-preconfigured-expression-sets
+        (BETA) List all available preconfigured expression sets.
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -29,7 +29,7 @@ class BucketsCreateTest(base.LoggingTestBase):
 
   def testCreateSuccess(self):
     expected_bucket = self.msgs.LogBucket(
-        retentionDays=2, displayName='display_name', description='description')
+        retentionDays=2, description='description')
     self.mock_client_v2.projects_locations_buckets.Create.Expect(
         self.msgs.LoggingProjectsLocationsBucketsCreateRequest(
             bucketId='pierogie',
@@ -38,7 +38,7 @@ class BucketsCreateTest(base.LoggingTestBase):
         expected_bucket)
     self.RunLogging(
         'buckets create pierogie --location=global --retention-days=2 '
-        '--display-name=display_name --description=description',
+        '--description=description',
         calliope_base.ReleaseTrack.ALPHA)
 
   def testCreateNoPerms(self):

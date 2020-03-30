@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute sole-tenancy node-groups remove-iam-policy-binding -
-        remove IAM policy binding from a Google Compute Engine node group
+        remove IAM policy binding from a Compute Engine node group
 
 SYNOPSIS
     gcloud beta compute sole-tenancy node-groups remove-iam-policy-binding
@@ -8,8 +8,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Remove an IAM policy binding from a Google Compute Engine node
-    group.
+    (BETA) Remove an IAM policy binding from a Compute Engine node group.
 
 POSITIONAL ARGUMENTS
      Node group resource - The node group for which to remove IAM policy
@@ -50,8 +49,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the compute/beta API. The full documentation for this API

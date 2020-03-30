@@ -76,32 +76,32 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To create a new deployment from a top-level yaml file, run:
+    To create a new deployment from a top-level YAML file, run:
 
         $ gcloud alpha deployment-manager deployments create my-deployment \
-            --config config.yaml --description "My deployment"
+            --config=config.yaml --description="My deployment"
 
     To create a new deployment from a top-level template file, run:
 
-        $ gcloud deployment-manager deployments create my-deployment       \
-                  --template template.{jinja|py}             \
-            --properties "string-key:'string-value',integer-key:12345"
+        $ gcloud deployment-manager deployments create my-deployment   \
+            --template=template.{jinja|py}   \
+            --properties="string-key:'string-value',integer-key:12345"
 
     To create a new deployment directly from a composite type, run:
 
-        $ gcloud deployment-manager deployments create my-deployment       \
-                  --composite-type <project-id>/composite:<type-name>      \
-                   \
-            --properties "string-key:'string-value',integer-key:12345"
+        $ gcloud deployment-manager deployments create my-deployment   \
+            --composite-type=<project-id>/composite:<type-name>   \
+            --properties="string-key:'string-value',integer-key:12345"
 
     To preview a deployment without actually creating resources, run:
 
         $ gcloud alpha deployment-manager deployments create \
-            my-new-deployment --config config.yaml --preview
+            my-new-deployment --config=config.yaml --preview
 
     To instantiate a deployment that has been previewed, issue an update
     command for that deployment without specifying a config file.

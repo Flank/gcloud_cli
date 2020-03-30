@@ -11,7 +11,7 @@ gcloud beta access\-context\-manager levels update \-
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta access\-context\-manager levels update\fR (\fILEVEL\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) [\fB\-\-basic\-level\-spec\fR=\fIBASIC_LEVEL_SPEC\fR] [\fB\-\-combine\-function\fR=\fICOMBINE_FUNCTION\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-title\fR=\fITITLE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta access\-context\-manager levels update\fR (\fILEVEL\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-title\fR=\fITITLE\fR] [\fB\-\-custom\-level\-spec\fR=\fICUSTOM_LEVEL_SPEC\fR\ |\ \fB\-\-basic\-level\-spec\fR=\fIBASIC_LEVEL_SPEC\fR\ \fB\-\-combine\-function\fR=\fICOMBINE_FUNCTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -48,11 +48,46 @@ The ID of the access policy.
 
 .RS 2m
 .TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Long\-form description of access level.
+
+.TP 2m
+\fB\-\-title\fR=\fITITLE\fR
+Short human\-readable title of the access level.
+
+.TP 2m
+
+Level specification. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+
+Custom level specification.
+
+.RS 2m
+.TP 2m
+\fB\-\-custom\-level\-spec\fR=\fICUSTOM_LEVEL_SPEC\fR
+Path to a file representing an expression for an access level.
+
+The expression is in the Common Expression Langague (CEL) format.For example:
+
+.RS 2m
+ expression: "origin.region_code in ['US', 'CA']"
+.RE
+
+.RE
+.sp
+.TP 2m
+
+Basic level specification.
+
+.RS 2m
+.TP 2m
 \fB\-\-basic\-level\-spec\fR=\fIBASIC_LEVEL_SPEC\fR
 Path to a file containing a list of basic access level conditions.
 
-An access level condition file is a YAML\-formatted list of conditions, which
-are YAML objects representing a Condition as described in the API reference. For
+An access level condition file is a YAML\-formatted list of conditions,which are
+YAML objects representing a Condition as described in the API reference. For
 example:
 
 .RS 2m
@@ -68,15 +103,9 @@ example:
 For a basic level, determines how conditions are combined.
 \fICOMBINE_FUNCTION\fR must be one of: \fBand\fR, \fBor\fR.
 
-.TP 2m
-\fB\-\-description\fR=\fIDESCRIPTION\fR
-Long\-form description of access level.
 
-.TP 2m
-\fB\-\-title\fR=\fITITLE\fR
-Short human\-readable title of the access level.
-
-
+.RE
+.RE
 .RE
 .sp
 
@@ -85,8 +114,9 @@ Short human\-readable title of the access level.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

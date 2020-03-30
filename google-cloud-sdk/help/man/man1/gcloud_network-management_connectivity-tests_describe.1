@@ -1,0 +1,83 @@
+
+.TH "GCLOUD_NETWORK\-MANAGEMENT_CONNECTIVITY\-TESTS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud network\-management connectivity\-tests describe \- describe a connectivity test
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud network\-management connectivity\-tests describe\fR \fICONNECTIVITY_TEST\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Show details of a connectivity test.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Connectivity test resource \- Name of the connectivity test you want to
+describe. This represents a Cloud resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [connectivity_test] on the command line with a
+fully specified name; set the property [core/project]; provide the argument
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fICONNECTIVITY_TEST\fR
+ID of the connectivity test or fully qualified identifier for the connectivity
+test.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBnetworkmanagement/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/
+
+
+
+.SH "EXAMPLES"
+
+The following command prints of a connectivity test with the name
+\f5my\-test\fR.
+
+.RS 2m
+$ gcloud network\-management connectivity\-tests describe my\-test
+.RE
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta network\-management connectivity\-tests describe
+.RE
+

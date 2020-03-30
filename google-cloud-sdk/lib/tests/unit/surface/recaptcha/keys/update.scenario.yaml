@@ -1,0 +1,559 @@
+title: cloud iot describe test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      recaptcha keys update mytestkey --labels=foo=bar --display-name TestKey --ios --bundle-ids=com.test.bundle.id
+  - stderr: |
+      Updated key [mytestkey].
+  - stdout: |
+      json:
+        displayName: TestKey
+        iosSettings:
+          allowedBundleIds:
+          - com.test.bundle.id
+        labels:
+          foo: bar
+- execute:
+  - command: |
+      recaptcha keys update mytestkey --display-name TestKey --web --domains=test.com.mx  --security-preference=security
+  - stderr: |
+      Updated key [mytestkey].
+  - stdout: |
+      json:
+        displayName: mytestkey
+        webSettings:
+          allowedDomains:
+          - test.com.mx
+          challengeSecurityPreference: SECURITY
+          integrationType: SCORE
+- execute:
+  - command: |
+      recaptcha keys update mytestkey --display-name TestKey --web --domains=test.com.mx  --security-preference=balance
+  - stderr: |
+      Updated key [mytestkey].
+  - stdout: |
+      json:
+        displayName: mytestkey
+        webSettings:
+          allowedDomains:
+          - test.com.mx
+          challengeSecurityPreference: BALANCE
+          integrationType: SCORE
+- execute:
+  - command: |
+      recaptcha keys update mytestkey --display-name TestKey --web --domains=test.com.mx  --security-preference=usability
+  - stderr: |
+      Updated key [mytestkey].
+  - stdout: |
+      json:
+        displayName: mytestkey
+        webSettings:
+          allowedDomains:
+          - test.com.mx
+          challengeSecurityPreference: USABILITY
+          integrationType: SCORE
+- execute:
+  - command: |
+      recaptcha keys update mytestkey --display-name TestKey --android --package-names=test.package.google.com.mx
+  - stderr: |
+      Updated key [mytestkey].
+  - stdout: |
+      json:
+        androidSettings:
+          allowedPackageNames:
+          - com.test.package.google.com.mx
+        displayName: TestKey
+- execute:
+  - command: |
+      recaptcha keys update mytestkey --display-name UpdatedTestKey
+  - stderr: |
+      Updated key [mytestkey].
+  - stdout: |
+      json:
+        androidSettings:
+          allowedPackageNames:
+          - com.test.package.google.com.mx
+        displayName: UpdatedTestKey
+- execute:
+  - command: |
+      recaptcha keys update mytestkey --web --security-preference security
+  - stderr: |
+      Updated key [mytestkey].
+  - stdout: |
+      json:
+        displayName: mytestkey
+        webSettings:
+          allowedDomains:
+          - test.com.mx
+          challengeSecurityPreference: SECURITY
+          integrationType: SCORE
+- execute:
+  - command: |
+      recaptcha keys update mytestkey --labels=foo=bar --display-name=testkey --web --allow-amp-traffic
+  - stderr: |
+      Updated key [mytestkey].
+  - stdout: |
+      json:
+        displayName: testkey
+        labels:
+          foo: bar
+        webSettings:
+          allowAmpTraffic: true
+actions:
+- execute_command:
+    command: |
+      recaptcha keys update mytestkey --labels=foo=bar --display-name TestKey --ios --bundle-ids=com.test.bundle.id
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '123456789'
+            projectId: fake-project
+            lifecycleState: ACTIVE
+            name: Fake Project
+            labels:
+              service-account-downloaded-notification-opt-out: 'true'
+            createTime: '2014-09-30T14:51:18.935Z'
+            parent:
+              type: folder
+              id: '396521612403'
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/123456789/keys/mytestkey?alt=json&updateMask=displayName%2CiosSettings.allowedBundleIds%2Clabels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              displayName: TestKey
+              iosSettings:
+                allowedBundleIds:
+                - com.test.bundle.id
+              labels:
+                foo: bar
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              displayName: TestKey
+              iosSettings:
+                allowedBundleIds:
+                - com.test.bundle.id
+              labels:
+                foo: bar
+    - expect_stderr: |
+        Updated key [mytestkey].
+    - expect_stdout: |
+        json:
+          displayName: TestKey
+          iosSettings:
+            allowedBundleIds:
+            - com.test.bundle.id
+          labels:
+            foo: bar
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys update mytestkey --display-name TestKey --web --domains=test.com.mx  --security-preference=security
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '123456789'
+            projectId: fake-project
+            lifecycleState: ACTIVE
+            name: Fake Project
+            labels:
+              service-account-downloaded-notification-opt-out: 'true'
+            createTime: '2014-09-30T14:51:18.935Z'
+            parent:
+              type: folder
+              id: '396521612403'
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/123456789/keys/mytestkey?alt=json&updateMask=displayName%2CwebSettings.allowedDomains%2CwebSettings.challengeSecurityPreference
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              displayName: TestKey
+              webSettings:
+                allowedDomains:
+                - test.com.mx
+                challengeSecurityPreference: SECURITY
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              displayName: mytestkey
+              webSettings:
+                allowedDomains:
+                - test.com.mx
+                integrationType: SCORE
+                challengeSecurityPreference: SECURITY
+    - expect_stderr: |
+        Updated key [mytestkey].
+    - expect_stdout: |
+        json:
+          displayName: mytestkey
+          webSettings:
+            allowedDomains:
+            - test.com.mx
+            challengeSecurityPreference: SECURITY
+            integrationType: SCORE
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys update mytestkey --display-name TestKey --web --domains=test.com.mx  --security-preference=balance
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '123456789'
+            projectId: fake-project
+            lifecycleState: ACTIVE
+            name: Fake Project
+            labels:
+              service-account-downloaded-notification-opt-out: 'true'
+            createTime: '2014-09-30T14:51:18.935Z'
+            parent:
+              type: folder
+              id: '396521612403'
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/123456789/keys/mytestkey?alt=json&updateMask=displayName%2CwebSettings.allowedDomains%2CwebSettings.challengeSecurityPreference
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              displayName: TestKey
+              webSettings:
+                allowedDomains:
+                - test.com.mx
+                challengeSecurityPreference: BALANCE
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              displayName: mytestkey
+              webSettings:
+                allowedDomains:
+                - test.com.mx
+                integrationType: SCORE
+                challengeSecurityPreference: BALANCE
+    - expect_stderr: |
+        Updated key [mytestkey].
+    - expect_stdout: |
+        json:
+          displayName: mytestkey
+          webSettings:
+            allowedDomains:
+            - test.com.mx
+            challengeSecurityPreference: BALANCE
+            integrationType: SCORE
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys update mytestkey --display-name TestKey --web --domains=test.com.mx  --security-preference=usability
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '123456789'
+            projectId: fake-project
+            lifecycleState: ACTIVE
+            name: Fake Project
+            labels:
+              service-account-downloaded-notification-opt-out: 'true'
+            createTime: '2014-09-30T14:51:18.935Z'
+            parent:
+              type: folder
+              id: '396521612403'
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/123456789/keys/mytestkey?alt=json&updateMask=displayName%2CwebSettings.allowedDomains%2CwebSettings.challengeSecurityPreference
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              displayName: TestKey
+              webSettings:
+                allowedDomains:
+                - test.com.mx
+                challengeSecurityPreference: USABILITY
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              displayName: mytestkey
+              webSettings:
+                allowedDomains:
+                - test.com.mx
+                integrationType: SCORE
+                challengeSecurityPreference: USABILITY
+    - expect_stderr: |
+        Updated key [mytestkey].
+    - expect_stdout: |
+        json:
+          displayName: mytestkey
+          webSettings:
+            allowedDomains:
+            - test.com.mx
+            challengeSecurityPreference: USABILITY
+            integrationType: SCORE
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys update mytestkey --display-name TestKey --android --package-names=test.package.google.com.mx
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '123456789'
+            projectId: fake-project
+            lifecycleState: ACTIVE
+            name: Fake Project
+            labels:
+              service-account-downloaded-notification-opt-out: 'true'
+            createTime: '2014-09-30T14:51:18.935Z'
+            parent:
+              type: folder
+              id: '396521612403'
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/123456789/keys/mytestkey?alt=json&updateMask=androidSettings.allowedPackageNames%2CdisplayName
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              androidSettings:
+                allowedPackageNames:
+                - test.package.google.com.mx
+              displayName: TestKey
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              displayName: TestKey
+              androidSettings:
+                allowedPackageNames:
+                - com.test.package.google.com.mx
+    - expect_stderr: |
+        Updated key [mytestkey].
+    - expect_stdout: |
+        json:
+          androidSettings:
+            allowedPackageNames:
+            - com.test.package.google.com.mx
+          displayName: TestKey
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys update mytestkey --display-name UpdatedTestKey
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '123456789'
+            projectId: fake-project
+            lifecycleState: ACTIVE
+            name: Fake Project
+            labels:
+              service-account-downloaded-notification-opt-out: 'true'
+            createTime: '2014-09-30T14:51:18.935Z'
+            parent:
+              type: folder
+              id: '396521612403'
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/123456789/keys/mytestkey?alt=json&updateMask=displayName
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              displayName: UpdatedTestKey
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              displayName: UpdatedTestKey
+              androidSettings:
+                allowedPackageNames:
+                - com.test.package.google.com.mx
+    - expect_stderr: |
+        Updated key [mytestkey].
+    - expect_stdout: |
+        json:
+          androidSettings:
+            allowedPackageNames:
+            - com.test.package.google.com.mx
+          displayName: UpdatedTestKey
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys update mytestkey --web --security-preference security
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '123456789'
+            projectId: fake-project
+            lifecycleState: ACTIVE
+            name: Fake Project
+            labels:
+              service-account-downloaded-notification-opt-out: 'true'
+            createTime: '2014-09-30T14:51:18.935Z'
+            parent:
+              type: folder
+              id: '396521612403'
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/123456789/keys/mytestkey?alt=json&updateMask=webSettings.challengeSecurityPreference
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              webSettings:
+                challengeSecurityPreference: SECURITY
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              displayName: mytestkey
+              webSettings:
+                allowedDomains:
+                - test.com.mx
+                integrationType: SCORE
+                challengeSecurityPreference: SECURITY
+    - expect_stderr: |
+        Updated key [mytestkey].
+    - expect_stdout: |
+        json:
+          displayName: mytestkey
+          webSettings:
+            allowedDomains:
+            - test.com.mx
+            challengeSecurityPreference: SECURITY
+            integrationType: SCORE
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys update mytestkey --labels=foo=bar --display-name=testkey --web --allow-amp-traffic
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '123456789'
+            projectId: fake-project
+            lifecycleState: ACTIVE
+            name: Fake Project
+            labels:
+              service-account-downloaded-notification-opt-out: 'true'
+            createTime: '2014-09-30T14:51:18.935Z'
+            parent:
+              type: folder
+              id: '396521612403'
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/123456789/keys/mytestkey?alt=json&updateMask=displayName%2Clabels%2CwebSettings.allowAmpTraffic
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              displayName: testkey
+              labels:
+                foo: bar
+              webSettings:
+                allowAmpTraffic: true
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              displayName: testkey
+              labels:
+                foo: bar
+              webSettings:
+                allowAmpTraffic: true
+    - expect_stderr: |
+        Updated key [mytestkey].
+    - expect_stdout: |
+        json:
+          displayName: testkey
+          labels:
+            foo: bar
+          webSettings:
+            allowAmpTraffic: true
+    - expect_exit:
+        code: 0

@@ -198,34 +198,7 @@ class FileShareConfig(_messages.Message):
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message):
-  r"""Instance represents the interface for SLM services to actuate the state
-  of control plane resources.  Example Instance in JSON, where   consumer-
-  project=snapchat,   producer-project=cloud-sql:  ```json Instance: {
-  "name":   "projects/snapchat/locations/us-east1/instances/prod-instance",
-  "create_time": {     "seconds": 1526406431,   },   "labels": {     "env":
-  "prod",     "foo": "bar"   },   "state": READY,   "software_versions": {
-  "software_update": "cloud-sql-09-28-2018",   },
-  "maintenance_policy_names": {     "UpdatePolicy":
-  "projects/snapchat/locations/us-east1/maintenancePolicies/prod-update-
-  policy",   }   "rollout_metadata": {     "projects/cloud-
-  sql/locations/global/rolloutTypes/software_update": {       "release":
-  "projects/cloud-sql/locations/global/releases/cloud-sql-09-28-2018",
-  "rollout":       "projects/cloud-sql/locations/us-east1/rollouts/cloud-
-  sql-09-28-2018-canary",     },     "projects/cloud-
-  sql/locations/global/rolloutTypes/instance_restart": {       "release":
-  "projects/cloud-sql/locations/global/releases/cloud-sql-09-20-repair",
-  "rollout":       "projects/cloud-sql/locations/us-east1/rollouts/cloud-
-  sql-09-20-repair-100-percent",     }   }   "tenant_project_id": "cloud-sql-
-  test-tenant",   "producer_metadata": {     "cloud-sql-tier": "basic",
-  "cloud-sql-instance-size": "1G",   },   "provisioned_resources": [     {
-  "resource-type": "compute-instance",       "resource-url":
-  "https://www.googleapis.com/compute/v1/projects/cloud-sql/zones/us-
-  east1-b/instances/vm-1",     }   ],   "maintenance_schedules": {
-  "csa_rollout": {        "start_time": {           "seconds": 1526406431,
-  },        "end_time": {           "seconds": 1535406431,        },     },
-  "ncsa_rollout": {        "start_time": {           "seconds": 1526406431,
-  },        "end_time": {           "seconds": 1535406431,        },     }
-  },   "consumer_defined_name": "my-sql-instance1", } ```
+  r"""A GoogleCloudSaasacceleratorManagementProvidersV1Instance object.
 
   Enums:
     StateValueValuesEnum: Output only. Current lifecycle state of the resource
@@ -245,12 +218,6 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
     ProducerMetadataValue: Output only. Custom string attributes used
       primarily to expose producer-specific information in monitoring
       dashboards. See go/get-instance-metadata.
-    RolloutMetadataValue: The map between RolloutType and the corresponding
-      RolloutMetadata. This is only mutated by rollout service. For actuation
-      implementation, this information is pass-through for Rollout management.
-      Producer shall not modify by itself. For update of a single entry in
-      this map, the update field mask shall follow this sementics: go
-      /advanced-field-masks
     SoftwareVersionsValue: Software versions that are used to deploy this
       instance. This can be mutated by rollout services.
 
@@ -279,12 +246,6 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
     provisionedResources: Output only. The list of data plane resources
       provisioned for this instance, e.g. compute VMs. See go/get-instance-
       metadata.
-    rolloutMetadata: The map between RolloutType and the corresponding
-      RolloutMetadata. This is only mutated by rollout service. For actuation
-      implementation, this information is pass-through for Rollout management.
-      Producer shall not modify by itself. For update of a single entry in
-      this map, the update field mask shall follow this sementics: go
-      /advanced-field-masks
     slmInstanceTemplate: Link to the SLM instance template. Only populated
       when updating SLM instances via SSA's Actuation service adaptor. Service
       producers with custom control plane (e.g. Cloud SQL) doesn't need to
@@ -312,6 +273,7 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
       UPDATING: Instance is being updated.
       REPAIRING: Instance is unheathy and under repair.
       DELETING: Instance is being deleted.
+      ERROR: Instance encountered an error and is in indeterministic state.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -319,6 +281,7 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
     UPDATING = 3
     REPAIRING = 4
     DELETING = 5
+    ERROR = 6
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -434,37 +397,6 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   @encoding.MapUnrecognizedFields('additionalProperties')
-  class RolloutMetadataValue(_messages.Message):
-    r"""The map between RolloutType and the corresponding RolloutMetadata.
-    This is only mutated by rollout service. For actuation implementation,
-    this information is pass-through for Rollout management. Producer shall
-    not modify by itself. For update of a single entry in this map, the update
-    field mask shall follow this sementics: go/advanced-field-masks
-
-    Messages:
-      AdditionalProperty: An additional property for a RolloutMetadataValue
-        object.
-
-    Fields:
-      additionalProperties: Additional properties of type RolloutMetadataValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a RolloutMetadataValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A
-          GoogleCloudSaasacceleratorManagementProvidersV1RolloutMetadata
-          attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1RolloutMetadata', 2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
   class SoftwareVersionsValue(_messages.Message):
     r"""Software versions that are used to deploy this instance. This can be
     mutated by rollout services.
@@ -499,13 +431,12 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
   name = _messages.StringField(6)
   producerMetadata = _messages.MessageField('ProducerMetadataValue', 7)
   provisionedResources = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource', 8, repeated=True)
-  rolloutMetadata = _messages.MessageField('RolloutMetadataValue', 9)
-  slmInstanceTemplate = _messages.StringField(10)
-  sloMetadata = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata', 11)
-  softwareVersions = _messages.MessageField('SoftwareVersionsValue', 12)
-  state = _messages.EnumField('StateValueValuesEnum', 13)
-  tenantProjectId = _messages.StringField(14)
-  updateTime = _messages.StringField(15)
+  slmInstanceTemplate = _messages.StringField(9)
+  sloMetadata = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata', 10)
+  softwareVersions = _messages.MessageField('SoftwareVersionsValue', 11)
+  state = _messages.EnumField('StateValueValuesEnum', 12)
+  tenantProjectId = _messages.StringField(13)
+  updateTime = _messages.StringField(14)
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule(_messages.Message):
@@ -551,24 +482,6 @@ class GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata(_messages.M
   nodeId = _messages.StringField(3)
 
 
-class GoogleCloudSaasacceleratorManagementProvidersV1NotificationMetadata(_messages.Message):
-  r"""NotificationMetadata is the notification state for an instance.
-
-  Fields:
-    rescheduled: Whether the instance update has been rescheduled.
-    scheduledEndTime: The scheduled end time for the maintenance window during
-      which update can be performed on the instance.
-    scheduledStartTime: The scheduled start time for the maintenance window
-      during which update can be performed on the instance.
-    targetRelease: The target release to be applied to the instance.
-  """
-
-  rescheduled = _messages.BooleanField(1)
-  scheduledEndTime = _messages.StringField(2)
-  scheduledStartTime = _messages.StringField(3)
-  targetRelease = _messages.StringField(4)
-
-
 class GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource(_messages.Message):
   r"""Describes provisioned dataplane resources.
 
@@ -585,21 +498,6 @@ class GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource(_messag
 
   resourceType = _messages.StringField(1)
   resourceUrl = _messages.StringField(2)
-
-
-class GoogleCloudSaasacceleratorManagementProvidersV1RolloutMetadata(_messages.Message):
-  r"""RolloutMetadata for an actuation instance. It maps to a single
-  RolloutType.
-
-  Fields:
-    notification: Instance level notification metadata.
-    releaseName: The last Release that has been applied to the instance.
-    rolloutName: The last rollout that has been applied to the instance.
-  """
-
-  notification = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1NotificationMetadata', 1)
-  releaseName = _messages.StringField(2)
-  rolloutName = _messages.StringField(3)
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1SloEligibility(_messages.Message):
@@ -651,7 +549,7 @@ class GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata(_messages.Messa
   the instance.
 
   Fields:
-    eligibility: Optional: user-defined instance eligibility.
+    eligibility: Optional. User-defined instance eligibility.
     exclusions: List of SLO exclusion windows. When multiple entries in the
       list match (matching the exclusion time-window against current time
       point) the exclusion reason used in the first matching entry will be
@@ -663,7 +561,7 @@ class GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata(_messages.Messa
       temporary ineligible for the purpose of SLO calculation. For permanent
       instance SLO exclusion, use of custom instance eligibility is
       recommended. See 'eligibility' field below.
-    nodes: Optional: list of nodes. Some producers need to use per-node
+    nodes: Optional. List of nodes. Some producers need to use per-node
       metadata to calculate SLO. This field allows such producers to publish
       per-node SLO meta data, which will be consumed by SSA Eligibility
       Exporter and published in the form of per node metric to Monarch.
@@ -690,7 +588,7 @@ class Instance(_messages.Message):
 
   Fields:
     createTime: Output only. The time when the instance was created.
-    description: Optional. A description of the instance (2048 characters or
+    description: Optional. The description of the instance (2048 characters or
       less).
     etag: Server-specified ETag for the instance resource to prevent
       simultaneous updates from overwriting each other.
@@ -733,12 +631,23 @@ class Instance(_messages.Message):
 
     Values:
       TIER_UNSPECIFIED: Not set.
-      STANDARD: STANDARD tier.
-      PREMIUM: PREMIUM tier.
+      STANDARD: STANDARD tier. BASIC_HDD is the preferred term for this tier.
+      PREMIUM: PREMIUM tier. BASIC_SSD is the preferred term for this tier.
+      BASIC_HDD: BASIC instances offer a maximum capacity of 63.9 TB.
+        BASIC_HDD is an alias for STANDARD Tier, offering economical
+        performance backed by Persistent Disk HDD.
+      BASIC_SSD: BASIC instances offer a maximum capacity of 63.9 TB.
+        BASIC_SSD is an alias for PREMIUM Tier, and offers improved
+        performance backed by Persistent Disk SSD.
+      HIGH_SCALE_SSD: HIGH_SCALE instances offer larger capacity and
+        professional performance backed by Persistent Disk SSD.
     """
     TIER_UNSPECIFIED = 0
     STANDARD = 1
     PREMIUM = 2
+    BASIC_HDD = 3
+    BASIC_SSD = 4
+    HIGH_SCALE_SSD = 5
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):

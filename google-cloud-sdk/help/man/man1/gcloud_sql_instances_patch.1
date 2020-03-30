@@ -11,7 +11,7 @@ gcloud sql instances patch \- updates the settings of a Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud sql instances patch\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-[no\-]assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-diff\fR] [\fB\-\-[no\-]enable\-bin\-log\fR] [\fB\-\-[no\-]enable\-database\-replication\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-any\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-[no\-]require\-ssl\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]\ |\ \fB\-\-clear\-gae\-apps\fR] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]\ |\ \fB\-\-clear\-authorized\-networks\fR] [\fB\-\-clear\-database\-flags\fR\ |\ \fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-no\-backup\fR\ |\ \fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud sql instances patch\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-[no\-]assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-diff\fR] [\fB\-\-[no\-]enable\-bin\-log\fR] [\fB\-\-[no\-]enable\-database\-replication\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-any\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-[no\-]require\-ssl\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]\ |\ \fB\-\-clear\-gae\-apps\fR] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]\ |\ \fB\-\-clear\-authorized\-networks\fR] [\fB\-\-clear\-database\-flags\fR\ |\ \fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-no\-backup\fR\ |\ \fB\-\-backup\-location\fR=\fIBACKUP_LOCATION\fR\ \fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -177,9 +177,6 @@ only shared\-core machine types (e.g., db\-f1\-micro) apply. A complete list of
 tiers is available here: https://cloud.google.com/sql/pricing. WARNING: Instance
 will be restarted.
 
-IMPORTANT: First Generation instances are deprecated. If you're considering any
-First Generation tiers, we recommend using Second Generation instead.
-
 .TP 2m
 
 At most one of these may be specified:
@@ -268,6 +265,12 @@ At most one of these may be specified:
 Specified if daily backup should be disabled.
 
 .TP 2m
+\fB\-\-backup\-location\fR=\fIBACKUP_LOCATION\fR
+Choose where to store your backups. Backups are stored in the closest
+multi\-region location to you by default. Only customize if needed. Specify
+empty string to revert to default.
+
+.TP 2m
 \fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR
 Start time of daily backups, specified in the 24 hour format \- HH:MM, in the
 UTC timezone.
@@ -282,8 +285,9 @@ UTC timezone.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

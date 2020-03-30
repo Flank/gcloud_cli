@@ -58,8 +58,19 @@ If set, display only the logs for this particular task.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To show the logs from running the AI Platform job \f5\fImy\-job\fR\fR, run:
+
+.RS 2m
+$ gcloud ai\-platform jobs stream\-logs my\-job
+.RE
 
 
 

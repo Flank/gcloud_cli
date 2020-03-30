@@ -13,21 +13,23 @@ SYNOPSIS
         [--description=DESCRIPTION]
         [--disk=[auto-delete=AUTO-DELETE],[boot=BOOT],
           [device-name=DEVICE-NAME],[mode=MODE],[name=NAME],[scope=SCOPE]]
-        [--enable-display-device] [--hostname=HOSTNAME]
-        [--labels=[KEY=VALUE,...]]
+        [--enable-display-device] [--erase-windows-vss-signature]
+        [--hostname=HOSTNAME] [--labels=[KEY=VALUE,...]]
         [--local-ssd=[device-name=DEVICE-NAME],[interface=INTERFACE]]
         [--machine-type=MACHINE_TYPE] [--maintenance-policy=MAINTENANCE_POLICY]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
-        [--min-cpu-platform=PLATFORM] [--network=NETWORK]
-        [--network-interface=[PROPERTY=VALUE,...]]
+        [--min-cpu-platform=PLATFORM] [--min-node-cpu=MIN_NODE_CPU]
+        [--network=NETWORK] [--network-interface=[PROPERTY=VALUE,...]]
         [--network-tier=NETWORK_TIER] [--preemptible]
         [--private-network-ip=PRIVATE_NETWORK_IP]
-        [--no-require-csek-key-create] [--no-restart-on-failure]
+        [--no-require-csek-key-create]
+        [--resource-policies=[RESOURCE_POLICY,...]] [--no-restart-on-failure]
         [--shielded-integrity-monitoring] [--shielded-secure-boot]
         [--shielded-vtpm] [--source-instance-template=SOURCE_INSTANCE_TEMPLATE]
-        [--subnet=SUBNET] [--tags=TAG,[TAG,...]] [--zone=ZONE]
-        [--address=ADDRESS | --no-address]
+        [--source-machine-image=SOURCE_MACHINE_IMAGE]
+        [--source-machine-image-csek-key-file=FILE] [--subnet=SUBNET]
+        [--tags=TAG,[TAG,...]] [--zone=ZONE] [--address=ADDRESS | --no-address]
         [--boot-disk-kms-key=BOOT_DISK_KMS_KEY
           : --boot-disk-kms-keyring=BOOT_DISK_KMS_KEYRING
           --boot-disk-kms-location=BOOT_DISK_KMS_LOCATION
@@ -47,13 +49,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances create facilitates the creation of
-    Google Compute Engine virtual machines. For example, running:
-
-        $ gcloud beta compute instances create example-instance-1 \
-            example-instance-2 example-instance-3 --zone us-central1-a
-
-    will create three instances called example-instance-1, example-instance-2,
-    and example-instance-3 in the us-central1-a zone.
+    Google Compute Engine virtual machines.
 
     When an instance is in RUNNING state and the system begins to boot, the
     instance creation is considered finished, and the command returns with a
@@ -182,7 +178,7 @@ FLAGS
             If yes, this persistent disk will be automatically deleted when the
             instance is deleted. However, if the disk is later detached from
             the instance, this option won't apply. The default value for this
-            is no.
+            is yes.
 
          kms-key
             Fully qualified Cloud KMS cryptokey name that will protect the
@@ -289,6 +285,11 @@ FLAGS
         Enable a display device for instances using a Windows image. Disabled
         by default.
 
+     --erase-windows-vss-signature
+        Specifies whether the disk restored from source snapshots or source
+        machine image should erase Windows specific VSS signature. See
+        https://cloud.google.com/sdk/gcloud/reference/compute/disks/snapshot#--guest-flush
+
      --hostname=HOSTNAME
         Specify the hostname of the instance to be created. The specified
         hostname must be RFC1035 compliant. If hostname is not specified, the
@@ -338,10 +339,11 @@ FLAGS
      --metadata=KEY=VALUE,[KEY=VALUE,...]
         Metadata to be made available to the guest operating system running on
         the instances. Each metadata entry is a key/value pair separated by an
-        equals sign. Metadata keys must be unique and less than 128 bytes in
-        length. Values must be less than or equal to 32,768 bytes in length.
+        equals sign. Each metadata key must be unique and have a max of 128
+        bytes in length. Each value must have a max of 256 KB in length.
         Multiple arguments can be passed to this flag, e.g., --metadata
-        key-1=value-1,key-2=value-2,key-3=value-3.
+        key-1=value-1,key-2=value-2,key-3=value-3. The combined total size for
+        all metadata entries is 512 KB.
 
         In images that have Compute Engine tools installed on them, such as the
         official images (https://cloud.google.com/compute/docs/images), the
@@ -375,6 +377,10 @@ FLAGS
 
         You can find more information on-line:
         https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
+
+     --min-node-cpu=MIN_NODE_CPU
+        Minimum number of virtual CPUs this instance will consume when running
+        on a sole-tenant node.
 
      --network=NETWORK
         Specifies the network that the instances will be part of. If --subnet
@@ -465,6 +471,10 @@ FLAGS
         for more details. Enabled by default, use --no-require-csek-key-create
         to disable.
 
+     --resource-policies=[RESOURCE_POLICY,...]
+        A list of resource policy names to be added to the instance. The
+        policies must exist in the same region as the instance.
+
      --restart-on-failure
         The instances will be restarted if they are terminated by Compute
         Engine. This does not affect terminations performed by the user.
@@ -491,6 +501,16 @@ FLAGS
 
         Users can also override machine type and labels. Values of other flags
         will be ignored and --source-instance-template will be used instead.
+
+     --source-machine-image=SOURCE_MACHINE_IMAGE
+        The name of the machine image that the instance will be created from.
+
+     --source-machine-image-csek-key-file=FILE
+        Path to a Customer-Supplied Encryption Key (CSEK) key file, mapping
+        resources to user managed keys which were used to encrypt the source
+        machine-image. See
+        https://cloud.google.com/compute/docs/disks/customer-supplied-encryption
+        for more details.
 
      --subnet=SUBNET
         Specifies the subnet that the instances will be part of. If --network
@@ -544,8 +564,12 @@ FLAGS
           instance.
 
        --no-address
-          If provided, the instances will not be assigned external IP
-          addresses.
+          If provided, the instances are not assigned external IP addresses. To
+          pull container images, you must configure private Google access if
+          using Container Registry or configure Cloud NAT for instances to
+          access container images directly. For more information, see:
+          + https://cloud.google.com/vpc/docs/configure-private-google-access
+          + https://cloud.google.com/nat/docs/using-nat
 
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the disk. The arguments in this group can be used to
@@ -769,16 +793,23 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To create an instance with the latest Red Hat Enterprise Linux 8 image
+    To create an instance with the latest 'Red Hat Enterprise Linux 8' image
     available, run:
 
         $ gcloud beta compute instances create example-instance \
             --image-family=rhel-8 --image-project=rhel-cloud \
             --zone=us-central1-a
+
+    To create instances called 'example-instance-1', 'example-instance-2', and
+    'example-instance-3' in the 'us-central1-a' zone, run:
+
+        $ gcloud beta compute instances create example-instance-1 \
+            example-instance-2 example-instance-3 --zone=us-central1-a
 
 NOTES
     This command is currently in BETA and may change without notice. These

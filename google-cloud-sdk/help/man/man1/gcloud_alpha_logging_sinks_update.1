@@ -11,7 +11,7 @@ gcloud alpha logging sinks update \- updates a sink
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha logging sinks update\fR \fISINK_NAME\fR [\fIDESTINATION\fR] [\fB\-\-add\-exclusions\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIdisabled\fR=\fIDISABLED\fR],[\fIfilter\fR=\fIFILTER\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-clear\-exclusions\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disabled\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-remove\-exclusions\fR=[\fIEXCLUSION\fR\ \fIID\fR,...]] [\fB\-\-use\-partitioned\-tables\fR] [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-dlp\-deidentify\-template\fR=\fIDLP_DEIDENTIFY_TEMPLATE\fR\ \fB\-\-dlp\-inspect\-template\fR=\fIDLP_INSPECT_TEMPLATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha logging sinks update\fR \fISINK_NAME\fR [\fIDESTINATION\fR] [\fB\-\-add\-exclusion\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIdisabled\fR=\fIDISABLED\fR],[\fIfilter\fR=\fIFILTER\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-clear\-exclusions\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disabled\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-remove\-exclusions\fR=[\fIEXCLUSION\fR\ \fIID\fR,...]] [\fB\-\-update\-exclusion\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIdisabled\fR=\fIDISABLED\fR],[\fIfilter\fR=\fIFILTER\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-use\-partitioned\-tables\fR] [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-dlp\-deidentify\-template\fR=\fIDLP_DEIDENTIFY_TEMPLATE\fR\ \fB\-\-dlp\-inspect\-template\fR=\fIDLP_INSPECT_TEMPLATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -44,19 +44,19 @@ unchanged.
 
 .RS 2m
 .TP 2m
-\fB\-\-add\-exclusions\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIdisabled\fR=\fIDISABLED\fR],[\fIfilter\fR=\fIFILTER\fR],[\fIname\fR=\fINAME\fR]
+\fB\-\-add\-exclusion\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIdisabled\fR=\fIDISABLED\fR],[\fIfilter\fR=\fIFILTER\fR],[\fIname\fR=\fINAME\fR]
 Add an exclusion filter for a log entry that is not to be exported. This flag
 can be repeated.
 
-The \f5name\fR and \f5filter\fR attributes are required. The following keys are
-accepted:
+The \f5\fIname\fR\fR and \f5\fIfilter\fR\fR attributes are required. The
+following keys are accepted:
 
 .RS 2m
 .TP 2m
 \fBname\fR
-An identifier, such as "load\-balancer\-exclusion". Identifiers are limited to
-100 characters and can include only letters, digits, underscores, hyphens, and
-periods.
+An identifier, such as \f5\fIload\-balancer\-exclusion\fR\fR. Identifiers are
+limited to 100 characters and can include only letters, digits, underscores,
+hyphens, and periods.
 
 .TP 2m
 \fBdescription\fR
@@ -93,12 +93,40 @@ any) is unchanged.
 Specify the name of the Logging exclusion(s) to delete.
 
 .TP 2m
+\fB\-\-update\-exclusion\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIdisabled\fR=\fIDISABLED\fR],[\fIfilter\fR=\fIFILTER\fR],[\fIname\fR=\fINAME\fR]
+Update an exclusion filter for a log entry that is not to be exported. This flag
+can be repeated.
+
+The \f5\fIname\fR\fR and \f5\fIfilter\fR\fR attributes are required. following
+keys are accepted:
+
+.RS 2m
+.TP 2m
+name\fB
+An identifier, such as \f5\fIload\-balancer\-exclusion\fR\fR. Identifiers are
+limited to 100 characters and can include only letters, digits, underscores,
+hyphens, and periods.
+
+.TP 2m
+\fRdescription\fB
+A description of this exclusion.
+
+.TP 2m
+\fRfilter\fB
+An advanced log filter that matches the log entries to be excluded.
+
+.TP 2m
+\fRdisabled\fB
+If this exclusion should be disabled and not exclude the log entries.
+.RE
+.sp
+.TP 2m
 
 Settings for sink exporting data to BigQuery.
 
 .RS 2m
 .TP 2m
-\fB\-\-use\-partitioned\-tables\fR
+\fR\-\-use\-partitioned\-tables\fB
 If specified, use BigQuery's partitioned tables. By default, Logging creates
 dated tables based on the log entries' timestamps, e.g. 'syslog_20170523'.
 Partitioned tables remove the suffix and special query syntax
@@ -113,19 +141,19 @@ At most one of these may be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR
+\fR\-\-billing\-account\fB=\fIBILLING_ACCOUNT_ID\fR
 Update a sink associated with this billing account.
 
 .TP 2m
-\fB\-\-folder\fR=\fIFOLDER_ID\fR
+\fR\-\-folder\fB=\fIFOLDER_ID\fR
 Update a sink associated with this folder.
 
 .TP 2m
-\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+\fR\-\-organization\fB=\fIORGANIZATION_ID\fR
 Update a sink associated with this organization.
 
 .TP 2m
-\fB\-\-project\fR=\fIPROJECT_ID\fR
+\fR\-\-project\fB=\fIPROJECT_ID\fR
 Update a sink associated with this project.
 
 The Google Cloud Platform project name to use for this invocation. If omitted,
@@ -148,18 +176,19 @@ are unchanged.
 
 .RS 2m
 .TP 2m
-\fB\-\-dlp\-deidentify\-template\fR=\fIDLP_DEIDENTIFY_TEMPLATE\fR
+\fR\-\-dlp\-deidentify\-template\fB=\fIDLP_DEIDENTIFY_TEMPLATE\fR
 Relative path to a Cloud DLP de\-identification template resource. For example
 "projects/my\-project/deidentifyTemplates/my\-template" or
 "organizations/my\-org/deidentifyTemplates/my\-template".
 
 .TP 2m
-\fB\-\-dlp\-inspect\-template\fR=\fIDLP_INSPECT_TEMPLATE\fR
+\fR\-\-dlp\-inspect\-template\fB=\fIDLP_INSPECT_TEMPLATE\fR
 Relative path to a Cloud DLP inspection template resource. For example
 "projects/my\-project/inspectTemplates/my\-template" or
 "organizations/my\-org/inspectTemplates/my\-template".
 
 
+\fR
 .RE
 .RE
 .sp
@@ -169,8 +198,9 @@ Relative path to a Cloud DLP inspection template resource. For example
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

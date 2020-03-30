@@ -1,0 +1,85 @@
+title: privateca subordinates describe scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      privateca subordinates describe ca1 --location europe-west1
+  - stdout: |
+      ca_certificate_description:
+        subject_description:
+          not_after_time: '2020-10-17T15:14:00.105-07:00'
+          not_before_time: '2018-10-17T15:14:00.105-07:00'
+      cloud_kms_key_version: projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1
+      gcs_bucket: ca1_privateca_content
+      name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca1
+      state: ACTIVE
+      type: SUBORDINATE
+- execute:
+  - command: |
+      privateca subordinates describe invalid_ca --location europe-west1
+  - error: '1: Cannot perform subordinates command on Root CA. Please use the `privateca
+      roots` command group instead.'
+actions:
+- execute_command:
+    command: |
+      privateca subordinates describe ca1 --location europe-west1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca1
+            type: SUBORDINATE
+            cloud_kms_key_version: projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1
+            state: ACTIVE
+            ca_certificate_description:
+              subject_description:
+                not_before_time: '2018-10-17T15:14:00.105-07:00'
+                not_after_time: '2020-10-17T15:14:00.105-07:00'
+            gcs_bucket: ca1_privateca_content
+    - expect_stdout: |
+        ca_certificate_description:
+          subject_description:
+            not_after_time: '2020-10-17T15:14:00.105-07:00'
+            not_before_time: '2018-10-17T15:14:00.105-07:00'
+        cloud_kms_key_version: projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1
+        gcs_bucket: ca1_privateca_content
+        name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca1
+        state: ACTIVE
+        type: SUBORDINATE
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      privateca subordinates describe invalid_ca --location europe-west1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/invalid_ca?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/europe-west1/certificateAuthorities/invalid_ca
+            type: SELF_SIGNED
+            cloud_kms_key_version: projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1
+            state: ACTIVE
+            ca_certificate_description:
+              subject_description:
+                not_before_time: '2018-10-17T15:14:00.105-07:00'
+                not_after_time: '2020-10-17T15:14:00.105-07:00'
+            gcs_bucket: ca1_privateca_content
+    - expect_exit:
+        code: 1
+        message: Cannot perform subordinates command on Root CA. Please use the `privateca
+          roots` command group instead.

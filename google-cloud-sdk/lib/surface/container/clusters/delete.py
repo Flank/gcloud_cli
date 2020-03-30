@@ -49,6 +49,17 @@ class Delete(base.DeleteCommand):
   - Persistent disk volumes
   """
 
+  detailed_help = {
+      'DESCRIPTION':
+          '{description}',
+      'EXAMPLES':
+          """\
+          To delete an existing cluster, run:
+
+            $ {command} sample-cluster
+          """,
+  }
+
   @staticmethod
   def Args(parser):
     """Register flags for this command.
@@ -65,9 +76,9 @@ class Delete(base.DeleteCommand):
     parser.add_argument(
         '--timeout',
         type=int,
-        default=1800,
+        default=3600,
         hidden=True,
-        help='THIS ARGUMENT NEEDS HELP TEXT.')
+        help='Timeout (seconds) for waiting on the operation to complete.')
     flags.AddAsyncFlag(parser)
 
   def Run(self, args):

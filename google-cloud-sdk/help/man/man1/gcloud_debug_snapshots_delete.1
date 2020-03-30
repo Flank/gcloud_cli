@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud debug snapshots delete \- delete debug snapshots
+gcloud debug snapshots delete \- delete debug snapshots for a Cloud Debugger debug target (debuggee)
 
 
 
@@ -17,9 +17,9 @@ gcloud debug snapshots delete \- delete debug snapshots
 
 .SH "DESCRIPTION"
 
-This command deletes snapshots from a Cloud Debugger debug target. It will ask
-for confirmation before deleting any snapshots. To suppress confirmation, use
-the global \-\-quiet option.
+\fBgcloud debug snapshots delete\fR is used to delete snapshots from a Cloud
+Debugger debug target (debuggee). It will ask for confirmation before deleting
+any snapshots. To suppress confirmation, use the global \-\-quiet option.
 
 
 
@@ -76,8 +76,36 @@ target is the most recent deployment of the default module and version.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete all active snapshots created by the current user of the debug target
+(debuggee), without being prompted for confirmation, run:
+
+.RS 2m
+$ gcloud debug snapshots delete \-\-target=<debuggee_id> \-\-quiet
+.RE
+
+To delete all active and inactive snapshots created by all users of the debug
+target (debuggee), run:
+
+.RS 2m
+$ gcloud debug snapshots delete \-\-target=<debuggee_id> \-\-all\-users \e
+    \-\-include\-inactive
+.RE
+
+To delete the debug snapshots with IDs 'ID1' and 'ID2' (where ID1 and ID2 were
+each created by different users) of the debug target (debuggee), run:
+
+.RS 2m
+$ gcloud debug snapshots delete ID1 ID2 \-\-target=<debuggee_id> \e
+    \-\-all\-users
+.RE
 
 
 

@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests of the 'deploy' command.
 
 Those tests are compact but hard to understand and modify. b/36553351 tracks
@@ -82,19 +81,26 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
                 key='deployment-tool',
                 value='cli-gcloud',
             ),
-        ],
-    )
+        ],)
 
   def _MaybeExpectRemoveIamPolicyBinding(self, test_name):
     self._ExpectRemoveIamPolicyBinding(test_name, True, False)
 
-  def _GenerateFunctionWithPubsub(
-      self, name, url, topic, entry_point=None, memory=None, timeout=None,
-      retry=None, project=None):
+  def _GenerateFunctionWithPubsub(self,
+                                  name,
+                                  url,
+                                  topic,
+                                  entry_point=None,
+                                  memory=None,
+                                  timeout=None,
+                                  retry=None,
+                                  project=None):
     if project is None:
       project = self.Project()
     result = self.messages.CloudFunction(
-        name=name, sourceArchiveUrl=url, entryPoint=entry_point,
+        name=name,
+        sourceArchiveUrl=url,
+        entryPoint=entry_point,
         eventTrigger=self.messages.EventTrigger(
             eventType='google.pubsub.topic.publish',
             resource='projects/{0}/topics/topic'.format(project),
@@ -108,8 +114,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
       result.timeout = timeout
     if retry:
       result.eventTrigger.failurePolicy = self.messages.FailurePolicy(
-          retry=self.messages.Retry(),
-      )
+          retry=self.messages.Retry(),)
     return result
 
   def _GenerateFunctionWithSource(self, name, repo, topic, entry_point=None):
@@ -118,7 +123,9 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
     else:
       source_repository = None
     return self.messages.CloudFunction(
-        name=name, sourceRepository=source_repository, entryPoint=entry_point,
+        name=name,
+        sourceRepository=source_repository,
+        entryPoint=entry_point,
         eventTrigger=self.messages.EventTrigger(
             eventType='providers/cloud.pubsub/eventTypes/topic.publish',
             resource=topic,
@@ -129,7 +136,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
 
   def _GenerateFunctionWithGcs(self, name, url, bucket):
     return self.messages.CloudFunction(
-        name=name, sourceArchiveUrl=url,
+        name=name,
+        sourceArchiveUrl=url,
         eventTrigger=self.messages.EventTrigger(
             eventType='google.storage.object.finalize',
             resource='projects/_/buckets/' + bucket,
@@ -140,7 +148,9 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
 
   def _GenerateFunctionWithTimeout(self, name, url, timeout, bucket):
     return self.messages.CloudFunction(
-        name=name, sourceArchiveUrl=url, timeout=timeout,
+        name=name,
+        sourceArchiveUrl=url,
+        timeout=timeout,
         eventTrigger=self.messages.EventTrigger(
             eventType='google.storage.object.finalize',
             resource='projects/_/buckets/' + bucket,
@@ -151,7 +161,9 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
 
   def _GenerateFunctionWithMaxInstances(self, name, url, max_instances, bucket):
     return self.messages.CloudFunction(
-        name=name, sourceArchiveUrl=url, maxInstances=max_instances,
+        name=name,
+        sourceArchiveUrl=url,
+        maxInstances=max_instances,
         eventTrigger=self.messages.EventTrigger(
             eventType='google.storage.object.finalize',
             resource='projects/_/buckets/' + bucket,
@@ -162,7 +174,9 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
 
   def _GenerateFunctionWithVPCConnector(self, name, url, vpc_connector, bucket):
     return self.messages.CloudFunction(
-        name=name, sourceArchiveUrl=url, vpcConnector=vpc_connector,
+        name=name,
+        sourceArchiveUrl=url,
+        vpcConnector=vpc_connector,
         eventTrigger=self.messages.EventTrigger(
             eventType='google.storage.object.finalize',
             resource='projects/_/buckets/' + bucket,
@@ -174,7 +188,9 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
   def _GenerateFunctionWithServiceAccount(self, name, url, service_account,
                                           bucket):
     return self.messages.CloudFunction(
-        name=name, sourceArchiveUrl=url, serviceAccountEmail=service_account,
+        name=name,
+        sourceArchiveUrl=url,
+        serviceAccountEmail=service_account,
         eventTrigger=self.messages.EventTrigger(
             eventType='google.storage.object.finalize',
             resource='projects/_/buckets/' + bucket,
@@ -183,8 +199,11 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         labels=self._GetDefaultLabelsMessage(),
     )
 
-  def _GenerateFunctionWithHttp(
-      self, name, url, entry_point=None, timeout=None):
+  def _GenerateFunctionWithHttp(self,
+                                name,
+                                url,
+                                entry_point=None,
+                                timeout=None):
     https_trigger = self.messages.HttpsTrigger()
     result = self.messages.CloudFunction(
         name=name,
@@ -208,7 +227,9 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
             name=test_name),
         self._GenerateFunctionWithPubsub(test_name, 'url', 'old-topic'))
 
-  def _ExpectFunctionCreateWithPubsub(self, gcs_dest_url, entry_point=None,
+  def _ExpectFunctionCreateWithPubsub(self,
+                                      gcs_dest_url,
+                                      entry_point=None,
                                       project=None):
     if project is None:
       project = self.Project()
@@ -219,7 +240,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
             cloudFunction=self._GenerateFunctionWithPubsub(
-                test_name, gcs_dest_url,
+                test_name,
+                gcs_dest_url,
                 'projects/{0}/topics/topic'.format(project),
                 entry_point=entry_point,
                 project=project)),
@@ -228,18 +250,21 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
 
-  def _ExpectFunctionCreateWithPubsubAndRepo(self, source_repository,
+  def _ExpectFunctionCreateWithPubsubAndRepo(self,
+                                             source_repository,
                                              entry_point=None):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    test_location = 'projects/{}/locations/{}'.format(
-        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(self.Project(),
+                                                      self.GetRegion())
     self.mock_client.projects_locations_functions.Create.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
             cloudFunction=self._GenerateFunctionWithSource(
-                test_name, source_repository,
-                'projects/fake-project/topics/topic', entry_point=entry_point)),
+                test_name,
+                source_repository,
+                'projects/fake-project/topics/topic',
+                entry_point=entry_point)),
         self._GenerateActiveOperation('operations/operation'))
     self._MaybeExpectRemoveIamPolicyBinding(test_name)
     self._ExpectGetOperationAndGetFunction(test_name)
@@ -248,13 +273,13 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
   def _ExpectFunctionCreateWithGcs(self, gcs_dest_url):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    test_location = 'projects/{}/locations/{}'.format(
-        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(self.Project(),
+                                                      self.GetRegion())
     self.mock_client.projects_locations_functions.Create.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
-            cloudFunction=self._GenerateFunctionWithGcs(
-                test_name, gcs_dest_url, 'path')),
+            cloudFunction=self._GenerateFunctionWithGcs(test_name, gcs_dest_url,
+                                                        'path')),
         self._GenerateActiveOperation('operations/operation'))
     self._MaybeExpectRemoveIamPolicyBinding(test_name)
     self._ExpectGetOperationAndGetFunction(test_name)
@@ -263,8 +288,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
   def _ExpectFunctionCreateWithTimeout(self, gcs_dest_url):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    test_location = 'projects/{}/locations/{}'.format(
-        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(self.Project(),
+                                                      self.GetRegion())
     self.mock_client.projects_locations_functions.Create.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
@@ -275,12 +300,13 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
 
-  def _ExpectFunctionCreateWithMaxInstances(self, gcs_dest_url,
+  def _ExpectFunctionCreateWithMaxInstances(self,
+                                            gcs_dest_url,
                                             max_instances=8):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    test_location = 'projects/{}/locations/{}'.format(
-        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(self.Project(),
+                                                      self.GetRegion())
     self.mock_client.projects_locations_functions.Create.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
@@ -292,10 +318,11 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
     return 0
 
   def _ExpectFunctionCreateWithClearMaxInstances(self, gcs_dest_url):
-    return self._ExpectFunctionCreateWithMaxInstances(gcs_dest_url,
-                                                      max_instances=0)
+    return self._ExpectFunctionCreateWithMaxInstances(
+        gcs_dest_url, max_instances=0)
 
   def _ExpectFunctionCreateWithVPCConnector(self, vpc_connector):
+
     def Callback(gcs_dest_url):
       test_name = 'projects/{}/locations/{}/functions/my-test'.format(
           self.Project(), self.GetRegion())
@@ -319,8 +346,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
   def _ExpectFunctionCreateWithServiceAccount(self, gcs_dest_url):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    test_location = 'projects/{}/locations/{}'.format(
-        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(self.Project(),
+                                                      self.GetRegion())
     self.mock_client.projects_locations_functions.Create.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
@@ -350,8 +377,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         version=1)
 
     self.mock_client.projects_locations_functions.GetIamPolicy.Expect(
-        self.messages.
-        CloudfunctionsProjectsLocationsFunctionsGetIamPolicyRequest(
+        self.messages
+        .CloudfunctionsProjectsLocationsFunctionsGetIamPolicyRequest(
             resource=test_name),
         response=initial_policy)
     set_request = \
@@ -361,12 +388,10 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
               policy=updated_policy))
     if fail_policy_bind:
       self.mock_client.projects_locations_functions.SetIamPolicy.Expect(
-          set_request,
-          exception=testutil.CreateTestHttpError(404, 'Not Found'))
+          set_request, exception=testutil.CreateTestHttpError(404, 'Not Found'))
     else:
       self.mock_client.projects_locations_functions.SetIamPolicy.Expect(
-          set_request,
-          response=updated_policy)
+          set_request, response=updated_policy)
 
   def _ExpectRemoveIamPolicyBinding(self, test_name, fail_policy_bind,
                                     blank_policy_first):
@@ -388,8 +413,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         version=1)
     if blank_policy_first:
       self.mock_client.projects_locations_functions.GetIamPolicy.Expect(
-          self.messages.
-          CloudfunctionsProjectsLocationsFunctionsGetIamPolicyRequest(
+          self.messages
+          .CloudfunctionsProjectsLocationsFunctionsGetIamPolicyRequest(
               resource=test_name),
           response=self.messages.Policy(etag=b'ACAB'))
       self.mock_client.operations.Get.Expect(
@@ -397,8 +422,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
               name='operations/operation'),
           self._GenerateActiveOperation('operations/operation'))
     self.mock_client.projects_locations_functions.GetIamPolicy.Expect(
-        self.messages.
-        CloudfunctionsProjectsLocationsFunctionsGetIamPolicyRequest(
+        self.messages
+        .CloudfunctionsProjectsLocationsFunctionsGetIamPolicyRequest(
             resource=test_name),
         response=initial_policy)
     set_request = \
@@ -408,20 +433,21 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
               policy=updated_policy))
     if fail_policy_bind:
       self.mock_client.projects_locations_functions.SetIamPolicy.Expect(
-          set_request,
-          exception=testutil.CreateTestHttpError(404, 'Not Found'))
+          set_request, exception=testutil.CreateTestHttpError(404, 'Not Found'))
     else:
       self.mock_client.projects_locations_functions.SetIamPolicy.Expect(
-          set_request,
-          response=updated_policy)
+          set_request, response=updated_policy)
 
-  def _ExpectFunctionCreateWithHttp(
-      self, gcs_dest_url, entry_point=None, allow_unauthenticated=False,
-      no_allow_unauthenticated=False, fail_policy_bind=False):
+  def _ExpectFunctionCreateWithHttp(self,
+                                    gcs_dest_url,
+                                    entry_point=None,
+                                    allow_unauthenticated=False,
+                                    no_allow_unauthenticated=False,
+                                    fail_policy_bind=False):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    test_location = 'projects/{}/locations/{}'.format(
-        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(self.Project(),
+                                                      self.GetRegion())
     self.mock_client.projects_locations_functions.Create.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
@@ -441,8 +467,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
   def _ExpectFailedFunctionCreate(self, gcs_dest_url):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    test_location = 'projects/{}/locations/{}'.format(
-        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(self.Project(),
+                                                      self.GetRegion())
     self.mock_client.projects_locations_functions.Create.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location=test_location,
@@ -466,18 +492,17 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         self._GenerateSuccessfulOperation('operations/operation'))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
-            name=updated_function.name),
-        updated_function)
+            name=updated_function.name), updated_function)
     return 0
 
   def _ExpectCopyFileToGCS(self, callback):
+
     def FakeCopyFileToGCS(client_obj, local_path, target_obj_ref):
       del client_obj, local_path
       return self.callback(target_obj_ref.ToUrl())
 
     self.callback = callback
-    self.StartObjectPatch(storage_api.StorageClient,
-                          'CopyFileToGCS',
+    self.StartObjectPatch(storage_api.StorageClient, 'CopyFileToGCS',
                           FakeCopyFileToGCS)
 
   def _RunDeployFromRepoScenario(self, expected_repository, source_args):
@@ -488,12 +513,11 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
     self._ExpectFunctionCreateWithPubsubAndRepo(expected_repository)
-    self.Run(
-        'functions deploy my-test {0} --trigger-topic topic'.format(
-            source_args))
+    self.Run('functions deploy my-test {0} --trigger-topic topic'.format(
+        source_args))
 
-  def _CopyFileToGCSCallback(
-      self, gcs_dest_url, event_type, resource, test_name, test_location):
+  def _CopyFileToGCSCallback(self, gcs_dest_url, event_type, resource,
+                             test_name, test_location):
     # We need to know what the arguments to gsutil were to know what
     # sourceArchiveUrl to expect in the Create() call
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -506,10 +530,11 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
                 name=test_name,
                 sourceArchiveUrl=gcs_dest_url,
                 labels=self._GetDefaultLabelsMessage(),
-                runtime='nodejs6'
-            ),
-            location=test_location,),
-        self._GenerateActiveOperation('operations/operation'),)
+                runtime='nodejs6'),
+            location=test_location,
+        ),
+        self._GenerateActiveOperation('operations/operation'),
+    )
 
     self._ExpectRemoveIamPolicyBinding(test_name, True, False)
     self._ExpectGetOperationAndGetFunction(test_name)
@@ -517,31 +542,142 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
 
   def _ExpectCreateFunctionWith(self, event_type, resource):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
-    test_location = 'projects/{}/locations/{}'.format(
-        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(self.Project(),
+                                                      self.GetRegion())
     test_name = test_location + '/functions/my-test'
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
+
     def CopyCallback(args):
-      return self._CopyFileToGCSCallback(
-          args, event_type, resource, test_name, test_location)
+      return self._CopyFileToGCSCallback(args, event_type, resource, test_name,
+                                         test_location)
+
     self._ExpectCopyFileToGCS(CopyCallback)
 
   def _ExpectCreateFunctionWithModules(self, event_type, resource):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
-    test_location = 'projects/{}/locations/{}'.format(
-        self.Project(), self.GetRegion())
+    test_location = 'projects/{}/locations/{}'.format(self.Project(),
+                                                      self.GetRegion())
     test_name = test_location + '/functions/my-test'
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
+
     def CopyCallback(args):
-      return self._CopyFileToGCSCallback(
-          args, event_type, resource, test_name, test_location)
+      return self._CopyFileToGCSCallback(args, event_type, resource, test_name,
+                                         test_location)
+
     self._ExpectCopyFileToGCS(CopyCallback)
+
+  def _ExpectFunctionCreateWithIngressEgressSettings(self, ingress_settings,
+                                                     egress_settings):
+
+    def Callback(gcs_dest_url):
+      test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+          self.Project(), self.GetRegion())
+      test_location = 'projects/{}/locations/{}'.format(self.Project(),
+                                                        self.GetRegion())
+      self.mock_client.projects_locations_functions.Create.Expect(
+          self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
+              location=test_location,
+              cloudFunction=self
+              ._GenerateFunctionCreateWithIngressEgressSettings(
+                  test_name, gcs_dest_url, 'path', ingress_settings,
+                  egress_settings)),
+          self._GenerateActiveOperation('operations/operation'))
+      self._ExpectRemoveIamPolicyBinding(test_name, True, False)
+      self._ExpectGetOperationAndGetFunction(test_name)
+      return 0
+
+    return Callback
+
+  def _GenerateFunctionCreateWithIngressEgressSettings(self, name, url, bucket,
+                                                       ingress_settings,
+                                                       egress_settings):
+    ingress_settings_enum = arg_utils.ChoiceEnumMapper(
+        arg_name='ingress_settings',
+        message_enum=self.messages.CloudFunction.IngressSettingsValueValuesEnum,
+        custom_mappings=flags.INGRESS_SETTINGS_MAPPING).GetEnumForChoice(
+            ingress_settings)
+    egress_settings_enum = arg_utils.ChoiceEnumMapper(
+        arg_name='egress_settings',
+        message_enum=self.messages.CloudFunction
+        .VpcConnectorEgressSettingsValueValuesEnum,
+        custom_mappings=flags.EGRESS_SETTINGS_MAPPING).GetEnumForChoice(
+            egress_settings)
+    return self.messages.CloudFunction(
+        name=name,
+        sourceArchiveUrl=url,
+        vpcConnector='my-vpc',
+        eventTrigger=self.messages.EventTrigger(
+            eventType='google.storage.object.finalize',
+            resource='projects/_/buckets/' + bucket,
+        ),
+        runtime='nodejs6',
+        labels=self._GetDefaultLabelsMessage(),
+        vpcConnectorEgressSettings=egress_settings_enum,
+        ingressSettings=ingress_settings_enum,
+    )
+
+  def testCreateWithIngressEgressSettings(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
+    self._ExpectCopyFileToGCS(
+        self._ExpectFunctionCreateWithIngressEgressSettings(
+            ingress_settings='all', egress_settings='all'))
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+    self.Run(
+        'functions deploy my-test --vpc-connector my-vpc --trigger-bucket path '
+        '--stage-bucket buck --runtime=nodejs6 --ingress-settings=all '
+        '--egress-settings=all')
+
+  def testInvalidIngressSettings(self):
+    self.MockUnpackedSourcesDirSize()
+    with self.assertRaisesRegex(
+        cli_test_base.MockArgumentError, 'argument --ingress-settings: '
+        'Invalid choice: \'all-traffic\'.'):
+      self.Run('functions deploy my-test --vpc-connector my-vpc '
+               '--trigger-bucket path --stage-bucket buck --runtime=nodejs6 '
+               '--ingress-settings=all-traffic')
+
+  def testInvalidEgressSettings(self):
+    self.MockUnpackedSourcesDirSize()
+    with self.assertRaisesRegex(
+        cli_test_base.MockArgumentError, 'argument --egress-settings: '
+        'Invalid choice: \'private\'.'):
+      self.Run('functions deploy my-test --vpc-connector my-vpc '
+               '--trigger-bucket path --stage-bucket buck --runtime=nodejs6 '
+               '--egress-settings=private')
+
+  def testRaisesVpcConnectorRequiredIfEgressSettingsSpecified(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithHttp)
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+    with self.assertRaisesRegex(
+        RequiredArgumentException, '.*vpc-connector.*'
+        'Flag `--vpc-connector` is '
+        'required for setting `egress-settings`.'):
+      self.Run('functions deploy my-test '
+               '--trigger-bucket path '
+               '--stage-bucket buck --runtime=nodejs6 '
+               '--egress-settings=private-ranges-only')
 
 
 class FunctionsDeployTest(FunctionsDeployTestBase):
@@ -552,8 +688,9 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectCopyFileToGCS(functools.partial(
-        self._ExpectFunctionCreateWithPubsub, entry_point='foo_bar'))
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithPubsub, entry_point='foo_bar'))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -562,6 +699,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.Run('functions deploy my-test --trigger-topic topic '
              '--stage-bucket buck '
              '--entry-point foo_bar --runtime=nodejs6')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testCreateWithGcs(self):
     self.MockUnpackedSourcesDirSize()
@@ -578,6 +717,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.Run(
         'functions deploy my-test --trigger-bucket path --stage-bucket buck '
         '--runtime=nodejs6')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testCreateWithServiceAccount(self):
     self.MockUnpackedSourcesDirSize()
@@ -607,9 +748,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
     self.ExpectResourceManagerTestIamPolicyBinding(False)
-    self.Run(
-        'functions deploy my-test --timeout 30s --trigger-bucket path '
-        '--stage-bucket buck --runtime=nodejs6')
+    self.Run('functions deploy my-test --timeout 30s --trigger-bucket path '
+             '--stage-bucket buck --runtime=nodejs6')
 
   def testCreateWithHttp(self):
     self.MockUnpackedSourcesDirSize()
@@ -617,9 +757,9 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectCopyFileToGCS(functools.partial(
-        self._ExpectFunctionCreateWithHttp,
-        no_allow_unauthenticated=True))
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithHttp, no_allow_unauthenticated=True))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -627,6 +767,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run('functions deploy my-test --trigger-http --stage-bucket buck '
              '--runtime=nodejs6')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testFailedCreate(self):
     self.MockUnpackedSourcesDirSize()
@@ -648,10 +790,11 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
   def testFailedZip(self):
     self.MockUnpackedSourcesDirSize()
     error_message_for_zip = 'Error message for ZIP'
-    def ThrowingFakeMakeZipFromDir(
-        dest_zip_file, src_dir, predicate=None):
+
+    def ThrowingFakeMakeZipFromDir(dest_zip_file, src_dir, predicate=None):
       del predicate, dest_zip_file, src_dir
       raise ValueError(error_message_for_zip)
+
     mock_chooser = mock.MagicMock(gcloudignore.FileChooser)
     mock_chooser.GetIncludedFiles.return_value = []
     self.StartObjectPatch(
@@ -676,8 +819,9 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/another/locations/{}/functions/my-test'.format(
         self.GetRegion())
-    self._ExpectCopyFileToGCS(functools.partial(
-        self._ExpectFunctionCreateWithPubsub, project='another'))
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithPubsub, project='another'))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -724,9 +868,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
     self.ExpectResourceManagerTestIamPolicyBinding(False)
-    self.Run(
-        'functions deploy my-test --max-instances 8 --trigger-bucket path '
-        '--stage-bucket buck --runtime=nodejs6')
+    self.Run('functions deploy my-test --max-instances 8 --trigger-bucket path '
+             '--stage-bucket buck --runtime=nodejs6')
 
   def testCreateWithClearMaxInstances(self):
     self.MockUnpackedSourcesDirSize()
@@ -803,17 +946,16 @@ class FunctionsDeployArgumentValidationTest(FunctionsDeployTestBase):
         'argument --trigger-http: At most one of --trigger-bucket | '
         '--trigger-http | --trigger-topic | --trigger-event --trigger-resource '
         'may be specified.'):
-      self.Run(
-          'functions deploy my-test --trigger-event '
-          'providers/cloud.pubsub/eventTypes/topic.publish '
-          '--trigger-resource topic --trigger-http --stage-bucket buck'
-      )
+      self.Run('functions deploy my-test --trigger-event '
+               'providers/cloud.pubsub/eventTypes/topic.publish '
+               '--trigger-resource topic --trigger-http --stage-bucket buck')
 
   def testMissingTriggerResource(self):
     self.MockUnpackedSourcesDirSize()
-    with self.assertRaisesRegex(FunctionsError, (
-        r'You must provide --trigger-resource when using '
-        r'--trigger-event=providers/cloud.pubsub/eventTypes/topic.publish')):
+    with self.assertRaisesRegex(
+        FunctionsError,
+        (r'You must provide --trigger-resource when using '
+         r'--trigger-event=providers/cloud.pubsub/eventTypes/topic.publish')):
       self.Run(
           'functions deploy my-test '
           '--trigger-event providers/cloud.pubsub/eventTypes/topic.publish '
@@ -847,9 +989,9 @@ class FunctionsDeployArgumentValidationTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectCopyFileToGCS(functools.partial(
-        self._ExpectFunctionCreateWithHttp,
-        no_allow_unauthenticated=True))
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithHttp, no_allow_unauthenticated=True))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -869,10 +1011,9 @@ class FunctionsDeployTriggerTest(FunctionsDeployTestBase):
         event_type='providers/cloud.pubsub/eventTypes/topic.publish',
         resource='projects/fake-project/topics/topic')
     self.ExpectResourceManagerTestIamPolicyBinding(False)
-    self.Run(
-        'functions deploy my-test '
-        '--trigger-event providers/cloud.pubsub/eventTypes/topic.publish '
-        '--trigger-resource topic --stage-bucket buck --runtime=nodejs6')
+    self.Run('functions deploy my-test '
+             '--trigger-event providers/cloud.pubsub/eventTypes/topic.publish '
+             '--trigger-resource topic --stage-bucket buck --runtime=nodejs6')
 
   def testObjectChange(self):
     self.MockUnpackedSourcesDirSize()
@@ -881,10 +1022,9 @@ class FunctionsDeployTriggerTest(FunctionsDeployTestBase):
         event_type='providers/cloud.storage/eventTypes/object.change',
         resource='projects/_/buckets/bucket')
     self.ExpectResourceManagerTestIamPolicyBinding(False)
-    self.Run(
-        'functions deploy my-test '
-        '--trigger-event providers/cloud.storage/eventTypes/object.change '
-        '--trigger-resource bucket --stage-bucket buck --runtime=nodejs6')
+    self.Run('functions deploy my-test '
+             '--trigger-event providers/cloud.storage/eventTypes/object.change '
+             '--trigger-resource bucket --stage-bucket buck --runtime=nodejs6')
 
   def testObjectChangeBucketManged(self):
     self.MockUnpackedSourcesDirSize()
@@ -923,8 +1063,9 @@ class FunctionsBetaTests(FunctionsDeployTest):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectCopyFileToGCS(functools.partial(
-        self._ExpectFunctionCreateWithHttp, allow_unauthenticated=True))
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithHttp, allow_unauthenticated=True))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -938,10 +1079,11 @@ class FunctionsBetaTests(FunctionsDeployTest):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectCopyFileToGCS(functools.partial(
-        self._ExpectFunctionCreateWithHttp,
-        allow_unauthenticated=True,
-        fail_policy_bind=True))
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithHttp,
+            allow_unauthenticated=True,
+            fail_policy_bind=True))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -960,8 +1102,9 @@ class FunctionsBetaTests(FunctionsDeployTest):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
     self.ExpectResourceManagerTestIamPolicyBinding(True)
-    self._ExpectCopyFileToGCS(functools.partial(
-        self._ExpectFunctionCreateWithHttp, allow_unauthenticated=True))
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithHttp, allow_unauthenticated=True))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -977,8 +1120,9 @@ class FunctionsBetaTests(FunctionsDeployTest):
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
     self.ExpectResourceManagerTestIamPolicyBinding(True)
-    self._ExpectCopyFileToGCS(functools.partial(
-        self._ExpectFunctionCreateWithHttp, no_allow_unauthenticated=True))
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithHttp, no_allow_unauthenticated=True))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
@@ -997,102 +1141,15 @@ class FunctionsBetaTests(FunctionsDeployTest):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectCopyFileToGCS(functools.partial(
-        self._ExpectFunctionCreateWithHttp, no_allow_unauthenticated=True))
+    self._ExpectCopyFileToGCS(
+        functools.partial(
+            self._ExpectFunctionCreateWithHttp, no_allow_unauthenticated=True))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
     self.Run('functions deploy my-test --trigger-http --stage-bucket buck '
              '--runtime=nodejs6 --no-allow-unauthenticated')
-
-  def _ExpectFunctionCreateWithIngressEgressSettings(
-      self,
-      ingress_settings,
-      egress_settings):
-    def Callback(gcs_dest_url):
-      test_name = 'projects/{}/locations/{}/functions/my-test'.format(
-          self.Project(), self.GetRegion())
-      test_location = 'projects/{}/locations/{}'.format(self.Project(),
-                                                        self.GetRegion())
-      self.mock_client.projects_locations_functions.Create.Expect(
-          self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
-              location=test_location,
-              cloudFunction=self
-              ._GenerateFunctionCreateWithIngressEgressSettings(
-                  test_name, gcs_dest_url, 'path',
-                  ingress_settings, egress_settings)),
-          self._GenerateActiveOperation('operations/operation'))
-      self._ExpectRemoveIamPolicyBinding(test_name, True, False)
-      self._ExpectGetOperationAndGetFunction(test_name)
-      return 0
-
-    return Callback
-
-  def _GenerateFunctionCreateWithIngressEgressSettings(
-      self, name, url, bucket, ingress_settings, egress_settings):
-    ingress_settings_enum = arg_utils.ChoiceEnumMapper(
-        arg_name='ingress_settings',
-        message_enum=self.messages.CloudFunction.IngressSettingsValueValuesEnum,
-        custom_mappings=flags.INGRESS_SETTINGS_MAPPING).GetEnumForChoice(
-            ingress_settings)
-    egress_settings_enum = arg_utils.ChoiceEnumMapper(
-        arg_name='egress_settings',
-        message_enum=self.messages.CloudFunction
-        .VpcConnectorEgressSettingsValueValuesEnum,
-        custom_mappings=flags.EGRESS_SETTINGS_MAPPING).GetEnumForChoice(
-            egress_settings)
-    return self.messages.CloudFunction(
-        name=name,
-        sourceArchiveUrl=url,
-        vpcConnector='my-vpc',
-        eventTrigger=self.messages.EventTrigger(
-            eventType='google.storage.object.finalize',
-            resource='projects/_/buckets/' + bucket,
-        ),
-        runtime='nodejs6',
-        labels=self._GetDefaultLabelsMessage(),
-        vpcConnectorEgressSettings=egress_settings_enum,
-        ingressSettings=ingress_settings_enum,
-    )
-
-  def testCreateWithIngressEgressSettings(self):
-    self.MockUnpackedSourcesDirSize()
-    self.MockChooserAndMakeZipFromFileList()
-    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
-    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
-        self.Project(), self.GetRegion())
-    self.ExpectResourceManagerTestIamPolicyBinding(True)
-    self._ExpectCopyFileToGCS(self
-                              ._ExpectFunctionCreateWithIngressEgressSettings(
-                                  ingress_settings='all',
-                                  egress_settings='all'))
-    self.mock_client.projects_locations_functions.Get.Expect(
-        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
-            name=test_name),
-        exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self.Run(
-        'functions deploy my-test --vpc-connector my-vpc --trigger-bucket path '
-        '--stage-bucket buck --runtime=nodejs6 --ingress-settings=all '
-        '--egress-settings=all')
-
-  def testInvalidIngressSettings(self):
-    self.MockUnpackedSourcesDirSize()
-    with self.assertRaisesRegex(cli_test_base.MockArgumentError,
-                                'argument --ingress-settings: '
-                                'Invalid choice: \'all-traffic\'.'):
-      self.Run('functions deploy my-test --vpc-connector my-vpc '
-               '--trigger-bucket path --stage-bucket buck --runtime=nodejs6 '
-               '--ingress-settings=all-traffic')
-
-  def testInvalidEgressSettings(self):
-    self.MockUnpackedSourcesDirSize()
-    with self.assertRaisesRegex(
-        cli_test_base.MockArgumentError, 'argument --egress-settings: '
-        'Invalid choice: \'private\'.'):
-      self.Run('functions deploy my-test --vpc-connector my-vpc '
-               '--trigger-bucket path --stage-bucket buck --runtime=nodejs6 '
-               '--egress-settings=private')
 
 
 class FunctionsAlphaTests(FunctionsBetaTests):
@@ -1105,13 +1162,48 @@ class FunctionsAlphaTests(FunctionsBetaTests):
   def _MaybeExpectRemoveIamPolicyBinding(self, test_name):
     self._ExpectRemoveIamPolicyBinding(test_name, True, True)
 
+  def _GenerateFunctionWithBuildWorkerPool(self, name, url, build_worker_pool,
+                                           bucket):
+    return self.messages.CloudFunction(
+        name=name,
+        sourceArchiveUrl=url,
+        buildWorkerPool=build_worker_pool,
+        eventTrigger=self.messages.EventTrigger(
+            eventType='google.storage.object.finalize',
+            resource='projects/_/buckets/' + bucket,
+        ),
+        runtime='nodejs6',
+        labels=self._GetDefaultLabelsMessage(),
+    )
+
+  def _ExpectFunctionCreateWithBuildWorkerPool(self, build_worker_pool):
+
+    def Callback(gcs_dest_url):
+      test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+          self.Project(), self.GetRegion())
+      test_location = 'projects/{}/locations/{}'.format(self.Project(),
+                                                        self.GetRegion())
+      self.mock_client.projects_locations_functions.Create.Expect(
+          self.messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
+              location=test_location,
+              cloudFunction=self._GenerateFunctionWithBuildWorkerPool(
+                  test_name, gcs_dest_url, build_worker_pool, 'path')),
+          self._GenerateActiveOperation('operations/operation'))
+      self._MaybeExpectRemoveIamPolicyBinding(test_name)
+      self._ExpectGetOperationAndGetFunction(test_name)
+      return 0
+
+    return Callback
+
+  def _ExpectFunctionCreateWithClearBuildWorkerPool(self):
+    return self._ExpectFunctionCreateWithBuildWorkerPool('')
+
   def testInvalidTriggerResourceProjectResource(self):
     self.MockUnpackedSourcesDirSize()
     with self.assertRaisesRegex(properties.InvalidProjectError, '@'):
-      self.Run(
-          'functions deploy my-test '
-          '--trigger-event providers/firebase.auth/eventTypes/user.create '
-          '--trigger-resource @ --stage-bucket buck --runtime=nodejs6')
+      self.Run('functions deploy my-test '
+               '--trigger-event providers/firebase.auth/eventTypes/user.create '
+               '--trigger-resource @ --stage-bucket buck --runtime=nodejs6')
 
   def testUserCreateExplicitProject(self):
     self.MockUnpackedSourcesDirSize()
@@ -1120,10 +1212,9 @@ class FunctionsAlphaTests(FunctionsBetaTests):
         event_type='providers/firebase.auth/eventTypes/user.create',
         resource='projects/asdf')
     self.ExpectResourceManagerTestIamPolicyBinding(False)
-    self.Run(
-        'functions deploy my-test '
-        '--trigger-event providers/firebase.auth/eventTypes/user.create '
-        '--trigger-resource asdf --stage-bucket buck --runtime=nodejs6')
+    self.Run('functions deploy my-test '
+             '--trigger-event providers/firebase.auth/eventTypes/user.create '
+             '--trigger-resource asdf --stage-bucket buck --runtime=nodejs6')
 
   def testUserCreateExplicitProjectWithNodeModules(self):
     self.MockUnpackedSourcesDirSize()
@@ -1131,30 +1222,63 @@ class FunctionsAlphaTests(FunctionsBetaTests):
         event_type='providers/firebase.auth/eventTypes/user.create',
         resource='projects/asdf')
     self.ExpectResourceManagerTestIamPolicyBinding(False)
-    self.Run(
-        'functions deploy my-test '
-        '--trigger-event providers/firebase.auth/eventTypes/user.create '
-        '--trigger-resource asdf --stage-bucket buck --runtime=nodejs6')
+    self.Run('functions deploy my-test '
+             '--trigger-event providers/firebase.auth/eventTypes/user.create '
+             '--trigger-resource asdf --stage-bucket buck --runtime=nodejs6')
 
-  def testRaisesVpcConnectorRequiredIfEgressSettingsSpecified(self):
+  def testCreateWithBuildWorkerPool(self):
     self.MockUnpackedSourcesDirSize()
     self.MockChooserAndMakeZipFromFileList()
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithHttp)
+    self._ExpectCopyFileToGCS(
+        self._ExpectFunctionCreateWithBuildWorkerPool('worker'))
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    with self.assertRaisesRegex(
-        RequiredArgumentException, '.*vpc-connector.*'
-        'Flag `--vpc-connector` is '
-        'required for setting `egress-settings`.'):
-      self.Run('functions deploy my-test '
-               '--trigger-bucket path '
-               '--stage-bucket buck --runtime=nodejs6 '
-               '--egress-settings=private-ranges-only')
+    self.Run(
+        'functions deploy my-test '
+        '--build-worker-pool worker --trigger-bucket path '
+        '--stage-bucket buck --runtime=nodejs6')
+
+  def testCreateWithClearBuildWorkerPool(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    self._ExpectCopyFileToGCS(
+        self._ExpectFunctionCreateWithClearBuildWorkerPool())
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+    self.Run(
+        'functions deploy my-test '
+        '--clear-build-worker-pool --trigger-bucket path '
+        '--stage-bucket buck --runtime=nodejs6')
+
+  def testCreateWithEmptyBuildWorkerPool(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
+    self._ExpectCopyFileToGCS(
+        self._ExpectFunctionCreateWithBuildWorkerPool(None))
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=test_name),
+        exception=testutil.CreateTestHttpError(404, 'Not Found'))
+    self.Run(
+        'functions deploy my-test '
+        '--build-worker-pool "" --trigger-bucket path '
+        '--stage-bucket buck --runtime=nodejs6')
 
 
 if __name__ == '__main__':

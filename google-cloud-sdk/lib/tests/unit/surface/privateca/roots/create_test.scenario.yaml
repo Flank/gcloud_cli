@@ -1,0 +1,357 @@
+title: privateca roots create test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: core/project foo
+- execute:
+  - command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config root-ca
+      --kms-key-version projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
+  - stderr: |
+      Created Certificate Authority [projects/foo/locations/us-west1/certificateAuthorities/new-ca].
+- execute:
+  - command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config root-ca
+      --kms-key-version 1 --kms-key k1 --kms-keyring kr1 --kms-location us-central1
+  - error: '1: Invalid value for [--kms-key-version]: Resource is in an unsupported
+      location. Supported locations are: europe-west1, us-east1, us-west1.'
+- execute:
+  - command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config root-ca
+      --kms-key-version 1 --kms-key k1 --kms-keyring kr1 --kms-location us-west1
+  - error: '1: The current user does not have permissions for this operation. Please
+      ensure you have storage.buckets.create permissions on the project and that you
+      are logged-in as the correct user and try again.'
+actions:
+- set_property:
+    core/project: foo
+- execute_command:
+    command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config root-ca
+      --kms-key-version projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/foo/locations/europe-west1
+              locationId: europe-west1
+            - name: projects/foo/locations/us-east1
+              locationId: us-east1
+            - name: projects/foo/locations/us-west1
+              locationId: us-west1
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/foo:testIamPermissions?alt=json
+          method: POST
+          body:
+            json:
+              permissions:
+              - privateca.certificateauthorities.create
+              - storage.buckets.create
+        return_response:
+          headers:
+            status: '200'
+          body:
+            permissions:
+            - privateca.certificateauthorities.create
+            - storage.buckets.create
+    - api_call:
+        expect_request:
+          uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1:testIamPermissions?alt=json
+          method: POST
+          body:
+            json:
+              permissions:
+              - cloudkms.cryptoKeys.setIamPolicy
+        return_response:
+          headers:
+            status: '200'
+          body:
+            permissions:
+            - cloudkms.cryptoKeys.setIamPolicy
+    - api_call:
+        expect_request:
+          uri: https://serviceusage.googleapis.com/v1beta1/projects/foo/services/privateca.googleapis.com:generateServiceIdentity?alt=json
+          method: POST
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "operations/finished.DONE_OPERATION",
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity",
+                "email": "service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com",
+                "uniqueId": "111511143951582361276"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://storage.googleapis.com/storage/v1/b?alt=json&project=foo
+          method: POST
+          body:
+            text:
+              matches: .*privateca_content_[0-9a-f-]+.*
+            json:
+              location: us-west1
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+             "kind": "storage#bucket",
+             "id": "privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
+             "selfLink": "https://www.googleapis.com/storage/v1/b/privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
+             "projectNumber": "166289904856",
+             "name": "privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
+             "timeCreated": "2020-02-12T20:10:10.558Z",
+             "updated": "2020-02-12T20:10:10.558Z",
+             "metageneration": "1",
+             "iamConfiguration": {
+              "bucketPolicyOnly": {
+               "enabled": false
+              },
+              "uniformBucketLevelAccess": {
+               "enabled": false
+              }
+             },
+             "location": "us-west1",
+             "locationType": "region",
+             "storageClass": "STANDARD",
+             "etag": "CAE="
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1:getIamPolicy?alt=json&options.requestedPolicyVersion=3
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "version": 1,
+              "etag": "ACAB"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1:setIamPolicy?alt=json
+          method: POST
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com
+                  role: roles/cloudkms.signerVerifier
+                etag: ACAB
+                version: 3
+              updateMask: bindings,etag,version
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "bindings": [
+                {
+                  "members": [
+                    "serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com"
+                  ],
+                  "role": "roles/cloudkms.signerVerifier"
+                }
+              ],
+              "version": 3,
+              "etag": "ACAC"
+            }
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://storage\.googleapis\.com/storage/v1/b/privateca_content_[0-9a-f-]+/iam\?alt=json&optionsRequestedPolicyVersion=3
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "storage#policy",
+              "resourceId": "projects/_/buckets/privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
+              "version": 1,
+              "etag": "CAE=",
+              "bindings": [
+                {
+                  "role": "roles/storage.legacyBucketOwner",
+                  "members": [
+                    "projectEditor:foo",
+                    "projectOwner:foo"
+                  ]
+                },
+                {
+                  "role": "roles/storage.legacyBucketReader",
+                  "members": [
+                    "projectViewer:foo"
+                  ]
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://storage\.googleapis\.com/storage/v1/b/privateca_content_[0-9a-f-]+/iam\?alt=json
+          method: PUT
+          body:
+            text:
+              matches: .*projects/_/buckets/privateca_content_[0-9a-f-]+.*
+            json:
+              kind: storage#policy
+              version: 3
+              etag: CAE=
+              bindings:
+              - role: roles/storage.legacyBucketOwner
+                members:
+                - projectEditor:foo
+                - projectOwner:foo
+              - role: roles/storage.legacyBucketReader
+                members:
+                - projectViewer:foo
+              - role: roles/storage.objectAdmin
+                members:
+                - serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "storage#policy",
+              "resourceId": "projects/_/buckets/privateca_content_e4c0350d-8111-4fdc-8a7e-e8d679fb8789",
+              "version": 1,
+              "etag": "CAE=",
+              "bindings": [
+                {
+                  "role": "roles/storage.legacyBucketOwner",
+                  "members": [
+                    "projectEditor:foo",
+                    "projectOwner:foo"
+                  ]
+                },
+                {
+                  "role": "roles/storage.legacyBucketReader",
+                  "members": [
+                    "projectViewer:foo"
+                  ]
+                },
+                {
+                  "role": "roles/storage.objectAdmin",
+                  "members": [
+                    "serviceAccount:service-166289904856@gcp-sa-eprivateca.iam.gserviceaccount.com"
+                  ]
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://privateca\.googleapis\.com/v1alpha1/projects/foo/locations/us-west1/certificateAuthorities\?alt=json&certificateAuthorityId=new-ca&requestId=[^&]+
+          method: POST
+          headers: {}
+          body:
+            json:
+              cloudKmsKeyVersion: projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
+              config:
+                reusableConfig:
+                  reusableConfig: projects/privateca-data/locations/us-west1/reusableConfigs/root-ca
+                subjectConfig:
+                  commonName: peter
+                  subject: {}
+                  subjectAltName: {}
+              issuingOptions:
+                includeCaCertUrl: true
+                includeCrlAccessUrl: true
+              type: SELF_SIGNED
+              lifetime: 315569261s
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/foo/locations/us-west1/operations/operation-123
+            done: true
+            response:
+              name: projects/foo/locations/us-west1/certificateAuthorities/new-ca
+    - expect_stderr: |
+        Created Certificate Authority [projects/foo/locations/us-west1/certificateAuthorities/new-ca].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config root-ca
+      --kms-key-version 1 --kms-key k1 --kms-keyring kr1 --kms-location us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/foo/locations/europe-west1
+              locationId: europe-west1
+            - name: projects/foo/locations/us-east1
+              locationId: us-east1
+            - name: projects/foo/locations/us-west1
+              locationId: us-west1
+    - expect_exit:
+        code: 1
+        message: >-
+          Invalid value for [--kms-key-version]: Resource is in an unsupported location.
+          Supported
+          locations are: europe-west1, us-east1, us-west1.
+- execute_command:
+    command: privateca roots create new-ca --subject CN=peter,O=Google --reusable-config root-ca
+      --kms-key-version 1 --kms-key k1 --kms-keyring kr1 --kms-location us-west1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/foo/locations/europe-west1
+              locationId: europe-west1
+            - name: projects/foo/locations/us-east1
+              locationId: us-east1
+            - name: projects/foo/locations/us-west1
+              locationId: us-west1
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/foo:testIamPermissions?alt=json
+          method: POST
+          body:
+            json:
+              permissions:
+              - privateca.certificateauthorities.create
+              - storage.buckets.create
+        return_response:
+          headers:
+            status: '200'
+          body:
+            permissions:
+            - privateca.certificateauthorities.create
+    - expect_exit:
+        code: 1
+        message: >-
+          The current user does not have permissions for this operation. Please ensure
+          you have
+          storage.buckets.create permissions on the project and that you are logged-in
+          as the
+          correct user and try again.

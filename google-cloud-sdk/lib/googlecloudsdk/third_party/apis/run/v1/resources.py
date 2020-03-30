@@ -24,20 +24,22 @@ DOCS_URL = 'https://cloud.google.com/run/'
 class Collections(enum.Enum):
   """Collections for all supported apis."""
 
-  NAMESPACES = (
-      'namespaces',
-      'namespaces/{namespacesId}',
-      {},
-      [u'namespacesId'],
-      True
-  )
-  NAMESPACES_AUTODOMAINMAPPINGS = (
-      'namespaces.autodomainmappings',
+  API_V1_NAMESPACES = (
+      'api.v1.namespaces',
       '{+name}',
       {
           '':
-              'namespaces/{namespacesId}/autodomainmappings/'
-              '{autodomainmappingsId}',
+              'namespaces/{namespacesId}',
+      },
+      [u'name'],
+      True
+  )
+  API_V1_NAMESPACES_SECRETS = (
+      'api.v1.namespaces.secrets',
+      '{+name}',
+      {
+          '':
+              'namespaces/{namespacesId}/secrets/{secretsId}',
       },
       [u'name'],
       True
@@ -101,23 +103,9 @@ class Collections(enum.Enum):
   )
   PROJECTS_LOCATIONS = (
       'projects.locations',
-      '{+name}',
-      {
-          '':
-              'projects/{projectsId}/locations/{locationsId}',
-      },
-      [u'name'],
-      True
-  )
-  PROJECTS_LOCATIONS_AUTODOMAINMAPPINGS = (
-      'projects.locations.autodomainmappings',
-      '{+name}',
-      {
-          '':
-              'projects/{projectsId}/locations/{locationsId}/'
-              'autodomainmappings/{autodomainmappingsId}',
-      },
-      [u'name'],
+      'projects/{projectsId}/locations/{locationsId}',
+      {},
+      [u'projectsId', u'locationsId'],
       True
   )
   PROJECTS_LOCATIONS_CONFIGURATIONS = (
@@ -142,6 +130,17 @@ class Collections(enum.Enum):
       [u'name'],
       True
   )
+  PROJECTS_LOCATIONS_NAMESPACES = (
+      'projects.locations.namespaces',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/namespaces/'
+              '{namespacesId}',
+      },
+      [u'name'],
+      True
+  )
   PROJECTS_LOCATIONS_REVISIONS = (
       'projects.locations.revisions',
       '{+name}',
@@ -160,6 +159,17 @@ class Collections(enum.Enum):
           '':
               'projects/{projectsId}/locations/{locationsId}/routes/'
               '{routesId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS_LOCATIONS_SECRETS = (
+      'projects.locations.secrets',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/secrets/'
+              '{secretsId}',
       },
       [u'name'],
       True

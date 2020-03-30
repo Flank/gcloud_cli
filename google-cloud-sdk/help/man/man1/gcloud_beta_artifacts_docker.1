@@ -1,0 +1,97 @@
+
+.TH "GCLOUD_BETA_ARTIFACTS_DOCKER" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta artifacts docker \- manage Artifact Registry container images and tags
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta artifacts docker\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR To list images under repository \f5my\-repo\fR, project
+\f5my\-project\fR, in \f5us\-central1\fR:
+
+.RS 2m
+$ gcloud beta artifacts docker images list \e
+  us\-central1\-docker.pkg.dev/my\-project/my\-repo
+.RE
+
+To delete image \f5busy\-box\fR in \f5us\-west1\fR and all of its digests and
+tags:
+
+.RS 2m
+$ gcloud beta artifacts docker images delete
+us\-west1\-docker.pkg.dev/my\-project/my\-repository/busy\-box
+.RE
+
+To add tag \f5my\-tag\fR to image \f5busy\-box\fR referenced by digest
+\f5abcxyz\fR in \f5us\-west1\fR:
+
+.RS 2m
+$ gcloud beta artifacts docker tags add
+us\-west1\-docker.pkg.dev/my\-project/my\-repository/busy\-box@sha256:abcxyz
+us\-west1\-docker.pkg.dev/my\-project/my\-repository/busy\-box:my\-tag
+.RE
+
+To delete tag \f5my\-tag\fR from image \f5busy\-box\fR in \f5us\-west1\fR:
+
+.RS 2m
+$ gcloud beta artifacts docker tags delete
+us\-west1\-docker.pkg.dev/my\-project/my\-repository/busy\-box:my\-tag
+.RE
+
+To list tags for image \f5busy\-box\fR in \f5us\-west1\fR:
+
+.RS 2m
+$ gcloud beta artifacts docker tags list
+us\-west1\-docker.pkg.dev/my\-project/my\-repository/busy\-box
+.RE
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBimages\fR
+\fB(BETA)\fR Manage Artifact Registry container images.
+
+.TP 2m
+\fBtags\fR
+\fB(BETA)\fR Manage Artifact Registry container image tags.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha artifacts docker
+.RE
+

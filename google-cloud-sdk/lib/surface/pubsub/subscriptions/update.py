@@ -56,11 +56,14 @@ class Update(base.UpdateCommand):
       An HttpException if there was a problem calling the
       API subscriptions.Patch command.
     """
+    flags.ValidateDeadLetterPolicy(args)
+
     client = subscriptions.SubscriptionsClient()
     subscription_ref = args.CONCEPTS.subscription.Parse()
     dead_letter_topic = getattr(args, 'dead_letter_topic', None)
     max_delivery_attempts = getattr(args, 'max_delivery_attempts', None)
     clear_dead_letter_policy = getattr(args, 'clear_dead_letter_policy', None)
+    clear_retry_policy = getattr(args, 'clear_retry_policy', None)
 
     labels_update = labels_util.ProcessUpdateArgsLazy(
         args, client.messages.Subscription.LabelsValue,
@@ -76,6 +79,13 @@ class Update(base.UpdateCommand):
     if dead_letter_topic:
       dead_letter_topic = args.CONCEPTS.dead_letter_topic.Parse().RelativeName()
 
+    min_retry_delay = getattr(args, 'min_retry_delay', None)
+    if min_retry_delay:
+      min_retry_delay = util.FormatDuration(min_retry_delay)
+    max_retry_delay = getattr(args, 'max_retry_delay', None)
+    if max_retry_delay:
+      max_retry_delay = util.FormatDuration(max_retry_delay)
+
     try:
       result = client.Patch(
           subscription_ref,
@@ -88,7 +98,10 @@ class Update(base.UpdateCommand):
           expiration_period=expiration_period,
           dead_letter_topic=dead_letter_topic,
           max_delivery_attempts=max_delivery_attempts,
-          clear_dead_letter_policy=clear_dead_letter_policy)
+          clear_dead_letter_policy=clear_dead_letter_policy,
+          clear_retry_policy=clear_retry_policy,
+          min_retry_delay=min_retry_delay,
+          max_retry_delay=max_retry_delay)
     except subscriptions.NoFieldsSpecifiedError:
       if not any(args.IsSpecified(arg) for arg in ('clear_labels',
                                                    'update_labels',
@@ -109,10 +122,12 @@ class UpdateAlpha(Update):
   def Args(cls, parser):
     resource_args.AddSubscriptionResourceArg(parser, 'to update.')
     flags.AddSubscriptionSettingsFlags(
-        parser, is_update=True, support_dead_letter_queues=True)
+        parser,
+        is_update=True,
+        support_filtering=True,
+        support_retry_policy=True)
     labels_util.AddUpdateLabelsFlags(parser)
 
   @exceptions.CatchHTTPErrorRaiseHTTPException()
   def Run(self, args):
-    flags.ValidateDeadLetterPolicy(args)
     return super(UpdateAlpha, self).Run(args)

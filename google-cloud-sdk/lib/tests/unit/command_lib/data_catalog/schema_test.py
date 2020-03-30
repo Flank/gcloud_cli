@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from apitools.base.py import encoding
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.data_catalog.entries import util
+from googlecloudsdk.command_lib.data_catalog.entries import v1_util
 from tests.lib import parameterized
 from tests.lib import test_case
 
@@ -30,6 +31,7 @@ class SchemaTest(test_case.TestCase, parameterized.TestCase):
 
   def SetUp(self):
     self.messages = apis.GetMessagesModule('datacatalog', 'v1beta1')
+    self.messages_v1 = apis.GetMessagesModule('datacatalog', 'v1')
 
   @parameterized.named_parameters(
       ('YAML file contents',
@@ -73,7 +75,12 @@ class SchemaTest(test_case.TestCase, parameterized.TestCase):
          }
        ]""")
   )
+
   def testProcessSchemaFromFile(self, contents):
+    self._testProcessSchemaFromFileV1beta1(contents)
+    self._testProcessSchemaFromFileV1(contents)
+
+  def _testProcessSchemaFromFileV1beta1(self, contents):
     schema_message = util.ProcessSchemaFromFile(contents)
     expected_message = encoding.DictToMessage(
         {'columns': [
@@ -85,6 +92,20 @@ class SchemaTest(test_case.TestCase, parameterized.TestCase):
             ]}
         ]},
         self.messages.GoogleCloudDatacatalogV1beta1Schema)
+    self.assertEqual(schema_message, expected_message)
+
+  def _testProcessSchemaFromFileV1(self, contents):
+    schema_message = v1_util.ProcessSchemaFromFile(contents)
+    expected_message = encoding.DictToMessage(
+        {'columns': [
+            {'column': 'field1', 'type': 'type1',
+             'description': 'description1'},
+            {'column': 'field2', 'type': 'RECORD', 'subcolumns': [
+                {'column': 'field3', 'type': 'type3', 'mode': 'REQUIRED'},
+                {'column': 'field4', 'type': 'type4', 'mode': 'REPEATED'}
+            ]}
+        ]},
+        self.messages_v1.GoogleCloudDatacatalogV1Schema)
     self.assertEqual(schema_message, expected_message)
 
   def testProcessSchemaFromFileInvalidSchemaFile(self):

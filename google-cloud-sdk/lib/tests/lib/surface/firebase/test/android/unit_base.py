@@ -50,8 +50,10 @@ ALL_TEST_RUN_ARGS = {
     calliope_base.ReleaseTrack.GA:
         ALL_GA_TEST_RUN_ARGS,
     calliope_base.ReleaseTrack.BETA:
-        ALL_GA_TEST_RUN_ARGS +
-        ['additional_apks', 'client_details', 'other_files', 'robo_script']
+        ALL_GA_TEST_RUN_ARGS + [
+            'additional_apks', 'client_details', 'num_uniform_shards',
+            'other_files', 'robo_script', 'test_targets_for_shard'
+        ]
 }
 
 

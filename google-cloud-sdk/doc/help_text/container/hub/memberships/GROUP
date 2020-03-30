@@ -1,0 +1,45 @@
+NAME
+    gcloud container hub memberships - manage memberships of all your GKE and
+        other Kubernetes cluster with HUB
+
+SYNOPSIS
+    gcloud container hub memberships COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage memberships of all your GKE and other Kubernetes cluster with HUB.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        Delete a membership.
+
+     describe
+        Describe a membership.
+
+     list
+        List memberships.
+
+     register
+        Register a cluster with Hub.
+
+     unregister
+        Unregister a cluster from Hub.
+
+     update
+        Update a membership.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha container hub memberships
+        $ gcloud beta container hub memberships
+

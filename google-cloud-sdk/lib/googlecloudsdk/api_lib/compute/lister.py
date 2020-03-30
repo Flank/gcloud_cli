@@ -512,8 +512,12 @@ def _GetListCommandFrontendPrototype(args, message=None):
   """
   filter_expr = flags.RewriteFilter(args, message=message)
   max_results = int(args.page_size) if args.page_size else None
+  local_filter, _ = filter_expr
   if args.limit and (max_results is None or max_results > args.limit):
     max_results = args.limit
+  if not local_filter:
+    # If we are not applying a client-side filter, don't limit batch size.
+    max_results = None
   return _Frontend(filter_expr=filter_expr, maxResults=max_results)
 
 
@@ -1035,13 +1039,22 @@ class MultiScopeLister(object):
     else:
       # scopeSet is AllScopes
       # generate AggregatedList
+      request_message = self.aggregation_service.GetRequestType(
+          'AggregatedList')
       for project_ref in sorted(list(scope_set.projects)):
-        requests.append(
-            (self.aggregation_service, 'AggregatedList',
-             self.aggregation_service.GetRequestType('AggregatedList')(
-                 filter=frontend.filter,
-                 maxResults=frontend.max_results,
-                 project=project_ref.project)))
+        if hasattr(request_message, 'includeAllScopes'):
+          requests.append((self.aggregation_service, 'AggregatedList',
+                           request_message(
+                               filter=frontend.filter,
+                               maxResults=frontend.max_results,
+                               project=project_ref.project,
+                               includeAllScopes=True)))
+        else:
+          requests.append((self.aggregation_service, 'AggregatedList',
+                           request_message(
+                               filter=frontend.filter,
+                               maxResults=frontend.max_results,
+                               project=project_ref.project)))
 
     errors = []
     response_count = 0

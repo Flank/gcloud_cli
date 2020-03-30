@@ -5,7 +5,7 @@ SYNOPSIS
     gcloud compute url-maps create URL_MAP
         (--default-backend-bucket=DEFAULT_BACKEND_BUCKET
           | --default-service=DEFAULT_SERVICE) [--description=DESCRIPTION]
-        [GCLOUD_WIDE_FLAG ...]
+        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute url-maps create is used to create URL maps which map HTTP
@@ -45,12 +45,51 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the URL map.
 
+     At most one of these may be specified:
+
+       --global
+          If set, the URL map is global.
+
+       --region=REGION
+          Region of the URL map to create. If not specified, you may be
+          prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a global URL map with a default service, run:
+
+    $ gcloud compute url-maps create URL_MAP_NAME \        --default-service=BACKEND_SERVICE_NAME
+
+    To create a regional URL map with a default service, run:
+
+    $ gcloud compute url-maps create URL_MAP_NAME \        --default-service=BACKEND_SERVICE_NAME --region=REGION_NAME
+
+    To create a global URL map with a default backend bucket, run:
+
+    $ gcloud compute url-maps create URL_MAP_NAME \        --default-backend-bucket=BACKEND_BUCKET_NAME
 
 NOTES
     These variants are also available:

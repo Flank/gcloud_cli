@@ -11,15 +11,17 @@ gcloud alpha compute instance\-groups managed update \- update Google Compute En
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed update\fR \fINAME\fR [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-update\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]] [\fB\-\-clear\-autohealing\fR\ |\ \fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR\ \fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed update\fR \fINAME\fR [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]] [\fB\-\-clear\-autohealing\fR\ |\ \fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR\ \fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR \fBgcloud alpha compute instance\-groups managed update\fR allows
-you to specify or modify the StatefulPolicy and AutoHealingPolicy for an
-existing managed instance group.
+\fB(ALPHA)\fR Update Google Compute Engine managed instance groups.
+
+\fBgcloud alpha compute instance\-groups managed update\fR allows you to specify
+or modify the StatefulPolicy and AutoHealingPolicy for an existing managed
+instance group.
 
 Stateful Policy defines what stateful resources should be preserved for the
 group. When instances in the group are removed or recreated, those stateful
@@ -56,25 +58,24 @@ Name of the managed instance group to update.
 .RS 2m
 .TP 2m
 \fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR
-Specify type of instance redistribution policy. Instance redistribution type
-gives possibility to enable or disable automatic instance redistribution between
-zones to its target distribution. Target distribution is a state of regional
-managed instance group where all instances are spread out equally between all
-target zones.
+Specifies the type of the instance redistribution policy. An instance
+redistribution type lets you enable or disable automatic instance redistribution
+across zones to meet the target distribution. The target distribution is a state
+of a regional managed instance group where all instances are spread out evenly
+across all target zones.
 
-Instance redistribution type may be specified for non\-autoscaled regional
-managed instance group only. By default it is set to PROACTIVE.
+An instance redistribution type can be specified only for a non\-autoscaled
+regional managed instance group. By default it is set to PROACTIVE.
 
 The following types are available:
 
 .RS 2m
 .IP "\(em" 2m
-NONE \- managed instance group will not take any action to bring instances to
-its target distribution.
+NONE \- The managed instance group does not redistribute instances across zones.
 
 .IP "\(em" 2m
-PROACTIVE \- managed instance group will actively converge all instances between
-zones to its target distribution.
+PROACTIVE \- The managed instance group proactively redistributes instances to
+meet its target distribution.
 
 .RE
 .RE
@@ -87,11 +88,10 @@ zones to its target distribution.
 Stop considering the disks stateful by the instance group.
 
 .TP 2m
-\fB\-\-update\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]
-Disks considered stateful by the instance group. Usually, the managed instance
-group deletes disks when deleting instances; however, in the case of stateful
-disks, these disks are detached from the deleted instance and attached to new
-instances the managed instance group creates.
+\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]
+Disks considered stateful by the instance group. Managed instance groups
+preserve and reattach stateful disks on VM autohealing, update, and recreate
+events.
 
 Use this argument multiple times to update more disks.
 
@@ -107,10 +107,11 @@ case new stateful disk definition will be added to the instance config.
 .TP 2m
 \fBauto\-delete\fR
 (Optional) Specifies the auto deletion policy of the stateful disk. Supported
-values are 'never' (never delete this disk) and
-\'on\-permanent\-instance\-deletion' (delete the stateful disk when the given
-instance is permanently deleted from the instance group; for example when the
-group is resized down). If omitted, 'never' is used as the default.
+values are \f5\fInever\fR\fR (never delete this disk) and
+\f5\fIon\-permanent\-instance\-deletion\fR\fR (delete the stateful disk when the
+given instance is permanently deleted from the instance group; for example when
+the group is resized down). If omitted, \f5\fInever\fR\fR is used as the
+default.
 
 .RE
 .sp
@@ -199,8 +200,9 @@ invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

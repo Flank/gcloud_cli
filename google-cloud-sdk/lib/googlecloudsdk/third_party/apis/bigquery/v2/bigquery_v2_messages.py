@@ -1045,6 +1045,7 @@ class ExplainQueryStage(_messages.Message):
     shuffleOutputBytes: Total number of bytes written to shuffle.
     shuffleOutputBytesSpilled: Total number of bytes written to shuffle and
       spilled to disk.
+    slotMs: Slot-milliseconds used by the stage.
     startMs: Stage start time represented as milliseconds since epoch.
     status: Current status for the stage.
     steps: List of operations within the stage in dependency order
@@ -1081,17 +1082,18 @@ class ExplainQueryStage(_messages.Message):
   recordsWritten = _messages.IntegerField(16)
   shuffleOutputBytes = _messages.IntegerField(17)
   shuffleOutputBytesSpilled = _messages.IntegerField(18)
-  startMs = _messages.IntegerField(19)
-  status = _messages.StringField(20)
-  steps = _messages.MessageField('ExplainQueryStep', 21, repeated=True)
-  waitMsAvg = _messages.IntegerField(22)
-  waitMsMax = _messages.IntegerField(23)
-  waitRatioAvg = _messages.FloatField(24)
-  waitRatioMax = _messages.FloatField(25)
-  writeMsAvg = _messages.IntegerField(26)
-  writeMsMax = _messages.IntegerField(27)
-  writeRatioAvg = _messages.FloatField(28)
-  writeRatioMax = _messages.FloatField(29)
+  slotMs = _messages.IntegerField(19)
+  startMs = _messages.IntegerField(20)
+  status = _messages.StringField(21)
+  steps = _messages.MessageField('ExplainQueryStep', 22, repeated=True)
+  waitMsAvg = _messages.IntegerField(23)
+  waitMsMax = _messages.IntegerField(24)
+  waitRatioAvg = _messages.FloatField(25)
+  waitRatioMax = _messages.FloatField(26)
+  writeMsAvg = _messages.IntegerField(27)
+  writeMsMax = _messages.IntegerField(28)
+  writeRatioAvg = _messages.FloatField(29)
+  writeRatioMax = _messages.FloatField(30)
 
 
 class ExplainQueryStep(_messages.Message):
@@ -1403,25 +1405,29 @@ class JobConfigurationExtract(_messages.Message):
   Fields:
     compression: [Optional] The compression type to use for exported files.
       Possible values include GZIP, DEFLATE, SNAPPY, and NONE. The default
-      value is NONE. DEFLATE and SNAPPY are only supported for Avro.
+      value is NONE. DEFLATE and SNAPPY are only supported for Avro. Not
+      applicable when extracting models.
     destinationFormat: [Optional] The exported file format. Possible values
-      include CSV, NEWLINE_DELIMITED_JSON and AVRO. The default value is CSV.
-      Tables with nested or repeated fields cannot be exported as CSV.
+      include CSV, NEWLINE_DELIMITED_JSON or AVRO for tables and
+      ML_TF_SAVED_MODEL or ML_XGBOOST_BOOSTER for models. The default value
+      for tables is CSV. Tables with nested or repeated fields cannot be
+      exported as CSV. The default value for models is ML_TF_SAVED_MODEL.
     destinationUri: [Pick one] DEPRECATED: Use destinationUris instead,
       passing only one URI as necessary. The fully-qualified Google Cloud
       Storage URI where the extracted table should be written.
     destinationUris: [Pick one] A list of fully-qualified Google Cloud Storage
       URIs where the extracted table should be written.
     fieldDelimiter: [Optional] Delimiter to use between fields in the exported
-      data. Default is ','
+      data. Default is ','. Not applicable when extracting models.
     printHeader: [Optional] Whether to print out a header row in the results.
-      Default is true.
+      Default is true. Not applicable when extracting models.
     sourceModel: A reference to the model being exported.
     sourceTable: A reference to the table being exported.
     useAvroLogicalTypes: [Optional] If destinationFormat is set to "AVRO",
       this flag indicates whether to enable extracting applicable column types
       (such as TIMESTAMP) to their corresponding AVRO logical types
       (timestamp-micros), instead of only using their raw types (avro-long).
+      Not applicable when extracting models.
   """
 
   compression = _messages.StringField(1)

@@ -22,7 +22,6 @@ from googlecloudsdk.calliope import base
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-@base.Hidden
 class Snapshots(base.Group):
   """Create and manage Cloud Filestore snapshots.
 
@@ -31,10 +30,6 @@ class Snapshots(base.Group):
   To create a snapshot with the name 'my-snapshot', run:
 
     $ {command} create my-snapshot
-
-  To create a local snapshot with the name 'my-snapshot', run:
-
-    $ {command} create my-snapshot --local
 
   To delete a snapshot with the name 'my-snapshot', run:
 

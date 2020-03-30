@@ -23,7 +23,10 @@ import os
 import socket
 import threading
 
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import devshell
+from googlecloudsdk.core.credentials import store
+from tests.lib import sdk_test_base
 
 
 class AuthReferenceServer(threading.Thread):
@@ -90,3 +93,37 @@ class AuthReferenceServer(threading.Thread):
             s.close()
     except socket.error:
       pass
+
+
+class DevshellTestBase(sdk_test_base.SdkBase):
+  """A base class for tests of Dev Shell.
+
+  This class sets up the fake enviornment to test Dev Shell. Resources are
+  cleaned up by the TearDown function at the end of each test.
+  """
+
+  @sdk_test_base.Retry(
+      why='The port used by the proxy may be in use.',
+      max_retrials=3,
+      sleep_ms=300)
+  def _CreateAndStartDevshellProxy(self):
+    self.devshell_proxy = AuthReferenceServer(self.GetPort())
+    try:
+      self.devshell_proxy.Start()
+    except Exception as e:  # pylint: disable=bare-except
+      # Clean up environment variables set by Start().
+      self.devshell_proxy.Stop()
+      raise e
+
+  def SetUp(self):
+    self._devshell_provider = store.DevShellCredentialProvider()
+    self._devshell_provider.Register()
+    self.assertIsNone(properties.VALUES.core.project.Get())
+    self._CreateAndStartDevshellProxy()
+    self.assertEqual('fooproj', properties.VALUES.core.project.Get())
+
+  def TearDown(self):
+    self._devshell_provider.UnRegister()
+    # Need to do this check while the dev shell proxy is still active.
+    self.assertIsNone(properties.VALUES.core.project.Get())
+    self.devshell_proxy.Stop()

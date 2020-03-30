@@ -55,8 +55,9 @@ ID of the location or fully qualified identifier for the location.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -64,6 +65,16 @@ help\fR for details.
 
 This command uses the \fBtpu/v1\fR API. The full documentation for this API can
 be found at: https://cloud.google.com/tpu/
+
+
+
+.SH "EXAMPLES"
+
+The following command describes the TPUs running in zone \f5us\-central1\-b\fR:
+
+.RS 2m
+$ gcloud compute tpus locations describe zone=us\-central1\-b
+.RE
 
 
 

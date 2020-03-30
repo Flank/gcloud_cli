@@ -58,17 +58,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To list the roles for an organization, run:
+    To list the roles for the organization 12345, run:
 
-        $ gcloud alpha iam roles list --organization 12345
+        $ gcloud alpha iam roles list --organization=12345
 
-    To list the roles for a project, run:
+    To list the roles for the project myproject, run:
 
-        $ gcloud alpha iam roles list --project myproject
+        $ gcloud alpha iam roles list --project=myproject
 
     To list the curated roles, run:
 

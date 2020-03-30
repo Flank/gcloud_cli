@@ -298,6 +298,49 @@ class CommitmentsCreateAlphaTest(CommitmentsCreateTestBeta):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
+  def testCreateLicense(self):
+    commitment = self.MakeLicenseCommitment(name='test', license_url='sap-12',
+                                            amount=1, cores='1-2')
+    self.Run("""
+        compute commitments create-license test
+        --plan 12-month
+        --license sap-12
+        --region fake-region
+        --amount 1
+        --cores-per-license 1-2
+        """)
+    self.CheckRequests(
+        [(self.compute.regionCommitments,
+          'Insert',
+          self.messages.ComputeRegionCommitmentsInsertRequest(
+              commitment=commitment,
+              project='my-project',
+              region='fake-region',
+          )
+         )],
+    )
+
+  def testCreateLicenseNoCores(self):
+    commitment = self.MakeLicenseCommitment(name='test', license_url='sap-12',
+                                            amount=1)
+    self.Run("""
+          compute commitments create-license test
+          --plan 12-month
+          --license sap-12
+          --region fake-region
+          --amount 1
+          """)
+    self.CheckRequests(
+        [(self.compute.regionCommitments,
+          'Insert',
+          self.messages.ComputeRegionCommitmentsInsertRequest(
+              commitment=commitment,
+              project='my-project',
+              region='fake-region',
+          )
+         )],
+    )
+
 
 if __name__ == '__main__':
   test_case.main()

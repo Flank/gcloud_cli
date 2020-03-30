@@ -3,11 +3,34 @@ NAME
 
 SYNOPSIS
     gcloud alpha game servers realms update (REALM : --location=LOCATION)
-        [--async] [--time-zone=TIME_ZONE] [--update-labels=[KEY=VALUE,...]]
+        --dry-run [--preview-time=PREVIEW_TIME] [--time-zone=TIME_ZONE]
+        [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Update a Cloud Game Server Realm.
+
+EXAMPLES
+    To update Realm 'my-realm' in project 'my-project' and location in
+    'my-location' with a new time-zone run:
+
+        $ gcloud alpha game servers realms update my-realm \
+            --project=my-project --location=my-location --time-zone=EST \
+            --no-dry-run
+
+    To preview Realm update for 'my-realm' in project 'my-project' and location
+    in 'my-location' with a new time-zone run:
+
+        $ gcloud alpha game servers realms update my-realm \
+            --project=my-project --location=my-location --time-zone=EST \
+            --dry-run
+
+    To update labels for Realm 'my-realm' in project 'my-project' and location
+    in 'my-location' run:
+
+        $ gcloud alpha game servers realms update my-realm \
+            --project=my-project --location=my-location \
+            --update-labels="key1=val1" --no-dry-run
 
 POSITIONAL ARGUMENTS
      Realm resource - Cloud Game Server Realm to update. The arguments in this
@@ -26,10 +49,14 @@ POSITIONAL ARGUMENTS
        --location=LOCATION
           Google Cloud location.
 
-FLAGS
-     --async
-        Return immediately, without waiting for the operation in progress to
-        complete.
+REQUIRED FLAGS
+     --dry-run
+        Validate the changes, but do not execute it.
+
+OPTIONAL FLAGS
+     --preview-time=PREVIEW_TIME
+        This attribute is only relevant for preview (--dry-run). It is used to
+        validate the state for a future time.
 
      --time-zone=TIME_ZONE
         Time zone where all realm-specific policies are evaluated. The value of
@@ -63,14 +90,16 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the gameservices/v1alpha API. The full documentation for
@@ -80,5 +109,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta game servers realms update
 

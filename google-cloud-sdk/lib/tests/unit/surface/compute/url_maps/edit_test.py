@@ -42,7 +42,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
 
   def SetUp(self):
     self.SelectApi('v1')
-    self._api = 'v1'
+    self._api = ''
     self._url_maps_api = self.compute_v1.urlMaps
     self.url_map = self._CreateUrlMap()
     self.yaml_file_contents = self._CreateYaml()
@@ -53,16 +53,15 @@ class URLMapsEditTest(test_base.BaseEditTest):
         defaultService=(
             'https://compute.googleapis.com/compute/%(api)s/projects/'
             'my-project/global/backendServices/my-backend-service' % {
-                'api': self._api}),
+                'api': self.api
+            }),
         description='My URL Map',
         fingerprint=b'my-fingerprint',
         hostRules=[
             self.messages.HostRule(
-                hosts=['google.com', '*.google.com'],
-                pathMatcher='www'),
+                hosts=['google.com', '*.google.com'], pathMatcher='www'),
             self.messages.HostRule(
-                hosts=['youtube.com', '*.youtube.com'],
-                pathMatcher='youtube'),
+                hosts=['youtube.com', '*.youtube.com'], pathMatcher='youtube'),
         ],
         pathMatchers=[
             self.messages.PathMatcher(
@@ -70,19 +69,22 @@ class URLMapsEditTest(test_base.BaseEditTest):
                 defaultService=(
                     'https://compute.googleapis.com/compute/%(api)s/projects/'
                     'my-project/global/backendServices/www-service' % {
-                        'api': self._api})),
+                        'api': self.api
+                    })),
             self.messages.PathMatcher(
                 name='youtube',
                 defaultService=(
                     'https://compute.googleapis.com/compute/%(api)s/projects/'
                     'my-project/global/backendServices/youtube-service' % {
-                        'api': self._api})),
+                        'api': self.api
+                    })),
         ],
         name='my-url-map',
         selfLink=(
             'https://compute.googleapis.com/compute/%(api)s/projects/my-project/'
             'global/urlMaps/my-url-map' % {
-                'api': self._api}))
+                'api': self.api
+            }))
 
   def _CreateYaml(self):
     return textwrap.dedent("""\
@@ -191,7 +193,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
         #   - defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-service
         #     name: youtube
         #   selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/my-url-map
-        """ % {'api': self._api})
+        """ % {'api': self.api})
 
   def _CreateJson(self):
     return textwrap.dedent("""\
@@ -365,13 +367,14 @@ class URLMapsEditTest(test_base.BaseEditTest):
         #     ],
         #     "selfLink": "https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/my-url-map"
         #   }
-        """ % {'api': self._api})
+        """ % {'api': self.api})
 
   def RunEdit(self, command):
-    self.Run('compute url-maps edit ' + command)
+    self.Run(self._api + ' compute url-maps edit ' + command)
 
   def testSimpleEditingWithYAML(self):
-    self.mock_edit.side_effect = iter([textwrap.dedent("""\
+    self.mock_edit.side_effect = iter([
+        textwrap.dedent("""\
         # You can edit the resource below. Lines beginning with "#" are
         # ignored.
         #
@@ -397,7 +400,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
         - defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-service
           name: youtube
 
-        """ % {'api': self._api})])
+        """ % {'api': self.api})
+    ])
 
     self.make_requests.side_effect = iter([
         [self.url_map],
@@ -410,14 +414,10 @@ class URLMapsEditTest(test_base.BaseEditTest):
 
     self.AssertFileOpenedWith(self.yaml_file_contents)
     self.CheckRequests(
-        [(self._url_maps_api,
-          'Get',
+        [(self._url_maps_api, 'Get',
           self.messages.ComputeUrlMapsGetRequest(
-              project='my-project',
-              urlMap='my-url-map'))],
-
-        [(self._url_maps_api,
-          'Update',
+              project='my-project', urlMap='my-url-map'))],
+        [(self._url_maps_api, 'Update',
           self.messages.ComputeUrlMapsUpdateRequest(
               project='my-project',
               urlMap='my-url-map',
@@ -425,7 +425,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                   defaultService=(
                       'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendServices/my-backend-service') %
-                  {'api': self._api},
+                  {'api': self.api},
                   description='A changed description',
                   fingerprint=b'my-fingerprint',
                   hostRules=[
@@ -439,14 +439,15 @@ class URLMapsEditTest(test_base.BaseEditTest):
                           defaultService=(
                               'https://compute.googleapis.com/compute/%(api)s/'
                               'projects/my-project/global/backendServices/'
-                              'youtube-service') % {'api': self._api}),
+                              'youtube-service') % {'api': self.api}),
                   ],
                   name='my-url-map',
               )))],
     )
 
   def testSimpleEditingWithBackendBucketsAndYAML(self):
-    self.mock_edit.side_effect = iter([textwrap.dedent("""\
+    self.mock_edit.side_effect = iter([
+        textwrap.dedent("""\
         # You can edit the resource below. Lines beginning with "#" are
         # ignored.
         #
@@ -472,7 +473,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
         - defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-service
           name: youtube
 
-        """ % {'api': self._api})])
+        """ % {'api': self.api})
+    ])
 
     self.make_requests.side_effect = iter([
         [self.url_map],
@@ -485,22 +487,18 @@ class URLMapsEditTest(test_base.BaseEditTest):
 
     self.AssertFileOpenedWith(self.yaml_file_contents)
     self.CheckRequests(
-        [(self._url_maps_api,
-          'Get',
+        [(self._url_maps_api, 'Get',
           self.messages.ComputeUrlMapsGetRequest(
-              project='my-project',
-              urlMap='my-url-map'))],
-
-        [(self._url_maps_api,
-          'Update',
+              project='my-project', urlMap='my-url-map'))],
+        [(self._url_maps_api, 'Update',
           self.messages.ComputeUrlMapsUpdateRequest(
               project='my-project',
               urlMap='my-url-map',
               urlMapResource=self.messages.UrlMap(
                   defaultService=(
                       'https://compute.googleapis.com/compute/%(api)s/projects/'
-                      'my-project/global/backendBuckets/my-backend-bucket') % {
-                          'api': self._api},
+                      'my-project/global/backendBuckets/my-backend-bucket') %
+                  {'api': self.api},
                   description='A changed description',
                   fingerprint=b'my-fingerprint',
                   hostRules=[
@@ -514,14 +512,15 @@ class URLMapsEditTest(test_base.BaseEditTest):
                           defaultService=(
                               'https://compute.googleapis.com/compute/%(api)s/'
                               'projects/my-project/global/backendServices/'
-                              'youtube-service') % {'api': self._api}),
+                              'youtube-service') % {'api': self.api}),
                   ],
                   name='my-url-map',
               )))],
     )
 
   def testUriNormalization(self):
-    self.mock_edit.side_effect = iter([textwrap.dedent("""\
+    self.mock_edit.side_effect = iter([
+        textwrap.dedent("""\
         ---
         defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/my-backend-service
         hostRules:
@@ -540,7 +539,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
         - host: youtube.com
           path: /view/this
           service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-watch
-        """ % {'api': self._api})])
+        """ % {'api': self.api})
+    ])
 
     self.make_requests.side_effect = iter([
         [self.url_map],
@@ -553,14 +553,10 @@ class URLMapsEditTest(test_base.BaseEditTest):
 
     self.AssertFileOpenedWith(self.yaml_file_contents)
     self.CheckRequests(
-        [(self._url_maps_api,
-          'Get',
+        [(self._url_maps_api, 'Get',
           self.messages.ComputeUrlMapsGetRequest(
-              project='my-project',
-              urlMap='my-url-map'))],
-
-        [(self._url_maps_api,
-          'Update',
+              project='my-project', urlMap='my-url-map'))],
+        [(self._url_maps_api, 'Update',
           self.messages.ComputeUrlMapsUpdateRequest(
               project='my-project',
               urlMap='my-url-map',
@@ -568,7 +564,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                   defaultService=(
                       'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendServices/my-backend-service') %
-                  {'api': self._api},
+                  {'api': self.api},
                   fingerprint=b'my-fingerprint',
                   hostRules=[
                       self.messages.HostRule(
@@ -581,15 +577,15 @@ class URLMapsEditTest(test_base.BaseEditTest):
                           defaultService=(
                               'https://compute.googleapis.com/compute/%(api)s/'
                               'projects/my-project/global/backendServices/'
-                              'youtube-service') % {'api': self._api},
+                              'youtube-service') % {'api': self.api},
                           pathRules=[
                               self.messages.PathRule(
                                   paths=['/view'],
                                   service=(
                                       'https://compute.googleapis.com/compute/'
                                       '%(api)s/projects/my-project/global/'
-                                      'backendServices/youtube-watch') % {
-                                          'api': self._api},
+                                      'backendServices/youtube-watch') %
+                                  {'api': self.api},
                               ),
                           ],
                       ),
@@ -602,13 +598,14 @@ class URLMapsEditTest(test_base.BaseEditTest):
                           service=(
                               'https://compute.googleapis.com/compute/%(api)s/'
                               'projects/my-project/global/backendServices/'
-                              'youtube-watch') % {'api': self._api}),
+                              'youtube-watch') % {'api': self.api}),
                   ],
               )))],
     )
 
   def testUriNormalizationWithBackendBuckets(self):
-    self.mock_edit.side_effect = iter([textwrap.dedent("""\
+    self.mock_edit.side_effect = iter([
+        textwrap.dedent("""\
         ---
         defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/my-backend-bucket
         hostRules:
@@ -630,7 +627,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
         - host: youtube.com
           path: /view/this
           service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-watch
-        """ % {'api': self._api})])
+        """ % {'api': self.api})
+    ])
 
     self.make_requests.side_effect = iter([
         [self.url_map],
@@ -643,22 +641,18 @@ class URLMapsEditTest(test_base.BaseEditTest):
 
     self.AssertFileOpenedWith(self.yaml_file_contents)
     self.CheckRequests(
-        [(self._url_maps_api,
-          'Get',
+        [(self._url_maps_api, 'Get',
           self.messages.ComputeUrlMapsGetRequest(
-              project='my-project',
-              urlMap='my-url-map'))],
-
-        [(self._url_maps_api,
-          'Update',
+              project='my-project', urlMap='my-url-map'))],
+        [(self._url_maps_api, 'Update',
           self.messages.ComputeUrlMapsUpdateRequest(
               project='my-project',
               urlMap='my-url-map',
               urlMapResource=self.messages.UrlMap(
                   defaultService=(
                       'https://compute.googleapis.com/compute/%(api)s/projects/'
-                      'my-project/global/backendBuckets/my-backend-bucket') % {
-                          'api': self._api},
+                      'my-project/global/backendBuckets/my-backend-bucket') %
+                  {'api': self.api},
                   fingerprint=b'my-fingerprint',
                   hostRules=[
                       self.messages.HostRule(
@@ -671,23 +665,23 @@ class URLMapsEditTest(test_base.BaseEditTest):
                           defaultService=(
                               'https://compute.googleapis.com/compute/%(api)s/'
                               'projects/my-project/global/backendServices/'
-                              'youtube-service') % {'api': self._api},
+                              'youtube-service') % {'api': self.api},
                           pathRules=[
                               self.messages.PathRule(
                                   paths=['/view'],
                                   service=(
                                       'https://compute.googleapis.com/compute/'
                                       '%(api)s/projects/my-project/global/'
-                                      'backendServices/youtube-watch') % {
-                                          'api': self._api},
+                                      'backendServices/youtube-watch') %
+                                  {'api': self.api},
                               ),
                               self.messages.PathRule(
                                   paths=['/images/*'],
                                   service=(
                                       'https://compute.googleapis.com/compute/'
                                       '%(api)s/projects/my-project/global/'
-                                      'backendBuckets/images-bucket') % {
-                                          'api': self._api},
+                                      'backendBuckets/images-bucket') %
+                                  {'api': self.api},
                               ),
                           ],
                       ),
@@ -700,7 +694,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                           service=(
                               'https://compute.googleapis.com/compute/%(api)s/'
                               'projects/my-project/global/backendServices/'
-                              'youtube-watch') % {'api': self._api}),
+                              'youtube-watch') % {'api': self.api}),
                   ],
               )))],
     )
@@ -725,7 +719,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
                            normalize_space=True)
 
   def testRemovalOfEntireStructuresWithYAML(self):
-    self.mock_edit.side_effect = iter([textwrap.dedent("""\
+    self.mock_edit.side_effect = iter([
+        textwrap.dedent("""\
         # You can edit the resource below. Lines beginning with "#" are
         # ignored.
         #
@@ -755,7 +750,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
         defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/my-backend-service
         description: My URL Map
 
-        """ % {'api': self._api})])
+        """ % {'api': self.api})
+    ])
 
     self.make_requests.side_effect = iter([
         [self.url_map],
@@ -768,14 +764,10 @@ class URLMapsEditTest(test_base.BaseEditTest):
 
     self.AssertFileOpenedWith(self.yaml_file_contents)
     self.CheckRequests(
-        [(self._url_maps_api,
-          'Get',
+        [(self._url_maps_api, 'Get',
           self.messages.ComputeUrlMapsGetRequest(
-              project='my-project',
-              urlMap='my-url-map'))],
-
-        [(self._url_maps_api,
-          'Update',
+              project='my-project', urlMap='my-url-map'))],
+        [(self._url_maps_api, 'Update',
           self.messages.ComputeUrlMapsUpdateRequest(
               project='my-project',
               urlMap='my-url-map',
@@ -783,7 +775,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                   defaultService=(
                       'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendServices/my-backend-service') %
-                  {'api': self._api},
+                  {'api': self.api},
                   description='My URL Map',
                   fingerprint=b'my-fingerprint',
                   name='my-url-map',
@@ -791,7 +783,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
     )
 
   def testSimpleEditingWithJSON(self):
-    self.mock_edit.side_effect = iter([textwrap.dedent("""\
+    self.mock_edit.side_effect = iter([
+        textwrap.dedent("""\
         # You can edit the resource below. Lines beginning with "#" are
         # ignored.
         #
@@ -869,7 +862,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
             }
           ]
         }
-        """ % {'api': self._api})])
+        """ % {'api': self.api})
+    ])
 
     self.make_requests.side_effect = iter([
         [self.url_map],
@@ -882,22 +876,18 @@ class URLMapsEditTest(test_base.BaseEditTest):
 
     self.AssertFileOpenedWith(self.json_file_contents)
     self.CheckRequests(
-        [(self._url_maps_api,
-          'Get',
+        [(self._url_maps_api, 'Get',
           self.messages.ComputeUrlMapsGetRequest(
-              project='my-project',
-              urlMap='my-url-map'))],
-
-        [(self._url_maps_api,
-          'Update',
+              project='my-project', urlMap='my-url-map'))],
+        [(self._url_maps_api, 'Update',
           self.messages.ComputeUrlMapsUpdateRequest(
               project='my-project',
               urlMap='my-url-map',
               urlMapResource=self.messages.UrlMap(
                   defaultService=(
                       'https://compute.googleapis.com/compute/%(api)s/projects/'
-                      'my-project/global/backendServices/my-backend-service')  %
-                  {'api': self._api},
+                      'my-project/global/backendServices/my-backend-service') %
+                  {'api': self.api},
                   description='A changed description',
                   fingerprint=b'my-fingerprint',
                   hostRules=[
@@ -911,14 +901,15 @@ class URLMapsEditTest(test_base.BaseEditTest):
                           defaultService=(
                               'https://compute.googleapis.com/compute/%(api)s/'
                               'projects/my-project/global/backendServices/'
-                              'youtube-service') % {'api': self._api}),
+                              'youtube-service') % {'api': self.api}),
                   ],
                   name='my-url-map',
               )))],
     )
 
   def testSimpleEditingBackendBucketsWithJSON(self):
-    self.mock_edit.side_effect = iter([textwrap.dedent("""\
+    self.mock_edit.side_effect = iter([
+        textwrap.dedent("""\
         # You can edit the resource below. Lines beginning with "#" are
         # ignored.
         #
@@ -1000,7 +991,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
             }
           ]
         }
-        """ % {'api': self._api})])
+        """ % {'api': self.api})
+    ])
 
     self.make_requests.side_effect = iter([
         [self.url_map],
@@ -1013,22 +1005,18 @@ class URLMapsEditTest(test_base.BaseEditTest):
 
     self.AssertFileOpenedWith(self.json_file_contents)
     self.CheckRequests(
-        [(self._url_maps_api,
-          'Get',
+        [(self._url_maps_api, 'Get',
           self.messages.ComputeUrlMapsGetRequest(
-              project='my-project',
-              urlMap='my-url-map'))],
-
-        [(self._url_maps_api,
-          'Update',
+              project='my-project', urlMap='my-url-map'))],
+        [(self._url_maps_api, 'Update',
           self.messages.ComputeUrlMapsUpdateRequest(
               project='my-project',
               urlMap='my-url-map',
               urlMapResource=self.messages.UrlMap(
                   defaultService=(
                       'https://compute.googleapis.com/compute/%(api)s/projects/'
-                      'my-project/global/backendBuckets/my-backend-bucket') % {
-                          'api': self._api},
+                      'my-project/global/backendBuckets/my-backend-bucket') %
+                  {'api': self.api},
                   description='A changed description',
                   fingerprint=b'my-fingerprint',
                   hostRules=[
@@ -1042,13 +1030,13 @@ class URLMapsEditTest(test_base.BaseEditTest):
                           defaultService=(
                               'https://compute.googleapis.com/compute/%(api)s/'
                               'projects/my-project/global/backendServices/'
-                              'youtube-service') % {'api': self._api}),
+                              'youtube-service') % {'api': self.api}),
                       self.messages.PathMatcher(
                           name='images',
                           defaultService=(
                               'https://compute.googleapis.com/compute/%(api)s/'
                               'projects/my-project/global/backendBuckets/'
-                              'image-bucket') % {'api': self._api}),
+                              'image-bucket') % {'api': self.api}),
                   ],
                   name='my-url-map',
               )))],
@@ -1148,7 +1136,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
           "defaultService", "https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/my-backend-service",
           "description": "A changed description"
         }
-        """ % {'api': self._api})
+        """ % {'api': self.api})
 
     self.mock_edit.side_effect = iter([
         bad_modifications,
@@ -1170,7 +1158,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
               "defaultService": "https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/my-backend-service",
               "description": "A changed description"
             }
-            """ % {'api': self._api}),
+            """ % {'api': self.api}),
     ])
 
     self.make_requests.side_effect = iter([
@@ -1185,14 +1173,12 @@ class URLMapsEditTest(test_base.BaseEditTest):
     self.AssertFileOpenedWith(self.json_file_contents, bad_modifications)
 
     self.CheckRequests(
-        [(self._url_maps_api,
-          'Get',
+        [(self._url_maps_api, 'Get',
           self.messages.ComputeUrlMapsGetRequest(
               project='my-project',
               urlMap='my-url-map',
           ))],
-        [(self._url_maps_api,
-          'Update',
+        [(self._url_maps_api, 'Update',
           self.messages.ComputeUrlMapsUpdateRequest(
               project='my-project',
               urlMap='my-url-map',
@@ -1200,7 +1186,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                   defaultService=(
                       'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendServices/my-backend-service') %
-                  {'api': self._api},
+                  {'api': self.api},
                   description='A changed description',
                   fingerprint=b'my-fingerprint',
                   name='my-url-map',
@@ -1213,7 +1199,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
   def testEditingWithYAMLWithSyntaxErrorsAndNoRetry(self):
     self.WriteInput('n\n')  # Answer no when prompted to try again.
 
-    self.mock_edit.side_effect = iter([textwrap.dedent("""\
+    self.mock_edit.side_effect = iter([
+        textwrap.dedent("""\
         # You can edit the resource below. Lines beginning with "#" are
         # ignored.
         #
@@ -1231,7 +1218,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
         *defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/my-backend-service
         description: A changed description
 
-        """ % {'api': self._api})])
+        """ % {'api': self.api})
+    ])
 
     self.make_requests.side_effect = iter([
         [self.url_map],
@@ -1283,7 +1271,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
         *defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/my-backend-service
         description: A changed description
 
-        """ % {'api': self._api})
+        """ % {'api': self.api})
 
     self.mock_edit.side_effect = iter([
         bad_modifications,
@@ -1305,7 +1293,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
             defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/my-backend-service
             description: A changed description
 
-            """ % {'api': self._api}),
+            """ % {'api': self.api}),
     ])
 
     self.make_requests.side_effect = iter([
@@ -1320,14 +1308,12 @@ class URLMapsEditTest(test_base.BaseEditTest):
     self.AssertFileOpenedWith(self.yaml_file_contents, bad_modifications)
 
     self.CheckRequests(
-        [(self._url_maps_api,
-          'Get',
+        [(self._url_maps_api, 'Get',
           self.messages.ComputeUrlMapsGetRequest(
               project='my-project',
               urlMap='my-url-map',
           ))],
-        [(self._url_maps_api,
-          'Update',
+        [(self._url_maps_api, 'Update',
           self.messages.ComputeUrlMapsUpdateRequest(
               project='my-project',
               urlMap='my-url-map',
@@ -1335,7 +1321,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                   defaultService=(
                       'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendServices/my-backend-service') %
-                  {'api': self._api},
+                  {'api': self.api},
                   description='A changed description',
                   fingerprint=b'my-fingerprint',
                   name='my-url-map',
@@ -1350,7 +1336,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
   def testEditingWithServerError(self):
     self.WriteInput('n\n')  # Answer no when prompted to try again.
 
-    self.mock_edit.side_effect = iter([textwrap.dedent("""\
+    self.mock_edit.side_effect = iter([
+        textwrap.dedent("""\
         # You can edit the resource below. Lines beginning with "#" are
         # ignored.
         #
@@ -1368,7 +1355,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
         defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/my-backend-service
         description: A changed description
 
-        """ % {'api': self._api})])
+        """ % {'api': self.api})
+    ])
 
     self.make_requests.side_effect = iter([
         [self.url_map],
@@ -1382,14 +1370,12 @@ class URLMapsEditTest(test_base.BaseEditTest):
 
     self.AssertFileOpenedWith(self.yaml_file_contents)
     self.CheckRequests(
-        [(self._url_maps_api,
-          'Get',
+        [(self._url_maps_api, 'Get',
           self.messages.ComputeUrlMapsGetRequest(
               project='my-project',
               urlMap='my-url-map',
           ))],
-        [(self._url_maps_api,
-          'Update',
+        [(self._url_maps_api, 'Update',
           self.messages.ComputeUrlMapsUpdateRequest(
               project='my-project',
               urlMap='my-url-map',
@@ -1397,7 +1383,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                   defaultService=(
                       'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendServices/my-backend-service') %
-                  {'api': self._api},
+                  {'api': self.api},
                   description='A changed description',
                   fingerprint=b'my-fingerprint',
                   name='my-url-map',
@@ -1437,24 +1423,24 @@ class URLMapsEditBetaTest(URLMapsEditTest):
     self.Run('beta compute url-maps edit --global ' + command)
 
 
-class RegionURLMapsEditBetaTest(test_base.BaseEditTest):
+class RegionURLMapsEditTest(test_base.BaseEditTest):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self._api = 'beta'
-    self._url_maps_api = self.compute_beta.regionUrlMaps
+    self.SelectApi('v1')
+    self._api = ''
+    self._url_maps_api = self.compute_v1.regionUrlMaps
     self.url_map = self._CreateUrlMap()
     self.yaml_file_contents = self._CreateYaml()
 
   def RunEdit(self, command):
-    self.Run('beta compute url-maps edit --region us-west1 ' + command)
+    self.Run(self._api + ' compute url-maps edit --region us-west1 ' + command)
 
   def _CreateUrlMap(self):
     return self.messages.UrlMap(
         defaultService=(
             'https://compute.googleapis.com/compute/%(api)s/projects/'
             'my-project/regions/us-west1/backendServices/my-backend-service' % {
-                'api': self._api
+                'api': self.api
             }),
         description='My URL Map',
         fingerprint=b'my-fingerprint',
@@ -1471,7 +1457,7 @@ class RegionURLMapsEditBetaTest(test_base.BaseEditTest):
                     'https://compute.googleapis.com/compute/%(api)s/projects/'
                     'my-project/regions/us-west1/backendServices/www-service' %
                     {
-                        'api': self._api
+                        'api': self.api
                     })),
             self.messages.PathMatcher(
                 name='youtube',
@@ -1479,14 +1465,14 @@ class RegionURLMapsEditBetaTest(test_base.BaseEditTest):
                     'https://compute.googleapis.com/compute/%(api)s/projects/'
                     'my-project/regions/us-west1/backendServices/'
                     'youtube-service' % {
-                        'api': self._api
+                        'api': self.api
                     })),
         ],
         name='my-url-map',
         selfLink=(
             'https://compute.googleapis.com/compute/%(api)s/projects/my-project/'
             'regions/us-west1/urlMaps/my-url-map' % {
-                'api': self._api
+                'api': self.api
             }))
 
   def _CreateYaml(self):
@@ -1596,7 +1582,7 @@ class RegionURLMapsEditBetaTest(test_base.BaseEditTest):
         #   - defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west1/backendServices/youtube-service
         #     name: youtube
         #   selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west1/urlMaps/my-url-map
-        """ % {'api': self._api})
+        """ % {'api': self.api})
 
   def testSimpleEditingWithYAML(self):
     self.mock_edit.side_effect = iter([
@@ -1626,7 +1612,7 @@ class RegionURLMapsEditBetaTest(test_base.BaseEditTest):
         - defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west1/backendServices/youtube-service
           name: youtube
 
-        """ % {'api': self._api})
+        """ % {'api': self.api})
     ])
 
     self.make_requests.side_effect = iter([
@@ -1652,7 +1638,7 @@ class RegionURLMapsEditBetaTest(test_base.BaseEditTest):
                   defaultService=(
                       'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/regions/us-west1/backendServices/'
-                      'my-backend-service') % {'api': self._api},
+                      'my-backend-service') % {'api': self.api},
                   description='A changed description',
                   fingerprint=b'my-fingerprint',
                   hostRules=[
@@ -1667,11 +1653,21 @@ class RegionURLMapsEditBetaTest(test_base.BaseEditTest):
                               'https://compute.googleapis.com/compute/%(api)s/'
                               'projects/my-project/regions/us-west1/'
                               'backendServices/youtube-service') %
-                          {'api': self._api}),
+                          {'api': self.api}),
                   ],
                   name='my-url-map',
               )))],
     )
+
+
+class RegionURLMapsEditBetaTest(RegionURLMapsEditTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._url_maps_api = self.compute_beta.regionUrlMaps
+    self.url_map = self._CreateUrlMap()
+    self.yaml_file_contents = self._CreateYaml()
 
 
 class RegionURLMapsEditAlphaTest(RegionURLMapsEditBetaTest):
@@ -1682,9 +1678,6 @@ class RegionURLMapsEditAlphaTest(RegionURLMapsEditBetaTest):
     self._url_maps_api = self.compute_alpha.regionUrlMaps
     self.url_map = self._CreateUrlMap()
     self.yaml_file_contents = self._CreateYaml()
-
-  def RunEdit(self, command):
-    self.Run('alpha compute url-maps edit --region us-west1 ' + command)
 
 
 if __name__ == '__main__':

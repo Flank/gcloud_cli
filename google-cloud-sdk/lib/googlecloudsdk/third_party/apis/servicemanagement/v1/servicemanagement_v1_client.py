@@ -9,6 +9,7 @@ class ServicemanagementV1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://servicemanagement.googleapis.com/'
+  MTLS_BASE_URL = u'https://servicemanagement.mtls.googleapis.com/'
 
   _PACKAGE = u'servicemanagement'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform', u'https://www.googleapis.com/auth/cloud-platform.read-only', u'https://www.googleapis.com/auth/service.management', u'https://www.googleapis.com/auth/service.management.readonly']
@@ -421,6 +422,36 @@ service.
         supports_download=False,
     )
 
+    def Patch(self, request, global_params=None):
+      r"""Patches specified subset of the settings that control the specified.
+customer's usage of the service.  Attempts to update a field not
+controlled by the caller will result in an access denied error.
+
+Operation<response: CustomerSettings>
+
+      Args:
+        request: (ServicemanagementServicesCustomerSettingsPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'PATCH',
+        method_id=u'servicemanagement.services.customerSettings.patch',
+        ordered_params=[u'serviceName', u'customerId'],
+        path_params=[u'customerId', u'serviceName'],
+        query_params=[u'updateMask'],
+        relative_path=u'v1/services/{serviceName}/customerSettings/{customerId}',
+        request_field=u'customerSettings',
+        request_type_name=u'ServicemanagementServicesCustomerSettingsPatchRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
   class ServicesProjectSettingsService(base_api.BaseApiService):
     """Service class for the services_projectSettings resource."""
 
@@ -531,7 +562,7 @@ Operation<response: Rollout>
         method_id=u'servicemanagement.services.rollouts.create',
         ordered_params=[u'serviceName'],
         path_params=[u'serviceName'],
-        query_params=[u'baseRolloutId', u'force'],
+        query_params=[u'force'],
         relative_path=u'v1/services/{serviceName}/rollouts',
         request_field=u'rollout',
         request_type_name=u'ServicemanagementServicesRolloutsCreateRequest',
@@ -871,36 +902,6 @@ of "project:{PROJECT-ID}".
         request_field='',
         request_type_name=u'ServicemanagementServicesListRequest',
         response_type_name=u'ListServicesResponse',
-        supports_download=False,
-    )
-
-    def Patch(self, request, global_params=None):
-      r"""Updates the specified one of the configurations. If the specified service.
-does not exist the patch operation fails.
-
-
-Operation<response: ManagedService>
-
-      Args:
-        request: (ServicemanagementServicesPatchRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('Patch')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Patch.method_config = lambda: base_api.ApiMethodInfo(
-        http_method=u'PATCH',
-        method_id=u'servicemanagement.services.patch',
-        ordered_params=[u'serviceName'],
-        path_params=[u'serviceName'],
-        query_params=[u'updateMask'],
-        relative_path=u'v1/services/{serviceName}',
-        request_field=u'managedService',
-        request_type_name=u'ServicemanagementServicesPatchRequest',
-        response_type_name=u'Operation',
         supports_download=False,
     )
 

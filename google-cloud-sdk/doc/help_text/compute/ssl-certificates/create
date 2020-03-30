@@ -5,11 +5,11 @@ NAME
 SYNOPSIS
     gcloud compute ssl-certificates create NAME --certificate=LOCAL_FILE_PATH
         --private-key=LOCAL_FILE_PATH [--description=DESCRIPTION]
-        [GCLOUD_WIDE_FLAG ...]
+        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute ssl-certificates create is used to create SSL certificates
-    which can be used to configure a target HTTPS proxy. An SSL certificate
+    gcloud compute ssl-certificates create creates SSL certificates, which you
+    can use in a target HTTPS or target SSL proxy. An SSL certificate resource
     consists of a certificate and private key. The private key is encrypted
     before it is stored. For more information, see:
     https://cloud.google.com/load-balancing/docs/ssl-certificates
@@ -32,12 +32,45 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the SSL certificate.
 
+     At most one of these may be specified:
+
+       --global
+          If set, the SSL certificate is global.
+
+       --region=REGION
+          Region of the SSL certificate to create. If not specified, you may be
+          prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a certificate 'my-cert' from a certificate placed under path
+    'foo/cert' and a private key placed under path 'foo/pk', run:
+
+        $ gcloud compute ssl-certificates create my-cert \
+          --certificate=foo/cert --private-key=foo/pk
 
 NOTES
     These variants are also available:

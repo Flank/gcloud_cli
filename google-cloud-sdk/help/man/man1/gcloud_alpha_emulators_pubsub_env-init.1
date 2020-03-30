@@ -47,8 +47,9 @@ $ gcloud info \-\-format='get(config.paths.global_config_dir)'
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -57,7 +58,7 @@ help\fR for details.
 To print the env variables exports for a pubsub emulator, run:
 
 .RS 2m
-$ gcloud alpha emulators pubsub env\-init \-\-data\-dir DATA\-DIR
+$ gcloud alpha emulators pubsub env\-init \-\-data\-dir=DATA\-DIR
 .RE
 
 For a detailed walkthrough of setting Pub/Sub emulator environment variables,

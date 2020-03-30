@@ -5,9 +5,11 @@ NAME
 SYNOPSIS
     gcloud alpha remote-build-execution worker-pools update
         (WORKERPOOL : --instance=INSTANCE) [--async] [--disk-size=DISK_SIZE]
-        [--machine-type=MACHINE_TYPE] [--min-cpu-platform=MIN_CPU_PLATFORM]
-        [--network-access=NETWORK_ACCESS] [--reserved]
-        [--update-labels=[KEY=VALUE,...]] [--worker-count=WORKER_COUNT]
+        [--disk-type=DISK_TYPE] [--machine-type=MACHINE_TYPE]
+        [--max-concurrent-actions=MAX_CONCURRENT_ACTIONS]
+        [--min-cpu-platform=MIN_CPU_PLATFORM] [--network-access=NETWORK_ACCESS]
+        [--reserved] [--update-labels=[KEY=VALUE,...]]
+        [--worker-count=WORKER_COUNT]
         [--clear-accelerator-config | --accelerator-count=ACCELERATOR_COUNT
           --accelerator-type=ACCELERATOR_TYPE]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
@@ -42,11 +44,24 @@ FLAGS
      --disk-size=DISK_SIZE
         Size of the disk, in Gb, for each worker. Defaults to 200Gb.
 
+     --disk-type=DISK_TYPE
+        Type of persistent disk the worker VMs will use. Default is
+        pd-standard. DISK_TYPE must be one of:
+
+         pd-ssd
+            SSD persistent disk.
+
+         pd-standard
+            Standard persistent disk.
+
      --machine-type=MACHINE_TYPE
         The type of VM to use for each worker. To get a list of valid machine
         types, use the following command:
 
         $ gcloud compute machine-types list
+
+     --max-concurrent-actions=MAX_CONCURRENT_ACTIONS
+        Maximum actions each worker VM can run concurrently.
 
      --min-cpu-platform=MIN_CPU_PLATFORM
         Minimum CPU platform for the workers. For more information see
@@ -120,14 +135,16 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the remotebuildexecution/v1alpha API. The full

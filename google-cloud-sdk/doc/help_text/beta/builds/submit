@@ -117,8 +117,27 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To submit a build with source located at storage URL
+    gs://bucket/object.zip:
+
+        $ gcloud beta builds submit  `gs://bucket/object.zip` \
+           --tag=gcr.io/my-project/image
+
+    To submit a build with source located at storage URL gs://bucket/object.zip
+    using config file config.yaml:
+
+        $ gcloud beta builds submit `gs://bucket/object.zip` \
+            --tag=gcr.io/my-project/image --config=config.yaml
+
+    To submit a build with local source source.tgz asynchronously:
+
+        $ gcloud beta builds submit `source.tgz` \
+            --tag=gcr.io/my-project/image --async
 
 NOTES
     You can also run a build locally using the separate component: gcloud

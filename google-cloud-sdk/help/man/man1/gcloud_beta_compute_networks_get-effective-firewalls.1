@@ -1,0 +1,73 @@
+
+.TH "GCLOUD_BETA_COMPUTE_NETWORKS_GET\-EFFECTIVE\-FIREWALLS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute networks get\-effective\-firewalls \- get the effective firewalls of a Google Compute Engine network
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute networks get\-effective\-firewalls\fR \fINAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute networks get\-effective\-firewalls\fR Get
+the effective firewalls applied on the network. For example:
+
+.RS 2m
+$ gcloud beta compute networks get\-effective\-firewalls \e
+    example\-network
+.RE
+
+gets the effective firewalls applied on the network 'example\-network'.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the network to get effective firewalls.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To get the effective firewalls of network with name example\-network, run:
+
+.RS 2m
+$ gcloud beta compute networks get\-effective\-firewalls \e
+    example\-network,
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute networks get\-effective\-firewalls
+.RE
+

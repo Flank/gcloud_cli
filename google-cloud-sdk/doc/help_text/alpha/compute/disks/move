@@ -12,16 +12,8 @@ DESCRIPTION
     is attached to a running or stopped instance; use the gcloud compute
     instances move command instead.
 
-    For example, running:
-
-        $ gcloud compute disks move example-disk-1 --zone us-central1-b \
-           --destination-zone us-central1-f
-
-    will move the disk called example-disk-1, currently running in
-    us-central1-b, to us-central1-f.
-
-    Please note that gcloud compute disks move does not yet support regional
-    persistent disks. Please see
+    The gcloud compute disks move command does not support regional persistent
+    disks. See
     https://cloud.google.com/compute/docs/disks/regional-persistent-disk for
     more details.
 
@@ -62,8 +54,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To move the disk called example-disk-1 from us-central1-b to us-central1-f,
+    run:
+
+        $ gcloud alpha compute disks move example-disk-1 \
+            --zone=us-central1-b --destination-zone=us-central1-f
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

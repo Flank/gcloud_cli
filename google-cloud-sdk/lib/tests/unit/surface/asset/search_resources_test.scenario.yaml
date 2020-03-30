@@ -1,0 +1,101 @@
+title: surface unit test for asset search-resources
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: core/project proj-foo
+- execute:
+  - command: asset search-resources --scope='projects/123' --query='name:"*abc*"'
+  - stdout: |
+      results:
+      - asset_type: compute.googleapis.com/Subnetwork
+        display_name: default
+        name: //compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc
+        project: projects/123
+- execute:
+  - command: asset search-resources --query='name:"*abc*"'
+  - stdout: |
+      results:
+      - asset_type: compute.googleapis.com/Subnetwork
+        display_name: default
+        name: //compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc
+        project: projects/123
+actions:
+- set_property:
+    core/project: proj-foo  # `projects/proj-foo` has project number `projects/123`
+- execute_command:
+    command: asset search-resources --scope='projects/123' --query='name:"*abc*"'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1p1beta1/resources:search?alt=json&query=name%3A%22%2Aabc%2A%22&scope=projects%2F123
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "results": [
+                {
+                  "asset_type": "compute.googleapis.com/Subnetwork",
+                  "display_name": "default",
+                  "name": "//compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc",
+                  "project": "projects/123"
+                }
+              ]
+            }
+    - expect_stdout: |
+        results:
+        - asset_type: compute.googleapis.com/Subnetwork
+          display_name: default
+          name: //compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc
+          project: projects/123
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Search without --scope specified, will fall back to the core/project.
+    command: asset search-resources --query='name:"*abc*"'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/proj-foo?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '123'
+            projectId: proj-foo
+            lifecycleState: ACTIVE
+            name: Fake Project
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1p1beta1/resources:search?alt=json&query=name%3A%22%2Aabc%2A%22&scope=projects%2F123
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "results": [
+                {
+                  "asset_type": "compute.googleapis.com/Subnetwork",
+                  "display_name": "default",
+                  "name": "//compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc",
+                  "project": "projects/123"
+                }
+              ]
+            }
+    - expect_stdout: |
+        results:
+        - asset_type: compute.googleapis.com/Subnetwork
+          display_name: default
+          name: //compute.googleapis.com/projects/proj-foo/regions/asia-northeast3/subnetworks/abc
+          project: projects/123
+    - expect_exit:
+        code: 0

@@ -1,5 +1,16 @@
 title: LabelManager - LabelKeys - List test
 release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: labelmanager keys list --label-parent="organizations/123"
+  - stdout: |
+      NAME           DISPLAY_NAME
+      labelKeys/123  env
+      labelKeys/456  location
+- execute:
+  - command: labelmanager keys list --label-parent="organizations/999"
+  - error: '1: PERMISSION_DENIED: The caller does not have permission'
 
 actions:
 - execute_command:

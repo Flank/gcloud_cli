@@ -106,8 +106,9 @@ property value for this command invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -116,17 +117,16 @@ help\fR for details.
 To submit a Spark SQL job with a local script, run:
 
 .RS 2m
-$ gcloud alpha dataproc jobs submit spark\-sql \-\-cluster my_cluster \e
-    \-\-file my_queries.ql
+$ gcloud alpha dataproc jobs submit spark\-sql \-\-cluster=my_cluster \e
+    \-\-file=my_queries.ql
 .RE
 
 To submit a Spark SQL job with inline queries, run:
 
 .RS 2m
-$ gcloud alpha dataproc jobs submit spark\-sql \-\-cluster my_cluster \e
-    \-e \e
-    "CREATE EXTERNAL TABLE foo(bar int) LOCATION\e
- 'gs://my_bucket/'" \-e "SELECT * FROM foo WHERE bar > 2"
+$ gcloud alpha dataproc jobs submit spark\-sql \-\-cluster=my_cluster
+    \-e="CREATE EXTERNAL TABLE foo(bar int) LOCATION 'gs://my_bucket/'"
+    \-e="SELECT * FROM foo WHERE bar > 2"
 .RE
 
 

@@ -110,6 +110,22 @@ class PrintAccessTokenTest(cli_test_base.CliTestBase):
     mock_creds.create_scoped.assert_called_once_with(
         [auth_util.CLOUD_PLATFORM_SCOPE], token_uri='token_uri_override')
 
+  def testImpersonateServiceAccount(self):
+    # It would be best to use autospec here, but mock doesn't support it for
+    # static methods yet.
+    mock_get_adc = self.StartPatch(
+        'oauth2client.client.GoogleCredentials.get_application_default')
+    mock_get_adc.return_value = self.GetGoogleCredentials(
+        token='foo_access_token')
+
+    self.Run(
+        'beta auth application-default print-access-token '
+        '--impersonate-service-account '
+        'serviceaccount@project.iam.gserviceaccount.com')
+    self.AssertErrContains(
+        'Impersonate service account '
+        "'serviceaccount@project.iam.gserviceaccount.com' is detected.")
+
 
 if __name__ == '__main__':
   test_case.main()

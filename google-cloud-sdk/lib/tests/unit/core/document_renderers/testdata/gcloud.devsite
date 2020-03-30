@@ -2,7 +2,7 @@
 <head>
 <title>gcloud</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="project_path" value="/sdk/_project.yaml">
+<meta name="project_path" value="/sdk/docs/_project.yaml">
 <meta name="book_path" value="/sdk/_book.yaml">
 <!--
         THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -99,7 +99,7 @@ Print a summary help and exit.
 </dd>
 </section>
 
-<section id="GROUPS">
+<section id="GROUP">
 <dt>GROUPS</dt>
 <dd class="sectionbody">
 <code><code><var>GROUP</var></code></code> is one of the following:

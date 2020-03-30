@@ -363,6 +363,8 @@ class ExecuteCommandUntilAction(Action):
         scenario_context.command_executor(command)
         exit_code = 0
       except Exception as e:  # pylint: disable=broad-except
+        if isinstance(e, (KeyboardInterrupt, SystemExit)):
+          raise
         exit_code = getattr(e, 'exit_code', 1)
       stdout = scenario_context.stream_mocker.stdout_reader()
       stderr = scenario_context.stream_mocker.stderr_reader()
@@ -584,6 +586,8 @@ class CommandExecutionAction(Action):
       try:
         self.Execute(scenario_context)
       except Exception as e:  # pylint: disable=broad-except, Best effort
+        if isinstance(e, (KeyboardInterrupt, SystemExit)):
+          raise
         log.error('Cleanup step failed: {}'.format(e))
 
   def _SetEventData(self, scenario_context, new_event_data):

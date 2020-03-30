@@ -82,8 +82,9 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -100,7 +101,7 @@ To get details about a regional forwarding rule, run:
 
 .RS 2m
 $ gcloud alpha compute forwarding\-rules describe FORWARDING\-RULE \e
-    \-\-region us\-central1
+    \-\-region=us\-central1
 .RE
 
 

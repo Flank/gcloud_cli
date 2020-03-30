@@ -28,6 +28,7 @@ from googlecloudsdk.api_lib.endpoints import exceptions
 from googlecloudsdk.core import config
 from googlecloudsdk.core import log
 from googlecloudsdk.core import yaml
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 from tests.lib import e2e_base
 from tests.lib import test_case
@@ -60,6 +61,7 @@ def _get_docker_config(*unused_args, **kwargs):
   return old_path, False
 
 
+@test_case.Filters.skip('rate/quota issues', 'b/151331743')
 class EndpointsIntegrationTest(e2e_base.WithServiceAuth):
   """Tests basic functionality of the ServiceManagement V1 client."""
 
@@ -76,7 +78,8 @@ class EndpointsIntegrationTest(e2e_base.WithServiceAuth):
     self.service = 'my-bookstore-api.{0}.appspot.com'.format(self.Project())
 
     # Set gsutil env variable
-    self.old_boto_path = os.getenv('BOTO_CONFIG', None)
+    self.old_boto_path = encoding.GetEncodedValue(os.environ, 'BOTO_CONFIG',
+                                                  None)
     os.environ['BOTO_CONFIG'] = (config.Paths()
                                  .LegacyCredentialsGSUtilPath(self.Account()))
 

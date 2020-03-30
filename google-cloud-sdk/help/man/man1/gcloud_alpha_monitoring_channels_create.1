@@ -28,6 +28,38 @@ flags will override the given channel's settings.
 For information about the JSON/YAML format of a notification channel:
 https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.notificationChannels
 
+Additional documentation can for this operation can be found at:
+https://cloud.google.com/monitoring/alerts/using\-channels\-api
+
+
+.SH "EXAMPLES"
+The following commands setup both email and SMS notification channels for the
+team lead. Note that the display name and description focus on the
+purpose/semantics of the channel rather than its destination. This is a
+best\-practice that facilitates swapping/updating notification channels
+in\-place (such as when users change teams, projects, roles, companies, etc.)
+with minimal impact to the alerting policies that reference the existing
+channels. It is also a best practice to supply at least two channels of
+different types for a given person.
+
+.RS 2m
+$ gcloud alpha monitoring channels create               \e
+    \-\-display\-name="Foo Team Lead (Primary)"               \e
+    \-\-description="Primary contact method for the Foo team lead"   \e
+                \-\-type=email               \e
+    \-\-user\-labels=team=foo,role=lead,ord=1               \e
+    \-\-channel\-labels=email_address=user@somedomain.tld
+.RE
+
+.RS 2m
+$ gcloud alpha monitoring channels create               \e
+    \-\-display\-name="Foo Team Lead (Secondary)"               \e
+    \-\-description="Secondary contact method for the Foo team lead" \e
+                  \-\-type=sms               \e
+    \-\-user\-labels=team=foo,role=lead,ord=2               \e
+    \-\-channel\-labels=number=123\-456\-7890
+.RE
+
 
 
 .SH "FLAGS"
@@ -104,8 +136,9 @@ will replace the labels value in the given channel.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -114,5 +147,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta monitoring channels create
+.RE
 

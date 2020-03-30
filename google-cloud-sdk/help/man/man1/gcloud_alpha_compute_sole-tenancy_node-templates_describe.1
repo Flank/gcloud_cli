@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute sole\-tenancy node\-templates describe \- describes a Google Compute Engine node template
+gcloud alpha compute sole\-tenancy node\-templates describe \- describe a Compute Engine node template
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha compute sole\-tenancy node\-templates describe \- describes a Googl
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Describes a Google Compute Engine node template.
+\fB(ALPHA)\fR Describe a Compute Engine node template.
 
 
 
@@ -71,8 +71,20 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe a node template, run:
+
+.RS 2m
+$ gcloud alpha compute sole\-tenancy node\-templates describe \e
+    my\-node\-template
+.RE
 
 
 

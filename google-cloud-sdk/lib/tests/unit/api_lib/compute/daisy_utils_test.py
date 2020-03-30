@@ -47,23 +47,37 @@ class DaisyUtilsTest(cli_test_base.CliTestBase):
     self._AssertSafeBucketName('googoogle', 'go-ogo-ogle')
     self._AssertSafeBucketName('goog-google', 'go-og-go-ogle')
 
-  def testMakeGcsUri(self):
+  def testMakeGcsUriObject(self):
     uri = 'gs://bucket/file/a'
     result = daisy_utils.MakeGcsUri(uri)
-    if uri != result:
-      self.fail('%r is not equal to %r' % (result, uri))
+    self.assertEqual(uri, result)
 
-  def testMakeGcsUriNotGcsUri(self):
+  def testMakeGcsUriBucket(self):
+    uri = 'gs://bucket'
+    result = daisy_utils.MakeGcsUri(uri)
+    self.assertEqual(uri + '/', result)
+
+  def testMakeGcsUriBucketTrailingSlash(self):
+    uri = 'gs://bucket/'
+    result = daisy_utils.MakeGcsUri(uri)
+    self.assertEqual(uri, result)
+
+  def testMakeGcsUriErrorOnNotGcsUri(self):
     with self.AssertRaisesExceptionMatches(
         resources.InvalidResourceException,
         r'could not parse resource [http://google.com]: unknown API host'):
       daisy_utils.MakeGcsUri('http://google.com')
 
-  def testMakeGcsObjectOrPathUriBucketOnly(self):
+  def testMakeGcsObjectUri(self):
+    uri = 'gs://bucket/file/a'
+    result = daisy_utils.MakeGcsObjectUri(uri)
+    self.assertEqual(uri, result)
+
+  def testMakeGcsObjectUriErrorOnBucketOnly(self):
     with self.AssertRaisesExceptionMatches(
         storage_util.InvalidObjectNameError,
         r'Missing object name'):
-      daisy_utils.MakeGcsObjectOrPathUri('gs://bucket')
+      daisy_utils.MakeGcsObjectUri('gs://bucket')
 
   def _AssertSafeBucketName(self, original, expected):
     safe_bucket_name = daisy_utils._GetSafeBucketName(original)

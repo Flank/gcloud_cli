@@ -46,32 +46,46 @@ class OperationStatusTest(base.SqlMockTestBeta):
     self.assertEqual(str(first), str(second))
 
   def testDoneOperation(self):
-    operation = self.GetOperation('CREATE', 'DONE')
+    operation = self.GetOperation(
+        self.client.sql_messages.Operation.OperationTypeValueValuesEnum.CREATE,
+        self.client.sql_messages.Operation.StatusValueValuesEnum.DONE)
     self.ExpectOperationGet(operation)
     status = _GetOperationStatus(self.mocked_client,
                                  self.GetOperationRef(operation))
     self.assertTrue(status)
 
   def testPendingOperation(self):
-    operation = self.GetOperation('CREATE', 'PENDING')
+    operation = self.GetOperation(
+        self.client.sql_messages.Operation.OperationTypeValueValuesEnum.CREATE,
+        self.client.sql_messages.Operation.StatusValueValuesEnum.PENDING)
     self.ExpectOperationGet(operation)
     status = _GetOperationStatus(self.mocked_client,
                                  self.GetOperationRef(operation))
     self.assertFalse(status)
 
   def testUnknownOperation(self):
-    operation = self.GetOperation('CREATE', 'UNKNOWN')
+    operation = self.GetOperation(
+        self.client.sql_messages.Operation.OperationTypeValueValuesEnum.CREATE,
+        self.client.sql_messages.Operation.StatusValueValuesEnum
+        .SQL_OPERATION_STATUS_UNSPECIFIED)
     self.ExpectOperationGet(operation)
     status = _GetOperationStatus(self.mocked_client,
                                  self.GetOperationRef(operation))
-    self.AssertErrorsEqual(status, exceptions.OperationError('UNKNOWN'))
+    self.AssertErrorsEqual(
+        status, exceptions.OperationError('SQL_OPERATION_STATUS_UNSPECIFIED'))
 
   def testFailedOperationWithMessage(self):
-    error = self.messages.OperationErrors(errors=[
-        self.messages.OperationError(
-            code='bad_thing', message='Error: A Bad Thing (tm) happened.')
-    ])
-    operation = self.GetOperation('CREATE', 'FAILED', error)
+    error = self.messages.OperationErrors(
+        kind='sql#operationErrors',
+        errors=[
+            self.messages.OperationError(
+                kind='sql#operationError',
+                code='bad_thing',
+                message='Error: A Bad Thing (tm) happened.')
+        ])
+    operation = self.GetOperation(
+        self.client.sql_messages.Operation.OperationTypeValueValuesEnum.CREATE,
+        self.client.sql_messages.Operation.StatusValueValuesEnum.DONE, error)
     self.ExpectOperationGet(operation)
     status = _GetOperationStatus(self.mocked_client,
                                  self.GetOperationRef(operation))
@@ -84,8 +98,14 @@ class OperationStatusTest(base.SqlMockTestBeta):
 
   def testFailedOperationWithoutMessage(self):
     error = self.messages.OperationErrors(
-        errors=[self.messages.OperationError(code='bad_thing')])
-    operation = self.GetOperation('CREATE', 'FAILED', error)
+        kind='sql#operationErrors',
+        errors=[
+            self.messages.OperationError(
+                kind='sql#operationError', code='bad_thing')
+        ])
+    operation = self.GetOperation(
+        self.client.sql_messages.Operation.OperationTypeValueValuesEnum.CREATE,
+        self.client.sql_messages.Operation.StatusValueValuesEnum.DONE, error)
     self.ExpectOperationGet(operation)
     status = _GetOperationStatus(self.mocked_client,
                                  self.GetOperationRef(operation))

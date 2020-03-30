@@ -12,8 +12,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -30,8 +31,14 @@ COMMANDS
      describe
         Describe a Google Compute Engine resource policy.
 
+     get-iam-policy
+        Get the IAM policy for a Google Compute Engine resource policy.
+
      list
         List Google Compute Engine resource policies.
+
+     set-iam-policy
+        Set the IAM policy for a Google Compute Engine resource policy.
 
 NOTES
     These variants are also available:

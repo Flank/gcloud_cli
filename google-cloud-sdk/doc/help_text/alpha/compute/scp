@@ -136,14 +136,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To copy a remote directory, ~/narnia, from example-instance to the
     ~/wardrobe directory of your local host, run:
 
-        $ gcloud alpha compute scp --recurse=example-instance:~/narnia \
+        $ gcloud alpha compute scp --recurse example-instance:~/narnia \
             ~/wardrobe
 
     Conversely, files from your local computer can be copied to a virtual
@@ -155,23 +156,23 @@ EXAMPLES
     If the zone cannot be determined, you will be prompted for it. Use the
     --zone flag to avoid being prompted:
 
-        $ gcloud alpha compute scp --recurse=example-instance:~/narnia \
+        $ gcloud alpha compute scp --recurse example-instance:~/narnia \
             ~/wardrobe --zone=us-central1-a
 
     To specify the project, zone, and recurse all together, run:
 
         $ gcloud alpha compute scp --project="my-gcp-project" \
-            --zone="us-east1-b" --recurse=~/foo-folder/ gcp-instance-name:~/
+            --zone="us-east1-b" --recurse ~/foo-folder/ gcp-instance-name:~/
 
     You can limit the allowed time to ssh. For example, to allow a key to be
     used through 2019:
 
-        $ gcloud alpha compute scp --recurse=example-instance:~/narnia \
+        $ gcloud alpha compute scp --recurse example-instance:~/narnia \
             ~/wardrobe --ssh-key-expiration="2020-01-01T00:00:00:00Z"
 
     Or alternatively, allow access for the next two minutes:
 
-        $ gcloud alpha compute scp --recurse=example-instance:~/narnia \
+        $ gcloud alpha compute scp --recurse example-instance:~/narnia \
             ~/wardrobe --ssh-key-expire-after=2m
 
 NOTES

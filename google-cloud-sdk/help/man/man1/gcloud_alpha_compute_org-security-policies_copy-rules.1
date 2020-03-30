@@ -11,7 +11,7 @@ gcloud alpha compute org\-security\-policies copy\-rules \- replace the rules of
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute org\-security\-policies copy\-rules\fR \fISECURITY_POLICY_ID\fR \fB\-\-source\-security\-policy\fR=\fISOURCE_SECURITY_POLICY\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute org\-security\-policies copy\-rules\fR \fISECURITY_POLICY\fR \fB\-\-source\-security\-policy\fR=\fISOURCE_SECURITY_POLICY\fR [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -30,8 +30,8 @@ various resources.
 
 .RS 2m
 .TP 2m
-\fISECURITY_POLICY_ID\fR
-Resource ID of the security policy to copy the rules to.
+\fISECURITY_POLICY\fR
+Display name or ID of the security policy to copy the rules to.
 
 
 .RE
@@ -42,7 +42,19 @@ Resource ID of the security policy to copy the rules to.
 .RS 2m
 .TP 2m
 \fB\-\-source\-security\-policy\fR=\fISOURCE_SECURITY_POLICY\fR
-Source security policy to copy the rules from.
+The URL of the source security policy to copy the rules from.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+Organization in which the organization security policy to copy the rules to.
+Must be set if security\-policy is display name.
 
 
 .RE
@@ -53,8 +65,21 @@ Source security policy to copy the rules from.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To copy the rules of an organization security policy with ID ``123456789", from
+another organization security policy with ID ``987654321", run:
+
+.RS 2m
+$ gcloud alpha compute org\-security\-policies copy\-rules copy\-rules \e
+    123456789 \-\-source\-security\-policy=987654321
+.RE
 
 
 
@@ -63,5 +88,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute org\-security\-policies copy\-rules
+.RE
 

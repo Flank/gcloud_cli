@@ -37,7 +37,7 @@ DETAILED_HELP = {
         To turn on node auto repair in "node-pool-1" in the cluster
         "sample-cluster", run:
 
-          $ {command} node-pool-1 --cluster=example-cluster --enable-autoupgrade
+          $ {command} node-pool-1 --cluster=sample-cluster --enable-autoupgrade
         """,
 }
 
@@ -69,21 +69,33 @@ class Update(base.UpdateCommand):
     _Args(parser)
     group = parser.add_mutually_exclusive_group(required=True)
 
+    flags.AddNodePoolLocationsFlag(group)
+
     node_management_group = group.add_argument_group('Node management')
     flags.AddEnableAutoRepairFlag(node_management_group, for_node_pool=True)
     flags.AddEnableAutoUpgradeFlag(node_management_group, for_node_pool=True)
 
     autoscaling_group = flags.AddClusterAutoscalingFlags(group, hidden=False)
     flags.AddNodePoolAutoprovisioningFlag(autoscaling_group, hidden=False)
+    flags.AddWorkloadMetadataFromNodeFlag(group)
+
+    surge_upgrade_group = group.add_argument_group('Upgrade settings')
+    flags.AddSurgeUpgradeFlag(surge_upgrade_group, for_node_pool=True)
+    flags.AddMaxUnavailableUpgradeFlag(surge_upgrade_group, for_node_pool=True)
 
   def ParseUpdateNodePoolOptions(self, args):
+    flags.ValidateSurgeUpgradeSettings(args)
     return api_adapter.UpdateNodePoolOptions(
         enable_autorepair=args.enable_autorepair,
         enable_autoupgrade=args.enable_autoupgrade,
         enable_autoscaling=args.enable_autoscaling,
+        node_locations=args.node_locations,
         max_nodes=args.max_nodes,
         min_nodes=args.min_nodes,
-        enable_autoprovisioning=args.enable_autoprovisioning)
+        workload_metadata_from_node=args.workload_metadata_from_node,
+        enable_autoprovisioning=args.enable_autoprovisioning,
+        max_surge_upgrade=args.max_surge_upgrade,
+        max_unavailable_upgrade=args.max_unavailable_upgrade)
 
   def Run(self, args):
     """This is what gets called when the user runs this command.
@@ -144,7 +156,7 @@ class UpdateBeta(Update):
     flags.AddSurgeUpgradeFlag(surge_upgrade_group, for_node_pool=True)
     flags.AddMaxUnavailableUpgradeFlag(surge_upgrade_group, for_node_pool=True)
 
-    flags.AddWorkloadMetadataFromNodeFlag(group)
+    flags.AddWorkloadMetadataFromNodeFlag(group, use_mode=False)
 
     flags.AddNodePoolLocationsFlag(group)
 
@@ -184,7 +196,7 @@ class UpdateAlpha(Update):
     flags.AddSurgeUpgradeFlag(surge_upgrade_group, for_node_pool=True)
     flags.AddMaxUnavailableUpgradeFlag(surge_upgrade_group, for_node_pool=True)
 
-    flags.AddWorkloadMetadataFromNodeFlag(group)
+    flags.AddWorkloadMetadataFromNodeFlag(group, use_mode=False)
 
     flags.AddNodePoolLocationsFlag(group)
 

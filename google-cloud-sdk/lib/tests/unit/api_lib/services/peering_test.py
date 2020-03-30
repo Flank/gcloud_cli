@@ -117,3 +117,47 @@ class PeeringTest(unit_test_base.SNUnitTestBase):
     with self.assertRaisesRegex(
         exceptions.ListConnectionsPermissionDeniedException, r'Error!'):
       peering.ListConnections(self.PROJECT_NUMBER, self.service, self.NETWORK)
+
+  def testEnableVpcServiceControls_Success(self):
+    """Test EnableVpcServiceControls returns operation when successful."""
+    want = self.services_messages.Operation(
+        name=self.OPERATION_NAME, done=False)
+    self.ExpectEnableVpcServiceControls(self.NETWORK, self.OPERATION_NAME)
+
+    got = peering.EnableVpcServiceControls(self.PROJECT_NUMBER, self.service,
+                                           self.NETWORK)
+
+    self.assertEqual(got, want)
+
+  def testEnableVpcServiceControls_PermissionDenied(self):
+    """Test EnableVpcServiceControls raises correctly when server returns 403 error."""
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error!')
+    self.ExpectEnableVpcServiceControls(self.NETWORK, None, error=server_error)
+
+    with self.assertRaisesRegex(
+        exceptions.EnableVpcServiceControlsPermissionDeniedException,
+        r'Error!'):
+      peering.EnableVpcServiceControls(self.PROJECT_NUMBER, self.service,
+                                       self.NETWORK)
+
+  def testDisableVpcServiceControls_Success(self):
+    """Test DisableVpcServiceControls returns operation when successful."""
+    want = self.services_messages.Operation(
+        name=self.OPERATION_NAME, done=False)
+    self.ExpectDisableVpcServiceControls(self.NETWORK, self.OPERATION_NAME)
+
+    got = peering.DisableVpcServiceControls(self.PROJECT_NUMBER, self.service,
+                                            self.NETWORK)
+
+    self.assertEqual(got, want)
+
+  def testDisableVpcServiceControls_PermissionDenied(self):
+    """Test DisableVpcServiceControls raises correctly when server returns 403 error."""
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error!')
+    self.ExpectDisableVpcServiceControls(self.NETWORK, None, error=server_error)
+
+    with self.assertRaisesRegex(
+        exceptions.DisableVpcServiceControlsPermissionDeniedException,
+        r'Error!'):
+      peering.DisableVpcServiceControls(self.PROJECT_NUMBER, self.service,
+                                        self.NETWORK)

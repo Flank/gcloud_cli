@@ -6,7 +6,7 @@ SYNOPSIS
     gcloud beta data-catalog tag-templates fields update
         (FIELD : --location=LOCATION --tag-template=TAG_TEMPLATE)
         [--add-enum-values=[ADD_ENUM_VALUES,...]] [--display-name=DISPLAY_NAME]
-        [GCLOUD_WIDE_FLAG ...]
+        [--required] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Update a Cloud Data Catalog tag template field.
@@ -38,12 +38,17 @@ FLAGS
      --display-name=DISPLAY_NAME
         Display name of the tag template field.
 
+     --required
+        Indicates if the tag template field is required. Updating from FALSE
+        (optional) to TRUE (required) is NOT allowed.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the datacatalog/v1beta1 API. The full documentation for
@@ -60,9 +65,15 @@ EXAMPLES
         $ gcloud beta data-catalog tag-templates fields update FIELD \
             --add-enum-values=A,B
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    Set a tag template field to be optional:
 
+        $ gcloud beta data-catalog tag-templates fields update FIELD \
+            --no-required
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud data-catalog tag-templates fields update
         $ gcloud alpha data-catalog tag-templates fields update
 

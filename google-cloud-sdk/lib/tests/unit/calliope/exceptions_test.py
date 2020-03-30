@@ -90,6 +90,15 @@ class ExceptionsTest(util.Base, sdk_test_base.WithOutputCapture):
     self.assertIsInstance(new_err, core_exceptions.NetworkIssueError)
     self.assertTrue(print_exc)
 
+  def testConvertKnownErrorNonAscii(self):
+    err = socket.error(errno.ECONNREFUSED, b'\xce\x94')
+    try:
+      new_err, print_exc = exceptions.ConvertKnownError(err)
+    except UnicodeError as e:
+      self.fail(e)
+    self.assertIsInstance(new_err, core_exceptions.NetworkIssueError)
+    self.assertTrue(print_exc)
+
   def testConvertUnknownError(self):
     err = ValueError()
     new_err, print_exc = exceptions.ConvertKnownError(err)

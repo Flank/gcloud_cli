@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha dns active-peering-zones deactivate-zone - deactivates a Cloud
+        DNS peering zone
+
+SYNOPSIS
+    gcloud alpha dns active-peering-zones deactivate-zone --zone-id=ZONE_ID
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command deactivates a Cloud DNS peering zone, removing any
+    peering config and setting a deactivate time. Reponses sent to the
+    deactivated zone will return REFUSED.
+
+REQUIRED FLAGS
+     --zone-id=ZONE_ID
+        The unique system generated id for the peering zone to deactivate.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To deactivate a peering zone, run:
+
+        $ gcloud alpha dns active-peering-zones deactivate-zone \
+            peering_zone_id
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

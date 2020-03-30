@@ -1,5 +1,5 @@
 title: policytroubleshoot iam scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -33,7 +33,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://policytroubleshooter.googleapis.com/v1beta/iam:troubleshoot?alt=json
+          uri: https://policytroubleshooter.googleapis.com/v1/iam:troubleshoot?alt=json
           method: POST
           body: |-
             {

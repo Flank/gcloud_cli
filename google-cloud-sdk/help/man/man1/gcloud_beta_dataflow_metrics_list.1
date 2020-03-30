@@ -106,8 +106,9 @@ interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -116,43 +117,44 @@ help\fR for details.
 Filter metrics with the given name:
 
 .RS 2m
-$ gcloud beta dataflow metrics list \-\-filter="name=ElementCount"
+$ gcloud beta dataflow metrics list JOB \-\-filter="name=ElementCount"
 .RE
 
 Filter child metrics with matching transforms:
 
 .RS 2m
-$ gcloud beta dataflow metrics list \-\-transform=WordCount
+$ gcloud beta dataflow metrics list JOB \-\-transform=WordCount
 .RE
 
 Filter child output metrics:
 
 .RS 2m
-$ gcloud beta dataflow metrics list \-\-transform=WordCount/Write.*out
+$ gcloud beta dataflow metrics list JOB \e
+    \-\-transform=WordCount/Write.*out
 .RE
 
 Filter all output metrics:
 
 .RS 2m
-$ gcloud beta dataflow metrics list \-\-transform=.*out
+$ gcloud beta dataflow metrics list JOB \-\-transform=.*out
 .RE
 
 Filter all custom\-defined user metrics
 
 .RS 2m
-$ gcloud beta dataflow metrics list \-\-source=user
+$ gcloud beta dataflow metrics list JOB \-\-source=user
 .RE
 
 Filter metrics with a scalar value greater than a threshold.
 
 .RS 2m
-$ gcloud beta dataflow metrics list \-\-filter="scalar > 50"
+$ gcloud beta dataflow metrics list JOB \-\-filter="scalar > 50"
 .RE
 
 List metrics that have changed in the last 2 weeks:
 
 .RS 2m
-$ gcloud beta dataflow metrics list \-\-after=\-P2W
+$ gcloud beta dataflow metrics list JOB \-\-changed\-after=\-P2W
 .RE
 
 

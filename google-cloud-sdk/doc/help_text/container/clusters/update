@@ -6,17 +6,18 @@ SYNOPSIS
     gcloud container clusters update NAME
         (--complete-credential-rotation | --complete-ip-rotation
           | --database-encryption-key=DATABASE_ENCRYPTION_KEY
-          | --disable-database-encryption | --enable-autoscaling
-          | --enable-binauthz | --enable-intra-node-visibility
-          | --enable-legacy-authorization | --enable-master-authorized-networks
-          | --enable-network-policy | --enable-stackdriver-kubernetes
+          | --disable-database-encryption | --disable-workload-identity
+          | --enable-autoscaling | --enable-binauthz
+          | --enable-intra-node-visibility | --enable-legacy-authorization
+          | --enable-master-authorized-networks | --enable-network-policy
+          | --enable-shielded-nodes | --enable-stackdriver-kubernetes
           | --enable-vertical-pod-autoscaling | --generate-password
           | --maintenance-window=START_TIME | --node-locations=ZONE,[ZONE,...]
           | --remove-labels=[KEY,...] | --set-password
           | --start-credential-rotation | --start-ip-rotation
           | --update-addons=[ADDON=ENABLED|DISABLED,...]
-          | --update-labels=[KEY=VALUE,...] | --clear-maintenance-window
-          | --remove-maintenance-exclusion=NAME
+          | --update-labels=[KEY=VALUE,...] | --workload-pool=WORKLOAD_POOL
+          | --clear-maintenance-window | --remove-maintenance-exclusion=NAME
           | [--add-maintenance-exclusion-end=TIME_STAMP
           : --add-maintenance-exclusion-name=NAME
           --add-maintenance-exclusion-start=TIME_STAMP]
@@ -80,14 +81,21 @@ REQUIRED FLAGS
           resource ID in the format of
           projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
           For more information, see
-          <https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets>.
+          https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets.
 
        --disable-database-encryption
           Disable database encryption.
 
           Disable Database Encryption which encrypt Kubernetes Secrets at the
           application layer. For more information, see
-          <https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets>.
+          https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets.
+
+       --disable-workload-identity
+          Disable Workload Identity on the cluster.
+
+          For more information on Workload Identity, see
+
+              https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 
        --enable-autoscaling
           Enables autoscaling for a node pool.
@@ -136,6 +144,12 @@ REQUIRED FLAGS
           enabling network policy on an existing cluster the network policy
           addon must first be enabled on the master by using
           --update-addons=NetworkPolicy=ENABLED flag.
+
+       --enable-shielded-nodes
+          Enable Shielded Nodes for this cluster. Enabling Shielded Nodes will
+          enable a more secure Node credential bootstrapping implementation.
+          Starting with version 1.18, clusters will have shielded GKE nodes by
+          default.
 
        --enable-stackdriver-kubernetes
           Enable Stackdriver Kubernetes monitoring and logging.
@@ -223,6 +237,7 @@ REQUIRED FLAGS
           HorizontalPodAutoscaling=ENABLED|DISABLED
           HttpLoadBalancing=ENABLED|DISABLED
           KubernetesDashboard=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
+          CloudRun=ENABLED|DISABLED
 
        --update-labels=[KEY=VALUE,...]
           Labels to apply to the Google Cloud resources in use by the
@@ -231,6 +246,19 @@ REQUIRED FLAGS
 
               $ gcloud container clusters update example-cluster \
                   --update-labels=label_a=value1,label_b=value2
+
+       --workload-pool=WORKLOAD_POOL
+          Enable Workload Identity on the cluster.
+
+          When enabled, Kubernetes service accounts will be able to act as
+          Cloud IAM Service Accounts, through the provided workload pool.
+
+          Currently, the only accepted workload pool is the workload pool of
+          the Cloud project containing the cluster, PROJECT_NAME.svc.id.goog.
+
+          For more information on Workload Identity, see
+
+              https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 
        At most one of these may be specified:
 
@@ -368,7 +396,9 @@ REQUIRED FLAGS
               Path of the JSON/YAML file which contains information about the
               cluster's node autoprovisioning configuration. Currently it
               contains a list of resource limits, identity defaults for
-              autoprovisioning and node locations for autoprovisioning.
+              autoprovisioning, node upgrade settings, node management
+              settings, minimum cpu platform, and node locations for
+              autoprovisioning.
 
               Resource limits are specified in the field 'resourceLimits'. Each
               resource limits definition contains three fields: resourceType,
@@ -381,12 +411,32 @@ REQUIRED FLAGS
 
               Identity default contains at most one of the below fields:
               serviceAccount: The Google Cloud Platform Service Account to be
-              used by node VMs in autoprovisioined node pools. If not
-              specified, the project default service account is used. scopes: A
-              list of scopes be used by node instances in autoprovisioined node
+              used by node VMs in autoprovisioned node pools. If not specified,
+              the project's default service account is used. scopes: A list of
+              scopes to be used by node instances in autoprovisioned node
               pools. Multiple scopes can be specified, separated by commas. For
               information on defaults, look at:
               https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
+
+              Note: Node Upgrade settings are implemented only in Beta and
+              Alpha. Node Upgrade settings are specified under the field
+              'upgradeSettings', which has the following fields:
+              maxSurgeUpgrade: Number of extra (surge) nodes to be created on
+              each upgrade of an autoprovisioned node pool.
+              maxUnavailableUpgrade: Number of nodes that can be unavailable at
+              the same time on each upgrade of an autoprovisioned node pool.
+
+              Note: Node Management settings are implemented only in Beta and
+              Alpha. Node Management settings are specified under the field
+              'nodeManagement', which has the following fields:
+              enableAutoUpgrade: A boolean field that indicates if node
+              autoupgrade is enabled for autoprovisioned node pools.
+              enableAutoRepair: A boolean field that indicates if node
+              autorepair is enabled for autoprovisioned node pools.
+
+              minCpuPlatform: If specified, new autoprovisioned nodes will be
+              scheduled on host with specified CPU architecture or a newer one.
+              Note: Min CPU platform can only be specified in Beta and Alpha.
 
               Autoprovisioning locations is a set of zones where new node pools
               can be created by Autoprovisioning. Autoprovisioning locations
@@ -426,14 +476,14 @@ REQUIRED FLAGS
              Flags to specify identity for autoprovisioned nodes:
 
                --autoprovisioning-scopes=[SCOPE,...]
-                  The scopes be used by node instances in autoprovisioined node
+                  The scopes be used by node instances in autoprovisioned node
                   pools. Multiple scopes can be specified, separated by commas.
                   For information on defaults, look at:
                   https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
 
                --autoprovisioning-service-account=AUTOPROVISIONING_SERVICE_ACCOUNT
                   The Google Cloud Platform Service Account to be used by node
-                  VMs in autoprovisioined node pools. If not specified, the
+                  VMs in autoprovisioned node pools. If not specified, the
                   project default service account is used.
 
              Arguments to set limits on accelerators:
@@ -549,8 +599,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To enable autoscaling for an existing cluster, run:
+
+        $ gcloud container clusters update sample-cluster \
+            --enable-autoscaling
 
 NOTES
     These variants are also available:

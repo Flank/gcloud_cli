@@ -28,7 +28,6 @@ class PrintIdentityTokenTest(e2e_base.WithServiceAuth):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
 
-  @test_case.Filters.skip('Broken', 'b/141070917')
   def testPrintIdentityToken(self):
     """Test print identity token for a service account."""
     self.Run('auth print-identity-token')

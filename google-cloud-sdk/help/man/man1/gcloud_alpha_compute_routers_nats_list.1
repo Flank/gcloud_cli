@@ -72,8 +72,21 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list all NATs in router \f5\fIr1\fR\fR in region \f5\fIus\-central1\fR\fR,
+run:
+
+.RS 2m
+$ gcloud alpha compute routers nats list \-\-router=r1 \e
+  \-\-region=us\-central1.
+.RE
 
 
 

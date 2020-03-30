@@ -214,40 +214,6 @@ class NetworksCreateAlphaTest(NetworksCreateBetaTest):
     self.SelectApi('alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def testCreateDisabledMulticast(self):
-    expected = self.messages.Network(
-        name='my-network', autoCreateSubnetworks=True)
-    expected.multicastMode = (
-        self.messages.Network.MulticastModeValueValuesEnum.DISABLED)
-    expected.routingConfig = self.messages.NetworkRoutingConfig()
-    expected.routingConfig.routingMode = (
-        self.messages.NetworkRoutingConfig.RoutingModeValueValuesEnum.REGIONAL)
-
-    self.make_requests.side_effect = iter([[expected]])
-
-    self.Run('compute networks create my-network --multicast-mode disabled')
-    expected_insert = (self.compute.networks, 'Insert',
-                       self.messages.ComputeNetworksInsertRequest(
-                           project='my-project', network=expected))
-    self.CheckRequests([expected_insert])
-
-  def testCreateZonalMulticast(self):
-    expected = self.messages.Network(
-        name='my-network', autoCreateSubnetworks=True)
-    expected.multicastMode = (
-        self.messages.Network.MulticastModeValueValuesEnum.ZONAL)
-    expected.routingConfig = self.messages.NetworkRoutingConfig()
-    expected.routingConfig.routingMode = (
-        self.messages.NetworkRoutingConfig.RoutingModeValueValuesEnum.REGIONAL)
-
-    self.make_requests.side_effect = iter([[expected]])
-
-    self.Run('compute networks create my-network --multicast-mode zonal')
-    expected_insert = (self.compute.networks, 'Insert',
-                       self.messages.ComputeNetworksInsertRequest(
-                           project='my-project', network=expected))
-    self.CheckRequests([expected_insert])
-
   def testCreateWithMtu(self):
     expected = self.messages.Network(
         name='my-network', autoCreateSubnetworks=True, mtu=1500)

@@ -11,8 +11,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -29,8 +30,14 @@ COMMANDS
      diagnose
         Run a detailed diagnostic on a cluster.
 
+     export
+        Export a cluster.
+
      get-iam-policy
         Get IAM policy for a cluster.
+
+     import
+        Import a cluster.
 
      list
         View a list of clusters in a project.
@@ -44,19 +51,20 @@ COMMANDS
 EXAMPLES
     To create a cluster, run:
 
-        $ gcloud dataproc clusters create my_cluster
+        $ gcloud dataproc clusters create my_cluster --region=us-central1
 
     To resize a cluster, run:
 
-        $ gcloud dataproc clusters update my_cluster --num_workers 5
+        $ gcloud dataproc clusters update my_cluster --region=us-central1 \
+            --num_workers 5
 
     To delete a cluster, run:
 
-        $ gcloud dataproc clusters delete my_cluster
+        $ gcloud dataproc clusters delete my_cluster --region=us-central1
 
     To view the details of a cluster, run:
 
-        $ gcloud dataproc clusters describe my_cluster
+        $ gcloud dataproc clusters describe my_cluster --region=us-central1
 
     To see the list of all clusters, run:
 

@@ -20,12 +20,14 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.ml_engine import versions_api
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.ml_engine import endpoint_util
 from googlecloudsdk.command_lib.ml_engine import flags
 from googlecloudsdk.command_lib.ml_engine import versions_util
 
 
 def _AddSetDefaultArgs(parser):
   flags.GetModelName(positional=False, required=True).AddToParser(parser)
+  flags.GetRegionArg('version').AddToParser(parser)
   flags.VERSION_NAME.AddToParser(parser)
 
 
@@ -37,9 +39,9 @@ class SetDefault(base.DescribeCommand):
     _AddSetDefaultArgs(parser)
 
   def Run(self, args):
-    return versions_util.SetDefault(versions_api.VersionsClient(),
-                                    args.version,
-                                    model=args.model)
+    with endpoint_util.MlEndpointOverrides(region=args.region):
+      client = versions_api.VersionsClient()
+      return versions_util.SetDefault(client, args.version, model=args.model)
 
 
 _DETAILED_HELP = {

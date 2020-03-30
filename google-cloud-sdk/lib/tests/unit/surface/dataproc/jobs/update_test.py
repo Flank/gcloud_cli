@@ -20,6 +20,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import jobs_unit_base
@@ -29,20 +31,46 @@ import six
 class JobsUpdateUnitTest(jobs_unit_base.JobsUnitTestBase):
   """Tests for dataproc jobs update."""
 
-  def testUpdateJobLabels(self):
+  def _testUpdateJobLabels(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
     original_job = self.MakeRunningJob(jobId=self.JOB_ID,
                                        labels={'customer': 'emca'})
-    self.ExpectGetJob(original_job)
+    self.ExpectGetJob(original_job, region=region)
     updated_job = self.MakeRunningJob(jobId=self.JOB_ID,
                                       labels={'customer': 'acme'})
 
     changed_fields = ['labels']
     self.ExpectUpdateJob(
-        job=updated_job, field_paths=changed_fields, response=updated_job)
+        job=updated_job,
+        field_paths=changed_fields,
+        response=updated_job,
+        region=region)
 
     result = self.RunDataproc(
-        'jobs update {0} --update-labels=customer=acme'.format(self.JOB_ID))
+        'jobs update {0} --update-labels=customer=acme {1}'.format(
+            self.JOB_ID, region_flag))
     self.AssertMessagesEqual(updated_job, result)
+
+  def testUpdateJobLabels(self):
+    self._testUpdateJobLabels()
+
+  def testUpdateJob_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testUpdateJobLabels(region='global')
+
+  def testUpdateJob_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testUpdateJobLabels(
+        region='us-central1', region_flag='--region=us-central1')
+
+  def testUpdateJob_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc(
+          'jobs update {0} --update-labels=customer=acme' + self.JOB_ID,
+          set_region=False)
 
   def testAddJobLabels(self):
     original_job = self.MakeRunningJob(jobId=self.JOB_ID,
@@ -144,15 +172,21 @@ class JobsUpdateUnitTest(jobs_unit_base.JobsUnitTestBase):
         for key, value in sorted(six.iteritems(labels_dict))
     ])
 
-  def ExpectUpdateJob(
-      self, job, field_paths, response=None, exception=None):
+  def ExpectUpdateJob(self,
+                      job,
+                      field_paths,
+                      response=None,
+                      exception=None,
+                      region=None):
+    if region is None:
+      region = self.REGION
     if not (response or exception):
       response = self.MakeOperation()
     self.mock_client.projects_regions_jobs.Patch.Expect(
         self.messages.DataprocProjectsRegionsJobsPatchRequest(
             jobId=job.reference.jobId,
             projectId=self.Project(),
-            region=self.REGION,
+            region=region,
             job=job,
             updateMask=','.join(field_paths)),
         response=response,

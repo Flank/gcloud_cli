@@ -27,7 +27,7 @@ class SplitUrlTest(test_case.Base):
   def testGoogleApis(self):
     domain = 'www.googleapis.com'
     api_name = 'sql'
-    api_version = 'v1beta3'
+    api_version = 'v1beta4'
     resource_path = 'path/to/resource'
     url = 'https://{0}/{1}/{2}/{3}'.format(
         domain, api_name, api_version, resource_path)
@@ -37,7 +37,7 @@ class SplitUrlTest(test_case.Base):
   def testGoogleApis_NoResource(self):
     domain = 'www.googleapis.com'
     api_name = 'sql'
-    api_version = 'v1beta3'
+    api_version = 'v1beta4'
     resource_path = ''
     url = 'https://{0}/{1}/{2}/{3}'.format(
         domain, api_name, api_version, resource_path)
@@ -47,7 +47,7 @@ class SplitUrlTest(test_case.Base):
   def testGoogleApis_ApiNameFirst(self):
     domain = 'googleapis.com'
     api_name = 'sql'
-    api_version = 'v1beta3'
+    api_version = 'v1beta4'
     resource_path = 'path/to/resource'
     url = 'https://{1}.{0}/{2}/{3}'.format(
         domain, api_name, api_version, resource_path)
@@ -57,7 +57,7 @@ class SplitUrlTest(test_case.Base):
   def testGoogleApis_K8sStyle(self):
     domain = 'googleapis.com'
     api_name = 'run'
-    api_version = 'v1beta3'
+    api_version = 'v1beta4'
     resource_path = 'path/to/resource'
     k8s_api = 'elephant.dev'
     url = 'https://{api}.{domain}/apis/{k8s_api}/{version}/{resource}'.format(
@@ -69,10 +69,27 @@ class SplitUrlTest(test_case.Base):
     self.assertEqual((api_name, api_version, resource_path),
                      resource_util.SplitDefaultEndpointUrl(url))
 
+  def testGoogleApis_Regionalized8sStyle(self):
+    region = 'my-fakeregion1'
+    domain = 'googleapis.com'
+    api_name = 'run'
+    api_version = 'v1beta3'
+    resource_path = 'path/to/resource'
+    k8s_api = 'elephant.dev'
+    url = 'https://{region}-{api}.{domain}/apis/{k8s_api}/{version}/{resource}'.format(
+        region=region,
+        domain=domain,
+        api=api_name,
+        k8s_api=k8s_api,
+        version=api_version,
+        resource=resource_path)
+    self.assertEqual((api_name, api_version, resource_path),
+                     resource_util.SplitDefaultEndpointUrl(url))
+
   def testGoogleApis_ApiNameFirst_NoResource(self):
     domain = 'googleapis.com'
     api_name = 'sql'
-    api_version = 'v1beta3'
+    api_version = 'v1beta4'
     resource_path = ''
     url = 'https://{1}.{0}/{2}/{3}'.format(
         domain, api_name, api_version, resource_path)
@@ -82,7 +99,7 @@ class SplitUrlTest(test_case.Base):
   def testOtherDomain(self):
     domain = 'otherdomain.com'
     api_name = 'sql'
-    api_version = 'v1beta3'
+    api_version = 'v1beta4'
     resource_path = 'path/to/resource'
     url = 'https://{0}/{1}/{2}/{3}'.format(
         domain, api_name, api_version, resource_path)
@@ -190,8 +207,8 @@ class CollectionInfoTests(test_case.Base):
 
   def testDefaultSubcollection(self):
     collection_info = resource_util.CollectionInfo(
-        'sql', 'v1beta3',
-        base_url='http://base_url.com/v1beta3',
+        'sql', 'v1beta4',
+        base_url='http://base_url.com/v1beta4',
         docs_url='https://cloud.google.com/docs',
         name='backupRuns',
         path=('projects/{project}/instances/{instance}/'

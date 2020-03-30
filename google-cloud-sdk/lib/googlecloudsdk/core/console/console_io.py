@@ -53,6 +53,16 @@ class Error(exceptions.Error):
   pass
 
 
+class RequiredPromptError(Error):
+  """An exception for when a prompt cannot silenced with the --quiet flag."""
+
+  def __init__(self):
+    super(RequiredPromptError, self).__init__(
+        'This prompt could not be answered because you are not in an '
+        'interactive session.  Please re-run the command without the --quiet '
+        'flag to respond to the prompts.')
+
+
 class UnattendedPromptError(Error):
   """An exception for when a prompt cannot be answered."""
 
@@ -181,8 +191,8 @@ def IsInteractive(output=False, error=False, heuristic=False):
     # probably being run from a task scheduler context. HOMEPATH can be '\'
     # when a user has a network mapped home directory.
     # Cygwin has it all! Both Windows and Linux. Checking both is perfect.
-    home = os.getenv('HOME')
-    homepath = os.getenv('HOMEPATH')
+    home = encoding.GetEncodedValue(os.environ, 'HOME')
+    homepath = encoding.GetEncodedValue(os.environ, 'HOMEPATH')
     if not homepath and (not home or home == '/'):
       return False
   return True

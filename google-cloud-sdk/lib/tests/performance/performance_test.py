@@ -28,16 +28,18 @@ import datetime
 import os
 import timeit
 
+from googlecloudsdk.core.util import encoding
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
-CHANGE_NUMBER = os.environ.get('KOKORO_PIPER_CHANGELIST')
+CHANGE_NUMBER = encoding.GetEncodedValue(os.environ, 'KOKORO_PIPER_CHANGELIST')
 DATETIME = datetime.datetime.now().strftime('%Y-%m-%d %H:00:00')
 MAX_TAB_COMPLETION_TIME = 0.05  # 50 milliseconds
 MAX_STARTUP_TIME = 0.6  # 600 milliseconds
-TAB_COMPLETION_OUTPUT_FILE = os.environ.get('TAB_COMPLETION_TIMES_FILE')
-STARTUP_OUTPUT_FILE = os.environ.get('STARTUP_TIMES_FILE')
+TAB_COMPLETION_OUTPUT_FILE = encoding.GetEncodedValue(
+    os.environ, 'TAB_COMPLETION_TIMES_FILE')
+STARTUP_OUTPUT_FILE = encoding.GetEncodedValue(os.environ, 'STARTUP_TIMES_FILE')
 TIMING_RUNS = 10
 
 TAB_COMPLETION_SCRIPT = """\

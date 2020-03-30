@@ -23,16 +23,21 @@ from googlecloudsdk.core.console import progress_tracker
 
 
 _TRIGGER_SUBSCRIBED = 'Subscribed'
-_TRIGGER_DEPENDENCY = 'Dependency'
+_TRIGGER_DEPENDENCY = 'DependencyReady'
 # Source's only have 1 guaranteed condition, Ready, which is also their terminal
 # condition. Because its terminal and not a unique condition name, we'll use
 # this stage to manually track it.
 SOURCE_READY = 'source_ready'
 
 
-def TriggerSourceStages():
+def TriggerAndSourceStages():
   return [
-      progress_tracker.Stage('Creating Event Source...', key=SOURCE_READY),
+      progress_tracker.Stage('Creating Event Source...', key=SOURCE_READY)
+  ] + TriggerStages()
+
+
+def TriggerStages():
+  return [
       progress_tracker.Stage('Subscribing Service...', key=_TRIGGER_SUBSCRIBED),
       progress_tracker.Stage('Linking Trigger...', key=_TRIGGER_DEPENDENCY),
   ]

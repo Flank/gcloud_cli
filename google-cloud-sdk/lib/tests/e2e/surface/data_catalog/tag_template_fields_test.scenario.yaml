@@ -63,7 +63,7 @@ actions:
     prefix: datacatalog
 - execute_command:
     command: data-catalog tag-templates create $$my-tag-template$$ --location=$$location$$
-      --display-name="Template display name" --field=id=dbl_field,display_name=double_field,type=double
+      --display-name="Template display name" --field=id=dbl_field,display-name=double_field,type=double,required=true
     events:
     - api_call:
         expect_request:
@@ -78,6 +78,7 @@ actions:
                   displayName: double_field
                   type:
                     primitiveType: DOUBLE
+                  isRequired: true
         return_response:
           headers:
             cache-control: private
@@ -93,8 +94,42 @@ actions:
                 type:
                   primitiveType: DOUBLE
                 name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+                isRequired: true
     - expect_stderr: |
         Created tag template [$$my-tag-template$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog tag-templates fields update dbl_field --tag-template=$$my-tag-template$$
+      --location=$$location$$ --display-name="new_double_field" --no-required
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field?alt=json&updateMask=display_name%2Cis_required
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              displayName: new_double_field
+              isRequired: false
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '480'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            displayName: new_double_field
+            type:
+              primitiveType: DOUBLE
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+    - expect_stderr: |
+        Updated tag template field [dbl_field].
+    - expect_stdout: |
+        displayName: new_double_field
+        name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+        type:
+          primitiveType: DOUBLE
     - expect_exit:
         code: 0
 - execute_command:
@@ -132,6 +167,37 @@ actions:
         Created tag template field [$$my-tag-template-field$$1].
     - expect_exit:
         code: 0
+# Updating a tag template field from optional to required should fail.
+- execute_command:
+    command: data-catalog tag-templates fields update $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
+      --location=$$location$$ --display-name="New field display name" --add-enum-values=C,D --required
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$1?alt=json&updateMask=display_name%2Ctype.enum_type%2Cis_required
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              displayName: New field display name
+              type:
+                enumType:
+                  allowedValues:
+                  - displayName: C
+                  - displayName: D
+              isRequired: true
+        return_response:
+          headers:
+            status: '400'
+          body:
+            error:
+              code: 400
+              message: Adding a new required field or changing an existing field from optional to required on an existing tag template is not supported.
+              status: INVALID_ARGUMENT
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*INVALID_ARGUMENT.*Adding a new required field or changing an existing field from optional to required on an existing tag template is not supported.*
 - execute_command:
     command: data-catalog tag-templates fields update $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
       --location=$$location$$ --display-name="New field display name" --add-enum-values=C,D

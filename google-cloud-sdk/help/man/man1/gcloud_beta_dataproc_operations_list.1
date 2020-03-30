@@ -99,40 +99,44 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To see the list of all operations, run:
+To see the list of all operations in Dataproc's 'us\-central1' region, run:
 
 .RS 2m
-$ gcloud beta dataproc operations list
+$ gcloud beta dataproc operations list \-\-region='us\-central1'
 .RE
 
-To see the list of all create cluster operations, run:
+To see the list of all create cluster operations in Dataproc's 'global' region,
+run:
 
 .RS 2m
-$ gcloud beta dataproc operations list \e
+$ gcloud beta dataproc operations list \-\-region='global' \e
     \-\-filter='operationType = CREATE'
 .RE
 
-To see the list of all active operations in a cluster named mycluster, run:
+To see the list of all active operations in a cluster named 'mycluster' located
+in Dataproc's 'global' region, run:
 
 .RS 2m
-$ gcloud beta dataproc operations list \e
-    \-\-filter='status.state = RUNNING AND clusterName = mycluster'
+$ gcloud beta dataproc operations list \-\-region='global' \e
+    \-\-filter='status.state = RUNNING AND
+  clusterName = mycluster'
 .RE
 
-To see a list of all pending operations the label \f5env=staging\fR on cluster
-\f5mycluster\fR, run:
+To see a list of all pending operations with the label \f5env=staging\fR on
+cluster \f5mycluster\fR located in Dataproc's 'us\-central1' region, run:
 
 .RS 2m
-$ gcloud beta dataproc operations list \e
-    \-\-filter='status.state = PENDING  AND labels.env = staging AND
- clusterName = mycluster'
+$ gcloud beta dataproc operations list \-\-region='us\-central1' \e
+    \-\-filter='status.state = PENDING
+  AND labels.env = staging AND clusterName = mycluster'
 .RE
 
 

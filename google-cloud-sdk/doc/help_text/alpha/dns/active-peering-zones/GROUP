@@ -1,0 +1,36 @@
+NAME
+    gcloud alpha dns active-peering-zones - manage your Cloud DNS
+        active-peering-zones
+
+SYNOPSIS
+    gcloud alpha dns active-peering-zones COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage your Cloud DNS active-peering-zones.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To list the consumer active-peering-zones targeting a producer network,
+    run:
+
+        $ gcloud alpha dns active-peering-zones list \
+            --target-network="my-producer-network"
+
+    To revoke a peering connection from the producer by deactivating an
+    active-peering-zone, run:
+
+        $ gcloud alpha dns active-peering-zones deactivate consumer_zone_id
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

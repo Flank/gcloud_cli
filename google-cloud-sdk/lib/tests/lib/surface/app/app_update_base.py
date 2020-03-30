@@ -49,14 +49,12 @@ class AppUpdateBase(sdk_test_base.WithFakeAuth,
 
   def ExpectPatchApplicationRequest(
       self, project, update_mask,
-      split_health_checks=None,
-      use_container_optimized_os=None):
+      split_health_checks=None):
     request = self.messages.AppengineAppsPatchRequest(
         name='apps/{0}'.format(project),
         application=self.messages.Application(
             featureSettings=self.messages.FeatureSettings(
-                splitHealthChecks=split_health_checks,
-                useContainerOptimizedOs=use_container_optimized_os)),
+                splitHealthChecks=split_health_checks)),
         updateMask=update_mask)
     self.mock_client.apps.Patch.Expect(
         request,

@@ -11,7 +11,13 @@ gcloud alpha compute network\-endpoint\-groups describe \- describe a Google Com
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute network\-endpoint\-groups describe\fR \fINAME\fR [\fB\-\-global\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute network\-endpoint\-groups describe\fR \fINAME\fR [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Describe a Google Compute Engine network endpoint group.
 
 
 
@@ -37,6 +43,33 @@ At most one of these may be specified:
 .TP 2m
 \fB\-\-global\fR
 If set, the network endpoint group is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the network endpoint group to operate on. If not specified, you may be
+prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
@@ -76,8 +109,9 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

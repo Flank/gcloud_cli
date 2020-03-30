@@ -30,7 +30,7 @@ class _BaseUsersDeleteTest(object):
   def testDelete(self):
     prompt_mock = self.StartObjectPatch(
         console_io, 'PromptContinue', return_value=True)
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Delete.Expect(
         msgs.SqlUsersDeleteRequest(
             project=self.Project(),
@@ -41,7 +41,8 @@ class _BaseUsersDeleteTest(object):
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
-        msgs.Operation(name='op_name', status='DONE'))
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql users delete --instance my_instance my_username '
              '--host my_host')
     self.assertEqual(prompt_mock.call_count, 1)
@@ -57,7 +58,7 @@ class _BaseUsersDeleteTest(object):
   def testDeleteWithNoHostArgument(self):
     prompt_mock = self.StartObjectPatch(
         console_io, 'PromptContinue', return_value=True)
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Delete.Expect(
         msgs.SqlUsersDeleteRequest(
             project=self.Project(),
@@ -68,14 +69,15 @@ class _BaseUsersDeleteTest(object):
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
-        msgs.Operation(name='op_name', status='DONE'))
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql users delete --instance my_instance my_username')
     self.assertEqual(prompt_mock.call_count, 1)
 
   def testDeleteWithHostFlag(self):
     prompt_mock = self.StartObjectPatch(
         console_io, 'PromptContinue', return_value=True)
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Delete.Expect(
         msgs.SqlUsersDeleteRequest(
             project=self.Project(),
@@ -86,7 +88,8 @@ class _BaseUsersDeleteTest(object):
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
-        msgs.Operation(name='op_name', status='DONE'))
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql users delete --instance my_instance my_username '
              '--host my_host')
     self.assertEqual(prompt_mock.call_count, 1)
@@ -98,7 +101,7 @@ class _BaseUsersDeleteTest(object):
                '--host my_host --async')
 
   def testDeleteAsync(self):
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Delete.Expect(
         msgs.SqlUsersDeleteRequest(
             project=self.Project(),

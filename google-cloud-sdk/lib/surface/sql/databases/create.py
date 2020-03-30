@@ -70,6 +70,7 @@ class AddDatabase(base.Command):
         collection='sql.instances')
 
     new_database = sql_messages.Database(
+        kind='sql#database',
         project=instance_ref.project,
         instance=instance_ref.instance,
         name=args.database,
@@ -100,6 +101,7 @@ class AddDatabase(base.Command):
         # TODO(b/36051979): Refactor when b/35156765 is resolved.
         raise
       result = new_database
+      result.kind = None
 
     log.CreatedResource(args.database, kind='database', is_async=args.async_)
 

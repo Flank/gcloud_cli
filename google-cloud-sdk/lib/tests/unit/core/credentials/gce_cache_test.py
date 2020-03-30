@@ -24,15 +24,15 @@ import socket
 
 from googlecloudsdk.core.credentials import gce
 from googlecloudsdk.core.credentials import gce_cache
+from tests.lib import cli_test_base
 from tests.lib import parameterized
-from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 import mock
 import six
 
 
-class GCECacheTest(parameterized.TestCase, sdk_test_base.SdkBase):
+class GCECacheTest(parameterized.TestCase, cli_test_base.CliTestBase):
 
   def SetUp(self):
     self.current_time = 1000
@@ -41,19 +41,19 @@ class GCECacheTest(parameterized.TestCase, sdk_test_base.SdkBase):
     self.StartPatch(
         'googlecloudsdk.core.config.Paths.GCECachePath',
         return_value=self.tempfilepath)
-    self._SetUpServerResponse(error=six.moves.urllib.error.URLError(''))
+    self._SetUpServerResponse(errors=six.moves.urllib.error.URLError(''))
 
   def _SetUpFile(self, contents, mtime):
     with io.open(self.tempfilepath, 'w') as f:
       f.write(contents)
     os.utime(self.tempfilepath, (0, mtime))
 
-  def _SetUpServerResponse(self, error=None):
+  def _SetUpServerResponse(self, errors=None):
     method_to_patch = 'googlecloudsdk.core.credentials.gce_read.ReadNoProxy'
-    if error:
-      self.StartPatch(method_to_patch, side_effect=error)
+    if errors:
+      return self.StartPatch(method_to_patch, side_effect=errors)
     else:
-      self.StartPatch(method_to_patch, return_value='123')
+      return self.StartPatch(method_to_patch, return_value='123')
 
   # In these tests, the answer is retrieved from memory.
   def testGetOnGCE_InMemoryTrue(self):
@@ -80,8 +80,7 @@ class GCECacheTest(parameterized.TestCase, sdk_test_base.SdkBase):
     self.assertTrue(on_gce_cache.connected)
     # Should be current time, since file mtime was:
     #     current_time - _GCE_CACHE_MAX_AGE
-    self.assertEqual(on_gce_cache.expiration_time,
-                     self.current_time)
+    self.assertEqual(on_gce_cache.expiration_time, self.current_time)
 
   def testGetOnGce_InMemoryExpired_OnDiskTrue(self):
     on_gce_cache = gce_cache._OnGCECache(False, self.current_time - 1)
@@ -91,8 +90,7 @@ class GCECacheTest(parameterized.TestCase, sdk_test_base.SdkBase):
     self.assertTrue(on_gce_cache.connected)
     # Should be current time, since file mtime was:
     #     current_time - _GCE_CACHE_MAX_AGE
-    self.assertEqual(on_gce_cache.expiration_time,
-                     self.current_time)
+    self.assertEqual(on_gce_cache.expiration_time, self.current_time)
 
   def testGetOnGce_NotInMemory_OnDisk_False(self):
     on_gce_cache = gce_cache._OnGCECache()
@@ -102,8 +100,7 @@ class GCECacheTest(parameterized.TestCase, sdk_test_base.SdkBase):
     self.assertIs(on_gce_cache.connected, False)
     # Should be current time, since file mtime was:
     #     current_time - _GCE_CACHE_MAX_AGE
-    self.assertEqual(on_gce_cache.expiration_time,
-                     self.current_time)
+    self.assertEqual(on_gce_cache.expiration_time, self.current_time)
 
   def testGetOnGce_NotInMemory_OnDisk_Empty(self):
     on_gce_cache = gce_cache._OnGCECache()
@@ -113,8 +110,7 @@ class GCECacheTest(parameterized.TestCase, sdk_test_base.SdkBase):
     self.assertIs(on_gce_cache.connected, False)
     # Should be current time, since file mtime was:
     #     current_time - _GCE_CACHE_MAX_AGE
-    self.assertEqual(on_gce_cache.expiration_time,
-                     self.current_time)
+    self.assertEqual(on_gce_cache.expiration_time, self.current_time)
 
   def testGetOnGce_NotInMemory_OnDisk_Corrupt(self):
     on_gce_cache = gce_cache._OnGCECache()
@@ -124,8 +120,7 @@ class GCECacheTest(parameterized.TestCase, sdk_test_base.SdkBase):
     self.assertIs(on_gce_cache.connected, False)
     # Should be current time, since file mtime was:
     #     current_time - _GCE_CACHE_MAX_AGE
-    self.assertEqual(on_gce_cache.expiration_time,
-                     self.current_time)
+    self.assertEqual(on_gce_cache.expiration_time, self.current_time)
 
   def testGetOnGce_NotInMemory_OnDisk_ExpiredNoCheckAge(self):
     on_gce_cache = gce_cache._OnGCECache()
@@ -136,8 +131,7 @@ class GCECacheTest(parameterized.TestCase, sdk_test_base.SdkBase):
     self.assertIs(on_gce_cache.connected, True)
     # Should be current time, since file mtime was:
     #     current_time - _GCE_CACHE_MAX_AGE
-    self.assertEqual(on_gce_cache.expiration_time,
-                     self.current_time - 1)
+    self.assertEqual(on_gce_cache.expiration_time, self.current_time - 1)
 
   # In these tests, the answer is computed by attempting to reach the server.
   # The memory and and disk caches should be updated.
@@ -175,17 +169,12 @@ class GCECacheTest(parameterized.TestCase, sdk_test_base.SdkBase):
     self.AssertFileExistsWithContents('False', self.tempfilepath)
 
   def testGetOnGce_NotInMemory_NotOnDisk_CheckServerErrors(self):
-    errors = (
-        six.moves.urllib.error.URLError(''),
-        six.moves.urllib.error.HTTPError(None, None, None, None, None),
-        socket.timeout(''),
-        socket.error(''),
-        socket.herror(''),
-        socket.gaierror(''),
-        six.moves.http_client.BadStatusLine('')
-    )
+    errors = (six.moves.urllib.error.URLError(''),
+              six.moves.urllib.error.HTTPError(None, None, None, None, None),
+              socket.timeout(''), socket.error(''), socket.herror(''),
+              socket.gaierror(''), six.moves.http_client.BadStatusLine(''))
     for error in errors:
-      self._SetUpServerResponse(error=error)
+      self._SetUpServerResponse(errors=error)
       on_gce_cache = gce_cache._OnGCECache()
 
       self.assertIs(on_gce_cache.GetOnGCE(), False)
@@ -243,6 +232,68 @@ class GCECacheTest(parameterized.TestCase, sdk_test_base.SdkBase):
     # Cache was actually reset also.
     self.assertFalse(gce_cache.GetOnGCE())
     self.AssertFileExistsWithContents('False', self.tempfilepath)
+
+  def testConnectionRetry_UnknownError(self):
+    mock_read_no_proxy = self._SetUpServerResponse(errors=ValueError(''))
+    on_gce_cache = gce_cache._OnGCECache()
+    with self.AssertRaisesExceptionMatches(ValueError, ''):
+      on_gce_cache.GetOnGCE()
+    mock_read_no_proxy.asset_called_once()
+
+  def testConnectionRetry_CannotResolveName(self):
+    mock_read_no_proxy = self._SetUpServerResponse(
+        errors=six.moves.urllib_error.URLError('Name or service not known'))
+    on_gce_cache = gce_cache._OnGCECache()
+    self.assertFalse(on_gce_cache.GetOnGCE())
+    self.assertFalse(on_gce_cache.connected)
+    mock_read_no_proxy.asset_called_once()
+    self.AssertFileExistsWithContents('False', self.tempfilepath)
+
+  def testConnectionRetry_CannotResolveName_Subclass(self):
+    mock_read_no_proxy = self._SetUpServerResponse(
+        errors=six.moves.urllib.error.HTTPError(
+            None, None, 'Name or service not known', None, None))
+    on_gce_cache = gce_cache._OnGCECache()
+    self.assertFalse(on_gce_cache.GetOnGCE())
+    self.assertFalse(on_gce_cache.connected)
+    mock_read_no_proxy.asset_called_once()
+    self.AssertFileExistsWithContents('False', self.tempfilepath)
+
+  def testConnectionRetry_URLError_OtherReason(self):
+    mock_read_no_proxy = self._SetUpServerResponse(
+        errors=six.moves.urllib_error.URLError('other reason'))
+    on_gce_cache = gce_cache._OnGCECache()
+    self.assertFalse(on_gce_cache.GetOnGCE())
+    self.assertFalse(on_gce_cache.connected)
+    self.assertEqual(mock_read_no_proxy.call_count, 4)
+    self.AssertFileExistsWithContents('False', self.tempfilepath)
+
+  def testConnectionRetry_URLError_OtherReason_Subclass(self):
+    mock_read_no_proxy = self._SetUpServerResponse(
+        errors=six.moves.urllib.error.HTTPError(None, None, None, None, None))
+    on_gce_cache = gce_cache._OnGCECache()
+    self.assertFalse(on_gce_cache.GetOnGCE())
+    self.assertFalse(on_gce_cache.connected)
+    self.assertEqual(mock_read_no_proxy.call_count, 4)
+    self.AssertFileExistsWithContents('False', self.tempfilepath)
+
+  def testConnectionRetry_HttpException(self):
+    mock_read_no_proxy = self._SetUpServerResponse(
+        errors=six.moves.http_client.HTTPException('some reason'))
+    on_gce_cache = gce_cache._OnGCECache()
+    self.assertFalse(on_gce_cache.GetOnGCE())
+    self.assertFalse(on_gce_cache.connected)
+    self.assertEqual(mock_read_no_proxy.call_count, 4)
+    self.AssertFileExistsWithContents('False', self.tempfilepath)
+
+  def testConnectionRetry_RetryOnce(self):
+    mock_read_no_proxy = self._SetUpServerResponse(
+        errors=[six.moves.http_client.HTTPException('some reason'), '123'])
+    on_gce_cache = gce_cache._OnGCECache()
+    self.assertTrue(on_gce_cache.GetOnGCE())
+    self.assertTrue(on_gce_cache.connected)
+    self.assertEqual(mock_read_no_proxy.call_count, 2)
+    self.AssertFileExistsWithContents('True', self.tempfilepath)
 
 
 if __name__ == '__main__':

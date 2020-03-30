@@ -51,19 +51,20 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To print out a list of resources in the deployment with some summary
     information about each, run:
 
-        $ gcloud deployment-manager resources list --deployment my-deployment
+        $ gcloud deployment-manager resources list --deployment=my-deployment
 
     To print only the name of each resource, run:
 
         $ gcloud deployment-manager resources list \
-            --deployment my-deployment --simple-list
+            --deployment=my-deployment --simple-list
 
 NOTES
     These variants are also available:

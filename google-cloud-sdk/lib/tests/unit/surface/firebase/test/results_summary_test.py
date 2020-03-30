@@ -35,7 +35,6 @@ from tests.lib.surface.firebase.test.android import unit_base
 TOOLRESULTS_MESSAGES = apis.GetMessagesModule('toolresults', 'v1beta3')
 
 TEST_OUTCOME_FORMAT = util.OUTCOMES_FORMAT
-FLAKY_ATTEMPTS_OUTCOME_FORMAT = util.FLAKY_ATTEMPTS_OUTCOMES_FORMAT
 
 HISTORY_ID = 'bh.1'
 EXECUTION_ID = '5'
@@ -50,6 +49,17 @@ DIMENSIONS = [
     TOOLRESULTS_MESSAGES.StepDimensionValueEntry(
         key='Orientation', value='up'),
     ]
+
+ENVIRONMENT_DIMENSIONS = [
+    TOOLRESULTS_MESSAGES.EnvironmentDimensionValueEntry(
+        key='Model', value='Nexus'),
+    TOOLRESULTS_MESSAGES.EnvironmentDimensionValueEntry(
+        key='Locale', value='en'),
+    TOOLRESULTS_MESSAGES.EnvironmentDimensionValueEntry(
+        key='Version', value='v1'),
+    TOOLRESULTS_MESSAGES.EnvironmentDimensionValueEntry(
+        key='Orientation', value='up'),
+]
 
 MULTI_STEP_0 = TOOLRESULTS_MESSAGES.MultiStep(
     multistepNumber=0,
@@ -95,6 +105,7 @@ INCONCLUSIVE_INFRA_OUTCOME = TOOLRESULTS_MESSAGES.Outcome(
     summary=INCONCLUSIVE,
     inconclusiveDetail=TOOLRESULTS_MESSAGES.InconclusiveDetail(
         infrastructureFailure=True))
+INCONCLUSIVE_OUTCOME = TOOLRESULTS_MESSAGES.Outcome(summary=INCONCLUSIVE)
 INCONCLUSIVE_ABORTED_OUTCOME = TOOLRESULTS_MESSAGES.Outcome(
     summary=INCONCLUSIVE,
     inconclusiveDetail=TOOLRESULTS_MESSAGES.InconclusiveDetail(
@@ -110,6 +121,7 @@ SKIPPED_ARCH_OUTCOME = TOOLRESULTS_MESSAGES.Outcome(
     summary=SKIPPED,
     skippedDetail=TOOLRESULTS_MESSAGES.SkippedDetail(
         incompatibleArchitecture=True))
+SKIPPED_OUTCOME = TOOLRESULTS_MESSAGES.Outcome(summary=SKIPPED)
 UNSET_OUTCOME = TOOLRESULTS_MESSAGES.Outcome(
     summary=SUMMARY_ENUM.unset)
 
@@ -127,6 +139,8 @@ FAIL_OVERVIEW2 = TOOLRESULTS_MESSAGES.TestSuiteOverview(
     errorCount=2,
     skippedCount=1,
     totalCount=8)
+FLAKY_OVERVIEW = TOOLRESULTS_MESSAGES.TestSuiteOverview(
+    flakyCount=3, totalCount=4)
 
 
 class ResultsSummaryTest(unit_base.AndroidMockClientTest):
@@ -141,105 +155,127 @@ class ResultsSummaryTest(unit_base.AndroidMockClientTest):
   def testNoResultsAvailable(self):
     summary_fetcher = self._createResultsSummaryFetcher()
 
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(steps=[]))
+    self._expectHistoriesExecutionsEnvironmentsList([])
+    self._expectHistoriesExecutionsStepsList([])
 
-    summary = summary_fetcher.CreateMatrixOutcomeSummary()
+    summary = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
 
     self.assertEqual([], summary)
-    self.AssertErrEquals("""\
-WARNING: No results found, something went wrong. Try re-running the tests.
-""")
+    self.AssertErrContains(
+        """WARNING: Environment has no results, something went wrong. Displaying step outcomes instead."""
+    )
+    self.AssertErrContains(
+        """WARNING: No test results found, something went wrong. Try re-running the tests."""
+    )
 
-  def testStepOutcomeIsMissing(self):
+  def testEnvironmentAndStepOutcomeIsMissing(self):
     summary_fetcher = self._createResultsSummaryFetcher()
 
-    # Create step with missing outcome
-    step = self._createStep(None, [EMPTY_OVERVIEW])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(steps=[step]))
+    # Create environment with missing outcome
+    environment = self._createEnvironment(None, [EMPTY_OVERVIEW])
+    self._expectHistoriesExecutionsEnvironmentsList([environment])
+    self._expectHistoriesExecutionsStepsList([])
 
-    outcomes = summary_fetcher.CreateMatrixOutcomeSummary()
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
 
     self.assertEqual(len(outcomes), 0)
     self.AssertErrContains('no outcome')
+    self.AssertErrContains('Displaying step outcomes instead.')
 
-  def testResultsForOneDimension(self):
+  def testUseStepResultsIfNoEnvironmentResultsAreAvailable(self):
     summary_fetcher = self._createResultsSummaryFetcher()
 
-    step = self._createStep(FAILURE_TIMEOUT_OUTCOME, [FAIL_OVERVIEW1])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(steps=[step]))
+    self._expectHistoriesExecutionsEnvironmentsList([])
 
-    outcomes = summary_fetcher.CreateMatrixOutcomeSummary()
+    step = self._createStep(FAILURE_TIMEOUT_OUTCOME, [FAIL_OVERVIEW1])
+    self._expectHistoriesExecutionsStepsList([step])
+
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
     resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
 
+    self.AssertErrContains(
+        """WARNING: Environment has no results, something went wrong. Displaying step outcomes instead."""
+    )
     self.AssertOutputContains('| OUTCOME | TEST_AXIS_VALUE | TEST_DETAILS |',
                               normalize_space=True)
     self.AssertOutputContains('| Failed | Nexus-v1-en-up | Test timed out |',
                               normalize_space=True)
-    self.AssertErrEquals('')
 
-  def testResultsForFlakyAttempts(self):
+  def testResultsForOneDimension(self):
     summary_fetcher = self._createResultsSummaryFetcher()
 
-    step1 = self._createPrimaryStep(FAILURE_OUTCOME, [FAIL_OVERVIEW1])
-    step2 = self._createRerunStep(SUCCESS_OUTCOME, [PASS_OVERVIEW1])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(steps=[step1, step2]))
+    environment = self._createEnvironment(FAILURE_TIMEOUT_OUTCOME,
+                                          [FAIL_OVERVIEW1])
+    self._expectHistoriesExecutionsEnvironmentsList([environment])
 
-    outcomes = summary_fetcher.CreateFlakyAttemptsMatrixOutcomeSummary()
-    resource_printer.Print(outcomes, FLAKY_ATTEMPTS_OUTCOME_FORMAT)
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
+    resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
 
     self.AssertOutputContains(
-        '| OUTCOME | TEST_AXIS_VALUE | PASSED_EXECUTIONS |',
-        normalize_space=True)
-    self.AssertOutputContains('| Flaky | Nexus-v1-en-up | 50% (1 of 2) |',
-                              normalize_space=True)
+        '| OUTCOME | TEST_AXIS_VALUE | TEST_DETAILS |', normalize_space=True)
+    self.AssertOutputContains(
+        '| Failed | Nexus-v1-en-up | Test timed out |', normalize_space=True)
     self.AssertErrEquals('')
 
-  def testResultsForPassedFlakyAttempts(self):
+  def testResultsForFlakyEnvironment(self):
     summary_fetcher = self._createResultsSummaryFetcher()
 
-    step = self._createStep(SUCCESS_OUTCOME, [PASS_OVERVIEW1])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(steps=[step]))
+    environment = self._createEnvironment(FLAKY_OUTCOME, [FLAKY_OVERVIEW])
+    self.tr_client.projects_histories_executions_environments.List.Expect(
+        request=self._createEnvironmentsListRequest(None),
+        response=self.toolresults_msgs.ListEnvironmentsResponse(
+            environments=[environment]))
 
-    outcomes = summary_fetcher.CreateFlakyAttemptsMatrixOutcomeSummary()
-    resource_printer.Print(outcomes, FLAKY_ATTEMPTS_OUTCOME_FORMAT)
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
+    resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
 
     self.AssertOutputContains(
-        '| OUTCOME | TEST_AXIS_VALUE | PASSED_EXECUTIONS |',
+        '| OUTCOME | TEST_AXIS_VALUE | TEST_DETAILS |', normalize_space=True)
+    self.AssertOutputContains(
+        '| Flaky | Nexus-v1-en-up | 3 test cases flaky, 1 passed |',
         normalize_space=True)
-    self.AssertOutputContains('| Passed | Nexus-v1-en-up | 100% (1 of 1) |',
-                              normalize_space=True)
+    self.AssertErrEquals('')
+
+  def testResultsForPassedEnvironment(self):
+    summary_fetcher = self._createResultsSummaryFetcher()
+
+    environment = self._createEnvironment(SUCCESS_OUTCOME, [PASS_OVERVIEW1])
+    self._expectHistoriesExecutionsEnvironmentsList([environment])
+
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
+    resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
+
+    self.AssertOutputContains(
+        '| OUTCOME | TEST_AXIS_VALUE | TEST_DETAILS |', normalize_space=True)
+    self.AssertOutputContains(
+        '| Passed | Nexus-v1-en-up | 8 test cases passed, 1 skipped |',
+        normalize_space=True)
     self.AssertErrEquals('')
 
   def testResultsWithMultipleDimensions(self):
     summary_fetcher = self._createResultsSummaryFetcher()
 
-    step1 = self._createStep(FAILURE_CRASH_OUTCOME, [FAIL_OVERVIEW1])
-    step2 = self._createStep(SUCCESS_OUTCOME, [PASS_OVERVIEW1])
-    step3 = self._createStep(INCONCLUSIVE_INFRA_OUTCOME, [EMPTY_OVERVIEW])
-    step4 = self._createStep(FAILURE_INSTALL_OUTCOME, [EMPTY_OVERVIEW])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(
-            steps=[step1, step2, step3, step4]))
+    environment1 = self._createEnvironment(FAILURE_CRASH_OUTCOME,
+                                           [FAIL_OVERVIEW1])
+    environment2 = self._createEnvironment(SUCCESS_OUTCOME, [PASS_OVERVIEW1])
+    environment3 = self._createEnvironment(INCONCLUSIVE_INFRA_OUTCOME,
+                                           [EMPTY_OVERVIEW])
+    environment4 = self._createEnvironment(INCONCLUSIVE_OUTCOME,
+                                           [EMPTY_OVERVIEW])
+    environment5 = self._createEnvironment(FAILURE_INSTALL_OUTCOME,
+                                           [EMPTY_OVERVIEW])
+    self._expectHistoriesExecutionsEnvironmentsList(
+        [environment1, environment2, environment3, environment4, environment5])
 
-    outcomes = summary_fetcher.CreateMatrixOutcomeSummary()
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
     resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
 
     self.AssertOutputContains(
         """Failed | Nexus-v1-en-up | App failed to install |
         | Failed | Nexus-v1-en-up | Application crashed |
-        | Passed | Nexus-v1-en-up | 9 test cases passed |
-        | Inconclusive | Nexus-v1-en-up | Infrastructure failure |""",
+        | Passed | Nexus-v1-en-up | 8 test cases passed, 1 skipped |
+        | Inconclusive | Nexus-v1-en-up | Infrastructure failure |
+        | Inconclusive | Nexus-v1-en-up | Unknown reason |""",
         normalize_space=True)
     self.AssertErrContains('Slack channel')
     self.AssertErrContains('[{0}]'.format(EXECUTION_ID))
@@ -247,17 +283,22 @@ WARNING: No results found, something went wrong. Try re-running the tests.
   def testResultsWithSkippedDimensions(self):
     summary_fetcher = self._createResultsSummaryFetcher()
 
-    step1 = self._createStep(SUCCESS_OUTCOME, [PASS_OVERVIEW2])
-    step2 = self._createStep(SKIPPED_DEVICE_OUTCOME, [EMPTY_OVERVIEW])
-    step3 = self._createStep(INCONCLUSIVE_ABORTED_OUTCOME, [EMPTY_OVERVIEW])
-    step4 = self._createStep(SKIPPED_VERSION_OUTCOME, [EMPTY_OVERVIEW])
-    step5 = self._createStep(SKIPPED_ARCH_OUTCOME, [EMPTY_OVERVIEW])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(
-            steps=[step1, step2, step3, step4, step5]))
+    environment1 = self._createEnvironment(SUCCESS_OUTCOME, [PASS_OVERVIEW2])
+    environment2 = self._createEnvironment(SKIPPED_DEVICE_OUTCOME,
+                                           [EMPTY_OVERVIEW])
+    environment3 = self._createEnvironment(INCONCLUSIVE_ABORTED_OUTCOME,
+                                           [EMPTY_OVERVIEW])
+    environment4 = self._createEnvironment(SKIPPED_VERSION_OUTCOME,
+                                           [EMPTY_OVERVIEW])
+    environment5 = self._createEnvironment(SKIPPED_ARCH_OUTCOME,
+                                           [EMPTY_OVERVIEW])
+    environment6 = self._createEnvironment(SKIPPED_OUTCOME, [EMPTY_OVERVIEW])
+    self._expectHistoriesExecutionsEnvironmentsList([
+        environment1, environment2, environment3, environment4, environment5,
+        environment6
+    ])
 
-    outcomes = summary_fetcher.CreateMatrixOutcomeSummary()
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
     resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
 
     self.AssertOutputContains(
@@ -266,19 +307,18 @@ WARNING: No results found, something went wrong. Try re-running the tests.
         | Skipped | Nexus-v1-en-up | App does not support the OS version |
         | Skipped | Nexus-v1-en-up | App does not support the device \
         architecture |
-        | Skipped | Nexus-v1-en-up | Incompatible device/OS combination |""",
+        | Skipped | Nexus-v1-en-up | Incompatible device/OS combination |
+        | Skipped | Nexus-v1-en-up | Unknown reason |""",
         normalize_space=True)
     self.AssertErrEquals('')
 
   def testResultsSuccessWithNativeCrashOutcome(self):
     summary_fetcher = self._createResultsSummaryFetcher()
-    step = self._createStep(SUCCESS_NATIVE_CRASH_OUTCOME, [EMPTY_OVERVIEW])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(
-            steps=[step]))
+    environment = self._createEnvironment(SUCCESS_NATIVE_CRASH_OUTCOME,
+                                          [EMPTY_OVERVIEW])
+    self._expectHistoriesExecutionsEnvironmentsList([environment])
 
-    outcomes = summary_fetcher.CreateMatrixOutcomeSummary()
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
     resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
 
     self.AssertOutputContains(
@@ -288,13 +328,11 @@ WARNING: No results found, something went wrong. Try re-running the tests.
 
   def testResultsFailureWithNativeCrashOutcome(self):
     summary_fetcher = self._createResultsSummaryFetcher()
-    step = self._createStep(FAILURE_NATIVE_CRASH_OUTCOME, [FAIL_OVERVIEW1])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(
-            steps=[step]))
+    environment = self._createEnvironment(FAILURE_NATIVE_CRASH_OUTCOME,
+                                          [FAIL_OVERVIEW1])
+    self._expectHistoriesExecutionsEnvironmentsList([environment])
 
-    outcomes = summary_fetcher.CreateMatrixOutcomeSummary()
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
     resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
 
     self.AssertOutputContains(
@@ -304,14 +342,11 @@ WARNING: No results found, something went wrong. Try re-running the tests.
 
   def testResultsFailureTimeoutWithNativeCrashOutcome(self):
     summary_fetcher = self._createResultsSummaryFetcher()
-    step = self._createStep(FAILURE_TIMEOUT_WITH_NATIVE_CRASH_OUTCOME,
-                            [EMPTY_OVERVIEW])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(
-            steps=[step]))
+    environment = self._createEnvironment(
+        FAILURE_TIMEOUT_WITH_NATIVE_CRASH_OUTCOME, [EMPTY_OVERVIEW])
+    self._expectHistoriesExecutionsEnvironmentsList([environment])
 
-    outcomes = summary_fetcher.CreateMatrixOutcomeSummary()
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
     resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
 
     self.AssertOutputContains(
@@ -321,12 +356,11 @@ WARNING: No results found, something went wrong. Try re-running the tests.
 
   def testResultsInconclusiveWithInfrastructureFailureOutcome(self):
     summary_fetcher = self._createResultsSummaryFetcher()
-    step = self._createStep(INCONCLUSIVE_INFRA_OUTCOME, [EMPTY_OVERVIEW])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(steps=[step]))
+    environment = self._createEnvironment(INCONCLUSIVE_INFRA_OUTCOME,
+                                          [EMPTY_OVERVIEW])
+    self._expectHistoriesExecutionsEnvironmentsList([environment])
 
-    outcomes = summary_fetcher.CreateMatrixOutcomeSummary()
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
     resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
 
     self.AssertOutputContains(
@@ -338,17 +372,18 @@ WARNING: No results found, something went wrong. Try re-running the tests.
   def testResultsWithPagination(self):
     summary_fetcher = self._createResultsSummaryFetcher()
 
-    step1 = self._createStep(FAILURE_OUTCOME, [FAIL_OVERVIEW1])
-    step2 = self._createStep(FAILURE_OUTCOME, [FAIL_OVERVIEW2])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(
-            nextPageToken='token', steps=[step1]))
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest('token'),
-        response=self.toolresults_msgs.ListStepsResponse(steps=[step2]))
+    environment1 = self._createEnvironment(FAILURE_OUTCOME, [FAIL_OVERVIEW1])
+    environment2 = self._createEnvironment(FAILURE_OUTCOME, [FAIL_OVERVIEW2])
+    self.tr_client.projects_histories_executions_environments.List.Expect(
+        request=self._createEnvironmentsListRequest(None),
+        response=self.toolresults_msgs.ListEnvironmentsResponse(
+            nextPageToken='token', environments=[environment1]))
+    self.tr_client.projects_histories_executions_environments.List.Expect(
+        request=self._createEnvironmentsListRequest('token'),
+        response=self.toolresults_msgs.ListEnvironmentsResponse(
+            environments=[environment2]))
 
-    outcomes = summary_fetcher.CreateMatrixOutcomeSummary()
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
     resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
 
     self.AssertOutputContains(
@@ -360,19 +395,20 @@ WARNING: No results found, something went wrong. Try re-running the tests.
   def testResultsWithMultipleTestSuites(self):
     summary_fetcher = self._createResultsSummaryFetcher()
 
-    step1 = self._createStep(SUCCESS_OUTCOME, [PASS_OVERVIEW1, PASS_OVERVIEW2])
-    step2 = self._createStep(FAILURE_OUTCOME, [FAIL_OVERVIEW1, FAIL_OVERVIEW2])
-    self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self._createStepsListRequest(None),
-        response=self.toolresults_msgs.ListStepsResponse(steps=[step1, step2]))
+    environment1 = self._createEnvironment(SUCCESS_OUTCOME,
+                                           [PASS_OVERVIEW1, PASS_OVERVIEW2])
+    environment2 = self._createEnvironment(FAILURE_OUTCOME,
+                                           [FAIL_OVERVIEW1, FAIL_OVERVIEW2])
+    self._expectHistoriesExecutionsEnvironmentsList(
+        [environment1, environment2])
 
-    outcomes = summary_fetcher.CreateMatrixOutcomeSummary()
+    outcomes = summary_fetcher.CreateMatrixOutcomeSummaryUsingEnvironments()
     resource_printer.Print(outcomes, TEST_OUTCOME_FORMAT)
 
     self.AssertOutputContains(
         """Failed | Nexus-v1-en-up | 5 test cases failed, 5 passed, 2 errors, \
         1 skipped |
-        | Passed | Nexus-v1-en-up | 22 test cases passed""",
+        | Passed | Nexus-v1-en-up | 21 test cases passed, 1 skipped""",
         normalize_space=True)
 
   def testFetchTestRollupOutcome_HttpErrorOccurs(self):
@@ -455,6 +491,8 @@ WARNING: No results found, something went wrong. Try re-running the tests.
     self.assertEqual(exc, exit_code.INCONCLUSIVE)
     self.AssertErrContains('did not provide a roll-up')
 
+  ### BELOW ARE HELPER METHODS ###
+
   def _createResultsSummaryFetcher(self):
     return results_summary.ToolResultsSummaryFetcher(
         self.PROJECT_ID,
@@ -470,27 +508,24 @@ WARNING: No results found, something went wrong. Try re-running the tests.
                                       outcome=outcome,
                                       testExecutionStep=execution_step)
 
-  def _createPrimaryStep(self, outcome, overviews):
-    execution_step = self.toolresults_msgs.TestExecutionStep(
-        testSuiteOverviews=overviews)
-    return self.toolresults_msgs.Step(name='Bonobo test',
-                                      dimensionValue=DIMENSIONS,
-                                      outcome=outcome,
-                                      testExecutionStep=execution_step,
-                                      multiStep=MULTI_STEP_0)
-
-  def _createRerunStep(self, outcome, overviews):
-    execution_step = self.toolresults_msgs.TestExecutionStep(
-        testSuiteOverviews=overviews)
-    return self.toolresults_msgs.Step(name='Bonobo test',
-                                      dimensionValue=DIMENSIONS,
-                                      outcome=outcome,
-                                      testExecutionStep=execution_step,
-                                      multiStep=MULTI_STEP_1)
+  def _createEnvironment(self, outcome, overviews):
+    return self.toolresults_msgs.Environment(
+        dimensionValue=ENVIRONMENT_DIMENSIONS,
+        environmentResult=TOOLRESULTS_MESSAGES.MergedResult(
+            outcome=outcome, testSuiteOverviews=overviews))
 
   def _createStepsListRequest(self, token):
     return (self.toolresults_msgs
             .ToolresultsProjectsHistoriesExecutionsStepsListRequest(
+                projectId=self.PROJECT_ID,
+                historyId=HISTORY_ID,
+                executionId=EXECUTION_ID,
+                pageSize=100,
+                pageToken=token))
+
+  def _createEnvironmentsListRequest(self, token):
+    return (self.toolresults_msgs
+            .ToolresultsProjectsHistoriesExecutionsEnvironmentsListRequest(
                 projectId=self.PROJECT_ID,
                 historyId=HISTORY_ID,
                 executionId=EXECUTION_ID,
@@ -509,6 +544,17 @@ WARNING: No results found, something went wrong. Try re-running the tests.
         request=self._createHistoriesExecutionsRequest(),
         response=self.toolresults_msgs.Execution(executionId=EXECUTION_ID,
                                                  outcome=outcome))
+
+  def _expectHistoriesExecutionsEnvironmentsList(self, environments_list):
+    self.tr_client.projects_histories_executions_environments.List.Expect(
+        request=self._createEnvironmentsListRequest(None),
+        response=self.toolresults_msgs.ListEnvironmentsResponse(
+            environments=environments_list))
+
+  def _expectHistoriesExecutionsStepsList(self, steps_list):
+    self.tr_client.projects_histories_executions_steps.List.Expect(
+        request=self._createStepsListRequest(None),
+        response=self.toolresults_msgs.ListStepsResponse(steps=steps_list))
 
 
 if __name__ == '__main__':

@@ -22,9 +22,11 @@ from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute.org_security_policies import client
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.org_security_policies import flags
+from googlecloudsdk.command_lib.compute.org_security_policies import org_security_policies_utils
+import six
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Describe(base.DescribeCommand):
   """Describe a Google Compute Engine organization security policy.
 
@@ -40,11 +42,32 @@ class Describe(base.DescribeCommand):
     cls.ORG_SECURITY_POLICY_ARG = flags.OrgSecurityPolicyArgument(
         required=True, operation='describe')
     cls.ORG_SECURITY_POLICY_ARG.AddArgument(parser, operation_type='get')
+    parser.add_argument(
+        '--organization',
+        help=('Organization in which the organization security policy is to be'
+              ' described. Must be set if SECURITY_POLICY is display name.'))
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     ref = self.ORG_SECURITY_POLICY_ARG.ResolveAsResource(
         args, holder.resources, with_project=False)
     org_security_policy = client.OrgSecurityPolicy(
-        ref=ref, compute_client=holder.client)
-    return org_security_policy.Describe(only_generate_request=False)
+        ref=ref,
+        compute_client=holder.client,
+        resources=holder.resources,
+        version=six.text_type(self.ReleaseTrack()).lower())
+
+    sp_id = org_security_policies_utils.GetSecurityPolicyId(
+        org_security_policy, ref.Name(), organization=args.organization)
+    return org_security_policy.Describe(
+        sp_id=sp_id, only_generate_request=False)
+
+
+Describe.detailed_help = {
+    'EXAMPLES':
+        """\
+    To describe an organization security policy with ID ``123456789", run:
+
+      $ {command} describe 123456789
+    """,
+}

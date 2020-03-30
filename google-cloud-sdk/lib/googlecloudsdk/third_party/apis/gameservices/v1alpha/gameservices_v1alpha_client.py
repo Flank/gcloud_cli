@@ -9,6 +9,7 @@ class GameservicesV1alpha(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://gameservices.googleapis.com/'
+  MTLS_BASE_URL = u'https://gameservices.mtls.googleapis.com/'
 
   _PACKAGE = u'gameservices'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
@@ -35,160 +36,13 @@ class GameservicesV1alpha(base_api.BaseApiClient):
         default_global_params=default_global_params,
         additional_http_headers=additional_http_headers,
         response_encoding=response_encoding)
-    self.projects_locations_allocationPolicies = self.ProjectsLocationsAllocationPoliciesService(self)
     self.projects_locations_gameServerDeployments_configs = self.ProjectsLocationsGameServerDeploymentsConfigsService(self)
     self.projects_locations_gameServerDeployments = self.ProjectsLocationsGameServerDeploymentsService(self)
     self.projects_locations_operations = self.ProjectsLocationsOperationsService(self)
     self.projects_locations_realms_gameServerClusters = self.ProjectsLocationsRealmsGameServerClustersService(self)
     self.projects_locations_realms = self.ProjectsLocationsRealmsService(self)
-    self.projects_locations_scalingPolicies = self.ProjectsLocationsScalingPoliciesService(self)
     self.projects_locations = self.ProjectsLocationsService(self)
     self.projects = self.ProjectsService(self)
-
-  class ProjectsLocationsAllocationPoliciesService(base_api.BaseApiService):
-    """Service class for the projects_locations_allocationPolicies resource."""
-
-    _NAME = u'projects_locations_allocationPolicies'
-
-    def __init__(self, client):
-      super(GameservicesV1alpha.ProjectsLocationsAllocationPoliciesService, self).__init__(client)
-      self._upload_configs = {
-          }
-
-    def Create(self, request, global_params=None):
-      r"""Creates a new allocation policy in a given project and location.
-
-      Args:
-        request: (GameservicesProjectsLocationsAllocationPoliciesCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('Create')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/allocationPolicies',
-        http_method=u'POST',
-        method_id=u'gameservices.projects.locations.allocationPolicies.create',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[u'allocationPolicyId'],
-        relative_path=u'v1alpha/{+parent}/allocationPolicies',
-        request_field=u'allocationPolicy',
-        request_type_name=u'GameservicesProjectsLocationsAllocationPoliciesCreateRequest',
-        response_type_name=u'Operation',
-        supports_download=False,
-    )
-
-    def Delete(self, request, global_params=None):
-      r"""Deletes a single allocation policy.
-
-      Args:
-        request: (GameservicesProjectsLocationsAllocationPoliciesDeleteRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('Delete')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Delete.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/allocationPolicies/{allocationPoliciesId}',
-        http_method=u'DELETE',
-        method_id=u'gameservices.projects.locations.allocationPolicies.delete',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1alpha/{+name}',
-        request_field='',
-        request_type_name=u'GameservicesProjectsLocationsAllocationPoliciesDeleteRequest',
-        response_type_name=u'Operation',
-        supports_download=False,
-    )
-
-    def Get(self, request, global_params=None):
-      r"""Gets details of a single allocation policy.
-
-      Args:
-        request: (GameservicesProjectsLocationsAllocationPoliciesGetRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (AllocationPolicy) The response message.
-      """
-      config = self.GetMethodConfig('Get')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Get.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/allocationPolicies/{allocationPoliciesId}',
-        http_method=u'GET',
-        method_id=u'gameservices.projects.locations.allocationPolicies.get',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1alpha/{+name}',
-        request_field='',
-        request_type_name=u'GameservicesProjectsLocationsAllocationPoliciesGetRequest',
-        response_type_name=u'AllocationPolicy',
-        supports_download=False,
-    )
-
-    def List(self, request, global_params=None):
-      r"""List allocation policies in a given project and location.
-
-      Args:
-        request: (GameservicesProjectsLocationsAllocationPoliciesListRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (ListAllocationPoliciesResponse) The response message.
-      """
-      config = self.GetMethodConfig('List')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    List.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/allocationPolicies',
-        http_method=u'GET',
-        method_id=u'gameservices.projects.locations.allocationPolicies.list',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[u'filter', u'orderBy', u'pageSize', u'pageToken'],
-        relative_path=u'v1alpha/{+parent}/allocationPolicies',
-        request_field='',
-        request_type_name=u'GameservicesProjectsLocationsAllocationPoliciesListRequest',
-        response_type_name=u'ListAllocationPoliciesResponse',
-        supports_download=False,
-    )
-
-    def Patch(self, request, global_params=None):
-      r"""Patches a single allocation policy.
-
-      Args:
-        request: (GameservicesProjectsLocationsAllocationPoliciesPatchRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('Patch')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Patch.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/allocationPolicies/{allocationPoliciesId}',
-        http_method=u'PATCH',
-        method_id=u'gameservices.projects.locations.allocationPolicies.patch',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[u'updateMask'],
-        relative_path=u'v1alpha/{+name}',
-        request_field=u'allocationPolicy',
-        request_type_name=u'GameservicesProjectsLocationsAllocationPoliciesPatchRequest',
-        response_type_name=u'Operation',
-        supports_download=False,
-    )
 
   class ProjectsLocationsGameServerDeploymentsConfigsService(base_api.BaseApiService):
     """Service class for the projects_locations_gameServerDeployments_configs resource."""
@@ -201,10 +55,9 @@ class GameservicesV1alpha(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates a new game server config in a given project, location, and game.
-server deployment. Game server configs are immutable. A game server config,
-is not applied until it is rolled out. The rollout is managed
-by updating the game server rollout resource.
+      r"""Creates a new Game Server Config in a given project, Location, and Game.
+Server Deployment. Game Server Configs are immutable, and are not applied
+until referenced in the Game Server Deployment Rollout resource.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsConfigsCreateRequest) input message
@@ -231,8 +84,8 @@ by updating the game server rollout resource.
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a single game server config. If a game server config referenced in.
-game server rollout, the deletion will fail since it will be in use.
+      r"""Deletes a single Game Server Config. The deletion will fail if the Game.
+Server Config is referenced in a Game Server Deployment Rollout.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsConfigsDeleteRequest) input message
@@ -259,7 +112,7 @@ game server rollout, the deletion will fail since it will be in use.
     )
 
     def Get(self, request, global_params=None):
-      r"""Gets details of a single game server config.
+      r"""Gets details of a single Game Server Config.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsConfigsGetRequest) input message
@@ -286,8 +139,8 @@ game server rollout, the deletion will fail since it will be in use.
     )
 
     def List(self, request, global_params=None):
-      r"""Lists game server configs in a given project, location, and game server.
-deployment.
+      r"""Lists Game Server Configs in a given project, Location, and Game Server.
+Deployment.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsConfigsListRequest) input message
@@ -323,37 +176,8 @@ deployment.
       self._upload_configs = {
           }
 
-    def CommitRollout(self, request, global_params=None):
-      r"""Commits the ongoing game server deployment rollout by setting the rollout.
-percentage to 100 in all clusters whose labels match labels in the game
-server template.
-
-      Args:
-        request: (GameservicesProjectsLocationsGameServerDeploymentsCommitRolloutRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('CommitRollout')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    CommitRollout.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/gameServerDeployments/{gameServerDeploymentsId}:commitRollout',
-        http_method=u'POST',
-        method_id=u'gameservices.projects.locations.gameServerDeployments.commitRollout',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1alpha/{+name}:commitRollout',
-        request_field=u'commitRolloutRequest',
-        request_type_name=u'GameservicesProjectsLocationsGameServerDeploymentsCommitRolloutRequest',
-        response_type_name=u'Operation',
-        supports_download=False,
-    )
-
     def Create(self, request, global_params=None):
-      r"""Creates a new game server deployment in a given project and location.
+      r"""Creates a new Game Server Deployment in a given project and Location.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsCreateRequest) input message
@@ -380,7 +204,7 @@ server template.
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a single game server deployment.
+      r"""Deletes a single Game Server Deployment.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsDeleteRequest) input message
@@ -406,8 +230,37 @@ server template.
         supports_download=False,
     )
 
+    def FetchDeploymentState(self, request, global_params=None):
+      r"""Retrieves information about the current state of the Game Server.
+Ddeployment. Gathers all the Agones fleets and Agones autoscalers,
+including fleets running an older version of the Game Server Deployment.
+
+      Args:
+        request: (GameservicesProjectsLocationsGameServerDeploymentsFetchDeploymentStateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (FetchDeploymentStateResponse) The response message.
+      """
+      config = self.GetMethodConfig('FetchDeploymentState')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    FetchDeploymentState.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/gameServerDeployments/{gameServerDeploymentsId}:fetchDeploymentState',
+        http_method=u'POST',
+        method_id=u'gameservices.projects.locations.gameServerDeployments.fetchDeploymentState',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1alpha/{+name}:fetchDeploymentState',
+        request_field=u'fetchDeploymentStateRequest',
+        request_type_name=u'GameservicesProjectsLocationsGameServerDeploymentsFetchDeploymentStateRequest',
+        response_type_name=u'FetchDeploymentStateResponse',
+        supports_download=False,
+    )
+
     def Get(self, request, global_params=None):
-      r"""Gets details of a single game server deployment.
+      r"""Gets details of a single Game Server Deployment.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsGetRequest) input message
@@ -463,7 +316,7 @@ set.
     )
 
     def GetRollout(self, request, global_params=None):
-      r"""Gets details of a rollout of a single game server deployment.
+      r"""Gets details a single Game Server Deployment Rollout.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsGetRolloutRequest) input message
@@ -490,7 +343,7 @@ set.
     )
 
     def List(self, request, global_params=None):
-      r"""Lists game server deployments in a given project and location.
+      r"""Lists Game Server Deployments in a given project and Location.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsListRequest) input message
@@ -517,7 +370,7 @@ set.
     )
 
     def Patch(self, request, global_params=None):
-      r"""Patches a game server deployment.
+      r"""Patches a Game Server Deployment.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsPatchRequest) input message
@@ -544,8 +397,8 @@ set.
     )
 
     def PreviewRollout(self, request, global_params=None):
-      r"""Previews the rollout of game server deployment. This API does not.
-mutate the rollout resource.
+      r"""Previews the Game Server Deployment Rollout. This API does not mutate the.
+Rollout resource.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsPreviewRolloutRequest) input message
@@ -568,35 +421,6 @@ mutate the rollout resource.
         request_field=u'gameServerDeploymentRollout',
         request_type_name=u'GameservicesProjectsLocationsGameServerDeploymentsPreviewRolloutRequest',
         response_type_name=u'PreviewGameServerDeploymentRolloutResponse',
-        supports_download=False,
-    )
-
-    def RevertRollout(self, request, global_params=None):
-      r"""Rolls back the ongoing game server deployment rollout by setting the.
-rollout percentage to 0 in all clusters whose labels match labels in the
-game server template.
-
-      Args:
-        request: (GameservicesProjectsLocationsGameServerDeploymentsRevertRolloutRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('RevertRollout')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    RevertRollout.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/gameServerDeployments/{gameServerDeploymentsId}:revertRollout',
-        http_method=u'POST',
-        method_id=u'gameservices.projects.locations.gameServerDeployments.revertRollout',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1alpha/{+name}:revertRollout',
-        request_field=u'revertRolloutRequest',
-        request_type_name=u'GameservicesProjectsLocationsGameServerDeploymentsRevertRolloutRequest',
-        response_type_name=u'Operation',
         supports_download=False,
     )
 
@@ -627,62 +451,6 @@ Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
         request_field=u'setIamPolicyRequest',
         request_type_name=u'GameservicesProjectsLocationsGameServerDeploymentsSetIamPolicyRequest',
         response_type_name=u'Policy',
-        supports_download=False,
-    )
-
-    def SetRolloutTarget(self, request, global_params=None):
-      r"""Sets rollout target for the ongoing game server deployment rollout in the.
-specified clusters and based on the given rollout percentage. Default is 0.
-
-      Args:
-        request: (GameservicesProjectsLocationsGameServerDeploymentsSetRolloutTargetRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('SetRolloutTarget')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    SetRolloutTarget.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/gameServerDeployments/{gameServerDeploymentsId}:setRolloutTarget',
-        http_method=u'POST',
-        method_id=u'gameservices.projects.locations.gameServerDeployments.setRolloutTarget',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1alpha/{+name}:setRolloutTarget',
-        request_field=u'setRolloutTargetRequest',
-        request_type_name=u'GameservicesProjectsLocationsGameServerDeploymentsSetRolloutTargetRequest',
-        response_type_name=u'Operation',
-        supports_download=False,
-    )
-
-    def StartRollout(self, request, global_params=None):
-      r"""Starts rollout of this game server deployment based on the given game.
-server template.
-
-      Args:
-        request: (GameservicesProjectsLocationsGameServerDeploymentsStartRolloutRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('StartRollout')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    StartRollout.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/gameServerDeployments/{gameServerDeploymentsId}:startRollout',
-        http_method=u'POST',
-        method_id=u'gameservices.projects.locations.gameServerDeployments.startRollout',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1alpha/{+name}:startRollout',
-        request_field=u'startRolloutRequest',
-        request_type_name=u'GameservicesProjectsLocationsGameServerDeploymentsStartRolloutRequest',
-        response_type_name=u'Operation',
         supports_download=False,
     )
 
@@ -720,7 +488,12 @@ may "fail open" without warning.
     )
 
     def UpdateRollout(self, request, global_params=None):
-      r"""Patches the rollout of game server deployment.
+      r"""Patches a single Game Server Deployment Rollout.
+The method will not return an error if the update does not affect any
+existing realms. For example - if the default_game_server_config is changed
+but all existing realms use the override, that is valid. Similarly, if a
+non existing realm is explicitly called out in game_server_config_overrides
+field, that will also not result in an error.
 
       Args:
         request: (GameservicesProjectsLocationsGameServerDeploymentsUpdateRolloutRequest) input message
@@ -979,7 +752,7 @@ is the parent resource, without the operations collection id.
     )
 
     def List(self, request, global_params=None):
-      r"""Lists game server clusters in a given project and location.
+      r"""Lists Game Server Clusters in a given project and location.
 
       Args:
         request: (GameservicesProjectsLocationsRealmsGameServerClustersListRequest) input message
@@ -1125,7 +898,7 @@ location.
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates a new Realm in a given project and location.
+      r"""Creates a new Realm in a given project and Location.
 
       Args:
         request: (GameservicesProjectsLocationsRealmsCreateRequest) input message
@@ -1152,7 +925,7 @@ location.
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a single realm.
+      r"""Deletes a single Realm.
 
       Args:
         request: (GameservicesProjectsLocationsRealmsDeleteRequest) input message
@@ -1179,7 +952,7 @@ location.
     )
 
     def Get(self, request, global_params=None):
-      r"""Gets details of a single realm.
+      r"""Gets details of a single Realm.
 
       Args:
         request: (GameservicesProjectsLocationsRealmsGetRequest) input message
@@ -1206,7 +979,7 @@ location.
     )
 
     def List(self, request, global_params=None):
-      r"""Lists realms in a given project and location.
+      r"""Lists Realms in a given project and Location.
 
       Args:
         request: (GameservicesProjectsLocationsRealmsListRequest) input message
@@ -1283,151 +1056,6 @@ location.
         request_field=u'realm',
         request_type_name=u'GameservicesProjectsLocationsRealmsPreviewUpdateRequest',
         response_type_name=u'PreviewRealmUpdateResponse',
-        supports_download=False,
-    )
-
-  class ProjectsLocationsScalingPoliciesService(base_api.BaseApiService):
-    """Service class for the projects_locations_scalingPolicies resource."""
-
-    _NAME = u'projects_locations_scalingPolicies'
-
-    def __init__(self, client):
-      super(GameservicesV1alpha.ProjectsLocationsScalingPoliciesService, self).__init__(client)
-      self._upload_configs = {
-          }
-
-    def Create(self, request, global_params=None):
-      r"""Creates a new scaling policy in a given project and location.
-
-      Args:
-        request: (GameservicesProjectsLocationsScalingPoliciesCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('Create')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/scalingPolicies',
-        http_method=u'POST',
-        method_id=u'gameservices.projects.locations.scalingPolicies.create',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[u'scalingPolicyId'],
-        relative_path=u'v1alpha/{+parent}/scalingPolicies',
-        request_field=u'scalingPolicy',
-        request_type_name=u'GameservicesProjectsLocationsScalingPoliciesCreateRequest',
-        response_type_name=u'Operation',
-        supports_download=False,
-    )
-
-    def Delete(self, request, global_params=None):
-      r"""Deletes a single scaling policy.
-
-      Args:
-        request: (GameservicesProjectsLocationsScalingPoliciesDeleteRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('Delete')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Delete.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/scalingPolicies/{scalingPoliciesId}',
-        http_method=u'DELETE',
-        method_id=u'gameservices.projects.locations.scalingPolicies.delete',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1alpha/{+name}',
-        request_field='',
-        request_type_name=u'GameservicesProjectsLocationsScalingPoliciesDeleteRequest',
-        response_type_name=u'Operation',
-        supports_download=False,
-    )
-
-    def Get(self, request, global_params=None):
-      r"""Gets details of a single scaling policy.
-
-      Args:
-        request: (GameservicesProjectsLocationsScalingPoliciesGetRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (ScalingPolicy) The response message.
-      """
-      config = self.GetMethodConfig('Get')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Get.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/scalingPolicies/{scalingPoliciesId}',
-        http_method=u'GET',
-        method_id=u'gameservices.projects.locations.scalingPolicies.get',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1alpha/{+name}',
-        request_field='',
-        request_type_name=u'GameservicesProjectsLocationsScalingPoliciesGetRequest',
-        response_type_name=u'ScalingPolicy',
-        supports_download=False,
-    )
-
-    def List(self, request, global_params=None):
-      r"""Lists ScalingPolicies in a given project and location.
-
-      Args:
-        request: (GameservicesProjectsLocationsScalingPoliciesListRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (ListScalingPoliciesResponse) The response message.
-      """
-      config = self.GetMethodConfig('List')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    List.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/scalingPolicies',
-        http_method=u'GET',
-        method_id=u'gameservices.projects.locations.scalingPolicies.list',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[u'filter', u'orderBy', u'pageSize', u'pageToken'],
-        relative_path=u'v1alpha/{+parent}/scalingPolicies',
-        request_field='',
-        request_type_name=u'GameservicesProjectsLocationsScalingPoliciesListRequest',
-        response_type_name=u'ListScalingPoliciesResponse',
-        supports_download=False,
-    )
-
-    def Patch(self, request, global_params=None):
-      r"""Patches a single scaling policy.
-
-      Args:
-        request: (GameservicesProjectsLocationsScalingPoliciesPatchRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Operation) The response message.
-      """
-      config = self.GetMethodConfig('Patch')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Patch.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1alpha/projects/{projectsId}/locations/{locationsId}/scalingPolicies/{scalingPoliciesId}',
-        http_method=u'PATCH',
-        method_id=u'gameservices.projects.locations.scalingPolicies.patch',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[u'updateMask'],
-        relative_path=u'v1alpha/{+name}',
-        request_field=u'scalingPolicy',
-        request_type_name=u'GameservicesProjectsLocationsScalingPoliciesPatchRequest',
-        response_type_name=u'Operation',
         supports_download=False,
     )
 

@@ -208,8 +208,8 @@ class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
             self._GetOperationRef('operation-3', 'central2-a'),
             messages.Operation.StatusValueValuesEnum.PENDING))
 
-    client.zoneOperations.Get.Expect(
-        self.messages.ComputeZoneOperationsGetRequest(
+    client.zoneOperations.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
             operation='operation-3',
             zone='central2-a',
             project=self.Project()),
@@ -232,8 +232,8 @@ class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
             self._GetOperationRef('operation-2', 'central2-a'),
             messages.Operation.StatusValueValuesEnum.PENDING))
 
-    client.zoneOperations.Get.Expect(
-        self.messages.ComputeZoneOperationsGetRequest(
+    client.zoneOperations.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
             operation='operation-2',
             zone='central2-a',
             project=self.Project()),
@@ -262,8 +262,8 @@ class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
               self._GetOperationRef('operation-X', 'central2-a'),
               messages.Operation.StatusValueValuesEnum.PENDING))
 
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),
@@ -271,6 +271,7 @@ class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
               self._GetOperationRef('operation-X', 'central2-a'),
               self.messages.Operation.StatusValueValuesEnum.DONE,
               self._GetInstanceRef('instance-1', 'central2-a')))
+
       client.instances.Get.Expect(
           self.messages.ComputeInstancesGetRequest(
               instance='instance-1', project='fake-project', zone='central2-a'),
@@ -315,8 +316,8 @@ class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
               self._GetOperationRef('operation-X', 'central2-a'),
               messages.Operation.StatusValueValuesEnum.PENDING))
 
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),
@@ -324,6 +325,7 @@ class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
               self._GetOperationRef('operation-X', 'central2-a'),
               self.messages.Operation.StatusValueValuesEnum.DONE,
               self._GetInstanceRef('instance-1', 'central2-a')))
+
       client.instances.Get.Expect(
           self.messages.ComputeInstancesGetRequest(
               instance='instance-1', project='fake-project', zone='central2-a'),
@@ -366,8 +368,8 @@ class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
               self._GetOperationRef('operation-X', 'central2-a'),
               messages.Operation.StatusValueValuesEnum.PENDING))
 
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),
@@ -375,6 +377,7 @@ class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
               self._GetOperationRef('operation-X', 'central2-a'),
               self.messages.Operation.StatusValueValuesEnum.DONE,
               self._GetInstanceRef('instance-1', 'central2-a')))
+
       client.instances.Get.Expect(
           self.messages.ComputeInstancesGetRequest(
               instance='instance-1', project='fake-project', zone='central2-a'),
@@ -475,8 +478,8 @@ class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
               self._GetOperationRef('operation-X', 'central2-a'),
               messages.Operation.StatusValueValuesEnum.PENDING))
 
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),
@@ -484,6 +487,7 @@ class UpdateContainerTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
               self._GetOperationRef('operation-X', 'central2-a'),
               self.messages.Operation.StatusValueValuesEnum.DONE,
               self._GetInstanceRef('instance-1', 'central2-a')))
+
       client.instances.Get.Expect(
           self.messages.ComputeInstancesGetRequest(
               instance='instance-1', project='fake-project', zone='central2-a'),
@@ -683,8 +687,8 @@ class UpdateContainerAlphaTest(
           self._GetOperationMessage(
               self._GetOperationRef('operation-X', 'central2-a'),
               self.messages.Operation.StatusValueValuesEnum.PENDING))
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),

@@ -492,15 +492,25 @@ class Session(object):
     self._Handle(current_event, self._captured_stderr)
     self._captured_stderr = ''
 
-  def _HandleFileWrite(self, path, private=False, append=False):
+  def _HandleFileWrite(self,
+                       path,
+                       private=False,
+                       append=False,
+                       create_path=False):
     return self._HandleFileWriteImpl(
-        False, path, private=private, append=append)
+        False, path, private=private, append=append, create_path=create_path)
 
-  def _HandleBinaryFileWrite(self, path, private=False):
-    return self._HandleFileWriteImpl(True, path, private=private, append=False)
+  def _HandleBinaryFileWrite(self, path, private=False, create_path=False):
+    return self._HandleFileWriteImpl(
+        True, path, private=private, append=False, create_path=create_path)
 
   @contextlib.contextmanager
-  def _HandleFileWriteImpl(self, is_binary, path, private=False, append=False):
+  def _HandleFileWriteImpl(self,
+                           is_binary,
+                           path,
+                           private=False,
+                           append=False,
+                           create_path=False):
     """Intercept calls to write files."""
     abs_path = os.path.abspath(path)
 
@@ -514,17 +524,21 @@ class Session(object):
     # the temp directory because they are mocked out.
     temp_dir = os.path.abspath(tempfile.gettempdir())
     is_temp = abs_path.startswith(temp_dir) and not is_known_location
+    is_compute_ssh_hosts_file = path.endswith(
+        os.path.join('.ssh', 'google_compute_known_hosts'))
 
-    if not (is_known_location or is_temp):
+    if not (is_known_location or is_temp or is_compute_ssh_hosts_file):
       raise Error('Command is attempting to write file outside of current '
                   'working directory: [{}]'.format(abs_path))
 
     # Pass through the write like normal
     if is_binary:
-      with self._orig_binary_file_writer(path, private=private) as fw:
+      with self._orig_binary_file_writer(
+          path, private=private, create_path=create_path) as fw:
         yield fw
     else:
-      with self._orig_file_writer(path, private=private, append=append) as fw:
+      with self._orig_file_writer(
+          path, private=private, append=append, create_path=create_path) as fw:
         yield fw
 
     # After they close it, capture what happened.

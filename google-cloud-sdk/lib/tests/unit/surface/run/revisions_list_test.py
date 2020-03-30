@@ -26,10 +26,10 @@ from tests.lib.surface.run import base
 from six.moves import range
 
 
-class RevisionsListTestBeta(base.ServerlessSurfaceBase):
+class RevisionsListTest(base.ServerlessSurfaceBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.revisions = [
@@ -43,6 +43,7 @@ class RevisionsListTestBeta(base.ServerlessSurfaceBase):
           self.namespace.Name(), r.name)
       r.labels['serving.knative.dev/service'] = 'foo'
       r.labels['serving.knative.dev/configuration'] = 'foo'
+      r.labels['cloud.googleapis.com/location'] = 'us-central1'
       r.annotations[revision.AUTHOR_ANNOTATION] = 'some{}@google.com'.format(i)
       r.status.conditions = [
           self.serverless_messages.RevisionCondition(
@@ -54,7 +55,6 @@ class RevisionsListTestBeta(base.ServerlessSurfaceBase):
       ]
 
     self.operations.ListRevisions.return_value = (r for r in self.revisions)
-    self._MockConnectionContext()
 
   def testPaging(self):
     """Two pages of revisions are listable using the Serverless API format."""
@@ -137,6 +137,7 @@ class RevisionsListTestBeta(base.ServerlessSurfaceBase):
 
   def testNoArgUri(self):
     """Two routes are listable using the Serverless API format."""
+    self._MockConnectionContext()
     self.Run('run revisions list --uri')
 
     self.operations.ListRevisions.assert_called_once_with(self.namespace,
@@ -146,6 +147,12 @@ class RevisionsListTestBeta(base.ServerlessSurfaceBase):
         https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions/revision1
         """,
         normalize_space=True)
+
+
+class RevisionsListTestBeta(RevisionsListTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class RevisionsListTestAlpha(RevisionsListTestBeta):

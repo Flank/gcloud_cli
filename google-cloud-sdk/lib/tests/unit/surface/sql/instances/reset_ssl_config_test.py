@@ -46,7 +46,8 @@ class _BaseInstancesResetSSLConfigTest(object):
                 38,
                 39,
                 415000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -55,7 +56,8 @@ class _BaseInstancesResetSSLConfigTest(object):
                 38,
                 39,
                 525000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 8,
@@ -64,22 +66,22 @@ class _BaseInstancesResetSSLConfigTest(object):
                 39,
                 26,
                 601000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='reset-test',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='4d5a6c5e-38fc-4ac5-9980-72ee44c621d8',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/4d5a6c5e-38fc-4ac5-9980-72ee44c621d8'.
-            format(self.Project()),
-            operationType='UPDATE',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/4d5a6c5e-38fc-4ac5-9980-72ee44c621d8'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .UPDATE,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -98,7 +100,8 @@ class _BaseInstancesResetSSLConfigTest(object):
                 38,
                 39,
                 415000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -107,7 +110,8 @@ class _BaseInstancesResetSSLConfigTest(object):
                 38,
                 39,
                 525000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 8,
@@ -116,22 +120,22 @@ class _BaseInstancesResetSSLConfigTest(object):
                 39,
                 26,
                 601000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='reset-test',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='4d5a6c5e-38fc-4ac5-9980-72ee44c621d8',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/4d5a6c5e-38fc-4ac5-9980-72ee44c621d8'.
-            format(self.Project()),
-            operationType='UPDATE',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/4d5a6c5e-38fc-4ac5-9980-72ee44c621d8'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .UPDATE,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -140,7 +144,7 @@ class _BaseInstancesResetSSLConfigTest(object):
 
     self.Run('sql instances reset-ssl-config reset-test')
     self.AssertErrContains(
-        'Reset SSL config for [https://www.googleapis.com/sql/v1beta4/'
+        'Reset SSL config for [https://sqladmin.googleapis.com/sql/v1beta4/'
         'projects/{0}/instances/reset-test].'.format(self.Project()))
 
   def testResetAsync(self):
@@ -148,7 +152,7 @@ class _BaseInstancesResetSSLConfigTest(object):
 
     self.Run('sql instances reset-ssl-config reset-test --async')
     self.AssertErrNotContains(
-        'Reset SSL config for [https://www.googleapis.com/sql/v1beta4/'
+        'Reset SSL config for [https://sqladmin.googleapis.com/sql/v1beta4/'
         'projects/{0}/instances/reset-test].'.format(self.Project()))
 
   def testResetNoConfirmCancels(self):

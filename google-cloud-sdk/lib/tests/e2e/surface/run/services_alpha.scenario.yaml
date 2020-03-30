@@ -114,30 +114,6 @@ actions:
         Deploying container to Cloud Run service [$$service-name$$] in project [cloud-sdk-integration-testing] region [us-central1]
     - api_call:
         expect_request:
-          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/cloud-sdk-integration-testing/services/$$service-name$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '1016'
-            content-type: application/json; charset=UTF-8
-            status: '404'
-          body:
-            error:
-              code: 404
-              message: Resource '$$service-name$$' of kind 'SERVICE' in region 'us-central1'
-                in project 'cloud-sdk-integration-testing' does not exist.
-              status: NOT_FOUND
-              details:
-              - '@type': type.googleapis.com/google.rpc.DebugInfo
-                detail: |-
-                  [ORIGINAL ERROR] generic::not_found: userFacingMessage: Resource '$$service-name$$' of kind 'SERVICE' in region 'us-central1' in project 'cloud-sdk-integration-testing' does not exist.;
-                  com.google.cloud.eventprocessing.serverless.error.NotFoundException: userFacingMessage: Resource '$$service-name$$' of kind 'SERVICE' in region 'us-central1' in project 'cloud-sdk-integration-testing' does not exist.;  Code: NOT_FOUND [google.rpc.error_details_ext] { message: "Resource \'$$service-name$$\' of kind \'SERVICE\' in region \'us-central1\' in project \'cloud-sdk-integration-testing\' does not exist." }
-        repeatable: true
-    - api_call:
-        expect_request:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/cloud-sdk-integration-testing/services?alt=json
           method: POST
           headers: {}
@@ -161,7 +137,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '1736'
+            content-length: '1628'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -171,8 +147,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3q14OaI
               generation: 1
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -181,25 +157,18 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name$$-00001-jey
+                  name: service-name-20191121-173211-y1up-00001-pof
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
-                    resources:
-                      limits:
-                        memory: 256M
-                        cpu: 1000m
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -239,7 +208,7 @@ actions:
             status: '200'
           body:
             version: 1
-            etag: BwWWPJhg260=
+            etag: BwWX3q2ISg0=
             bindings:
             - role: roles/run.invoker
               members:
@@ -253,7 +222,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2665'
+            content-length: '2589'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -263,8 +232,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3q4iWfA
               generation: 1
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -273,25 +242,18 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name$$-00001-jey
+                  name: service-name-20191121-173211-y1up-00001-pof
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
-                    resources:
-                      limits:
-                        memory: 256M
-                        cpu: 1000m
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -300,18 +262,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:01Z'
+                lastTransitionTime: '2019-11-21T17:32:23.574Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:01Z'
+                lastTransitionTime: '2019-11-21T17:32:22.974Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:01Z'
-              latestReadyRevisionName: $$service-name$$-00001-jey
-              latestCreatedRevisionName: $$service-name$$-00001-jey
+                lastTransitionTime: '2019-11-21T17:32:23.574Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-00001-pof
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-00001-pof
               traffic:
-              - revisionName: $$service-name$$-00001-jey
+              - revisionName: service-name-20191121-173211-y1up-00001-pof
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -329,7 +292,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2665'
+            content-length: '2589'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -339,8 +302,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3q4iWfA
               generation: 1
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -349,25 +312,18 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name$$-00001-jey
+                  name: service-name-20191121-173211-y1up-00001-pof
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
-                    resources:
-                      limits:
-                        memory: 256M
-                        cpu: 1000m
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -376,18 +332,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:02Z'
+                lastTransitionTime: '2019-11-21T17:32:23.574Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:02Z'
+                lastTransitionTime: '2019-11-21T17:32:22.974Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:02Z'
-              latestReadyRevisionName: $$service-name$$-00001-jey
-              latestCreatedRevisionName: $$service-name$$-00001-jey
+                lastTransitionTime: '2019-11-21T17:32:23.574Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-00001-pof
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-00001-pof
               traffic:
-              - revisionName: $$service-name$$-00001-jey
+              - revisionName: service-name-20191121-173211-y1up-00001-pof
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -415,7 +372,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2665'
+            content-length: '2589'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -425,8 +382,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3q4iWfA
               generation: 1
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -435,25 +392,18 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata:
-                  name: $$service-revision-name$$
+                  name: service-name-20191121-173211-y1up-00001-pof
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
-                    resources:
-                      limits:
-                        memory: 256M
-                        cpu: 1000m
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -462,18 +412,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:03Z'
+                lastTransitionTime: '2019-11-21T17:32:23.574Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:03Z'
+                lastTransitionTime: '2019-11-21T17:32:22.974Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:03Z'
-              latestReadyRevisionName: $$service-revision-name$$
-              latestCreatedRevisionName: $$service-revision-name$$
+                lastTransitionTime: '2019-11-21T17:32:23.574Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-00001-pof
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-00001-pof
               traffic:
-              - revisionName: $$service-revision-name$$
+              - revisionName: service-name-20191121-173211-y1up-00001-pof
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -501,7 +452,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2665'
+            content-length: '2589'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -511,8 +462,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3q4iWfA
               generation: 1
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -521,25 +472,18 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata:
-                  name: $$service-revision-name$$
+                  name: service-name-20191121-173211-y1up-00001-pof
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
-                    resources:
-                      limits:
-                        memory: 256M
-                        cpu: 1000m
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -548,18 +492,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:04Z'
+                lastTransitionTime: '2019-11-21T17:32:23.574Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:04Z'
+                lastTransitionTime: '2019-11-21T17:32:22.974Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:04Z'
-              latestReadyRevisionName: $$service-revision-name$$
-              latestCreatedRevisionName: $$service-revision-name$$
+                lastTransitionTime: '2019-11-21T17:32:23.574Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-00001-pof
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-00001-pof
               traffic:
-              - revisionName: $$service-revision-name$$
+              - revisionName: service-name-20191121-173211-y1up-00001-pof
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -573,18 +518,18 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '3162'
+            content-length: '2816'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             apiVersion: serving.knative.dev/v1
             kind: Revision
             metadata:
-              name: $$service-revision-name$$
+              name: service-name-20191121-173211-y1up-00001-pof
               namespace: '462803083913'
-              selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/revisions/$$service-name$$-00001-jey
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/revisions/service-name-20191121-173211-y1up-00001-pof
+              uid: 7f161a9d-fb37-4244-a948-45c870131c96
+              resourceVersion: AAWX3q4Yoag
               generation: 1
               labels:
                 serving.knative.dev/route: $$service-name$$
@@ -595,42 +540,36 @@ actions:
               annotations:
                 run.googleapis.com/client-name: gcloud
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
               ownerReferences:
               - apiVersion: serving.knative.dev/v1
                 kind: Configuration
                 name: $$service-name$$
-                uid: 92610cc6-ad75-11e9-b545-42010a800168
+                uid: 32f80a67-abb9-4196-a307-208c076ab64e
                 controller: true
                 blockOwnerDeletion: true
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:13.344441Z'
             spec:
               containerConcurrency: 80
-              timeoutSeconds: 900
               containers:
               - image: gcr.io/knative-samples/helloworld-nodejs
-                resources:
-                  limits:
-                    memory: 256M
-                    cpu: 1000m
-                ports:
-                - containerPort: 8080
             status:
               observedGeneration: 1
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:05Z'
+                lastTransitionTime: '2019-11-21T17:32:22.807Z'
               - type: Active
                 status: 'True'
                 severity: Info
-                lastTransitionTime: '2019-07-23T20:10:05Z'
+                lastTransitionTime: '2019-11-21T17:32:22.807Z'
               - type: ContainerHealthy
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:05Z'
+                lastTransitionTime: '2019-11-21T17:32:22.807Z'
               - type: ResourcesAvailable
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:05Z'
-              logUrl: https://console.cloud.google.com/logs/viewer?project=cloud-sdk-integration-testing&resource=cloud_run_revision/service_name/$$service-name$$/revision_name/$$service-name$$-00001-jey&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22$$service-name$$%22%0Aresource.labels.revision_name%3D%22$$service-name$$-00001-jey%22
+                lastTransitionTime: '2019-11-21T17:32:21.172Z'
+              logUrl: https://console.cloud.google.com/logs/viewer?project=cloud-sdk-integration-testing&resource=cloud_run_revision/service_name/$$service-name$$/revision_name/service-name-20191121-173211-y1up-00001-pof&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22$$service-name$$%22%0Aresource.labels.revision_name%3D%22service-name-20191121-173211-y1up-00001-pof%22
               imageDigest: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
         repeatable: true
     - api_call:
@@ -675,7 +614,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2953'
+            content-length: '2842'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -685,8 +624,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3q5JRqY
               generation: 2
               labels:
                 label1: one
@@ -697,29 +636,22 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name$$-00002-bob
+                  name: service-name-20191121-173211-y1up-00002-har
                   labels:
                     label1: one
                     label2: two
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                     autoscaling.knative.dev/maxScale: '3'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
-                    resources:
-                      limits:
-                        cpu: 1000m
-                        memory: 256M
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -728,18 +660,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:06Z'
+                lastTransitionTime: '2019-11-21T17:32:23.574Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:06Z'
+                lastTransitionTime: '2019-11-21T17:32:22.974Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:06Z'
-              latestReadyRevisionName: $$service-name$$-00001-jey
-              latestCreatedRevisionName: $$service-name$$-00001-jey
+                lastTransitionTime: '2019-11-21T17:32:23.574Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-00001-pof
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-00001-pof
               traffic:
-              - revisionName: $$service-name$$-00001-jey
+              - revisionName: service-name-20191121-173211-y1up-00001-pof
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -752,7 +685,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2953'
+            content-length: '2842'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -762,8 +695,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3q9MJFA
               generation: 2
               labels:
                 label1: one
@@ -774,29 +707,22 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name$$-00002-bob
+                  name: service-name-20191121-173211-y1up-00002-har
                   labels:
                     label1: one
                     label2: two
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                     autoscaling.knative.dev/maxScale: '3'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
-                    resources:
-                      limits:
-                        cpu: 1000m
-                        memory: 256M
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -805,18 +731,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:07Z'
+                lastTransitionTime: '2019-11-21T17:32:43.089Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:07Z'
+                lastTransitionTime: '2019-11-21T17:32:34.528Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:07Z'
-              latestReadyRevisionName: $$service-name$$-00002-bob
-              latestCreatedRevisionName: $$service-name$$-00002-bob
+                lastTransitionTime: '2019-11-21T17:32:43.089Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-00002-har
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-00002-har
               traffic:
-              - revisionName: $$service-name$$-00002-bob
+              - revisionName: service-name-20191121-173211-y1up-00002-har
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -834,7 +761,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2953'
+            content-length: '2842'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -844,8 +771,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3q9MJFA
               generation: 2
               labels:
                 label1: one
@@ -856,29 +783,22 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name$$-00002-bob
+                  name: service-name-20191121-173211-y1up-00002-har
                   labels:
                     label1: one
                     label2: two
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                     autoscaling.knative.dev/maxScale: '3'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
-                    resources:
-                      limits:
-                        cpu: 1000m
-                        memory: 256M
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -887,18 +807,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:08Z'
+                lastTransitionTime: '2019-11-21T17:32:43.089Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:08Z'
+                lastTransitionTime: '2019-11-21T17:32:34.528Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:08Z'
-              latestReadyRevisionName: $$service-name$$-00002-bob
-              latestCreatedRevisionName: $$service-name$$-00002-bob
+                lastTransitionTime: '2019-11-21T17:32:43.089Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-00002-har
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-00002-har
               traffic:
-              - revisionName: $$service-name$$-00002-bob
+              - revisionName: service-name-20191121-173211-y1up-00002-har
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -909,66 +830,8 @@ actions:
           body:
             json: {}
         repeatable: true
-    - api_call:
-        expect_request:
-          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/cloud-sdk-integration-testing/routes/$$service-name$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '2095'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            apiVersion: serving.knative.dev/v1
-            kind: Route
-            metadata:
-              name: $$service-name$$
-              namespace: '462803083913'
-              selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/routes/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
-              generation: 1
-              creationTimestamp: '2019-07-23T18:13:29Z'
-              labels:
-                serving.knative.dev/service: $$service-name$$
-                label1: one
-                label2: two
-                cloud.googleapis.com/location: us-central1
-              annotations:
-                run.googleapis.com/client-name: gcloud
-                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              ownerReferences:
-              - kind: Service
-                name: $$service-name$$
-                uid: 92610cc6-ad75-11e9-b545-42010a800168
-                apiVersion: serving.knative.dev/v1
-                controller: true
-                blockOwnerDeletion: true
-            spec:
-              traffic:
-              - configurationName: $$service-name$$
-                percent: 100
-            status:
-              observedGeneration: 1
-              conditions:
-              - type: Ready
-                status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:09Z'
-              traffic:
-              - revisionName: $$service-revision-name-2$$
-                percent: 100
-              url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
-              address:
-                url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
-        repeatable: true
     - expect_stderr: |
-        Service [$$service-name$$] revision [$$service-revision-name-2$$] is active and serving traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+        Service [$$service-name$$] revision [$$service-revision-name-2$$] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
     - expect_exit:
         code: 0
 - write_file:
@@ -992,6 +855,29 @@ actions:
     events:
     - api_call:
         expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '350'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            projectNumber: '462803083913'
+            projectId: cloud-sdk-integration-testing
+            lifecycleState: ACTIVE
+            name: Cloud SDK Integration Testing
+            labels:
+              service-account-downloaded-notification-opt-out: 'true'
+            createTime: '2014-09-30T14:51:18.935Z'
+            parent:
+              type: folder
+              id: '396521612403'
+    - api_call:
+        expect_request:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/cloud-sdk-integration-testing/services/$$service-name$$?alt=json
           method: GET
           headers: {}
@@ -999,7 +885,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2953'
+            content-length: '2842'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -1009,8 +895,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3q9MJFA
               generation: 2
               labels:
                 label1: one
@@ -1021,29 +907,22 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata:
-                  name: $$service-revision-name-2$$
+                  name: service-name-20191121-173211-y1up-00002-har
                   labels:
                     label1: one
                     label2: two
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                     autoscaling.knative.dev/maxScale: '3'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
-                    resources:
-                      limits:
-                        cpu: 1000m
-                        memory: 256M
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -1052,18 +931,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:10Z'
+                lastTransitionTime: '2019-11-21T17:32:43.089Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:10Z'
+                lastTransitionTime: '2019-11-21T17:32:34.528Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:10Z'
-              latestReadyRevisionName: $$service-revision-name-2$$
-              latestCreatedRevisionName: $$service-revision-name-2$$
+                lastTransitionTime: '2019-11-21T17:32:43.089Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-00002-har
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-00002-har
               traffic:
-              - revisionName: $$service-revision-name-2$$
+              - revisionName: service-name-20191121-173211-y1up-00002-har
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -1078,7 +958,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2953'
+            content-length: '2842'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -1088,8 +968,8 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3q9MJFA
               generation: 2
               labels:
                 label1: one
@@ -1100,29 +980,22 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata:
-                  name: $$service-revision-name-2$$
+                  name: service-name-20191121-173211-y1up-00002-har
                   labels:
                     label1: one
                     label2: two
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                     autoscaling.knative.dev/maxScale: '3'
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
-                    resources:
-                      limits:
-                        cpu: 1000m
-                        memory: 256M
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -1131,18 +1004,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:11Z'
+                lastTransitionTime: '2019-11-21T17:32:43.089Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:11Z'
+                lastTransitionTime: '2019-11-21T17:32:34.528Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:11Z'
-              latestReadyRevisionName: $$service-revision-name-2$$
-              latestCreatedRevisionName: $$service-revision-name-2$$
+                lastTransitionTime: '2019-11-21T17:32:43.089Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-00002-har
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-00002-har
               traffic:
-              - revisionName: $$service-revision-name-2$$
+              - revisionName: service-name-20191121-173211-y1up-00002-har
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -1169,7 +1043,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2393'
+            content-length: '2086'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -1179,30 +1053,22 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3q+AoFg
               generation: 3
               labels:
                 cloud.googleapis.com/location: us-central1
               annotations:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata: {}
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/cloudrun/hello
-                    resources:
-                      limits:
-                        memory: 256M
-                        cpu: 1000m
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -1211,18 +1077,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:12Z'
+                lastTransitionTime: '2019-11-21T17:32:43.089Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:12Z'
+                lastTransitionTime: '2019-11-21T17:32:34.528Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:12Z'
-              latestReadyRevisionName: $$service-revision-name-2$$
-              latestCreatedRevisionName: $$service-revision-name-2$$
+                lastTransitionTime: '2019-11-21T17:32:43.089Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-00002-har
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-00002-har
               traffic:
-              - revisionName: $$service-revision-name-2$$
+              - revisionName: service-name-20191121-173211-y1up-00002-har
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -1235,7 +1102,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2381'
+            content-length: '2074'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -1245,30 +1112,22 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3rBu4gA
               generation: 3
               labels:
                 cloud.googleapis.com/location: us-central1
               annotations:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata: {}
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/cloudrun/hello
-                    resources:
-                      limits:
-                        memory: 256M
-                        cpu: 1000m
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -1277,18 +1136,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:13Z'
+                lastTransitionTime: '2019-11-21T17:33:02.144Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:13Z'
+                lastTransitionTime: '2019-11-21T17:32:54.242Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:13Z'
-              latestReadyRevisionName: $$service-name$$-fvrlp
-              latestCreatedRevisionName: $$service-name$$-fvrlp
+                lastTransitionTime: '2019-11-21T17:33:02.144Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-qlcn9
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-qlcn9
               traffic:
-              - revisionName: $$service-name$$-fvrlp
+              - revisionName: service-name-20191121-173211-y1up-qlcn9
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -1306,7 +1166,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2381'
+            content-length: '2074'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -1316,30 +1176,22 @@ actions:
               name: $$service-name$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
+              resourceVersion: AAWX3rBu4gA
               generation: 3
               labels:
                 cloud.googleapis.com/location: us-central1
               annotations:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:32:12.424610Z'
             spec:
               template:
                 metadata: {}
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/cloudrun/hello
-                    resources:
-                      limits:
-                        memory: 256M
-                        cpu: 1000m
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -1348,18 +1200,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:14Z'
+                lastTransitionTime: '2019-11-21T17:33:02.144Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:14Z'
+                lastTransitionTime: '2019-11-21T17:32:54.242Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:14Z'
-              latestReadyRevisionName: $$service-name$$-fvrlp
-              latestCreatedRevisionName: $$service-name$$-fvrlp
+                lastTransitionTime: '2019-11-21T17:33:02.144Z'
+              latestReadyRevisionName: service-name-20191121-173211-y1up-qlcn9
+              latestCreatedRevisionName: service-name-20191121-173211-y1up-qlcn9
               traffic:
-              - revisionName: $$service-name$$-fvrlp
+              - revisionName: service-name-20191121-173211-y1up-qlcn9
                 percent: 100
+                latestRevision: true
               url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
@@ -1405,29 +1258,6 @@ actions:
         Deploying container to Cloud Run service [$$service-name2$$] in project [cloud-sdk-integration-testing] region [us-central1]
     - api_call:
         expect_request:
-          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/cloud-sdk-integration-testing/services/$$service-name2$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '1020'
-            content-type: application/json; charset=UTF-8
-            status: '404'
-          body:
-            error:
-              code: 404
-              message: Resource '$$service-name2$$' of kind 'SERVICE' in region 'us-central1'
-                in project 'cloud-sdk-integration-testing' does not exist.
-              status: NOT_FOUND
-              details:
-              - '@type': type.googleapis.com/google.rpc.DebugInfo
-                detail: |-
-                  [ORIGINAL ERROR] generic::not_found: userFacingMessage: Resource '$$service-name2$$' of kind 'SERVICE' in region 'us-central1' in project 'cloud-sdk-integration-testing' does not exist.;
-                  com.google.cloud.eventprocessing.serverless.error.NotFoundException: userFacingMessage: Resource '$$service-name2$$' of kind 'SERVICE' in region 'us-central1' in project 'cloud-sdk-integration-testing' does not exist.;  Code: NOT_FOUND [google.rpc.error_details_ext] { message: "Resource \'$$service-name2$$\' of kind \'SERVICE\' in region \'us-central1\' in project \'cloud-sdk-integration-testing\' does not exist." }
-    - api_call:
-        expect_request:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/cloud-sdk-integration-testing/services?alt=json
           method: POST
           headers: {}
@@ -1457,7 +1287,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '1869'
+            content-length: '1761'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -1467,8 +1297,8 @@ actions:
               name: $$service-name2$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name2$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 9429ca22-b30d-4b35-823d-84fecf7ee4fd
+              resourceVersion: AAWX3rCfbnE
               generation: 1
               labels:
                 label1: one
@@ -1479,28 +1309,21 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:33:05.325681Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name2$$-00001-nom
+                  name: service-name2-20191121-173211-265d-00001-qor
                   labels:
                     label1: one
                     label2: two
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
-                    resources:
-                      limits:
-                        memory: 256M
-                        cpu: 1000m
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -1540,7 +1363,7 @@ actions:
             status: '200'
           body:
             version: 1
-            etag: BwWWPJw44Zo=
+            etag: BwWX3rCt4fY=
             bindings:
             - role: roles/run.invoker
               members:
@@ -1554,7 +1377,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2803'
+            content-length: '2727'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -1564,8 +1387,8 @@ actions:
               name: $$service-name2$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name2$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 9429ca22-b30d-4b35-823d-84fecf7ee4fd
+              resourceVersion: AAWX3rF4UyA
               generation: 1
               labels:
                 label1: one
@@ -1576,28 +1399,21 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:33:05.325681Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name2$$-00001-nom
+                  name: service-name2-20191121-173211-265d-00001-qor
                   labels:
                     label1: one
                     label2: two
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
-                    resources:
-                      limits:
-                        memory: 256M
-                        cpu: 1000m
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -1606,18 +1422,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:15Z'
+                lastTransitionTime: '2019-11-21T17:33:19.540Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:15Z'
+                lastTransitionTime: '2019-11-21T17:33:19.335Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:15Z'
-              latestReadyRevisionName: $$service-name2$$-00001-nom
-              latestCreatedRevisionName: $$service-name2$$-00001-nom
+                lastTransitionTime: '2019-11-21T17:33:19.540Z'
+              latestReadyRevisionName: service-name2-20191121-173211-265d-00001-qor
+              latestCreatedRevisionName: service-name2-20191121-173211-265d-00001-qor
               traffic:
-              - revisionName: $$service-name2$$-00001-nom
+              - revisionName: service-name2-20191121-173211-265d-00001-qor
                 percent: 100
+                latestRevision: true
               url: https://$$service-name2$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name2$$-ixwc4imo7a-uc.a.run.app
@@ -1635,7 +1452,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '2803'
+            content-length: '2727'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -1645,8 +1462,8 @@ actions:
               name: $$service-name2$$
               namespace: '462803083913'
               selfLink: /apis/serving.knative.dev/v1/namespaces/462803083913/services/$$service-name2$$
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-              resourceVersion: '51639050'
+              uid: 9429ca22-b30d-4b35-823d-84fecf7ee4fd
+              resourceVersion: AAWX3rF4UyA
               generation: 1
               labels:
                 label1: one
@@ -1657,28 +1474,21 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                autoscaling.knative.dev/maxScale: '1000'
-              creationTimestamp: '2019-07-23T18:13:29Z'
+              creationTimestamp: '2019-11-21T17:33:05.325681Z'
             spec:
               template:
                 metadata:
-                  name: $$service-name2$$-00001-nom
+                  name: service-name2-20191121-173211-265d-00001-qor
                   labels:
                     label1: one
                     label2: two
                   annotations:
                     run.googleapis.com/client-name: gcloud
+                    client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                 spec:
                   containerConcurrency: 80
-                  timeoutSeconds: 900
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs
-                    resources:
-                      limits:
-                        memory: 256M
-                        cpu: 1000m
-                    ports:
-                    - containerPort: 8080
               traffic:
               - percent: 100
                 latestRevision: true
@@ -1687,18 +1497,19 @@ actions:
               conditions:
               - type: Ready
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:16Z'
+                lastTransitionTime: '2019-11-21T17:33:19.540Z'
               - type: ConfigurationsReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:16Z'
+                lastTransitionTime: '2019-11-21T17:33:19.335Z'
               - type: RoutesReady
                 status: 'True'
-                lastTransitionTime: '2019-07-23T20:10:16Z'
-              latestReadyRevisionName: $$service-name2$$-00001-nom
-              latestCreatedRevisionName: $$service-name2$$-00001-nom
+                lastTransitionTime: '2019-11-21T17:33:19.540Z'
+              latestReadyRevisionName: service-name2-20191121-173211-265d-00001-qor
+              latestCreatedRevisionName: service-name2-20191121-173211-265d-00001-qor
               traffic:
-              - revisionName: $$service-name2$$-00001-nom
+              - revisionName: service-name2-20191121-173211-265d-00001-qor
                 percent: 100
+                latestRevision: true
               url: https://$$service-name2$$-ixwc4imo7a-uc.a.run.app
               address:
                 url: https://$$service-name2$$-ixwc4imo7a-uc.a.run.app
@@ -1735,7 +1546,7 @@ actions:
               name: $$service-name2$$
               group: v1
               kind: service
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
+              uid: 9429ca22-b30d-4b35-823d-84fecf7ee4fd
     - expect_stderr: |
         Deleted service [$$service-name2$$].
     - expect_exit:
@@ -1763,7 +1574,7 @@ actions:
               name: $$service-name$$
               group: v1
               kind: service
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
+              uid: 7044030b-b65d-48e3-a2e4-f0c03970cb34
     - expect_stderr: |
         Deleted service [$$service-name$$].
     - expect_exit:

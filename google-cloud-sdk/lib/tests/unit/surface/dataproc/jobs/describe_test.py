@@ -20,6 +20,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import jobs_unit_base
@@ -28,11 +30,33 @@ from tests.lib.surface.dataproc import jobs_unit_base
 class JobsDescribeUnitTest(jobs_unit_base.JobsUnitTestBase):
   """Tests for dataproc jobs describe."""
 
-  def testDescribeJob(self):
-    expected = self.MakeRunningJob()
-    self.ExpectGetJob(expected)
-    result = self.RunDataproc('jobs describe ' + self.JOB_ID)
+  def _testDescribeJob(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+
+    expected = self.MakeRunningJob(region=region)
+    self.ExpectGetJob(expected, region=region)
+    result = self.RunDataproc(
+        'jobs describe {0} {1}'.format(self.JOB_ID, region_flag))
     self.AssertMessagesEqual(expected, result)
+
+  def testDescribeJob(self):
+    self._testDescribeJob()
+
+  def testDescribeJob_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testDescribeJob(region='global')
+
+  def testDescribeJob_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testDescribeJob(
+        region='us-central1', region_flag='--region=us-central1')
+
+  def testDescribeJob_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('jobs describe my-job', set_region=False)
 
   def testDescribeJobNotFound(self):
     job = self.MakeJob(hadoopJob=self.HADOOP_JOB)

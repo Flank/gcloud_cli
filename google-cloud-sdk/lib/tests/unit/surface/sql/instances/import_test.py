@@ -42,7 +42,8 @@ class _BaseInstancesImportTest(object):
             instancesImportRequest=self.messages.InstancesImportRequest(
                 importContext=self.messages.ImportContext(
                     database=None,
-                    fileType='SQL',
+                    fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                    .SQL,
                     kind='sql#importContext',
                     uri='gs://speckletest/testinstance.gz')),
             project=self.Project(),
@@ -57,28 +58,29 @@ class _BaseInstancesImportTest(object):
                 13,
                 18,
                 875000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=None,
             endTime=None,
             error=None,
             exportContext=None,
             importContext=self.messages.ImportContext(
                 database=None,
-                fileType='SQL',
+                fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                .SQL,
                 kind='sql#importContext',
                 uri='gs://speckletest/testinstance.gz'),
             targetId='testinstance',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='ffa26eae-a675-47f1-a8c8-579849098aeb',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/ffa26eae-a675-47f1-a8c8-579849098aeb'.
-            format(self.Project()),
-            operationType='IMPORT',
-            status='PENDING',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/ffa26eae-a675-47f1-a8c8-579849098aeb'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .IMPORT,
+            status=self.messages.Operation.StatusValueValuesEnum.PENDING,
             user='170350250316@developer.gserviceaccount.com',
         ))
     self.mocked_client.operations.Get.Expect(
@@ -96,7 +98,8 @@ class _BaseInstancesImportTest(object):
                 13,
                 18,
                 875000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -105,7 +108,8 @@ class _BaseInstancesImportTest(object):
                 13,
                 18,
                 925000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 8,
@@ -114,26 +118,27 @@ class _BaseInstancesImportTest(object):
                 13,
                 39,
                 764000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=self.messages.ImportContext(
                 database=None,
-                fileType='SQL',
+                fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                .SQL,
                 kind='sql#importContext',
                 uri='gs://speckletest/testinstance.gz'),
             targetId='testinstance',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='ffa26eae-a675-47f1-a8c8-579849098aeb',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/ffa26eae-a675-47f1-a8c8-579849098aeb'.
-            format(self.Project()),
-            operationType='IMPORT',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/ffa26eae-a675-47f1-a8c8-579849098aeb'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .IMPORT,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -145,11 +150,11 @@ class _BaseInstancesImportTest(object):
              'gs://speckletest/testinstance.gz')
 
     self.AssertErrContains('PROMPT_CONTINUE')
-    self.AssertErrContains(
-        'Imported '
-        '[https://www.googleapis.com/sql/v1beta4'
-        '/projects/{0}/instances/testinstance] from '
-        '[gs://speckletest/testinstance.gz].'.format(self.Project()))
+    self.AssertErrContains('Imported '
+                           '[https://sqladmin.googleapis.com/sql/v1beta4'
+                           '/projects/{0}/instances/testinstance] from '
+                           '[gs://speckletest/testinstance.gz].'.format(
+                               self.Project()))
 
   def testSimpleImportAsync(self):
     self._ExpectImport()
@@ -159,11 +164,11 @@ class _BaseInstancesImportTest(object):
              'gs://speckletest/testinstance.gz --async')
 
     self.AssertErrContains('PROMPT_CONTINUE')
-    self.AssertErrNotContains(
-        'Imported '
-        '[https://www.googleapis.com/sql/v1beta4'
-        '/projects/{0}/instances/testinstance] from '
-        '[gs://speckletest/testinstance.gz].'.format(self.Project()))
+    self.AssertErrNotContains('Imported '
+                              '[https://sqladmin.googleapis.com/sql/v1beta4'
+                              '/projects/{0}/instances/testinstance] from '
+                              '[gs://speckletest/testinstance.gz].'.format(
+                                  self.Project()))
 
   def testFailedImport(self):
     self.mocked_client.instances.Import.Expect(
@@ -172,7 +177,8 @@ class _BaseInstancesImportTest(object):
             instancesImportRequest=self.messages.InstancesImportRequest(
                 importContext=self.messages.ImportContext(
                     database=None,
-                    fileType='SQL',
+                    fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                    .SQL,
                     kind='sql#importContext',
                     uri='gs://nosuchbucket/testinstance.gz')),
             project=self.Project(),
@@ -187,28 +193,29 @@ class _BaseInstancesImportTest(object):
                 13,
                 18,
                 875000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=None,
             endTime=None,
             error=None,
             exportContext=None,
             importContext=self.messages.ImportContext(
                 database=None,
-                fileType='SQL',
+                fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                .SQL,
                 kind='sql#importContext',
                 uri='gs://nosuchbucket/testinstance.gz'),
             targetId='testinstance',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/bf159e2a-fe9b-4eaa-9d88-00d801fe9e04'.
-            format(self.Project()),
-            operationType='IMPORT',
-            status='PENDING',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/bf159e2a-fe9b-4eaa-9d88-00d801fe9e04'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .IMPORT,
+            status=self.messages.Operation.StatusValueValuesEnum.PENDING,
             user='170350250316@developer.gserviceaccount.com',
         ))
     self.mocked_client.operations.Get.Expect(
@@ -225,7 +232,8 @@ class _BaseInstancesImportTest(object):
                 13,
                 18,
                 875000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -234,7 +242,8 @@ class _BaseInstancesImportTest(object):
                 13,
                 18,
                 925000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 8,
@@ -243,7 +252,8 @@ class _BaseInstancesImportTest(object):
                 13,
                 39,
                 764000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=self.messages.OperationErrors(
                 errors=[
                     self.messages.OperationError(
@@ -254,21 +264,21 @@ class _BaseInstancesImportTest(object):
             exportContext=None,
             importContext=self.messages.ImportContext(
                 database=None,
-                fileType='SQL',
+                fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                .SQL,
                 kind='sql#importContext',
                 uri='gs://nosuchbucket/testinstance.gz'),
             targetId='testinstance',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/bf159e2a-fe9b-4eaa-9d88-00d801fe9e04'.
-            format(self.Project()),
-            operationType='IMPORT',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/bf159e2a-fe9b-4eaa-9d88-00d801fe9e04'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .IMPORT,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 

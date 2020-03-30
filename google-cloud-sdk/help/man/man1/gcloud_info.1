@@ -17,27 +17,7 @@ gcloud info \- display information about the current gcloud environment
 
 .SH "DESCRIPTION"
 
-gcloud info displays information about the current gcloud environment.
-
-.RS 2m
-.IP "\(bu" 2m
-gcloud info prints information about the current active configuration, including
-the Google Cloud Platform account, project and directory paths for logs.
-.RE
-.sp
-
-.RS 2m
-.IP "\(bu" 2m
-gcloud info \-\-run\-diagnostics checks network connectivity and hidden
-properties.
-.RE
-.sp
-
-.RS 2m
-.IP "\(bu" 2m
-gcloud info \-\-show\-log prints the contents of the most recent log file.
-.RE
-.sp
+Display information about the current gcloud environment.
 
 
 
@@ -72,5 +52,29 @@ Print the contents of the last log file.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To display information about the current gcloud environment including the Google
+Cloud Platform account, project and directory paths for logs, run:
+
+.RS 2m
+$ gcloud info
+.RE
+
+To check network connectivity and hidden properties, run:
+
+.RS 2m
+$ gcloud info \-\-run\-diagnostics
+.RE
+
+To print the contents of the most recent log file, run:
+
+.RS 2m
+$ gcloud info \-\-show\-log
+.RE

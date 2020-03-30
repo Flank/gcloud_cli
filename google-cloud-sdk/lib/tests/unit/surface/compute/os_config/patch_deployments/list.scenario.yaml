@@ -1,0 +1,317 @@
+title: patch-deployments list.
+release_tracks: [GA, BETA, ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      compute os-config patch-deployments list --project my-project
+  - stdout: |
+      NAME                             LAST_RUN              NEXT_RUN              FREQUENCY
+      one-time-schedule-in-the-future  ---                   2200-09-01T12:00:00Z  Once: Scheduled for 2200-09-01T12:00:00Z
+      one-time-schedule-in-the-past    2000-09-01T12:00:00Z  ---                   Once: Scheduled for 2000-09-01T12:00:00Z
+      weekly-no-last-run               ---                   2019-09-01T12:00:00Z  Recurring - Weekly
+      monthly-day-of-week              2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific day(s)
+      monthly-day-of-month             2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific date(s)
+- execute:
+  - command: |
+      compute os-config patch-deployments list --project my-project --limit 1
+  - stdout: |
+      NAME                             LAST_RUN  NEXT_RUN              FREQUENCY
+      one-time-schedule-in-the-future  ---       2200-09-01T12:00:00Z  Once: Scheduled for 2200-09-01T12:00:00Z
+- execute:
+  - command: |
+      compute os-config patch-deployments list --project my-project --page-size 1
+  - stdout: |
+      NAME                             LAST_RUN  NEXT_RUN              FREQUENCY
+      one-time-schedule-in-the-future  ---       2200-09-01T12:00:00Z  Once: Scheduled for 2200-09-01T12:00:00Z
+
+      NAME                           LAST_RUN              NEXT_RUN  FREQUENCY
+      one-time-schedule-in-the-past  2000-09-01T12:00:00Z  ---       Once: Scheduled for 2000-09-01T12:00:00Z
+
+      NAME                LAST_RUN  NEXT_RUN              FREQUENCY
+      weekly-no-last-run  ---       2019-09-01T12:00:00Z  Recurring - Weekly
+
+      NAME                 LAST_RUN              NEXT_RUN              FREQUENCY
+      monthly-day-of-week  2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific day(s)
+
+      NAME                  LAST_RUN              NEXT_RUN              FREQUENCY
+      monthly-day-of-month  2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific date(s)
+- execute:
+  - command: |
+      compute os-config patch-deployments list --project my-project --sort-by ~name
+  - stdout: |
+      NAME                             LAST_RUN              NEXT_RUN              FREQUENCY
+      weekly-no-last-run               ---                   2019-09-01T12:00:00Z  Recurring - Weekly
+      one-time-schedule-in-the-past    2000-09-01T12:00:00Z  ---                   Once: Scheduled for 2000-09-01T12:00:00Z
+      one-time-schedule-in-the-future  ---                   2200-09-01T12:00:00Z  Once: Scheduled for 2200-09-01T12:00:00Z
+      monthly-day-of-week              2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific day(s)
+      monthly-day-of-month             2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific date(s)
+- execute:
+  - command: |
+      compute os-config patch-deployments list --project my-project --filter "name:weekly"
+  - stdout: |
+      NAME                LAST_RUN  NEXT_RUN              FREQUENCY
+      weekly-no-last-run  ---       2019-09-01T12:00:00Z  Recurring - Weekly
+- execute:
+  - command: |
+      compute os-config patch-deployments list --project my-project --uri
+  - stdout: |
+      https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/one-time-schedule-in-the-future
+      https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/one-time-schedule-in-the-past
+      https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/weekly-no-last-run
+      https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/monthly-day-of-week
+      https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/monthly-day-of-month
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta
+      ALPHA: v1alpha2
+- define_reference:
+    reference: patch-deployments
+    value: |
+      {
+        "patchDeployments" :
+        [
+          {
+            "createTime": "2019-01-01T12:00:00Z",
+            "instanceFilter": {
+              "all": true
+            },
+            "name": "projects/fake-project/patchDeployments/one-time-schedule-in-the-future",
+            "oneTimeSchedule": {
+              "executeTime": "2200-09-01T12:00:00Z"
+            },
+            "updateTime": "2019-09-01T12:00:00Z"
+          },
+          {
+            "createTime": "2019-01-01T12:00:00Z",
+            "instanceFilter": {
+              "all": true
+            },
+            "lastExecuteTime": "2000-09-01T12:00:00Z",
+            "name": "projects/fake-project/patchDeployments/one-time-schedule-in-the-past",
+            "oneTimeSchedule": {
+              "executeTime": "2000-09-01T12:00:00Z"
+            },
+            "updateTime": "2019-09-01T12:00:00Z"
+          },
+          {
+            "createTime": "2019-01-01T12:00:00Z",
+            "instanceFilter": {
+              "all": true
+            },
+            "name": "projects/fake-project/patchDeployments/weekly-no-last-run",
+            "recurringSchedule": {
+              "frequency": "WEEKLY",
+              "nextExecuteTime": "2019-09-01T12:00:00Z",
+              "timeOfDay": {
+                "hours": 7,
+                "minutes": 30
+              },
+              "timeZone": {
+                "id": "America/Los_Angeles"
+              },
+              "weekly": {
+                "dayOfWeek": "TUESDAY"
+              }
+            },
+            "updateTime": "2019-09-01T12:00:00Z"
+          },
+          {
+            "createTime": "2019-01-01T12:00:00Z",
+            "instanceFilter": {
+              "all": true
+            },
+            "lastExecuteTime": "2019-08-01T12:00:00Z",
+            "name": "projects/fake-project/patchDeployments/monthly-day-of-week",
+            "recurringSchedule": {
+              "frequency": "MONTHLY",
+              "lastExecuteTime": "2019-08-01T12:00:00Z",
+              "nextExecuteTime": "2019-09-01T12:00:00Z",
+              "timeOfDay": {
+                "hours": 7,
+                "minutes": 30
+              },
+              "timeZone": {
+                "id": "America/Los_Angeles"
+              },
+              "monthly": {
+                "weekDayOfMonth": {
+                  "weekOrdinal": "1",
+                  "dayOfWeek": "FRIDAY"
+                }
+              }
+            },
+            "updateTime": "2019-09-01T12:00:00Z"
+          },
+          {
+            "createTime": "2019-01-01T12:00:00Z",
+            "instanceFilter": {
+              "all": true
+            },
+            "lastExecuteTime": "2019-08-01T12:00:00Z",
+            "name": "projects/fake-project/patchDeployments/monthly-day-of-month",
+            "recurringSchedule": {
+              "frequency": "MONTHLY",
+              "lastExecuteTime": "2019-08-01T12:00:00Z",
+              "nextExecuteTime": "2019-09-01T12:00:00Z",
+              "timeOfDay": {
+                "hours": 7,
+                "minutes": 30
+              },
+              "timeZone": {
+                "id": "America/Los_Angeles"
+              },
+              "monthly": {
+                "month_day": "1"
+              }
+            },
+            "updateTime": "2019-09-01T12:00:00Z"
+          }
+        ]
+      }
+- execute_command:
+    command: |
+      compute os-config patch-deployments list --project my-project
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/my-project/patchDeployments?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$patch-deployments$$
+    - expect_stdout: |
+        NAME                             LAST_RUN              NEXT_RUN              FREQUENCY
+        one-time-schedule-in-the-future  ---                   2200-09-01T12:00:00Z  Once: Scheduled for 2200-09-01T12:00:00Z
+        one-time-schedule-in-the-past    2000-09-01T12:00:00Z  ---                   Once: Scheduled for 2000-09-01T12:00:00Z
+        weekly-no-last-run               ---                   2019-09-01T12:00:00Z  Recurring - Weekly
+        monthly-day-of-week              2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific day(s)
+        monthly-day-of-month             2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific date(s)
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config patch-deployments list --project my-project --limit 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/my-project/patchDeployments?alt=json&pageSize=1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$patch-deployments$$
+    - expect_stdout: |
+        NAME                             LAST_RUN  NEXT_RUN              FREQUENCY
+        one-time-schedule-in-the-future  ---       2200-09-01T12:00:00Z  Once: Scheduled for 2200-09-01T12:00:00Z
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config patch-deployments list --project my-project --page-size 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/my-project/patchDeployments?alt=json&pageSize=1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$patch-deployments$$
+    - expect_stdout: |
+        NAME                             LAST_RUN  NEXT_RUN              FREQUENCY
+        one-time-schedule-in-the-future  ---       2200-09-01T12:00:00Z  Once: Scheduled for 2200-09-01T12:00:00Z
+
+        NAME                           LAST_RUN              NEXT_RUN  FREQUENCY
+        one-time-schedule-in-the-past  2000-09-01T12:00:00Z  ---       Once: Scheduled for 2000-09-01T12:00:00Z
+
+        NAME                LAST_RUN  NEXT_RUN              FREQUENCY
+        weekly-no-last-run  ---       2019-09-01T12:00:00Z  Recurring - Weekly
+
+        NAME                 LAST_RUN              NEXT_RUN              FREQUENCY
+        monthly-day-of-week  2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific day(s)
+
+        NAME                  LAST_RUN              NEXT_RUN              FREQUENCY
+        monthly-day-of-month  2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific date(s)
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config patch-deployments list --project my-project --sort-by ~name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/my-project/patchDeployments?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$patch-deployments$$
+    - expect_stdout: |
+        NAME                             LAST_RUN              NEXT_RUN              FREQUENCY
+        weekly-no-last-run               ---                   2019-09-01T12:00:00Z  Recurring - Weekly
+        one-time-schedule-in-the-past    2000-09-01T12:00:00Z  ---                   Once: Scheduled for 2000-09-01T12:00:00Z
+        one-time-schedule-in-the-future  ---                   2200-09-01T12:00:00Z  Once: Scheduled for 2200-09-01T12:00:00Z
+        monthly-day-of-week              2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific day(s)
+        monthly-day-of-month             2019-08-01T12:00:00Z  2019-09-01T12:00:00Z  Recurring - Monthly on specific date(s)
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config patch-deployments list --project my-project --filter "name:weekly"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/my-project/patchDeployments?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$patch-deployments$$
+    - expect_stdout: |
+        NAME                LAST_RUN  NEXT_RUN              FREQUENCY
+        weekly-no-last-run  ---       2019-09-01T12:00:00Z  Recurring - Weekly
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config patch-deployments list --project my-project --uri
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/my-project/patchDeployments?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$patch-deployments$$
+    - expect_stdout: |
+        https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/one-time-schedule-in-the-future
+        https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/one-time-schedule-in-the-past
+        https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/weekly-no-last-run
+        https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/monthly-day-of-week
+        https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/monthly-day-of-month
+    - expect_exit:
+        code: 0

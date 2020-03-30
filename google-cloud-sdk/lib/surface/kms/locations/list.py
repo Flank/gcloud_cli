@@ -25,6 +25,8 @@ from googlecloudsdk.command_lib.kms import flags
 from googlecloudsdk.core import properties
 
 
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class List(base.ListCommand):
   """List the project's locations.
 
@@ -33,7 +35,8 @@ class List(base.ListCommand):
 
   @staticmethod
   def Args(parser):
-    parser.display_info.AddFormat('table(locationId, metadata.hsmAvailable)')
+    parser.display_info.AddFormat(
+        'table(locationId, metadata.hsmAvailable, metadata.ekmAvailable)')
     parser.display_info.AddUriFunc(
         cloudkms_base.MakeGetUriFunc(flags.LOCATION_COLLECTION))
 

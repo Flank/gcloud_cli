@@ -996,6 +996,55 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
                            '--services-ipv4-cidr', 'badIpv4Cidr',
                            self.TEST_ENVIRONMENT_ID)
 
+  def testWebServerAccessControl(self):
+    # Test is only valid in beta.
+    if self.track != calliope_base.ReleaseTrack.BETA:
+      return
+
+    self._SetTestMessages()
+
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=self.messages.NodeConfig(
+            diskSizeGb=self.DEFAULT_DISK_SIZE_GB),
+        webServerNetworkAccessControl=self.messages
+        .WebServerNetworkAccessControl(allowedIpRanges=[
+            self.messages.AllowedIpRange(
+                value='192.168.35.0/28', description='description1'),
+            self.messages.AllowedIpRange(
+                value='2001:db8::/32', description='description2')
+        ]))
+
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+
+    actual_op = self.RunEnvironments(
+        'create', '--project', self.TEST_PROJECT, '--location',
+        self.TEST_LOCATION, '--async', '--web-server-allow-ip',
+        'ip_range=192.168.35.0/28,description=description1',
+        '--web-server-allow-ip',
+        'ip_range=2001:db8::/32,description=description2',
+        self.TEST_ENVIRONMENT_ID)
+
+    self.assertEqual(self.running_op, actual_op)
+
+  def testWebServerAccessControlFormatValidation(self):
+    """Test that IP range format validation fails fast."""
+    # Test is only valid in beta.
+    if self.track != calliope_base.ReleaseTrack.BETA:
+      return
+
+    self._SetTestMessages()
+    with self.AssertRaisesExceptionMatches(command_util.Error,
+                                           'Invalid IP range'):
+      self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                           '--location', self.TEST_LOCATION, '--async',
+                           '--web-server-allow-ip', 'ip_range=badIpRange',
+                           self.TEST_ENVIRONMENT_ID)
+
 
 class EnvironmentsCreateAlphaTest(EnvironmentsCreateBetaTest):
 

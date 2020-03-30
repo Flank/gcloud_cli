@@ -151,7 +151,13 @@ class ForwardingRulesListTest(test_base.BaseTest,
         errors=[])
     self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
 
-  def RequestAggregate(self, command, return_value, output):
+  def RequestAggregate(self,
+                       command,
+                       return_value,
+                       output,
+                       request_args={'includeAllScopes': True}):
+    if request_args is None:
+      request_args = {}
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(return_value)
     ]
@@ -160,7 +166,7 @@ class ForwardingRulesListTest(test_base.BaseTest,
         requests=[(self.compute.forwardingRules,
                    'AggregatedList',
                    self.messages.ComputeForwardingRulesAggregatedListRequest(
-                       project='my-project'))],
+                       project='my-project', **request_args))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -260,7 +266,8 @@ class ForwardingRulesListBetaTest(ForwardingRulesListTest):
         global-forwarding-rule-1          162.222.178.85 TCP         proxy-1
         global-forwarding-rule-2          162.222.178.86 UDP         proxy-2
         """)
-    self.RequestAggregate(command, return_value, output)
+    self.RequestAggregate(
+        command, return_value, output, request_args={'includeAllScopes': True})
 
   def testRegionsWithNoArgs(self):
     command = 'compute forwarding-rules list --uri --regions ""'
@@ -271,7 +278,8 @@ class ForwardingRulesListBetaTest(ForwardingRulesListTest):
         https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-ilb
         """.format(api=self.api))
 
-    self.RequestAggregate(command, return_value, output)
+    self.RequestAggregate(
+        command, return_value, output, request_args={'includeAllScopes': True})
 
   def testOneRegion(self):
     command = 'compute forwarding-rules list --uri --regions region-1'

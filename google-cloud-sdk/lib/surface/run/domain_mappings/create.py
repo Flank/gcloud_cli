@@ -32,18 +32,23 @@ DOMAIN_MAPPINGS_HELP_DOCS_URL = ('https://cloud.google.com/run/docs/'
                                  'mapping-custom-domains/')
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.Command):
-  """Create domain mappings."""
+  """Create domain mappings for Cloud Run for Anthos."""
 
   detailed_help = {
       'DESCRIPTION':
-          '{description}',
+          """\
+          {description}
+
+          For domain mapping support with fully managed Cloud Run, use
+          `gcloud beta run domain-mappings create`.
+          """,
       'EXAMPLES':
           """\
           To create a Cloud Run domain mapping, run:
 
-              $ {command} --service myapp --domain www.example.com
+              $ {command} --service=myapp --domain=www.example.com
           """,
   }
 
@@ -58,6 +63,11 @@ class Create(base.Command):
         'Domain name is the ID of DomainMapping resource.',
         required=True,
         prefixes=False)
+    parser.add_argument(
+        '--force-override',
+        action='store_true',
+        help='Map this domain even if it is already mapped to another service.'
+    )
     concept_parsers.ConceptParser([
         domain_mapping_presentation]).AddToParser(parser)
 
@@ -73,13 +83,19 @@ class Create(base.Command):
 
   def Run(self, args):
     """Create a domain mapping."""
+    # domains.cloudrun.com api group only supports v1alpha1 on clusters.
     conn_context = connection_context.GetConnectionContext(
-        args, self.ReleaseTrack())
+        args,
+        flags.Product.RUN,
+        self.ReleaseTrack(),
+        version_override=('v1alpha1'
+                          if flags.GetPlatform() != flags.PLATFORM_MANAGED else
+                          None))
     domain_mapping_ref = args.CONCEPTS.domain.Parse()
 
     # Check if the provided domain has already been verified
     # if mapping to a non-CRoGKE service
-    if flags.IsManaged(args):
+    if flags.GetPlatform() == flags.PLATFORM_MANAGED:
       client = global_methods.GetServerlessClientInstance()
       all_domains = global_methods.ListVerifiedDomains(
           client, flags.GetRegion(args))
@@ -99,18 +115,36 @@ class Create(base.Command):
                 help=DOMAIN_MAPPINGS_HELP_DOCS_URL, domains=domains_text))
 
     with serverless_operations.Connect(conn_context) as client:
-      mapping = client.CreateDomainMapping(domain_mapping_ref, args.service)
+      mapping = client.CreateDomainMapping(domain_mapping_ref, args.service,
+                                           args.force_override)
       for record in mapping.records:
         record.name = record.name or mapping.route_name
       return mapping.records
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class AlphaCreate(Create):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class BetaCreate(Create):
   """Create domain mappings."""
+
+  detailed_help = {
+      'DESCRIPTION': '{description}',
+      'EXAMPLES':
+          """\
+          To create a Cloud Run domain mapping, run:
+
+              $ {command} --service=myapp --domain=www.example.com
+          """,
+  }
 
   @staticmethod
   def Args(parser):
     Create.CommonArgs(parser)
 
-AlphaCreate.__doc__ = Create.__doc__
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class AlphaCreate(BetaCreate):
+  """Create domain mappings."""
+
+  @staticmethod
+  def Args(parser):
+    Create.CommonArgs(parser)

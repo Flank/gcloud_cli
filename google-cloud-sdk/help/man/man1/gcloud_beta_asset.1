@@ -26,8 +26,9 @@ gcloud beta asset \- manage the Cloud Asset Inventory
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -54,12 +55,28 @@ help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBanalyze\-iam\-policy\fR
+\fB(BETA)\fR Analyzes accessible IAM policies that match a request.
+
+.TP 2m
 \fBexport\fR
 \fB(BETA)\fR Export the cloud assets to Google Cloud Storage.
 
 .TP 2m
 \fBget\-history\fR
 \fB(BETA)\fR Get the update history of assets that overlaps a time window.
+
+.TP 2m
+\fBsearch\-all\-iam\-policies\fR
+\fB(BETA)\fR Searches all IAM policies under a given scope (i.e., an
+organization, a folder, or a project) with
+\f5cloudasset.assets.searchAllIamPolicies\fR permission.
+
+.TP 2m
+\fBsearch\-all\-resources\fR
+\fB(BETA)\fR Searches all the resources under a given scope (i.e., an
+organization, a folder, or a project) with
+\f5cloudasset.assets.searchAllResources\fR permission.
 
 
 .RE

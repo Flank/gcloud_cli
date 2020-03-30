@@ -53,6 +53,23 @@ class ListTest(test_base.OsloginBaseTest):
     profile = self.profiles['profile_with_keys']
     self.assertEqual(response, profile.sshPublicKeys.additionalProperties)
 
+  def testImpersonateServiceAccount(self, track):
+    self._RunSetUp(track)
+    properties.VALUES.core.user_output_enabled.Set(False)
+
+    self.mock_oslogin_client.users.GetLoginProfile.Expect(
+        request=self.messages.OsloginUsersGetLoginProfileRequest(
+            name='users/service_account_user@google.com'),
+        response=self.profiles['profile_with_keys'])
+
+    response = self.Run("""
+        compute os-login ssh-keys list
+            --impersonate-service-account service_account_user@google.com
+        """)
+
+    profile = self.profiles['profile_with_keys']
+    self.assertEqual(response, profile.sshPublicKeys.additionalProperties)
+
 
 if __name__ == '__main__':
   test_case.main()

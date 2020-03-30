@@ -1,0 +1,291 @@
+title: scc notifications update scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      scc notifications update testconfig --organization 975322607948 --description "New Description" --pubsub-topic "projects/22222/topics/newtopic"
+  - stderr: |
+      Updated.
+  - stdout: |
+        configId: testconfig
+        description: New Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/newtopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+        - execute:
+  - command: |
+      scc notifications update testconfig --organization 975322607948 --description "New Description"
+  - stderr: |
+      Updated.
+  - stdout: |
+        configId: testconfig
+        description: New Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/oldTopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+  - command: |
+      scc notifications update testconfig --organization 975322607948 --pubsub-topic "projects/22222/topics/newtopic"
+  - stderr: |
+      Updated.
+  - stdout: |
+        configId: testconfig
+        description: Unmodified Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/newtopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+  - command: |
+      scc notifications update organizations/975322607948/notificationConfigs/testconfig --description "New Description" --pubsub-topic "projects/22222/topics/newtopic"
+  - stderr: |
+      Updated.
+  - stdout: |
+        configId: testconfig
+        description: New Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/newtopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+  - command: |
+      scc notifications update organizations/975322607948/notificationConfigs/testconfig --description "New Description"
+  - stderr: |
+      Updated.
+  - stdout: |
+        configId: testconfig
+        description: New Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/oldTopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+  - command: |
+      scc notifications update organizations/975322607948/notificationConfigs/testconfig --pubsub-topic "projects/22222/topics/newtopic"
+  - stderr: |
+      Updated.
+  - stdout: |
+        configId: testconfig
+        description: Unmodified Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/newtopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+actions:
+- execute_command:
+    # Update description and pubsub topic
+    command: |
+      scc notifications update testconfig --organization 975322607948 --description "New Description" --pubsub-topic "projects/22222/topics/newtopic"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/975322607948/notificationConfigs/testconfig?alt=json&updateMask=description%2CpubsubTopic
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "description": "New Description",
+              "pubsubTopic": "projects/22222/topics/newtopic"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "description": "New Description",
+              "pubsubTopic": "projects/22222/topics/newtopic",
+              "updateTime": "2019-03-12T23:45:08.062Z"
+            }
+    - expect_stderr: |
+        Updated.
+    - expect_stdout: |
+        configId: testconfig
+        description: New Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/newtopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Update description
+    command: |
+      scc notifications update testconfig --organization 975322607948 --description "New Description"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/975322607948/notificationConfigs/testconfig?alt=json&updateMask=description
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "description": "New Description",
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "description": "New Description",
+              "pubsubTopic": "projects/22222/topics/oldTopic",
+              "updateTime": "2019-03-12T23:45:08.062Z"
+            }
+    - expect_stderr: |
+        Updated.
+    - expect_stdout: |
+        configId: testconfig
+        description: New Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/oldTopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Update pubsubTopic
+    command: |
+      scc notifications update testconfig --organization 975322607948 --pubsub-topic "projects/22222/topics/newtopic"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/975322607948/notificationConfigs/testconfig?alt=json&updateMask=pubsubTopic
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "pubsubTopic": "projects/22222/topics/newtopic"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "description": "Unmodified Description",
+              "pubsubTopic": "projects/22222/topics/newtopic",
+              "updateTime": "2019-03-12T23:45:08.062Z"
+            }
+    - expect_stderr: |
+        Updated.
+    - expect_stdout: |
+        configId: testconfig
+        description: Unmodified Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/newtopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Update description and pubsub topic
+    command: |
+      scc notifications update organizations/975322607948/notificationConfigs/testconfig --description "New Description" --pubsub-topic "projects/22222/topics/newtopic"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/975322607948/notificationConfigs/testconfig?alt=json&updateMask=description%2CpubsubTopic
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "description": "New Description",
+              "pubsubTopic": "projects/22222/topics/newtopic"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "description": "New Description",
+              "pubsubTopic": "projects/22222/topics/newtopic",
+              "updateTime": "2019-03-12T23:45:08.062Z"
+            }
+    - expect_stderr: |
+        Updated.
+    - expect_stdout: |
+        configId: testconfig
+        description: New Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/newtopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Update description
+    command: |
+      scc notifications update organizations/975322607948/notificationConfigs/testconfig --description "New Description"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/975322607948/notificationConfigs/testconfig?alt=json&updateMask=description
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "description": "New Description",
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "description": "New Description",
+              "pubsubTopic": "projects/22222/topics/oldTopic",
+              "updateTime": "2019-03-12T23:45:08.062Z"
+            }
+    - expect_stderr: |
+        Updated.
+    - expect_stdout: |
+        configId: testconfig
+        description: New Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/oldTopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Update pubsubTopic
+    command: |
+      scc notifications update organizations/975322607948/notificationConfigs/testconfig --pubsub-topic "projects/22222/topics/newtopic"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/975322607948/notificationConfigs/testconfig?alt=json&updateMask=pubsubTopic
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "pubsubTopic": "projects/22222/topics/newtopic"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "configId": "testconfig",
+              "organizationName": "organizations/975322607948",
+              "description": "Unmodified Description",
+              "pubsubTopic": "projects/22222/topics/newtopic",
+              "updateTime": "2019-03-12T23:45:08.062Z"
+            }
+    - expect_stderr: |
+        Updated.
+    - expect_stdout: |
+        configId: testconfig
+        description: Unmodified Description
+        organizationName: organizations/975322607948
+        pubsubTopic: projects/22222/topics/newtopic
+        updateTime: '2019-03-12T23:45:08.062Z'
+    - expect_exit:
+        code: 0

@@ -53,7 +53,7 @@ class _BaseClientCertsCreateTest(object):
                         52,
                         170000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     expirationTime=None,
                     instance='integration-test',
                     sha1Fingerprint='d926e1fb26e4dba2f73a14bea4ee9554577deda9',
@@ -72,7 +72,8 @@ class _BaseClientCertsCreateTest(object):
                     55,
                     28,
                     96000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                    tzinfo=protorpc_util.TimeZoneOffset(
+                        datetime.timedelta(0))).isoformat(),
                 expirationTime=datetime.datetime(
                     2024,
                     1,
@@ -81,7 +82,8 @@ class _BaseClientCertsCreateTest(object):
                     55,
                     28,
                     96000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                    tzinfo=protorpc_util.TimeZoneOffset(
+                        datetime.timedelta(0))).isoformat(),
                 instance='integration-test',
                 sha1Fingerprint='515917f85cf67be2912ca94c9f9bf8e35ee2aa47',
             ),

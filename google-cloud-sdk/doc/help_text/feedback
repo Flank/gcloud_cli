@@ -24,5 +24,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To send feedback, including the log file for the most recent command, run:
+
+        $ gcloud feedback
+
+    To send feedback with a previously generated log file named 'my-logfile',
+    run:
+
+        $ gcloud feedback --log-file=my-logfile

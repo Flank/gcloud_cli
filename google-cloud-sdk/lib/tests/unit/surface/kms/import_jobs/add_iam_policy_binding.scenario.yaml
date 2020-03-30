@@ -1,5 +1,5 @@
 title: kms import-jobs add-iam-policy-binding scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 # add binding without condition to a policy without condition

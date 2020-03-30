@@ -62,7 +62,7 @@ class ExternalVpnGatewaysUpdateLabelsGaTest(
     self.ExpectGetRequest(gateway_ref, existing_gateway)
     self.ExpectSetLabelsRequest(gateway_ref, labels_after_update,
                                 self._FINGERPRINT_1, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(gateway_ref, updated_gateway)
     return updated_gateway
 

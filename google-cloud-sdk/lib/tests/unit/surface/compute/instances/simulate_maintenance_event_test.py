@@ -31,11 +31,12 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
                                    cli_test_base.CliTestBase,
                                    waiter_test_base.Base):
 
-  track = calliope_base.ReleaseTrack.GA
-  api_version = 'v1'
-  zone = 'zone-2'
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def SetUp(self):
+    self.zone = 'zone-2'
     self.api_mock = utils.ComputeApiMock(
         self.api_version, project=self.Project(), zone=self.zone).Start()
     self.addCleanup(self.api_mock.Stop)
@@ -70,6 +71,14 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
             self.api_mock.messages.ComputeZoneOperationsGetRequest(
                 **operation_ref.AsDict()))
 
+  def _GetOperationWaitRequest(self, operation_ref):
+    return (self.api_mock.adapter.apitools_client.zoneOperations, 'Wait',
+            self.api_mock.messages.ComputeZoneOperationsWaitRequest(
+                **operation_ref.AsDict()))
+
+  def _GetOperationPollingRequest(self, operation_ref):
+    return self._GetOperationWaitRequest(operation_ref)
+
   def _GetInstanceGetRequest(self, instance_ref):
     return (self.api_mock.adapter.apitools_client.instances, 'Get',
             self.api_mock.messages.ComputeInstancesGetRequest(
@@ -97,8 +106,8 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
          self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
     ])
     self.api_mock.batch_responder.ExpectBatch([
-        (self._GetOperationGetRequest(operation_ref), self._GetOperationMessage(
-            operation_ref, self.status_enum.DONE)),
+        (self._GetOperationPollingRequest(operation_ref),
+         self._GetOperationMessage(operation_ref, self.status_enum.DONE)),
     ])
     self.api_mock.batch_responder.ExpectBatch([
         (self._GetInstanceGetRequest(instance_ref),
@@ -158,7 +167,7 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
         self._GetOperationMessage(operation_refs[c], self.status_enum.PENDING))
                                                for c in range(n_instances)])
     self.api_mock.batch_responder.ExpectBatch(
-        [(self._GetOperationGetRequest(operation_refs[c]),
+        [(self._GetOperationPollingRequest(operation_refs[c]),
           self._GetOperationMessage(operation_refs[c], self.status_enum.DONE))
          for c in range(n_instances)])
     self.api_mock.batch_responder.ExpectBatch(
@@ -251,18 +260,16 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
 
 class SimulateMaintenanceEventTestBeta(SimulateMaintenanceEventTest):
 
-  def SetUp(self):
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'beta'
-    super(SimulateMaintenanceEventTestBeta, self).SetUp()
 
 
 class SimulateMaintenanceEventTestAlpha(SimulateMaintenanceEventTest):
 
-  def SetUp(self):
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'alpha'
-    super(SimulateMaintenanceEventTestAlpha, self).SetUp()
 
 
 if __name__ == '__main__':

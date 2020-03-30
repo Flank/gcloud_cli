@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta ml\-engine models remove\-iam\-policy\-binding \- remove IAM policy binding from a ML model
+gcloud beta ml\-engine models remove\-iam\-policy\-binding \- remove IAM policy binding for a model
 
 
 
@@ -17,7 +17,10 @@ gcloud beta ml\-engine models remove\-iam\-policy\-binding \- remove IAM policy 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Remove an IAM policy binding from a ML model.
+\fB(BETA)\fR Removes a policy binding from an AI Platform Model. One binding
+consists of a member, a role and an optional condition. See $ gcloud beta
+ml\-engine models get\-iam\-policy for examples of how to specify a model
+resource.
 
 
 
@@ -26,12 +29,12 @@ gcloud beta ml\-engine models remove\-iam\-policy\-binding \- remove IAM policy 
 .RS 2m
 .TP 2m
 
-Model resource \- The model for which to remove IAM policy binding from. This
-represents a Cloud resource. (NOTE) Some attributes are not given arguments in
-this group but can be set in other ways. To set the [project] attribute: provide
-the argument [model] on the command line with a fully specified name; provide
-the argument [\-\-project] on the command line; set the property [core/project].
-This must be specified.
+Model resource \- The AI Platform model for which to remove IAM policy binding
+from. This represents a Cloud resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [model] on the command line with a fully
+specified name; provide the argument [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
@@ -81,26 +84,28 @@ The role to remove the member from.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
 
-
-
-.SH "API REFERENCE"
-
-This command uses the \fBml/v1\fR API. The full documentation for this API can
-be found at: https://cloud.google.com/ml/
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To Remove an IAM policy binding for the role of 'roles/editor' for the user
-\'test\-user@gmail.com' with model 'my_model', run:
+To remove an IAM policy binding for the role of 'roles/ml.admin' for the user
+\'test\-user@gmail.com' on model with identifier 'my_model', run:
 
 .RS 2m
 $ gcloud beta ml\-engine models remove\-iam\-policy\-binding my_model \e
-    \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
+    \-\-member='user:test\-user@gmail.com' \-\-role='roles/ml.admin'
+.RE
+
+To remove an IAM policy binding for the role of 'roles/ml.admin' from all
+authenticated users on model 'my_model', run:
+
+.RS 2m
+$ gcloud beta ml\-engine models remove\-iam\-policy\-binding my_model \e
+    \-\-member='allAuthenticatedUsers' \-\-role='roles/ml.admin'
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy

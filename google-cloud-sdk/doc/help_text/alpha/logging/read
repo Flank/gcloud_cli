@@ -6,7 +6,8 @@ SYNOPSIS
         [--freshness=FRESHNESS; default="1d"] [--order=ORDER; default="desc"]
         [--billing-account=BILLING_ACCOUNT_ID | --folder=FOLDER_ID
           | --organization=ORGANIZATION_ID | --project=PROJECT_ID]
-        [--limit=LIMIT] [GCLOUD_WIDE_FLAG ...]
+        [--bucket=BUCKET --location=LOCATION --view=VIEW] [--limit=LIMIT]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha logging read reads log entries. Log entries matching
@@ -55,6 +56,24 @@ FLAGS
           and billing. To specify a different project for quota and billing,
           use --billing-project or billing/quota_project property.
 
+     These arguments are used in conjunction with the parent to construct a
+     view resource.
+
+       --bucket=BUCKET
+          Id of the bucket. If this argument is provided then --location and
+          --view must also be specified. This flag must be specified if any of
+          the other arguments in this group are specified.
+
+       --location=LOCATION
+          Location of the bucket. If this argument is provided then --bucket
+          and --view must also be specified. This flag must be specified if any
+          of the other arguments in this group are specified.
+
+       --view=VIEW
+          Id of the view. If this argument is provided then --location and
+          --bucket must also be specified. This flag must be specified if any
+          of the other arguments in this group are specified.
+
 LIST COMMAND FLAGS
      --limit=LIMIT
         Maximum number of resources to list. The default is unlimited. This
@@ -65,8 +84,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To read log entries from Google Compute Engine instances, run:

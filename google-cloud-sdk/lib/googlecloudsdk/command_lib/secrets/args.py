@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope.concepts import concepts
+from googlecloudsdk.command_lib.secrets import completers as secrets_completers
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.core import resources
 
@@ -45,6 +46,16 @@ def AddDataFile(parser, positional=False, **kwargs):
       **kwargs)
 
 
+def AddPolicy(parser, positional=False, **kwargs):
+  parser.add_argument(
+      _ArgOrFlag('replication-policy', positional),
+      metavar='POLICY',
+      help=('The type of replication policy to apply to this secret. Allowed '
+            'values are "automatic" and "user-managed". If user-managed then '
+            '--locations must also be provided.'),
+      **kwargs)
+
+
 def AddProject(parser, positional=False, **kwargs):
   concept_parsers.ConceptParser.ForResource(
       name=_ArgOrFlag('project', positional),
@@ -61,7 +72,6 @@ def AddLocation(parser, purpose, positional=False, **kwargs):
       **kwargs).AddToParser(parser)
 
 
-# TODO(b/135570696): may want to convert to resource arg & add fallthrough
 def AddLocations(parser, resource, positional=False, **kwargs):
   parser.add_argument(
       _ArgOrFlag('locations', positional),
@@ -81,10 +91,27 @@ def AddSecret(parser, purpose, positional=False, **kwargs):
       **kwargs).AddToParser(parser)
 
 
+def AddBetaSecret(parser, purpose, positional=False, **kwargs):
+  concept_parsers.ConceptParser.ForResource(
+      name=_ArgOrFlag('secret', positional),
+      resource_spec=GetBetaSecretResourceSpec(),
+      group_help='The secret {}.'.format(purpose),
+      **kwargs).AddToParser(parser)
+
+
 def AddVersion(parser, purpose, positional=False, **kwargs):
   concept_parsers.ConceptParser.ForResource(
       name=_ArgOrFlag('version', positional),
       resource_spec=GetVersionResourceSpec(),
+      group_help='Numeric secret version {}.'.format(purpose),
+      **kwargs).AddToParser(parser)
+
+
+def AddBetaVersion(parser, purpose, positional=False, **kwargs):
+  # Adds a SecretVersion parser using the beta Secrets completer
+  concept_parsers.ConceptParser.ForResource(
+      name=_ArgOrFlag('version', positional),
+      resource_spec=GetBetaVersionResourceSpec(),
       group_help='Numeric secret version {}.'.format(purpose),
       **kwargs).AddToParser(parser)
 
@@ -123,8 +150,14 @@ def GetSecretAttributeConfig():
   return concepts.ResourceParameterAttributeConfig(
       name='secret',
       help_text='The secret of the {resource}.',
-      completion_request_params={'fieldMask': 'name'},
-      completion_id_field='name')
+      completer=secrets_completers.SecretsCompleter)
+
+
+def GetBetaSecretAttributeConfig():
+  return concepts.ResourceParameterAttributeConfig(
+      name='secret',
+      help_text='The secret of the {resource}.',
+      completer=secrets_completers.BetaSecretsCompleter)
 
 
 def GetVersionAttributeConfig():
@@ -133,7 +166,6 @@ def GetVersionAttributeConfig():
       help_text='The version of the {resource}.',
       completion_request_params={'fieldMask': 'name'},
       completion_id_field='name')
-
 
 # Resource specs
 
@@ -167,6 +199,16 @@ def GetSecretResourceSpec():
       projectsId=GetProjectAttributeConfig())
 
 
+def GetBetaSecretResourceSpec():
+  return concepts.ResourceSpec(
+      resource_collection='secretmanager.projects.secrets',
+      resource_name='secret',
+      plural_name='secrets',
+      disable_auto_completers=False,
+      secretsId=GetBetaSecretAttributeConfig(),
+      projectsId=GetProjectAttributeConfig())
+
+
 def GetVersionResourceSpec():
   return concepts.ResourceSpec(
       'secretmanager.projects.secrets.versions',
@@ -178,24 +220,35 @@ def GetVersionResourceSpec():
       projectsId=GetProjectAttributeConfig())
 
 
+def GetBetaVersionResourceSpec():
+  return concepts.ResourceSpec(
+      'secretmanager.projects.secrets.versions',
+      resource_name='version',
+      plural_name='version',
+      disable_auto_completers=False,
+      versionsId=GetVersionAttributeConfig(),
+      secretsId=GetBetaSecretAttributeConfig(),
+      projectsId=GetProjectAttributeConfig())
+
+
 # Resource parsers
 
 
-def ParseProjectRef(ref, **kwargs):
+def ParseProjectRef(ref, version=None, **kwargs):
   kwargs['collection'] = 'secretmanager.projects'
-  return resources.REGISTRY.Parse(ref, **kwargs)
+  return resources.REGISTRY.Parse(ref, api_version=version, **kwargs)
 
 
-def ParseLocationRef(ref, **kwargs):
+def ParseLocationRef(ref, version=None, **kwargs):
   kwargs['collection'] = 'secretmanager.projects.locations'
-  return resources.REGISTRY.Parse(ref, **kwargs)
+  return resources.REGISTRY.Parse(ref, api_version=version, **kwargs)
 
 
-def ParseSecretRef(ref, **kwargs):
+def ParseSecretRef(ref, version=None, **kwargs):
   kwargs['collection'] = 'secretmanager.projects.secrets'
-  return resources.REGISTRY.Parse(ref, **kwargs)
+  return resources.REGISTRY.Parse(ref, api_version=version, **kwargs)
 
 
-def ParseVersionRef(ref, **kwargs):
+def ParseVersionRef(ref, version=None, **kwargs):
   kwargs['collection'] = 'secretmanager.projects.secrets.versions'
-  return resources.REGISTRY.Parse(ref, **kwargs)
+  return resources.REGISTRY.Parse(ref, api_version=version, **kwargs)

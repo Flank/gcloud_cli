@@ -8,7 +8,7 @@ SYNOPSIS
         [--access-levels=[LEVEL,...]] [--async] [--description=DESCRIPTION]
         [--perimeter-type=PERIMETER_TYPE; default="regular"]
         [--restricted-services=[SERVICE,...]]
-        [--enable-vpc-service-restriction
+        [--enable-vpc-accessible-services
           --vpc-allowed-services=[VPC_SERVICE,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -69,23 +69,24 @@ OPTIONAL FLAGS
         Comma-separated list of services to which the perimeter boundary does
         apply (for example, storage.googleapis.com).
 
-     --enable-vpc-service-restriction
+     --enable-vpc-accessible-services
         Whether to restrict API calls within the perimeter to those in the
         vpc-allowed-services list.
 
      --vpc-allowed-services=[VPC_SERVICE,...]
         Comma-separated list of APIs accessible from within the Service
-        Perimeter. Requires vpc-service-restriction be enabled.
+        Perimeter. Requires vpc-accessible-services be enabled.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
-    This command uses the accesscontextmanager/v1beta API. The full
+    This command uses the accesscontextmanager/v1alpha API. The full
     documentation for this API can be found at:
     https://cloud.google.com/access-context-manager/docs/reference/rest/
 

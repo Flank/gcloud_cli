@@ -20,6 +20,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
 from surface.dataproc.jobs import list as jobs_list
 from tests.lib import sdk_test_base
@@ -36,24 +37,45 @@ class JobsListUnitTest(jobs_unit_base.JobsUnitTestBase):
         for job_id in self.JOB_IDS]
 
   def ExpectListJobs(
-      self, request=None, jobs=None, exception=None):
+      self, request=None, jobs=None, exception=None, region=None):
+    if region is None:
+      region = self.REGION
     if not request:
       request = self.messages.DataprocProjectsRegionsJobsListRequest(
-          pageSize=100, region=self.REGION, projectId=self.Project())
+          pageSize=100, region=region, projectId=self.Project())
     response = None
     if not exception:
       response = self.messages.ListJobsResponse(jobs=jobs)
     self.mock_client.projects_regions_jobs.List.Expect(
         request, response=response, exception=exception)
 
-  def testListJobs(self):
+  def _testListJobs(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
     expected = self.jobs
-    self.ExpectListJobs(jobs=expected)
-    actual = self.RunDataproc('jobs list')
+    self.ExpectListJobs(jobs=expected, region=region)
+    actual = self.RunDataproc('jobs list {0}'.format(region_flag))
     expected = resource_projector.MakeSerializable(
         [jobs_list.TypedJob(resource) for resource in expected])
     actual = resource_projector.MakeSerializable(actual)
     self.AssertMessagesEqual(expected, actual)
+
+  def testListJobs(self):
+    self._testListJobs()
+
+  def testListJobs_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testListJobs(region='global')
+
+  def testListJobs_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testListJobs(region='us-central1', region_flag='--region=us-central1')
+
+  def testListJobs_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'The required property \[region\] is not currently set'
+    with self.assertRaisesRegex(properties.RequiredPropertyError, regex):
+      self.RunDataproc('jobs list', set_region=False)
 
   def testListJobsOutput(self):
     expected = self.jobs

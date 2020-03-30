@@ -1,32 +1,32 @@
 NAME
-    gcloud alpha compute sole-tenancy - read and manage Google Compute Engine
+    gcloud alpha compute sole-tenancy - read and manage Compute Engine
         sole-tenancy resources
 
 SYNOPSIS
     gcloud alpha compute sole-tenancy GROUP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read and manage Google Compute Engine sole-tenancy resources.
+    (ALPHA) Read and manage Compute Engine sole-tenancy resources.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
 
      node-groups
-        (ALPHA) Read Google Compute Engine sole-tenancy node groups.
+        (ALPHA) Read Compute Engine sole-tenancy node groups.
 
      node-templates
-        (ALPHA) Read and manage Google Compute Engine sole-tenancy node
-        templates.
+        (ALPHA) Read and manage Compute Engine sole-tenancy node templates.
 
      node-types
-        (ALPHA) Read Google Compute Engine sole-tenancy node types.
+        (ALPHA) Read Compute Engine sole-tenancy node types.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

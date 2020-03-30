@@ -11,7 +11,7 @@ gcloud alpha access\-context\-manager levels create \- create a new access level
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha access\-context\-manager levels create\fR (\fILEVEL\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-basic\-level\-spec\fR=\fIBASIC_LEVEL_SPEC\fR \fB\-\-title\fR=\fITITLE\fR [\fB\-\-async\fR] [\fB\-\-combine\-function\fR=\fICOMBINE_FUNCTION\fR;\ default="and"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha access\-context\-manager levels create\fR (\fILEVEL\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-title\fR=\fITITLE\fR (\fB\-\-custom\-level\-spec\fR=\fICUSTOM_LEVEL_SPEC\fR\ |\ [\fB\-\-basic\-level\-spec\fR=\fIBASIC_LEVEL_SPEC\fR\ :\ \fB\-\-combine\-function\fR=\fICOMBINE_FUNCTION\fR;\ default="and"]) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -48,6 +48,37 @@ The ID of the access policy.
 
 .RS 2m
 .TP 2m
+\fB\-\-title\fR=\fITITLE\fR
+Short human\-readable title of the access level.
+
+.TP 2m
+
+Level specification. Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+
+Custom level specification.
+
+.RS 2m
+.TP 2m
+\fB\-\-custom\-level\-spec\fR=\fICUSTOM_LEVEL_SPEC\fR
+Path to a file representing an expression that represents an access level.
+
+The expression is in the Common Expression Langague (CEL) format. For example:
+
+.RS 2m
+  expression: "origin.region_code in ['US', 'CA']"
+.RE
+
+.RE
+.sp
+.TP 2m
+
+Basic level specification.
+
+.RS 2m
+.TP 2m
 \fB\-\-basic\-level\-spec\fR=\fIBASIC_LEVEL_SPEC\fR
 Path to a file containing a list of basic access level conditions.
 
@@ -61,13 +92,18 @@ example:
    \- 2001:db8::/48
  \- members
    \- user:user@example.com
+This flag must be specified if any of the other arguments in this group are
+specified.
 .RE
 
 .TP 2m
-\fB\-\-title\fR=\fITITLE\fR
-Short human\-readable title of the access level.
+\fB\-\-combine\-function\fR=\fICOMBINE_FUNCTION\fR; default="and"
+For a basic level, determines how conditions are combined.
+\fICOMBINE_FUNCTION\fR must be one of: \fBand\fR, \fBor\fR.
 
 
+.RE
+.RE
 .RE
 .sp
 
@@ -77,11 +113,6 @@ Short human\-readable title of the access level.
 .TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
-
-.TP 2m
-\fB\-\-combine\-function\fR=\fICOMBINE_FUNCTION\fR; default="and"
-For a basic level, determines how conditions are combined.
-\fICOMBINE_FUNCTION\fR must be one of: \fBand\fR, \fBor\fR.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -96,14 +127,15 @@ Long\-form description of access level.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "API REFERENCE"
 
-This command uses the \fBaccesscontextmanager/v1beta\fR API. The full
+This command uses the \fBaccesscontextmanager/v1alpha\fR API. The full
 documentation for this API can be found at:
 https://cloud.google.com/access\-context\-manager/docs/reference/rest/
 

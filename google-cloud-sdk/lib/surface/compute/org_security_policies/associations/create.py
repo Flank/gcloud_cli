@@ -18,13 +18,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import sys
+
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute.org_security_policies import client
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.org_security_policies import flags
+from googlecloudsdk.command_lib.compute.org_security_policies import org_security_policies_utils
+from googlecloudsdk.core import log
+import six
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Create(base.CreateCommand):
   """Create a new association between a security policy and an organization or folder resource.
 
@@ -40,27 +45,34 @@ class Create(base.CreateCommand):
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    org_security_policy = client.OrgSecurityPolicy(compute_client=holder.client)
+    org_security_policy = client.OrgSecurityPolicy(
+        compute_client=holder.client,
+        resources=holder.resources,
+        version=six.text_type(self.ReleaseTrack()).lower())
 
     name = None
     attachment_id = None
-    security_policy_id = None
     replace_existing_association = False
-
-    if args.security_policy:
-      security_policy_id = args.security_policy
 
     if args.IsSpecified('name'):
       name = args.name
 
-    if args.IsSpecified('organization'):
-      attachment_id = 'organizations/' + args.organization
-      if name is None:
-        name = 'organization-' + args.organization
-    elif args.IsSpecified('folder'):
+    attachment_id = None
+    if args.IsSpecified('folder'):
       attachment_id = 'folders/' + args.folder
       if name is None:
         name = 'folder-' + args.folder
+
+    if args.IsSpecified('organization') and attachment_id is None:
+      attachment_id = 'organizations/' + args.organization
+      if name is None:
+        name = 'organization-' + args.organization
+
+    if attachment_id is None:
+      log.error(
+          'Must specify attachment ID with --organization=ORGANIZATION or '
+          '--folder=FOLDER')
+      sys.exit()
 
     replace_existing_association = False
     if args.replace_association_on_target:
@@ -69,8 +81,23 @@ class Create(base.CreateCommand):
     association = holder.client.messages.SecurityPolicyAssociation(
         attachmentId=attachment_id, name=name)
 
+    security_policy_id = org_security_policies_utils.GetSecurityPolicyId(
+        org_security_policy,
+        args.security_policy,
+        organization=args.organization)
     return org_security_policy.AddAssociation(
         association=association,
         security_policy_id=security_policy_id,
         replace_existing_association=replace_existing_association,
         only_generate_request=False)
+
+
+Create.detailed_help = {
+    'EXAMPLES':
+        """\
+    To associate an organization security policy under folder with ID
+    ``123456789" to folder ``987654321", run:
+
+      $ {command} create --security-policy=123456789 --folder=987654321
+    """,
+}

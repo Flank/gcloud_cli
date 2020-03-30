@@ -153,8 +153,9 @@ purpose. This flag is mutually exclusive with \fB\-\-obsolete\-in\fR.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -164,15 +165,15 @@ To deprecate an image called 'IMAGE' immediately, mark it as obsolete in one
 day, and mark it as deleted in two days, use:
 
 .RS 2m
-$ gcloud compute images deprecate IMAGE \-\-state DEPRECATED \e
-    \-\-obsolete\-in 1d \-\-delete\-in 2d
+$ gcloud compute images deprecate IMAGE \-\-state=DEPRECATED \e
+    \-\-obsolete\-in=1d \-\-delete\-in=2d
 .RE
 
 To un\-deprecate an image called 'IMAGE' and clear times for deprecated,
 obsoleted, and deleted, use:
 
 .RS 2m
-$ gcloud compute images deprecate IMAGE \-\-state ACTIVE
+$ gcloud compute images deprecate IMAGE \-\-state=ACTIVE
 .RE
 
 

@@ -243,7 +243,7 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
   def testLimit(self):
     self.ExpectListerInvoke(
         scope_set=self.MakeAllScopes(zonal=True),
-        max_results=1,
+        max_results=None,
         result=resource_projector.MakeSerializable(test_resources.INSTANCES_V1),
         with_implementation=self.implementation)
     self.Run("""

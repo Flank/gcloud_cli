@@ -60,7 +60,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
     request = self._ExpectCreate(policy)
 
     result = self.Run('compute resource-policies create snapshot-schedule pol1 '
-                      '--start-time 04:00Z --region {} --daily-schedule '
+                      '--start-time 04:00 --region {} --daily-schedule '
                       '--max-retention-days 1'.format(self.region))
 
     self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
@@ -85,7 +85,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
 
     result = self.Run(
         'compute resource-policies create snapshot-schedule pol1 '
-        '--start-time 04:00Z --region {} --description "{}" --daily-schedule '
+        '--start-time 04:00 --region {} --description "{}" --daily-schedule '
         '--max-retention-days 1'.format(self.region, description))
 
     self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
@@ -181,7 +181,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
             schedule=schedule))
     request = self._ExpectCreate(policy)
 
-    contents = ('[{"day": "MONDAY", "startTime": "04:00Z"}, '
+    contents = ('[{"day": "MONDAY", "startTime": "04:00"}, '
                 '{"day": "WEDNESDAY", "startTime": "02:00-8:00"}]')
     schedule_file = self.Touch(self.temp_path, 'my-schedule.json',
                                contents=contents)
@@ -339,7 +339,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
       ('[{"day": "MONDAY"}]',
        'Each JSON/YAML object in the list must have the following keys: '
        '[day, startTime].'),
-      ('[{"startTime": "04:00Z"}]',
+      ('[{"startTime": "04:00"}]',
        'Each JSON/YAML object in the list must have the following keys: '
        '[day, startTime].'),
       ('[{}]',

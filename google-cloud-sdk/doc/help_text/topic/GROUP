@@ -25,6 +25,9 @@ TOPICS
      cli-trees
         CLI trees supplementary help.
 
+     client-certificate
+        Client certificate authorization supplementary help.
+
      command-conventions
         gcloud command conventions supplementary help.
 

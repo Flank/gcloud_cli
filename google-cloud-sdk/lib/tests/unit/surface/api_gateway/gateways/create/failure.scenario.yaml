@@ -1,0 +1,54 @@
+# Disabiling trailing spaces rule since the linter sees an extra space in string below that is
+# required for tests to pass
+# yamllint disable rule:trailing-spaces
+title: Cloud API Gateway Gateway Create with no location Test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway gateways create test-name --api-config projects/project-name/apis/api-name/configs/api-config-name
+  - error: |-
+      1: Error parsing [gateway].
+      The [gateway] resource is not properly specified.
+      Failed to find attribute [location]. The attribute can be set in the following ways: 
+      - provide the argument [--location] on the command line
+- execute:
+  - command: |
+      api-gateway gateways create test-name --location us-central1
+  - stderr: |
+      ERROR: (gcloud.alpha.api-gateway.gateways.create) argument (--api-config : --api): Must be specified.
+      Usage: gcloud alpha api-gateway gateways create (GATEWAY : --location=LOCATION) (--api-config=API_CONFIG : --api=API) [optional flags]
+        optional flags may be  --api | --async | --display-name | --help | --labels |
+                               --location
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha api-gateway gateways create --help
+  - error: '1: argument (--api-config : --api): Must be specified.'
+actions:
+- execute_command:
+    command: |
+      api-gateway gateways create test-name --api-config projects/project-name/apis/api-name/configs/api-config-name
+    events:
+    - expect_exit:
+        code: 1
+        message: |-
+          Error parsing [gateway].
+          The [gateway] resource is not properly specified.
+          Failed to find attribute [location]. The attribute can be set in the following ways: 
+          - provide the argument [--location] on the command line
+- execute_command:
+    command: |
+      api-gateway gateways create test-name --location us-central1
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.api-gateway.gateways.create) argument (--api-config : --api): Must be specified.
+        Usage: gcloud alpha api-gateway gateways create (GATEWAY : --location=LOCATION) (--api-config=API_CONFIG : --api=API) [optional flags]
+          optional flags may be  --api | --async | --display-name | --help | --labels |
+                                 --location
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha api-gateway gateways create --help
+    - expect_exit:
+        code: 1
+        message: 'argument (--api-config : --api): Must be specified.'

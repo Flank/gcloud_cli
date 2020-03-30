@@ -226,15 +226,16 @@ def ParseExpirationPeriodWithNeverSentinel(value):
 def AddSubscriptionSettingsFlags(parser,
                                  is_update=False,
                                  support_message_ordering=False,
-                                 support_dead_letter_queues=False):
+                                 support_filtering=False,
+                                 support_retry_policy=False):
   """Adds the flags for creating or updating a subscription.
 
   Args:
     parser: The argparse parser.
     is_update: Whether or not this is for the update operation (vs. create).
     support_message_ordering: Whether or not flags for ordering should be added.
-    support_dead_letter_queues: Whether or not flags for dead letter queues
-      should be added.
+    support_filtering: Whether or not flags for filtering should be added.
+    support_retry_policy: Whether or not flags for retry policy should be added.
   """
   AddAckDeadlineFlag(parser)
   AddPushConfigFlags(parser)
@@ -248,38 +249,43 @@ def AddSubscriptionSettingsFlags(parser,
             order. If true, messages with the same ordering key will by sent to
             subscribers in the order in which they were received by Cloud
             Pub/Sub.""")
-  if support_dead_letter_queues:
-    current_group = parser
-    if is_update:
-      mutual_exclusive_group = current_group.add_mutually_exclusive_group()
-      mutual_exclusive_group.add_argument(
-          '--clear-dead-letter-policy',
-          action='store_true',
-          default=None,
-          help="""If set, clear the dead letter policy from the subscription."""
-      )
-      current_group = mutual_exclusive_group
-
-    set_dead_letter_policy_group = current_group.add_argument_group(
-        help="""Dead Letter Queue Options. The Cloud Pub/Sub service account
-             associated with the enclosing subscription's parent project (i.e.,
-             service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com)
-             must have permission to Publish() to this topic and Acknowledge()
-             messages on this subscription.""")
-    dead_letter_topic = resource_args.CreateTopicResourceArg(
-        'to publish dead letter messages to.',
-        flag_name='dead-letter-topic',
-        positional=False,
-        required=False)
-    resource_args.AddResourceArgs(set_dead_letter_policy_group,
-                                  [dead_letter_topic])
-    set_dead_letter_policy_group.add_argument(
-        '--max-delivery-attempts',
-        type=arg_parsers.BoundedInt(5, 100),
+  if support_filtering and not is_update:
+    parser.add_argument(
+        '--filter',
+        type=str,
+        help="""A non-empty string written in the Cloud Pub/Sub filter
+            language. This feature is part of an invitation-only alpha
+            release.""")
+  current_group = parser
+  if is_update:
+    mutual_exclusive_group = current_group.add_mutually_exclusive_group()
+    mutual_exclusive_group.add_argument(
+        '--clear-dead-letter-policy',
+        action='store_true',
         default=None,
-        help="""Maximum number of delivery attempts for any message. The value
-            must be between 5 and 100. Defaults to 5. `--dead-letter-topic`
-            must also be specified.""")
+        help="""If set, clear the dead letter policy from the subscription.""")
+    current_group = mutual_exclusive_group
+
+  set_dead_letter_policy_group = current_group.add_argument_group(
+      help="""Dead Letter Queue Options. The Cloud Pub/Sub service account
+           associated with the enclosing subscription's parent project (i.e.,
+           service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com)
+           must have permission to Publish() to this topic and Acknowledge()
+           messages on this subscription.""")
+  dead_letter_topic = resource_args.CreateTopicResourceArg(
+      'to publish dead letter messages to.',
+      flag_name='dead-letter-topic',
+      positional=False,
+      required=False)
+  resource_args.AddResourceArgs(set_dead_letter_policy_group,
+                                [dead_letter_topic])
+  set_dead_letter_policy_group.add_argument(
+      '--max-delivery-attempts',
+      type=arg_parsers.BoundedInt(5, 100),
+      default=None,
+      help="""Maximum number of delivery attempts for any message. The value
+          must be between 5 and 100. Defaults to 5. `--dead-letter-topic`
+          must also be specified.""")
   parser.add_argument(
       '--expiration-period',
       type=ParseExpirationPeriodWithNeverSentinel,
@@ -289,6 +295,42 @@ def AddSubscriptionSettingsFlags(parser,
           and days, respectively. If the unit is omitted, seconds is
           assumed. This flag additionally accepts the special value "never" to
           indicate that the subscription will never expire.""")
+
+  if support_retry_policy:
+    current_group = parser
+    if is_update:
+      mutual_exclusive_group = current_group.add_mutually_exclusive_group()
+      mutual_exclusive_group.add_argument(
+          '--clear-retry-policy',
+          action='store_true',
+          default=None,
+          help="""If set, clear the retry policy from the subscription.""")
+      current_group = mutual_exclusive_group
+
+    set_retry_policy_group = current_group.add_argument_group(
+        help="""Retry Policy Options. Retry policy specifies how Cloud Pub/Sub
+                retries message delivery for this subscription. This feature is
+                currently experimental and not recommended for production
+                use.""")
+
+    set_retry_policy_group.add_argument(
+        '--min-retry-delay',
+        type=arg_parsers.Duration(lower_bound='0s', upper_bound='600s'),
+        help="""The minimum delay between consecutive deliveries of a given
+            message. Value should be between 0 and 600 seconds. Defaults to 10
+            seconds. Valid values are strings of the form INTEGER[UNIT], where
+            UNIT is one of "s", "m", "h", and "d" for seconds, minutes, hours,
+            and days, respectively. If the unit is omitted, seconds is
+            assumed.""")
+    set_retry_policy_group.add_argument(
+        '--max-retry-delay',
+        type=arg_parsers.Duration(lower_bound='0s', upper_bound='600s'),
+        help="""The maximum delay between consecutive deliveries of a given
+            message. Value should be between 0 and 600 seconds. Defaults to 10
+            seconds. Valid values are strings of the form INTEGER[UNIT], where
+            UNIT is one of "s", "m", "h", and "d" for seconds, minutes, hours,
+            and days, respectively. If the unit is omitted, seconds is
+            assumed.""")
 
 
 def AddPublishMessageFlags(parser,
@@ -358,6 +400,22 @@ def ParseMessageBody(args):
   if args.message_body is not None:
     log.warning(DEPRECATION_FORMAT_STR.format('MESSAGE_BODY', '--message'))
   return args.message_body or args.message
+
+
+def ValidateFilterString(args):
+  """Raises an exception if filter string is empty.
+
+  Args:
+    args (argparse.Namespace): Parsed arguments
+
+  Raises:
+    InvalidArgumentException: if filter string is empty.
+  """
+  if args.filter is not None and not args.filter:
+    raise exceptions.InvalidArgumentException(
+        '--filter',
+        'Filter string must be non-empty. If you do not want a filter, ' +
+        'do not set the --filter argument.')
 
 
 def ValidateDeadLetterPolicy(args):

@@ -11,7 +11,7 @@ gcloud compute backend\-services add\-backend \- add a backend to a backend serv
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute backend\-services add\-backend\fR \fIBACKEND_SERVICE_NAME\fR ([\fB\-\-instance\-group\fR=\fIINSTANCE_GROUP\fR\ :\ \fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR\ |\ \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR]\ |\ [\fB\-\-network\-endpoint\-group\fR=\fINETWORK_ENDPOINT_GROUP\fR\ :\ \fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR]) [\fB\-\-balancing\-mode\fR=\fIBALANCING_MODE\fR] [\fB\-\-capacity\-scaler\fR=\fICAPACITY_SCALER\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-utilization\fR=\fIMAX_UTILIZATION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-max\-connections\fR=\fIMAX_CONNECTIONS\fR\ |\ \fB\-\-max\-connections\-per\-endpoint\fR=\fIMAX_CONNECTIONS_PER_ENDPOINT\fR\ |\ \fB\-\-max\-connections\-per\-instance\fR=\fIMAX_CONNECTIONS_PER_INSTANCE\fR\ |\ \fB\-\-max\-rate\fR=\fIMAX_RATE\fR\ |\ \fB\-\-max\-rate\-per\-endpoint\fR=\fIMAX_RATE_PER_ENDPOINT\fR\ |\ \fB\-\-max\-rate\-per\-instance\fR=\fIMAX_RATE_PER_INSTANCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute backend\-services add\-backend\fR \fIBACKEND_SERVICE_NAME\fR ([\fB\-\-instance\-group\fR=\fIINSTANCE_GROUP\fR\ :\ \fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR\ |\ \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR]\ |\ [\fB\-\-network\-endpoint\-group\fR=\fINETWORK_ENDPOINT_GROUP\fR\ :\ \fB\-\-global\-network\-endpoint\-group\fR\ |\ \fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR]) [\fB\-\-balancing\-mode\fR=\fIBALANCING_MODE\fR] [\fB\-\-capacity\-scaler\fR=\fICAPACITY_SCALER\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-failover\fR] [\fB\-\-max\-utilization\fR=\fIMAX_UTILIZATION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-max\-connections\fR=\fIMAX_CONNECTIONS\fR\ |\ \fB\-\-max\-connections\-per\-endpoint\fR=\fIMAX_CONNECTIONS_PER_ENDPOINT\fR\ |\ \fB\-\-max\-connections\-per\-instance\fR=\fIMAX_CONNECTIONS_PER_INSTANCE\fR\ |\ \fB\-\-max\-rate\fR=\fIMAX_RATE\fR\ |\ \fB\-\-max\-rate\-per\-endpoint\fR=\fIMAX_RATE_PER_ENDPOINT\fR\ |\ \fB\-\-max\-rate\-per\-instance\fR=\fIMAX_RATE_PER_INSTANCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -138,6 +138,15 @@ Name of the network endpoint group to add to the backend service. This flag must
 be specified if any of the other arguments in this group are specified.
 
 .TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\-network\-endpoint\-group\fR
+If set, the network endpoint group is global.
+
+.TP 2m
 \fB\-\-network\-endpoint\-group\-zone\fR=\fINETWORK_ENDPOINT_GROUP_ZONE\fR
 Zone of the network endpoint group to add to the backend service. If not
 specified and the \f5\fIcompute/zone\fR\fR property isn't set, you may be
@@ -169,6 +178,7 @@ Alternatively, the zone can be stored in the environment variable
 .RE
 .RE
 .RE
+.RE
 .sp
 
 .SH "OPTIONAL FLAGS"
@@ -176,7 +186,12 @@ Alternatively, the zone can be stored in the environment variable
 .RS 2m
 .TP 2m
 \fB\-\-balancing\-mode\fR=\fIBALANCING_MODE\fR
-Defines the strategy for balancing load. \fIBALANCING_MODE\fR must be one of:
+Defines the strategy for balancing load.
+
+This cannot be used when the endpoint type of an attached network endpoint group
+is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+
+\fIBALANCING_MODE\fR must be one of:
 
 .RS 2m
 .TP 2m
@@ -247,59 +262,68 @@ service only prevents new connections to instances in the group. All existing
 connections are allowed to continue until they close by normal means. This
 cannot be used for internal load balancing.
 
+This cannot be used when the endpoint type of an attached network endpoint group
+is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional, textual description for the backend.
 
 .TP 2m
-\fB\-\-max\-utilization\fR=\fIMAX_UTILIZATION\fR
-Defines the maximum target for average CPU utilization of the backend instance
-in the backend instance group. Acceptable values are 0.0 (0%) through 1.0
-(100%). Available for all backend service protocols, with
-\-\-balancing\-mode=UTILIZATION.
+\fB\-\-failover\fR
+Designates whether this is a failover backend. More than one failover backend
+can be configured for a given BackendService. Not compatible with the \-\-global
+flag
 
-For backend services that use SSL, TCP, or UDP protocols, you may specify either
-\f5\-\-max\-connections\fR or \f5\-\-max\-connections\-per\-instance\fR, either
-by themselves or one in conjunction with \f5\-\-max\-utilization\fR. In other
-words, the following configuration options are supported:
+.TP 2m
+\fB\-\-max\-utilization\fR=\fIMAX_UTILIZATION\fR
+Defines the maximum target for average utilization of the backend instance in
+the backend instance group. Acceptable values are \f50.0\fR (0%) through
+\f51.0\fR(100%). Available for all backend service protocols, with
+\f5\-\-balancing\-mode=UTILIZATION\fR.
+
+For backend services that use SSL, TCP, or UDP protocols, the following
+configuration options are supported:
+
 .RS 2m
 .IP "\(em" 2m
 no additional parameter
 .IP "\(em" 2m
-just \f5\-\-max\-utilization\fR
+only \f5\-\-max\-utilization\fR
 .IP "\(em" 2m
-just \f5\-\-max\-connections\fR
+only \f5\-\-max\-connections\fR (except for regional managed instance groups)
 .IP "\(em" 2m
-just \f5\-\-max\-connections\-per\-instance\fR
+only \f5\-\-max\-connections\-per\-instance\fR
 .IP "\(em" 2m
-both \f5\-\-max\-utilization\fR and \f5\-\-max\-connections\fR
+both \f5\-\-max\-utilization\fR and \f5\-\-max\-connections\fR (except for
+regional managed instance groups)
 .IP "\(em" 2m
 both \f5\-\-max\-utilization\fR and \f5\-\-max\-connections\-per\-instance\fR
 
 .RE
 .RE
 .sp
-The meanings for \f5\-\-max\-connections\fR and
+The meanings for \f5\-max\-connections\fR and
 \f5\-\-max\-connections\-per\-instance\fR are the same as for
-\-\-balancing\-mode=CONNECTION. If one is used in conjunction with
-\f5\-\-max\-utilization\fR, instances are considered at capacity when either
-maximum utilization or maximum connections is reached.
+\-\-balancing\-mode=CONNECTION. If one is used with \f5\-\-max\-utilization\fR,
+instances are considered at capacity when either maximum utilization or maximum
+connections is reached.
 
-For backend services that use HTTP, HTTPS, or HTTP/2 protocols, you may specify
-either \f5\-\-max\-rate\fR or \f5\-\-max\-rate\-per\-instance\fR, either by
-themselves or one in conjunction with \f5\-\-max\-utilization\fR. In other
-words, the following configuration options are supported:
+For backend services that use HTTP, HTTPS, or HTTP/2 protocols, the following
+configuration options are supported:
+
 .RS 2m
 .IP "\(bu" 2m
 no additional parameter
 .IP "\(bu" 2m
-just \f5\-\-max\-utilization\fR
+only \f5\-\-max\-utilization\fR
 .IP "\(bu" 2m
-just \f5\-\-max\-rate\fR
+only \f5\-\-max\-rate\fR (except for regional managed instance groups)
 .IP "\(bu" 2m
-just \f5\-\-max\-rate\-per\-instance\fR
+only \f5\-\-max\-rate\-per\-instance\fR
 .IP "\(bu" 2m
-both \f5\-\-max\-utilization\fR and \f5\-\-max\-rate\fR
+both \f5\-\-max\-utilization\fR and \f5\-\-max\-rate\fR (except for regional
+managed instance groups)
 .IP "\(bu" 2m
 both \f5\-\-max\-utilization\fR and \f5\-\-max\-rate\-per\-instance\fR
 
@@ -334,8 +358,12 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-max\-connections\fR=\fIMAX_CONNECTIONS\fR
-Maximum concurrent connections that the backend can handle. Valid for instance
-group and network endpoint group backends.
+Maximum concurrent connections that the backend can handle. Valid for network
+endpoint group and instance group backends (except for regional managed instance
+groups).
+
+This cannot be used when the endpoint type of an attached network endpoint group
+is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
 
 .TP 2m
 \fB\-\-max\-connections\-per\-endpoint\fR=\fIMAX_CONNECTIONS_PER_ENDPOINT\fR
@@ -345,6 +373,9 @@ endpoints are unhealthy, an effective maximum number of connections per healthy
 endpoint is calculated by multiplying \f5MAX_CONNECTIONS_PER_ENDPOINT\fR by the
 number of endpoints in the network endpoint group, then dividing by the number
 of healthy endpoints.
+
+This cannot be used when the endpoint type of an attached network endpoint group
+is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
 
 .TP 2m
 \fB\-\-max\-connections\-per\-instance\fR=\fIMAX_CONNECTIONS_PER_INSTANCE\fR
@@ -358,9 +389,12 @@ group, then dividing by the number of healthy instances.
 .TP 2m
 \fB\-\-max\-rate\fR=\fIMAX_RATE\fR
 Maximum number of HTTP requests per second (RPS) that the backend can handle.
-Valid for instance group and network endpoint group backends. Must not be
-defined if the backend is a managed instance group using autoscaling based on
-load balancing.
+Valid for network endpoint group and instance group backends (except for
+regional managed instance groups). Must not be defined if the backend is a
+managed instance group using load balancing\-based autoscaling.
+
+This cannot be used when the endpoint type of an attached network endpoint group
+is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
 
 .TP 2m
 \fB\-\-max\-rate\-per\-endpoint\fR=\fIMAX_RATE_PER_ENDPOINT\fR
@@ -369,6 +403,9 @@ requests per second (RPS) per endpoint if all endpoints are healthy. When one or
 more endpoints are unhealthy, an effective maximum rate per healthy endpoint is
 calculated by multiplying \f5MAX_RATE_PER_ENDPOINT\fR by the number of endpoints
 in the network endpoint group, then dividing by the number of healthy endpoints.
+
+This cannot be used when the endpoint type of an attached network endpoint group
+is INTERNET_IP_PORT or INTERNET_FQDN_PORT.
 
 .TP 2m
 \fB\-\-max\-rate\-per\-instance\fR=\fIMAX_RATE_PER_INSTANCE\fR
@@ -390,8 +427,9 @@ backends that use autoscaling based on load balancing.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

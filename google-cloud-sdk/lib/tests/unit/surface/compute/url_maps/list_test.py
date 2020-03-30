@@ -31,8 +31,11 @@ import mock
 
 class URLMapsListTest(test_base.BaseTest, completer_test_base.CompleterBase):
 
+  URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
+
   def SetUp(self):
     self.SelectApi('v1')
+    self._api = ''
     self._url_maps_api = self.compute_v1.urlMaps
     self._test_url_maps = test_resources.URL_MAPS
 
@@ -41,8 +44,37 @@ class URLMapsListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     self.addCleanup(list_json_patcher.stop)
     self.list_json = list_json_patcher.start()
 
+    self.url_maps = [
+        self.messages.UrlMap(
+            name='url-map1',
+            defaultService=(self.URI_PREFIX +
+                            'global/backendService/default-service'),
+            selfLink=self.URI_PREFIX + 'global/url-maps/url-map1'),
+        self.messages.UrlMap(
+            name='url-map2',
+            defaultService=(self.URI_PREFIX +
+                            'global/backendService/default-service'),
+            selfLink=self.URI_PREFIX + 'global/url-maps/url-map2')
+    ]
+    self.region_url_maps = [
+        self.messages.UrlMap(
+            name='region-url-map1',
+            defaultService=(self.URI_PREFIX +
+                            'regions/region-1/backendService/default-service'),
+            region='region-1',
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-1/url-maps/region-url-map1')),
+        self.messages.UrlMap(
+            name='region-url-map2',
+            defaultService=(self.URI_PREFIX +
+                            'regions/region-1/backendService/default-service'),
+            region='region-2',
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-2/url-maps/region-url-map2'))
+    ]
+
   def RunList(self, command):
-    self.Run('compute url-maps list ' + command)
+    self.Run('compute url-maps list --global ' + command)
 
   def testSimpleCase(self):
     self.list_json.side_effect = [
@@ -55,7 +87,6 @@ class URLMapsListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         requests=[(self._url_maps_api,
                    'List',
                    self.messages.ComputeUrlMapsListRequest(
-                       maxResults=500,
                        project='my-project'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
@@ -95,15 +126,15 @@ class URLMapsListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     )
 
 
-class URLMapsListBetaTest(test_base.BaseTest,
-                          completer_test_base.CompleterBase):
+class RegionURLMapsListTest(test_base.BaseTest,
+                            completer_test_base.CompleterBase):
 
-  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
+  URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
 
   def SetUp(self):
-    self._api = 'beta'
-    self.SelectApi('beta')
-    self._compute_api = self.compute_beta
+    self._api = ''
+    self.SelectApi('v1')
+    self._compute_api = self.compute_v1
 
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson')
@@ -144,7 +175,7 @@ class URLMapsListBetaTest(test_base.BaseTest,
     output = ("""\
         https://compute.googleapis.com/compute/{0}/projects/my-project/global/url-maps/url-map1
         https://compute.googleapis.com/compute/{0}/projects/my-project/global/url-maps/url-map2
-    """.format(self._api))
+    """.format(self.api))
 
     self.RequestOnlyGlobal(command, self.url_maps, output)
 
@@ -152,7 +183,7 @@ class URLMapsListBetaTest(test_base.BaseTest,
     command = self._api + ' compute url-maps list --uri --regions region-1'
     output = ("""\
         https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/url-maps/region-url-map1
-        """.format(self._api))
+        """.format(self.api))
 
     self.RequestOneRegion(command, self.region_url_maps, output)
 
@@ -162,7 +193,7 @@ class URLMapsListBetaTest(test_base.BaseTest,
     output = ("""\
         https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/url-maps/region-url-map1
         https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-2/url-maps/region-url-map2
-        """.format(self._api))
+        """.format(self.api))
 
     self.RequestTwoRegions(command, self.region_url_maps, output)
 
@@ -203,8 +234,7 @@ class URLMapsListBetaTest(test_base.BaseTest,
 
     self.list_json.assert_called_once_with(
         requests=[(self._compute_api.urlMaps, 'AggregatedList',
-                   self.messages.ComputeUrlMapsAggregatedListRequest(
-                       project='my-project'))],
+                   self._getListRequestMessage('my-project'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -244,8 +274,60 @@ class URLMapsListBetaTest(test_base.BaseTest,
 
     self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
 
+  def _getListRequestMessage(self, project):
+    return self.messages.ComputeUrlMapsAggregatedListRequest(project=project,
+            includeAllScopes=True)
 
-class URLMapsListAlphaTest(URLMapsListBetaTest):
+
+class RegionURLMapsListBetaTest(RegionURLMapsListTest):
+
+  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi('beta')
+    self._compute_api = self.compute_beta
+
+    list_json_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
+    self.addCleanup(list_json_patcher.stop)
+    self.list_json = list_json_patcher.start()
+
+    self.url_maps = [
+        self.messages.UrlMap(
+            name='url-map1',
+            defaultService=(self.URI_PREFIX +
+                            'global/backendService/default-service'),
+            selfLink=self.URI_PREFIX + 'global/url-maps/url-map1'),
+        self.messages.UrlMap(
+            name='url-map2',
+            defaultService=(self.URI_PREFIX +
+                            'global/backendService/default-service'),
+            selfLink=self.URI_PREFIX + 'global/url-maps/url-map2')
+    ]
+    self.region_url_maps = [
+        self.messages.UrlMap(
+            name='region-url-map1',
+            defaultService=(self.URI_PREFIX +
+                            'regions/region-1/backendService/default-service'),
+            region='region-1',
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-1/url-maps/region-url-map1')),
+        self.messages.UrlMap(
+            name='region-url-map2',
+            defaultService=(self.URI_PREFIX +
+                            'regions/region-1/backendService/default-service'),
+            region='region-2',
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-2/url-maps/region-url-map2'))
+    ]
+
+  def _getListRequestMessage(self, project):
+    return self.messages.ComputeUrlMapsAggregatedListRequest(
+        project=project, includeAllScopes=True)
+
+
+class RegionURLMapsListAlphaTest(RegionURLMapsListBetaTest):
 
   URI_PREFIX = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
 

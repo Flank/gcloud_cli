@@ -47,7 +47,8 @@ class _BaseOperationsWaitTest(object):
                 23,
                 12,
                 672000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 7,
@@ -56,7 +57,8 @@ class _BaseOperationsWaitTest(object):
                 23,
                 13,
                 672000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 7,
@@ -65,22 +67,22 @@ class _BaseOperationsWaitTest(object):
                 23,
                 16,
                 342000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='integration-test',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='1cb8a924-898d-41ec-b695-39a6dc018d16',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'.
-            format(self.Project()),
-            operationType='CREATE_USER',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CREATE_USER,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
     # pylint: disable=line-too-long
@@ -98,7 +100,8 @@ class _BaseOperationsWaitTest(object):
                 23,
                 12,
                 672000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 7,
@@ -107,7 +110,8 @@ class _BaseOperationsWaitTest(object):
                 23,
                 13,
                 672000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 7,
@@ -116,22 +120,22 @@ class _BaseOperationsWaitTest(object):
                 23,
                 16,
                 342000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='integration-test',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='1cb8a924-898d-41ec-b695-39a6dc018d16',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'.
-            format(self.Project()),
-            operationType='CREATE_USER',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CREATE_USER,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -150,7 +154,8 @@ class _BaseOperationsWaitTest(object):
                 23,
                 1,
                 104000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 7,
@@ -159,7 +164,8 @@ class _BaseOperationsWaitTest(object):
                 23,
                 2,
                 165000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 7,
@@ -168,22 +174,22 @@ class _BaseOperationsWaitTest(object):
                 23,
                 3,
                 165000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='integration-test',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='27e060bf-4e4b-4fbb-b451-a9ee6c8a433a',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/27e060bf-4e4b-4fbb-b451-a9ee6c8a433a'.
-            format(self.Project()),
-            operationType='RESTART',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/27e060bf-4e4b-4fbb-b451-a9ee6c8a433a'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .RESTART,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='1@developer.gserviceaccount.com',
         ))
     # pylint: disable=line-too-long
@@ -201,7 +207,8 @@ class _BaseOperationsWaitTest(object):
                 23,
                 1,
                 104000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 7,
@@ -210,7 +217,8 @@ class _BaseOperationsWaitTest(object):
                 23,
                 2,
                 165000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 7,
@@ -219,22 +227,22 @@ class _BaseOperationsWaitTest(object):
                 23,
                 3,
                 165000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='integration-test',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='27e060bf-4e4b-4fbb-b451-a9ee6c8a433a',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/27e060bf-4e4b-4fbb-b451-a9ee6c8a433a'.
-            format(self.Project()),
-            operationType='RESTART',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/27e060bf-4e4b-4fbb-b451-a9ee6c8a433a'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .RESTART,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='1@developer.gserviceaccount.com',
         ))
 
@@ -252,8 +260,9 @@ NAME                                  TYPE         START                        
     wait_mock = self.StartPatch(
         'googlecloudsdk.api_lib.sql.operations.OperationsV1Beta4.'
         'WaitForOperation')
-    op_ref = ('https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/'
-              '1cb8a924-898d-41ec-b695-39a6dc018d16'.format(self.Project()))
+    op_ref = (
+        'https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/'
+        '1cb8a924-898d-41ec-b695-39a6dc018d16'.format(self.Project()))
 
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
@@ -269,7 +278,8 @@ NAME                                  TYPE         START                        
                 23,
                 1,
                 104000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 7,
@@ -278,7 +288,8 @@ NAME                                  TYPE         START                        
                 23,
                 2,
                 165000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 7,
@@ -287,20 +298,22 @@ NAME                                  TYPE         START                        
                 23,
                 3,
                 165000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='integration-test',
             targetLink=(
-                'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/'
+                'https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/'
                 'integration-test').format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='1cb8a924-898d-41ec-b695-39a6dc018d16',
             selfLink=op_ref,
-            operationType='RESTART',
-            status='DONE',
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .RESTART,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='1@developer.gserviceaccount.com',
         ))
 
@@ -318,8 +331,9 @@ NAME                                  TYPE         START                        
     wait_mock = self.StartPatch(
         'googlecloudsdk.api_lib.sql.operations.OperationsV1Beta4.'
         'WaitForOperation')
-    op_ref = ('https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/'
-              '1cb8a924-898d-41ec-b695-39a6dc018d16'.format(self.Project()))
+    op_ref = (
+        'https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/'
+        '1cb8a924-898d-41ec-b695-39a6dc018d16'.format(self.Project()))
 
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
@@ -335,7 +349,8 @@ NAME                                  TYPE         START                        
                 23,
                 1,
                 104000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 7,
@@ -344,7 +359,8 @@ NAME                                  TYPE         START                        
                 23,
                 2,
                 165000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 7,
@@ -353,20 +369,22 @@ NAME                                  TYPE         START                        
                 23,
                 3,
                 165000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='integration-test',
             targetLink=(
-                'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/'
+                'https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/'
                 'integration-test').format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='1cb8a924-898d-41ec-b695-39a6dc018d16',
             selfLink=op_ref,
-            operationType='RESTART',
-            status='DONE',
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .RESTART,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='1@developer.gserviceaccount.com',
         ))
 

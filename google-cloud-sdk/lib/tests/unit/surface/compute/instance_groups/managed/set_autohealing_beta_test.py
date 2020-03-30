@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
+from tests.lib.cli_test_base import MockArgumentError
 from tests.lib.surface.compute import test_base
 from mock import patch
 
@@ -219,6 +220,19 @@ class InstanceGroupManagersSetAutohealingZonalTest(test_base.BaseTest):
         compute instance-groups managed set-autohealing group-1
           --zone central2-a
           --http-health-check health-check-1
+        """)
+
+  @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
+         'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
+         instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
+  def testInvalidInitialDelay(self):
+    with self.assertRaisesRegex(
+        MockArgumentError,
+        '.*value of initial delay must be between 0 and 1y.*'):
+      self.Run("""
+        compute instance-groups managed set-autohealing group-1
+          --zone central2-a
+          --initial-delay 2018y
         """)
 
 

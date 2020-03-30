@@ -12,8 +12,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -49,7 +50,7 @@ COMMANDS
         (ALPHA) Describe the latest image from an image family.
 
      export
-        (ALPHA) Export a Google Compute Engine image.
+        (ALPHA) Export a Compute Engine image.
 
      get-iam-policy
         (ALPHA) Get the IAM policy for a Google Compute Engine image.

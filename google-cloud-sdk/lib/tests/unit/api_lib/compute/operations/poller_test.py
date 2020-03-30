@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,8 +49,8 @@ class PollerTest(waiter_test_base.Base):
 
   def ExpectOperation(self, operation_service, operation_ref,
                       result_service, result_ref, retries=1, error_msg=None):
-    request_type = operation_service.GetRequestType('Get')
-    response_type = operation_service.GetResponseType('Get')
+    request_type = operation_service.GetRequestType('Wait')
+    response_type = operation_service.GetResponseType('Wait')
     response = response_type()
     for i in range(retries):
       if error_msg:
@@ -60,7 +60,7 @@ class PollerTest(waiter_test_base.Base):
         response.status = (self.status_pending
                            if i < retries-1 else self.status_done)
       response.targetLink = result_ref.SelfLink()
-      operation_service.Get.Expect(
+      operation_service.Wait.Expect(
           request=request_type(**operation_ref.AsDict()),
           response=response)
 

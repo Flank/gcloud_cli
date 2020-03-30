@@ -189,7 +189,7 @@ class SessionTests(_SessionTestsBase):
         r'directory: \[{}\]'.format(
             re.escape(os.path.abspath('/asdf/foo.txt')))):
       with self.Execute(ce):
-        files.WriteFileContents('/asdf/foo.txt', 'asdf')
+        files.WriteFileContents('/asdf/foo.txt', 'asdf', create_path=False)
 
   def testJustBinaryFileWriteEvent(self):
     ce = self.CommandExecution(
@@ -649,6 +649,67 @@ class SessionTests(_SessionTestsBase):
       # Running again.
       status, body = http.Http().request(
           'https://example.com/operations/operation-12345', method='GET',
+          body='', headers={})
+      self.assertEqual({'status': '200'}, status)
+      self.assertEqual(op_body, self.FromJson(body))
+
+  def testAPICallOperationWithWait(self):
+    request_mock = self.StartObjectPatch(session.Session, '_MakeRealRequest')
+    op_body = {
+        'name': 'operation-12345',
+        'kind': 'foo#operation',
+        'operationType': 'CREATE',
+        'status': 'PENDING',
+    }
+    create_call = {
+        'api_call': {
+            'poll_operation': True,
+            'expect_request': {
+                'uri': 'https://example.com/create',
+                'method': 'GET',
+                'body': None
+            },
+            'return_response': {
+                'headers': {'status': '200'},
+                'body': dict(op_body)
+            }
+        }
+    }
+
+    ce = self.CommandExecution(
+        create_call,
+        {'expect_stderr': 'Polling operation [operation-12345]\n'},
+        {'expect_exit': {'code': 0}})
+
+    rrr = reference_resolver.ResourceReferenceResolver()
+    with self.Execute(ce, execution_mode=session.ExecutionMode.REMOTE, rrr=rrr):
+      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      status, body = http.Http().request(
+          'https://example.com/create', method='GET', body='', headers={})
+      self.assertEqual({'status': '200'}, status)
+      self.assertEqual(op_body, self.FromJson(body))
+
+      self.assertEqual(rrr._extracted_ids['operation'], 'operation-12345')
+      log.status.Print('Polling operation [operation-12345]')
+
+      op_body['status'] = 'RUNNING'
+      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      status, body = http.Http().request(
+          'https://example.com/operations/operation-12345/wait', method='POST',
+          body='', headers={})
+      self.assertEqual({'status': '200'}, status)
+      self.assertEqual(op_body, self.FromJson(body))
+      # Running again.
+      status, body = http.Http().request(
+          'https://example.com/operations/operation-12345/wait', method='POST',
+          body='', headers={})
+      self.assertEqual({'status': '200'}, status)
+      self.assertEqual(op_body, self.FromJson(body))
+
+      op_body['status'] = 'DONE'
+      request_mock.return_value = ({'status': '200'}, self.ToJson(op_body))
+      status, body = http.Http().request(
+          'https://example.com/operations/operation-12345/wait', method='POST',
           body='', headers={})
       self.assertEqual({'status': '200'}, status)
       self.assertEqual(op_body, self.FromJson(body))

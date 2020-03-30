@@ -1,0 +1,89 @@
+title: service directory endpoints describe test scenario
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      service-directory endpoints describe my-endpoint --service my-service --namespace my-namespace --location us-east1
+  - stdout: |
+      name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint
+- execute:
+  - command: |
+      service-directory endpoints describe projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint
+  - stdout: |
+      name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint
+- execute:
+  - command: |
+      service-directory endpoints describe my-endpoint --service my-service --namespace my-namespace --location us-east1
+  - stdout: |
+      address: 10.01.0.1
+      name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint
+      port: 2
+actions:
+- execute_command:
+    command: |
+      service-directory endpoints describe my-endpoint --service my-service --namespace my-namespace --location us-east1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint"
+            }
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      service-directory endpoints describe projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint"
+            }
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      service-directory endpoints describe my-endpoint --service my-service --namespace my-namespace --location us-east1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint",
+              "address": "10.01.0.1",
+              "port": 2
+            }
+    - expect_stdout: |
+        address: 10.01.0.1
+        name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/my-endpoint
+        port: 2
+    - expect_exit:
+        code: 0

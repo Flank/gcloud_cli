@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.ml_engine import models
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.ml_engine import endpoint_util
 from googlecloudsdk.command_lib.ml_engine import flags
 
 
@@ -28,6 +29,7 @@ _COLLECTION = 'ml.models'
 
 def _AddDescribeArgs(parser):
   flags.GetModelName().AddToParser(parser)
+  flags.GetRegionArg('model').AddToParser(parser)
 
 
 # TODO(b/62998601): don't repeat the first sentence due. Also if b/62998171 is
@@ -46,4 +48,5 @@ class Describe(base.DescribeCommand):
     _AddDescribeArgs(parser)
 
   def Run(self, args):
-    return models.ModelsClient().Get(args.model)
+    with endpoint_util.MlEndpointOverrides(region=args.region):
+      return models.ModelsClient().Get(args.model)

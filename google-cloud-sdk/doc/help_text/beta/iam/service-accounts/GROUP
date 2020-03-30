@@ -20,8 +20,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -33,7 +34,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add an IAM policy binding to an IAM Service Account.
+        (BETA) Add an IAM policy binding to an IAM service account.
 
      create
         (BETA) Create a service account for a project.
@@ -57,7 +58,7 @@ COMMANDS
         (BETA) List all of a project's service accounts.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding of a service account.
+        (BETA) Remove IAM policy binding from a service account.
 
      set-iam-policy
         (BETA) Set IAM policy for a service account.

@@ -80,19 +80,19 @@ class MatrixCreator(object):
     """Builds either a FileReference or an AppBundle message for a file."""
     if filename.endswith('.aab'):
       return None, self._messages.AppBundle(
-          bundleLocation=self._BuildFileReference(filename))
+          bundleLocation=self._BuildFileReference(os.path.basename(filename)))
     else:
-      return self._BuildFileReference(filename), None
+      return self._BuildFileReference(os.path.basename(filename)), None
 
   def _BuildFileReference(self, filename):
     """Build a FileReference pointing to the GCS copy of a file."""
     return self._messages.FileReference(
-        gcsPath=os.path.join(self._gcs_results_root,
-                             os.path.basename(filename)))
+        gcsPath=os.path.join(self._gcs_results_root, filename))
 
   def _GetOrchestratorOption(self):
-    orchestrator_options = (self._messages.AndroidInstrumentationTest.
-                            OrchestratorOptionValueValuesEnum)
+    orchestrator_options = (
+        self._messages.AndroidInstrumentationTest
+        .OrchestratorOptionValueValuesEnum)
     if self._args.use_orchestrator is None:
       return orchestrator_options.ORCHESTRATOR_OPTION_UNSPECIFIED
     elif self._args.use_orchestrator:
@@ -125,12 +125,13 @@ class MatrixCreator(object):
     spec.androidInstrumentationTest = self._messages.AndroidInstrumentationTest(
         appApk=app_apk,
         appBundle=app_bundle,
-        testApk=self._BuildFileReference(self._args.test),
+        testApk=self._BuildFileReference(os.path.basename(self._args.test)),
         appPackageId=self._args.app_package,
         testPackageId=self._args.test_package,
         testRunnerClass=self._args.test_runner_class,
         testTargets=(self._args.test_targets or []),
-        orchestratorOption=self._GetOrchestratorOption())
+        orchestratorOption=self._GetOrchestratorOption(),
+        shardingOption=self._BuildShardingOption())
     return spec
 
   def _BuildAndroidRoboTestSpec(self):
@@ -144,7 +145,7 @@ class MatrixCreator(object):
         roboDirectives=self._BuildRoboDirectives(self._args.robo_directives))
     if getattr(self._args, 'robo_script', None):
       spec.androidRoboTest.roboScript = self._BuildFileReference(
-          self._args.robo_script)
+          os.path.basename(self._args.robo_script))
     return spec
 
   def _BuildAndroidGameLoopTestSpec(self):
@@ -165,18 +166,20 @@ class MatrixCreator(object):
     """Build a generic TestSpecification without test-type specifics."""
     device_files = []
     for obb_file in self._args.obb_files or []:
+      obb_file_name = os.path.basename(obb_file)
       device_files.append(
           self._messages.DeviceFile(
               obbFile=self._messages.ObbFile(
-                  obbFileName=os.path.basename(obb_file),
-                  obb=self._BuildFileReference(obb_file))))
-    for other_files in getattr(self._args, 'other_files', {}) or {}:
+                  obbFileName=obb_file_name,
+                  obb=self._BuildFileReference(obb_file_name))))
+    other_files = getattr(self._args, 'other_files', None) or {}
+    for device_path in other_files.keys():
       device_files.append(
           self._messages.DeviceFile(
               regularFile=self._messages.RegularFile(
-                  content=self._BuildFileReference(other_files),
-                  devicePath=self._args.other_files[other_files])))
-
+                  content=self._BuildFileReference(
+                      util.GetRelativeDevicePath(device_path)),
+                  devicePath=device_path)))
     environment_variables = []
     if self._args.environment_variables:
       for key, value in six.iteritems(self._args.environment_variables):
@@ -190,7 +193,8 @@ class MatrixCreator(object):
       account = self._messages.Account(googleAuto=self._messages.GoogleAuto())
 
     additional_apks = [
-        self._messages.Apk(location=self._BuildFileReference(additional_apk))
+        self._messages.Apk(
+            location=self._BuildFileReference(os.path.basename(additional_apk)))
         for additional_apk in getattr(self._args, 'additional_apks', []) or []
     ]
 
@@ -208,8 +212,33 @@ class MatrixCreator(object):
         disableVideoRecording=not self._args.record_video,
         disablePerformanceMetrics=not self._args.performance_metrics)
 
+  def _BuildShardingOption(self):
+    """Build a ShardingOption for an AndroidInstrumentationTest."""
+    if getattr(self._args, 'num_uniform_shards', {}):
+      return self._messages.ShardingOption(
+          uniformSharding=self._messages.UniformSharding(
+              numShards=self._args.num_uniform_shards))
+    elif getattr(self._args, 'test_targets_for_shard', {}):
+      return self._messages.ShardingOption(
+          manualSharding=self._BuildManualShard(
+              self._args.test_targets_for_shard))
+
+  def _BuildManualShard(self, test_targets_for_shard):
+    """Build a ManualShard for a ShardingOption."""
+    test_targets = [
+        self._BuildTestTargetsForShard(test_target)
+        for test_target in test_targets_for_shard
+    ]
+    return self._messages.ManualSharding(testTargetsForShard=test_targets)
+
+  def _BuildTestTargetsForShard(self, test_targets_for_each_shard):
+    return self._messages.TestTargetsForShard(testTargets=[
+        target for target in test_targets_for_each_shard.split(';')
+        if target is not None
+    ])
+
   def _TestSpecFromType(self, test_type):
-    """Map a test type into its corresponding TestSpecification message ."""
+    """Map a test type into its corresponding TestSpecification message."""
     if test_type == 'instrumentation':
       return self._BuildAndroidInstrumentationTestSpec()
     elif test_type == 'robo':

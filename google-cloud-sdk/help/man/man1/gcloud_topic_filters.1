@@ -174,10 +174,13 @@ True if \fIkey\fR matches the RE (regular expression) pattern \fIvalue\fR.
 True if \fIkey\fR does not match the RE (regular expression) pattern
 \fIvalue\fR.
 
-
 .RE
 .RE
 .sp
+For more about regular expression syntax, see:
+https://docs.python.org/3/library/re.html#re\-syntax
+
+
 
 .SH "EXAMPLES"
 
@@ -193,8 +196,8 @@ List Compute Engine instance resources that have machineType \fBf1\-micro\fR:
 $ gcloud compute instances list \-\-filter="machineType:f1\-micro"
 .RE
 
-List Compute Engine instance resources with zone prefix \fBus\fR and not
-MachineType \fBf1\-micro\fR:
+List Compute Engine instance resources using a regular expression for zone
+prefix \fBus\fR and not MachineType \fBf1\-micro\fR:
 
 .RS 2m
 $ gcloud compute instances list \e
@@ -292,9 +295,9 @@ pdq	abcpdqxyz	False	True
 xyz*	abcpdqxyz	False	False
 xyz	abcpdqxyz	False	True
 *	abcpdqxyz	True	True
-*	<None>	False	False
-*	<''>	False	False
-*	<otherwise>	True	True
+*	(None)	False	False
+*	('')	False	False
+*	(otherwise)	True	True
 abc*	abc.pdq.xyz	True	True
 abc	abc.pdq.xyz	True	True
 abc.pdq	abc.pdq.xyz	True	True

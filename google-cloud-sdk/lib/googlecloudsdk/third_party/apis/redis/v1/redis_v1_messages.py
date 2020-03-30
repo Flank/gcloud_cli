@@ -193,6 +193,9 @@ class Instance(_messages.Message):
   r"""A Google Cloud Redis instance.
 
   Enums:
+    ConnectModeValueValuesEnum: Optional. The connect mode of Redis instance.
+      If not provided, default one will be used. Current default:
+      DIRECT_PEERING.
     StateValueValuesEnum: Output only. The current state of this instance.
     TierValueValuesEnum: Required. The service tier of the instance.
 
@@ -200,9 +203,10 @@ class Instance(_messages.Message):
     LabelsValue: Resource labels to represent user provided metadata
     RedisConfigsValue: Optional. Redis configuration parameters, according to
       http://redis.io/topics/config. Currently, the only supported parameters
-      are:   Redis 3.2 and above:   *   maxmemory-policy  *   notify-keyspace-
-      events   Redis 4.0 and above:   *   activedefrag  *   lfu-log-factor  *
-      lfu-decay-time
+      are:   Redis version 3.2 and newer:   *   maxmemory-policy  *   notify-
+      keyspace-events   Redis version 4.0 and newer:   *   activedefrag  *
+      lfu-decay-time  *   lfu-log-factor  *   maxmemory-gb   Redis version 5.0
+      and newer:   *   stream-node-max-bytes  *   stream-node-max-entries
 
   Fields:
     alternativeLocationId: Optional. Only applicable to STANDARD_HA tier which
@@ -213,6 +217,8 @@ class Instance(_messages.Message):
       [network](/compute/docs/networks-and-firewalls#networks) to which the
       instance is connected. If left unspecified, the `default` network will
       be used.
+    connectMode: Optional. The connect mode of Redis instance. If not
+      provided, default one will be used. Current default: DIRECT_PEERING.
     createTime: Output only. The time the instance was created.
     currentLocationId: Output only. The current zone where the Redis endpoint
       is placed. For Basic Tier instances, this will always be the same as the
@@ -246,14 +252,15 @@ class Instance(_messages.Message):
     port: Output only. The port number of the exposed Redis endpoint.
     redisConfigs: Optional. Redis configuration parameters, according to
       http://redis.io/topics/config. Currently, the only supported parameters
-      are:   Redis 3.2 and above:   *   maxmemory-policy  *   notify-keyspace-
-      events   Redis 4.0 and above:   *   activedefrag  *   lfu-log-factor  *
-      lfu-decay-time
+      are:   Redis version 3.2 and newer:   *   maxmemory-policy  *   notify-
+      keyspace-events   Redis version 4.0 and newer:   *   activedefrag  *
+      lfu-decay-time  *   lfu-log-factor  *   maxmemory-gb   Redis version 5.0
+      and newer:   *   stream-node-max-bytes  *   stream-node-max-entries
     redisVersion: Optional. The version of Redis software. If not provided,
-      latest supported version will be used. Updating the version will perform
-      an upgrade/downgrade to the new version. Currently, the supported values
-      are:   *   `REDIS_4_0` for Redis 4.0 compatibility (default)  *
-      `REDIS_3_2` for Redis 3.2 compatibility
+      latest supported version will be used. Currently, the supported values
+      are:   *   `REDIS_3_2` for Redis 3.2 compatibility  *   `REDIS_4_0` for
+      Redis 4.0 compatibility (default)  *   `REDIS_5_0` for Redis 5.0
+      compatibility
     reservedIpRange: Optional. The CIDR range of internal addresses that are
       reserved for this instance. If not provided, the service will choose an
       unused /29 block, for example, 10.0.0.0/29 or 192.168.0.0/29. Ranges
@@ -264,6 +271,21 @@ class Instance(_messages.Message):
       status of this instance, if available.
     tier: Required. The service tier of the instance.
   """
+
+  class ConnectModeValueValuesEnum(_messages.Enum):
+    r"""Optional. The connect mode of Redis instance. If not provided, default
+    one will be used. Current default: DIRECT_PEERING.
+
+    Values:
+      CONNECT_MODE_UNSPECIFIED: Not set.
+      DIRECT_PEERING: Connect via directly peering with memorystore redis
+        hosted service.
+      PRIVATE_SERVICE_ACCESS: Connect with google via private service access
+        and share connection across google managed services.
+    """
+    CONNECT_MODE_UNSPECIFIED = 0
+    DIRECT_PEERING = 1
+    PRIVATE_SERVICE_ACCESS = 2
 
   class StateValueValuesEnum(_messages.Enum):
     r"""Output only. The current state of this instance.
@@ -334,9 +356,10 @@ class Instance(_messages.Message):
   class RedisConfigsValue(_messages.Message):
     r"""Optional. Redis configuration parameters, according to
     http://redis.io/topics/config. Currently, the only supported parameters
-    are:   Redis 3.2 and above:   *   maxmemory-policy  *   notify-keyspace-
-    events   Redis 4.0 and above:   *   activedefrag  *   lfu-log-factor  *
-    lfu-decay-time
+    are:   Redis version 3.2 and newer:   *   maxmemory-policy  *   notify-
+    keyspace-events   Redis version 4.0 and newer:   *   activedefrag  *
+    lfu-decay-time  *   lfu-log-factor  *   maxmemory-gb   Redis version 5.0
+    and newer:   *   stream-node-max-bytes  *   stream-node-max-entries
 
     Messages:
       AdditionalProperty: An additional property for a RedisConfigsValue
@@ -361,22 +384,23 @@ class Instance(_messages.Message):
 
   alternativeLocationId = _messages.StringField(1)
   authorizedNetwork = _messages.StringField(2)
-  createTime = _messages.StringField(3)
-  currentLocationId = _messages.StringField(4)
-  displayName = _messages.StringField(5)
-  host = _messages.StringField(6)
-  labels = _messages.MessageField('LabelsValue', 7)
-  locationId = _messages.StringField(8)
-  memorySizeGb = _messages.IntegerField(9, variant=_messages.Variant.INT32)
-  name = _messages.StringField(10)
-  persistenceIamIdentity = _messages.StringField(11)
-  port = _messages.IntegerField(12, variant=_messages.Variant.INT32)
-  redisConfigs = _messages.MessageField('RedisConfigsValue', 13)
-  redisVersion = _messages.StringField(14)
-  reservedIpRange = _messages.StringField(15)
-  state = _messages.EnumField('StateValueValuesEnum', 16)
-  statusMessage = _messages.StringField(17)
-  tier = _messages.EnumField('TierValueValuesEnum', 18)
+  connectMode = _messages.EnumField('ConnectModeValueValuesEnum', 3)
+  createTime = _messages.StringField(4)
+  currentLocationId = _messages.StringField(5)
+  displayName = _messages.StringField(6)
+  host = _messages.StringField(7)
+  labels = _messages.MessageField('LabelsValue', 8)
+  locationId = _messages.StringField(9)
+  memorySizeGb = _messages.IntegerField(10, variant=_messages.Variant.INT32)
+  name = _messages.StringField(11)
+  persistenceIamIdentity = _messages.StringField(12)
+  port = _messages.IntegerField(13, variant=_messages.Variant.INT32)
+  redisConfigs = _messages.MessageField('RedisConfigsValue', 14)
+  redisVersion = _messages.StringField(15)
+  reservedIpRange = _messages.StringField(16)
+  state = _messages.EnumField('StateValueValuesEnum', 17)
+  statusMessage = _messages.StringField(18)
+  tier = _messages.EnumField('TierValueValuesEnum', 19)
 
 
 class ListInstancesResponse(_messages.Message):
@@ -788,6 +812,21 @@ class RedisProjectsLocationsInstancesPatchRequest(_messages.Message):
   updateMask = _messages.StringField(3)
 
 
+class RedisProjectsLocationsInstancesUpgradeRequest(_messages.Message):
+  r"""A RedisProjectsLocationsInstancesUpgradeRequest object.
+
+  Fields:
+    name: Required. Redis instance resource name using the form:
+      `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+      where `location_id` refers to a GCP region.
+    upgradeInstanceRequest: A UpgradeInstanceRequest resource to be passed as
+      the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  upgradeInstanceRequest = _messages.MessageField('UpgradeInstanceRequest', 2)
+
+
 class RedisProjectsLocationsListRequest(_messages.Message):
   r"""A RedisProjectsLocationsListRequest object.
 
@@ -962,6 +1001,17 @@ class Status(_messages.Message):
   code = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   details = _messages.MessageField('DetailsValueListEntry', 2, repeated=True)
   message = _messages.StringField(3)
+
+
+class UpgradeInstanceRequest(_messages.Message):
+  r"""Request for UpgradeInstance.
+
+  Fields:
+    redisVersion: Required. Specifies the target version of Redis software to
+      upgrade to.
+  """
+
+  redisVersion = _messages.StringField(1)
 
 
 encoding.AddCustomJsonFieldMapping(

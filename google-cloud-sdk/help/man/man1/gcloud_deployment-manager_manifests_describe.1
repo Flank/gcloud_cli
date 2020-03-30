@@ -48,8 +48,9 @@ Deployment name.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -59,14 +60,14 @@ To display information about a manifest, run:
 
 .RS 2m
 $ gcloud deployment\-manager manifests describe \e
-    \-\-deployment my\-deployment manifest\-name
+    \-\-deployment=my\-deployment manifest\-name
 .RE
 
 To display information about the latest manifest, run:
 
 .RS 2m
 $ gcloud deployment\-manager manifests describe \e
-    \-\-deployment my\-deployment
+    \-\-deployment=my\-deployment
 .RE
 
 

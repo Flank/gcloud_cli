@@ -27,6 +27,7 @@ from tests.lib.surface import accesscontextmanager
 class PoliciesListTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -36,24 +37,23 @@ class PoliciesListTestGA(accesscontextmanager.Base):
     return self.messages.AccessPolicy(
         name='policies/{}'.format(policy_id),
         parent=parent,
-        title='My Policy')
+        title='My Policy',
+        etag='123abcdef')
 
   def _ExpectList(self, policies, organization):
     organization_name = 'organizations/{}'.format(organization)
     m = self.messages
     request_type = m.AccesscontextmanagerAccessPoliciesListRequest
     self.client.accessPolicies.List.Expect(
-        request_type(
-            parent=organization_name,
-        ),
+        request_type(parent=organization_name,),
         self.messages.ListAccessPoliciesResponse(accessPolicies=policies))
 
   def testList(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
 
     organization_id = '12345'
-    policy = self._MakePolicy('MY_POLICY',
-                              parent='organizations/' + organization_id)
+    policy = self._MakePolicy(
+        'MY_POLICY', parent='organizations/' + organization_id)
     self._ExpectList([policy], organization_id)
 
     results = self.Run(
@@ -62,31 +62,35 @@ class PoliciesListTestGA(accesscontextmanager.Base):
     self.assertEqual(results, [policy])
 
   def testList_Format(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     properties.VALUES.core.user_output_enabled.Set(True)
 
     organization_id = '12345'
-    policy = self._MakePolicy('MY_POLICY',
-                              parent='organizations/' + organization_id)
+    policy = self._MakePolicy(
+        'MY_POLICY', parent='organizations/' + organization_id)
     self._ExpectList([policy], organization_id)
 
     self.Run('access-context-manager policies list --organization 12345')
 
-    self.AssertOutputEquals("""\
-        NAME      ORGANIZATION  TITLE
-        MY_POLICY 12345         My Policy
-        """, normalize_space=True)
+    self.AssertOutputEquals(
+        """\
+        NAME      ORGANIZATION  TITLE      ETAG
+        MY_POLICY 12345         My Policy  123abcdef
+        """,
+        normalize_space=True)
 
 
 class PoliciesListTestBeta(PoliciesListTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class PoliciesListTestAlpha(PoliciesListTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 

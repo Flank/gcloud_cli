@@ -1,0 +1,83 @@
+title: privateca roots set-iam-policy
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: privateca roots set-iam-policy my-ca --location europe policy.json --project=my-project
+  - stderr: |
+      Updated IAM policy for Certificate Authority [my-ca].
+  - stdout: |
+      bindings:
+      - members:
+        - user:oldtest@gmail.com
+        - user:test@gmail.com
+        role: roles/non-primitive
+      etag: etag
+      version: 1
+actions:
+- write_file:
+    path: policy.json
+    contents: |
+      {
+        "version": 1,
+        "etag": "etag",
+        "bindings": [
+          {
+            "role": "roles/non-primitive",
+            "members": [
+              "user:test@gmail.com"
+            ]
+          }
+        ]
+      }
+
+- execute_command:
+    command: privateca roots set-iam-policy my-ca --location europe policy.json --project=my-project
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/my-project/locations/europe/certificateAuthorities/my-ca:setIamPolicy?alt=json
+          method: POST
+          body: |-
+            {
+              "policy":
+                {
+                  "etag": "etag",
+                  "version": 1,
+                  "bindings": [
+                    {
+                      "role": 'roles/non-primitive',
+                      "members": ['user:test@gmail.com']
+                    }
+                  ]
+                }
+              }
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:oldtest@gmail.com",
+                    "user:test@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for Certificate Authority [my-ca].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:oldtest@gmail.com
+          - user:test@gmail.com
+          role: roles/non-primitive
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0

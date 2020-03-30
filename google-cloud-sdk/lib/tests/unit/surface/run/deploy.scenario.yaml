@@ -9,12 +9,12 @@ summary:
   - command: run deploy aacrhello --image gcr.io/knative-samples/helloworld-nodejs
       --no-traffic
   - stderr: |
-      Deploying container to Cloud Run on GKE service [aacrhello] in namespace [default] of cluster [do-not-delete-gke-knative-test-cluster]
+      Deploying container to Cloud Run for Anthos service [aacrhello] in namespace [default] of cluster [do-not-delete-gke-knative-test-cluster]
   - staged_progress_tracker:
     - message: Deploying...
     - status: SUCCESS
   - stderr: |
-      Service [aacrhello] revision [$$service-revision-name-3$$] has been deployed
+      Service [aacrhello] revision [$$service-revision-name-3$$] has been deployed and is serving 0 percent of traffic
 actions:
 - set_property:
     # container/use_client_certificate: true
@@ -122,7 +122,7 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aacrhello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services/aacrhello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -133,7 +133,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/v1
             kind: Service
             metadata:
               annotations:
@@ -146,7 +146,7 @@ actions:
               name: aacrhello
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aacrhello
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/aacrhello
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
@@ -184,7 +184,7 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:04Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aacrhello.default.example.com
+              url: aacrhello.default.example.com
               domainInternal: aacrhello.default.svc.cluster.local
               latestCreatedRevisionName: aacrhello-rev02
               latestReadyRevisionName: aacrhello-rev02
@@ -198,94 +198,16 @@ actions:
                 revisionName: aacrhello-rev01
 
     - expect_stderr: |
-        Deploying container to Cloud Run on GKE service [aacrhello] in namespace [default] of cluster [do-not-delete-gke-knative-test-cluster]
-
+        Deploying container to Cloud Run for Anthos service [aacrhello] in namespace [default] of cluster [do-not-delete-gke-knative-test-cluster]
     - api_call:
         expect_request:
           uri:
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aacrhello\?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
-            content-length: '1860'
-            content-type: application/json
-            status: '200'
-          body:
-            apiVersion: serving.knative.dev/v1alpha1
-            kind: Service
-            metadata:
-              annotations:
-                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
-                run.googleapis.com/client-name: gcloud
-                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-              creationTimestamp: '2019-07-23T18:13:29Z'
-              generation: 2
-              name: aacrhello
-              namespace: default
-              resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aacrhello
-              uid: 92610cc6-ad75-11e9-b545-42010a800168
-            spec:
-              template:
-                metadata:
-                  annotations:
-                    run.googleapis.com/client-name: gcloud
-                  creationTimestamp: '2019-07-23T18:13:29Z'
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
-                spec:
-                  containers:
-                  - image: gcr.io/knative-samples/helloworld-nodejs
-                    name: ''
-                    resources:
-                      requests:
-                        cpu: 400m
-                    timeoutSeconds: 300
-              traffic:
-              - latestRevision: true
-                percent: 10
-                revisionName: aacrhello-rev02
-              - latestRevision: false
-                percent: 90
-                revisionName: aacrhello-rev01
-            status:
-              address:
-                hostname: aacrhello.default.svc.cluster.local
-              conditions:
-              - lastTransitionTime: '2019-07-23T20:10:04Z'
-                status: 'True'
-                type: ConfigurationsReady
-              - lastTransitionTime: '2019-07-23T20:10:04Z'
-                status: 'True'
-                type: Ready
-              - lastTransitionTime: '2019-07-23T20:10:04Z'
-                status: 'True'
-                type: RoutesReady
-              domain: aacrhello.default.example.com
-              domainInternal: aacrhello.default.svc.cluster.local
-              latestCreatedRevisionName: aacrhello-rev02
-              latestReadyRevisionName: aacrhello-rev02
-              observedGeneration: 2
-              traffic:
-              - latestRevision: true
-                percent: 10
-                revisionName: aacrhello-rev02
-              - latestRevision: false
-                percent: 90
-                revisionName: aacrhello-rev01
-    - api_call:
-        expect_request:
-          uri:
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aacrhello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services/aacrhello\?alt=json
           method: PUT
           headers: {}
           body:
             json:
-              apiVersion: serving.knative.dev/v1alpha1
+              apiVersion: serving.knative.dev/v1
               kind: Service
               metadata:
                 annotations:
@@ -306,11 +228,10 @@ actions:
                           cpu: 400m
                       timeoutSeconds: 300
                 traffic:
-                - latestRevision: false
-                  percent: 90
-                  revisionName: aacrhello-rev01
                 - percent: 10
                   revisionName: aacrhello-rev02
+                - percent: 90
+                  revisionName: aacrhello-rev01
               status:
                 address:
                   hostname: aacrhello.default.svc.cluster.local
@@ -321,7 +242,7 @@ actions:
                   type: Ready
                 - status: 'True'
                   type: RoutesReady
-                domain: aacrhello.default.example.com
+                url: aacrhello.default.example.com
                 domainInternal: aacrhello.default.svc.cluster.local
                 observedGeneration: 2
         return_response:
@@ -330,7 +251,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/v1
             kind: Service
             metadata:
               annotations:
@@ -345,7 +266,7 @@ actions:
               name: aacrhello
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aacrhello
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/aacrhello
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
@@ -383,7 +304,7 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:07Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aacrhello.default.example.com
+              url: aacrhello.default.example.com
               domainInternal: aacrhello.default.svc.cluster.local
               latestCreatedRevisionName: aacrhello-rev02
               latestReadyRevisionName: aacrhello-rev02
@@ -399,7 +320,7 @@ actions:
         repeatable: true
         expect_request:
           uri:
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aacrhello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services/aacrhello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -409,7 +330,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/v1
             kind: Service
             metadata:
               annotations:
@@ -424,7 +345,7 @@ actions:
               name: aacrhello
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aacrhello
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/aacrhello
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
@@ -461,7 +382,7 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:08Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aacrhello.default.svc.cluster.local
+              url: aacrhello.default.svc.cluster.local
               domainInternal: aacrhello.default.svc.cluster.local
               latestCreatedRevisionName: aacrhello-rev03
               latestReadyRevisionName: aacrhello-rev03
@@ -479,7 +400,7 @@ actions:
         repeatable: true
         expect_request:
           uri:
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aacrhello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services/aacrhello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -489,7 +410,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/v1
             kind: Service
             metadata:
               annotations:
@@ -504,7 +425,7 @@ actions:
               name: aacrhello
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aacrhello
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/aacrhello
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
@@ -541,7 +462,7 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:08Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aacrhello.default.svc.cluster.local
+              url: aacrhello.default.svc.cluster.local
               domainInternal: aacrhello.default.svc.cluster.local
               latestCreatedRevisionName: aacrhello-rev03
               latestReadyRevisionName: aacrhello-rev03
@@ -559,7 +480,7 @@ actions:
           body:
             json: {}
     - expect_stderr: |
-        Service [aacrhello] revision [$$service-revision-name-3$$] has been deployed
+        Service [aacrhello] revision [$$service-revision-name-3$$] has been deployed and is serving 0 percent of traffic
 
 
     - expect_exit:

@@ -32,7 +32,7 @@ class HealthChecksCreateHttp2Test(test_base.BaseTest, parameterized.TestCase):
     self.track = calliope_base.ReleaseTrack.GA
 
   def RunCreate(self, command):
-    self.Run('compute health-checks create http2 ' + command)
+    self.Run('compute health-checks create http2 %s' % command)
 
   def testDefaultOptions(self):
     self.make_requests.side_effect = [[
@@ -418,20 +418,6 @@ class HealthChecksCreateHttp2BetaTest(HealthChecksCreateHttp2Test,
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi('beta')
 
-  def RunCreate(self, command):
-    self.Run('compute health-checks create http2 --global ' + command)
-
-
-class HealthChecksCreateHttp2AlphaTest(HealthChecksCreateHttp2BetaTest,
-                                       parameterized.TestCase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
-
-  def RunCreate(self, command):
-    self.Run('compute health-checks create http2 --global ' + command)
-
   @parameterized.named_parameters(
       ('DisableLogging', '--no-enable-logging', False),
       ('EnableLogging', '--enable-logging', True))
@@ -463,15 +449,24 @@ class HealthChecksCreateHttp2AlphaTest(HealthChecksCreateHttp2BetaTest,
               project='my-project'))],)
 
 
-class RegionHealthChecksCreateHttp2BetaTest(test_base.BaseTest,
-                                            parameterized.TestCase):
+class HealthChecksCreateHttp2AlphaTest(HealthChecksCreateHttp2BetaTest,
+                                       parameterized.TestCase):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+
+
+class RegionHealthChecksCreateHttp2Test(test_base.BaseTest,
+                                        parameterized.TestCase):
+
+  def SetUp(self):
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def RunCreate(self, command):
-    self.Run('compute health-checks create http2 --region us-west-1 ' + command)
+    self.Run(
+        'compute health-checks create http2 --region us-west-1 %s' % command)
 
   def testDefaultOptions(self):
     self.make_requests.side_effect = [[
@@ -779,6 +774,44 @@ class RegionHealthChecksCreateHttp2BetaTest(test_base.BaseTest,
                   timeoutSec=5,
                   healthyThreshold=2,
                   unhealthyThreshold=2),
+              project='my-project',
+              region='us-west-1'))])
+
+
+class RegionHealthChecksCreateHttp2BetaTest(RegionHealthChecksCreateHttp2Test):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  @parameterized.named_parameters(
+      ('DisableLogging', '--no-enable-logging', False),
+      ('EnableLogging', '--enable-logging', True))
+  def testLogConfig(self, enable_logs_flag, enable_logs):
+
+    self.RunCreate("""my-health-check {0}""".format(enable_logs_flag))
+
+    expected_log_config = self.messages.HealthCheckLogConfig(enable=enable_logs)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Insert',
+          self.messages.ComputeRegionHealthChecksInsertRequest(
+              healthCheck=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP2,
+                  http2HealthCheck=self.messages.HTTP2HealthCheck(
+                      port=80,
+                      requestPath='/',
+                      portSpecification=(
+                          self.messages.HTTP2HealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
+                      proxyHeader=(self.messages.HTTP2HealthCheck
+                                   .ProxyHeaderValueValuesEnum.NONE)),
+                  checkIntervalSec=5,
+                  timeoutSec=5,
+                  healthyThreshold=2,
+                  unhealthyThreshold=2,
+                  logConfig=expected_log_config),
               project='my-project',
               region='us-west-1'))])
 

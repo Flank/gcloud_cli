@@ -34,7 +34,7 @@ class _BaseInstancesExportSqlTest(object):
     export_context = self.messages.ExportContext(
         csvExportOptions=None,
         databases=databases or [],
-        fileType='SQL',
+        fileType=self.messages.ExportContext.FileTypeValueValuesEnum.SQL,
         kind='sql#exportContext',
         sqlExportOptions=self.messages.ExportContext.SqlExportOptionsValue(
             schemaOnly=None,
@@ -61,24 +61,24 @@ class _BaseInstancesExportSqlTest(object):
                 50,
                 43,
                 963000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=None,
             endTime=None,
             error=None,
             exportContext=export_context,
             importContext=None,
             targetId='testinstance',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='af859489-ca9c-470f-8340-86da167b368f',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'.
-            format(self.Project()),
-            operationType='EXPORT',
-            status='PENDING',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .EXPORT,
+            status=self.messages.Operation.StatusValueValuesEnum.PENDING,
             user='170350250316@developer.gserviceaccount.com',
         ))
     self.mocked_client.operations.Get.Expect(
@@ -96,7 +96,8 @@ class _BaseInstancesExportSqlTest(object):
                 50,
                 43,
                 963000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -105,7 +106,8 @@ class _BaseInstancesExportSqlTest(object):
                 50,
                 44,
                 13000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 8,
@@ -114,22 +116,22 @@ class _BaseInstancesExportSqlTest(object):
                 50,
                 49,
                 639000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=export_context,
             importContext=None,
             targetId='testinstance',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='af859489-ca9c-470f-8340-86da167b368f',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'.
-            format(self.Project()),
-            operationType='EXPORT',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .EXPORT,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 

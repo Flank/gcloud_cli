@@ -1,0 +1,145 @@
+
+.TH "GCLOUD_ALPHA_CODE_DEV" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha code dev \- run a service in a development environment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha code dev\fR [\fB\-\-build\-context\-directory\fR=\fIBUILD_CONTEXT_DIRECTORY\fR] [\fB\-\-builder\fR=\fIBUILDER\fR] [\fB\-\-cloudsql\-instances\fR=[\fICLOUDSQL_INSTANCE\fR,...]] [\fB\-\-cpu\-limit\fR=\fICPU_LIMIT\fR] [\fB\-\-dockerfile\fR=\fIDOCKERFILE\fR;\ default="Dockerfile"] [\fB\-\-image\-name\fR=\fIIMAGE_NAME\fR] [\fB\-\-local\-port\fR=\fILOCAL_PORT\fR] [\fB\-\-memory\-limit\fR=\fIMEMORY_LIMIT\fR] [\fB\-\-minikube\-vm\-driver\fR=\fIMINIKUBE_VM_DRIVER\fR;\ default="docker"] [\fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-service\-name\fR=\fISERVICE_NAME\fR] [\fB\-\-stop\-cluster\fR] [\fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR] [\fB\-\-kind\-cluster\fR=\fIKIND_CLUSTER\fR\ |\ \fB\-\-kube\-context\fR=\fIKUBE_CONTEXT\fR\ |\ \fB\-\-minikube\-profile\fR=\fIMINIKUBE_PROFILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR By default, this command runs the user's containers on minikube on
+the local machine. To run on another kubernetes cluster, use the
+\-\-kube\-context flag.
+
+When using minikube, if the minikube cluster is not running, this command will
+start a new minikube cluster with that name.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-build\-context\-directory\fR=\fIBUILD_CONTEXT_DIRECTORY\fR
+If set, use this as the context directory when building the container image.
+Otherwise, the directory of the Dockerfile will be used.
+
+.TP 2m
+\fB\-\-builder\fR=\fIBUILDER\fR
+Build with a given Cloud Native Computing Foundation Buildpack builder.
+
+.TP 2m
+\fB\-\-cloudsql\-instances\fR=[\fICLOUDSQL_INSTANCE\fR,...]
+Cloud SQL instance connection strings. Must be in the form
+<project>:<region>:<instance>.
+
+.TP 2m
+\fB\-\-cpu\-limit\fR=\fICPU_LIMIT\fR
+Container CPU limit. Limit is expressed as a number of CPUs. Fractional CPU
+limits are allowed (e.g. 1.5).
+
+.TP 2m
+\fB\-\-dockerfile\fR=\fIDOCKERFILE\fR; default="Dockerfile"
+Dockerfile for the service image.
+
+.TP 2m
+\fB\-\-image\-name\fR=\fIIMAGE_NAME\fR
+Name for the built docker image.
+
+.TP 2m
+\fB\-\-local\-port\fR=\fILOCAL_PORT\fR
+Local port to which the service connection is forwarded. If this flag is not
+set, then a random port is chosen.
+
+.TP 2m
+\fB\-\-memory\-limit\fR=\fIMEMORY_LIMIT\fR
+Container memory limit. Limit is expressed either as an integer representing the
+number of bytes or an integer followed by a unit suffix. Valid unit suffixes are
+"B", "KB", "MB", "GB", "TB", "KiB", "MiB", "GiB", "TiB", or "PiB".
+
+.TP 2m
+\fB\-\-minikube\-vm\-driver\fR=\fIMINIKUBE_VM_DRIVER\fR; default="docker"
+If running on minikube, use this vm driver.
+
+.TP 2m
+\fB\-\-namespace\fR=\fINAMESPACE\fR
+Kubernetes namespace for development kubernetes objects.
+
+.TP 2m
+\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
+When connecting to Google Cloud Platform services, use a service account key.
+
+.TP 2m
+\fB\-\-service\-name\fR=\fISERVICE_NAME\fR
+Name of the service.
+
+.TP 2m
+\fB\-\-stop\-cluster\fR
+If running on minikube or kind, stop the minkube profile or kind cluster at the
+end of the session.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as environment variables.
+
+.TP 2m
+\fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR
+Path to a local YAML file with definitions for all environment variables.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-kind\-cluster\fR=\fIKIND_CLUSTER\fR
+Kind cluster.
+
+.TP 2m
+\fB\-\-kube\-context\fR=\fIKUBE_CONTEXT\fR
+Kubernetes context.
+
+.TP 2m
+\fB\-\-minikube\-profile\fR=\fIMINIKUBE_PROFILE\fR
+Minikube profile.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

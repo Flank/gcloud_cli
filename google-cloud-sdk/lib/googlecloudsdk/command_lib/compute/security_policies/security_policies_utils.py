@@ -54,6 +54,9 @@ def SecurityPolicyFromFile(input_file, messages, file_format):
   if 'fingerprint' in parsed_security_policy:
     security_policy.fingerprint = base64.urlsafe_b64decode(
         parsed_security_policy['fingerprint'].encode('ascii'))
+  if 'cloudArmorConfig' in parsed_security_policy:
+    security_policy.cloudArmorConfig = messages.SecurityPolicyCloudArmorConfig(
+        enableMl=parsed_security_policy['cloudArmorConfig']['enableMl'])
 
   rules = []
   for rule in parsed_security_policy['rules']:
@@ -67,6 +70,8 @@ def SecurityPolicyFromFile(input_file, messages, file_format):
     if 'versionedExpr' in rule['match']:
       match.versionedExpr = ConvertToEnum(rule['match']['versionedExpr'],
                                           messages)
+    if 'expr' in rule['match']:
+      match.expr = messages.Expr(expression=rule['match']['expr'])
     if 'config' in rule['match']:
       if 'srcIpRanges' in rule['match']['config']:
         match.config = messages.SecurityPolicyRuleMatcherConfig(
@@ -106,3 +111,14 @@ def WriteToFile(output_file, security_policy, file_format):
   """
   resource_printer.Print(
       security_policy, print_format=file_format, out=output_file)
+
+
+def CreateCloudArmorConfig(client, args):
+  """Returns a SecurityPolicyCloudArmorConfig message if args are valid."""
+
+  messages = client.messages
+  cloud_armor_config = None
+  if args.enable_ml is not None:
+    cloud_armor_config = messages.SecurityPolicyCloudArmorConfig(
+        enableMl=args.enable_ml)
+  return cloud_armor_config

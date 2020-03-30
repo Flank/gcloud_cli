@@ -29,16 +29,26 @@ from tests.lib import sdk_test_base
 class MonitoringTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   """Base class for Monitoring unit tests."""
 
-  def SetUp(self):
+  def PreSetUp(self):
+    super(MonitoringTestBase, self).PreSetUp()
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.client = mock.Client(client_class=apis.GetClientClass('monitoring',
-                                                               'v3'))
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
+
+  def SetUp(self):
+    super(MonitoringTestBase, self).SetUp()
+    self._client = None
     self.messages = apis.GetMessagesModule('monitoring', 'v3')
     self.comparison_enum = (
         self.messages.MetricThreshold.ComparisonValueValuesEnum)
     properties.VALUES.core.user_output_enabled.Set(False)
+
+  @property
+  def client(self):
+    if self._client is None:
+      self._client = mock.Client(
+          client_class=apis.GetClientClass('monitoring', 'v3'))
+      self._client.Mock()
+      self.addCleanup(self._client.Unmock)
+    return self._client
 
   def CreateAggregation(self, alignment_period=None, cross_series_reducer=None,
                         group_by_fields=None, per_series_aligner=None):

@@ -27,6 +27,7 @@ from __future__ import unicode_literals
 import os
 import sys
 
+from googlecloudsdk.core.util import encoding
 from tests.lib import e2e_base
 from tests.lib import func_code_util
 from tests.lib import parameterized
@@ -36,12 +37,13 @@ from tests.lib.scenario import session
 from tests.lib.scenario import test_base
 from tests.lib.scenario import updates
 
-SCENARIO_PREFIXES = os.environ.get(
-    'CLOUDSDK_SCENARIO_TESTING_PREFIXES', '').split(' ')
-EXECUTION_MODE = session.ExecutionMode[
-    os.environ.get('CLOUDSDK_SCENARIO_TESTING_EXECUTION_MODE') or 'REMOTE']
+SCENARIO_PREFIXES = encoding.GetEncodedValue(
+    os.environ, 'CLOUDSDK_SCENARIO_TESTING_PREFIXES', '').split(' ')
+EXECUTION_MODE = session.ExecutionMode[encoding.GetEncodedValue(
+    os.environ, 'CLOUDSDK_SCENARIO_TESTING_EXECUTION_MODE') or 'REMOTE']
 UPDATE_MODES = updates.Mode.FromEnv()
-DEBUG = bool(os.environ.get('CLOUDSDK_SCENARIO_TESTING_DEBUG'))
+DEBUG = bool(
+    encoding.GetEncodedValue(os.environ, 'CLOUDSDK_SCENARIO_TESTING_DEBUG'))
 
 
 # Uncomment these lines to override the values.

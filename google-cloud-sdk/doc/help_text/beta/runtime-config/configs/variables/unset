@@ -29,24 +29,25 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To delete a variable named "my-var", run:
 
         $ gcloud beta runtime-config configs variables unset \
-            --config-name my-config my-var
+            --config-name=my-config my-var
 
     To delete a variable, but fail if it does not exist, run:
 
         $ gcloud beta runtime-config configs variables unset \
-            --config-name my-config my-var --fail-if-absent
+            --config-name=my-config my-var --fail-if-absent
 
     To recursively delete a parent variable and its children, run:
 
         $ gcloud beta runtime-config configs variables unset \
-            --config-name my-config my-parent-var --recursive
+            --config-name=my-config my-parent-var --recursive
 
 NOTES
     This command is currently in BETA and may change without notice.

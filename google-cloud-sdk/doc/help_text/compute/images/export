@@ -1,5 +1,5 @@
 NAME
-    gcloud compute images export - export a Google Compute Engine image
+    gcloud compute images export - export a Compute Engine image
 
 SYNOPSIS
     gcloud compute images export --destination-uri=DESTINATION_URI
@@ -9,14 +9,15 @@ SYNOPSIS
         [--timeout=TIMEOUT; default="2h"] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute images export exports Virtual Disk images from Google
-    Compute Engine.
+    gcloud compute images export exports virtual disk images from Compute
+    Engine.
 
-    By default, images are exported in the Google Compute Engine format, which
-    is a disk.raw file that has been tarred and gzipped.
+    By default, images are exported in the Compute Engine format, which is a
+    'disk.raw' file that is tarred and gzipped.
 
-    The --export-format flag will export the image to a format supported by
-    QEMU using qemu-img. Valid formats include vmdk, vhdx, vpc, vdi, and qcow2.
+    The --export-format flag exports the image to a format supported by QEMU
+    using qemu-img. Valid formats include 'vmdk', 'vhdx', 'vpc', 'vdi', and
+    'qcow2'.
 
 REQUIRED FLAGS
      --destination-uri=DESTINATION_URI
@@ -85,8 +86,17 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To export a VMDK file 'my-image' from a project 'my-project' to a Cloud
+    Storage bucket 'my-bucket', run:
+
+        $ gcloud compute images export --image=my-image \
+            --destination-uri=gs://my-bucket/my-image.vmdk \
+            --image=my-image --format=vmdk --project=my-project
 
 NOTES
     These variants are also available:

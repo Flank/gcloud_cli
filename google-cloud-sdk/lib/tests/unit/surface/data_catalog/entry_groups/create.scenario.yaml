@@ -1,5 +1,5 @@
 title: Data Catalog create entry group scenario test.
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -12,12 +12,18 @@ summary:
   - stderr: |
       Created entry group [group1].
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta1
+      ALPHA: v1beta1
 - execute_command:
     command: data-catalog entry-groups create group1 --location=us-central1
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups?alt=json&entryGroupId=group1
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups?alt=json&entryGroupId=group1
           method: POST
           headers: {}
           body: null
@@ -38,7 +44,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups?alt=json&entryGroupId=group1
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups?alt=json&entryGroupId=group1
           method: POST
           headers: {}
           body:

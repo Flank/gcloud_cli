@@ -43,10 +43,11 @@ https://cloud.google.com/compute/docs/instances/adding\-removing\-ssh\-keys
 \fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
 Metadata to be made available to the guest operating system running on the
 instances. Each metadata entry is a key/value pair separated by an equals sign.
-Metadata keys must be unique and less than 128 bytes in length. Values must be
-less than or equal to 32,768 bytes in length. Multiple arguments can be passed
-to this flag, e.g., \f5\fI\-\-metadata
-key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR.
+Each metadata key must be unique and have a max of 128 bytes in length. Each
+value must have a max of 256 KB in length. Multiple arguments can be passed to
+this flag, e.g., \f5\fI\-\-metadata
+key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR. The combined total size
+for all metadata entries is 512 KB.
 
 In images that have Compute Engine tools installed on them, such as the official
 images (https://cloud.google.com/compute/docs/images), the following metadata
@@ -89,8 +90,9 @@ At least one of [\-\-metadata] or [\-\-metadata\-from\-file] is required.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

@@ -67,10 +67,11 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
         timeout=321,
         additional_apks=['gs://sea/apk1.apk', 'r/apk2.apk'],
         other_files={
-            'gs://sea/file1': '/sdcard/dir1',
-            'r/file2': '/sdcard/dir2'
+            '/sdcard/dir1/file.txt': 'gs://sea/file1.txt',
+            '/sdcard/dir2/file.txt': 'r/file2.txt',
         },
         num_flaky_test_attempts=1,
+        num_uniform_shards=2,
         client_details={
             'branch': 'my-branch',
             'buildNumber': '1234',
@@ -90,6 +91,9 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
     self.assertEqual(spec.testTimeout, '321s')
     self.assertIsNotNone(spec.testSetup.account)
     self.assertIsNotNone(spec.testSetup.account.googleAuto)
+    self.assertEqual(
+        spec.androidInstrumentationTest.shardingOption.uniformSharding
+        .numShards, 2)
 
     files_to_push = spec.testSetup.filesToPush
     self.assertEqual(len(files_to_push), 4)
@@ -100,11 +104,13 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
         self._BuildObbDeviceFile(
             'wilson.obb', 'gs://gatorade/2015-02-24/wilson.obb'), files_to_push)
     self.assertIn(
-        self._BuildRegularDeviceFile('gs://gatorade/2015-02-24/file1',
-                                     '/sdcard/dir1'), files_to_push)
+        self._BuildRegularDeviceFile(
+            'gs://gatorade/2015-02-24/sdcard/dir1/file.txt',
+            '/sdcard/dir1/file.txt'), files_to_push)
     self.assertIn(
-        self._BuildRegularDeviceFile('gs://gatorade/2015-02-24/file2',
-                                     '/sdcard/dir2'), files_to_push)
+        self._BuildRegularDeviceFile(
+            'gs://gatorade/2015-02-24/sdcard/dir2/file.txt',
+            '/sdcard/dir2/file.txt'), files_to_push)
 
     additional_apks = spec.testSetup.additionalApks
     self.assertEqual(len(additional_apks), 2)
@@ -235,7 +241,11 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
         results_bucket='gatorade',
         results_dir='2015-02-24',
         timeout=321,
-        network_profile='some-network-profile')
+        network_profile='some-network-profile',
+        test_targets_for_shard=[
+            'class com.testlab.kellogs.ExampleInstrumentedTest#flakyTest1;class com.testlab.kellogs.ExampleInstrumentedTest#flakyTest2',
+            'class com.testlab.kellogs.ExampleInstrumentedTest#flakyTest3'
+        ])
     creator = self.CreateMatrixCreator(args)
     req = creator._BuildTestMatrixRequest('id-3')
 
@@ -262,6 +272,15 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
     self.assertEqual(devices.androidVersionIds, ['10'])
     self.assertEqual(devices.locales, ['en_SEA'])
     self.assertEqual(devices.orientations, ['I-formation'])
+
+    test_targets_for_shard = spec.androidInstrumentationTest.shardingOption.manualSharding.testTargetsForShard
+    self.assertEqual(test_targets_for_shard[0].testTargets, [
+        'class com.testlab.kellogs.ExampleInstrumentedTest#flakyTest1',
+        'class com.testlab.kellogs.ExampleInstrumentedTest#flakyTest2'
+    ])
+    self.assertEqual(
+        test_targets_for_shard[1].testTargets,
+        ['class com.testlab.kellogs.ExampleInstrumentedTest#flakyTest3'])
 
   def testMatrixCreator_AndroidGameLoop_ValidateRequestFields(self):
     args = self.NewTestArgs(

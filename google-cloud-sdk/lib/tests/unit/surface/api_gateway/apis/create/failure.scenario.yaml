@@ -1,0 +1,30 @@
+title: Cloud API Gateway API Create with Failure
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway apis create
+  - stderr: |
+      ERROR: (gcloud.alpha.api-gateway.apis.create) argument API: Must be specified.
+      Usage: gcloud alpha api-gateway apis create API [optional flags]
+        optional flags may be  --async | --display-name | --help | --labels
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha api-gateway apis create --help
+  - error: '1: argument API: Must be specified.'
+actions:
+- execute_command:
+    command: |
+      api-gateway apis create
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.api-gateway.apis.create) argument API: Must be specified.
+        Usage: gcloud alpha api-gateway apis create API [optional flags]
+          optional flags may be  --async | --display-name | --help | --labels
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha api-gateway apis create --help
+    - expect_exit:
+        code: 1
+        message: 'argument API: Must be specified.'

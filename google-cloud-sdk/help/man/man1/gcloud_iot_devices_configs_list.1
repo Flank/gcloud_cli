@@ -87,8 +87,20 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list the 3 latest configurations of a device in region 'us\-central1', run:
+
+.RS 2m
+$ gcloud iot devices configs list \-\-region=us\-central1 \e
+    \-\-registry=my\-registry \-\-device=my\-device \-\-limit=3
+.RE
 
 
 

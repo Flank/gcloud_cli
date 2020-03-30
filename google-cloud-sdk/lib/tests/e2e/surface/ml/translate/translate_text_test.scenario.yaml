@@ -16,7 +16,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://translation.googleapis.com/v3beta1/projects/cloud-sdk-integration-testing/locations/global:translateText?alt=json
+          uri: https://translation.googleapis.com/v3/projects/cloud-sdk-integration-testing/locations/global:translateText?alt=json
           method: POST
           headers: {}
           body:

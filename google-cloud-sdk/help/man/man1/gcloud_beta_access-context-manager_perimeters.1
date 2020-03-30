@@ -11,7 +11,7 @@ gcloud beta access\-context\-manager perimeters \- manage Access Context Manager
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta access\-context\-manager perimeters\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta access\-context\-manager perimeters\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -30,10 +30,25 @@ Currently, the only allowed members of a service perimeter are projects.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdry\-run\fR
+\fB(BETA)\fR Enable management of dry\-run mode configuration for Service
+Perimeters.
+
+
+.RE
+.sp
 
 .SH "COMMANDS"
 
@@ -55,6 +70,10 @@ help\fR for details.
 .TP 2m
 \fBlist\fR
 \fB(BETA)\fR List service perimeters.
+
+.TP 2m
+\fBreplace\-all\fR
+\fB(BETA)\fR Replace all existing service perimeters.
 
 .TP 2m
 \fBupdate\fR

@@ -11,7 +11,13 @@ gcloud compute network\-endpoint\-groups create \- create a Google Compute Engin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute network\-endpoint\-groups create\fR \fINAME\fR [\fB\-\-default\-port\fR=\fIDEFAULT_PORT\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute network\-endpoint\-groups create\fR \fINAME\fR [\fB\-\-default\-port\fR=\fIDEFAULT_PORT\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-endpoint\-type\fR=\fINETWORK_ENDPOINT_TYPE\fR;\ default="gce\-vm\-ip\-port"] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-global\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Create a Google Compute Engine network endpoint group.
 
 
 
@@ -34,20 +40,79 @@ Name of the network endpoint group to operate on.
 The default port to use if the port number is not specified in the network
 endpoint.
 
-If this flag isn't specified, then every network endpoint in the network
-endpoint group must have a port specified.
+If this flag isn't specified for a NEG with endpoint type \f5GCE_VM_IP_PORT\fR,
+then every network endpoint in the network endpoint group must have a port
+specified. For a NEG with endpoint type \f5INTERNET_IP_PORT\fR and
+\f5INTERNET_FQDN_PORT\fR. If the default port is not specified the well known
+port for your backend protocol will be used (80 for http, 443 for https).
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
 Name of the network in which the NEG is created. \f5default\fR project network
 is used if unspecified.
 
+This is only supported for NEGs with endpoint type \f5GCE_VM_IP_PORT\fR.
+
+.TP 2m
+\fB\-\-network\-endpoint\-type\fR=\fINETWORK_ENDPOINT_TYPE\fR; default="gce\-vm\-ip\-port"
+Determines the spec of endpoints attached to this group.
+
+.RS 2m
+.IP "\(em" 2m
+\f5GCE_VM_IP_PORT\fR
+
+.RS 2m
+Endpoint IP address must belong to a VM in Google Compute Engine
+(either the primary IP or as part of an aliased IP range).
+The `\-\-default\-port` must be specified or every network endpoint
+in the network endpoint group must have a port specified.
+.RE
+
+.IP "\(em" 2m
+\f5INTERNET_IP_PORT\fR
+
+.RS 2m
+Endpoint IP address must be publicly routable address. The default
+port will be used if specified. If the default port is not
+specified, the well known port for your backend protocol will be
+used as the default port (80 for http,  443 for https).
+.RE
+
+.IP "\(em" 2m
+\f5INTERNET_FQDN_PORT\fR
+
+.RS 2m
+Endpoint FQDN must be resolvable to a public IP address via public
+DNS. The default port will be used if specified. If the default
+port is not specified, the well known port for your backend
+protocol will be used as the default port (80 for http, 443 for
+https).
+.RE
+
+.RE
+.RE
+.sp
+\fINETWORK_ENDPOINT_TYPE\fR must be one of: \fBgce\-vm\-ip\-port\fR,
+\fBinternet\-ip\-port\fR, \fBinternet\-fqdn\-port\fR.
+
+.RS 2m
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
 Name of the subnet to which all network endpoints belong.
 
 If not specified, network endpoints may belong to any subnetwork in the region
 where the network endpoint group is created.
+
+This is only supported for NEGs with endpoint type \f5GCE_VM_IP_PORT\fR.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the network endpoint group is global.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
@@ -79,6 +144,7 @@ Alternatively, the zone can be stored in the environment variable
 
 
 .RE
+.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
@@ -86,8 +152,9 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -97,8 +164,7 @@ To create a network endpoint group:
 
 .RS 2m
 $ gcloud compute network\-endpoint\-groups create my\-neg \e
-    \-\-zone=us\-central1\-a \-\-network=my\-network \e
-\-\-subnet=my\-subnetwork
+    \-\-zone=us\-central1\-a \-\-network=my\-network \-\-subnet=my\-subnetwork
 .RE
 
 

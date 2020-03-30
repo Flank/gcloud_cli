@@ -39,12 +39,12 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --file=FILE
-        The Yaml file you want to use to update a role. Can not be specified
+        The YAML file you want to use to update a role. Can not be specified
         with other flags except role-id.
 
      The following flags determine the fields need to be updated. You can
      update a role by specifying the following flags, or you can update a role
-     from a Yaml file by specifying the file flag.
+     from a YAML file by specifying the file flag.
 
        --add-permissions=ADD_PERMISSIONS
           The permissions you want to add to the role. Use commas to separate
@@ -71,19 +71,20 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To update a role from a Yaml file, run:
+    To update the role ProjectUpdater from a YAML file, run:
 
-        $ gcloud beta iam roles update viewer --organization 123 \
-            --file role_file_path
+        $ gcloud beta iam roles update roles/ProjectUpdater \
+            --organization=123 --file=role_file_path
 
-    To update a role with flags, run:
+    To update the role ProjectUpdater with flags, run:
 
-        $ gcloud beta iam roles update viewer --project myproject \
-            --permissions permission1,permission2
+        $ gcloud beta iam roles update roles/ProjectUpdater \
+            --project=myproject --permissions=permission1,permission2
 
 NOTES
     This command is currently in BETA and may change without notice. These

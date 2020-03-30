@@ -96,20 +96,26 @@ class InstancesUnitTestBase(UnitTestBase):
         memorySizeGb=1,
         tier=self.messages.Instance.TierValueValuesEnum('BASIC'))
 
-  def MakeAllOptionsInstance(self, name=None, redis_version='REDIS_3_2'):
+  def MakeAllOptionsInstance(self,
+                             name=None,
+                             redis_version='REDIS_3_2',
+                             connect_mode='DIRECT_PEERING'):
     network_ref = resources.REGISTRY.Create(
         'compute.networks', project=self.Project(), network='my-network')
     redis_configs = {
         'maxmemory-policy': 'noeviction',
         'notify-keyspace-events': 'El'
     }
-    if redis_version == 'REDIS_4_0':
+    if redis_version == 'REDIS_4_0' or redis_version == 'REDIS_5_0':
       redis_configs['maxmemory-policy'] = 'allkeys-lfu'
       redis_configs['activedefrag'] = 'yes'
       redis_configs['lfu-log-factor'] = '2'
       redis_configs['lfu-decay-time'] = '10'
+    if redis_version == 'REDIS_5_0':
+      redis_configs['stream-node-max-entries'] = '100'
+      redis_configs['stream-node-max-bytes'] = '4096'
 
-    return self.messages.Instance(
+    redis_instance = self.messages.Instance(
         name=name,
         alternativeLocationId='zone2',
         authorizedNetwork=network_ref.RelativeName(),
@@ -128,8 +134,16 @@ class InstancesUnitTestBase(UnitTestBase):
             self.messages.Instance.RedisConfigsValue,
             sort_items=True),
         redisVersion=redis_version,
-        reservedIpRange='10.0.0.0/29',
         tier=self.messages.Instance.TierValueValuesEnum('STANDARD_HA'))
+
+    if connect_mode == 'DIRECT_PEERING':
+      redis_instance.reservedIpRange = '10.0.0.0/29'
+      redis_instance.connectMode = self.messages.Instance.ConnectModeValueValuesEnum(
+          'DIRECT_PEERING')
+    else:
+      redis_instance.connectMode = self.messages.Instance.ConnectModeValueValuesEnum(
+          'PRIVATE_SERVICE_ACCESS')
+    return redis_instance
 
 
 class OperationsUnitTestBase(UnitTestBase):

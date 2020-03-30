@@ -11,7 +11,7 @@ gcloud dns managed\-zones update \- update an existing Cloud DNS managed\-zone
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud dns managed\-zones update\fR \fIZONE\fR [\fB\-\-async\fR] [\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR] [\fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]] [\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR] [\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR] [\fB\-\-networks\fR=[\fINETWORK\fR,...]] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR] [\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud dns managed\-zones update\fR \fIZONE\fR [\fB\-\-async\fR] [\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR] [\fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]] [\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR] [\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR] [\fB\-\-networks\fR=[\fINETWORK\fR,...]] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR] [\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-target\-network\fR=\fITARGET_NETWORK\fR\ \fB\-\-target\-project\fR=\fITARGET_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -146,9 +146,20 @@ $ gcloud dns managed\-zones update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
-
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 .RE
+.sp
+.TP 2m
+\fB\-\-target\-network\fR=\fITARGET_NETWORK\fR
+Network ID of the Google Compute Engine private network to forward queries to.
+
+.TP 2m
+\fB\-\-target\-project\fR=\fITARGET_PROJECT\fR
+Project ID of the Google Compute Engine private network to forward queries to.
+
+
 .RE
 .sp
 
@@ -157,8 +168,9 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

@@ -527,6 +527,46 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
 
     self.AssertOutputContains('algorithm: RSA_SIGN_PSS_2048_SHA256')
 
+  @parameterized.parameters(('enabled', 'enabled'), ('enabled', 'disabled'),
+                            ('disabled', 'enabled'), ('disabled', 'disabled'))
+  def testUpdateVersionState(self, initial_state, updated_state):
+    ck = next(self.cryptokey_namer)
+
+    self.RunKmsBeta('keys', 'create', ck, '--keyring', self.keyring,
+                    '--location', self.glbl, '--purpose', 'encryption')
+
+    # Key is created enabled.
+    self.ReRunUntilOutputContains(
+        self.FormatCmdKms('keys', 'versions', 'describe', '1', '--key', ck,
+                          '--keyring', self.keyring, '--location', self.glbl),
+        'ENABLED',
+        max_retrials=10,
+        max_wait_ms=60000)
+
+    # Set key to initial state
+    self.RunKmsBeta('keys', 'versions', 'update', '1', '--key', ck,
+                    '--location', self.glbl, '--keyring', self.keyring,
+                    '--state', initial_state)
+
+    self.ReRunUntilOutputContains(
+        self.FormatCmdKms('keys', 'versions', 'describe', '1', '--key', ck,
+                          '--keyring', self.keyring, '--location', self.glbl),
+        initial_state.upper(),
+        max_retrials=10,
+        max_wait_ms=60000)
+
+    # Update the state again
+    self.RunKmsBeta('keys', 'versions', 'update', '1', '--key', ck,
+                    '--location', self.glbl, '--keyring', self.keyring,
+                    '--state', updated_state)
+
+    self.ReRunUntilOutputContains(
+        self.FormatCmdKms('keys', 'versions', 'describe', '1', '--key', ck,
+                          '--keyring', self.keyring, '--location', self.glbl),
+        updated_state.upper(),
+        max_retrials=10,
+        max_wait_ms=60000)
+
 
 if __name__ == '__main__':
   test_case.main()

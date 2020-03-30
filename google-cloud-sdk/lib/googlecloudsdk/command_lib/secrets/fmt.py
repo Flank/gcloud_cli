@@ -27,8 +27,6 @@ table(
 )
 """
 
-_LOCATION_URI_FUNC = lambda r: secrets_args.ParseLocationRef(r.name).SelfLink()
-
 _SECRET_DATA = """
 value(
   payload.data.decode(base64).decode(utf8)
@@ -38,12 +36,11 @@ value(
 _SECRET_TABLE = """
 table(
   name.basename():label=NAME,
-  policy.replicaLocations.notnull().list():label=LOCATIONS,
-  createTime.date():label=CREATED
+  createTime.date():label=CREATED,
+  policy_transform():label=REPLICATION_POLICY,
+  locations_transform():label=LOCATIONS
 )
 """
-
-_SECRET_URI_FUNC = lambda r: secrets_args.ParseSecretRef(r.name).SelfLink()
 
 _VERSION_TABLE = """
 table(
@@ -63,24 +60,55 @@ _VERSION_STATE_TRANSFORMS = {
     }
 }
 
-_VERSION_URI_FUNC = lambda r: secrets_args.ParseVersionRef(r.name).SelfLink()
+
+def _TransformReplicationPolicy(r):
+  if 'replication' not in r:
+    return 'ERROR'
+  if 'automatic' in r['replication']:
+    return 'automatic'
+  if 'userManaged' in r['replication']:
+    return 'user_managed'
+  return 'ERROR'
 
 
-def UseLocationTable(parser):
+def _TransformLocations(r):
+  if 'replication' not in r:
+    return 'ERROR'
+  if 'automatic' in r['replication']:
+    return '-'
+  if 'userManaged' in r['replication'] and 'replicas' in r['replication'][
+      'userManaged']:
+    locations = []
+    for replica in r['replication']['userManaged']['replicas']:
+      locations.append(replica['location'])
+    return ','.join(locations)
+  return 'ERROR'
+
+_SECRET_TRANSFORMS = {
+    'policy_transform': _TransformReplicationPolicy,
+    'locations_transform': _TransformLocations
+}
+
+
+def UseLocationTable(parser, api_version):
   parser.display_info.AddFormat(_LOCATION_TABLE)
-  parser.display_info.AddUriFunc(_LOCATION_URI_FUNC)
+  parser.display_info.AddUriFunc(
+      lambda r: secrets_args.ParseLocationRef(r.name, api_version).SelfLink())
 
 
-def UseSecretTable(parser):
+def UseSecretTable(parser, api_version):
   parser.display_info.AddFormat(_SECRET_TABLE)
-  parser.display_info.AddUriFunc(_SECRET_URI_FUNC)
+  parser.display_info.AddTransforms(_SECRET_TRANSFORMS)
+  parser.display_info.AddUriFunc(
+      lambda r: secrets_args.ParseSecretRef(r.name, api_version).SelfLink())
 
 
 def UseSecretData(parser):
   parser.display_info.AddFormat(_SECRET_DATA)
 
 
-def UseVersionTable(parser):
+def UseVersionTable(parser, api_version):
   parser.display_info.AddFormat(_VERSION_TABLE)
   parser.display_info.AddTransforms(_VERSION_STATE_TRANSFORMS)
-  parser.display_info.AddUriFunc(_VERSION_URI_FUNC)
+  parser.display_info.AddUriFunc(
+      lambda r: secrets_args.ParseVersionRef(r.name, api_version).SelfLink())

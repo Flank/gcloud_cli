@@ -14,17 +14,15 @@ SYNOPSIS
         [--master-boot-disk-type=MASTER_BOOT_DISK_TYPE]
         [--master-machine-type=MASTER_MACHINE_TYPE]
         [--master-min-cpu-platform=PLATFORM]
-        [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--num-master-local-ssds=NUM_MASTER_LOCAL_SSDS]
         [--num-masters=NUM_MASTERS]
-        [--num-preemptible-worker-local-ssds=NUM_PREEMPTIBLE_WORKER_LOCAL_SSDS]
+        [--num-secondary-worker-local-ssds=NUM_SECONDARY_WORKER_LOCAL_SSDS]
         [--num-worker-local-ssds=NUM_WORKER_LOCAL_SSDS]
         [--optional-components=[COMPONENT,...]]
-        [--preemptible-worker-accelerator=[type=TYPE,[count=COUNT],...]]
-        [--preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE]
-        [--preemptible-worker-boot-disk-type=PREEMPTIBLE_WORKER_BOOT_DISK_TYPE]
-        [--properties=[PREFIX:PROPERTY=VALUE,...]] [--scopes=SCOPE,[SCOPE,...]]
-        [--service-account=SERVICE_ACCOUNT] [--tags=TAG,[TAG,...]]
+        [--properties=[PREFIX:PROPERTY=VALUE,...]]
+        [--secondary-worker-accelerator=[type=TYPE,[count=COUNT],...]]
+        [--secondary-worker-boot-disk-size=SECONDARY_WORKER_BOOT_DISK_SIZE]
+        [--secondary-worker-boot-disk-type=SECONDARY_WORKER_BOOT_DISK_TYPE]
         [--worker-accelerator=[type=TYPE,[count=COUNT],...]]
         [--worker-boot-disk-size=WORKER_BOOT_DISK_SIZE]
         [--worker-boot-disk-type=WORKER_BOOT_DISK_TYPE]
@@ -33,8 +31,12 @@ SYNOPSIS
         [--image=IMAGE | --image-version=VERSION]
         [--kerberos-config-file=KERBEROS_CONFIG_FILE
           | --kerberos-root-principal-password-uri=KERBEROS_ROOT_PRINCIPAL_PASSWORD_URI (--kerberos-kms-key=KERBEROS_KMS_KEY : --kerberos-kms-key-keyring=KERBEROS_KMS_KEY_KEYRING --kerberos-kms-key-location=KERBEROS_KMS_KEY_LOCATION --kerberos-kms-key-project=KERBEROS_KMS_KEY_PROJECT)]
-        [--network=NETWORK | --subnet=SUBNET]
-        [--single-node | --num-preemptible-workers=NUM_PREEMPTIBLE_WORKERS
+        [--metadata=KEY=VALUE,[KEY=VALUE,...] --scopes=SCOPE,[SCOPE,...]
+          --service-account=SERVICE_ACCOUNT
+          --tags=TAG,[TAG,...] --network=NETWORK | --subnet=SUBNET
+          --reservation=RESERVATION
+          --reservation-affinity=RESERVATION_AFFINITY; default="any"]
+        [--single-node | --num-secondary-workers=NUM_SECONDARY_WORKERS
           --num-workers=NUM_WORKERS] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -55,14 +57,10 @@ POSITIONAL ARGUMENTS
           this group are specified.
 
        --region=REGION
-          Cloud Dataproc region for the template. Each Cloud Dataproc region
-          constitutes an independent resource namespace constrained to
-          deploying instances into Google Compute Engine zones inside the
-          region. The default value of global is a special multi-region
-          namespace which is capable of deploying instances into all Google
-          Compute Engine zones globally, and is disjoint from other Cloud
-          Dataproc regions. Overrides the default dataproc/region property
-          value for this command invocation.
+          Dataproc region for the template. Each Dataproc region constitutes an
+          independent resource namespace constrained to deploying instances
+          into Compute Engine zones inside the region. Overrides the default
+          dataproc/region property value for this command invocation.
 
 FLAGS
      --autoscaling-policy=AUTOSCALING_POLICY
@@ -146,10 +144,6 @@ FLAGS
         You can find more information online:
         https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
 
-     --metadata=KEY=VALUE,[KEY=VALUE,...]
-        Metadata to be made available to the guest operating system running on
-        the instances
-
      --num-master-local-ssds=NUM_MASTER_LOCAL_SSDS
         The number of local SSDs to attach to the master in a cluster.
 
@@ -160,7 +154,7 @@ FLAGS
           1                  Standard
           3                  High Availability
 
-     --num-preemptible-worker-local-ssds=NUM_PREEMPTIBLE_WORKER_LOCAL_SSDS
+     --num-secondary-worker-local-ssds=NUM_SECONDARY_WORKER_LOCAL_SSDS
         The number of local SSDs to attach to each preemptible worker in a
         cluster.
 
@@ -173,30 +167,6 @@ FLAGS
         The following page documents the optional components that can be
         installed:
         https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/optional-components.
-
-     --preemptible-worker-accelerator=[type=TYPE,[count=COUNT],...]
-        Attaches accelerators (e.g. GPUs) to the preemptible-worker
-        instance(s).
-
-         type
-            The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
-            accelerator to attach to the instances. Use 'gcloud compute
-            accelerator-types list' to learn about all available accelerator
-            types.
-
-         count
-            The number of pieces of the accelerator to attach to each of the
-            instances. The default value is 1.
-
-     --preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE
-        The size of the boot disk. The value must be a whole number followed by
-        a size unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB
-        for terabyte. For example, 10GB will produce a 10 gigabyte disk. The
-        minimum size a boot disk can have is 10 GB. Disk size must be a
-        multiple of 1 GB.
-
-     --preemptible-worker-boot-disk-type=PREEMPTIBLE_WORKER_BOOT_DISK_TYPE
-        The type of the boot disk. The value must be pd-standard or pd-ssd.
 
      --properties=[PREFIX:PROPERTY=VALUE,...]
         Specifies configuration properties for installed packages, such as
@@ -233,98 +203,28 @@ FLAGS
         https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster-properties
         for more information.
 
-     --scopes=SCOPE,[SCOPE,...]
-        Specifies scopes for the node instances. Multiple SCOPEs can be
-        specified, separated by commas. Examples:
+     --secondary-worker-accelerator=[type=TYPE,[count=COUNT],...]
+        Attaches accelerators (e.g. GPUs) to the secondary-worker instance(s).
 
-            $ gcloud dataproc workflow-templates set-managed-cluster \
-                example-cluster \
-                --scopes https://www.googleapis.com/auth/bigtable.admin
+         type
+            The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
+            accelerator to attach to the instances. Use 'gcloud compute
+            accelerator-types list' to learn about all available accelerator
+            types.
 
-            $ gcloud dataproc workflow-templates set-managed-cluster \
-                example-cluster --scopes sqlservice,bigquery
+         count
+            The number of pieces of the accelerator to attach to each of the
+            instances. The default value is 1.
 
-        The following minimum scopes are necessary for the cluster to function
-        properly and are always added, even if not explicitly specified:
+     --secondary-worker-boot-disk-size=SECONDARY_WORKER_BOOT_DISK_SIZE
+        The size of the boot disk. The value must be a whole number followed by
+        a size unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB
+        for terabyte. For example, 10GB will produce a 10 gigabyte disk. The
+        minimum size a boot disk can have is 10 GB. Disk size must be a
+        multiple of 1 GB.
 
-            https://www.googleapis.com/auth/devstorage.read_write
-            https://www.googleapis.com/auth/logging.write
-
-        If the --scopes flag is not specified, the following default scopes are
-        also included:
-
-            https://www.googleapis.com/auth/bigquery
-            https://www.googleapis.com/auth/bigtable.admin.table
-            https://www.googleapis.com/auth/bigtable.data
-            https://www.googleapis.com/auth/devstorage.full_control
-
-        If you want to enable all scopes use the 'cloud-platform' scope.
-
-        SCOPE can be either the full URI of the scope or an alias. default
-        scopes are assigned to all instances. Available aliases are:
-
-          Alias                  URI
-          bigquery               https://www.googleapis.com/auth/bigquery
-          cloud-platform         https://www.googleapis.com/auth/cloud-platform
-          cloud-source-repos     https://www.googleapis.com/auth/source.full_control
-          cloud-source-repos-ro  https://www.googleapis.com/auth/source.read_only
-          compute-ro             https://www.googleapis.com/auth/compute.readonly
-          compute-rw             https://www.googleapis.com/auth/compute
-          datastore              https://www.googleapis.com/auth/datastore
-          default                https://www.googleapis.com/auth/devstorage.read_only
-                                 https://www.googleapis.com/auth/logging.write
-                                 https://www.googleapis.com/auth/monitoring.write
-                                 https://www.googleapis.com/auth/pubsub
-                                 https://www.googleapis.com/auth/service.management.readonly
-                                 https://www.googleapis.com/auth/servicecontrol
-                                 https://www.googleapis.com/auth/trace.append
-          gke-default            https://www.googleapis.com/auth/devstorage.read_only
-                                 https://www.googleapis.com/auth/logging.write
-                                 https://www.googleapis.com/auth/monitoring
-                                 https://www.googleapis.com/auth/service.management.readonly
-                                 https://www.googleapis.com/auth/servicecontrol
-                                 https://www.googleapis.com/auth/trace.append
-          logging-write          https://www.googleapis.com/auth/logging.write
-          monitoring             https://www.googleapis.com/auth/monitoring
-          monitoring-write       https://www.googleapis.com/auth/monitoring.write
-          pubsub                 https://www.googleapis.com/auth/pubsub
-          service-control        https://www.googleapis.com/auth/servicecontrol
-          service-management     https://www.googleapis.com/auth/service.management.readonly
-          sql (deprecated)       https://www.googleapis.com/auth/sqlservice
-          sql-admin              https://www.googleapis.com/auth/sqlservice.admin
-          storage-full           https://www.googleapis.com/auth/devstorage.full_control
-          storage-ro             https://www.googleapis.com/auth/devstorage.read_only
-          storage-rw             https://www.googleapis.com/auth/devstorage.read_write
-          taskqueue              https://www.googleapis.com/auth/taskqueue
-          trace                  https://www.googleapis.com/auth/trace.append
-          userinfo-email         https://www.googleapis.com/auth/userinfo.email
-
-        DEPRECATION WARNING: https://www.googleapis.com/auth/sqlservice account
-        scope and sql alias do not provide SQL instance management capabilities
-        and have been deprecated. Please, use
-        https://www.googleapis.com/auth/sqlservice.admin or sql-admin to manage
-        your Google SQL Service instances.
-
-     --service-account=SERVICE_ACCOUNT
-        The Google Cloud IAM service account to be authenticated as.
-
-     --tags=TAG,[TAG,...]
-        Specifies a list of tags to apply to the instance. These tags allow
-        network firewall rules and routes to be applied to specified VM
-        instances. See gcloud compute firewall-rules create(1) for more
-        details.
-
-        To read more about configuring network tags, read this guide:
-        https://cloud.google.com/vpc/docs/add-remove-network-tags
-
-        To list instances with their respective status and tags, run:
-
-            $ gcloud compute instances list \
-                --format='table(name,status,tags.list())'
-
-        To list instances tagged with a specific tag, tag1, run:
-
-            $ gcloud compute instances list --filter='tags:tag1'
+     --secondary-worker-boot-disk-type=SECONDARY_WORKER_BOOT_DISK_TYPE
+        The type of the boot disk. The value must be pd-standard or pd-ssd.
 
      --worker-accelerator=[type=TYPE,[count=COUNT],...]
         Attaches accelerators (e.g. GPUs) to the worker instance(s).
@@ -490,16 +390,126 @@ FLAGS
          --kerberos-kms-key-project=KERBEROS_KMS_KEY_PROJECT
             The Cloud project for the key.
 
-     At most one of these may be specified:
+     Compute Engine options for Dataproc clusters.
 
-       --network=NETWORK
-          The Compute Engine network that the VM instances of the cluster will
-          be part of. This is mutually exclusive with --subnet. If neither is
-          specified, this defaults to the "default" network.
+       --metadata=KEY=VALUE,[KEY=VALUE,...]
+          Metadata to be made available to the guest operating system running
+          on the instances
 
-       --subnet=SUBNET
-          Specifies the subnet that the cluster will be part of. This is
-          mutally exclusive with --network.
+       --scopes=SCOPE,[SCOPE,...]
+          Specifies scopes for the node instances. Multiple SCOPEs can be
+          specified, separated by commas. Examples:
+
+              $ gcloud dataproc workflow-templates set-managed-cluster \
+                  example-cluster \
+                  --scopes https://www.googleapis.com/auth/bigtable.admin
+
+              $ gcloud dataproc workflow-templates set-managed-cluster \
+                  example-cluster --scopes sqlservice,bigquery
+
+          The following minimum scopes are necessary for the cluster to
+          function properly and are always added, even if not explicitly
+          specified:
+
+              https://www.googleapis.com/auth/devstorage.read_write
+              https://www.googleapis.com/auth/logging.write
+
+          If the --scopes flag is not specified, the following default scopes
+          are also included:
+
+              https://www.googleapis.com/auth/bigquery
+              https://www.googleapis.com/auth/bigtable.admin.table
+              https://www.googleapis.com/auth/bigtable.data
+              https://www.googleapis.com/auth/devstorage.full_control
+
+          If you want to enable all scopes use the 'cloud-platform' scope.
+
+          SCOPE can be either the full URI of the scope or an alias. default
+          scopes are assigned to all instances. Available aliases are:
+
+            Alias                  URI
+            bigquery               https://www.googleapis.com/auth/bigquery
+            cloud-platform         https://www.googleapis.com/auth/cloud-platform
+            cloud-source-repos     https://www.googleapis.com/auth/source.full_control
+            cloud-source-repos-ro  https://www.googleapis.com/auth/source.read_only
+            compute-ro             https://www.googleapis.com/auth/compute.readonly
+            compute-rw             https://www.googleapis.com/auth/compute
+            datastore              https://www.googleapis.com/auth/datastore
+            default                https://www.googleapis.com/auth/devstorage.read_only
+                                   https://www.googleapis.com/auth/logging.write
+                                   https://www.googleapis.com/auth/monitoring.write
+                                   https://www.googleapis.com/auth/pubsub
+                                   https://www.googleapis.com/auth/service.management.readonly
+                                   https://www.googleapis.com/auth/servicecontrol
+                                   https://www.googleapis.com/auth/trace.append
+            gke-default            https://www.googleapis.com/auth/devstorage.read_only
+                                   https://www.googleapis.com/auth/logging.write
+                                   https://www.googleapis.com/auth/monitoring
+                                   https://www.googleapis.com/auth/service.management.readonly
+                                   https://www.googleapis.com/auth/servicecontrol
+                                   https://www.googleapis.com/auth/trace.append
+            logging-write          https://www.googleapis.com/auth/logging.write
+            monitoring             https://www.googleapis.com/auth/monitoring
+            monitoring-write       https://www.googleapis.com/auth/monitoring.write
+            pubsub                 https://www.googleapis.com/auth/pubsub
+            service-control        https://www.googleapis.com/auth/servicecontrol
+            service-management     https://www.googleapis.com/auth/service.management.readonly
+            sql (deprecated)       https://www.googleapis.com/auth/sqlservice
+            sql-admin              https://www.googleapis.com/auth/sqlservice.admin
+            storage-full           https://www.googleapis.com/auth/devstorage.full_control
+            storage-ro             https://www.googleapis.com/auth/devstorage.read_only
+            storage-rw             https://www.googleapis.com/auth/devstorage.read_write
+            taskqueue              https://www.googleapis.com/auth/taskqueue
+            trace                  https://www.googleapis.com/auth/trace.append
+            userinfo-email         https://www.googleapis.com/auth/userinfo.email
+
+          DEPRECATION WARNING: https://www.googleapis.com/auth/sqlservice
+          account scope and sql alias do not provide SQL instance management
+          capabilities and have been deprecated. Please, use
+          https://www.googleapis.com/auth/sqlservice.admin or sql-admin to
+          manage your Google SQL Service instances.
+
+       --service-account=SERVICE_ACCOUNT
+          The Google Cloud IAM service account to be authenticated as.
+
+       --tags=TAG,[TAG,...]
+          Specifies a list of tags to apply to the instance. These tags allow
+          network firewall rules and routes to be applied to specified VM
+          instances. See gcloud compute firewall-rules create(1) for more
+          details.
+
+          To read more about configuring network tags, read this guide:
+          https://cloud.google.com/vpc/docs/add-remove-network-tags
+
+          To list instances with their respective status and tags, run:
+
+              $ gcloud compute instances list \
+                  --format='table(name,status,tags.list())'
+
+          To list instances tagged with a specific tag, tag1, run:
+
+              $ gcloud compute instances list --filter='tags:tag1'
+
+       At most one of these may be specified:
+
+         --network=NETWORK
+            The Compute Engine network that the VM instances of the cluster
+            will be part of. This is mutually exclusive with --subnet. If
+            neither is specified, this defaults to the "default" network.
+
+         --subnet=SUBNET
+            Specifies the subnet that the cluster will be part of. This is
+            mutally exclusive with --network.
+
+       Specifies the reservation for the instance.
+
+         --reservation=RESERVATION
+            The name of the reservation, required when
+            --reservation-affinity=specific.
+
+         --reservation-affinity=RESERVATION_AFFINITY; default="any"
+            The type of reservation for the instance. RESERVATION_AFFINITY must
+            be one of: any, none, specific.
 
      At most one of these may be specified:
 
@@ -512,8 +522,8 @@ FLAGS
 
        Multi-node cluster flags
 
-         --num-preemptible-workers=NUM_PREEMPTIBLE_WORKERS
-            The number of preemptible worker nodes in the cluster.
+         --num-secondary-workers=NUM_SECONDARY_WORKERS
+            The number of secondary worker nodes in the cluster.
 
          --num-workers=NUM_WORKERS
             The number of worker nodes in the cluster. Defaults to
@@ -523,8 +533,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To update managed cluster in a workflow template, run:
+
+        $ gcloud dataproc workflow-templates set-managed-cluster \
+            my_template --region=us-central1 --no-address --num-workers=10 \
+            --worker-machine-type=custom-6-23040
 
 NOTES
     These variants are also available:

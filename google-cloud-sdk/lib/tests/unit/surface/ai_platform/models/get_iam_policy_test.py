@@ -2,7 +2,6 @@
 # Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
-# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -55,6 +54,13 @@ class GetIamPolicyUnitTestGA(base.MlGaPlatformTestBase):
   def testGetIamPolicy(self, module_name):
     response = self.Run('{} models get-iam-policy myModel '
                         '    --format disable'.format(module_name))
+
+    self.assertEqual(response, self.policy)
+
+  def testGetIamPolicyResource(self, module_name):
+    response = self.Run('{} models get-iam-policy projects/{}/models/myModel '
+                        '    --format disable'.format(module_name,
+                                                      self.Project()))
 
     self.assertEqual(response, self.policy)
 

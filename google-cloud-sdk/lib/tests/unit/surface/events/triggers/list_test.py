@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.events import trigger
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.command_lib.events import exceptions
 from tests.lib.surface.run import base
 
 import six
@@ -31,34 +30,44 @@ class TriggersListTestAlpha(base.ServerlessSurfaceBase):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def _MakeTriggers(self, num_triggers):
+  def _MakeTriggers(self, num_triggers, use_uri=False):
     """Creates triggers and assigns them as output to ListTriggers."""
     self.triggers = [
-        trigger.Trigger.New(
-            self.mock_serverless_client, 'fake-project')
-        for _ in range(num_triggers)]
+        trigger.Trigger.New(self.mock_serverless_client, 'fake-project')
+        for _ in range(num_triggers)
+    ]
     for i, t in enumerate(self.triggers):
       t.name = 't{}'.format(i)
       t.status.conditions = [
           self.serverless_messages.TriggerCondition(
-              type='Ready',
-              status=six.text_type(bool(i % 2)))
+              type='Ready', status=six.text_type(bool(i % 2)))
       ]
       t.metadata.selfLink = '/apis/serving.knative.dev/v1alpha1/namespaces/{}/triggers/{}'.format(
           self.namespace.Name(), t.name)
       t.filter_attributes[
           trigger.EVENT_TYPE_FIELD] = 'com.google.event.type.{}'.format(i)
-      t.subscriber = 's{}'.format(i)
+      if use_uri:
+        t._m.spec.subscriber.uri = 'https://s{}.googleapis.com/'.format(i)
+      else:
+        t.subscriber = 's{}'.format(i)
     self.operations.ListTriggers.return_value = self.triggers
 
-  def testTriggersFailNonGKE(self):
-    """Triggers are not yet supported on managed Cloud Run."""
-    with self.assertRaises(exceptions.UnsupportedArgumentError):
-      self.Run('events triggers list --region=us-central1')
-    self.AssertErrContains(
-        'Events are only available with Cloud Run for Anthos.')
+  def testListManaged(self):
+    """Two triggers are listable."""
+    self._MakeTriggers(num_triggers=2)
+    out = self.Run('events triggers list --region=us-central1')
 
-  def testTriggersList(self):
+    self.operations.ListTriggers.assert_called_once_with(
+        self._NamespaceRef(project='fake-project'))
+    self.assertEqual(out, self.triggers)
+    self.AssertOutputEquals(
+        """  TRIGGER EVENT TYPE TARGET
+           X t0 com.google.event.type.0 s0
+           + t1 com.google.event.type.1 s1
+        """,
+        normalize_space=True)
+
+  def testListWithSubscriberRef(self):
     """Two triggers are listable."""
     self._MakeTriggers(num_triggers=2)
     out = self.Run('events triggers list --platform=gke '
@@ -74,7 +83,23 @@ class TriggersListTestAlpha(base.ServerlessSurfaceBase):
         """,
         normalize_space=True)
 
-  def testTriggersListUri(self):
+  def testListWithSubscriberUri(self):
+    """Two triggers are listable."""
+    self._MakeTriggers(num_triggers=2, use_uri=True)
+    out = self.Run('events triggers list --platform=gke '
+                   '--cluster=cluster-1 --cluster-location=us-central1-a')
+
+    self.operations.ListTriggers.assert_called_once_with(
+        self._NamespaceRef(project='default'))
+    self.assertEqual(out, self.triggers)
+    self.AssertOutputEquals(
+        """  TRIGGER EVENT TYPE TARGET
+           X t0 com.google.event.type.0 https://s0.googleapis.com/
+           + t1 com.google.event.type.1 https://s1.googleapis.com/
+        """,
+        normalize_space=True)
+
+  def testListUri(self):
     """Two triggers are listable."""
     self._MakeTriggers(num_triggers=2)
     self._MockConnectionContext(is_gke_context=True)

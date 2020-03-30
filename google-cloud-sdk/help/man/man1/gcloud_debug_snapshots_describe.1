@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud debug snapshots describe \- describe debug snapshots
+gcloud debug snapshots describe \- describe the debug snapshots for a Cloud Debugger debug target         (debuggee)
 
 
 
@@ -17,10 +17,11 @@ gcloud debug snapshots describe \- describe debug snapshots
 
 .SH "DESCRIPTION"
 
-This command describes debug snapshots for a Cloud Debugger debug target. If the
-snapshot has been completed, the output will include details on the stack trace
-and local variables, stored in a compact form which is primarily intended to be
-machine\-readable rather than human\-readable.
+\fBgcloud debug snapshots describe\fR is used to describe the debug snapshots
+for a Cloud Debugger debug target (debuggee). If the snapshot has completed, the
+output will include details on the stack trace and local variables, stored in a
+compact form which is primarily intended to be machine\-readable rather than
+human\-readable.
 
 
 
@@ -67,8 +68,28 @@ target is the most recent deployment of the default module and version.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe the debug snapshots for snapshots with IDs 'ID1' and 'ID2' of the
+debug target (debuggee), run:
+
+.RS 2m
+$ gcloud debug snapshots describe ID1 ID2 \-\-target=<debuggee_id>
+.RE
+
+To describe all active snapshots in file main.py of the debug target (debuggee),
+run:
+
+.RS 2m
+$ gcloud debug snapshots describe \-\-target=<debuggee_id> \e
+    \-\-location="main.py:.*"
+.RE
 
 
 

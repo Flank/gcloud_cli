@@ -124,8 +124,9 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -135,7 +136,7 @@ For example, to list named ports for an instance group:
 
 .RS 2m
 $ gcloud beta compute instance\-groups get\-named\-ports \e
-    example\-instance\-group \-\-zone us\-central1\-a
+    example\-instance\-group \-\-zone=us\-central1\-a
 .RE
 
 The above example lists named ports assigned to an instance group named

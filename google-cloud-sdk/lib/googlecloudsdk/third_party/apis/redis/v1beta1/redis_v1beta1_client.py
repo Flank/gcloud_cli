@@ -9,6 +9,7 @@ class RedisV1beta1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://redis.googleapis.com/'
+  MTLS_BASE_URL = u'https://redis.mtls.googleapis.com/'
 
   _PACKAGE = u'redis'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
@@ -299,6 +300,34 @@ after a few hours, so there is no need to call DeleteOperation.
         relative_path=u'v1beta1/{+name}',
         request_field=u'instance',
         request_type_name=u'RedisProjectsLocationsInstancesPatchRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Upgrade(self, request, global_params=None):
+      r"""Upgrades Redis instance to the newer Redis version specified in the.
+request.
+
+      Args:
+        request: (RedisProjectsLocationsInstancesUpgradeRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Upgrade')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Upgrade.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/projects/{projectsId}/locations/{locationsId}/instances/{instancesId}:upgrade',
+        http_method=u'POST',
+        method_id=u'redis.projects.locations.instances.upgrade',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1beta1/{+name}:upgrade',
+        request_field=u'upgradeInstanceRequest',
+        request_type_name=u'RedisProjectsLocationsInstancesUpgradeRequest',
         response_type_name=u'Operation',
         supports_download=False,
     )

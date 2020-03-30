@@ -1,0 +1,62 @@
+# ToDo: Run tests with client
+title: scc notifications create scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      scc notifications delete testconfig --organization 975322607948
+  - stderr: |
+      Deleted.
+- execute:
+  - command: |
+      scc notifications delete organizations/975322607948/notificationConfigs/testconfig
+  - stderr: |
+      Deleted.
+actions:
+- execute_command:
+    # Delete an existing config
+    command: |
+      scc notifications delete testconfig --organization 975322607948
+    events:
+    - expect_prompt_continue:
+        message: |
+          Are you sure you want to delete a notification config from your org?
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/975322607948/notificationConfigs/testconfig?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Deleted.
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Delete an existing config
+    command: |
+      scc notifications delete organizations/975322607948/notificationConfigs/testconfig
+    events:
+    - expect_prompt_continue:
+        message: |
+          Are you sure you want to delete a notification config from your org?
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/975322607948/notificationConfigs/testconfig?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Deleted.
+    - expect_exit:
+        code: 0

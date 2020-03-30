@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud compute sole\-tenancy node\-groups update \- updates a Google Compute Engine node group
+gcloud compute sole\-tenancy node\-groups update \- update a Compute Engine node group
 
 
 
@@ -17,7 +17,7 @@ gcloud compute sole\-tenancy node\-groups update \- updates a Google Compute Eng
 
 .SH "DESCRIPTION"
 
-Updates a Google Compute Engine node group.
+Update a Compute Engine node group.
 
 
 
@@ -90,8 +90,20 @@ The names of the nodes to remove from the group.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update a node group to have two more nodes, run:
+
+.RS 2m
+$ gcloud compute sole\-tenancy node\-groups update my\-node\-group \e
+    \-\-add\-nodes=2
+.RE
 
 
 

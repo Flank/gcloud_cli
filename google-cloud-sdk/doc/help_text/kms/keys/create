@@ -7,29 +7,38 @@ SYNOPSIS
         [--labels=[KEY=VALUE,...]] [--location=LOCATION]
         [--next-rotation-time=NEXT_ROTATION_TIME]
         [--protection-level=PROTECTION_LEVEL; default="software"]
-        [--rotation-period=ROTATION_PERIOD] [GCLOUD_WIDE_FLAG ...]
+        [--rotation-period=ROTATION_PERIOD] [--skip-initial-version-creation]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Creates a new key within the given keyring.
 
-    The flag purpose is always required when creating a key. The flag
-    default-algorithm is required when creating an asymmetric key. Algorithm
-    and purpose should be compatible.
+    The flag --purpose is always required when creating a key. The flag
+    --default-algorithm is required when creating an asymmetric key, or when
+    creating an external key. Algorithm and purpose should be compatible.
 
-    The optional flags rotation-period and next-rotation-time define a rotation
-    schedule for the key. A schedule can also be defined by the
-    create-rotation-schedule command.
+    The optional flags --rotation-period and --next-rotation-time define a
+    rotation schedule for the key. A schedule can also be defined by the
+    --create-rotation-schedule command.
 
-    The flag next-rotation-time must be in ISO 8601 or RFC3339 format, and
+    The flag --next-rotation-time must be in ISO 8601 or RFC3339 format, and
     rotation-period must be in the form INTEGER[UNIT], where units can be one
     of seconds (s), minutes (m), hours (h) or days (d).
 
-    The optional flag protection-level specifies the protection level of the
-    created key. The default is software; use "HSM" to create a hardware-backed
-    key.
+    The optional flag ``--protection-level`` specifies the physical environment
+    where crypto operations with the key happen. The default is software; use
+    hsm to create a hardware-backed key, or external to create an externally
+    backed key.
 
-    The optional flag labels defines a user specified key/value pair for the
+    The optional flag --labels defines a user specified key/value pair for the
     given key.
+
+    The flag --skip-initial-version-creation creates a CryptoKey with no
+    versions. If you import into the CryptoKey, or create a new version in that
+    CryptoKey, there will be no primary version until one is set using the
+    --set-primary-version command. You must include
+    ``--skip-initial-version-creation`` when creating a CryptoKey with
+    protection level external.
 
 POSITIONAL ARGUMENTS
      KEY
@@ -42,10 +51,11 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --default-algorithm=DEFAULT_ALGORITHM
-        The default algorithm for the crypto key. See
-        https://cloud.google.com/kms/docs/algorithms for guidance on choosing
-        an algorithm. DEFAULT_ALGORITHM must be one of: ec-sign-p256-sha256,
-        ec-sign-p384-sha384, google-symmetric-encryption,
+        The default algorithm for the crypto key. For more information about
+        choosing an algorithm, see
+        https://cloud.google.com/kms/docs/algorithms. DEFAULT_ALGORITHM must be
+        one of: ec-sign-p256-sha256, ec-sign-p384-sha384,
+        external-symmetric-encryption, google-symmetric-encryption,
         rsa-decrypt-oaep-2048-sha256, rsa-decrypt-oaep-3072-sha256,
         rsa-decrypt-oaep-4096-sha256, rsa-decrypt-oaep-4096-sha512,
         rsa-sign-pkcs1-2048-sha256, rsa-sign-pkcs1-3072-sha256,
@@ -73,18 +83,23 @@ OPTIONAL FLAGS
 
      --protection-level=PROTECTION_LEVEL; default="software"
         Protection level of the key. PROTECTION_LEVEL must be one of: software,
-        hsm.
+        hsm, external.
 
      --rotation-period=ROTATION_PERIOD
         Automatic rotation period of the key. See $ gcloud topic datetimes for
         information on duration formats.
 
+     --skip-initial-version-creation
+        Skip creating the first version in a key and setting it as primary
+        during creation.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     The following command creates a key named frodo with protection level
@@ -132,7 +147,20 @@ EXAMPLES
         $ gcloud kms keys create gimli \
             --location=us-east1 \
             --keyring=fellowship \
+            --purpose=encryption \
             --protection-level=hsm
+
+    The following command creates a key named legolas with protection level
+    external and default algorithm external-symmetric-encryption within the
+    keyring fellowship and location us-central1:
+
+        $ gcloud kms keys create legolas \
+            --location=us-central1 \
+            --keyring=fellowship \
+            --purpose=encryption \
+            --default-algorithm=external-symmetric-encryption \
+            --protection-level=external
+            --skip-initial-version-creation
 
 NOTES
     These variants are also available:

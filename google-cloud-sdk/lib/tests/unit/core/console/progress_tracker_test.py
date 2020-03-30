@@ -551,6 +551,7 @@ class CompletionProgressTrackerTest(sdk_test_base.SdkBase):
 
 # TODO(b/125840199) Add tab completion support on windows.
 @test_case.Filters.DoNotRunOnWindows('Tab completion not supported on Windows.')
+@test_case.Filters.DoNotRunOnMac('b/147804852')
 class CompletionProgressTrackerFdTest(sdk_test_base.SdkBase):
 
   def SetUp(self):

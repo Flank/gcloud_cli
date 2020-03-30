@@ -1,9 +1,41 @@
 title: LabelManager - LabelValues - Create test
 release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: labelmanager values create test --label-key="env" --label-parent="organizations/999"
+      --async
+  - error: '1: Invalid display_name for LabelKey [env] in parent [organizations/999]'
+- execute:
+  - command: labelmanager values create test --label-key="env" --label-parent="organizations/999"
+      --async
+  - stdout: |
+      done: false
+      name: operations/clv.12345
+- execute:
+  - command: labelmanager values create staging --label-key="env" --label-parent="organizations/999"
+  - progress_tracker:
+    - message: Waiting for LabelValue [staging] to be created with [operations/clv.789]
+    - status: SUCCESS
+  - stdout: |
+      displayName: staging
+      name: labelValues/111
+      parent: labelKeys/123
+      state: ACTIVE
+- execute:
+  - command: labelmanager values create prod --label-key="env" --label-parent="organizations/999"
+      --async
+  - error: '1: PERMISSION_DENIED: The caller does not have permission'
+- execute:
+  - command: labelmanager values create prod --label-key="labelKeys/123" --async
+  - stdout: |
+      done: false
+      name: operations/clv.12345
 
 actions:
 - execute_command:
-    command: labelmanager values create test --label-key="env" --label-parent="organizations/999" --async
+    command: labelmanager values create test --label-key="env" --label-parent="organizations/999"
+      --async
     events:
     - api_call:
         expect_request:
@@ -21,9 +53,10 @@ actions:
               name: labelKeys/456
     - expect_exit:
         code: 1
-        message: 'Invalid display_name for label key [env] in parent [organizations/999]'
+        message: Invalid display_name for LabelKey [env] in parent [organizations/999]
 - execute_command:
-    command: labelmanager values create test --label-key="env" --label-parent="organizations/999" --async
+    command: labelmanager values create test --label-key="env" --label-parent="organizations/999"
+      --async
     events:
     - api_call:
         expect_request:
@@ -93,7 +126,7 @@ actions:
         expect_request:
           uri: https://labelmanager.googleapis.com/v1alpha1/operations/clv.789?alt=json
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             status: '200'
@@ -110,13 +143,13 @@ actions:
               }
             }
     - expect_progress_tracker:
-        message: Waiting for label value [staging] to be created with [operations/clv.789]
+        message: Waiting for LabelValue [staging] to be created with [operations/clv.789]
         status: SUCCESS
     - api_call:
         expect_request:
           uri: https://labelmanager.googleapis.com/v1alpha1/labelValues/111?alt=json
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             status: '200'
@@ -134,7 +167,8 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: labelmanager values create prod --label-key="env" --label-parent="organizations/999" --async
+    command: labelmanager values create prod --label-key="env" --label-parent="organizations/999"
+      --async
     events:
     - api_call:
         expect_request:

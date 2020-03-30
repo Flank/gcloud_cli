@@ -566,7 +566,7 @@ def AddCreateDiskArgs(parser, enable_kms=False, enable_snapshots=False,
       *auto-delete*::: If ``yes'',  this persistent disk will be
       automatically deleted when the instance is deleted. However,
       if the disk is later detached from the instance, this option
-      won't apply. The default value for this is ``no''.
+      won't apply. The default value for this is ``yes''.
       """.format(disk_name_extra_help, disk_mode_extra_help,
                  disk_device_name_help)
   if enable_kms:
@@ -977,8 +977,15 @@ def AddAddressArgs(parser,
   addresses.add_argument(
       '--no-address',
       action='store_true',
-      help=('If provided, the instances will not be assigned external IP '
-            'addresses.'))
+      help="""\
+           If provided, the instances are not assigned external IP
+           addresses. To pull container images, you must configure private
+           Google access if using Container Registry or configure Cloud NAT
+           for instances to access container images directly. For more
+           information, see:
+             * https://cloud.google.com/vpc/docs/configure-private-google-access
+             * https://cloud.google.com/nat/docs/using-nat
+           """)
   if instances:
     address_help = """\
         Assigns the given external address to the instance that is created.
@@ -1129,13 +1136,22 @@ def AddMinCpuPlatformArgs(parser, track, required=False):
       """.format(track.prefix + ' ' if track.prefix else ''))
 
 
-def AddMinNodeCpuArg(parser):
+def AddMinNodeCpuArg(parser, is_update=False):
   parser.add_argument(
       '--min-node-cpu',
       help="""\
       Minimum number of virtual CPUs this instance will consume when running on
       a sole-tenant node.
       """)
+  if is_update:
+    parser.add_argument(
+        '--clear-min-node-cpu',
+        action='store_true',
+        help="""\
+        Removes the min-node-cpu field from the instance. If specified, the
+        instance min-node-cpu will be cleared. The instance will not be
+        overcommitted and utilize the full CPU count assigned.
+        """)
 
 
 def AddLocationHintArg(parser):
@@ -2376,3 +2392,18 @@ def AddUpdateContainerArgs(parser, container_mount_disk_enabled=False):
       parser,
       container_mount_disk_enabled=container_mount_disk_enabled)
   _AddContainerArgs(parser)
+
+
+def AddPostKeyRevocationActionTypeArgs(parser):
+  """Helper to add --post-key-revocation-action-type flag."""
+  parser.add_argument(
+      '--post-key-revocation-action-type',
+      choices=['noop', 'shutdown'],
+      metavar='POLICY',
+      required=False,
+      help="""\
+      The instance will be shut down when the KMS key of one of its disk is
+      revoked, if set to `SHUTDOWN`.
+
+      Default setting is `NOOP`.
+      """)

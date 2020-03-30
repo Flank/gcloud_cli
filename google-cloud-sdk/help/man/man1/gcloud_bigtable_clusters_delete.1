@@ -53,8 +53,20 @@ Cloud Bigtable instance for the cluster.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a cluster, run:
+
+.RS 2m
+$ gcloud bigtable clusters delete my\-cluster\-id \e
+    \-\-instance=my\-instance\-id
+.RE
 
 
 

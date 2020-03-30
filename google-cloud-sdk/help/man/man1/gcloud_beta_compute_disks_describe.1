@@ -105,8 +105,19 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe the disk 'my\-disk' in zone 'us\-east1\-a', run:
+
+.RS 2m
+$ gcloud beta compute disks describe my\-disk \-\-zone=us\-east1\-a
+.RE
 
 
 

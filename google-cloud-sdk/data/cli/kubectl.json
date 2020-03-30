@@ -1,5 +1,5 @@
 {
-  "CLI_VERSION": "v1.13.11-dispatcher",
+  "CLI_VERSION": "v1.14.10-dispatcher",
   "VERSION": "1",
   "capsule": "",
   "commands": {
@@ -77,19 +77,19 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-uninitialized": {
+        "--kustomize": {
           "attr": {},
           "category": "",
           "default": "",
-          "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
           "is_required": false,
-          "name": "--include-uninitialized",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
+          "name": "--kustomize",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
         },
         "--local": {
           "attr": {},
@@ -214,7 +214,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Update the annotations on one or more resources\n\nAll Kubernetes objects support the ability to store additional data with the object as annotations. Annotations are key/value pairs that can be larger than labels and include arbitrary string values such as structured JSON. Tools and system extensions may use annotations to store their own data.\n\nAttempting to set an annotation that already exists will fail unless --overwrite is set. If --resource-version is specified and does not match the current resource version on the server the command will fail.\n\nUse \"kubectl api-resources\" for a complete list of supported resources.",
+        "DESCRIPTION": "Update the annotations on one or more resources\n\n All Kubernetes objects support the ability to store additional data with the object as annotations. Annotations are key/value pairs that can be larger than labels and include arbitrary string values such as structured JSON. Tools and system extensions may use annotations to store their own data.\n\n Attempting to set an annotation that already exists will fail unless --overwrite is set. If --resource-version is specified and does not match the current resource version on the server the command will fail.\n\nUse \"kubectl api-resources\" for a complete list of supported resources.",
         "EXAMPLES": "  # Update pod 'foo' with the annotation 'description' and the value 'my frontend'.\n  # If the same annotation is set multiple times, only the last value will be applied\n  kubectl annotate pods foo description='my frontend'\n\n  # Update a pod identified by type and name in \"pod.json\"\n  kubectl annotate -f pod.json description='my frontend'\n\n  # Update pod 'foo' with the annotation 'description' and the value 'my frontend running nginx', overwriting any existing value.\n  kubectl annotate --overwrite pods foo description='my frontend running nginx'\n\n  # Update all pods in the namespace\n  kubectl annotate pods --all description='my frontend running nginx'\n\n  # Update pod 'foo' only if the resource is unchanged from version 1.\n  kubectl annotate pods foo description='my frontend running nginx' --resource-version=1\n\n  # Update pod 'foo' by removing an annotation named 'description' if it exists.\n  # Does not require the --overwrite flag.\n  kubectl annotate pods foo description-"
       }
     },
@@ -374,19 +374,19 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--include-uninitialized": {
+            "--kustomize": {
               "attr": {},
               "category": "",
               "default": "",
-              "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
               "is_required": false,
-              "name": "--include-uninitialized",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
+              "name": "--kustomize",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             },
             "--output": {
               "attr": {},
@@ -470,7 +470,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Edit the latest last-applied-configuration annotations of resources from the default editor.\n\nThe edit-last-applied command allows you to directly edit any API resource you can retrieve via the command line tools. It will open the editor defined by your KUBE _EDITOR, or EDITOR environment variables, or fall back to 'vi' for Linux or 'notepad' for Windows. You can edit multiple objects, although changes are applied one at a time. The command accepts filenames as well as command line arguments, although the files you point to must be previously saved versions of resources.\n\nThe default format is YAML. To edit in JSON, specify \"-o json\".\n\nThe flag --windows-line-endings can be used to force Windows line endings, otherwise the default for your operating system will be used.\n\nIn the event an error occurs while updating, a temporary file will be created on disk that contains your unapplied changes. The most common error when updating a resource is another editor changing the resource on the server. When this occurs, you will have to apply your changes to the newer version of the resource, or update your temporary saved copy to include the latest resource version.",
+            "DESCRIPTION": "Edit the latest last-applied-configuration annotations of resources from the default editor.\n\n The edit-last-applied command allows you to directly edit any API resource you can retrieve via the command line tools. It will open the editor defined by your KUBE_EDITOR, or EDITOR environment variables, or fall back to 'vi' for Linux or 'notepad' for Windows. You can edit multiple objects, although changes are applied one at a time. The command accepts filenames as well as command line arguments, although the files you point to must be previously saved versions of resources.\n\n The default format is YAML. To edit in JSON, specify \"-o json\".\n\n The flag --windows-line-endings can be used to force Windows line endings, otherwise the default for your operating system will be used.\n\n In the event an error occurs while updating, a temporary file will be created on disk that contains your unapplied changes. The most common error when updating a resource is another editor changing the resource on the server. When this occurs, you will have to apply your changes to the newer version of the resource, or update your temporary saved copy to include the latest resource version.",
             "EXAMPLES": "  # Edit the last-applied-configuration annotations by type/name in YAML.\n  kubectl apply edit-last-applied deployment/nginx\n\n  # Edit the last-applied-configuration annotations by file in JSON.\n  kubectl apply edit-last-applied -f deploy.yaml -o json"
           }
         },
@@ -574,7 +574,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Set the latest last-applied-configuration annotations by setting it to match the contents of a file. This results in the last-applied-configuration being updated as though 'kubectl apply -f <file>' was run, without updating any other parts of the object.",
+            "DESCRIPTION": "Set the latest last-applied-configuration annotations by setting it to match the contents of a file. This results in the last-applied-configuration being updated as though 'kubectl apply -f<file> ' was run, without updating any other parts of the object.",
             "EXAMPLES": "  # Set the last-applied-configuration of a resource to match the contents of a file.\n  kubectl apply set-last-applied -f deploy.yaml\n\n  # Execute set-last-applied against each configuration file in a directory.\n  kubectl apply set-last-applied -f path/\n\n  # Set the last-applied-configuration of a resource to match the contents of a file, will create the annotation if it does not already exist.\n  kubectl apply set-last-applied -f deploy.yaml --create-annotation=true"
           }
         },
@@ -606,6 +606,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--filename",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--kustomize": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--kustomize",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -664,7 +678,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "View the latest last-applied-configuration annotations by type/name or file.\n\nThe default output will be printed to stdout in YAML format. One can use -o option to change output format.",
+            "DESCRIPTION": "View the latest last-applied-configuration annotations by type/name or file.\n\n The default output will be printed to stdout in YAML format. One can use -o option to change output format.",
             "EXAMPLES": "  # View the last-applied-configuration annotations by type/name in YAML.\n  kubectl apply view-last-applied deployment/nginx\n\n  # View the last-applied-configuration annotations by file in JSON\n  kubectl apply view-last-applied -f deploy.yaml -o json"
           }
         }
@@ -716,12 +730,54 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "If true, only print the object that would be sent, without sending it.",
+          "description": "If true, only print the object that would be sent, without sending it. Warning: --dry-run cannot accurately output the result of merging the local manifest and the server-side data. Use --server-dry-run to get the merged result instead.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
           "is_required": false,
           "name": "--dry-run",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
+        "--experimental-field-manager": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Name of the manager used to track field ownership. This is an alpha feature and flag.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--experimental-field-manager",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--experimental-force-conflicts": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, server-side apply will force the changes against conflicts. This is an alpha feature and flag.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--experimental-force-conflicts",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
+        "--experimental-server-side": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, apply runs in the server instead of the client. This is an alpha feature and flag.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--experimental-server-side",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -768,19 +824,19 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-uninitialized": {
+        "--kustomize": {
           "attr": {},
           "category": "",
           "default": "",
-          "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+          "description": "Process a kustomization directory. This flag can't be used together with -f or -R.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
           "is_required": false,
-          "name": "--include-uninitialized",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
+          "name": "--kustomize",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
         },
         "--openapi-patch": {
           "attr": {},
@@ -975,8 +1031,8 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Apply a configuration to a resource by filename or stdin. The resource name must be specified. This resource will be created if it doesn't exist yet. To use 'apply', always create the resource initially with either 'apply' or 'create --save-config'.\n\nJSON and YAML formats are accepted.\n\nAlpha Disclaimer: the --prune functionality is not yet complete. Do not use unless you are aware of what the current state is. See https://issues.k8s.io/34274.",
-        "EXAMPLES": "  # Apply the configuration in pod.json to a pod.\n  kubectl apply -f ./pod.json\n\n  # Apply the JSON passed into stdin to a pod.\n  cat pod.json | kubectl apply -f -\n\n  # Note: --prune is still in Alpha\n  # Apply the configuration in manifest.yaml that matches label app=nginx and delete all the other resources that are not in the file and match label app=nginx.\n  kubectl apply --prune -f manifest.yaml -l app=nginx\n\n  # Apply the configuration in manifest.yaml and delete all the other configmaps that are not in the file.\n  kubectl apply --prune -f manifest.yaml --all --prune-whitelist=core/v1/ConfigMap"
+        "DESCRIPTION": "Apply a configuration to a resource by filename or stdin. The resource name must be specified. This resource will be created if it doesn't exist yet. To use 'apply', always create the resource initially with either 'apply' or 'create --save-config'.\n\n JSON and YAML formats are accepted.\n\n Alpha Disclaimer: the --prune functionality is not yet complete. Do not use unless you are aware of what the current state is. See https://issues.k8s.io/34274.",
+        "EXAMPLES": "  # Apply the configuration in pod.json to a pod.\n  kubectl apply -f ./pod.json\n\n  # Apply resources from a directory containing kustomization.yaml - e.g. dir/kustomization.yaml.\n  kubectl apply -k dir/\n\n  # Apply the JSON passed into stdin to a pod.\n  cat pod.json | kubectl apply -f -\n\n  # Note: --prune is still in Alpha\n  # Apply the configuration in manifest.yaml that matches label app=nginx and delete all the other resources that are not in the file and match label app=nginx.\n  kubectl apply --prune -f manifest.yaml -l app=nginx\n\n  # Apply the configuration in manifest.yaml and delete all the other configmaps that are not in the file.\n  kubectl apply --prune -f manifest.yaml --all --prune-whitelist=core/v1/ConfigMap"
       }
     },
     "attach": {
@@ -1075,6 +1131,34 @@
               "type": "bool",
               "value": ""
             },
+            "--list": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, prints all allowed actions.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--list",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--no-headers": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, prints allowed actions without headers",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--no-headers",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
             "--quiet": {
               "attr": {},
               "category": "",
@@ -1115,8 +1199,8 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Check whether an action is allowed.\n\nVERB is a logical Kubernetes API verb like 'get', 'list', 'watch', 'delete', etc. TYPE is a Kubernetes resource. Shortcuts and groups will be resolved. NONRESOURCEURL is a partial URL starts with \"/\". NAME is the name of a particular Kubernetes resource.",
-            "EXAMPLES": "  # Check to see if I can create pods in any namespace\n  kubectl auth can-i create pods --all-namespaces\n\n  # Check to see if I can list deployments in my current namespace\n  kubectl auth can-i list deployments.extensions\n\n  # Check to see if I can do everything in my current namespace (\"*\" means all)\n  kubectl auth can-i '*' '*'\n\n  # Check to see if I can get the job named \"bar\" in namespace \"foo\"\n  kubectl auth can-i list jobs.batch/bar -n foo\n\n  # Check to see if I can read pod logs\n  kubectl auth can-i get pods --subresource=log\n\n  # Check to see if I can access the URL /logs/\n  kubectl auth can-i get /logs/"
+            "DESCRIPTION": "Check whether an action is allowed.\n\n VERB is a logical Kubernetes API verb like 'get', 'list', 'watch', 'delete', etc. TYPE is a Kubernetes resource. Shortcuts and groups will be resolved. NONRESOURCEURL is a partial URL starts with \"/\". NAME is the name of a particular Kubernetes resource.",
+            "EXAMPLES": "  # Check to see if I can create pods in any namespace\n  kubectl auth can-i create pods --all-namespaces\n\n  # Check to see if I can list deployments in my current namespace\n  kubectl auth can-i list deployments.extensions\n\n  # Check to see if I can do everything in my current namespace (\"*\" means all)\n  kubectl auth can-i '*' '*'\n\n  # Check to see if I can get the job named \"bar\" in namespace \"foo\"\n  kubectl auth can-i list jobs.batch/bar -n foo\n\n  # Check to see if I can read pod logs\n  kubectl auth can-i get pods --subresource=log\n\n  # Check to see if I can access the URL /logs/\n  kubectl auth can-i get /logs/\n\n  # List all allowed actions in namespace \"foo\"\n  kubectl auth can-i --list --namespace=foo"
           }
         },
         "reconcile": {
@@ -1161,6 +1245,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--filename",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--kustomize": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--kustomize",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -1247,7 +1345,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Reconciles rules for RBAC Role, RoleBinding, ClusterRole, and ClusterRole binding objects.\n\nThis is preferred to 'apply' for RBAC resources so that proper rule coverage checks are done.",
+            "DESCRIPTION": "Reconciles rules for RBAC Role, RoleBinding, ClusterRole, and ClusterRole binding objects.\n\n Missing objects are created, and the containing namespace is created for namespaced objects, if required.\n\n Existing roles are updated to include the permissions in the input objects, and remove extra permissions if --remove-extra-permissions is specified.\n\n Existing bindings are updated to include the subjects in the input objects, and remove extra subjects if --remove-extra-subjects is specified.\n\n This is preferred to 'apply' for RBAC resources so that semantically-aware merging of rules and subjects is done.",
             "EXAMPLES": "  # Reconcile rbac resources from a file\n  kubectl auth reconcile -f my-rbac-rules.yaml"
           }
         }
@@ -1336,6 +1434,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--generator",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--kustomize": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--kustomize",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -1463,7 +1575,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Creates an autoscaler that automatically chooses and sets the number of pods that run in a kubernetes cluster.\n\nLooks up a Deployment, ReplicaSet, StatefulSet, or ReplicationController by name and creates an autoscaler that uses the given resource as a reference. An autoscaler can automatically increase or decrease number of pods deployed within the system as needed.",
+        "DESCRIPTION": "Creates an autoscaler that automatically chooses and sets the number of pods that run in a kubernetes cluster.\n\n Looks up a Deployment, ReplicaSet, StatefulSet, or ReplicationController by name and creates an autoscaler that uses the given resource as a reference. An autoscaler can automatically increase or decrease number of pods deployed within the system as needed.",
         "EXAMPLES": "  # Auto scale a deployment \"foo\", with the number of pods between 2 and 10, no target CPU utilization specified so a default autoscaling policy will be used:\n  kubectl autoscale deployment foo --min=2 --max=10\n\n  # Auto scale a replication controller \"foo\", with the number of pods between 1 and 5, target CPU utilization at 80%:\n  kubectl autoscale rc foo --max=5 --cpu-percent=80"
       }
     },
@@ -1515,6 +1627,20 @@
               "nargs": "0",
               "type": "bool",
               "value": ""
+            },
+            "--kustomize": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--kustomize",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             },
             "--output": {
               "attr": {},
@@ -1570,7 +1696,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Approve a certificate signing request.\n\nkubectl certificate approve allows a cluster admin to approve a certificate signing request (CSR). This action tells a certificate signing controller to issue a certificate to the requestor with the attributes requested in the CSR.\n\nSECURITY NOTICE: Depending on the requested attributes, the issued certificate can potentially grant a requester access to cluster resources or to authenticate as a requested identity. Before approving a CSR, ensure you understand what the signed certificate can do."
+            "DESCRIPTION": "Approve a certificate signing request.\n\n kubectl certificate approve allows a cluster admin to approve a certificate signing request (CSR). This action tells a certificate signing controller to issue a certificate to the requestor with the attributes requested in the CSR.\n\n SECURITY NOTICE: Depending on the requested attributes, the issued certificate can potentially grant a requester access to cluster resources or to authenticate as a requested identity. Before approving a CSR, ensure you understand what the signed certificate can do."
           }
         },
         "deny": {
@@ -1618,6 +1744,20 @@
               "nargs": "0",
               "type": "bool",
               "value": ""
+            },
+            "--kustomize": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--kustomize",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             },
             "--output": {
               "attr": {},
@@ -1673,7 +1813,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Deny a certificate signing request.\n\nkubectl certificate deny allows a cluster admin to deny a certificate signing request (CSR). This action tells a certificate signing controller to not to issue a certificate to the requestor."
+            "DESCRIPTION": "Deny a certificate signing request.\n\n kubectl certificate deny allows a cluster admin to deny a certificate signing request (CSR). This action tells a certificate signing controller to not to issue a certificate to the requestor."
           }
         }
       },
@@ -1808,7 +1948,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Dumps cluster info out suitable for debugging and diagnosing cluster problems.  By default, dumps everything to stdout. You can optionally specify a directory with --output-directory.  If you specify a directory, kubernetes will build a set of files in that directory.  By default only dumps things in the 'kube-system' namespace, but you can switch to a different namespace with the --namespaces flag, or specify --all-namespaces to dump all namespaces.\n\nThe command also dumps the logs of all of the pods in the cluster, these logs are dumped into different directories based on namespace and pod name.",
+            "DESCRIPTION": "Dumps cluster info out suitable for debugging and diagnosing cluster problems.  By default, dumps everything to stdout. You can optionally specify a directory with --output-directory.  If you specify a directory, kubernetes will build a set of files in that directory.  By default only dumps things in the 'kube-system' namespace, but you can switch to a different namespace with the --namespaces flag, or specify --all-namespaces to dump all namespaces.\n\n The command also dumps the logs of all of the pods in the cluster, these logs are dumped into different directories based on namespace and pod name.",
             "EXAMPLES": "  # Dump current cluster state to stdout\n  kubectl cluster-info dump\n\n  # Dump current cluster state to /path/to/cluster-state\n  kubectl cluster-info dump --output-directory=/path/to/cluster-state\n\n  # Dump all namespaces to stdout\n  kubectl cluster-info dump --all-namespaces\n\n  # Dump a set of namespaces to /path/to/cluster-state\n  kubectl cluster-info dump --namespaces default,kube-system --output-directory=/path/to/cluster-state"
           }
         }
@@ -1842,7 +1982,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Output shell completion code for the specified shell (bash or zsh). The shell code must be evaluated to provide interactive completion of kubectl commands.  This can be done by sourcing it from the .bash _profile.\n\nDetailed instructions on how to do this are available here: https://kubernetes.io/docs/tasks/tools/install-kubectl/#enabling-shell-autocompletion\n\nNote for zsh users: [1] zsh completions are only supported in versions of zsh >= 5.2",
+        "DESCRIPTION": "Output shell completion code for the specified shell (bash or zsh). The shell code must be evaluated to provide interactive completion of kubectl commands.  This can be done by sourcing it from the .bash_profile.\n\n Detailed instructions on how to do this are available here: https://kubernetes.io/docs/tasks/tools/install-kubectl/#enabling-shell-autocompletion\n\n Note for zsh users: [1] zsh completions are only supported in versions of zsh >= 5.2",
         "EXAMPLES": "  # Installing bash completion on macOS using homebrew\n  ## If running Bash 3.2 included with macOS\n  brew install bash-completion\n  ## or, if running Bash 4.1+\n  brew install bash-completion@2\n  ## If kubectl is installed via homebrew, this should start working immediately.\n  ## If you've installed via other means, you may need add the completion to your completion directory\n  kubectl completion bash > $(brew --prefix)/etc/bash_completion.d/kubectl\n\n\n  # Installing bash completion on Linux\n  ## If bash-completion is not installed on Linux, please install the 'bash-completion' package\n  ## via your distribution's package manager.\n  ## Load the kubectl completion code for bash into the current shell\n  source <(kubectl completion bash)\n  ## Write bash completion code to a file and source if from .bash_profile\n  kubectl completion bash > ~/.kube/completion.bash.inc\n  printf \"\n  # Kubectl shell completion\n  source '$HOME/.kube/completion.bash.inc'\n  \" >> $HOME/.bash_profile\n  source $HOME/.bash_profile\n\n  # Load the kubectl completion code for zsh[1] into the current shell\n  source <(kubectl completion zsh)\n  # Set the kubectl completion code for zsh[1] to autoload on startup\n  kubectl completion zsh > \"${fpath[1]}/_kubectl\""
       }
     },
@@ -1988,7 +2128,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Renames a context from the kubeconfig file.\n\nCONTEXT _NAME is the context name that you wish change.\n\nNEW _NAME is the new name you wish to set.\n\nNote: In case the context being renamed is the 'current-context', this field will also be updated.",
+            "DESCRIPTION": "Renames a context from the kubeconfig file.\n\n CONTEXT_NAME is the context name that you wish change.\n\n NEW_NAME is the new name you wish to set.\n\n Note: In case the context being renamed is the 'current-context', this field will also be updated.",
             "EXAMPLES": "  # Rename the context 'old-name' to 'new-name' in your kubeconfig file\n  kubectl config rename-context old-name new-name"
           }
         },
@@ -2022,7 +2162,8 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Sets an individual value in a kubeconfig file\n\nPROPERTY _NAME is a dot delimited name where each token represents either an attribute name or a map key.  Map keys may not contain dots.\n\nPROPERTY _VALUE is the new value you wish to set. Binary fields such as 'certificate-authority-data' expect a base64 encoded string unless the --set-raw-bytes flag is used."
+            "DESCRIPTION": "Sets an individual value in a kubeconfig file\n\n PROPERTY_NAME is a dot delimited name where each token represents either an attribute name or a map key.  Map keys may not contain dots.\n\n PROPERTY_VALUE is the new value you wish to set. Binary fields such as 'certificate-authority-data' expect a base64 encoded string unless the --set-raw-bytes flag is used.\n\n Specifying a attribute name that already exists will merge new fields on top of existing values.",
+            "EXAMPLES": "  # Set server field on the my-cluster cluster to https://1.2.3.4\n  kubectl config set clusters.my-cluster.server https://1.2.3.4\n\n  # Set certificate-authority-data field on the my-cluster cluster.\n  kubectl config set clusters.my-cluster.certificate-authority-data $(echo \"cert_data_here\" | base64 -i -)\n\n  # Set cluster field in the my-context context to my-cluster.\n  kubectl config set contexts.my-context.cluster my-cluster\n\n  # Set client-key-data field in the cluster-admin user using --set-raw-bytes option.\n  kubectl config set users.cluster-admin.client-key-data cert_data_here --set-raw-bytes=true"
           }
         },
         "set-cluster": {
@@ -2055,7 +2196,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Sets a cluster entry in kubeconfig.\n\nSpecifying a name that already exists will merge new fields on top of existing values for those fields.",
+            "DESCRIPTION": "Sets a cluster entry in kubeconfig.\n\n Specifying a name that already exists will merge new fields on top of existing values for those fields.",
             "EXAMPLES": "  # Set only the server field on the e2e cluster entry without touching other values.\n  kubectl config set-cluster e2e --server=https://1.2.3.4\n\n  # Embed certificate authority data for the e2e cluster entry\n  kubectl config set-cluster e2e --certificate-authority=~/.kube/e2e/kubernetes.ca.crt\n\n  # Disable cert checking for the dev cluster entry\n  kubectl config set-cluster e2e --insecure-skip-tls-verify=true"
           }
         },
@@ -2089,7 +2230,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Sets a context entry in kubeconfig\n\nSpecifying a name that already exists will merge new fields on top of existing values for those fields.",
+            "DESCRIPTION": "Sets a context entry in kubeconfig\n\n Specifying a name that already exists will merge new fields on top of existing values for those fields.",
             "EXAMPLES": "  # Set the user field on the gce context entry without touching other values\n  kubectl config set-context gce --user=cluster-admin"
           }
         },
@@ -2151,7 +2292,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Sets a user entry in kubeconfig\n\nSpecifying a name that already exists will merge new fields on top of existing values.\n\n  Client-certificate flags:\n  --client-certificate=certfile --client-key=keyfile\n\n  Bearer token flags:\n    --token=bearer_token\n\n  Basic auth flags:\n    --username=basic_user --password=basic_password\n\nBearer token and basic auth are mutually exclusive.",
+            "DESCRIPTION": "Sets a user entry in kubeconfig\n\n Specifying a name that already exists will merge new fields on top of existing values.\n\n  Client-certificate flags:\n  --client-certificate=certfile --client-key=keyfile\n\n  Bearer token flags:\n    --token=bearer_token\n\n  Basic auth flags:\n    --username=basic_user --password=basic_password\n\n Bearer token and basic auth are mutually exclusive.",
             "EXAMPLES": "  # Set only the \"client-key\" field on the \"cluster-admin\"\n  # entry, without touching other values:\n  kubectl config set-credentials cluster-admin --client-key=~/.kube/admin.key\n\n  # Set basic auth for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --username=admin --password=uXFGweU9l35qcif\n\n  # Embed client certificate data in the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --client-certificate=~/.kube/admin.crt --embed-certs=true\n\n  # Enable the Google Compute Platform auth provider for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --auth-provider=gcp\n\n  # Enable the OpenID Connect auth provider for the \"cluster-admin\" entry with additional args\n  kubectl config set-credentials cluster-admin --auth-provider=oidc --auth-provider-arg=client-id=foo --auth-provider-arg=client-secret=bar\n\n  # Remove the \"client-secret\" config value for the OpenID Connect auth provider for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --auth-provider=oidc --auth-provider-arg=client-secret-"
           }
         },
@@ -2170,7 +2311,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Unsets an individual value in a kubeconfig file\n\nPROPERTY _NAME is a dot delimited name where each token represents either an attribute name or a map key.  Map keys may not contain dots.",
+            "DESCRIPTION": "Unsets an individual value in a kubeconfig file\n\n PROPERTY_NAME is a dot delimited name where each token represents either an attribute name or a map key.  Map keys may not contain dots.",
             "EXAMPLES": "  # Unset the current-context.\n  kubectl config unset current-context\n\n  # Unset namespace in foo context.\n  kubectl config unset contexts.foo.namespace"
           }
         },
@@ -2307,7 +2448,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Display merged kubeconfig settings or a specified kubeconfig file.\n\nYou can use --output jsonpath={...} to extract specific values using a jsonpath expression.",
+            "DESCRIPTION": "Display merged kubeconfig settings or a specified kubeconfig file.\n\n You can use --output jsonpath={...} to extract specific values using a jsonpath expression.",
             "EXAMPLES": "  # Show merged kubeconfig settings.\n  kubectl config view\n\n  # Show merged kubeconfig settings and raw certificate data.\n  kubectl config view --raw\n\n  # Get the password for the e2e user\n  kubectl config view -o jsonpath='{.users[?(@.name == \"e2e\")].user.password}'"
           }
         }
@@ -2323,7 +2464,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Modify kubeconfig files using subcommands like \"kubectl config set current-context my-context\"\n\nThe loading order follows these rules:\n\n  1. If the --kubeconfig flag is set, then only that file is loaded. The flag may only be set once and no merging takes place.\n  2. If $KUBECONFIG environment variable is set, then it is used as a list of paths (normal path delimitting rules for your system). These paths are merged. When a value is modified, it is modified in the file that defines the stanza. When a value is created, it is created in the first file that exists. If no files in the chain exist, then it creates the last file in the list.\n  3. Otherwise, ${HOME}/.kube/config is used and no merging takes place."
+        "DESCRIPTION": "Modify kubeconfig files using subcommands like \"kubectl config set current-context my-context\"\n\n The loading order follows these rules:\n\n  1.  If the --kubeconfig flag is set, then only that file is loaded. The flag may only be set once and no merging takes place.\n  2.  If $KUBECONFIG environment variable is set, then it is used as a list of paths (normal path delimiting rules for your system). These paths are merged. When a value is modified, it is modified in the file that defines the stanza. When a value is created, it is created in the first file that exists. If no files in the chain exist, then it creates the last file in the list.\n  3.  Otherwise, ${HOME}/.kube/config is used and no merging takes place."
       }
     },
     "convert": {
@@ -2354,6 +2495,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--filename",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--kustomize": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--kustomize",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -2453,7 +2608,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Convert config files between different API versions. Both YAML and JSON formats are accepted.\n\nThe command takes filename, directory, or URL as input, and convert it into format of version specified by --output-version flag. If target version is not specified or not supported, convert to latest version.\n\nThe default output will be printed to stdout in YAML format. One can use -o option to change to output destination.",
+        "DESCRIPTION": "Convert config files between different API versions. Both YAML and JSON formats are accepted.\n\n The command takes filename, directory, or URL as input, and convert it into format of version specified by --output-version flag. If target version is not specified or not supported, convert to latest version.\n\n The default output will be printed to stdout in YAML format. One can use -o option to change to output destination.",
         "EXAMPLES": "  # Convert 'pod.yaml' to latest version and print to stdout.\n  kubectl convert -f pod.yaml\n\n  # Convert the live state of the resource specified by 'pod.yaml' to the latest version\n  # and print to stdout in JSON format.\n  kubectl convert -f pod.yaml --local -o json\n\n  # Convert all files under current directory to latest version and create them all.\n  kubectl convert -f . | kubectl create -f -"
       }
     },
@@ -3058,8 +3213,154 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Create a configmap based on a file, directory, or specified literal value.\n\nA single configmap may package one or more key/value pairs.\n\nWhen creating a configmap based on a file, the key will default to the basename of the file, and the value will default to the file content.  If the basename is an invalid key, you may specify an alternate key.\n\nWhen creating a configmap based on a directory, each file whose basename is a valid key in the directory will be packaged into the configmap.  Any directory entries except regular files are ignored (e.g. subdirectories, symlinks, devices, pipes, etc).\n\nAliases:\nconfigmap, cm",
+            "DESCRIPTION": "Create a configmap based on a file, directory, or specified literal value.\n\n A single configmap may package one or more key/value pairs.\n\n When creating a configmap based on a file, the key will default to the basename of the file, and the value will default to the file content.  If the basename is an invalid key, you may specify an alternate key.\n\n When creating a configmap based on a directory, each file whose basename is a valid key in the directory will be packaged into the configmap.  Any directory entries except regular files are ignored (e.g. subdirectories, symlinks, devices, pipes, etc).\n\nAliases:\nconfigmap, cm",
             "EXAMPLES": "  # Create a new configmap named my-config based on folder bar\n  kubectl create configmap my-config --from-file=path/to/bar\n\n  # Create a new configmap named my-config with specified keys instead of file basenames on disk\n  kubectl create configmap my-config --from-file=key1=/path/to/bar/file1.txt --from-file=key2=/path/to/bar/file2.txt\n\n  # Create a new configmap named my-config with key1=config1 and key2=config2\n  kubectl create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2\n\n  # Create a new configmap named my-config from the key=value pairs in the file\n  kubectl create configmap my-config --from-file=path/to/bar\n\n  # Create a new configmap named my-config from an env file\n  kubectl create configmap my-config --from-env-file=path/to/bar.env"
+          }
+        },
+        "cronjob": {
+          "capsule": "",
+          "commands": {},
+          "flags": {
+            "--allow-missing-template-keys": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to golang and jsonpath output formats.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--allow-missing-template-keys",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--dry-run": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, only print the object that would be sent, without sending it.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--dry-run",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--image": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Image name to run.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--image",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--output": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--output",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--restart": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "job's restart policy. supported values: OnFailure, Never",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--restart",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--save-config": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--save-config",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--schedule": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "A schedule in the Cron format the job should be run with.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--schedule",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--template": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Template string or path to template file to use when -o=go-template, -o=go-template-file. The template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--template",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--validate": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, use a schema to validate the input before sending it",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--validate",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            }
+          },
+          "groups": {},
+          "is_group": false,
+          "is_hidden": false,
+          "path": [
+            "kubectl",
+            "create",
+            "cronjob"
+          ],
+          "positionals": [],
+          "release": "GA",
+          "sections": {
+            "DESCRIPTION": "Create a cronjob with the specified name.\n\nAliases:\ncronjob, cj",
+            "EXAMPLES": "  # Create a cronjob\n  kubectl create cronjob my-job --image=busybox\n\n  # Create a cronjob with command\n  kubectl create cronjob my-job --image=busybox -- date\n\n  # Create a cronjob with schedule\n  kubectl create cronjob test-job --image=busybox --schedule=\"*/1 * * * *\""
           }
         },
         "deployment": {
@@ -4432,7 +4733,7 @@
               "positionals": [],
               "release": "GA",
               "sections": {
-                "DESCRIPTION": "Create a new secret for use with Docker registries.\n\n  Dockercfg secrets are used to authenticate against Docker registries.\n\n  When using the Docker command line to push images, you can authenticate to a given registry by running:\n      '$ docker login DOCKER_REGISTRY_SERVER --username=DOCKER_USER --password=DOCKER_PASSWORD --email=DOCKER_EMAIL'.\n\nThat produces a ~/.dockercfg file that is used by subsequent 'docker push' and 'docker pull' commands to authenticate to the registry. The email address is optional.\n\n  When creating applications, you may have a Docker registry that requires authentication.  In order for the\n  nodes to pull images on your behalf, they have to have the credentials.  You can provide this information\n  by creating a dockercfg secret and attaching it to your service account.",
+                "DESCRIPTION": "Create a new secret for use with Docker registries.\n\n  Dockercfg secrets are used to authenticate against Docker registries.\n\n  When using the Docker command line to push images, you can authenticate to a given registry by running:\n      '$ docker login DOCKER_REGISTRY_SERVER --username=DOCKER_USER --password=DOCKER_PASSWORD --email=DOCKER_EMAIL'.\n\n That produces a ~/.dockercfg file that is used by subsequent 'docker push' and 'docker pull' commands to authenticate to the registry. The email address is optional.\n\n  When creating applications, you may have a Docker registry that requires authentication.  In order for the\n  nodes to pull images on your behalf, they have to have the credentials.  You can provide this information\n  by creating a dockercfg secret and attaching it to your service account.",
                 "EXAMPLES": "  # If you don't already have a .dockercfg file, you can create a dockercfg secret directly by using:\n  kubectl create secret docker-registry my-secret --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL"
               }
             },
@@ -4621,7 +4922,7 @@
               "positionals": [],
               "release": "GA",
               "sections": {
-                "DESCRIPTION": "Create a secret based on a file, directory, or specified literal value.\n\nA single secret may package one or more key/value pairs.\n\nWhen creating a secret based on a file, the key will default to the basename of the file, and the value will default to the file content. If the basename is an invalid key or you wish to chose your own, you may specify an alternate key.\n\nWhen creating a secret based on a directory, each file whose basename is a valid key in the directory will be packaged into the secret. Any directory entries except regular files are ignored (e.g. subdirectories, symlinks, devices, pipes, etc).",
+                "DESCRIPTION": "Create a secret based on a file, directory, or specified literal value.\n\n A single secret may package one or more key/value pairs.\n\n When creating a secret based on a file, the key will default to the basename of the file, and the value will default to the file content. If the basename is an invalid key or you wish to chose your own, you may specify an alternate key.\n\n When creating a secret based on a directory, each file whose basename is a valid key in the directory will be packaged into the secret. Any directory entries except regular files are ignored (e.g. subdirectories, symlinks, devices, pipes, etc).",
                 "EXAMPLES": "  # Create a new secret named my-secret with keys for each file in folder bar\n  kubectl create secret generic my-secret --from-file=path/to/bar\n\n  # Create a new secret named my-secret with specified keys instead of names on disk\n  kubectl create secret generic my-secret --from-file=ssh-privatekey=~/.ssh/id_rsa --from-file=ssh-publickey=~/.ssh/id_rsa.pub\n\n  # Create a new secret named my-secret with key1=supersecret and key2=topsecret\n  kubectl create secret generic my-secret --from-literal=key1=supersecret --from-literal=key2=topsecret\n\n  # Create a new secret named my-secret using a combination of a file and a literal\n  kubectl create secret generic my-secret --from-file=ssh-privatekey=~/.ssh/id_rsa --from-literal=passphrase=topsecret\n\n  # Create a new secret named my-secret from an env file\n  kubectl create secret generic my-secret --from-env-file=path/to/bar.env"
               }
             },
@@ -4782,7 +5083,7 @@
               "positionals": [],
               "release": "GA",
               "sections": {
-                "DESCRIPTION": "Create a TLS secret from the given public/private key pair.\n\nThe public/private key pair must exist before hand. The public key certificate must be .PEM encoded and match the given private key.",
+                "DESCRIPTION": "Create a TLS secret from the given public/private key pair.\n\n The public/private key pair must exist before hand. The public key certificate must be .PEM encoded and match the given private key.",
                 "EXAMPLES": "  # Create a new TLS secret named tls-secret with the given key pair:\n  kubectl create secret tls tls-secret --cert=path/to/tls.cert --key=path/to/tls.key"
               }
             }
@@ -5095,7 +5396,7 @@
               "positionals": [],
               "release": "GA",
               "sections": {
-                "DESCRIPTION": "Create an ExternalName service with the specified name.\n\nExternalName service references to an external DNS address instead of only pods, which will allow application authors to reference services that exist off platform, on other clusters, or locally.",
+                "DESCRIPTION": "Create an ExternalName service with the specified name.\n\n ExternalName service references to an external DNS address instead of only pods, which will allow application authors to reference services that exist off platform, on other clusters, or locally.",
                 "EXAMPLES": "  # Create a new ExternalName service named my-ns\n  kubectl create service externalname my-ns --external-name bar.com"
               }
             },
@@ -5571,6 +5872,20 @@
           "type": "string",
           "value": "VALUE"
         },
+        "--kustomize": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--kustomize",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
         "--output": {
           "attr": {},
           "category": "",
@@ -5708,7 +6023,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Create a resource from a file or from stdin.\n\nJSON and YAML formats are accepted.",
+        "DESCRIPTION": "Create a resource from a file or from stdin.\n\n JSON and YAML formats are accepted.",
         "EXAMPLES": "  # Create a pod using the data in pod.json.\n  kubectl create -f ./pod.json\n\n  # Create a pod based on the JSON passed into stdin.\n  cat pod.json | kubectl create -f -\n\n  # Edit the data in docker-registry.yaml in JSON then create the resource using the edited data.\n  kubectl create -f docker-registry.yaml --edit -o json"
       }
     },
@@ -5726,6 +6041,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--all",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
+        "--all-namespaces": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If present, list the requested object(s) across all namespaces. Namespace in current context is ignored even if specified with --namespace.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--all-namespaces",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -5814,19 +6143,19 @@
           "type": "bool",
           "value": ""
         },
-        "--include-uninitialized": {
+        "--kustomize": {
           "attr": {},
           "category": "",
           "default": "",
-          "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+          "description": "Process a kustomization directory. This flag can't be used together with -f or -R.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
           "is_required": false,
-          "name": "--include-uninitialized",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
+          "name": "--kustomize",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
         },
         "--now": {
           "attr": {},
@@ -5923,8 +6252,8 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Delete resources by filenames, stdin, resources and names, or by resources and label selector.\n\nJSON and YAML formats are accepted. Only one type of the arguments may be specified: filenames, resources and names, or resources and label selector.\n\nSome resources, such as pods, support graceful deletion. These resources define a default period before they are forcibly terminated (the grace period) but you may override that value with the --grace-period flag, or pass --now to set a grace-period of 1. Because these resources often represent entities in the cluster, deletion may not be acknowledged immediately. If the node hosting a pod is down or cannot reach the API server, termination may take significantly longer than the grace period. To force delete a resource, you must pass a grace period of 0 and specify the --force flag.\n\nIMPORTANT: Force deleting pods does not wait for confirmation that the pod's processes have been terminated, which can leave those processes running until the node detects the deletion and completes graceful deletion. If your processes use shared storage or talk to a remote API and depend on the name of the pod to identify themselves, force deleting those pods may result in multiple processes running on different machines using the same identification which may lead to data corruption or inconsistency. Only force delete pods when you are sure the pod is terminated, or if your application can tolerate multiple copies of the same pod running at once. Also, if you force delete pods the scheduler may place new pods on those nodes before the node has released those resources and causing those pods to be evicted immediately.\n\nNote that the delete command does NOT do resource version checks, so if someone submits an update to a resource right when you submit a delete, their update will be lost along with the rest of the resource.",
-        "EXAMPLES": "  # Delete a pod using the type and name specified in pod.json.\n  kubectl delete -f ./pod.json\n\n  # Delete a pod based on the type and name in the JSON passed into stdin.\n  cat pod.json | kubectl delete -f -\n\n  # Delete pods and services with same names \"baz\" and \"foo\"\n  kubectl delete pod,service baz foo\n\n  # Delete pods and services with label name=myLabel.\n  kubectl delete pods,services -l name=myLabel\n\n  # Delete a pod with minimal delay\n  kubectl delete pod foo --now\n\n  # Force delete a pod on a dead node\n  kubectl delete pod foo --grace-period=0 --force\n\n  # Delete all pods\n  kubectl delete pods --all"
+        "DESCRIPTION": "Delete resources by filenames, stdin, resources and names, or by resources and label selector.\n\n JSON and YAML formats are accepted. Only one type of the arguments may be specified: filenames, resources and names, or resources and label selector.\n\n Some resources, such as pods, support graceful deletion. These resources define a default period before they are forcibly terminated (the grace period) but you may override that value with the --grace-period flag, or pass --now to set a grace-period of 1. Because these resources often represent entities in the cluster, deletion may not be acknowledged immediately. If the node hosting a pod is down or cannot reach the API server, termination may take significantly longer than the grace period. To force delete a resource, you must pass a grace period of 0 and specify the --force flag.\n\n IMPORTANT: Force deleting pods does not wait for confirmation that the pod's processes have been terminated, which can leave those processes running until the node detects the deletion and completes graceful deletion. If your processes use shared storage or talk to a remote API and depend on the name of the pod to identify themselves, force deleting those pods may result in multiple processes running on different machines using the same identification which may lead to data corruption or inconsistency. Only force delete pods when you are sure the pod is terminated, or if your application can tolerate multiple copies of the same pod running at once. Also, if you force delete pods the scheduler may place new pods on those nodes before the node has released those resources and causing those pods to be evicted immediately.\n\n Note that the delete command does NOT do resource version checks, so if someone submits an update to a resource right when you submit a delete, their update will be lost along with the rest of the resource.",
+        "EXAMPLES": "  # Delete a pod using the type and name specified in pod.json.\n  kubectl delete -f ./pod.json\n\n  # Delete resources from a directory containing kustomization.yaml - e.g. dir/kustomization.yaml.\n  kubectl delete -k dir\n\n  # Delete a pod based on the type and name in the JSON passed into stdin.\n  cat pod.json | kubectl delete -f -\n\n  # Delete pods and services with same names \"baz\" and \"foo\"\n  kubectl delete pod,service baz foo\n\n  # Delete pods and services with label name=myLabel.\n  kubectl delete pods,services -l name=myLabel\n\n  # Delete a pod with minimal delay\n  kubectl delete pod foo --now\n\n  # Force delete a pod on a dead node\n  kubectl delete pod foo --grace-period=0 --force\n\n  # Delete all pods\n  kubectl delete pods --all"
       }
     },
     "describe": {
@@ -5959,19 +6288,19 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-uninitialized": {
+        "--kustomize": {
           "attr": {},
           "category": "",
           "default": "",
-          "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
           "is_required": false,
-          "name": "--include-uninitialized",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
+          "name": "--kustomize",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
         },
         "--recursive": {
           "attr": {},
@@ -6026,7 +6355,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Show details of a specific resource or group of resources\n\nPrint a detailed description of the selected resources, including related resources such as events or controllers. You may select a single object by name, all objects of that type, provide a name prefix, or label selector. For example:\n\n  $ kubectl describe TYPE NAME_PREFIX\n\nwill first check for an exact match on TYPE and NAME PREFIX. If no such resource exists, it will output details for every resource that has a name prefixed with NAME PREFIX.\n\nUse \"kubectl api-resources\" for a complete list of supported resources.",
+        "DESCRIPTION": "Show details of a specific resource or group of resources\n\n Print a detailed description of the selected resources, including related resources such as events or controllers. You may select a single object by name, all objects of that type, provide a name prefix, or label selector. For example:\n\n  $ kubectl describe TYPE NAME_PREFIX\n\n will first check for an exact match on TYPE and NAME_PREFIX. If no such resource exists, it will output details for every resource that has a name prefixed with NAME_PREFIX.\n\nUse \"kubectl api-resources\" for a complete list of supported resources.",
         "EXAMPLES": "  # Describe a node\n  kubectl describe nodes kubernetes-node-emt8.c.myproject.internal\n\n  # Describe a pod\n  kubectl describe pods/nginx\n\n  # Describe a pod identified by type and name in \"pod.json\"\n  kubectl describe -f pod.json\n\n  # Describe all pods\n  kubectl describe pods\n\n  # Describe pods by label name=myLabel\n  kubectl describe po -l name=myLabel\n\n  # Describe all pods managed by the 'frontend' replication controller (rc-created pods\n  # get the name of the rc as a prefix in the pod the name).\n  kubectl describe pods frontend"
       }
     },
@@ -6034,6 +6363,48 @@
       "capsule": "",
       "commands": {},
       "flags": {
+        "--experimental-field-manager": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Name of the manager used to track field ownership. This is an alpha feature and flag.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--experimental-field-manager",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--experimental-force-conflicts": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, server-side apply will force the changes against conflicts. This is an alpha feature and flag.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--experimental-force-conflicts",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
+        "--experimental-server-side": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, apply runs in the server instead of the client. This is an alpha feature and flag.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--experimental-server-side",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
         "--filename": {
           "attr": {},
           "category": "",
@@ -6044,6 +6415,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--filename",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--kustomize": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--kustomize",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -6073,7 +6458,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Diff configurations specified by filename or stdin between the current online configuration, and the configuration as it would be if applied.\n\nOutput is always YAML.\n\nKUBECTL EXTERNAL DIFF environment variable can be used to select your own diff command. By default, the \"diff\" command available in your path will be run with \"-u\" (unicode) and \"-N\" (treat new files as empty) options.",
+        "DESCRIPTION": "Diff configurations specified by filename or stdin between the current online configuration, and the configuration as it would be if applied.\n\n Output is always YAML.\n\n KUBECTL_EXTERNAL_DIFF environment variable can be used to select your own diff command. By default, the \"diff\" command available in your path will be run with \"-u\" (unicode) and \"-N\" (treat new files as empty) options.",
         "EXAMPLES": "  # Diff resources included in pod.json.\n  kubectl diff -f pod.json\n\n  # Diff file read from stdin\n  cat service.yaml | kubectl diff -f -"
       }
     },
@@ -6204,7 +6589,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Drain node in preparation for maintenance.\n\nThe given node will be marked unschedulable to prevent new pods from arriving. 'drain' evicts the pods if the APIServer supports  http://kubernetes.io/docs/admin/disruptions/. Otherwise, it will use normal DELETE to delete the pods. The 'drain' evicts or deletes all pods except mirror pods (which cannot be deleted through the API server).  If there are DaemonSet-managed pods, drain will not proceed without --ignore-daemonsets, and regardless it will not delete any DaemonSet-managed pods, because those pods would be immediately replaced by the DaemonSet controller, which ignores unschedulable markings.  If there are any pods that are neither mirror pods nor managed by ReplicationController, ReplicaSet, DaemonSet, StatefulSet or Job, then drain will not delete any pods unless you use --force.  --force will also allow deletion to proceed if the managing resource of one or more pods is missing.\n\n'drain' waits for graceful termination. You should not operate on the machine until the command completes.\n\nWhen you are ready to put the node back into service, use kubectl uncordon, which will make the node schedulable again.\n\n! http://kubernetes.io/images/docs/kubectl_drain.svg",
+        "DESCRIPTION": "Drain node in preparation for maintenance.\n\n The given node will be marked unschedulable to prevent new pods from arriving. 'drain' evicts the pods if the APIServer supportshttp://kubernetes.io/docs/admin/disruptions/ . Otherwise, it will use normal DELETE to delete the pods. The 'drain' evicts or deletes all pods except mirror pods (which cannot be deleted through the API server).  If there are DaemonSet-managed pods, drain will not proceed without --ignore-daemonsets, and regardless it will not delete any DaemonSet-managed pods, because those pods would be immediately replaced by the DaemonSet controller, which ignores unschedulable markings.  If there are any pods that are neither mirror pods nor managed by ReplicationController, ReplicaSet, DaemonSet, StatefulSet or Job, then drain will not delete any pods unless you use --force.  --force will also allow deletion to proceed if the managing resource of one or more pods is missing.\n\n 'drain' waits for graceful termination. You should not operate on the machine until the command completes.\n\n When you are ready to put the node back into service, use kubectl uncordon, which will make the node schedulable again.\n\n http://kubernetes.io/images/docs/kubectl_drain.svg",
         "EXAMPLES": "  # Drain node \"foo\", even if there are pods not managed by a ReplicationController, ReplicaSet, Job, DaemonSet or StatefulSet on it.\n  $ kubectl drain foo --force\n\n  # As above, but abort if there are pods not managed by a ReplicationController, ReplicaSet, Job, DaemonSet or StatefulSet, and use a grace period of 15 minutes.\n  $ kubectl drain foo --grace-period=900"
       }
     },
@@ -6240,19 +6625,19 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-uninitialized": {
+        "--kustomize": {
           "attr": {},
           "category": "",
           "default": "",
-          "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
           "is_required": false,
-          "name": "--include-uninitialized",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
+          "name": "--kustomize",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
         },
         "--output": {
           "attr": {},
@@ -6377,7 +6762,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Edit a resource from the default editor.\n\nThe edit command allows you to directly edit any API resource you can retrieve via the command line tools. It will open the editor defined by your KUBE _EDITOR, or EDITOR environment variables, or fall back to 'vi' for Linux or 'notepad' for Windows. You can edit multiple objects, although changes are applied one at a time. The command accepts filenames as well as command line arguments, although the files you point to must be previously saved versions of resources.\n\nEditing is done with the API version used to fetch the resource. To edit using a specific API version, fully-qualify the resource, version, and group.\n\nThe default format is YAML. To edit in JSON, specify \"-o json\".\n\nThe flag --windows-line-endings can be used to force Windows line endings, otherwise the default for your operating system will be used.\n\nIn the event an error occurs while updating, a temporary file will be created on disk that contains your unapplied changes. The most common error when updating a resource is another editor changing the resource on the server. When this occurs, you will have to apply your changes to the newer version of the resource, or update your temporary saved copy to include the latest resource version.",
+        "DESCRIPTION": "Edit a resource from the default editor.\n\n The edit command allows you to directly edit any API resource you can retrieve via the command line tools. It will open the editor defined by your KUBE_EDITOR, or EDITOR environment variables, or fall back to 'vi' for Linux or 'notepad' for Windows. You can edit multiple objects, although changes are applied one at a time. The command accepts filenames as well as command line arguments, although the files you point to must be previously saved versions of resources.\n\n Editing is done with the API version used to fetch the resource. To edit using a specific API version, fully-qualify the resource, version, and group.\n\n The default format is YAML. To edit in JSON, specify \"-o json\".\n\n The flag --windows-line-endings can be used to force Windows line endings, otherwise the default for your operating system will be used.\n\n In the event an error occurs while updating, a temporary file will be created on disk that contains your unapplied changes. The most common error when updating a resource is another editor changing the resource on the server. When this occurs, you will have to apply your changes to the newer version of the resource, or update your temporary saved copy to include the latest resource version.",
         "EXAMPLES": "  # Edit the service named 'docker-registry':\n  kubectl edit svc/docker-registry\n\n  # Use an alternative editor\n  KUBE_EDITOR=\"nano\" kubectl edit svc/docker-registry\n\n  # Edit the job 'myjob' in JSON using the v1 API format:\n  kubectl edit job.v1.batch/myjob -o json\n\n  # Edit the deployment 'mydeployment' in YAML and save the modified config in its annotation:\n  kubectl edit deployment/mydeployment -o yaml --save-config"
       }
     },
@@ -6485,7 +6870,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "List the fields for supported resources\n\nThis command describes the fields associated with each supported API resource. Fields are identified via a simple JSONPath identifier:\n\n  <type>.<fieldName>[.<fieldName>]\n\nAdd the --recursive flag to display all of the fields at once without descriptions. Information about each field is retrieved from the server in OpenAPI format.\n\nUse \"kubectl api-resources\" for a complete list of supported resources.",
+        "DESCRIPTION": "List the fields for supported resources\n\n This command describes the fields associated with each supported API resource. Fields are identified via a simple JSONPath identifier:\n\n  <type>.<fieldName>[.<fieldName>]\n\n Add the --recursive flag to display all of the fields at once without descriptions. Information about each field is retrieved from the server in OpenAPI format.\n\nUse \"kubectl api-resources\" for a complete list of supported resources.",
         "EXAMPLES": "  # Get the documentation of the resource and its fields\n  kubectl explain pods\n\n  # Get the documentation of a specific field of a resource\n  kubectl explain pods.spec.containers"
       }
     },
@@ -6573,6 +6958,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--generator",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--kustomize": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--kustomize",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -6798,8 +7197,8 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Expose a resource as a new Kubernetes service.\n\nLooks up a deployment, service, replica set, replication controller or pod by name and uses the selector for that resource as the selector for a new service on the specified port. A deployment or replica set will be exposed as a service only if its selector is convertible to a selector that service supports, i.e. when the selector contains only the matchLabels component. Note that if no port is specified via --port and the exposed resource has multiple ports, all will be re-used by the new service. Also if no labels are specified, the new service will re-use the labels from the resource it exposes.\n\nPossible resources include (case insensitive):\n\npod (po), service (svc), replicationcontroller (rc), deployment (deploy), replicaset (rs)",
-        "EXAMPLES": "  # Create a service for a replicated nginx, which serves on port 80 and connects to the containers on port 8000.\n  kubectl expose rc nginx --port=80 --target-port=8000\n\n  # Create a service for a replication controller identified by type and name specified in \"nginx-controller.yaml\", which serves on port 80 and connects to the containers on port 8000.\n  kubectl expose -f nginx-controller.yaml --port=80 --target-port=8000\n\n  # Create a service for a pod valid-pod, which serves on port 444 with the name \"frontend\"\n  kubectl expose pod valid-pod --port=444 --name=frontend\n\n  # Create a second service based on the above service, exposing the container port 8443 as port 443 with the name \"nginx-https\"\n  kubectl expose service nginx --port=443 --target-port=8443 --name=nginx-https\n\n  # Create a service for a replicated streaming application on port 4100 balancing UDP traffic and named 'video-stream'.\n  kubectl expose rc streamer --port=4100 --protocol=udp --name=video-stream\n\n  # Create a service for a replicated nginx using replica set, which serves on port 80 and connects to the containers on port 8000.\n  kubectl expose rs nginx --port=80 --target-port=8000\n\n  # Create a service for an nginx deployment, which serves on port 80 and connects to the containers on port 8000.\n  kubectl expose deployment nginx --port=80 --target-port=8000"
+        "DESCRIPTION": "Expose a resource as a new Kubernetes service.\n\n Looks up a deployment, service, replica set, replication controller or pod by name and uses the selector for that resource as the selector for a new service on the specified port. A deployment or replica set will be exposed as a service only if its selector is convertible to a selector that service supports, i.e. when the selector contains only the matchLabels component. Note that if no port is specified via --port and the exposed resource has multiple ports, all will be re-used by the new service. Also if no labels are specified, the new service will re-use the labels from the resource it exposes.\n\n Possible resources include (case insensitive):\n\n pod (po), service (svc), replicationcontroller (rc), deployment (deploy), replicaset (rs)",
+        "EXAMPLES": "  # Create a service for a replicated nginx, which serves on port 80 and connects to the containers on port 8000.\n  kubectl expose rc nginx --port=80 --target-port=8000\n\n  # Create a service for a replication controller identified by type and name specified in \"nginx-controller.yaml\", which serves on port 80 and connects to the containers on port 8000.\n  kubectl expose -f nginx-controller.yaml --port=80 --target-port=8000\n\n  # Create a service for a pod valid-pod, which serves on port 444 with the name \"frontend\"\n  kubectl expose pod valid-pod --port=444 --name=frontend\n\n  # Create a second service based on the above service, exposing the container port 8443 as port 443 with the name \"nginx-https\"\n  kubectl expose service nginx --port=443 --target-port=8443 --name=nginx-https\n\n  # Create a service for a replicated streaming application on port 4100 balancing UDP traffic and named 'video-stream'.\n  kubectl expose rc streamer --port=4100 --protocol=UDP --name=video-stream\n\n  # Create a service for a replicated nginx using replica set, which serves on port 80 and connects to the containers on port 8000.\n  kubectl expose rs nginx --port=80 --target-port=8000\n\n  # Create a service for an nginx deployment, which serves on port 80 and connects to the containers on port 8000.\n  kubectl expose deployment nginx --port=80 --target-port=8000"
       }
     },
     "get": {
@@ -6848,20 +7247,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--export": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, use 'export' for the resources. Exported resources are stripped of cluster-specific information.",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--export",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--field-selector": {
           "attr": {},
           "category": "",
@@ -6904,19 +7289,19 @@
           "type": "bool",
           "value": ""
         },
-        "--include-uninitialized": {
+        "--kustomize": {
           "attr": {},
           "category": "",
           "default": "",
-          "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
           "is_required": false,
-          "name": "--include-uninitialized",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
+          "name": "--kustomize",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
         },
         "--label-columns": {
           "attr": {},
@@ -7111,8 +7496,26 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Display one or many resources\n\nPrints a table of the most important information about the specified resources. You can filter the list using a label selector and the --selector flag. If the desired resource type is namespaced you will only see results in your current namespace unless you pass --all-namespaces.\n\nUninitialized objects are not shown unless --include-uninitialized is passed.\n\nBy specifying the output as 'template' and providing a Go template as the value of the --template flag, you can filter the attributes of the fetched resources.\n\nUse \"kubectl api-resources\" for a complete list of supported resources.",
-        "EXAMPLES": "  # List all pods in ps output format.\n  kubectl get pods\n\n  # List all pods in ps output format with more information (such as node name).\n  kubectl get pods -o wide\n\n  # List a single replication controller with specified NAME in ps output format.\n  kubectl get replicationcontroller web\n\n  # List deployments in JSON output format, in the \"v1\" version of the \"apps\" API group:\n  kubectl get deployments.v1.apps -o json\n\n  # List a single pod in JSON output format.\n  kubectl get -o json pod web-pod-13je7\n\n  # List a pod identified by type and name specified in \"pod.yaml\" in JSON output format.\n  kubectl get -f pod.yaml -o json\n\n  # Return only the phase value of the specified pod.\n  kubectl get -o template pod/web-pod-13je7 --template={{.status.phase}}\n\n  # List all replication controllers and services together in ps output format.\n  kubectl get rc,services\n\n  # List one or more resources by their type and names.\n  kubectl get rc/web service/frontend pods/web-pod-13je7"
+        "DESCRIPTION": "Display one or many resources\n\n Prints a table of the most important information about the specified resources. You can filter the list using a label selector and the --selector flag. If the desired resource type is namespaced you will only see results in your current namespace unless you pass --all-namespaces.\n\n Uninitialized objects are not shown unless --include-uninitialized is passed.\n\n By specifying the output as 'template' and providing a Go template as the value of the --template flag, you can filter the attributes of the fetched resources.\n\nUse \"kubectl api-resources\" for a complete list of supported resources.",
+        "EXAMPLES": "  # List all pods in ps output format.\n  kubectl get pods\n\n  # List all pods in ps output format with more information (such as node name).\n  kubectl get pods -o wide\n\n  # List a single replication controller with specified NAME in ps output format.\n  kubectl get replicationcontroller web\n\n  # List deployments in JSON output format, in the \"v1\" version of the \"apps\" API group:\n  kubectl get deployments.v1.apps -o json\n\n  # List a single pod in JSON output format.\n  kubectl get -o json pod web-pod-13je7\n\n  # List a pod identified by type and name specified in \"pod.yaml\" in JSON output format.\n  kubectl get -f pod.yaml -o json\n\n  # List resources from a directory with kustomization.yaml - e.g. dir/kustomization.yaml.\n  kubectl get -k dir/\n\n  # Return only the phase value of the specified pod.\n  kubectl get -o template pod/web-pod-13je7 --template={{.status.phase}}\n\n  # List resource information in custom columns.\n  kubectl get pod test-pod -o custom-columns=CONTAINER:.spec.containers[0].name,IMAGE:.spec.containers[0].image\n\n  # List all replication controllers and services together in ps output format.\n  kubectl get rc,services\n\n  # List one or more resources by their type and names.\n  kubectl get rc/web service/frontend pods/web-pod-13je7"
+      }
+    },
+    "kustomize": {
+      "capsule": "",
+      "commands": {},
+      "flags": {},
+      "groups": {},
+      "is_group": false,
+      "is_hidden": false,
+      "path": [
+        "kubectl",
+        "kustomize"
+      ],
+      "positionals": [],
+      "release": "GA",
+      "sections": {
+        "DESCRIPTION": "Print a set of API resources generated from instructions in a kustomization.yaml file.\n\n The argument must be the path to the directory containing the file, or a git repository URL with a path suffix specifying same with respect to the repository root.\n\n kubectl kustomize somedir",
+        "EXAMPLES": "  # Use the current working directory\n  kubectl kustomize .\n\n  # Use some shared configuration directory\n  kubectl kustomize /home/configuration/production\n\n  # Use a URL\n  kubectl kustomize github.com/kubernetes-sigs/kustomize.git/examples/helloWorld?ref=v1.0.6"
       }
     },
     "label": {
@@ -7189,19 +7592,19 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--include-uninitialized": {
+        "--kustomize": {
           "attr": {},
           "category": "",
           "default": "",
-          "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
           "is_required": false,
-          "name": "--include-uninitialized",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
+          "name": "--kustomize",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
         },
         "--list": {
           "attr": {},
@@ -7340,7 +7743,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Update the labels on a resource.\n\n  * A label key and value must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  63 characters each.\n  * Optionally, the key can begin with a DNS subdomain prefix and a single '/', like example.com/my-app\n  * If --overwrite is true, then existing labels can be overwritten, otherwise attempting to overwrite a label will result in an error.\n  * If --resource-version is specified, then updates will use this resource version, otherwise the existing resource-version will be used.",
+        "DESCRIPTION": "Update the labels on a resource.\n\n  *  A label key and value must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  63 characters each.\n  *  Optionally, the key can begin with a DNS subdomain prefix and a single '/', like example.com/my-app\n  *  If --overwrite is true, then existing labels can be overwritten, otherwise attempting to overwrite a label will result in an error.\n  *  If --resource-version is specified, then updates will use this resource version, otherwise the existing resource-version will be used.",
         "EXAMPLES": "  # Update pod 'foo' with the label 'unhealthy' and the value 'true'.\n  kubectl label pods foo unhealthy=true\n\n  # Update pod 'foo' with the label 'status' and the value 'unhealthy', overwriting any existing value.\n  kubectl label --overwrite pods foo status=unhealthy\n\n  # Update all pods in the namespace\n  kubectl label pods --all status=unhealthy\n\n  # Update a pod identified by the type and name in \"pod.json\"\n  kubectl label -f pod.json status=unhealthy\n\n  # Update pod 'foo' only if the resource is unchanged from version 1.\n  kubectl label pods foo status=unhealthy --resource-version=1\n\n  # Update pod 'foo' by removing a label named 'bar' if it exists.\n  # Does not require the --overwrite flag.\n  kubectl label pods foo bar-"
       }
     },
@@ -7400,6 +7803,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--limit-bytes",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--max-log-requests": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Specify maximum number of concurrent logs to follow when using by a selector. Defaults to 5.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--max-log-requests",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -7514,7 +7931,7 @@
       "release": "GA",
       "sections": {
         "DESCRIPTION": "Print the logs for a container in a pod or specified resource. If the pod has only one container, the container name is optional.\n\nAliases:\nlogs, log",
-        "EXAMPLES": "  # Return snapshot logs from pod nginx with only one container\n  kubectl logs nginx\n\n  # Return snapshot logs from pod nginx with multi containers\n  kubectl logs nginx --all-containers=true\n\n  # Return snapshot logs from all containers in pods defined by label app=nginx\n  kubectl logs -lapp=nginx --all-containers=true\n\n  # Return snapshot of previous terminated ruby container logs from pod web-1\n  kubectl logs -p -c ruby web-1\n\n  # Begin streaming the logs of the ruby container in pod web-1\n  kubectl logs -f -c ruby web-1\n\n  # Display only the most recent 20 lines of output in pod nginx\n  kubectl logs --tail=20 nginx\n\n  # Show all logs from pod nginx written in the last hour\n  kubectl logs --since=1h nginx\n\n  # Return snapshot logs from first container of a job named hello\n  kubectl logs job/hello\n\n  # Return snapshot logs from container nginx-1 of a deployment named nginx\n  kubectl logs deployment/nginx -c nginx-1"
+        "EXAMPLES": "  # Return snapshot logs from pod nginx with only one container\n  kubectl logs nginx\n\n  # Return snapshot logs from pod nginx with multi containers\n  kubectl logs nginx --all-containers=true\n\n  # Return snapshot logs from all containers in pods defined by label app=nginx\n  kubectl logs -lapp=nginx --all-containers=true\n\n  # Return snapshot of previous terminated ruby container logs from pod web-1\n  kubectl logs -p -c ruby web-1\n\n  # Begin streaming the logs of the ruby container in pod web-1\n  kubectl logs -f -c ruby web-1\n\n  # Begin streaming the logs from all containers in pods defined by label app=nginx\n  kubectl logs -f -lapp=nginx --all-containers=true\n\n  # Display only the most recent 20 lines of output in pod nginx\n  kubectl logs --tail=20 nginx\n\n  # Show all logs from pod nginx written in the last hour\n  kubectl logs --since=1h nginx\n\n  # Return snapshot logs from first container of a job named hello\n  kubectl logs job/hello\n\n  # Return snapshot logs from container nginx-1 of a deployment named nginx\n  kubectl logs deployment/nginx -c nginx-1"
       }
     },
     "patch": {
@@ -7559,6 +7976,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--filename",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--kustomize": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--kustomize",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -7672,7 +8103,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Update field(s) of a resource using strategic merge patch, a JSON merge patch, or a JSON patch.\n\nJSON and YAML formats are accepted.\n\nPlease refer to the models in https://htmlpreview.github.io/?https://github.com/kubernetes/kubernetes/blob/HEAD/docs/api-reference/v1/definitions.html to find if a field is mutable.",
+        "DESCRIPTION": "Update field(s) of a resource using strategic merge patch, a JSON merge patch, or a JSON patch.\n\n JSON and YAML formats are accepted.",
         "EXAMPLES": "  # Partially update a node using a strategic merge patch. Specify the patch as JSON.\n  kubectl patch node k8s-node-1 -p '{\"spec\":{\"unschedulable\":true}}'\n\n  # Partially update a node using a strategic merge patch. Specify the patch as YAML.\n  kubectl patch node k8s-node-1 -p $'spec:\\n unschedulable: true'\n\n  # Partially update a node identified by the type and name specified in \"node.json\" using strategic merge patch.\n  kubectl patch -f node.json -p '{\"spec\":{\"unschedulable\":true}}'\n\n  # Update a container's image; spec.containers[*].name is required because it's a merge key.\n  kubectl patch pod valid-pod -p '{\"spec\":{\"containers\":[{\"name\":\"kubernetes-serve-hostname\",\"image\":\"new image\"}]}}'\n\n  # Update a container's image using a json patch with positional arrays.\n  kubectl patch pod valid-pod --type='json' -p='[{\"op\": \"replace\", \"path\": \"/spec/containers/0/image\", \"value\":\"new image\"}]'"
       }
     },
@@ -7709,7 +8140,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "List all available plugin files on a user's PATH.\n\nAvailable plugin files are those that are: - executable - anywhere on the user's PATH - begin with \"kubectl-\""
+            "DESCRIPTION": "List all available plugin files on a user's PATH.\n\n Available plugin files are those that are: - executable - anywhere on the user's PATH - begin with \"kubectl-\""
           }
         }
       },
@@ -7724,7 +8155,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Provides utilities for interacting with plugins.\n\nPlugins provide extended functionality that is not part of the major command-line distribution. Please refer to the documentation and examples for more information about how write your own plugins."
+        "DESCRIPTION": "Provides utilities for interacting with plugins.\n\n Plugins provide extended functionality that is not part of the major command-line distribution. Please refer to the documentation and examples for more information about how write your own plugins."
       }
     },
     "port-forward": {
@@ -7735,7 +8166,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Addresses to listen on (comma separated)",
+          "description": "Addresses to listen on (comma separated). Only accepts IP addresses or localhost as a value. When localhost is supplied, kubectl will try to bind on both 127.0.0.1 and ::1 and will fail if neither of these addresses are available to bind.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -7770,7 +8201,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Forward one or more local ports to a pod.\n\nUse resource type/name such as deployment/mydeployment to select a pod. Resource type defaults to 'pod' if omitted.\n\nIf there are multiple pods matching the criteria, a pod will be selected automatically. The forwarding session ends when the selected pod terminates, and rerun of the command is needed to resume forwarding.",
+        "DESCRIPTION": "Forward one or more local ports to a pod. This command requires the node to have 'socat' installed.\n\n Use resource type/name such as deployment/mydeployment to select a pod. Resource type defaults to 'pod' if omitted.\n\n If there are multiple pods matching the criteria, a pod will be selected automatically. The forwarding session ends when the selected pod terminates, and rerun of the command is needed to resume forwarding.",
         "EXAMPLES": "  # Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in the pod\n  kubectl port-forward pod/mypod 5000 6000\n\n  # Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in a pod selected by the deployment\n  kubectl port-forward deployment/mydeployment 5000 6000\n\n  # Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in a pod selected by the service\n  kubectl port-forward service/myservice 5000 6000\n\n  # Listen on port 8888 locally, forwarding to 5000 in the pod\n  kubectl port-forward pod/mypod 8888:5000\n\n  # Listen on port 8888 on all addresses, forwarding to 5000 in the pod\n  kubectl port-forward --address 0.0.0.0 pod/mypod 8888:5000\n\n  # Listen on port 8888 on localhost and selected IP, forwarding to 5000 in the pod\n  kubectl port-forward --address localhost,10.19.21.23 pod/mypod 8888:5000\n\n  # Listen on a random port locally, forwarding to 5000 in the pod\n  kubectl port-forward pod/mypod :5000"
       }
     },
@@ -8035,6 +8466,20 @@
           "type": "string",
           "value": "VALUE"
         },
+        "--kustomize": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Process a kustomization directory. This flag can't be used together with -f or -R.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--kustomize",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
         "--output": {
           "attr": {},
           "category": "",
@@ -8144,7 +8589,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Replace a resource by filename or stdin.\n\nJSON and YAML formats are accepted. If replacing an existing resource, the complete resource spec must be provided. This can be obtained by\n\n  $ kubectl get TYPE NAME -o yaml\n\nPlease refer to the models in https://htmlpreview.github.io/?https://github.com/kubernetes/kubernetes/blob/HEAD/docs/api-reference/v1/definitions.html to find if a field is mutable.",
+        "DESCRIPTION": "Replace a resource by filename or stdin.\n\n JSON and YAML formats are accepted. If replacing an existing resource, the complete resource spec must be provided. This can be obtained by\n\n  $ kubectl get TYPE NAME -o yaml",
         "EXAMPLES": "  # Replace a pod using the data in pod.json.\n  kubectl replace -f ./pod.json\n\n  # Replace a pod based on the JSON passed into stdin.\n  cat pod.json | kubectl replace -f -\n\n  # Update a single-container pod's image version (tag) to v4\n  kubectl get pod mypod -o yaml | sed 's/\\(image: myimage\\):.*$/\\1:v4/' | kubectl replace -f -\n\n  # Force replace, delete and then re-create the resource\n  kubectl replace --force -f ./pod.json"
       }
     },
@@ -8179,6 +8624,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--filename",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--kustomize": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--kustomize",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -8287,6 +8746,20 @@
               "type": "string",
               "value": "VALUE"
             },
+            "--kustomize": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--kustomize",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
             "--output": {
               "attr": {},
               "category": "",
@@ -8341,7 +8814,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Mark the provided resource as paused\n\nPaused resources will not be reconciled by a controller. Use \"kubectl rollout resume\" to resume a paused resource. Currently only deployments support being paused.",
+            "DESCRIPTION": "Mark the provided resource as paused\n\n Paused resources will not be reconciled by a controller. Use \"kubectl rollout resume\" to resume a paused resource. Currently only deployments support being paused.",
             "EXAMPLES": "  # Mark the nginx deployment as paused. Any current state of\n  # the deployment will continue its function, new updates to the deployment will not\n  # have an effect as long as the deployment is paused.\n  kubectl rollout pause deployment/nginx"
           }
         },
@@ -8373,6 +8846,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--filename",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--kustomize": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--kustomize",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -8431,7 +8918,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Resume a paused resource\n\nPaused resources will not be reconciled by a controller. By resuming a resource, we allow it to be reconciled again. Currently only deployments support being resumed.",
+            "DESCRIPTION": "Resume a paused resource\n\n Paused resources will not be reconciled by a controller. By resuming a resource, we allow it to be reconciled again. Currently only deployments support being resumed.",
             "EXAMPLES": "  # Resume an already paused deployment\n  kubectl rollout resume deployment/nginx"
           }
         },
@@ -8449,6 +8936,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--filename",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--kustomize": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--kustomize",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -8521,7 +9022,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Show the status of the rollout.\n\nBy default 'rollout status' will watch the status of the latest rollout until it's done. If you don't want to wait for the rollout to finish then you can use --watch=false. Note that if a new rollout starts in-between, then 'rollout status' will continue watching the latest revision. If you want to pin to a specific revision and abort if it is rolled over by another revision, use --revision=N where N is the revision you need to watch for.",
+            "DESCRIPTION": "Show the status of the rollout.\n\n By default 'rollout status' will watch the status of the latest rollout until it's done. If you don't want to wait for the rollout to finish then you can use --watch=false. Note that if a new rollout starts in-between, then 'rollout status' will continue watching the latest revision. If you want to pin to a specific revision and abort if it is rolled over by another revision, use --revision=N where N is the revision you need to watch for.",
             "EXAMPLES": "  # Watch the rollout status of a deployment\n  kubectl rollout status deployment/nginx"
           }
         },
@@ -8567,6 +9068,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--filename",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--kustomize": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--kustomize",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -8655,7 +9170,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Manage the rollout of a resource.\n\nValid resource types include:\n\n  * deployments\n  * daemonsets\n  * statefulsets",
+        "DESCRIPTION": "Manage the rollout of a resource.\n\n Valid resource types include:\n\n  *  deployments\n  *  daemonsets\n  *  statefulsets",
         "EXAMPLES": "  # Rollback to the previous deployment\n  kubectl rollout undo deployment/abc\n\n  # Check the rollout status of a daemonset\n  kubectl rollout status daemonset/foo"
       }
     },
@@ -8855,6 +9370,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--image-pull-policy",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--kustomize": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Process a kustomization directory. This flag can't be used together with -f or -R.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--kustomize",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -9206,7 +9735,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Create and run a particular image, possibly replicated.\n\nCreates a deployment or job to manage the created container(s).",
+        "DESCRIPTION": "Create and run a particular image, possibly replicated.\n\n Creates a deployment or job to manage the created container(s).",
         "EXAMPLES": "  # Start a single instance of nginx.\n  kubectl run nginx --image=nginx\n\n  # Start a single instance of hazelcast and let the container expose port 5701 .\n  kubectl run hazelcast --image=hazelcast --port=5701\n\n  # Start a single instance of hazelcast and set environment variables \"DNS_DOMAIN=cluster\" and \"POD_NAMESPACE=default\" in the container.\n  kubectl run hazelcast --image=hazelcast --env=\"DNS_DOMAIN=cluster\" --env=\"POD_NAMESPACE=default\"\n\n  # Start a single instance of hazelcast and set labels \"app=hazelcast\" and \"env=prod\" in the container.\n  kubectl run hazelcast --image=hazelcast --labels=\"app=hazelcast,env=prod\"\n\n  # Start a replicated instance of nginx.\n  kubectl run nginx --image=nginx --replicas=5\n\n  # Dry run. Print the corresponding API objects without creating them.\n  kubectl run nginx --image=nginx --dry-run\n\n  # Start a single instance of nginx, but overload the spec of the deployment with a partial set of values parsed from JSON.\n  kubectl run nginx --image=nginx --overrides='{ \"apiVersion\": \"v1\", \"spec\": { ... } }'\n\n  # Start a pod of busybox and keep it in the foreground, don't restart it if it exits.\n  kubectl run -i -t busybox --image=busybox --restart=Never\n\n  # Start the nginx container using the default command, but use custom arguments (arg1 .. argN) for that command.\n  kubectl run nginx --image=nginx -- <arg1> <arg2> ... <argN>\n\n  # Start the nginx container using a different command and custom arguments.\n  kubectl run nginx --image=nginx --command -- <cmd> <arg1> ... <argN>\n\n  # Start the perl container to compute π to 2000 places and print it out.\n  kubectl run pi --image=perl --restart=OnFailure -- perl -Mbignum=bpi -wle 'print bpi(2000)'\n\n  # Start the cron job to compute π to 2000 places and print it out every 5 minutes.\n  kubectl run pi --schedule=\"0/5 * * * ?\" --image=perl --restart=OnFailure -- perl -Mbignum=bpi -wle 'print bpi(2000)'"
       }
     },
@@ -9266,6 +9795,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--filename",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--kustomize": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--kustomize",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -9393,7 +9936,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Set a new size for a Deployment, ReplicaSet, Replication Controller, or StatefulSet.\n\nScale also allows users to specify one or more preconditions for the scale action.\n\nIf --current-replicas or --resource-version is specified, it is validated before the scale is attempted, and it is guaranteed that the precondition holds true when the scale is sent to the server.",
+        "DESCRIPTION": "Set a new size for a Deployment, ReplicaSet, Replication Controller, or StatefulSet.\n\n Scale also allows users to specify one or more preconditions for the scale action.\n\n If --current-replicas or --resource-version is specified, it is validated before the scale is attempted, and it is guaranteed that the precondition holds true when the scale is sent to the server.",
         "EXAMPLES": "  # Scale a replicaset named 'foo' to 3.\n  kubectl scale --replicas=3 rs/foo\n\n  # Scale a resource identified by type and name specified in \"foo.yaml\" to 3.\n  kubectl scale --replicas=3 -f foo.yaml\n\n  # If the deployment named mysql's current size is 2, scale mysql to 3.\n  kubectl scale --current-replicas=2 --replicas=3 deployment/mysql\n\n  # Scale multiple replication controllers.\n  kubectl scale --replicas=5 rc/foo rc/bar rc/baz\n\n  # Scale statefulset named 'web' to 3.\n  kubectl scale --replicas=3 statefulset/web"
       }
     },
@@ -9512,6 +10055,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--keys",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--kustomize": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--kustomize",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -9654,7 +10211,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Update environment variables on a pod template.\n\nList environment variable definitions in one or more pods, pod templates. Add, update, or remove container environment variable definitions in one or more pod templates (within replication controllers or deployment configurations). View or modify the environment variable definitions on all containers in the specified pods or pod templates, or just those that match a wildcard.\n\nIf \"--env -\" is passed, environment variables can be read from STDIN using the standard env syntax.\n\nPossible resources include (case insensitive):\n\n  pod (po), replicationcontroller (rc), deployment (deploy), daemonset (ds), job, replicaset (rs)",
+            "DESCRIPTION": "Update environment variables on a pod template.\n\n List environment variable definitions in one or more pods, pod templates. Add, update, or remove container environment variable definitions in one or more pod templates (within replication controllers or deployment configurations). View or modify the environment variable definitions on all containers in the specified pods or pod templates, or just those that match a wildcard.\n\n If \"--env -\" is passed, environment variables can be read from STDIN using the standard env syntax.\n\n Possible resources include (case insensitive):\n\n  pod (po), replicationcontroller (rc), deployment (deploy), daemonset (ds), job, replicaset (rs)",
             "EXAMPLES": "  # Update deployment 'registry' with a new environment variable\n  kubectl set env deployment/registry STORAGE_DIR=/local\n\n  # List the environment variables defined on a deployments 'sample-build'\n  kubectl set env deployment/sample-build --list\n\n  # List the environment variables defined on all pods\n  kubectl set env pods --all --list\n\n  # Output modified deployment in YAML, and does not alter the object on the server\n  kubectl set env deployment/sample-build STORAGE_DIR=/data -o yaml\n\n  # Update all containers in all replication controllers in the project to have ENV=prod\n  kubectl set env rc --all ENV=prod\n\n  # Import environment from a secret\n  kubectl set env --from=secret/mysecret deployment/myapp\n\n  # Import environment from a config map with a prefix\n  kubectl set env --from=configmap/myconfigmap --prefix=MYSQL_ deployment/myapp\n\n  # Import specific keys from a config map\n  kubectl set env --keys=my-example-key --from=configmap/myconfigmap deployment/myapp\n\n  # Remove the environment variable ENV from container 'c1' in all deployment configs\n  kubectl set env deployments --all --containers=\"c1\" ENV-\n\n  # Remove the environment variable ENV from a deployment definition on disk and\n  # update the deployment config on the server\n  kubectl set env -f deploy.json ENV-\n\n  # Set some of the local shell environment into a deployment config on the server\n  env | grep RAILS_ | kubectl set env -e - deployment/registry"
           }
         },
@@ -9718,19 +10275,19 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--include-uninitialized": {
+            "--kustomize": {
               "attr": {},
               "category": "",
               "default": "",
-              "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
               "is_required": false,
-              "name": "--include-uninitialized",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
+              "name": "--kustomize",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             },
             "--local": {
               "attr": {},
@@ -9828,7 +10385,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Update existing container image(s) of resources.\n\nPossible resources include (case insensitive):\n\n  pod (po), replicationcontroller (rc), deployment (deploy), daemonset (ds), replicaset (rs)",
+            "DESCRIPTION": "Update existing container image(s) of resources.\n\n Possible resources include (case insensitive):\n\n  pod (po), replicationcontroller (rc), deployment (deploy), daemonset (ds), replicaset (rs)",
             "EXAMPLES": "  # Set a deployment's nginx container image to 'nginx:1.9.1', and its busybox container image to 'busybox'.\n  kubectl set image deployment/nginx busybox=busybox nginx=nginx:1.9.1\n\n  # Update all deployments' and rc's nginx container's image to 'nginx:1.9.1'\n  kubectl set image deployments,rc nginx=nginx:1.9.1 --all\n\n  # Update image of all containers of daemonset abc to 'nginx:1.9.1'\n  kubectl set image daemonset abc *=nginx:1.9.1\n\n  # Print result (in yaml format) of updating nginx container image from local file, without hitting the server\n  kubectl set image -f path/to/file.yaml nginx=nginx:1.9.1 --local -o yaml"
           }
         },
@@ -9906,19 +10463,19 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--include-uninitialized": {
+            "--kustomize": {
               "attr": {},
               "category": "",
               "default": "",
-              "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
               "is_required": false,
-              "name": "--include-uninitialized",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
+              "name": "--kustomize",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             },
             "--limits": {
               "attr": {},
@@ -10044,7 +10601,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Specify compute resource requirements (cpu, memory) for any resource that defines a pod template.  If a pod is successfully scheduled, it is guaranteed the amount of resource requested, but may burst up to its specified limits.\n\nfor each compute resource, if a limit is specified and a request is omitted, the request will default to the limit.\n\nPossible resources include (case insensitive): Use \"kubectl api-resources\" for a complete list of supported resources..",
+            "DESCRIPTION": "Specify compute resource requirements (cpu, memory) for any resource that defines a pod template.  If a pod is successfully scheduled, it is guaranteed the amount of resource requested, but may burst up to its specified limits.\n\n for each compute resource, if a limit is specified and a request is omitted, the request will default to the limit.\n\n Possible resources include (case insensitive): Use \"kubectl api-resources\" for a complete list of supported resources..",
             "EXAMPLES": "  # Set a deployments nginx container cpu limits to \"200m\" and memory to \"512Mi\"\n  kubectl set resources deployment nginx -c=nginx --limits=cpu=200m,memory=512Mi\n\n  # Set the resource request and limits for all containers in nginx\n  kubectl set resources deployment nginx --limits=cpu=200m,memory=512Mi --requests=cpu=100m,memory=256Mi\n\n  # Remove the resource requests for resources on containers in nginx\n  kubectl set resources deployment nginx --limits=cpu=0,memory=0 --requests=cpu=0,memory=0\n\n  # Print the result (in yaml format) of updating nginx container limits from a local, without hitting the server\n  kubectl set resources -f path/to/file.yaml --limits=cpu=200m,memory=512Mi --local -o yaml"
           }
         },
@@ -10107,20 +10664,6 @@
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
-            },
-            "--include-uninitialized": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--include-uninitialized",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
             },
             "--local": {
               "attr": {},
@@ -10218,7 +10761,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Set the selector on a resource. Note that the new selector will overwrite the old selector if the resource had one prior to the invocation of 'set selector'.\n\nA selector must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  63 characters. If --resource-version is specified, then updates will use this resource version, otherwise the existing resource-version will be used. Note: currently selectors can only be set on Service objects.",
+            "DESCRIPTION": "Set the selector on a resource. Note that the new selector will overwrite the old selector if the resource had one prior to the invocation of 'set selector'.\n\n A selector must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  63 characters. If --resource-version is specified, then updates will use this resource version, otherwise the existing resource-version will be used. Note: currently selectors can only be set on Service objects.",
             "EXAMPLES": "  # set the labels and selector before creating a deployment/service pair.\n  kubectl create service clusterip my-svc --clusterip=\"None\" -o yaml --dry-run | kubectl set selector --local -f - 'environment=qa' -o yaml | kubectl create -f -\n  kubectl create deployment my-dep -o yaml --dry-run | kubectl label --local -f - environment=qa -o yaml | kubectl create -f -"
           }
         },
@@ -10282,19 +10825,19 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--include-uninitialized": {
+            "--kustomize": {
               "attr": {},
               "category": "",
               "default": "",
-              "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
               "is_required": false,
-              "name": "--include-uninitialized",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
+              "name": "--kustomize",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             },
             "--local": {
               "attr": {},
@@ -10378,7 +10921,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Update ServiceAccount of pod template resources.\n\nPossible resources (case insensitive) can be:\n\nreplicationcontroller (rc), deployment (deploy), daemonset (ds), job, replicaset (rs), statefulset\n\nAliases:\nserviceaccount, sa",
+            "DESCRIPTION": "Update ServiceAccount of pod template resources.\n\n Possible resources (case insensitive) can be:\n\n replicationcontroller (rc), deployment (deploy), daemonset (ds), job, replicaset (rs), statefulset\n\nAliases:\nserviceaccount, sa",
             "EXAMPLES": "  # Set Deployment nginx-deployment's ServiceAccount to serviceaccount1\n  kubectl set serviceaccount deployment nginx-deployment serviceaccount1\n\n  # Print the result (in yaml format) of updated nginx deployment with serviceaccount from local file, without hitting apiserver\n  kubectl set sa -f nginx-deployment.yaml serviceaccount1 --local --dry-run -o yaml"
           }
         },
@@ -10456,19 +10999,19 @@
               "type": "string",
               "value": "VALUE"
             },
-            "--include-uninitialized": {
+            "--kustomize": {
               "attr": {},
               "category": "",
               "default": "",
-              "description": "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized.",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
               "is_required": false,
-              "name": "--include-uninitialized",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
+              "name": "--kustomize",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             },
             "--local": {
               "attr": {},
@@ -10582,7 +11125,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Configure application resources\n\nThese commands help you make changes to existing application resources."
+        "DESCRIPTION": "Configure application resources\n\n These commands help you make changes to existing application resources."
       }
     },
     "taint": {
@@ -10698,7 +11241,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Update the taints on one or more nodes.\n\n  * A taint consists of a key, value, and effect. As an argument here, it is expressed as key=value:effect.\n  * The key must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  253 characters.\n  * Optionally, the key can begin with a DNS subdomain prefix and a single '/', like example.com/my-app\n  * The value must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  63 characters.\n  * The effect must be NoSchedule, PreferNoSchedule or NoExecute.\n  * Currently taint can only apply to node.",
+        "DESCRIPTION": "Update the taints on one or more nodes.\n\n  *  A taint consists of a key, value, and effect. As an argument here, it is expressed as key=value:effect.\n  *  The key must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  253 characters.\n  *  Optionally, the key can begin with a DNS subdomain prefix and a single '/', like example.com/my-app\n  *  The value must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  63 characters.\n  *  The effect must be NoSchedule, PreferNoSchedule or NoExecute.\n  *  Currently taint can only apply to node.",
         "EXAMPLES": "  # Update node 'foo' with a taint with key 'dedicated' and value 'special-user' and effect 'NoSchedule'.\n  # If a taint with that key and effect already exists, its value is replaced as specified.\n  kubectl taint nodes foo dedicated=special-user:NoSchedule\n\n  # Remove from node 'foo' the taint with key 'dedicated' and effect 'NoSchedule' if one exists.\n  kubectl taint nodes foo dedicated:NoSchedule-\n\n  # Remove from node 'foo' all the taints with key 'dedicated'\n  kubectl taint nodes foo dedicated-\n\n  # Add a taint with key 'dedicated' on nodes having label mylabel=X\n  kubectl taint node -l myLabel=X  dedicated=foo:PreferNoSchedule"
       }
     },
@@ -10805,7 +11348,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Display Resource (CPU/Memory/Storage) usage of nodes.\n\nThe top-node command allows you to see the resource consumption of nodes.\n\nAliases:\nnode, nodes, no",
+            "DESCRIPTION": "Display Resource (CPU/Memory/Storage) usage of nodes.\n\n The top-node command allows you to see the resource consumption of nodes.\n\nAliases:\nnode, nodes, no",
             "EXAMPLES": "  # Show metrics for all nodes\n  kubectl top node\n\n  # Show metrics for a given node\n  kubectl top node NODE_NAME"
           }
         },
@@ -10937,7 +11480,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Display Resource (CPU/Memory/Storage) usage of pods.\n\nThe 'top pod' command allows you to see the resource consumption of pods.\n\nDue to the metrics pipeline delay, they may be unavailable for a few minutes since pod creation.\n\nAliases:\npod, pods, po",
+            "DESCRIPTION": "Display Resource (CPU/Memory/Storage) usage of pods.\n\n The 'top pod' command allows you to see the resource consumption of pods.\n\n Due to the metrics pipeline delay, they may be unavailable for a few minutes since pod creation.\n\nAliases:\npod, pods, po",
             "EXAMPLES": "  # Show metrics for all pods in the default namespace\n  kubectl top pod\n\n  # Show metrics for all pods in the given namespace\n  kubectl top pod --namespace=NAMESPACE\n\n  # Show metrics for a given pod and its containers\n  kubectl top pod POD_NAME --containers\n\n  # Show metrics for the pods defined by label name=myLabel\n  kubectl top pod -l name=myLabel"
           }
         }
@@ -10953,7 +11496,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Display Resource (CPU/Memory/Storage) usage.\n\nThe top command allows you to see the resource consumption for nodes or pods.\n\nThis command requires Heapster to be correctly configured and working on the server."
+        "DESCRIPTION": "Display Resource (CPU/Memory/Storage) usage.\n\n The top command allows you to see the resource consumption for nodes or pods.\n\n This command requires Heapster to be correctly configured and working on the server."
       }
     },
     "uncordon": {
@@ -11068,6 +11611,20 @@
       "capsule": "",
       "commands": {},
       "flags": {
+        "--all": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Select all resources in the namespace of the specified resource types",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--all",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
         "--all-namespaces": {
           "attr": {},
           "category": "",
@@ -11095,6 +11652,20 @@
           "nargs": "0",
           "type": "bool",
           "value": ""
+        },
+        "--field-selector": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Selector (field query) to filter on, supports '=', '==', and '!='.(e.g. --field-selector key1=value1,key2=value2). The server only supports a limited number of field queries per type.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--field-selector",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
         },
         "--filename": {
           "attr": {},
@@ -11205,7 +11776,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Experimental: Wait for a specific condition on one or many resources.\n\nThe command takes multiple resources and waits until the specified condition is seen in the Status field of every given resource.\n\nAlternatively, the command can wait for the given set of resources to be deleted by providing the \"delete\" keyword as the value to the --for flag.\n\nA successful message will be printed to stdout indicating when the specified condition has been met. One can use -o option to change to output destination.",
+        "DESCRIPTION": "Experimental: Wait for a specific condition on one or many resources.\n\n The command takes multiple resources and waits until the specified condition is seen in the Status field of every given resource.\n\n Alternatively, the command can wait for the given set of resources to be deleted by providing the \"delete\" keyword as the value to the --for flag.\n\n A successful message will be printed to stdout indicating when the specified condition has been met. One can use -o option to change to output destination.",
         "EXAMPLES": "  # Wait for the pod \"busybox1\" to contain the status condition of type \"Ready\".\n  kubectl wait --for=condition=Ready pod/busybox1\n\n  # Wait for the pod \"busybox1\" to be deleted, with a timeout of 60s, after having issued the \"delete\" command.\n  kubectl delete pod/busybox1\n  kubectl wait --for=delete pod/busybox1 --timeout=60s"
       }
     }
@@ -11621,7 +12192,7 @@
       "attr": {},
       "category": "",
       "default": "",
-      "description": "log level for V logs",
+      "description": "number for the log level verbosity",
       "group": "",
       "is_global": true,
       "is_hidden": false,
@@ -11655,6 +12226,6 @@
   "positionals": [],
   "release": "GA",
   "sections": {
-    "DESCRIPTION": "kubectl controls the Kubernetes cluster manager.\n\nFind more information at: https://kubernetes.io/docs/reference/kubectl/overview/"
+    "DESCRIPTION": "kubectl controls the Kubernetes cluster manager.\n\n Find more information at: https://kubernetes.io/docs/reference/kubectl/overview/"
   }
 }

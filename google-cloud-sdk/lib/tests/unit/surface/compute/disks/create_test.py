@@ -695,6 +695,21 @@ class DisksCreateTestBeta(DisksCreateTestGA):
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
 
+  def testCreateDiskEraseVss(self):
+    self.Run("""
+        compute disks create hamlet --zone central2-a \
+        --erase-windows-vss-signature
+    """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        [(self.compute.disks, 'Insert',
+          self.messages.ComputeDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='hamlet', sizeGb=500, eraseWindowsVssSignature=True),
+              project='my-project',
+              zone='central2-a'))])
+
   def testCreateZonalDiskWithPhysicalBlockSize(self):
     self.Run("""
         compute disks create disk-1 --zone central2-a
@@ -721,25 +736,6 @@ class DisksCreateTestAlpha(DisksCreateTestBeta):
     self.message_version = self.compute_alpha
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-
-  def testCreateDiskEraseVss(self):
-    self.Run("""
-        compute disks create hamlet --zone central2-a \
-        --erase-windows-vss-signature
-    """)
-
-    self.CheckRequests(
-        self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
-          self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='hamlet',
-                  sizeGb=500,
-                  eraseWindowsVssSignature=True
-              ),
-              project='my-project',
-              zone='central2-a'))])
 
   def testCreateDiskSourceDisk(self):
     self.Run("""

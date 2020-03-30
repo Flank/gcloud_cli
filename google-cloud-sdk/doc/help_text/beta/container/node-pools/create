@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud beta container node-pools create NAME
-        [--accelerator=[type=TYPE,[count=COUNT],...]] [--cluster=CLUSTER]
+        [--accelerator=[type=TYPE,[count=COUNT],...]]
+        [--boot-disk-kms-key=BOOT_DISK_KMS_KEY] [--cluster=CLUSTER]
         [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE]
         [--enable-autoprovisioning] [--enable-autorepair]
         [--no-enable-autoupgrade] [--image-type=IMAGE_TYPE]
@@ -24,6 +25,7 @@ SYNOPSIS
         [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--region=REGION | --zone=ZONE, -z ZONE]
+        [--reservation=RESERVATION --reservation-affinity=RESERVATION_AFFINITY]
         [--scopes=[SCOPE,...];
           default="gke-default" --service-account=SERVICE_ACCOUNT]
         [GCLOUD_WIDE_FLAG ...]
@@ -50,6 +52,14 @@ FLAGS
          count
             (Optional) The number of accelerators to attach to the instances.
             The default value is 1.
+
+     --boot-disk-kms-key=BOOT_DISK_KMS_KEY
+        The Customer Managed Encryption Key used to encrypt the boot disk
+        attached to each node in the node pool. This should be of the form
+        projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
+        For more information about protecting resources with Cloud KMS Keys
+        please see:
+        https://cloud.google.com/compute/docs/disks/customer-managed-encryption
 
      --cluster=CLUSTER
         The cluster to add the node pool to. Overrides the default
@@ -320,25 +330,33 @@ FLAGS
         WORKLOAD_METADATA_FROM_NODE must be one of:
 
          EXPOSED
+            [DEPRECATED] Pods running in this node pool have access to the
+            node's underlying Compute Engine Metadata Server.
+         GCE_METADATA
             Pods running in this node pool have access to the node's underlying
             Compute Engine Metadata Server.
-         GKE_METADATA_SERVER
+         GKE_METADATA
             Run the Kubernetes Engine Metadata Server on this node. The
             Kubernetes Engine Metadata Server exposes a metadata API to
             workloads that is compatible with the V1 Compute Metadata APIs
             exposed by the Compute Engine and App Engine Metadata Servers. This
             feature can only be enabled if Workload Identity is enabled at the
             cluster level.
+         GKE_METADATA_SERVER
+            [DEPRECATED] Run the Kubernetes Engine Metadata Server on this
+            node. The Kubernetes Engine Metadata Server exposes a metadata API
+            to workloads that is compatible with the V1 Compute Metadata APIs
+            exposed by the Compute Engine and App Engine Metadata Servers. This
+            feature can only be enabled if Workload Identity is enabled at the
+            cluster level.
          SECURE
-            Prevents pods not in hostNetwork from accessing certain VM
-            metadata, specifically kube-env, which contains Kubelet
+            [DPRECATED] Prevents pods not in hostNetwork from accessing certain
+            VM metadata, specifically kube-env, which contains Kubelet
             credentials, and the instance identity token. This is a temporary
             security solution available while the bootstrapping process for
             cluster nodes is being redesigned with significant security
             improvements. This feature is scheduled to be deprecated in the
             future and later removed.
-         UNSPECIFIED
-            Chooses the default.
 
      Cluster autoscaling
 
@@ -370,6 +388,16 @@ FLAGS
        --zone=ZONE, -z ZONE
           Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
+
+     Specifies the reservation for the node pool.
+
+       --reservation=RESERVATION
+          The name of the reservation, required when
+          --reservation-affinity=specific.
+
+       --reservation-affinity=RESERVATION_AFFINITY
+          The type of the reservation for the node pool. RESERVATION_AFFINITY
+          must be one of: any, none, specific.
 
      Options to specify the node identity.
 
@@ -445,15 +473,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create a new node pool "node-pool-1" with the default options in the
     cluster "sample-cluster", run:
 
         $ gcloud beta container node-pools create node-pool-1 \
-            --cluster=example-cluster
+            --cluster=sample-cluster
 
     The new node pool will show up in the cluster after all the nodes have been
     provisioned.
@@ -461,7 +490,7 @@ EXAMPLES
     To create a node pool with 5 nodes, run:
 
         $ gcloud beta container node-pools create node-pool-1 \
-            --cluster=example-cluster --num-nodes=5
+            --cluster=sample-cluster --num-nodes=5
 
 NOTES
     This command is currently in BETA and may change without notice. These

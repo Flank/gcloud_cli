@@ -61,8 +61,30 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create an instance with id my-instance-id with a cluster located in
+    us-east1-c, run:
+
+        $ gcloud alpha bigtable instances create my-instance-id \
+            --display-name="My Instance" --cluster=my-cluster-id \
+            --cluster-zone=us-east1-c
+
+    To create a DEVELOPMENT instance, run:
+
+        $ gcloud alpha bigtable instances create my-dev-instance \
+            --display-name="Dev Instance" --instance-type=DEVELOPMENT \
+            --cluster=my-cluster-id --cluster-zone=us-east1-c
+
+    To create an instance with HDD storage and 10 nodes, run:
+
+        $ gcloud alpha bigtable instances create my-hdd-instance \
+            --display-name="HDD Instance" --cluster-storage-type=HDD \
+            --cluster-num-nodes=10 --cluster=my-cluster-id \
+            --cluster-zone=us-east1-c
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

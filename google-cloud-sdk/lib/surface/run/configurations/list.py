@@ -100,9 +100,9 @@ class List(commands.List):
 
   def Run(self, args):
     """List available configurations."""
-    is_managed = flags.IsManaged(args)
+    is_managed = flags.GetPlatform() == flags.PLATFORM_MANAGED
     conn_context = connection_context.GetConnectionContext(
-        args, self.ReleaseTrack())
+        args, flags.Product.RUN, self.ReleaseTrack())
     self._SetFormat(
         args, show_region=is_managed, show_namespace=(not is_managed))
     namespace_ref = args.CONCEPTS.namespace.Parse()

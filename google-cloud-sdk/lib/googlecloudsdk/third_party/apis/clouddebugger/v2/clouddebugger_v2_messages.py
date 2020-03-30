@@ -44,7 +44,9 @@ class AliasContext(_messages.Message):
 
 
 class Breakpoint(_messages.Message):
-  r"""Represents the breakpoint specification, status and results.
+  r"""------------------------------------------------------------------------
+  ------ ## Breakpoint (the resource)  Represents the breakpoint
+  specification, status and results.
 
   Enums:
     ActionValueValuesEnum: Action that the agent should perform when the code
@@ -671,7 +673,7 @@ class SetBreakpointResponse(_messages.Message):
 
   Fields:
     breakpoint: Breakpoint resource. The field `id` is guaranteed to be set
-      (in addition to the echoed fileds).
+      (in addition to the echoed fields).
   """
 
   breakpoint = _messages.MessageField('Breakpoint', 1)

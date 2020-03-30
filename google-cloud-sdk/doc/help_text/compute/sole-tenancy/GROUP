@@ -1,31 +1,32 @@
 NAME
-    gcloud compute sole-tenancy - read and manage Google Compute Engine
-        sole-tenancy resources
+    gcloud compute sole-tenancy - read and manage Compute Engine sole-tenancy
+        resources
 
 SYNOPSIS
     gcloud compute sole-tenancy GROUP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Read and manage Google Compute Engine sole-tenancy resources.
+    Read and manage Compute Engine sole-tenancy resources.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
 
      node-groups
-        Read Google Compute Engine sole-tenancy node groups.
+        Read Compute Engine sole-tenancy node groups.
 
      node-templates
-        Read and manage Google Compute Engine sole-tenancy node templates.
+        Read and manage Compute Engine sole-tenancy node templates.
 
      node-types
-        Read Google Compute Engine sole-tenancy node types.
+        Read Compute Engine sole-tenancy node types.
 
 NOTES
     These variants are also available:

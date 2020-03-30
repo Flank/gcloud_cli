@@ -34,28 +34,31 @@ class SslCertificatesListTest(test_base.BaseTest,
 
   def SetUp(self):
     self.SelectApi('v1')
-    lister_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts')
-    self.addCleanup(lister_patcher.stop)
-    self.mock_get_global_resources = lister_patcher.start()
-    resources = test_resources.SSL_CERTIFICATES
-    self.mock_get_global_resources.return_value = (
-        resource_projector.MakeSerializable(resources))
     self.prefix = ''
+    self._compute_api = self.compute_v1
+    self.SetEncoding('utf8')
+    self._resources = test_resources.SSL_CERTIFICATES
+    list_json_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
+    self.addCleanup(list_json_patcher.stop)
+    self.list_json = list_json_patcher.start()
 
   def RunVersioned(self, command):
     return self.Run('{prefix} {command}'.format(
         prefix=self.prefix, command=command))
 
   def testTableOutput(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(self._resources)
+    ]
     self.RunVersioned("""
-        compute ssl-certificates list
+        compute ssl-certificates list --global
         """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.sslCertificates,
-        project='my-project',
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.sslCertificates, 'List',
+                   self.messages.ComputeSslCertificatesListRequest(
+                       project='my-project'))],
         http=self.mock_http(),
-        filter_expr=None,
         batch_url=self.batch_url,
         errors=[])
     self.AssertOutputEquals(
@@ -67,14 +70,17 @@ class SslCertificatesListTest(test_base.BaseTest,
         normalize_space=True)
 
   def getUriOutput(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(self._resources)
+    ]
     self.RunVersioned("""
         compute ssl-certificates list --uri
         """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.sslCertificates,
-        project='my-project',
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.sslCertificates, 'AggregatedList',
+                   self.messages.ComputeSslCertificatesAggregatedListRequest(
+                       project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
-        filter_expr=None,
         batch_url=self.batch_url,
         errors=[])
 
@@ -88,40 +94,55 @@ https://compute.googleapis.com/compute/v1/projects/my-project/global/sslCertific
         normalize_space=True)
 
   def testSslCertificatesCompleter(self):
+    # Completer always uses v1 API for List.
+    self.SelectApi('v1')
+    self.prefix = ''
+    self._compute_api = self.compute_v1
+
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(self._resources),
+        resource_projector.MakeSerializable(self._resources)
+    ]
     self.RunCompleter(
-        flags.SslCertificatesCompleter,
-        expected_command=[
+        flags.SslCertificatesCompleterBeta,
+        expected_command=[[
             'compute',
             'ssl-certificates',
             'list',
+            '--global',
             '--uri',
             '--quiet',
             '--format=disable',
-        ],
+        ], [
+            'compute',
+            'ssl-certificates',
+            'list',
+            '--filter=region:*',
+            '--uri',
+            '--quiet',
+            '--format=disable',
+        ]],
         expected_completions=[
             'ssl-cert-1',
             'ssl-cert-2',
         ],
         cli=self.cli,
     )
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.sslCertificates,
-        project='my-project',
+    self.list_json.assert_called_with(
+        requests=[(self._compute_api.sslCertificates, 'AggregatedList',
+                   self.messages.ComputeSslCertificatesAggregatedListRequest(
+                       project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
-        filter_expr=None,
         batch_url=self.batch_url,
         errors=[])
 
 
-class SslCertificatesListBetaTest(test_base.BaseTest,
-                                  completer_test_base.CompleterBase):
+class SslCertificatesListBetaTest(SslCertificatesListTest):
 
   def SetUp(self):
     self.SelectApi('beta')
-    list_json_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
-    self.addCleanup(list_json_patcher.stop)
-    self.list_json = list_json_patcher.start()
+    self.prefix = 'beta'
+    self._compute_api = self.compute_beta
     self.SetEncoding('utf8')
 
   def testTableOutput(self):
@@ -202,7 +223,7 @@ class SslCertificatesListBetaTest(test_base.BaseTest,
     self.list_json.assert_called_once_with(
         requests=[(self.compute_beta.sslCertificates, 'AggregatedList',
                    self.messages.ComputeSslCertificatesAggregatedListRequest(
-                       project='my-project'))],
+                       project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -223,6 +244,8 @@ class SslCertificatesListAlphaTest(test_base.BaseTest,
 
   def SetUp(self):
     self.SelectApi('alpha')
+    self.prefix = 'alpha'
+    self._compute_api = self.compute_alpha
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson')
     self.addCleanup(list_json_patcher.stop)
@@ -307,7 +330,7 @@ class SslCertificatesListAlphaTest(test_base.BaseTest,
     self.list_json.assert_called_once_with(
         requests=[(self.compute_alpha.sslCertificates, 'AggregatedList',
                    self.messages.ComputeSslCertificatesAggregatedListRequest(
-                       project='my-project'))],
+                       project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])

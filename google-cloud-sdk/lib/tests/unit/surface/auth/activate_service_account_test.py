@@ -83,6 +83,7 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase):
     self.assertEqual('google-cloud-sdk', creds_dict['_user_agent'])
     self.assertEqual('google-cloud-sdk', creds_dict['user_agent'])
     scopes = [
+        'openid',
         'https://www.googleapis.com/auth/userinfo.email',
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/appengine.admin',
@@ -167,6 +168,7 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase):
     self.assertEqual('google-cloud-sdk', creds_dict['user_agent'])
     self.assertEqual('google-cloud-sdk', creds_dict['_user_agent'])
     scopes = [
+        'openid',
         'https://www.googleapis.com/auth/userinfo.email',
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/appengine.admin',

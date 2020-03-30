@@ -44,6 +44,14 @@ class SslPolicyDeleteGATest(ssl_policies_test_base.SslPoliciesTestBase):
             self.messages.ComputeGlobalOperationsGetRequest(
                 **operation_ref.AsDict()))
 
+  def _MakeOperationWaitRequest(self, operation_ref):
+    return (self.global_operations, 'Wait',
+            self.messages.ComputeGlobalOperationsWaitRequest(
+                **operation_ref.AsDict()))
+
+  def _MakeOperationPollingRequest(self, operation_ref):
+    return self._MakeOperationWaitRequest(operation_ref)
+
   def testDeleteSingleSslPolicy(self):
     name = 'my-ssl-policy'
     ssl_policy_ref = self.GetSslPolicyRef(name)
@@ -57,10 +65,12 @@ class SslPolicyDeleteGATest(ssl_policies_test_base.SslPoliciesTestBase):
 
     self.ExpectDeleteRequest(ssl_policy_ref, pending_operation)
 
-    self.api_mock.batch_responder.ExpectBatch(
-        [(self._MakeOperationGetRequest(operation_ref), pending_operation)])
-    self.api_mock.batch_responder.ExpectBatch(
-        [(self._MakeOperationGetRequest(operation_ref), done_operation)])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._MakeOperationPollingRequest(operation_ref), pending_operation)
+    ])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._MakeOperationPollingRequest(operation_ref), done_operation)
+    ])
 
     self.Run('compute ssl-policies delete {}'.format(name))
 
@@ -70,6 +80,7 @@ class SslPolicyDeleteGATest(ssl_policies_test_base.SslPoliciesTestBase):
     operation_refs = [
         self.GetOperationRef('operation-{}'.format(n)) for n in range(0, 3)
     ]
+    # pylint: disable=g-complex-comprehension
     pending_operations = [
         self.MakeOperationMessage(
             operation_refs[n],
@@ -82,14 +93,19 @@ class SslPolicyDeleteGATest(ssl_policies_test_base.SslPoliciesTestBase):
             self.messages.Operation.StatusValueValuesEnum.DONE,
             ssl_policy_refs[n]) for n in range(0, 3)
     ]
+    # pylint: enable=g-complex-comprehension
 
     for n in range(0, 3):
       self.ExpectDeleteRequest(ssl_policy_refs[n], pending_operations[n])
 
-    self.api_mock.batch_responder.ExpectBatch([(self._MakeOperationGetRequest(
-        operation_refs[n]), pending_operations[n]) for n in range(0, 3)])
-    self.api_mock.batch_responder.ExpectBatch([(self._MakeOperationGetRequest(
-        operation_refs[n]), done_operations[n]) for n in range(0, 3)])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._MakeOperationPollingRequest(operation_refs[n]),
+         pending_operations[n]) for n in range(0, 3)
+    ])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._MakeOperationPollingRequest(operation_refs[n]),
+         done_operations[n]) for n in range(0, 3)
+    ])
 
     self.Run('compute ssl-policies delete {}'.format(' '.join(names)))
 

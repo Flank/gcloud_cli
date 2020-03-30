@@ -1,0 +1,29 @@
+title: Cloud API Gateway Gateway Get IAM Policy Success
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway gateways get-iam-policy test-name --location us-central1
+  - stdout: |
+      etag: ACAB
+actions:
+- execute_command:
+    command: |
+      api-gateway gateways get-iam-policy test-name --location us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways/test-name:getIamPolicy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            etag: ACAB
+    - expect_stdout: |
+        etag: ACAB
+    - expect_exit:
+        code: 0

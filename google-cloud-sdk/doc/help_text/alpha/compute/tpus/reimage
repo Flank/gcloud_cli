@@ -41,12 +41,20 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the tpu/v1 API. The full documentation for this API can
     be found at: https://cloud.google.com/tpu/
+
+EXAMPLES
+    The following command reimages a TPU with ID my-tpu in zone us-central1-b
+    with TensorFlow version 1.15:
+
+        $ gcloud alpha compute tpus reimage my-tpu --zone=us-central1-b \
+            --version=1.15
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

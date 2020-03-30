@@ -1,0 +1,32 @@
+NAME
+    gcloud alpha anthos - anthos command Group
+
+SYNOPSIS
+    gcloud alpha anthos GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Anthos command Group.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     auth
+        (ALPHA) Authenticate clusters using the Anthos client.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
+
+        $ gcloud anthos
+        $ gcloud beta anthos
+

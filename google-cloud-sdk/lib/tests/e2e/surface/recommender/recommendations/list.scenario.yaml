@@ -1,5 +1,5 @@
 title: List recommendations
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -11,13 +11,15 @@ actions:
 - define_reference:
     reference: api-version
     track_values:
-      ALPHA: v1alpha1
+      ALPHA: v1alpha2
       BETA: v1beta1
+      GA: v1
 - define_reference:
     reference: recommender
     track_values:
-      ALPHA: google.iam.policy.RoleRecommender
+      ALPHA: google.iam.policy.Recommender
       BETA: google.iam.policy.Recommender
+      GA: google.compute.instance.MachineTypeRecommender
 - execute_command:
     command: recommender recommendations list --project=cloud-sdk-integration-testing
       --location=global --recommender=$$recommender$$ --filter=state_info.state:"DISMISSED"

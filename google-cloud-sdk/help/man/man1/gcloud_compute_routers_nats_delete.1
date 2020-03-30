@@ -83,8 +83,20 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete NAT 'n1' in router 'r1', run:
+
+.RS 2m
+$ gcloud compute routers nats delete n1 \-\-router=r1 \e
+    \-\-region=us\-central1
+.RE
 
 
 

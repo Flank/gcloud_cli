@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.compute.ssl_certificates import flags
 from googlecloudsdk.command_lib.compute.ssl_certificates import ssl_certificates_utils
-from googlecloudsdk.core import log
 from googlecloudsdk.core.util import files
 
 
@@ -175,36 +175,46 @@ class Create(base.CreateCommand):
   @classmethod
   def Args(cls, parser):
     parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
-    cls.SSL_CERTIFICATE_ARG = flags.SslCertificateArgument()
+    cls.SSL_CERTIFICATE_ARG = flags.SslCertificateArgument(
+        include_l7_internal_load_balancing=True)
     cls.SSL_CERTIFICATE_ARG.AddArgument(parser, operation_type='create')
     _Args(
         parser,
-        include_l7_internal_load_balancing=False,
+        include_l7_internal_load_balancing=True,
         support_managed_certs=False)
 
   def Run(self, args):
     """Issues the request necessary for adding the SSL certificate."""
-    if self.ReleaseTrack() == base.ReleaseTrack.GA:
-      log.warning('The ssl-certificates create command will soon require '
-                  'either a --global or --region flag.')
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     client = holder.client
 
     ssl_certificate_ref = self.SSL_CERTIFICATE_ARG.ResolveAsResource(
-        args, holder.resources)
+        args, holder.resources, default_scope=compute_scope.ScopeEnum.GLOBAL)
+
     certificate = files.ReadFileContents(args.certificate)
     private_key = files.ReadFileContents(args.private_key)
 
-    request = client.messages.ComputeSslCertificatesInsertRequest(
-        sslCertificate=client.messages.SslCertificate(
-            name=ssl_certificate_ref.Name(),
-            certificate=certificate,
-            privateKey=private_key,
-            description=args.description),
-        project=ssl_certificate_ref.project)
+    if ssl_certificates_utils.IsRegionalSslCertificatesRef(ssl_certificate_ref):
+      request = client.messages.ComputeRegionSslCertificatesInsertRequest(
+          sslCertificate=client.messages.SslCertificate(
+              name=ssl_certificate_ref.Name(),
+              certificate=certificate,
+              privateKey=private_key,
+              description=args.description),
+          region=ssl_certificate_ref.region,
+          project=ssl_certificate_ref.project)
+      collection = client.apitools_client.regionSslCertificates
+    else:
+      request = client.messages.ComputeSslCertificatesInsertRequest(
+          sslCertificate=client.messages.SslCertificate(
+              name=ssl_certificate_ref.Name(),
+              certificate=certificate,
+              privateKey=private_key,
+              description=args.description),
+          project=ssl_certificate_ref.project)
+      collection = client.apitools_client.sslCertificates
 
-    return client.MakeRequests([(client.apitools_client.sslCertificates,
-                                 'Insert', request)])
+    return client.MakeRequests([(collection, 'Insert', request)])
 
 
 @base.UnicodeIsSupported
@@ -241,7 +251,7 @@ class CreateBeta(base.CreateCommand):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
 
     ssl_certificate_ref = self.SSL_CERTIFICATE_ARG.ResolveAsResource(
-        args, holder.resources)
+        args, holder.resources, default_scope=compute_scope.ScopeEnum.GLOBAL)
     return _Run(args, holder, ssl_certificate_ref)
 
 
@@ -279,6 +289,52 @@ class CreateAlpha(base.CreateCommand):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
 
     ssl_certificate_ref = self.SSL_CERTIFICATE_ARG.ResolveAsResource(
-        args, holder.resources)
+        args, holder.resources, default_scope=compute_scope.ScopeEnum.GLOBAL)
 
     return _Run(args, holder, ssl_certificate_ref)
+
+
+Create.detailed_help = {
+    'brief':
+        'Create a Google Compute Engine SSL certificate',
+    'DESCRIPTION':
+        """\
+        *{command}* creates SSL certificates, which you can use in a target
+        HTTPS or target SSL proxy. An SSL certificate resource consists of a
+        certificate and private key. The private key is encrypted before it is
+        stored. For more information, see:
+        [](https://cloud.google.com/load-balancing/docs/ssl-certificates)
+        """,
+    'EXAMPLES':
+        """\
+        To create a certificate 'my-cert' from a certificate placed under path
+        'foo/cert' and a private key placed under path 'foo/pk', run:
+
+            $ {command} my-cert --certificate=foo/cert --private-key=foo/pk
+        """,
+}
+CreateBeta.detailed_help = {
+    'brief':
+        'Create a Google Compute Engine SSL certificate',
+    'DESCRIPTION':
+        """\
+        *{command}* creates SSL certificates, which you can use in a target
+        HTTPS or target SSL proxy. An SSL certificate resource consists of a
+        certificate and private key. The private key is encrypted before it is
+        stored.
+
+        You can create either a managed or a self-managed SslCertificate. A managed
+        SslCertificate will be provisioned and renewed for you, when you specify
+        the `--domains` flag. A self-managed certificate is created by passing the
+        certificate obtained from Certificate Authority through `--certificate` and
+        `--private-key` flags.
+        """,
+    'EXAMPLES':
+        """\
+        To create a certificate 'my-cert' from a certificate placed under path
+        'foo/cert' and a private key placed under path 'foo/pk', run:
+
+            $ {command} my-cert --certificate=foo/cert --private-key=foo/pk
+        """,
+}
+CreateAlpha.detailed_help = CreateBeta.detailed_help

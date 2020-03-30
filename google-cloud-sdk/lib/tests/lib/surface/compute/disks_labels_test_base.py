@@ -136,6 +136,25 @@ class DisksLabelsTestBase(sdk_test_base.WithFakeAuth,
               project=self.Project()),
           operation)
 
+  def _ExpectOperationWaitRequest(self, operation_ref, operation):
+    if operation_ref.Collection() == 'compute.zoneOperations':
+      self.zone_operations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
+              operation=operation_ref.operation,
+              zone=operation_ref.zone,
+              project=self.Project()),
+          operation)
+    else:
+      self.region_operations.Wait.Expect(
+          self.messages.ComputeRegionOperationsWaitRequest(
+              operation=operation_ref.operation,
+              region=operation_ref.region,
+              project=self.Project()),
+          operation)
+
+  def _ExpectOperationPollingRequest(self, operation_ref, operation):
+    self._ExpectOperationWaitRequest(operation_ref, operation)
+
   def _ExpectLabelsSetRequest(
       self, disk_ref, labels, fingerprint, disk=None, exception=None):
     if disk_ref.Collection() == 'compute.disks':

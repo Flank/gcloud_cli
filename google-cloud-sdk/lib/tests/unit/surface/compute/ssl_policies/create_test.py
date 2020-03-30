@@ -54,7 +54,7 @@ class SslPolicyCreateGATest(ssl_policies_test_base.SslPoliciesTestBase):
         operation_ref, resource_ref=ssl_policy_ref)
 
     self.ExpectInsertRequest(ssl_policy_ref, ssl_policy_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(ssl_policy_ref, created_ssl_policy)
 
     response = self.Run('compute ssl-policies create {} --description "{}" '
@@ -90,7 +90,7 @@ class SslPolicyCreateGATest(ssl_policies_test_base.SslPoliciesTestBase):
         operation_ref, resource_ref=ssl_policy_ref)
 
     self.ExpectInsertRequest(ssl_policy_ref, ssl_policy_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(ssl_policy_ref, created_ssl_policy)
 
     response = self.Run('compute ssl-policies create {} --profile {} '
@@ -122,7 +122,7 @@ class SslPolicyCreateGATest(ssl_policies_test_base.SslPoliciesTestBase):
         operation_ref, resource_ref=ssl_policy_ref)
 
     self.ExpectInsertRequest(ssl_policy_ref, ssl_policy_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(ssl_policy_ref, created_ssl_policy)
 
     response = self.Run('compute ssl-policies create {} '
@@ -153,7 +153,7 @@ class SslPolicyCreateGATest(ssl_policies_test_base.SslPoliciesTestBase):
         operation_ref, resource_ref=ssl_policy_ref)
 
     self.ExpectInsertRequest(ssl_policy_ref, ssl_policy_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(ssl_policy_ref, created_ssl_policy)
 
     response = self.Run('compute ssl-policies create {} '

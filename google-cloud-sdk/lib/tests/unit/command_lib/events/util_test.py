@@ -25,6 +25,8 @@ from googlecloudsdk.api_lib.events import source
 from googlecloudsdk.api_lib.events import trigger
 from googlecloudsdk.command_lib.events import exceptions
 from googlecloudsdk.command_lib.events import util
+from googlecloudsdk.core import properties
+from googlecloudsdk.core import resources
 from tests.lib.surface.run import base
 
 
@@ -32,16 +34,26 @@ class UtilTest(base.ServerlessBase):
 
   def _MakeSourceCrds(self, num_sources, num_event_types_per_source):
     """Creates source CRDs with event types."""
-    self.source_crds = [
+    source_crds = [
         custom_resource_definition.SourceCustomResourceDefinition.New(
-            self.mock_crd_client, 'fake-project')
-        for _ in range(num_sources)]
-    self.event_types = []
-    for i, crd in enumerate(self.source_crds):
+            self.mock_crd_client, 'fake-project') for _ in range(num_sources)
+    ]
+    if hasattr(self, 'source_crds'):
+      self.source_crds.extend(source_crds)
+    else:
+      self.source_crds = source_crds
+
+    if not hasattr(self, 'event_types'):
+      self.event_types = []
+    for i, crd in enumerate(source_crds):
       crd.spec.group = 'events.api.group.{}'.format(i)
+      # Keep i == 0 to a valid source kind (CloudPubSubSource), but all others we'll append
+      # the index to keep the source kinds unique
+      source_kind = 'CloudPubSubSource' if i == 0 else 'CloudPubSubSource{}'.format(
+          i)
       crd.spec.names = (
           self.crd_messages.CustomResourceDefinitionNames(
-              kind='PubSub', plural='pubsubs'))
+              kind=source_kind, plural='cloudpubsubsources'))
       event_types = []
       for j in range(num_event_types_per_source):
         event_types.append(
@@ -55,7 +67,7 @@ class UtilTest(base.ServerlessBase):
   def _MakeSource(self, source_crd):
     """Creates a source object of the type specified by source_crd."""
     self.source = source.Source.New(self.mock_serverless_client,
-                                    'default',
+                                    'source-namespace',
                                     source_crd.source_kind,
                                     source_crd.source_api_category)
     self.source.name = 'source-for-my-trigger'
@@ -93,6 +105,44 @@ class UtilTest(base.ServerlessBase):
     with self.assertRaises(exceptions.EventTypeNotFound):
       util.EventTypeFromTypeString(self.source_crds,
                                    'google.source.0.event.type.0')
+
+  def testEventTypeFromTypeStringFilterSource(self):
+    self._MakeSourceCrds(num_sources=2, num_event_types_per_source=2)
+    self.assertEqual(
+        self.event_types[2],
+        util.EventTypeFromTypeString(self.source_crds,
+                                     'google.source.1.event.type.0',
+                                     'CloudPubSubSource1'))
+
+  def testEventTypeFromTypeStringMultipleMatchesNoPrompt(self):
+    properties.VALUES.core.disable_prompts.Set(True)
+    self._MakeSourceCrds(num_sources=1, num_event_types_per_source=2)
+    self._MakeSourceCrds(num_sources=1, num_event_types_per_source=2)
+    with self.assertRaises(exceptions.MultipleEventTypesFound):
+      util.EventTypeFromTypeString(self.source_crds,
+                                   'google.source.0.event.type.0')
+
+  def testEventTypeFromTypeStringMultipleMatchesWithPrompt(self):
+    properties.VALUES.core.disable_prompts.Set(False)
+    self._MakeSourceCrds(num_sources=1, num_event_types_per_source=2)
+    self._MakeSourceCrds(num_sources=1, num_event_types_per_source=2)
+    self.WriteInput('2')
+    self.assertEqual(
+        self.event_types[1],
+        util.EventTypeFromTypeString(self.source_crds,
+                                     'google.source.0.event.type.1'))
+
+  def testGetSourceRefAndCrdForTrigger(self):
+    self._MakeSourceCrds(num_sources=1, num_event_types_per_source=1)
+    self._MakeSource(self.source_crds[0])
+    self._MakeTrigger(self.source, self.event_types[0])
+    expected = resources.REGISTRY.Parse(
+        'source-for-my-trigger',
+        params={'namespacesId': 'source-namespace'},
+        collection='run.namespaces.cloudpubsubsources')
+    self.assertEqual(
+        (expected, self.source_crds[0]),
+        util.GetSourceRefAndCrdForTrigger(self.trigger, self.source_crds))
 
   def testValidateTriggerSucceeds(self):
     self._MakeSourceCrds(num_sources=1, num_event_types_per_source=1)

@@ -88,8 +88,9 @@ wildcards ("+" or "#") or null characters.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -97,6 +98,29 @@ help\fR for details.
 
 This command uses the \fBcloudiot/v1\fR API. The full documentation for this API
 can be found at: https://cloud.google.com/iot
+
+
+
+.SH "EXAMPLES"
+
+To send a simple command to a device in 'my\-registry' and region 'us\-central1'
+using a special command subfolder, run:
+
+.RS 2m
+$ gcloud beta iot devices commands send \-\-region=us\-central1 \e
+    \-\-registry=my\-registry \-\-device=my\-device \e
+    \-\-command\-data="restart job" \e
+    \-\-subfolder="/jobs/metric_collector"
+.RE
+
+To send a command containing special characters to a device in 'my\-registry'
+and region 'us\-central1', run:
+
+.RS 2m
+$ gcloud beta iot devices commands send \-\-region=us\-central1 \e
+    \-\-registry=my\-registry \-\-device=my\-device \e
+    \-\-command\-file=/path/to/command.file
+.RE
 
 
 

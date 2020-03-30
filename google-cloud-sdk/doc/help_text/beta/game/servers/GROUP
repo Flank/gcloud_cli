@@ -1,0 +1,38 @@
+NAME
+    gcloud beta game servers - managed Cloud Game Servers
+
+SYNOPSIS
+    gcloud beta game servers GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Managed Cloud Game Servers.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     clusters
+        (BETA) Deploy and manage Cloud Game Server Clusters.
+
+     configs
+        (BETA) Deploy and manage Cloud Game Server Configs.
+
+     deployments
+        (BETA) Deploy and manage Cloud Game Server Deployments.
+
+     realms
+        (BETA) Deploy and manage Cloud Game Server Realms.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha game servers
+

@@ -141,8 +141,14 @@ class CloneTestGaOnly(base.SourceSdkTest, sdk_test_base.WithOutputCapture):
     self.addCleanup(self.mock_client.Unmock)
 
   def testFullPathRaisesException(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'unrecognized arguments: --use-full-gcloud-path'):
+    err = """\
+ --use-full-gcloud-path flag is available in one or more alternate release tracks. Try:
+
+  gcloud alpha source repos clone --use-full-gcloud-path
+  gcloud beta source repos clone --use-full-gcloud-path
+"""
+    with self.AssertRaisesArgumentErrorRegexp(
+        err):
       self.RunSourceRepos(['clone', 'default', '--use-full-gcloud-path'])
 
   def testCloneMirror(self):

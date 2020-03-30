@@ -29,15 +29,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To describe a label key with id 123 run:
+    To describe a LabelKey with id '123', run:
 
         $ gcloud alpha labelmanager keys describe labelKeys/123
 
-    To describe a label key with the name env under the organization/123 run:
+    To describe a LabelKey with the name 'env' under 'organizations/123', run:
 
         $ gcloud alpha labelmanager keys describe env \
             --label_parent='organizations/123'

@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
     gcloud beta compute disks create DISK_NAME [DISK_NAME ...]
         [--csek-key-file=FILE] [--description=DESCRIPTION]
+        [--erase-windows-vss-signature]
         [--guest-os-features=[GUEST_OS_FEATURE,...]] [--labels=[KEY=VALUE,...]]
         [--licenses=[LICENSE,...]]
         [--physical-block-size=PHYSICAL_BLOCK_SIZE; default="4096"]
@@ -49,16 +50,17 @@ FLAGS
      --description=DESCRIPTION
         An optional, textual description for the disks being created.
 
+     --erase-windows-vss-signature
+        Specifies whether the disk restored from a source snapshot should erase
+        Windows specific VSS signature. See
+        https://cloud.google.com/sdk/gcloud/reference/compute/disks/snapshot#--guest-flush
+
      --guest-os-features=[GUEST_OS_FEATURE,...]
         This parameter enables one or more features for VM instances that use
         the image for their boot disks. The following features are available:
 
         * MULTI_IP_SUBNET - For configuring interfaces with a netmask other
           than /32.
-
-        * SECURE_BOOT - Enables UEFI secure boot, which restrics unsigned
-          software from booting or unsigned drivers from loading on the VM
-          instance.
 
         * UEFI_COMPATIBLE - Enables UEFI booting, which is an alternative
           system boot method. Most public images use the GRUB bootloader as
@@ -75,8 +77,8 @@ FLAGS
           for Windows server include the WINDOWS parameter to indicate that it
           is a Windows image.
 
-    GUEST_OS_FEATURE must be one of: MULTI_IP_SUBNET, SECURE_BOOT,
-    UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS, GVNIC.
+    GUEST_OS_FEATURE must be one of: MULTI_IP_SUBNET, UEFI_COMPATIBLE,
+    VIRTIO_SCSI_MULTIQUEUE, WINDOWS, GVNIC.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -240,8 +242,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     When creating disks, be sure to include the --zone option. To create disks

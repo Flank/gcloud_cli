@@ -42,10 +42,12 @@ class RemoteCompletionTest(base.SqlMockTestBeta,
             items=[
                 self.messages.DatabaseInstance(
                     currentDiskSize=287571860,
-                    databaseVersion='MYSQL_5_5',
+                    databaseVersion=self.messages.DatabaseInstance
+                    .DatabaseVersionValueValuesEnum.MYSQL_5_5,
                     etag='"yGhHGJDUk5hWK-gppo_8C-KD7iU/nbMj8WWUtdJPpSjOHUxEh"',
                     name='backupless-instance',
-                    instanceType='CLOUD_SQL_INSTANCE',
+                    instanceType=self.messages.DatabaseInstance
+                    .InstanceTypeValueValuesEnum.CLOUD_SQL_INSTANCE,
                     ipAddresses=[],
                     ipv6Address='2001:4860:4864:1:df7c:6a7a:d107:ab9d',
                     kind='sql#instance',
@@ -67,7 +69,7 @@ class RemoteCompletionTest(base.SqlMockTestBeta,
                             10,
                             788000,
                             tzinfo=protorpc_util.TimeZoneOffset(
-                                datetime.timedelta(0))),
+                                datetime.timedelta(0))).isoformat(),
                         expirationTime=datetime.datetime(
                             2024,
                             8,
@@ -77,13 +79,14 @@ class RemoteCompletionTest(base.SqlMockTestBeta,
                             10,
                             788000,
                             tzinfo=protorpc_util.TimeZoneOffset(
-                                datetime.timedelta(0))),
+                                datetime.timedelta(0))).isoformat(),
                         instance='backupless-instance',
                         kind='sql#sslCert',
                         sha1Fingerprint='a691db45f7dee0827650fd2eb277d2ca81b9',
                     ),
                     settings=self.messages.Settings(
-                        activationPolicy='ON_DEMAND',
+                        activationPolicy=self.messages.Settings
+                        .ActivationPolicyValueValuesEnum.ON_DEMAND,
                         authorizedGaeApplications=[],
                         backupConfiguration=self.messages.BackupConfiguration(
                             binaryLogEnabled=False,
@@ -104,12 +107,15 @@ class RemoteCompletionTest(base.SqlMockTestBeta,
                             kind='sql#locationPreference',
                             zone=None,
                         ),
-                        pricingPlan='PER_USE',
-                        replicationType='SYNCHRONOUS',
+                        pricingPlan=self.messages.Settings
+                        .PricingPlanValueValuesEnum.PER_USE,
+                        replicationType=self.messages.Settings
+                        .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
                         settingsVersion=1,
                         tier='db-n1-standard-1',
                     ),
-                    state='RUNNABLE',
+                    state=self.messages.DatabaseInstance.StateValueValuesEnum
+                    .RUNNABLE,
                 ),
             ],
             kind='sql#instancesList',

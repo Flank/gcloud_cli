@@ -1,0 +1,303 @@
+title: spanner backups list test
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Test listing backups for the instance
+  - command: spanner backups list --instance=test-instance
+  - stdout: |
+      BACKUP           SOURCE_DATABASE                 CREATION_TIME                EXPIRATION_TIME           STATE  BACKUP_SIZE_IN_BYTES  IN_USE_BY
+      test-backup      carolynz                        2020-02-11T20:30:26.504913Z  2020-03-29T10:00:00Z      READY  190
+      test123          aaa-restore-test-1578502374347  2020-02-11T20:17:51.088047Z  2020-02-12T20:17:50Z      READY
+      ns1              carolynz                        2020-01-30T19:18:39.876576Z  2020-03-29T10:00:00Z      READY  190
+      alternative_01   alternative                     2020-01-21T17:39:57.195245Z  2021-01-21T17:39:57Z      READY
+      test-backup5     carolynz                        2020-01-14T22:00:11.573548Z  2020-03-29T10:49:41Z      READY  190
+      sampledb-backup  carolynz-sampledb               2019-10-22T15:06:46.152891Z  2020-10-22T15:06:45.966Z  READY  7960149
+- execute:
+  - label: Test when there are no backups to list
+  - command: spanner backups list --instance=test-instance-foo
+  - stderr: |
+      Listed 0 items.
+- execute:
+  - label: Test listing backups filtered by database
+  - command: spanner backups list --instance=test-instance --database=carolynz
+  - stdout: |
+      BACKUP        SOURCE_DATABASE  CREATION_TIME                EXPIRATION_TIME       STATE  BACKUP_SIZE_IN_BYTES  IN_USE_BY
+      test-backup   carolynz         2020-02-11T20:30:26.504913Z  2020-03-29T10:00:00Z  READY  190
+      ns1           carolynz         2020-01-30T19:18:39.876576Z  2020-03-29T10:00:00Z  READY  190
+      test-backup5  carolynz         2020-01-14T22:00:11.573548Z  2020-03-29T10:49:41Z  READY  190
+- execute:
+  - label: Test listing backups with filter
+  - command: spanner backups list --instance=test-instance --filter='name:test-backup5'
+  - stdout: |
+      BACKUP        SOURCE_DATABASE  CREATION_TIME                EXPIRATION_TIME       STATE  BACKUP_SIZE_IN_BYTES  IN_USE_BY
+      test-backup5  carolynz         2020-01-14T22:00:11.573548Z  2020-03-29T10:49:41Z  READY  190
+- execute:
+  - label: Test listing backups with page-size
+  - command: spanner backups list --instance=test-instance --page-size=3
+  - stdout: |
+      BACKUP           SOURCE_DATABASE    CREATION_TIME                EXPIRATION_TIME           STATE  BACKUP_SIZE_IN_BYTES  IN_USE_BY
+      alternative_01   alternative        2020-01-21T17:39:57.195245Z  2021-01-21T17:39:57Z      READY
+      test-backup5     carolynz           2020-01-14T22:00:11.573548Z  2020-03-29T10:49:41Z      READY  190
+      sampledb-backup  carolynz-sampledb  2019-10-22T15:06:46.152891Z  2020-10-22T15:06:45.966Z  READY  7960149
+actions:
+- execute_command:
+    command: spanner backups list --instance=test-instance
+    label: Test listing backups for the instance
+    events:
+    - api_call:
+        expect_request:
+          uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/test-instance/backups?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "backups": [
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/test-backup",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz",
+                  "expireTime": "2020-03-29T10:00:00Z",
+                  "createTime": "2020-02-11T20:30:26.504913Z",
+                  "sizeBytes": "190",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/test123",
+                  "database": "projects/fake-project/instances/test-instance/databases/aaa-restore-test-1578502374347",
+                  "expireTime": "2020-02-12T20:17:50Z",
+                  "createTime": "2020-02-11T20:17:51.088047Z",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/ns1",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz",
+                  "expireTime": "2020-03-29T10:00:00Z",
+                  "createTime": "2020-01-30T19:18:39.876576Z",
+                  "sizeBytes": "190",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/alternative_01",
+                  "database": "projects/fake-project/instances/test-instance/databases/alternative",
+                  "expireTime": "2021-01-21T17:39:57Z",
+                  "createTime": "2020-01-21T17:39:57.195245Z",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/test-backup5",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz",
+                  "expireTime": "2020-03-29T10:49:41Z",
+                  "createTime": "2020-01-14T22:00:11.573548Z",
+                  "sizeBytes": "190",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/sampledb-backup",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz-sampledb",
+                  "expireTime": "2020-10-22T15:06:45.966Z",
+                  "createTime": "2019-10-22T15:06:46.152891Z",
+                  "sizeBytes": "7960149",
+                  "state": "READY"
+                }
+              ]
+            }
+    - expect_stdout: |
+        BACKUP           SOURCE_DATABASE                 CREATION_TIME                EXPIRATION_TIME           STATE  BACKUP_SIZE_IN_BYTES  IN_USE_BY
+        test-backup      carolynz                        2020-02-11T20:30:26.504913Z  2020-03-29T10:00:00Z      READY  190
+        test123          aaa-restore-test-1578502374347  2020-02-11T20:17:51.088047Z  2020-02-12T20:17:50Z      READY
+        ns1              carolynz                        2020-01-30T19:18:39.876576Z  2020-03-29T10:00:00Z      READY  190
+        alternative_01   alternative                     2020-01-21T17:39:57.195245Z  2021-01-21T17:39:57Z      READY
+        test-backup5     carolynz                        2020-01-14T22:00:11.573548Z  2020-03-29T10:49:41Z      READY  190
+        sampledb-backup  carolynz-sampledb               2019-10-22T15:06:46.152891Z  2020-10-22T15:06:45.966Z  READY  7960149
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: spanner backups list --instance=test-instance-foo
+    label: Test when there are no backups to list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/test-instance-foo/backups?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {}
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: spanner backups list --instance=test-instance --database=carolynz
+    label: Test listing backups filtered by database
+    events:
+    - api_call:
+        expect_request:
+          uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/test-instance/backups?alt=json&filter=database%3D%22projects%2Ffake-project%2Finstances%2Ftest-instance%2Fdatabases%2Fcarolynz%22
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "backups": [
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/test-backup",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz",
+                  "expireTime": "2020-03-29T10:00:00Z",
+                  "createTime": "2020-02-11T20:30:26.504913Z",
+                  "sizeBytes": "190",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/ns1",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz",
+                  "expireTime": "2020-03-29T10:00:00Z",
+                  "createTime": "2020-01-30T19:18:39.876576Z",
+                  "sizeBytes": "190",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/test-backup5",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz",
+                  "expireTime": "2020-03-29T10:49:41Z",
+                  "createTime": "2020-01-14T22:00:11.573548Z",
+                  "sizeBytes": "190",
+                  "state": "READY"
+                }
+              ]
+            }
+    - expect_stdout: |
+        BACKUP        SOURCE_DATABASE  CREATION_TIME                EXPIRATION_TIME       STATE  BACKUP_SIZE_IN_BYTES  IN_USE_BY
+        test-backup   carolynz         2020-02-11T20:30:26.504913Z  2020-03-29T10:00:00Z  READY  190
+        ns1           carolynz         2020-01-30T19:18:39.876576Z  2020-03-29T10:00:00Z  READY  190
+        test-backup5  carolynz         2020-01-14T22:00:11.573548Z  2020-03-29T10:49:41Z  READY  190
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: spanner backups list --instance=test-instance --filter='name:test-backup5'
+    label: Test listing backups with filter
+    events:
+    - api_call:
+        expect_request:
+          uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/test-instance/backups?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "backups": [
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/test-backup",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz",
+                  "expireTime": "2020-03-29T10:00:00Z",
+                  "createTime": "2020-02-11T20:30:26.504913Z",
+                  "sizeBytes": "190",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/test123",
+                  "database": "projects/fake-project/instances/test-instance/databases/aaa-restore-test-1578502374347",
+                  "expireTime": "2020-02-12T20:17:50Z",
+                  "createTime": "2020-02-11T20:17:51.088047Z",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/ns1",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz",
+                  "expireTime": "2020-03-29T10:00:00Z",
+                  "createTime": "2020-01-30T19:18:39.876576Z",
+                  "sizeBytes": "190",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/alternative_01",
+                  "database": "projects/fake-project/instances/test-instance/databases/alternative",
+                  "expireTime": "2021-01-21T17:39:57Z",
+                  "createTime": "2020-01-21T17:39:57.195245Z",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/test-backup5",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz",
+                  "expireTime": "2020-03-29T10:49:41Z",
+                  "createTime": "2020-01-14T22:00:11.573548Z",
+                  "sizeBytes": "190",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/sampledb-backup",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz-sampledb",
+                  "expireTime": "2020-10-22T15:06:45.966Z",
+                  "createTime": "2019-10-22T15:06:46.152891Z",
+                  "sizeBytes": "7960149",
+                  "state": "READY"
+                }
+              ]
+            }
+
+    - expect_stdout: |
+        BACKUP        SOURCE_DATABASE  CREATION_TIME                EXPIRATION_TIME       STATE  BACKUP_SIZE_IN_BYTES  IN_USE_BY
+        test-backup5  carolynz         2020-01-14T22:00:11.573548Z  2020-03-29T10:49:41Z  READY  190
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: spanner backups list --instance=test-instance --page-size=3
+    label: Test listing backups with page-size
+    events:
+    - api_call:
+        expect_request:
+          uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/test-instance/backups?alt=json&pageSize=3
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "backups": [
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/alternative_01",
+                  "database": "projects/fake-project/instances/test-instance/databases/alternative",
+                  "expireTime": "2021-01-21T17:39:57Z",
+                  "createTime": "2020-01-21T17:39:57.195245Z",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/test-backup5",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz",
+                  "expireTime": "2020-03-29T10:49:41Z",
+                  "createTime": "2020-01-14T22:00:11.573548Z",
+                  "sizeBytes": "190",
+                  "state": "READY"
+                },
+                {
+                  "name": "projects/fake-project/instances/test-instance/backups/sampledb-backup",
+                  "database": "projects/fake-project/instances/test-instance/databases/carolynz-sampledb",
+                  "expireTime": "2020-10-22T15:06:45.966Z",
+                  "createTime": "2019-10-22T15:06:46.152891Z",
+                  "sizeBytes": "7960149",
+                  "state": "READY"
+                }
+              ]
+            }
+
+    - expect_stdout: |
+        BACKUP           SOURCE_DATABASE    CREATION_TIME                EXPIRATION_TIME           STATE  BACKUP_SIZE_IN_BYTES  IN_USE_BY
+        alternative_01   alternative        2020-01-21T17:39:57.195245Z  2021-01-21T17:39:57Z      READY
+        test-backup5     carolynz           2020-01-14T22:00:11.573548Z  2020-03-29T10:49:41Z      READY  190
+        sampledb-backup  carolynz-sampledb  2019-10-22T15:06:46.152891Z  2020-10-22T15:06:45.966Z  READY  7960149
+    - expect_exit:
+        code: 0

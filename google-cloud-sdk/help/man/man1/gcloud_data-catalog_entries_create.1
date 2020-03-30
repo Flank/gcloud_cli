@@ -1,0 +1,273 @@
+
+.TH "GCLOUD_DATA\-CATALOG_ENTRIES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud data\-catalog entries create \- create a Cloud Data Catalog entry
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud data\-catalog entries create\fR (\fIENTRY\fR\ :\ \fB\-\-entry\-group\fR=\fIENTRY_GROUP\fR\ \fB\-\-location\fR=\fILOCATION\fR) ([\fB\-\-type\fR=\fITYPE\fR\ :\ \fB\-\-gcs\-file\-patterns\fR=[\fIGCS_FILE_PATTERNS\fR,...]]\ |\ [\fB\-\-user\-specified\-system\fR=\fIUSER_SPECIFIED_SYSTEM\fR\ \fB\-\-user\-specified\-type\fR=\fIUSER_SPECIFIED_TYPE\fR\ :\ \fB\-\-linked\-resource\fR=\fILINKED_RESOURCE\fR\ \fB\-\-source\-system\-create\-time\fR=\fISOURCE_SYSTEM_CREATE_TIME\fR\ \fB\-\-source\-system\-update\-time\fR=\fISOURCE_SYSTEM_UPDATE_TIME\fR]) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-schema\fR=[\fICOLUMN_NAME\fR=\fICOLUMN_TYPE\fR,...]\ |\ \fB\-\-schema\-from\-file\fR=\fISCHEMA_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Create a Cloud Data Catalog entry.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Entry resource \- Entry to create. The arguments in this group can be used to
+specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [entry] on the command line with a fully
+specified name; set the property [core/project]; provide the argument
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIENTRY\fR
+ID of the entry or fully qualified identifier for the entry. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-entry\-group\fR=\fIENTRY_GROUP\fR
+Entry group of the entry.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the entry.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Types can either be specified as a built\-in type or described as a custom type.
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+
+Built\-in type can be specified for an entry. For types FILESET, a file pattern
+must be specified.
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-type\fR=\fITYPE\fR
+Type of the entry. \fITYPE\fR must be one of: \fBdata\-stream\fR,
+\fBentry\-type\-unspecified\fR, \fBfileset\fR, \fBmodel\fR, \fBtable\fR. This
+flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-gcs\-file\-patterns\fR=[\fIGCS_FILE_PATTERNS\fR,...]
+Patterns to identify a set of files in Google Cloud Storage. A star (\f5*\fR)
+may be used at the end of a pattern to match arbitrary files beginning with that
+pattern.
+
+Examples of valid file patterns:
+.RS 2m
+.IP "\(em" 2m
+gs://bucket_name/\f5*\fR \- Matches all files in 'bucket_name'.
+.IP "\(em" 2m
+gs://bucket_name/file\f5*\fR \- Matches files prefixed by 'file' in
+\'bucket_name'.
+.IP "\(em" 2m
+gs://another_bucket/a.txt \- Matches 'gs://another_bucket/a.txt'.
+.RE
+.RE
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+
+For externally ingested resources, \f5\-\-user\-specified\-type\fR and
+\f5\-\-user\-specified\-system\fR are required. Linked resource and source
+system time stamps are optional.
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-user\-specified\-system\fR=\fIUSER_SPECIFIED_SYSTEM\fR
+External system from which the entry is fed. If \f5\-\-type\fR is not used, then
+\f5\-\-user\-specified\-system\fR must be provided. This flag must be specified
+if any of the other arguments in this group are specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-user\-specified\-type\fR=\fIUSER_SPECIFIED_TYPE\fR
+Type of the entry coming from external system. If \f5\-\-type\fR is not used,
+then \f5\-\-user\-specified\-type\fR must be provided. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-linked\-resource\fR=\fILINKED_RESOURCE\fR
+Link to the resource in external system. If \f5\-\-type\fR is not used, then
+\f5\-\-linked\-resource\fR may be provided.
+
+.TP 2m
+\fB\-\-source\-system\-create\-time\fR=\fISOURCE_SYSTEM_CREATE_TIME\fR
+Creation timestamp of the resource in the external system. If \f5\-\-type\fR is
+not used, then \f5\-\-source\-system\-create\-time\fR may be provided.
+
+.TP 2m
+\fB\-\-source\-system\-update\-time\fR=\fISOURCE_SYSTEM_UPDATE_TIME\fR
+Update timestamp of the resource in the external system. If \f5\-\-type\fR is
+not used, then \f5\-\-source\-system\-update\-time\fR may be provided.
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Textual description of the entry.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Human\-readable name for the entry.
+
+.TP 2m
+
+Column schema for the entry. A schema consists of a list of column names along
+with their types, descriptions, modes, and nested subcolumns. For example:
+
+.RS 2m
+\- column: first_name
+  description: First name
+  mode: REQUIRED
+  type: STRING
+\- column: last_name
+  description: Last name
+  mode: REQUIRED
+  type: STRING
+\- column: addresses
+  description: Addresses
+  mode: REPEATED
+  type: RECORD
+  subcolumns:
+  \- column: city
+    description: City
+    mode: NULLABLE
+    type: STRING
+  \- column: state
+    description: State
+    mode: NULLABLE
+    type: STRING
+.RE
+
+At most one of these may be specified:
+
+
+.RS 2m
+.TP 2m
+\fB\-\-schema\fR=[\fICOLUMN_NAME\fR=\fICOLUMN_TYPE\fR,...]
+Inline schema for the entry. When specifying a schema via this argument, only
+column names and types should be provided. Column modes will default to
+NULLABLE, and column descriptions and nested subcolumns are not supported.
+
+.TP 2m
+\fB\-\-schema\-from\-file\fR=\fISCHEMA_FROM_FILE\fR
+Path to a JSON or YAML file containing the schema for the entry. This can be
+used to specify schemas with column descriptions, column modes other than
+NULLABLE, and nested subcolumns.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdatacatalog/v1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/data\-catalog/docs/
+
+
+
+.SH "EXAMPLES"
+
+To create an entry for a Google Cloud Storage fileset, run:
+
+.RS 2m
+$ gcloud data\-catalog entries create entry1 \e
+    \-\-location=us\-central1 \-\-entry\-group=group1 \e
+    \-\-gcs\-file\-patterns="gs://bucket1/abc/*,gs://bucket1/file1" \e
+    \-\-display\-name="analytics data" type=FILESET
+.RE
+
+To create an entry for a Google Cloud Storage fileset with an inline schema,
+run:
+
+.RS 2m
+$ gcloud data\-catalog entries create entry1 \e
+    \-\-location=us\-central1 \-\-entry\-group=group1 \e
+    \-\-gcs\-file\-patterns="gs://bucket1/*" \-\-display\-name="sales data" \e
+    \-\-schema="qtr=STRING,sales=FLOAT,year=STRING"
+.RE
+
+To create an entry for a resource of a custom type, run:
+
+.RS 2m
+$ gcloud data\-catalog entries create entry1 \e
+    \-\-location=us\-central1 \-\-entry\-group=group1 \e
+    \-\-display\-name="sales data" \-\-linked\-resource="www.resource.com" \e
+    \-\-user\-specified\-type="type_name" \-\-user\-specified\-system="system_name"
+.RE
+
+To create an entry for a Google Cloud Storage fileset with a schema from a file,
+run:
+
+.RS 2m
+$ gcloud data\-catalog entries create entry1 \e
+    \-\-location=us\-central1 \-\-entry\-group=group1 \e
+    \-\-gcs\-file\-patterns="gs://bucket1/*" \-\-display\-name="sales data" \e
+    \-\-schema\-from\-file=/tmp/schema.json \-\-type=FILESET
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha data\-catalog entries create
+$ gcloud beta data\-catalog entries create
+.RE
+

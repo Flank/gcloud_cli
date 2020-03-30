@@ -59,10 +59,10 @@ additional-apks.empty:
   additional-apks: []
 
 other-files.list:
-  other-files: ["local/dir/file1", "/sdcard/dir1", "gs://bucket/file2", "/sdcard/dir2"]
+  other-files: ["/sdcard/dir1/file.txt","local/dir/file1.txt"]
 
 other-files.string:
-  other-files: "local/dir/file1"
+  other-files: "local/dir/file1.txt"
 
 other-files.int:
   other-files: 2
@@ -75,4 +75,15 @@ client-details.string:
 
 client-details.int:
   environment-variables: 2
+
+test-targets-for-shard.empty:
+  test-targets-for-shard:
+
+test-targets-for-shard.wrong-delimiter:
+  test-targets-for-shard:
+    - class com.ClassForShard1#flakyTest1,class com.ClassForShard1#flakyTest2
+    - class com.ClassForShard2#flakyTest3
+
+num-uniform-shards.string:
+  num-uniform-shards: two
 

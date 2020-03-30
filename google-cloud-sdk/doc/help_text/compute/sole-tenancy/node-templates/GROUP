@@ -1,6 +1,6 @@
 NAME
-    gcloud compute sole-tenancy node-templates - read and manage Google Compute
-        Engine sole-tenancy node templates
+    gcloud compute sole-tenancy node-templates - read and manage Compute Engine
+        sole-tenancy node templates
 
 SYNOPSIS
     gcloud compute sole-tenancy node-templates COMMAND [GCLOUD_WIDE_FLAG ...]
@@ -15,35 +15,36 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        Add IAM policy binding to a Google Compute Engine node template.
+        Add IAM policy binding to a Compute Engine node template.
 
      create
-        Creates a Google Compute Engine node template.
+        Create a Compute Engine node template.
 
      delete
-        Deletes a Google Compute Engine node template.
+        Delete a Google Compute Engine node template.
 
      describe
-        Describes a Google Compute Engine node template.
+        Describe a Compute Engine node template.
 
      get-iam-policy
-        Get the IAM Policy for a Google Compute Engine node template.
+        Get the IAM Policy for a Compute Engine node template.
 
      list
         List Google Compute Engine node templates.
 
      remove-iam-policy-binding
-        Remove IAM policy binding from a Google Compute Engine node template.
+        Remove IAM policy binding from a Compute Engine node template.
 
      set-iam-policy
-        Set the IAM policy for a Google Compute Engine node template.
+        Set the IAM policy for a Compute Engine node template.
 
 NOTES
     These variants are also available:

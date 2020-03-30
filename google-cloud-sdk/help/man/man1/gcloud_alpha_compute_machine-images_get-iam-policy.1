@@ -18,11 +18,12 @@ gcloud alpha compute machine\-images get\-iam\-policy \- get the IAM policy for 
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute machine\-images get\-iam\-policy\fR
-displays the IAM policy associated with a Google Compute Engine machine image in
-a project. If formatted as JSON, the output can be edited and used as a policy
-file for set\-iam\-policy. The output includes an "etag" field identifying the
-version emitted and allowing detection of concurrent policy updates; see $
-{parent} set\-iam\-policy for additional details.
+displays the IAM policy associated with a Compute Engine machine image in a
+project. If formatted as JSON, the output can be edited and used as a policy
+file for gcloud alpha compute machine\-images get\-iam\-policy set\-iam\-policy.
+The output includes an \f5etag\fR field that identifies the version emitted and
+allows detection of concurrent policy updates; see $ gcloud alpha compute
+machine\-images get\-iam\-policy set\-iam\-policy for additional details.
 
 
 
@@ -41,7 +42,7 @@ command line. This must be specified.
 .RS 2m
 .TP 2m
 \fIMACHINE_IMAGE\fR
-ID of the machine_image or fully qualified identifier for the machine_image.
+ID of the machine image or fully qualified identifier for the machine image.
 
 
 .RE
@@ -89,8 +90,9 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -117,5 +119,9 @@ $ gcloud alpha compute machine\-images get\-iam\-policy my\-machine\-image
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute machine\-images get\-iam\-policy
+.RE
 

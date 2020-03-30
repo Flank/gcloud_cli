@@ -1,52 +1,53 @@
 NAME
-    gcloud compute sole-tenancy node-groups - read Google Compute Engine
-        sole-tenancy node groups
+    gcloud compute sole-tenancy node-groups - read Compute Engine sole-tenancy
+        node groups
 
 SYNOPSIS
     gcloud compute sole-tenancy node-groups COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Read Google Compute Engine sole-tenancy node groups.
+    Read Compute Engine sole-tenancy node groups.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        Add IAM policy binding to a Google Compute Engine node group.
+        Add IAM policy binding to a Compute Engine node group.
 
      create
-        Creates a Google Compute Engine node group.
+        Create a Compute Engine node group.
 
      delete
-        Deletes a Google Compute Engine node group.
+        Delete a Compute Engine node group.
 
      describe
-        Describes a Google Compute Engine node group.
+        Describe a Compute Engine node group.
 
      get-iam-policy
-        Get the IAM policy for a Google Compute Engine node group.
+        Get the IAM policy for a Compute Engine node group.
 
      list
         List Google Compute Engine node groups.
 
      list-nodes
-        List Google Compute Engine sole-tenant nodes present in a node group.
+        List Compute Engine sole-tenant nodes present in a nodegroup.
 
      remove-iam-policy-binding
-        Remove IAM policy binding from a Google Compute Engine node group.
+        Remove IAM policy binding from a Compute Engine node group.
 
      set-iam-policy
-        Set the IAM policy for a Google Compute Engine node group.
+        Set the IAM policy for a Compute Engine node group.
 
      update
-        Updates a Google Compute Engine node group.
+        Update a Compute Engine node group.
 
 NOTES
     These variants are also available:

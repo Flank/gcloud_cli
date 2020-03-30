@@ -5,7 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha data-catalog tag-templates create
         (TAG_TEMPLATE : --location=LOCATION)
-        --field=[id=ID,type=TYPE,display_name=DISPLAY_NAME,...]
+        --field=[id=ID,
+          type=TYPE,display-name=DISPLAY_NAME,required=REQUIRED,...]
         [--display-name=DISPLAY_NAME] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -29,7 +30,7 @@ POSITIONAL ARGUMENTS
           Location of the tag template.
 
 REQUIRED FLAGS
-     --field=[id=ID,type=TYPE,display_name=DISPLAY_NAME,...]
+     --field=[id=ID,type=TYPE,display-name=DISPLAY_NAME,required=REQUIRED,...]
         Specification for a tag template field. This flag can be repeated to
         specify multiple fields. The following keys are allowed:
 
@@ -44,7 +45,10 @@ REQUIRED FLAGS
             To specify an enum field with values 'A' and 'B':
               `type=enum(A|B)`
 
-            *display_name*::: Display name of the tag template field.
+            *display-name*::: Display name of the tag template field.
+
+            *required*::: Indicates if the tag template field is required.
+                Defaults to FALSE.
 
 OPTIONAL FLAGS
      --display-name=DISPLAY_NAME
@@ -54,36 +58,39 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the datacatalog/v1beta1 API. The full documentation for
     this API can be found at: https://cloud.google.com/data-catalog/docs/
 
 EXAMPLES
-    Create a string tag template with a string field:
+    Create a string tag template with a required string field:
 
         $ gcloud alpha data-catalog tag-templates create TEMPLATE \
-            --field=id=ID,display_name=DISPLAY,type=string
+            --field=id=ID,display-name=DISPLAY,type=string,required=TRUE
 
-    Create an enum tag template with a enum field with values 'A' and 'B':
-
-        $ gcloud alpha data-catalog tag-templates create TEMPLATE \
-            --field=id=ID,display_name=DISPLAY,type=enum(A|B)
-
-    Create a tag template with a string field and an enum field with values 'A'
-    and 'B':
+    Create an enum tag template with an optional enum field with values 'A' and
+    'B':
 
         $ gcloud alpha data-catalog tag-templates create TEMPLATE \
-            --field=id=ID1,display_name=DISPLAY1,type=string \
-            --field=id=ID2,display_name=DISPLAY2,type=enum(A|B)
+            --field=id=ID,display-name=DISPLAY,type='enum(A|B)'
+
+    Create a tag template with a optional string field and a required enum
+    field with values 'A' and 'B':
+
+        $ gcloud alpha data-catalog tag-templates create TEMPLATE \
+            --field=id=ID1,display-name=DISPLAY1,type=string \
+            --field=id=ID2,display-name=DISPLAY2,type='enum(A|B)',required=TRUE
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud data-catalog tag-templates create
         $ gcloud beta data-catalog tag-templates create
 

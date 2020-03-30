@@ -22,7 +22,9 @@ import copy
 import os
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.command_lib.export import util as export_util
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import unit_base
@@ -34,31 +36,16 @@ class AutoscalingPoliciesExportUnitTest(unit_base.DataprocUnitTestBase):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
 
-  def testExportAutoscalingPolicies(self):
-    mocked_response = self.MakeAutoscalingPolicy('fake-project',
-                                                 'antarctica-north42',
+  def _testExportAutoscalingPolicies(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+
+    mocked_response = self.MakeAutoscalingPolicy('fake-project', region,
                                                  'policy-1')
     self.mock_client.projects_regions_autoscalingPolicies.Get.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesGetRequest(
-            name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1'
-        ),
-        response=mocked_response)
-
-    # Export clears id/name, since they cannot be set in import
-    expected_policy = copy.deepcopy(mocked_response)
-    expected_policy.id = None
-    expected_policy.name = None
-
-    self.RunDataproc('autoscaling-policies export policy-1')
-    self.AssertOutputEquals(export_util.Export(expected_policy))
-
-  def testExportAutoscalingPolicies_regionFlag(self):
-    mocked_response = self.MakeAutoscalingPolicy('fake-project', 'cool-region',
-                                                 'policy-1')
-    self.mock_client.projects_regions_autoscalingPolicies.Get.Expect(
-        self.messages.DataprocProjectsRegionsAutoscalingPoliciesGetRequest(
-            name='projects/fake-project/regions/cool-region/autoscalingPolicies/policy-1'
-        ),
+            name='projects/fake-project/regions/{0}/autoscalingPolicies/policy-1'
+            .format(region)),
         response=mocked_response)
 
     # Export clears id/name, since they cannot be set in import
@@ -67,8 +54,26 @@ class AutoscalingPoliciesExportUnitTest(unit_base.DataprocUnitTestBase):
     expected_policy.name = None
 
     self.RunDataproc(
-        'autoscaling-policies export policy-1 --region cool-region')
+        'autoscaling-policies export policy-1 {0}'.format(region_flag))
     self.AssertOutputEquals(export_util.Export(expected_policy))
+
+  def testExportAutoscalingPolicies(self):
+    self._testExportAutoscalingPolicies()
+
+  def testExportAutoscalingPolicies_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testExportAutoscalingPolicies(region='global')
+
+  def testExportAutoscalingPolicies_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testExportAutoscalingPolicies(
+        region='cool-region', region_flag='--region=cool-region')
+
+  def testExportAutoscalingPolicies_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('autoscaling-policies export policy-1', set_region=False)
 
   def testExportAutoscalingPolicies_uri(self):
     mocked_response = self.MakeAutoscalingPolicy('cool-project', 'cool-region',

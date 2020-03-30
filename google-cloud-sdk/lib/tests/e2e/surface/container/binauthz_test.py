@@ -127,8 +127,8 @@ class BinauthzTest(
         noteId=note_id,
         note=self.ca_messages.Note(
             kind=(self.ca_messages.Note.KindValueValuesEnum.ATTESTATION),
-            shortDescription='Attestation Authority Note',
-            attestationAuthority=self.ca_messages.Authority(),
+            shortDescription='Attestor Note',
+            attestation=self.ca_messages.AttestationNote(),
         ),
     )
     note = self.ca_client.projects_notes.Create(request)
@@ -260,14 +260,10 @@ class BinauthzTest(
 
     # Verify the generated Occurrence.
     occurrence = self.GetOccurrence(attestation.name)
-    self.assertEqual(
-        (occurrence.attestation.attestation.genericSignedAttestation
-         .signatures[0].publicKeyId),
-        'bogus_pk_id')
-    self.assertEqual(
-        (occurrence.attestation.attestation.genericSignedAttestation
-         .signatures[0].signature),
-        b'bogus_sig')
+    self.assertEqual((occurrence.attestation.signatures[0].publicKeyId),
+                     'bogus_pk_id')
+    self.assertEqual((occurrence.attestation.signatures[0].signature),
+                     b'bogus_sig')
 
     # Create an attestation with a different artifact URL.
     artifact_url2 = self.GenerateArtifactUrl()
@@ -309,7 +305,7 @@ class BinauthzTest(
         ],
         result_predicate=HasAtLeastThreeElements)
     self.assertEqual(
-        set(occ.resource.uri for occ in occurrences),
+        set(occ.resourceUri for occ in occurrences),
         set([self.artifact_url, artifact_url2, artifact_url3]),
     )
 
@@ -328,14 +324,10 @@ class BinauthzTest(
             'createTime'
         ]))
     self.assertEqual(1, len(occurrences))
-    self.assertEqual(
-        (occurrences[0].attestation.attestation.genericSignedAttestation
-         .signatures[0].publicKeyId),
-        'bogus_pk_id')
-    self.assertEqual(
-        (occurrences[0].attestation.attestation.genericSignedAttestation
-         .signatures[0].signature),
-        b'bogus_sig')
+    self.assertEqual((occurrences[0].attestation.signatures[0].publicKeyId),
+                     'bogus_pk_id')
+    self.assertEqual((occurrences[0].attestation.signatures[0].signature),
+                     b'bogus_sig')
     occurrences = list(self.RunAndUnwindWithRetry(
         [
             'container',
@@ -351,11 +343,9 @@ class BinauthzTest(
         ]))
     self.assertEqual(1, len(occurrences))
     self.assertEqual(
-        (occurrences[0].attestation.attestation.genericSignedAttestation
-         .signatures[0].publicKeyId),
-        ('//cloudkms.googleapis.com/v1/projects/{proj}/locations/us-west1/keyRings/foo/cryptoKeys/bar/cryptoKeyVersions/1'
-         .format(proj=self.Project())),
-    )
+        occurrences[0].attestation.signatures[0].publicKeyId,
+        '//cloudkms.googleapis.com/v1/projects/{proj}/locations/us-west1/keyRings/foo/cryptoKeys/bar/cryptoKeyVersions/1'
+        .format(proj=self.Project()))
 
 
 # TODO(b/112087150): Re-enable when quota is more forgiving.

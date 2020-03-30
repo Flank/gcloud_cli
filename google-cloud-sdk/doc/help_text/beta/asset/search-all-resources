@@ -1,0 +1,95 @@
+NAME
+    gcloud beta asset search-all-resources - searches all the resources under a
+        given scope (i.e., an organization, a folder, or a project) with
+        cloudasset.assets.searchAllResources permission
+
+SYNOPSIS
+    gcloud beta asset search-all-resources [--asset-types=[ASSET_TYPES,...]]
+        [--page-size=PAGE_SIZE] [--page-token=PAGE_TOKEN] [--query=QUERY]
+        [--scope=SCOPE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Searches all the resources under a given scope (i.e., an
+    organization, a folder, or a project) with
+    cloudasset.assets.searchAllResources permission.
+
+FLAGS
+     --asset-types=[ASSET_TYPES,...]
+        A list of asset types (i.e., "compute.googleapis.com/Disk") to search
+        of. If specified and non-empty, only resources matching the specified
+        types will be returned. If empty, it will search all the supported
+        asset types. See
+        https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/overview
+        for supported asset types.
+
+     --page-size=PAGE_SIZE
+        The page size for search result pagination. The number of matching
+        results may be fewer than requested based on the query. The maximum
+        page size is 2000. If page-size is not given the backend will pick an
+        appropriate default page size.
+
+     --page-token=PAGE_TOKEN
+        If present, retrieve the next batch of results from the preceding call
+        to this method. page_token must be the value of next_page_token from
+        the previous response. The values of all other method parameters must
+        be identical to those in the previous call.
+
+     --query=QUERY
+        The query statement.
+
+        Examples:
+        * To find all Cloud resources with "foobar" in their searchable
+          attributes: foobar
+        * To find all Cloud resources with "foo" prefix in their searchable
+          attributes: foo
+        * To find all Cloud resources with "oo" substring within any
+          searchable attribute: oo
+        * To find all Cloud resources with token "//xyz/123" in the full
+          resource name. See Full Resource Names
+          (https://cloud.google.com/apis/design/resource_names#full_resource_name):
+          name: "//xyz/123"
+        * To find all Cloud resources with prefix "//xyz" in the full
+          resource names. name: "//xyz"
+        * To find all Cloud resources with substring "xyz" in the full
+          resource names. name: "xyz"
+        * To find all Cloud resources with "xyz" in their display name:
+          displayName: "xyz"
+        * To find all Cloud resources with "xyz" in their description:
+          description: "xyz"
+
+     --scope=SCOPE
+        The search result scope is limited within a project, folder, or
+        organization. You must have the cloudasset.assets.searchAllResources
+        permission granted to the caller for the desired scope. The allowed
+        value must be one of the following:
+        * Organization number (i.e. "organizations/123")
+        * Folder number(i.e. "folders/1234")
+        * Project number (i.e. "projects/12345")
+    If not specified, it will use your configured project in $ gcloud config
+    list project. You can change this setting by running $ gcloud config set
+    project PROJECT_ID.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the cloudasset/v1p1beta1 API. The full documentation for
+    this API can be found at:
+    https://cloud.google.com/asset-inventory/docs/quickstart
+
+EXAMPLES
+    To search all the resources that contains xyz in the full resource name,
+    under the organization (organizations/123), which you have
+    cloudasset.assets.searchAllResources permission, run:
+
+        $ gcloud beta asset search-all-resources \
+          --scope='organizations/123' --query='name:"*xyz*"'
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

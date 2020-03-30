@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute packet\-mirrorings create \- create a Google Compute Engine packet mirroring
+gcloud beta compute packet\-mirrorings create \- create a Google Compute Engine packet mirroring policy
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute packet\-mirrorings create\fR \fINAME\fR \fB\-\-collector\-ilb\fR=\fICOLLECTOR_ILB\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-no\-enable\fR] [\fB\-\-filter\-cidr\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-filter\-protocols\fR=[\fIPROTOCOL\fR,...]] [\fB\-\-mirrored\-instances\fR=[\fIINSTANCE\fR,...]] [\fB\-\-mirrored\-subnets\fR=[\fISUBNET\fR,...]] [\fB\-\-mirrored\-tags\fR=[\fITAG\fR,...]] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute packet\-mirrorings create\fR \fINAME\fR \fB\-\-collector\-ilb\fR=\fICOLLECTOR_ILB\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-no\-enable\fR] [\fB\-\-filter\-cidr\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-filter\-protocols\fR=[\fIPROTOCOL\fR,...]] [\fB\-\-mirrored\-instances\fR=[\fIINSTANCE\fR,...]] [\fB\-\-mirrored\-subnets\fR=[\fISUBNET\fR,...]] [\fB\-\-mirrored\-tags\fR=[\fITAG\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Create a Google Compute Engine packet mirroring.
+\fB(BETA)\fR Create a Google Compute Engine packet mirroring policy.
 
 
 
@@ -151,28 +151,11 @@ The virtual machines with the provided tags must live in zones contained in the
 same region as this packet mirroring.
 
 .TP 2m
-\fB\-\-priority\fR=\fIPRIORITY\fR
-Priority of applying this packet mirroring. Priority is used to break ties in
-cases where there is more than one matching policy. In the case of two policies
-that apply for a given Instance, the one with the lowest\-numbered priority
-value wins. Mirroring all instances in a region for the network may produce a
-lot of mirrored traffic. If you want to "zoom in" on a subset of that traffic
-you can create another packet mirroring with a more restricted set of mirrored
-instances (using the \-\-mirrored\-\fB flags) or a more restrictive CIDR filter
-and send that traffic to a dedicated collector. Because we cannot mirror traffic
-to multiple sets of collector, you should set the priority for the more specific
-packet mirroring configuration to a lower value to ensure the packets are sent
-to the desired collector. Default value is 1000. Valid range is 0 through 65535.
-If multiple policies end up having the same priority, then one of the policies
-is picked non\-deterministically.
-
-.TP 2m
-\fR\-\-region\fB=\fIREGION\fR
+\fB\-\-region\fR=\fIREGION\fR
 Region of the packet mirroring to create. Overrides the default
-\fRcompute/region\fB property value for this command invocation.
+\fBcompute/region\fR property value for this command invocation.
 
 
-\fR
 .RE
 .sp
 
@@ -181,8 +164,9 @@ Region of the packet mirroring to create. Overrides the default
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -214,10 +198,11 @@ $ gcloud beta compute packet\-mirrorings create my\-pm
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud compute packet\-mirrorings create
 $ gcloud alpha compute packet\-mirrorings create
 .RE
 

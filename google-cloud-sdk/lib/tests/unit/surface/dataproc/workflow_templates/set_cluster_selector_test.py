@@ -21,8 +21,9 @@ from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk import calliope
-
+from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.command_lib.util.args import labels_util
+from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import unit_base
@@ -50,9 +51,12 @@ class WorkflowTemplateSetClusterSelectorUnitTest(
                                    workflow_template=None,
                                    cluster_selector=None,
                                    response=None,
-                                   exception=None):
+                                   exception=None,
+                                   region=None):
+    if region is None:
+      region = self.REGION
     if not workflow_template:
-      workflow_template = self.MakeWorkflowTemplate()
+      workflow_template = self.MakeWorkflowTemplate(region=region)
     self.ExpectGetWorkflowTemplate(
         name=workflow_template.name,
         version=workflow_template.version,
@@ -66,16 +70,40 @@ class WorkflowTemplateSetClusterSelectorUnitTest(
     self.ExpectSetClusterSelector(
         workflow_template, response=response, exception=exception)
 
-  def testSetClusterSelector(self):
-    workflow_template = self.MakeWorkflowTemplate()
+  def _testSetClusterSelector(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+    workflow_template = self.MakeWorkflowTemplate(region=region)
     cluster_labels = {'k1': 'v1'}
     cluster_selector = self.MakeClusterSelector(cluster_labels)
     self.ExpectCallSetClusterSelector(
-        workflow_template=workflow_template, cluster_selector=cluster_selector)
+        workflow_template=workflow_template,
+        cluster_selector=cluster_selector,
+        region=region)
     result = self.RunDataproc('workflow-templates set-cluster-selector {0} '
-                              '--cluster-labels=k1=v1'.format(
-                                  self.WORKFLOW_TEMPLATE))
+                              '--cluster-labels=k1=v1 {1}'.format(
+                                  self.WORKFLOW_TEMPLATE, region_flag))
     self.AssertMessagesEqual(workflow_template, result)
+
+  def testSetClusterSelector(self):
+    self._testSetClusterSelector()
+
+  def testSetClusterSelector_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testSetClusterSelector(region='global')
+
+  def testSetClusterSelector_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testSetClusterSelector(
+        region='us-central1', region_flag='--region=us-central1')
+
+  def testSetClusterSelector_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc(
+          'workflow-templates set-cluster-selector foo --cluster-labels=k1=v1',
+          set_region=False)
 
   def testSetClusterSelectorNoClusterLabels(self):
     workflow_template = self.MakeWorkflowTemplate()

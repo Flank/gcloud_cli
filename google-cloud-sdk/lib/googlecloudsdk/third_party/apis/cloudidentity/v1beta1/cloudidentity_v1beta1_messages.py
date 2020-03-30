@@ -12,20 +12,87 @@ from apitools.base.py import extra_types
 package = 'cloudidentity'
 
 
+class CheckTransitiveMembershipResponse(_messages.Message):
+  r"""The response message for MembershipsService.CheckTransitiveMembership.
+
+  Fields:
+    hasMembership: Response does not include the possible roles of a member
+      since the behavior of this rpc is not all-or-nothing unlike the other
+      rpcs. So, it may not be possible to list all the roles definitively, due
+      to possible lack of authorization in some of the paths.
+  """
+
+  hasMembership = _messages.BooleanField(1)
+
+
+class ClientContext(_messages.Message):
+  r"""Information related to the caller client.
+
+  Fields:
+    appId: [Optional] Identifier of the application. e.g., "com.google.Drive"
+    clientVersion: The name and the version of the client. e.g. "DXP 1.0"
+    iosVendorId: Vendor id of the ios device.
+    osVersion: [Optional] OS version on which the client app is running. e.g.,
+      "iOS 12.1"
+  """
+
+  appId = _messages.StringField(1)
+  clientVersion = _messages.StringField(2)
+  iosVendorId = _messages.StringField(3)
+  osVersion = _messages.StringField(4)
+
+
+class CloudidentityDevicesGetSettingsRequest(_messages.Message):
+  r"""A CloudidentityDevicesGetSettingsRequest object.
+
+  Fields:
+    clientContext_appId: [Optional] Identifier of the application. e.g.,
+      "com.google.Drive"
+    clientContext_clientVersion: The name and the version of the client. e.g.
+      "DXP 1.0"
+    clientContext_iosVendorId: Vendor id of the ios device.
+    clientContext_osVersion: [Optional] OS version on which the client app is
+      running. e.g., "iOS 12.1"
+    resourceId: Resource id of the entity for which the settings are
+      requested.
+  """
+
+  clientContext_appId = _messages.StringField(1)
+  clientContext_clientVersion = _messages.StringField(2)
+  clientContext_iosVendorId = _messages.StringField(3)
+  clientContext_osVersion = _messages.StringField(4)
+  resourceId = _messages.StringField(5, required=True)
+
+
+class CloudidentityDevicesSettingsRequest(_messages.Message):
+  r"""A CloudidentityDevicesSettingsRequest object.
+
+  Fields:
+    getEffectiveSettingsRequest: A GetEffectiveSettingsRequest resource to be
+      passed as the request body.
+    resourceId: Resource id of the entity for which the settings are
+      requested.
+  """
+
+  getEffectiveSettingsRequest = _messages.MessageField('GetEffectiveSettingsRequest', 1)
+  resourceId = _messages.StringField(2, required=True)
+
+
 class CloudidentityGroupsCreateRequest(_messages.Message):
   r"""A CloudidentityGroupsCreateRequest object.
 
   Enums:
-    InitialGroupConfigValueValuesEnum: Initial configuration for creating the
-      Group.
+    InitialGroupConfigValueValuesEnum: Required. The initial configuration
+      option for the `Group`.
 
   Fields:
     group: A Group resource to be passed as the request body.
-    initialGroupConfig: Initial configuration for creating the Group.
+    initialGroupConfig: Required. The initial configuration option for the
+      `Group`.
   """
 
   class InitialGroupConfigValueValuesEnum(_messages.Enum):
-    r"""Initial configuration for creating the Group.
+    r"""Required. The initial configuration option for the `Group`.
 
     Values:
       INITIAL_GROUP_CONFIG_UNSPECIFIED: <no description>
@@ -44,9 +111,9 @@ class CloudidentityGroupsDeleteRequest(_messages.Message):
   r"""A CloudidentityGroupsDeleteRequest object.
 
   Fields:
-    name: [Resource name](https://cloud.google.com/apis/design/resource_names)
-      of the Group in the format: `groups/{group_id}`, where `group_id` is the
-      unique id assigned to the Group.
+    name: Required. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      `Group` to retrieve.  Must be of the form `groups/{group_id}`.
   """
 
   name = _messages.StringField(1, required=True)
@@ -56,29 +123,94 @@ class CloudidentityGroupsGetRequest(_messages.Message):
   r"""A CloudidentityGroupsGetRequest object.
 
   Fields:
-    name: [Resource name](https://cloud.google.com/apis/design/resource_names)
-      of the Group in the format: `groups/{group_id}`, where `group_id` is the
-      unique id assigned to the Group.
+    name: Required. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      `Group` to retrieve.  Must be of the form `groups/{group_id}`.
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class CloudidentityGroupsListRequest(_messages.Message):
+  r"""A CloudidentityGroupsListRequest object.
+
+  Enums:
+    ViewValueValuesEnum: The level of detail to be returned.  If unspecified,
+      defaults to `View.BASIC`.
+
+  Fields:
+    pageSize: The maximum number of results to return.  Note that the number
+      of results returned may be less than this value even if there are more
+      available results. To fetch all results, clients must continue calling
+      this method repeatedly until the response no longer contains a
+      `next_page_token`.  If unspecified, defaults to 200 for `View.BASIC` and
+      to 50 for `View.FULL`.  Must not be greater than 1000 for `View.BASIC`
+      or 500 for `View.FULL`.
+    pageToken: The `next_page_token` value returned from a previous list
+      request, if any.
+    parent: Required. The parent resource under which to list all `Group`s.
+      Must be of the form `identitysources/{identity_source_id}` for external-
+      identity-mapped groups or `customers/{customer_id}` for Google Groups.
+    view: The level of detail to be returned.  If unspecified, defaults to
+      `View.BASIC`.
+  """
+
+  class ViewValueValuesEnum(_messages.Enum):
+    r"""The level of detail to be returned.  If unspecified, defaults to
+    `View.BASIC`.
+
+    Values:
+      VIEW_UNSPECIFIED: <no description>
+      BASIC: <no description>
+      FULL: <no description>
+    """
+    VIEW_UNSPECIFIED = 0
+    BASIC = 1
+    FULL = 2
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3)
+  view = _messages.EnumField('ViewValueValuesEnum', 4)
 
 
 class CloudidentityGroupsLookupRequest(_messages.Message):
   r"""A CloudidentityGroupsLookupRequest object.
 
   Fields:
-    groupKey_id: The id of the entity within the given namespace. The id must
-      be unique within its namespace.
-    groupKey_namespace: Namespaces provide isolation for ids, i.e an id only
-      needs to be unique within its namespace.  Namespaces are currently only
-      created as part of IdentitySource creation from Admin Console. A
-      namespace `"identitysources/{identity_source_id}"` is created
-      corresponding to every Identity Source `identity_source_id`.
+    groupKey_id: The ID of the entity.  For Google-managed entities, the `id`
+      must be the email address of an existing group or user.  For external-
+      identity-mapped entities, the `id` must be a string conforming to the
+      Identity Source's requirements.  Must be unique within a `namespace`.
+    groupKey_namespace: The namespace in which the entity exists.  If not
+      specified, the `EntityKey` represents a Google-managed entity such as a
+      Google user or a Google Group.  If specified, the `EntityKey` represents
+      an external-identity-mapped group. The namespace must correspond to an
+      identity source created in Admin Console and must be in the form of
+      `identitysources/{identity_source_id}.
   """
 
   groupKey_id = _messages.StringField(1)
   groupKey_namespace = _messages.StringField(2)
+
+
+class CloudidentityGroupsMembershipsCheckTransitiveMembershipRequest(_messages.Message):
+  r"""A CloudidentityGroupsMembershipsCheckTransitiveMembershipRequest object.
+
+  Fields:
+    parent: [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the group
+      to check the transitive membership in.  Format: `groups/{group_id}`,
+      where `group_id` is the unique id assigned to the Group to which the
+      Membership belongs to.
+    query: Required. A CEL expression that MUST include member specification.
+      This is a `required` field.  Example query: member_key_id ==
+      'member_key_id_value' [ && member_key_namespace ==
+      'member_key_namespace_value' ]
+  """
+
+  parent = _messages.StringField(1, required=True)
+  query = _messages.StringField(2)
 
 
 class CloudidentityGroupsMembershipsCreateRequest(_messages.Message):
@@ -86,10 +218,8 @@ class CloudidentityGroupsMembershipsCreateRequest(_messages.Message):
 
   Fields:
     membership: A Membership resource to be passed as the request body.
-    parent: [Resource
-      name](https://cloud.google.com/apis/design/resource_names) of the Group
-      to create Membership within. Format: `groups/{group_id}`, where
-      `group_id` is the unique id assigned to the Group.
+    parent: Required. The parent `Group` resource under which to create the
+      `Membership`.  Must be of the form `groups/{group_id}`.
   """
 
   membership = _messages.MessageField('Membership', 1)
@@ -100,25 +230,46 @@ class CloudidentityGroupsMembershipsDeleteRequest(_messages.Message):
   r"""A CloudidentityGroupsMembershipsDeleteRequest object.
 
   Fields:
-    name: [Resource name](https://cloud.google.com/apis/design/resource_names)
-      of the Membership to be deleted.  Format:
-      `groups/{group_id}/memberships/{member_id}`, where `group_id` is the
-      unique id assigned to the Group to which Membership belongs to, and
-      member_id is the unique id assigned to the member.
+    name: Required. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      `Membership` to delete.  Must be of the form
+      `groups/{group_id}/memberships/{membership_id}`.
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class CloudidentityGroupsMembershipsGetMembershipGraphRequest(_messages.Message):
+  r"""A CloudidentityGroupsMembershipsGetMembershipGraphRequest object.
+
+  Fields:
+    parent: Required. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the group
+      to search transitive memberships in.  Format: `groups/{group_id}`, where
+      `group_id` is the unique ID assigned to the Group to which the
+      Membership belongs to. group_id can be a wildcard collection id "-".
+      When a group_id is specified, the membership graph will be constrained
+      to paths between the member (defined in the query) and the parent. If a
+      wildcard collection is provided, all membership paths connected to the
+      member will be returned.
+    query: Required. A CEL expression that MUST include member specification
+      AND label(s).  Example query: member_key_id == 'member_key_id_value' [
+      && member_key_namespace == 'member_key_namespace_value' ] &&
+      <label_value> in labels
+  """
+
+  parent = _messages.StringField(1, required=True)
+  query = _messages.StringField(2)
 
 
 class CloudidentityGroupsMembershipsGetRequest(_messages.Message):
   r"""A CloudidentityGroupsMembershipsGetRequest object.
 
   Fields:
-    name: [Resource name](https://cloud.google.com/apis/design/resource_names)
-      of the Membership to be retrieved.  Format:
-      `groups/{group_id}/memberships/{member_id}`, where `group_id` is the
-      unique id assigned to the Group to which Membership belongs to, and
-      `member_id` is the unique id assigned to the member.
+    name: Required. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      `Membership` to retrieve.  Must be of the form
+      `groups/{group_id}/memberships/{membership_id}`.
   """
 
   name = _messages.StringField(1, required=True)
@@ -128,25 +279,28 @@ class CloudidentityGroupsMembershipsListRequest(_messages.Message):
   r"""A CloudidentityGroupsMembershipsListRequest object.
 
   Enums:
-    ViewValueValuesEnum: Membership resource view to be returned. Defaults to
-      MembershipView.BASIC.
+    ViewValueValuesEnum: The level of detail to be returned.  If unspecified,
+      defaults to `MembershipView.BASIC`.
 
   Fields:
-    pageSize: The default page size is 200 (max 1000) for the BASIC view, and
-      50 (max 500) for the FULL view.
-    pageToken: The next_page_token value returned from a previous list
-      request, if any
-    parent: [Resource
-      name](https://cloud.google.com/apis/design/resource_names) of the Group
-      to list Memberships within.  Format: `groups/{group_id}`, where
-      `group_id` is the unique id assigned to the Group.
-    view: Membership resource view to be returned. Defaults to
-      MembershipView.BASIC.
+    pageSize: The maximum number of results to return.  Note that the number
+      of results returned may be less than this value even if there are more
+      available results. To fetch all results, clients must continue calling
+      this method repeatedly until the response no longer contains a
+      `next_page_token`.  If unspecified, defaults to 200 for
+      `GroupView.BASIC` and to 50 for `GroupView.FULL`.  Must not be greater
+      than 1000 for `GroupView.BASIC` or 500 for `GroupView.FULL`.
+    pageToken: The `next_page_token` value returned from a previous search
+      request, if any.
+    parent: Required. The parent `Group` resource under which to lookup the
+      `Membership` name.  Must be of the form `groups/{group_id}`.
+    view: The level of detail to be returned.  If unspecified, defaults to
+      `MembershipView.BASIC`.
   """
 
   class ViewValueValuesEnum(_messages.Enum):
-    r"""Membership resource view to be returned. Defaults to
-    MembershipView.BASIC.
+    r"""The level of detail to be returned.  If unspecified, defaults to
+    `MembershipView.BASIC`.
 
     Values:
       BASIC: <no description>
@@ -165,17 +319,18 @@ class CloudidentityGroupsMembershipsLookupRequest(_messages.Message):
   r"""A CloudidentityGroupsMembershipsLookupRequest object.
 
   Fields:
-    memberKey_id: The id of the entity within the given namespace. The id must
-      be unique within its namespace.
-    memberKey_namespace: Namespaces provide isolation for ids, i.e an id only
-      needs to be unique within its namespace.  Namespaces are currently only
-      created as part of IdentitySource creation from Admin Console. A
-      namespace `"identitysources/{identity_source_id}"` is created
-      corresponding to every Identity Source `identity_source_id`.
-    parent: [Resource
-      name](https://cloud.google.com/apis/design/resource_names) of the Group
-      to lookup Membership within.  Format: `groups/{group_id}`, where
-      `group_id` is the unique id assigned to the Group.
+    memberKey_id: The ID of the entity.  For Google-managed entities, the `id`
+      must be the email address of an existing group or user.  For external-
+      identity-mapped entities, the `id` must be a string conforming to the
+      Identity Source's requirements.  Must be unique within a `namespace`.
+    memberKey_namespace: The namespace in which the entity exists.  If not
+      specified, the `EntityKey` represents a Google-managed entity such as a
+      Google user or a Google Group.  If specified, the `EntityKey` represents
+      an external-identity-mapped group. The namespace must correspond to an
+      identity source created in Admin Console and must be in the form of
+      `identitysources/{identity_source_id}.
+    parent: Required. The parent `Group` resource under which to lookup the
+      `Membership` name.  Must be of the form `groups/{group_id}`.
   """
 
   memberKey_id = _messages.StringField(1)
@@ -189,15 +344,76 @@ class CloudidentityGroupsMembershipsModifyMembershipRolesRequest(_messages.Messa
   Fields:
     modifyMembershipRolesRequest: A ModifyMembershipRolesRequest resource to
       be passed as the request body.
-    name: [membership resource name]
-      (https://cloud.google.com/apis/design/resource_names) of the Membership
-      in the format: `groups/{group_id}/memberships/{member_id}`, where
-      group_id is the unique ID assigned to the Group to which Membership
-      belongs to, and member_id is the unique ID assigned to the member.
+    name: Required. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      `Membership` whose roles are to be modified.  Must be of the form
+      `groups/{group_id}/memberships/{membership_id}`.
   """
 
   modifyMembershipRolesRequest = _messages.MessageField('ModifyMembershipRolesRequest', 1)
   name = _messages.StringField(2, required=True)
+
+
+class CloudidentityGroupsMembershipsPatchRequest(_messages.Message):
+  r"""A CloudidentityGroupsMembershipsPatchRequest object.
+
+  Fields:
+    membership: A Membership resource to be passed as the request body.
+    name: Output only. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      `Membership`.  Shall be of the form
+      `groups/{group_id}/memberships/{membership_id}`.
+    updateMask: Required. The fully-qualified names of fields to update.
+  """
+
+  membership = _messages.MessageField('Membership', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
+
+
+class CloudidentityGroupsMembershipsSearchTransitiveGroupsRequest(_messages.Message):
+  r"""A CloudidentityGroupsMembershipsSearchTransitiveGroupsRequest object.
+
+  Fields:
+    pageSize: The default page size is 200 (max 1000).
+    pageToken: The next_page_token value returned from a previous list
+      request, if any.
+    parent: [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the group
+      to search transitive memberships in.  Format: `groups/{group_id}`, where
+      `group_id` is always '-' as this API will search across all groups for a
+      given member.
+    query: Required. A CEL expression that MUST include member specification
+      AND label(s). This is a `required` field.  Users can search on label
+      attributes of groups. CONTAINS match ('in') is supported on labels.
+      Example query: member_key_id == 'member_key_id_value' [ &&
+      member_key_namespace == 'member_key_namespace_value' ] && <label_value>
+      in labels
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+  query = _messages.StringField(4)
+
+
+class CloudidentityGroupsMembershipsSearchTransitiveMembershipsRequest(_messages.Message):
+  r"""A CloudidentityGroupsMembershipsSearchTransitiveMembershipsRequest
+  object.
+
+  Fields:
+    pageSize: The default page size is 200 (max 1000).
+    pageToken: The next_page_token value returned from a previous list
+      request, if any.
+    parent: [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the group
+      to search transitive memberships in.  Format: `groups/{group_id}`, where
+      `group_id` is the unique ID assigned to the Group.
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
 
 
 class CloudidentityGroupsPatchRequest(_messages.Message):
@@ -205,11 +421,11 @@ class CloudidentityGroupsPatchRequest(_messages.Message):
 
   Fields:
     group: A Group resource to be passed as the request body.
-    name: Output only. [Resource
-      name](https://cloud.google.com/apis/design/resource_names) of the Group
-      in the format: `groups/{group_id}`, where group_id is the unique id
-      assigned to the Group.  Must be left blank while creating a Group
-    updateMask: Editable fields: `display_name`, `description`
+    name: Output only. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      `Group`.  Shall be of the form `groups/{group_id}`.
+    updateMask: Required. The fully-qualified names of fields to update.  May
+      only contain the following fields: `display_name`, `description`.
   """
 
   group = _messages.MessageField('Group', 1)
@@ -221,25 +437,31 @@ class CloudidentityGroupsSearchRequest(_messages.Message):
   r"""A CloudidentityGroupsSearchRequest object.
 
   Enums:
-    ViewValueValuesEnum: Group resource view to be returned. Defaults to
-      [GroupView.BASIC]().
+    ViewValueValuesEnum: The level of detail to be returned.  If unspecified,
+      defaults to `View.BASIC`.
 
   Fields:
-    pageSize: The default page size is 200 (max 1000) for the BASIC view, and
-      50 (max 500) for the FULL view.
-    pageToken: The next_page_token value returned from a previous search
+    pageSize: The maximum number of results to return.  Note that the number
+      of results returned may be less than this value even if there are more
+      available results. To fetch all results, clients must continue calling
+      this method repeatedly until the response no longer contains a
+      `next_page_token`.  If unspecified, defaults to 200 for
+      `GroupView.BASIC` and to 50 for `GroupView.FULL`.  Must not be greater
+      than 1000 for `GroupView.BASIC` or 500 for `GroupView.FULL`.
+    pageToken: The `next_page_token` value returned from a previous search
       request, if any.
-    query: Query string for performing search on groups. Users can search on
-      namespace and label attributes of groups. EXACT match ('=') is supported
-      on namespace, and CONTAINS match (':') is supported on labels. This is a
-      `required` field. Multiple queries can be combined using `AND` operator.
-      The operator is case sensitive. An example query would be:
-      "namespace=<namespace_value> AND labels:<labels_value>".
-    view: Group resource view to be returned. Defaults to [GroupView.BASIC]().
+    query: Required. The search query.  Must be specified in [Common
+      Expression Language](https://opensource.google/projects/cel). May only
+      contain equality operators on the parent and inclusion operators on
+      labels (e.g., `parent == 'customers/{customer_id}' &&
+      'cloudidentity.googleapis.com/groups.discussion_forum' in labels`).
+    view: The level of detail to be returned.  If unspecified, defaults to
+      `View.BASIC`.
   """
 
   class ViewValueValuesEnum(_messages.Enum):
-    r"""Group resource view to be returned. Defaults to [GroupView.BASIC]().
+    r"""The level of detail to be returned.  If unspecified, defaults to
+    `View.BASIC`.
 
     Values:
       BASIC: <no description>
@@ -254,63 +476,203 @@ class CloudidentityGroupsSearchRequest(_messages.Message):
   view = _messages.EnumField('ViewValueValuesEnum', 4)
 
 
-class EntityKey(_messages.Message):
-  r"""An EntityKey uniquely identifies an Entity. Namespaces are used to
-  provide isolation for ids.  A single Id can be reused across namespaces but
-  the combination of a namespace and an id must be unique.
+class DynamicGroupMetadata(_messages.Message):
+  r"""Dynamic group metadata like queries and status.
 
   Fields:
-    id: The id of the entity within the given namespace. The id must be unique
-      within its namespace.
-    namespace: Namespaces provide isolation for ids, i.e an id only needs to
-      be unique within its namespace.  Namespaces are currently only created
-      as part of IdentitySource creation from Admin Console. A namespace
-      `"identitysources/{identity_source_id}"` is created corresponding to
-      every Identity Source `identity_source_id`.
+    queries: Memberships will be the union of all queries. Only one entry with
+      USER resource is currently supported.
+    status: Output only. Status of the dynamic group.
+  """
+
+  queries = _messages.MessageField('DynamicGroupQuery', 1, repeated=True)
+  status = _messages.MessageField('DynamicGroupStatus', 2)
+
+
+class DynamicGroupQuery(_messages.Message):
+  r"""Defines a query on a resource.
+
+  Enums:
+    ResourceTypeValueValuesEnum:
+
+  Fields:
+    query: Query that determines the memberships of the dynamic group.
+      Examples: All users with at least one `organizations.department` of
+      engineering.  `user.organizations.exists(org,
+      org.department=='engineering')`  All users with at least one location
+      that has area of foo and building_id of bar.
+      `user.locations.exists(loc, loc.area=='foo' && loc.building_id=='bar')`
+    resourceType: A ResourceTypeValueValuesEnum attribute.
+  """
+
+  class ResourceTypeValueValuesEnum(_messages.Enum):
+    r"""ResourceTypeValueValuesEnum enum type.
+
+    Values:
+      RESOURCE_TYPE_UNSPECIFIED: Default value (not valid)
+      USER: For queries on User
+    """
+    RESOURCE_TYPE_UNSPECIFIED = 0
+    USER = 1
+
+  query = _messages.StringField(1)
+  resourceType = _messages.EnumField('ResourceTypeValueValuesEnum', 2)
+
+
+class DynamicGroupStatus(_messages.Message):
+  r"""The current status of a dynamic group along with timestamp.
+
+  Enums:
+    StatusValueValuesEnum: Status of the dynamic group.
+
+  Fields:
+    status: Status of the dynamic group.
+    statusTime: The latest time at which the dynamic group is guaranteed to be
+      in the given status. For example, if status is: UP_TO_DATE - The latest
+      time at which this dynamic group was confirmed to be up to date.
+      UPDATING_MEMBERSHIPS - The time at which dynamic group was created.
+  """
+
+  class StatusValueValuesEnum(_messages.Enum):
+    r"""Status of the dynamic group.
+
+    Values:
+      STATUS_UNSPECIFIED: Default.
+      UP_TO_DATE: The dynamic group is up-to-date.
+      UPDATING_MEMBERSHIPS: The dynamic group has just been created and
+        memberships are being updated.
+    """
+    STATUS_UNSPECIFIED = 0
+    UP_TO_DATE = 1
+    UPDATING_MEMBERSHIPS = 2
+
+  status = _messages.EnumField('StatusValueValuesEnum', 1)
+  statusTime = _messages.StringField(2)
+
+
+class EffectiveSetting(_messages.Message):
+  r"""A EffectiveSetting object.
+
+  Fields:
+    mamDataProtectionSetting: A MamDataProtectionSetting attribute.
+  """
+
+  mamDataProtectionSetting = _messages.MessageField('MamDataProtectionSetting', 1)
+
+
+class EntityKey(_messages.Message):
+  r"""A unique identifier for an entity in the Cloud Identity Groups API.  An
+  entity can represent either a group with an optional `namespace` or a user
+  without a `namespace`. The combination of `id` and `namespace` must be
+  unique; however, the same `id` can be used with different `namespace`s.
+
+  Fields:
+    id: The ID of the entity.  For Google-managed entities, the `id` must be
+      the email address of an existing group or user.  For external-identity-
+      mapped entities, the `id` must be a string conforming to the Identity
+      Source's requirements.  Must be unique within a `namespace`.
+    namespace: The namespace in which the entity exists.  If not specified,
+      the `EntityKey` represents a Google-managed entity such as a Google user
+      or a Google Group.  If specified, the `EntityKey` represents an
+      external-identity-mapped group. The namespace must correspond to an
+      identity source created in Admin Console and must be in the form of
+      `identitysources/{identity_source_id}.
   """
 
   id = _messages.StringField(1)
   namespace = _messages.StringField(2)
 
 
-class Group(_messages.Message):
-  r"""Resource representing a Group
-
-  Messages:
-    LabelsValue: Required. Labels for Group resource. Required. For creating
-      Groups under a namespace, set label key to
-      'labels/system/groups/external' and label value as empty.
+class ExpiryDetail(_messages.Message):
+  r"""The `MembershipRole` expiry details.
 
   Fields:
-    additionalGroupKeys: Optional. Additional entity key aliases for a Group
-    createTime: Output only. The time when the Group was created. Output only
+    expireTime: The time at which the `MembershipRole` will expire.
+  """
+
+  expireTime = _messages.StringField(1)
+
+
+class GetEffectiveSettingsRequest(_messages.Message):
+  r"""A GetEffectiveSettingsRequest object.
+
+  Fields:
+    clientContext: Context of the caller client.
+  """
+
+  clientContext = _messages.MessageField('ClientContext', 1)
+
+
+class GetEffectiveSettingsResponse(_messages.Message):
+  r"""A GetEffectiveSettingsResponse object.
+
+  Fields:
+    effectiveSetting: A EffectiveSetting attribute.
+    resourceId: Resource id of the device.
+  """
+
+  effectiveSetting = _messages.MessageField('EffectiveSetting', 1)
+  resourceId = _messages.StringField(2)
+
+
+class GetMembershipGraphResponse(_messages.Message):
+  r"""The response message for MembershipsService.GetMembershipGraph.
+
+  Fields:
+    adjacencyList: The membership graph's path information represented as an
+      adjacency list.
+    groups: The resources representing each group in the adjacency list. Each
+      group in this list can be correlated to a 'group' of the
+      MembershipAdjacencyList using the 'name' of the Group resource.
+  """
+
+  adjacencyList = _messages.MessageField('MembershipAdjacencyList', 1, repeated=True)
+  groups = _messages.MessageField('Group', 2, repeated=True)
+
+
+class Group(_messages.Message):
+  r"""A group within the Cloud Identity Groups API.  A `Group` is a collection
+  of entities, where each entity is either a user, another group or a service
+  account.
+
+  Messages:
+    LabelsValue: Required. The labels that apply to the `Group`.  Must not
+      contain more than one entry. Must contain the entry
+      `'cloudidentity.googleapis.com/groups.discussion_forum': ''` if the
+      `Group` is a Google Group or `'system/groups/external': ''` if the
+      `Group` is an external-identity-mapped group.
+
+  Fields:
+    additionalGroupKeys: Additional entity key aliases for a Group.
+    createTime: Output only. The time when the `Group` was created.
     description: An extended description to help users determine the purpose
-      of a Group. For example, you can include information about who should
-      join the Group, the types of messages to send to the Group, links to
-      FAQs about the Group, or related Groups. Maximum length is 4,096
-      characters.
-    displayName: The Group's display name.
-    groupKey: Required. Immutable. EntityKey of the Group.  Must be set when
-      creating a Group, read-only afterwards.
-    labels: Required. Labels for Group resource. Required. For creating Groups
-      under a namespace, set label key to 'labels/system/groups/external' and
-      label value as empty.
-    name: Output only. [Resource
-      name](https://cloud.google.com/apis/design/resource_names) of the Group
-      in the format: `groups/{group_id}`, where group_id is the unique id
-      assigned to the Group.  Must be left blank while creating a Group
-    parent: Required. Immutable. The entity under which this Group resides in
-      Cloud Identity resource hierarchy. Must be set when creating a Group,
-      read-only afterwards.  Currently allowed types: 'identitysources'.
-    updateTime: Output only. The time when the Group was last updated. Output
-      only
+      of a `Group`.  Must not be longer than 4,096 characters.
+    displayName: The display name of the `Group`.
+    dynamicGroupMetadata: Optional. Dynamic group metadata like queries and
+      status.
+    groupKey: Required. Immutable. The `EntityKey` of the `Group`.
+    labels: Required. The labels that apply to the `Group`.  Must not contain
+      more than one entry. Must contain the entry
+      `'cloudidentity.googleapis.com/groups.discussion_forum': ''` if the
+      `Group` is a Google Group or `'system/groups/external': ''` if the
+      `Group` is an external-identity-mapped group.
+    name: Output only. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      `Group`.  Shall be of the form `groups/{group_id}`.
+    parent: Required. Immutable. The resource name of the entity under which
+      this `Group` resides in the Cloud Identity resource hierarchy.  Must be
+      of the form `identitysources/{identity_source_id}` for external-
+      identity-mapped groups or `customers/{customer_id}` for Google Groups.
+    updateTime: Output only. The time when the `Group` was last updated.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Required. Labels for Group resource. Required. For creating Groups
-    under a namespace, set label key to 'labels/system/groups/external' and
-    label value as empty.
+    r"""Required. The labels that apply to the `Group`.  Must not contain more
+    than one entry. Must contain the entry
+    `'cloudidentity.googleapis.com/groups.discussion_forum': ''` if the
+    `Group` is a Google Group or `'system/groups/external': ''` if the `Group`
+    is an external-identity-mapped group.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -336,20 +698,103 @@ class Group(_messages.Message):
   createTime = _messages.StringField(2)
   description = _messages.StringField(3)
   displayName = _messages.StringField(4)
-  groupKey = _messages.MessageField('EntityKey', 5)
-  labels = _messages.MessageField('LabelsValue', 6)
-  name = _messages.StringField(7)
-  parent = _messages.StringField(8)
-  updateTime = _messages.StringField(9)
+  dynamicGroupMetadata = _messages.MessageField('DynamicGroupMetadata', 5)
+  groupKey = _messages.MessageField('EntityKey', 6)
+  labels = _messages.MessageField('LabelsValue', 7)
+  name = _messages.StringField(8)
+  parent = _messages.StringField(9)
+  updateTime = _messages.StringField(10)
+
+
+class GroupRelation(_messages.Message):
+  r"""Message representing a transitive group of a user or a group.
+
+  Enums:
+    RelationTypeValueValuesEnum: The relation between the member and the
+      transitive group.
+
+  Messages:
+    LabelsValue: Labels for Group resource.
+
+  Fields:
+    displayName: Display name for this group.
+    group: Resource name for this group.
+    groupKey: Entity key has an id and a namespace. In case of discussion
+      forums, the id will be an email address without a namespace.
+    labels: Labels for Group resource.
+    relationType: The relation between the member and the transitive group.
+    roles: Membership roles of the member for the group.
+  """
+
+  class RelationTypeValueValuesEnum(_messages.Enum):
+    r"""The relation between the member and the transitive group.
+
+    Values:
+      RELATION_TYPE_UNSPECIFIED: The relation type is undefined or
+        undetermined.
+      DIRECT: The two entities have only a direct membership with each other.
+      INDIRECT: The two entities have only an indirect membership with each
+        other.
+      DIRECT_AND_INDIRECT: The two entities have both a direct and an indirect
+        membership with each other.
+    """
+    RELATION_TYPE_UNSPECIFIED = 0
+    DIRECT = 1
+    INDIRECT = 2
+    DIRECT_AND_INDIRECT = 3
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Labels for Group resource.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  displayName = _messages.StringField(1)
+  group = _messages.StringField(2)
+  groupKey = _messages.MessageField('EntityKey', 3)
+  labels = _messages.MessageField('LabelsValue', 4)
+  relationType = _messages.EnumField('RelationTypeValueValuesEnum', 5)
+  roles = _messages.MessageField('TransitiveMembershipRole', 6, repeated=True)
+
+
+class ListGroupsResponse(_messages.Message):
+  r"""The response message for GroupsService.ListGroups.
+
+  Fields:
+    groups: The `Group`s under the specified `parent`.
+    nextPageToken: A continuation token to retrieve the next page of results,
+      or empty if there are no more results available.
+  """
+
+  groups = _messages.MessageField('Group', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
 
 
 class ListMembershipsResponse(_messages.Message):
-  r"""A ListMembershipsResponse object.
+  r"""The response message for MembershipsService.ListMemberships.
 
   Fields:
-    memberships: List of Memberships
-    nextPageToken: Token to retrieve the next page of results, or empty if
-      there are no more results available for listing.
+    memberships: The `Membership`s under the specified `parent`.
+    nextPageToken: A continuation token to retrieve the next page of results,
+      or empty if there are no more results available.
   """
 
   memberships = _messages.MessageField('Membership', 1, repeated=True)
@@ -357,91 +802,199 @@ class ListMembershipsResponse(_messages.Message):
 
 
 class LookupGroupNameResponse(_messages.Message):
-  r"""A LookupGroupNameResponse object.
+  r"""The response message for GroupsService.LookupGroupName.
 
   Fields:
-    name: [Resource name](https://cloud.google.com/apis/design/resource_names)
-      of the Group in the format: `groups/{group_id}`, where `group_id` is the
-      unique id assigned to the Group.
+    name: Output only. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      looked-up `Group`.
   """
 
   name = _messages.StringField(1)
 
 
 class LookupMembershipNameResponse(_messages.Message):
-  r"""A LookupMembershipNameResponse object.
+  r"""The response message for MembershipsService.LookupMembershipName.
 
   Fields:
-    name: [Resource name](https://cloud.google.com/apis/design/resource_names)
-      of the Membership being looked up.  Format:
-      `groups/{group_id}/memberships/{member_id}`, where `group_id` is the
-      unique id assigned to the Group to which Membership belongs to, and
-      `member_id` is the unique id assigned to the member.
+    name: The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      looked-up `Membership`.  Must be of the form
+      `groups/{group_id}/memberships/{membership_id}`.
   """
 
   name = _messages.StringField(1)
 
 
-class Membership(_messages.Message):
-  r"""Resource representing a Membership within a Group
+class MamDataProtectionSetting(_messages.Message):
+  r"""Data protection setting for enforcing data leak restrictions on user's
+  device.
 
   Fields:
-    createTime: Output only. Creation timestamp of the Membership.
-    memberKey: Required. Immutable. EntityKey of the entity to be added as the
-      member. Must be set while creating a Membership, read-only afterwards.
-      Currently allowed entity types: `Users`, `Groups`. This field will be
-      deprecated soon.
-    name: Output only. [Resource
-      name](https://cloud.google.com/apis/design/resource_names) of the
-      Membership in the format: `groups/{group_id}/memberships/{member_id}`,
-      where group_id is the unique id assigned to the Group to which
-      Membership belongs to, and member_id is the unique id assigned to the
-      member  Must be left blank while creating a Membership.
-    roles: Roles for a member within the Group.  Currently supported
-      MembershipRoles: `"MEMBER", "OWNER", "MANAGER"`.
-    updateTime: Output only. Last updated timestamp of the Membership.
+    copyPasteProtected: Whether user's data on the device is protected for
+      cut/copy/paste.
+    obfuscatedCustomerId: Obfuscated customer ID of the user in hex with at
+      most 16 chars.
+    sharingProtected: Whether the user's data on the device is protected for
+      native sharing.
   """
+
+  copyPasteProtected = _messages.BooleanField(1)
+  obfuscatedCustomerId = _messages.StringField(2)
+  sharingProtected = _messages.BooleanField(3)
+
+
+class MemberRelation(_messages.Message):
+  r"""Message representing a transitive membership of a group.
+
+  Enums:
+    RelationTypeValueValuesEnum: The relation between the group and the
+      transitive member.
+
+  Fields:
+    member: Resource name for this member if member is a GROUP, otherwise it
+      is empty.
+    preferredMemberKey: Entity key has an id and a namespace. In case of
+      discussion forums, the id will be an email address without a namespace.
+    relationType: The relation between the group and the transitive member.
+    roles: The membership role details (i.e name of role and expiry time).
+  """
+
+  class RelationTypeValueValuesEnum(_messages.Enum):
+    r"""The relation between the group and the transitive member.
+
+    Values:
+      RELATION_TYPE_UNSPECIFIED: The relation type is undefined or
+        undetermined.
+      DIRECT: The two entities have only a direct membership with each other.
+      INDIRECT: The two entities have only an indirect membership with each
+        other.
+      DIRECT_AND_INDIRECT: The two entities have both a direct and an indirect
+        membership with each other.
+    """
+    RELATION_TYPE_UNSPECIFIED = 0
+    DIRECT = 1
+    INDIRECT = 2
+    DIRECT_AND_INDIRECT = 3
+
+  member = _messages.StringField(1)
+  preferredMemberKey = _messages.MessageField('EntityKey', 2, repeated=True)
+  relationType = _messages.EnumField('RelationTypeValueValuesEnum', 3)
+  roles = _messages.MessageField('TransitiveMembershipRole', 4, repeated=True)
+
+
+class Membership(_messages.Message):
+  r"""A membership within the Cloud Identity Groups API.  A `Membership`
+  defines a relationship between a `Group` and an entity belonging to that
+  `Group`, referred to as a "member".
+
+  Enums:
+    TypeValueValuesEnum: Output only. The type of the membership.
+
+  Fields:
+    createTime: Output only. The time when the `Membership` was created.
+    memberKey: Immutable. The `EntityKey` of the member.  Either `member_key`
+      or `preferred_member_key` must be set when calling
+      MembershipsService.CreateMembership but not both; both shall be set when
+      returned.
+    name: Output only. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      `Membership`.  Shall be of the form
+      `groups/{group_id}/memberships/{membership_id}`.
+    preferredMemberKey: Required. Immutable. The `EntityKey` of the member.
+      Either `member_key` or `preferred_member_key` must be set when calling
+      MembershipsService.CreateMembership but not both; both shall be set when
+      returned.
+    roles: The `MembershipRole`s that apply to the `Membership`.  If
+      unspecified, defaults to a single `MembershipRole` with `name` `MEMBER`.
+      Must not contain duplicate `MembershipRole`s with the same `name`.
+    type: Output only. The type of the membership.
+    updateTime: Output only. The time when the `Membership` was last updated.
+  """
+
+  class TypeValueValuesEnum(_messages.Enum):
+    r"""Output only. The type of the membership.
+
+    Values:
+      TYPE_UNSPECIFIED: Default. Should not be used.
+      USER: Represents user type.
+      SERVICE_ACCOUNT: Represents service account type.
+      GROUP: Represents group type.
+      OTHER: Represents other type.
+    """
+    TYPE_UNSPECIFIED = 0
+    USER = 1
+    SERVICE_ACCOUNT = 2
+    GROUP = 3
+    OTHER = 4
 
   createTime = _messages.StringField(1)
   memberKey = _messages.MessageField('EntityKey', 2)
   name = _messages.StringField(3)
-  roles = _messages.MessageField('MembershipRole', 4, repeated=True)
-  updateTime = _messages.StringField(5)
+  preferredMemberKey = _messages.MessageField('EntityKey', 4)
+  roles = _messages.MessageField('MembershipRole', 5, repeated=True)
+  type = _messages.EnumField('TypeValueValuesEnum', 6)
+  updateTime = _messages.StringField(7)
+
+
+class MembershipAdjacencyList(_messages.Message):
+  r"""Membership graph's path information as an adjacency list.
+
+  Fields:
+    edges: Each edge contains information about the member that belongs to
+      this group.
+    group: Resource name of the group that the members belong to.
+  """
+
+  edges = _messages.MessageField('Membership', 1, repeated=True)
+  group = _messages.StringField(2)
 
 
 class MembershipRole(_messages.Message):
-  r"""Resource representing a role within a Membership.
+  r"""A membership role within the Cloud Identity Groups API.  A
+  `MembershipRole` defines the privileges granted to a `Membership`.
 
   Fields:
-    name: MembershipRole in string format. Currently supported
-      MembershipRoles: `"MEMBER", "OWNER", "MANAGER"`.
+    expiryDetail: The expiry details of the `MembershipRole`.  Expiry details
+      are only supported for `MEMBER` `MembershipRoles`.  May be set if `name`
+      is `MEMBER`. Must not be set if `name` is any other value.
+    name: The name of the `MembershipRole`.  Must be one of `OWNER`,
+      `MANAGER`, `MEMBER`.
   """
 
-  name = _messages.StringField(1)
+  expiryDetail = _messages.MessageField('ExpiryDetail', 1)
+  name = _messages.StringField(2)
 
 
 class ModifyMembershipRolesRequest(_messages.Message):
-  r"""A ModifyMembershipRolesRequest object.
+  r"""The request message for MembershipsService.ModifyMembershipRoles.
 
   Fields:
-    addRoles: Membership roles to be added. Currently supported
-      MembershipRole: 'MEMBER', 'OWNER', 'MANAGER'.
-    removeRoles: Membership role name to be removed. Currently supported
-      MembershipRole: 'OWNER', 'MANAGER'. If removing all roles is needed,
-      please use DeleteMembership to delete the whole membership resource.
-      MEMBER-less owner is not supported so removing just MEMBER role won't be
-      possible.
+    addRoles: The `MembershipRole`s to be added.  Adding or removing roles in
+      the same request as updating roles is not supported.  Must not be set if
+      `update_roles_params` is set.
+    removeRoles: The `name`s of the `MembershipRole`s to be removed.  Adding
+      or removing roles in the same request as updating roles is not
+      supported.  It is not possible to remove the `MEMBER` `MembershipRole`.
+      If you wish to delete a `Membership`, call
+      MembershipsService.DeleteMembership instead.  Must not contain `MEMBER`.
+      Must not be set if `update_roles_params` is set.
+    updateRolesParams: The `MembershipRole`s to be updated.  Updating roles in
+      the same request as adding or removing roles is not supported.  Must not
+      be set if either `add_roles` or `remove_roles` is set.
   """
 
   addRoles = _messages.MessageField('MembershipRole', 1, repeated=True)
   removeRoles = _messages.StringField(2, repeated=True)
+  updateRolesParams = _messages.MessageField('UpdateMembershipRolesParams', 3, repeated=True)
 
 
 class ModifyMembershipRolesResponse(_messages.Message):
-  r"""A ModifyMembershipRolesResponse object.
+  r"""The response message for MembershipsService.ModifyMembershipRoles.
 
   Fields:
-    membership: The membership resource after modifying the membership roles.
+    membership: The `Membership` resource after modifying its
+      `MembershipRole`s.
   """
 
   membership = _messages.MessageField('Membership', 1)
@@ -556,15 +1109,41 @@ class Operation(_messages.Message):
 
 
 class SearchGroupsResponse(_messages.Message):
-  r"""A SearchGroupsResponse object.
+  r"""The response message for GroupsService.SearchGroups.
 
   Fields:
-    groups: List of Groups satisfying the search query.
-    nextPageToken: Token to retrieve the next page of results, or empty if
-      there are no more results available for specified query.
+    groups: The `Group`s that match the search query.
+    nextPageToken: A continuation token to retrieve the next page of results,
+      or empty if there are no more results available.
   """
 
   groups = _messages.MessageField('Group', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class SearchTransitiveGroupsResponse(_messages.Message):
+  r"""The response message for MembershipsService.SearchTransitiveGroups.
+
+  Fields:
+    memberships: List of transitive groups satisfying the query.
+    nextPageToken: Token to retrieve the next page of results, or empty if
+      there are no more results available for listing.
+  """
+
+  memberships = _messages.MessageField('GroupRelation', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class SearchTransitiveMembershipsResponse(_messages.Message):
+  r"""The response message for MembershipsService.SearchTransitiveMemberships.
+
+  Fields:
+    memberships: List of transitive members satisfying the query.
+    nextPageToken: Token to retrieve the next page of results, or empty if
+      there are no more results.
+  """
+
+  memberships = _messages.MessageField('MemberRelation', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
 
 
@@ -680,6 +1259,32 @@ class Status(_messages.Message):
   code = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   details = _messages.MessageField('DetailsValueListEntry', 2, repeated=True)
   message = _messages.StringField(3)
+
+
+class TransitiveMembershipRole(_messages.Message):
+  r"""Message representing the role of a TransitiveMembership.
+
+  Fields:
+    role: TransitiveMembershipRole in string format. Currently supported
+      TransitiveMembershipRoles: `"MEMBER"`, `"OWNER"`, and `"MANAGER"`.
+  """
+
+  role = _messages.StringField(1)
+
+
+class UpdateMembershipRolesParams(_messages.Message):
+  r"""The details of an update to a `MembershipRole`.
+
+  Fields:
+    fieldMask: The fully-qualified names of fields to update.  May only
+      contain the field `expiry_detail`.
+    membershipRole: The `MembershipRole`s to be updated.  Only `MEMBER`
+      `MembershipRoles` can currently be updated.  May only contain a
+      `MembershipRole` with `name` `MEMBER`.
+  """
+
+  fieldMask = _messages.StringField(1)
+  membershipRole = _messages.MessageField('MembershipRole', 2)
 
 
 encoding.AddCustomJsonFieldMapping(

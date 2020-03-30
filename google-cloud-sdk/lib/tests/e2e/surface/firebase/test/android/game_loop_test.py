@@ -26,13 +26,6 @@ from tests.lib.surface.firebase.test.android import commands
 class GameLoopRunTest(e2e_base.TestIntegrationTestBase):
   """Integration test for test type game-loop."""
 
-  def testGameLoopTestType_InvalidScenarioNumber(self):
-    # ftlgame.apk only supports scenarios from 1 to 5.
-    with self.assertRaises(exceptions.BadMatrixError):
-      self.Run(
-          '{cmd} --type=game-loop --app={app} --scenario-numbers=2,6 '.format(
-              cmd=commands.ANDROID_BETA_TEST_RUN, app=e2e_base.FTLGAME_APP))
-
   def testGameLoopTestType_InvalidScenarioLabel(self):
     with self.assertRaises(exceptions.BadMatrixError):
       self.Run('{cmd} --type=game-loop --app={app} --scenario-labels=bad-label '

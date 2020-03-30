@@ -11,23 +11,14 @@ gcloud beta compute instances create \- create Google Compute Engine virtual mac
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-enable\-display\-device\fR] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-shielded\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR;\ default="any"] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-enable\-display\-device\fR] [\fB\-\-erase\-windows\-vss\-signature\fR] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-shielded\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-source\-machine\-image\fR=\fISOURCE_MACHINE_IMAGE\fR] [\fB\-\-source\-machine\-image\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR;\ default="any"] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR \fBgcloud beta compute instances create\fR facilitates the creation
-of Google Compute Engine virtual machines. For example, running:
-
-.RS 2m
-$ gcloud beta compute instances create example\-instance\-1 \e
-    example\-instance\-2 example\-instance\-3 \-\-zone us\-central1\-a
-.RE
-
-will create three instances called \f5example\-instance\-1\fR,
-\f5example\-instance\-2\fR, and \f5example\-instance\-3\fR in the
-\f5us\-central1\-a\fR zone.
+of Google Compute Engine virtual machines.
 
 When an instance is in RUNNING state and the system begins to boot, the instance
 creation is considered finished, and the command returns with a list of new
@@ -185,7 +176,7 @@ used.
 \fBauto\-delete\fR
 If \f5\fIyes\fR\fR, this persistent disk will be automatically deleted when the
 instance is deleted. However, if the disk is later detached from the instance,
-this option won't apply. The default value for this is \f5\fIno\fR\fR.
+this option won't apply. The default value for this is \f5\fIyes\fR\fR.
 
 .TP 2m
 \fBkms\-key\fR
@@ -327,6 +318,12 @@ Enable a display device for instances using a Windows image. Disabled by
 default.
 
 .TP 2m
+\fB\-\-erase\-windows\-vss\-signature\fR
+Specifies whether the disk restored from source snapshots or source machine
+image should erase Windows specific VSS signature. See
+https://cloud.google.com/sdk/gcloud/reference/compute/disks/snapshot#\-\-guest\-flush
+
+.TP 2m
 \fB\-\-hostname\fR=\fIHOSTNAME\fR
 Specify the hostname of the instance to be created. The specified hostname must
 be RFC1035 compliant. If hostname is not specified, the default hostname is
@@ -388,10 +385,11 @@ The instances should be terminated.
 \fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
 Metadata to be made available to the guest operating system running on the
 instances. Each metadata entry is a key/value pair separated by an equals sign.
-Metadata keys must be unique and less than 128 bytes in length. Values must be
-less than or equal to 32,768 bytes in length. Multiple arguments can be passed
-to this flag, e.g., \f5\fI\-\-metadata
-key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR.
+Each metadata key must be unique and have a max of 128 bytes in length. Each
+value must have a max of 256 KB in length. Multiple arguments can be passed to
+this flag, e.g., \f5\fI\-\-metadata
+key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR. The combined total size
+for all metadata entries is 512 KB.
 
 In images that have Compute Engine tools installed on them, such as the official
 images (https://cloud.google.com/compute/docs/images), the following metadata
@@ -433,6 +431,11 @@ CPU platform selection is available only in selected zones.
 
 You can find more information on\-line:
 https://cloud.google.com/compute/docs/instances/specify\-min\-cpu\-platform
+
+.TP 2m
+\fB\-\-min\-node\-cpu\fR=\fIMIN_NODE_CPU\fR
+Minimum number of virtual CPUs this instance will consume when running on a
+sole\-tenant node.
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
@@ -536,6 +539,11 @@ more details. Enabled by default, use \fB\-\-no\-require\-csek\-key\-create\fR
 to disable.
 
 .TP 2m
+\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]
+A list of resource policy names to be added to the instance. The policies must
+exist in the same region as the instance.
+
+.TP 2m
 \fB\-\-restart\-on\-failure\fR
 The instances will be restarted if they are terminated by Compute Engine. This
 does not affect terminations performed by the user. Enabled by default, use
@@ -565,6 +573,17 @@ The name of the instance template that the instance will be created from.
 
 Users can also override machine type and labels. Values of other flags will be
 ignored and \f5\-\-source\-instance\-template\fR will be used instead.
+
+.TP 2m
+\fB\-\-source\-machine\-image\fR=\fISOURCE_MACHINE_IMAGE\fR
+The name of the machine image that the instance will be created from.
+
+.TP 2m
+\fB\-\-source\-machine\-image\-csek\-key\-file\fR=\fIFILE\fR
+Path to a Customer\-Supplied Encryption Key (CSEK) key file, mapping resources
+to user managed keys which were used to encrypt the source machine\-image. See
+https://cloud.google.com/compute/docs/disks/customer\-supplied\-encryption for
+more details.
 
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
@@ -634,10 +653,21 @@ only be used when creating a single instance.
 
 .TP 2m
 \fB\-\-no\-address\fR
-If provided, the instances will not be assigned external IP addresses.
-
+If provided, the instances are not assigned external IP addresses. To pull
+container images, you must configure private Google access if using Container
+Registry or configure Cloud NAT for instances to access container images
+directly. For more information, see:
+.RS 2m
+.IP "\(bu" 2m
+https://cloud.google.com/vpc/docs/configure\-private\-google\-access
+.IP "\(bu" 2m
+https://cloud.google.com/nat/docs/using\-nat
+.RE
+.RE
 .RE
 .sp
+
+.RS 2m
 .TP 2m
 
 Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
@@ -949,20 +979,29 @@ Create instance without service account
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To create an instance with the latest \f5\fIRed Hat Enterprise Linux 8\fR\fR
-image available, run:
+To create an instance with the latest 'Red Hat Enterprise Linux 8' image
+available, run:
 
 .RS 2m
 $ gcloud beta compute instances create example\-instance \e
     \-\-image\-family=rhel\-8 \-\-image\-project=rhel\-cloud \e
     \-\-zone=us\-central1\-a
+.RE
+
+To create instances called 'example\-instance\-1', 'example\-instance\-2', and
+\'example\-instance\-3' in the 'us\-central1\-a' zone, run:
+
+.RS 2m
+$ gcloud beta compute instances create example\-instance\-1 \e
+    example\-instance\-2 example\-instance\-3 \-\-zone=us\-central1\-a
 .RE
 
 

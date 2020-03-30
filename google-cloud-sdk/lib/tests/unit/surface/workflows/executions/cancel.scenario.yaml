@@ -1,0 +1,43 @@
+title: gcloud workflows executions cancel test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      workflows executions cancel foo --location us-central1 --workflow test-workflow
+  - prompt:
+    - message: |
+        You are about to cancel execution [foo] of workflow [test-workflow].
+    - input: y
+  - stdout: |
+      argument: 'null'
+      name: projects/fake-project/locations/us-central1/workflows/test-workflow/executions/foo
+      state: CANCELLED
+actions:
+- execute_command:
+    command: |
+      workflows executions cancel foo --location us-central1 --workflow test-workflow
+    events:
+    - expect_prompt_continue:
+        message: |
+          You are about to cancel execution [foo] of workflow [test-workflow].
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://workflowexecutions.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/workflows/test-workflow/executions/foo:cancel?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/workflows/test-workflow/executions/foo
+            argument: 'null'
+            state: CANCELLED
+    - expect_stdout: |
+        argument: 'null'
+        name: projects/fake-project/locations/us-central1/workflows/test-workflow/executions/foo
+        state: CANCELLED
+    - expect_exit:
+        code: 0

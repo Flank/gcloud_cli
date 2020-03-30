@@ -11,14 +11,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
 
      buckets
-        (ALPHA) Manage Stackdriver Logging buckets.
+        (ALPHA) Manage Cloud Logging buckets.
 
      logs
         (ALPHA) Manages your project's logs.
@@ -31,6 +32,9 @@ GROUPS
 
      sinks
         (ALPHA) Manages sinks used to export logs.
+
+     views
+        (ALPHA) Manage Cloud Logging views.
 
 COMMANDS
     COMMAND is one of the following:

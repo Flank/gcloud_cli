@@ -5,11 +5,12 @@ NAME
 SYNOPSIS
     gcloud beta kms keyrings remove-iam-policy-binding
         (KEYRING : --location=LOCATION) --member=MEMBER --role=ROLE
-        [GCLOUD_WIDE_FLAG ...]
+        [--all | --condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Removes a policy binding from the IAM policy of a kms keyring. One
-    binding consists of a member and a role.
+    binding consists of a member, a role, and an optional condition.
 
 POSITIONAL ARGUMENTS
      Keyring resource - The keyring to remove the IAM policy binding. The
@@ -46,12 +47,46 @@ REQUIRED FLAGS
      --role=ROLE
         The role to remove the member from.
 
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --all
+          Remove all bindings with this role and member, irrespective of any
+          conditions.
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be removed. When condition is explicitly
+          specified as None (e.g. --condition=None), it matches a binding
+          without a condition. Otherwise, only the binding with a condition
+          which exactly matches the specified condition (including the optional
+          description) will be removed.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the cloudkms/v1 API. The full documentation for this API
@@ -65,6 +100,27 @@ EXAMPLES
         $ gcloud beta kms keyrings remove-iam-policy-binding fellowship \
             --location='global' --member='user:test-user@gmail.com' \
             --role='roles/cloudkms.signer'
+
+    To remove an IAM policy binding with a condition of
+    expression='request.time < timestamp("2019-01-01T00:00:00Z")',
+    title='expires_end_of_2018', and description='Expires at midnight on
+    2018-12-31' for the role of 'roles/cloudkms.signer' for the user
+    'test-user@gmail.com' on the keyring fellowship with location global, run:
+
+        $ gcloud beta kms keyrings remove-iam-policy-binding fellowship \
+            --location='global' --member='user:test-user@gmail.com' \
+            --role='roles/cloudkms.signer' \
+            --condition='expression=request.time <
+         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+        tion=Expires at midnight on 2018-12-31'
+
+    To remove all IAM policy bindings regardless of the condition for the role
+    of 'roles/cloudkms.signer' and for the user 'test-user@gmail.com' on the
+    keyring fellowship with location global, run:
+
+        $ gcloud beta kms keyrings remove-iam-policy-binding fellowship \
+            --location='global' --member='user:test-user@gmail.com' \
+            --role='roles/cloudkms.signer' --all
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

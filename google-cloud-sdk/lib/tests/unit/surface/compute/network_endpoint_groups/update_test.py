@@ -34,12 +34,14 @@ class NetworkEndpointGroupsUpdateTest(sdk_test_base.WithFakeAuth,
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'v1'))
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'v1')
+    self.api_version = 'v1'
+    self.client = mock.Client(
+        core_apis.GetClientClass('compute', self.api_version))
     self.client.Mock()
-    self.messages = self.client.MESSAGES_MODULE
     self.addCleanup(self.client.Unmock)
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', self.api_version)
+    self.messages = self.client.MESSAGES_MODULE
 
     self.operation_status_enum = self.messages.Operation.StatusValueValuesEnum
     self.region = 'us-central1'
@@ -49,8 +51,9 @@ class NetworkEndpointGroupsUpdateTest(sdk_test_base.WithFakeAuth,
     return self.messages.Operation(
         name=operation_name,
         status=status,
-        selfLink='https://compute.googleapis.com/compute/v1/projects/{0}/zones/'
-        '{1}/operations/{2}'.format(self.Project(), self.zone, operation_name),
+        selfLink='https://compute.googleapis.com/compute/{0}/projects/{1}/zones/'
+        '{2}/operations/{3}'.format(self.api_version, self.Project(), self.zone,
+                                    operation_name),
         targetLink=resource_uri)
 
   def _ExpectAttachEndpoints(self, endpoints, operation_suffix='X'):
@@ -87,18 +90,19 @@ class NetworkEndpointGroupsUpdateTest(sdk_test_base.WithFakeAuth,
 
   def _ExpectPollAndGet(self, operation_suffix='X'):
     neg_name = 'my-neg'
-    neg_uri = ('https://compute.googleapis.com/compute/v1/projects/{0}/zones/'
-               '{1}/networkEndpointGroups/{2}'.format(self.Project(), self.zone,
+    neg_uri = ('https://compute.googleapis.com/compute/{0}/projects/{1}/zones/'
+               '{2}/networkEndpointGroups/{3}'.format(self.api_version,
+                                                      self.Project(), self.zone,
                                                       neg_name))
-    self.client.zoneOperations.Get.Expect(
-        self.messages.ComputeZoneOperationsGetRequest(
+    self.client.zoneOperations.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
             operation='operation-' + operation_suffix,
             zone=self.zone,
             project=self.Project()),
         self._GetOperationMessage(
             'operation-' + operation_suffix,
-            self.messages.Operation.StatusValueValuesEnum.DONE,
-            neg_uri))
+            self.messages.Operation.StatusValueValuesEnum.DONE, neg_uri))
+
     self.client.networkEndpointGroups.Get.Expect(
         self.messages.ComputeNetworkEndpointGroupsGetRequest(
             networkEndpointGroup=neg_name, project=self.Project(),
@@ -193,20 +197,6 @@ class NetworkEndpointGroupsUpdateTest(sdk_test_base.WithFakeAuth,
           'compute network-endpoint-groups update my-neg '
           '--zone ' + self.zone)
 
-
-class AlphaNetworkEndpointGroupsUpdateTest(NetworkEndpointGroupsUpdateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
-    self.client.Mock()
-    self.messages = self.client.MESSAGES_MODULE
-    self.addCleanup(self.client.Unmock)
-
-    self.operation_status_enum = self.messages.Operation.StatusValueValuesEnum
-
   def _GetGlobalOperationMessage(self,
                                  operation_name,
                                  status,
@@ -214,8 +204,9 @@ class AlphaNetworkEndpointGroupsUpdateTest(NetworkEndpointGroupsUpdateTest):
     return self.messages.Operation(
         name=operation_name,
         status=status,
-        selfLink='https://compute.googleapis.com/compute/v1/projects/{0}/global/'
-        'operations/{1}'.format(self.Project(), operation_name),
+        selfLink='https://compute.googleapis.com/compute/{0}/projects/{1}/global/'
+        'operations/{2}'.format(self.api_version, self.Project(),
+                                operation_name),
         targetLink=resource_uri)
 
   def _ExpectAttachGlobalEndpoints(self, endpoints, operation_suffix='X'):
@@ -250,11 +241,13 @@ class AlphaNetworkEndpointGroupsUpdateTest(NetworkEndpointGroupsUpdateTest):
 
   def _ExpectGlobalPollAndGet(self, operation_suffix='X'):
     neg_name = 'my-global-neg'
-    neg_uri = ('https://compute.googleapis.com/compute/alpha/projects/{0}/global/'
-               'networkEndpointGroups/{1}'.format(self.Project(), neg_name))
-    self.client.globalOperations.Get.Expect(
-        self.messages.ComputeGlobalOperationsGetRequest(
-            operation='operation-' + operation_suffix, project=self.Project()),
+    neg_uri = ('https://compute.googleapis.com/compute/{0}/projects/{1}/global/'
+               'networkEndpointGroups/{2}'.format(self.api_version,
+                                                  self.Project(), neg_name))
+    self.client.globalOperations.Wait.Expect(
+        self.messages.ComputeGlobalOperationsWaitRequest(
+            operation='operation-' + operation_suffix,
+            project=self.Project()),
         self._GetGlobalOperationMessage(
             'operation-' + operation_suffix,
             self.messages.Operation.StatusValueValuesEnum.DONE, neg_uri))
@@ -306,6 +299,22 @@ class AlphaNetworkEndpointGroupsUpdateTest(NetworkEndpointGroupsUpdateTest):
     self.Run('compute network-endpoint-groups update my-global-neg '
              '--remove-endpoint fqdn=example.com --global')
     self.AssertErrContains('Detaching 1 endpoints from [my-global-neg].')
+
+
+class AlphaNetworkEndpointGroupsUpdateTest(NetworkEndpointGroupsUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+    self.client = mock.Client(
+        core_apis.GetClientClass('compute', self.api_version))
+    self.client.Mock()
+    self.addCleanup(self.client.Unmock)
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', self.api_version)
+    self.messages = self.client.MESSAGES_MODULE
+
+    self.operation_status_enum = self.messages.Operation.StatusValueValuesEnum
 
   def testUpdate_NonGcpPrivateIpPortType_AddEndpointSimple(self):
     endpoints = [

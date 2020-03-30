@@ -72,8 +72,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create a new feed 'feed1' in project 'p1' which alerts on compute disks
@@ -84,8 +85,9 @@ EXAMPLES
         --content-type=resource --pubsub-topic=projects/project1/topics/feed-topic
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud asset feeds create
         $ gcloud alpha asset feeds create
 

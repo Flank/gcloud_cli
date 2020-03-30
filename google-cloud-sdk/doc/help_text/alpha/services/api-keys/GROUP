@@ -1,0 +1,53 @@
+NAME
+    gcloud alpha services api-keys - manage api keys
+
+SYNOPSIS
+    gcloud alpha services api-keys COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage api keys.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     clone
+        (ALPHA) Create a new API key with the same metadata as input key.
+
+     create
+        (ALPHA) Create an API key.
+
+     delete
+        (ALPHA) Delete an API key.
+
+     describe
+        (ALPHA) Describe an API key's metadata.
+
+     get-key-string
+        (ALPHA) Get key string of an API key.
+
+     list
+        (ALPHA) Lists API keys.
+
+     lookup
+        (ALPHA) Look up resource name of a key string.
+
+     undelete
+        (ALPHA) Undelete an API key.
+
+     update
+        (ALPHA) Update an API key's metadata.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

@@ -259,12 +259,12 @@ class ForwardingRuleUpdateWithNetworkTierAlphaTest(
           """)
 
 
-class ForwardingRuleUpdateWithGlobalAccessBetaTest(
+class ForwardingRuleUpdateWithGlobalAccessGATest(
     forwarding_rules_update_test_base.UpdateTestBase):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testUpdateRegionWithGlobalAccess(self):
     self._SetNextGetResult(allowGlobalAccess=None)
@@ -281,6 +281,14 @@ class ForwardingRuleUpdateWithGlobalAccessBetaTest(
              '--no-allow-global-access --region us-central2')
 
     self._CheckPatchRequest(is_global=False, allowGlobalAccess=False)
+
+
+class ForwardingRuleUpdateWithGlobalAccessBetaTest(
+    ForwardingRuleUpdateWithGlobalAccessGATest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ForwardingRuleUpdateWithGlobalAccessAlphaTest(

@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import datetime
 from googlecloudsdk.api_lib.logging import util
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -72,7 +73,7 @@ class EntriesReadTest(base.LoggingTestBase):
   def testReadFilters(self):
     custom_timestamp = util.FormatTimestamp(fixture.MOCK_UTC_TIME -
                                             datetime.timedelta(hours=10))
-    self._setExpect('timestamp>="{0}" AND (severity=INFO logName=my-log)'
+    self._setExpect('timestamp>="{0}" AND severity=INFO logName=my-log'
                     .format(custom_timestamp))
     self.RunLogging('read "severity=INFO logName=my-log" --freshness=10h')
 
@@ -133,6 +134,39 @@ class EntriesReadTest(base.LoggingTestBase):
   def testReadNoAuth(self):
     self.RunWithoutAuth('read')
 
+
+@mock.patch('datetime.datetime', new=fixture.FakeDatetime)
+class EntriesReadTestAlpha(EntriesReadTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testReadFromView(self):
+    default_timestamp = util.FormatTimestamp(fixture.MOCK_UTC_TIME -
+                                             datetime.timedelta(days=1))
+    self.mock_client_v2.entries.List.Expect(
+        self.msgs.ListLogEntriesRequest(
+            resourceNames=['projects/my-project/locations/my-location/'
+                           'buckets/my-bucket/views/my-view'],
+            filter='timestamp>="{0}"'.format(default_timestamp),
+            orderBy='timestamp desc',
+            pageSize=1000),
+        self.msgs.ListLogEntriesResponse(entries=self._entries))
+    generator = self.RunLogging('read --format=disable --location=my-location '
+                                '--bucket=my-bucket --view=my-view')
+    self.assertEqual(list(generator), self._entries)
+
+  def testReadFromViewLocationRequired(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.RunLogging('read --bucket=my-bucket --view=my-view')
+
+  def testReadFromViewBucketRequired(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.RunLogging('read --location=my-location --view=my-view')
+
+  def testReadFromViewViewRequired(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.RunLogging('read --location=my-location --bucket=my-bucket')
 
 if __name__ == '__main__':
   test_case.main()

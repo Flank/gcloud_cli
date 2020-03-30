@@ -20,8 +20,8 @@ gcloud beta compute forwarding\-rules set\-target \- modify a forwarding rule to
 \fB(BETA)\fR \fBgcloud beta compute forwarding\-rules set\-target\fR is used to
 set a new target for a forwarding.RS 2m
 rule.         A forwarding rule directs traffic that matches a destination IP address
- to a forwarding target (load balancer, VPN
-gateway or VM instance).
+ (and possibly a TCP or UDP port) to a
+forwarding target (load balancer, VPN gateway or VM instance).
 .RE
 
 Forwarding rules can be either global or regional, specified with the
@@ -44,7 +44,7 @@ ephemeral internal IP address from the subnet specified with the
 self\-managed forwarding rule.
 
 Different types of load balancers work at different layers of the OSI networking
-model (http://en.wikipedia.org/wiki/Network_layer). Layer 3 targets include
+model (http://en.wikipedia.org/wiki/Network_layer). Layer 3/4 targets include
 target pools, target SSL proxies, target TCP proxies, and backend services.
 Layer 7 targets include target HTTP proxies and target HTTPS proxies. For more
 information, refer to
@@ -356,8 +356,9 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

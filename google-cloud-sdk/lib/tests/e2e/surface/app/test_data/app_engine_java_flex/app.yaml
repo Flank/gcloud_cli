@@ -1,4 +1,4 @@
-runtime: java7
+runtime: java
 env: flex
 manual_scaling:
   instances: 1

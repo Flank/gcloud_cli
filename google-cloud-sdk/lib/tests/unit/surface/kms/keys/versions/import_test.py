@@ -26,10 +26,10 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.kms import base
 
 
-class ImportKeyVersionTestBeta(base.KmsMockTest):
+class ImportKeyVersionTestGA(base.KmsMockTest):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.rsa_aes_wrapped_key_path = self.Touch(
@@ -105,8 +105,8 @@ class ImportKeyVersionTestBeta(base.KmsMockTest):
     with self.AssertRaisesExceptionMatches(
         exceptions.BadFileException,
         r'is larger than the maximum size of 65536 bytes.'):
-      self.Run('kms keys versions import --location={0} --keyring={1} --key={2} '
-               '--import-job={3} --rsa-aes-wrapped-key-file={4} '
+      self.Run('kms keys versions import --location={0} --keyring={1} '
+               '--key={2} --import-job={3} --rsa-aes-wrapped-key-file={4} '
                '--algorithm=google-symmetric-encryption'.format(
                    self.version_name.location_id, self.version_name.key_ring_id,
                    self.version_name.crypto_key_id,
@@ -127,13 +127,19 @@ class ImportKeyVersionTestBeta(base.KmsMockTest):
         exception=http_error.MakeHttpError())
     with self.AssertRaisesExceptionMatches(exceptions.HttpException,
                                            'Invalid request'):
-      self.Run('kms keys versions import --location={0} --keyring={1} --key={2} '
-               '--import-job={3} --rsa-aes-wrapped-key-file={4} '
+      self.Run('kms keys versions import --location={0} --keyring={1} '
+               '--key={2} --import-job={3} --rsa-aes-wrapped-key-file={4} '
                '--algorithm=google-symmetric-encryption'.format(
                    self.version_name.location_id, self.version_name.key_ring_id,
                    self.version_name.crypto_key_id,
                    self.import_job_name.RelativeName(),
                    self.rsa_aes_wrapped_key_path))
+
+
+class ImportKeyVersionTestBeta(ImportKeyVersionTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ImportKeyVersionTestAlpha(ImportKeyVersionTestBeta):

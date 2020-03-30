@@ -97,9 +97,9 @@ actions:
     delimiter: _
 - execute_command:
     command: data-catalog tag-templates create $$my-tag-template$$ --location=$$location$$
-      --display-name="Display name" --field=id=dbl_field,display_name=double_field,type=double
-      --field=id=str_field,display_name=string_field,type=string --field=id=bool_field,display_name=boolean_field,type=bool
-      --field=id=ts_field,display_name=timestamp_field,type=timestamp --field=id=enum_field,display_name=enums_field,type=enum(A|B)
+      --display-name="Display name" --field=id=dbl_field,display-name=double_field,type=double,required=true
+      --field=id=str_field,display-name=string_field,type=string --field=id=bool_field,display-name=boolean_field,type=bool,required=true
+      --field=id=ts_field,display-name=timestamp_field,type=timestamp --field=id=enum_field,display-name=enums_field,type=enum(A|B)
     events:
     - api_call:
         expect_request:
@@ -114,10 +114,12 @@ actions:
                   displayName: boolean_field
                   type:
                     primitiveType: BOOL
+                  isRequired: true
                 dbl_field:
                   displayName: double_field
                   type:
                     primitiveType: DOUBLE
+                  isRequired: true
                 enum_field:
                   displayName: enums_field
                   type:
@@ -148,6 +150,7 @@ actions:
                 type:
                   primitiveType: BOOL
                 name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
+                isRequired: true
               enum_field:
                 displayName: enums_field
                 type:
@@ -166,6 +169,7 @@ actions:
                 type:
                   primitiveType: DOUBLE
                 name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+                isRequired: true
               str_field:
                 displayName: string_field
                 type:
@@ -205,6 +209,7 @@ actions:
                 type:
                   primitiveType: BOOL
                 name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
+                isRequired: true
               enum_field:
                 displayName: enums_field
                 type:
@@ -223,17 +228,20 @@ actions:
                 type:
                   primitiveType: DOUBLE
                 name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+                isRequired: true
             iamPolicyNamespace: DATA_CATALOG
     - expect_stdout: |
         displayName: Display name
         fields:
           bool_field:
             displayName: boolean_field
+            isRequired: true
             name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
             type:
               primitiveType: BOOL
           dbl_field:
             displayName: double_field
+            isRequired: true
             name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
             type:
               primitiveType: DOUBLE
@@ -286,6 +294,7 @@ actions:
                 type:
                   primitiveType: DOUBLE
                 name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+                isRequired: true
               str_field:
                 displayName: string_field
                 type:
@@ -296,6 +305,7 @@ actions:
                 type:
                   primitiveType: BOOL
                 name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
+                isRequired: true
               enum_field:
                 displayName: enums_field
                 type:
@@ -317,11 +327,13 @@ actions:
         fields:
           bool_field:
             displayName: boolean_field
+            isRequired: true
             name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
             type:
               primitiveType: BOOL
           dbl_field:
             displayName: double_field
+            isRequired: true
             name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
             type:
               primitiveType: DOUBLE

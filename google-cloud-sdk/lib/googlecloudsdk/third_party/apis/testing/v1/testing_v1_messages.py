@@ -211,6 +211,7 @@ class AndroidModel(_messages.Message):
     supportedVersionIds: The set of Android versions this device supports.
     tags: Tags for this dimension. Examples: "default", "preview",
       "deprecated".
+    thumbnailUrl: URL of a thumbnail image of the device.
   """
 
   class FormFactorValueValuesEnum(_messages.Enum):
@@ -253,6 +254,7 @@ class AndroidModel(_messages.Message):
   supportedAbis = _messages.StringField(12, repeated=True)
   supportedVersionIds = _messages.StringField(13, repeated=True)
   tags = _messages.StringField(14, repeated=True)
+  thumbnailUrl = _messages.StringField(15)
 
 
 class AndroidRoboTest(_messages.Message):
@@ -703,7 +705,7 @@ class IosDeviceList(_messages.Message):
 
 
 class IosModel(_messages.Message):
-  r"""A description of an iOS device tests may be run on. Next tag: 11
+  r"""A description of an iOS device tests may be run on. Next tag: 12
 
   Enums:
     FormFactorValueValuesEnum: Whether this device is a phone, tablet,
@@ -873,7 +875,7 @@ class ManualSharding(_messages.Message):
   Fields:
     testTargetsForShard: Required. Group of packages, classes, and/or test
       methods to be run for each shard. The number of shard_test_targets must
-      be > 1, and <= 50.
+      be >= 1 and <= 50.
   """
 
   testTargetsForShard = _messages.MessageField('TestTargetsForShard', 1, repeated=True)
@@ -1149,6 +1151,17 @@ class StartActivityIntent(_messages.Message):
   action = _messages.StringField(1)
   categories = _messages.StringField(2, repeated=True)
   uri = _messages.StringField(3)
+
+
+class SystraceSetup(_messages.Message):
+  r"""A SystraceSetup object.
+
+  Fields:
+    durationSeconds: Systrace duration in seconds. Should be between 1 and 30
+      seconds. 0 disables systrace.
+  """
+
+  durationSeconds = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
 class TestDetails(_messages.Message):
@@ -1517,6 +1530,10 @@ class TestSetup(_messages.Message):
       Available network profiles can be queried by using the
       NETWORK_CONFIGURATION environment type when calling
       TestEnvironmentDiscoveryService.GetTestEnvironmentCatalog.
+    systrace: Systrace configuration for the run. If set a systrace will be
+      taken, starting on test start and lasting for the configured duration.
+      The systrace file thus obtained is put in the results bucket together
+      with the other artifacts from the run.
   """
 
   account = _messages.MessageField('Account', 1)
@@ -1525,6 +1542,7 @@ class TestSetup(_messages.Message):
   environmentVariables = _messages.MessageField('EnvironmentVariable', 4, repeated=True)
   filesToPush = _messages.MessageField('DeviceFile', 5, repeated=True)
   networkProfile = _messages.StringField(6)
+  systrace = _messages.MessageField('SystraceSetup', 7)
 
 
 class TestSpecification(_messages.Message):
@@ -1716,7 +1734,7 @@ class UniformSharding(_messages.Message):
   these sharding arguments via environment_variables is invalid.
 
   Fields:
-    numShards: Required. Total number of shards. The number must be > 1, and
+    numShards: Required. Total number of shards. The number must be >= 1 and
       <= 50.
   """
 

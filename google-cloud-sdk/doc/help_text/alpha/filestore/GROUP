@@ -20,11 +20,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
+
+     backups
+        (ALPHA) Create and manage Cloud Filestore backups.
 
      instances
         (ALPHA) Create and manage Cloud Filestore instances.
@@ -37,6 +41,9 @@ GROUPS
 
      regions
         (ALPHA) List regions where Cloud Filestore is available.
+
+     snapshots
+        (ALPHA) Create and manage Cloud Filestore snapshots.
 
      zones
         (ALPHA) List zones where Cloud Filestore is available.

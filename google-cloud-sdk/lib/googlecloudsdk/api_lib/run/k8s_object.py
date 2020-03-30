@@ -125,6 +125,13 @@ class KubernetesObject(object):
     return api_category if api_category is not None else cls.API_CATEGORY
 
   @classmethod
+  def ApiVersion(cls, api_version, api_category=None):
+    """Returns the api version with group prefix if exists."""
+    if api_category is None:
+      return api_version
+    return '{}/{}'.format(api_category, api_version)
+
+  @classmethod
   def SpecOnly(cls, spec, messages_mod, kind=None):
     """Produces a wrapped message with only the given spec.
 
@@ -166,7 +173,7 @@ class KubernetesObject(object):
       The newly created wrapped message.
     """
     api_category = cls.ApiCategory(api_category)
-    api_version = '{}/{}'.format(api_category, getattr(client, '_VERSION'))
+    api_version = cls.ApiVersion(getattr(client, '_VERSION'), api_category)
     messages_mod = client.MESSAGES_MODULE
     kind = cls.Kind(kind)
     ret = InitializedInstance(getattr(messages_mod, kind), cls.FIELD_BLACKLIST)
@@ -324,6 +331,13 @@ class KubernetesObject(object):
     assert hasattr(self, 'READY_CONDITION')
     if self.ready_condition:
       return self.ready_condition['status']
+
+  @property
+  def last_transition_time(self):
+    assert hasattr(self, 'READY_CONDITION')
+    return next((c.lastTransitionTime
+                 for c in self.status.conditions
+                 if c.type == self.READY_CONDITION), None)
 
   def _PickSymbol(self, best, alt, encoding):
     """Choose the best symbol (if it's in this encoding) or an alternate."""

@@ -11,7 +11,7 @@ gcloud alpha app update \- updates an App Engine application
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha app update\fR [\fB\-\-[no\-]split\-health\-checks\fR] [\fB\-\-use\-container\-optimized\-os\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha app update\fR [\fB\-\-[no\-]split\-health\-checks\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -31,16 +31,6 @@ Enables/disables split health checks by default on new deployments. Use
 \fB\-\-split\-health\-checks\fR to enable and
 \fB\-\-no\-split\-health\-checks\fR to disable.
 
-.TP 2m
-\fB\-\-use\-container\-optimized\-os\fR
-(DEPRECATED) Enables/disables Container\-Optimized OS as Flex base VM image by
-default on new deployments.
-
-Starting 2019\-11\-01, Container\-Optimized OS is the default VM image type of
-App Engine Flex deployments. The flag
-\f5\-\-no\-use\-container\-optimized\-os\fR is deprecated and will not have an
-effect.
-
 
 .RE
 .sp
@@ -50,8 +40,9 @@ effect.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

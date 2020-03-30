@@ -13,7 +13,6 @@ summary:
   - command: compute health-checks create tcp $$my-health-check$$ $$global_hc$$ --format
       'value(name)'
   - stderr: |
-      WARNING: The health-checks create tcp command will soon require either a --global or --region flag.
       Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$\].
   - stdout: |
       $$my-health-check$$
@@ -89,12 +88,6 @@ summary:
       Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$\].
 actions:
 - define_reference:
-    reference: warning-msg
-    track_values:
-      GA: "WARNING: The health-checks create tcp command will soon require either a --global or --region flag.\n"
-      BETA: .?
-      ALPHA: .?
-- define_reference:
     reference: compute-uri
     value: compute.googleapis.com/compute
 - define_reference:
@@ -135,7 +128,7 @@ actions:
     events:
     - expect_stderr:
         matches: |
-          $$warning-msg$$Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$\].
+          Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$\].
     - expect_stdout: |
         $$my-health-check$$
     - expect_exit:

@@ -22,19 +22,20 @@ from googlecloudsdk.command_lib.container.hub.features import base
 
 
 class Describe(base.DescribeCommand):
-  r"""Describe the status of MultiClusterIngress Feature resource.
+  """Describe the status of MultiClusterIngress Feature resource.
 
-  This command describes the status of MultiClusterIngress Feature resource
-  in Hub.
+  This command describes the status of MultiClusterIngress Feature resource in
+  Hub.
 
   ## Examples
 
-  Describe MultiClusterIngress Feature
+  Describe MultiClusterIngress Feature:
 
-      $ {command}
+    $ {command}
   """
 
   FEATURE_NAME = 'multiclusteringress'
+  FEATURE_DISPLAY_NAME = 'MultiClusterIngress'
 
   def Run(self, args):
     return self.RunCommand(args)

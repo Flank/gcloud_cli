@@ -1,14 +1,16 @@
 NAME
     gcloud alpha domains registrations authorization-code reset - resets
-        authorization code of specific registration
+        authorization code of a specific Cloud Domains registration
 
 SYNOPSIS
     gcloud alpha domains registrations authorization-code reset REGISTRATION
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Can only be called after 60 days have elapsed since initial
-    registration.
+    (ALPHA) Resets authorization code of a specific registration.
+
+    Can only be called after 60 days have elapsed since initial registration.
+    Also, the registration must be in state ACTIVE.
 
 POSITIONAL ARGUMENTS
      Registration resource - The domain registration to reset authorization
@@ -28,11 +30,12 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To reset authorization code of example.com run:
+    To reset authorization code of example.com, run:
 
         $ gcloud alpha domains registrations authorization-code reset \
             example.com

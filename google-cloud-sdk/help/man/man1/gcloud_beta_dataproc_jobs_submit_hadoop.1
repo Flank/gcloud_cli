@@ -128,8 +128,9 @@ property value for this command invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -138,23 +139,23 @@ help\fR for details.
 To submit a Hadoop job that runs the main class of a jar, run:
 
 .RS 2m
-$ gcloud beta dataproc jobs submit hadoop \-\-cluster my_cluster \e
-    \-\-jar my_jar.jar \-\- arg1 arg2
+$ gcloud beta dataproc jobs submit hadoop \-\-cluster=my_cluster \e
+    \-\-jar=my_jar.jar \-\- arg1 arg2
 .RE
 
 To submit a Hadoop job that runs a specific class of a jar, run:
 
 .RS 2m
-$ gcloud beta dataproc jobs submit hadoop \-\-cluster my_cluster \e
-    \-\-class org.my.main.Class \e
-    \-\-jars my_jar1.jar,my_jar2.jar \-\- arg1 arg2
+$ gcloud beta dataproc jobs submit hadoop \-\-cluster=my_cluster \e
+    \-\-class=org.my.main.Class \e
+    \-\-jars=my_jar1.jar,my_jar2.jar \-\- arg1 arg2
 .RE
 
 To submit a Hadoop job that runs a jar that is already on the cluster, run:
 
 .RS 2m
-$ gcloud beta dataproc jobs submit hadoop \-\-cluster my_cluster \e
-    \-\-jar file:///usr/lib/hadoop\-op/hadoop\-op\-examples.jar \e
+$ gcloud beta dataproc jobs submit hadoop \-\-cluster=my_cluster \e
+    \-\-jar=file:///usr/lib/hadoop\-op/hadoop\-op\-examples.jar \e
     \-\- wordcount gs://my_bucket/my_file.txt gs://my_bucket/output
 .RE
 

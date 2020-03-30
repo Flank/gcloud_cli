@@ -19,9 +19,9 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from apitools.base.py import encoding
-
 from googlecloudsdk.api_lib.accesscontextmanager import util
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.command_lib.accesscontextmanager import common
@@ -36,13 +36,6 @@ from googlecloudsdk.core import yaml
 import six
 
 REGISTRY = resources.REGISTRY
-
-
-class ParseResponseError(exceptions.Error):
-
-  def __init__(self, reason):
-    super(ParseResponseError,
-          self).__init__('Issue parsing response: {}'.format(reason))
 
 
 class ParseError(exceptions.Error):
@@ -70,8 +63,6 @@ class InvalidFormatError(ParseError):
                '    - projects/0123456789\n'
                '    accessLevels:\n'
                '    - accessPolicies/my_policy/accessLevels/my_level\n'
-               '    unrestrictedServices\n'
-               '    - "*"'
                '    restrictedServices:\n'
                '    - storage.googleapis.com').format(reason,
                                                       ', '.join(valid_fields)))
@@ -111,7 +102,7 @@ def _ValidateAllFieldsRecognized(path, conditions):
         type(conditions[0]))
 
 
-def _AddServiceFilterRestriction(args, req, version, restriction_type):
+def _AddVpcAccessibleServicesFilter(args, req, version):
   """Add the particular service filter message based on specified args."""
   service_restriction_config = None
   allowed_services = None
@@ -122,49 +113,42 @@ def _AddServiceFilterRestriction(args, req, version, restriction_type):
     service_perimeter_config = (
         util.GetMessages(version=version).ServicePerimeterConfig)
 
-  if args.IsSpecified(restriction_type + '_allowed_services'):
-    allowed_services = getattr(args, restriction_type + '_allowed_services')
+  if args.IsSpecified('vpc_allowed_services'):
+    allowed_services = getattr(args, 'vpc_allowed_services')
     restriction_modified = True
 
-  if args.IsSpecified('enable_' + restriction_type + '_service_restriction'):
-    enable_restriction = getattr(
-        args, 'enable_' + restriction_type + '_service_restriction')
+  if args.IsSpecified('enable_vpc_accessible_services'):
+    enable_restriction = getattr(args, 'enable_vpc_accessible_services')
     restriction_modified = True
 
   if restriction_modified:
-    service_restriction_config = getattr(
-        service_perimeter_config, restriction_type + 'ServiceRestriction')
+    service_restriction_config = getattr(service_perimeter_config,
+                                         'vpcAccessibleServices')
     if not service_restriction_config:
       service_restriction_config = (
-          getattr(
-              util.GetMessages(version=version),
-              restriction_type.capitalize() + 'ServiceRestriction'))
+          getattr(util.GetMessages(version=version), 'VpcAccessibleServices'))
     service_restriction_config.allowedServices = allowed_services
     service_restriction_config.enableRestriction = enable_restriction
 
-  setattr(service_perimeter_config, restriction_type + 'ServiceRestriction',
+  setattr(service_perimeter_config, 'vpcAccessibleServices',
           service_restriction_config)
   req.servicePerimeter.status = service_perimeter_config
 
   return req
 
 
-def AddVpcServiceRestrictionBeta(ref, args, req):
+def AddVpcAccessibleServicesAlpha(ref, args, req):
   del ref  # Unused
-  return AddVpcServiceRestriction(args, req, 'v1beta')
+  return AddVpcAccessibleServices(args, req, 'v1alpha')
 
 
-def AddVpcServiceRestriction(args, req, version=None):
-  """Hook to add the VpcServiceRestriction to request."""
-  return _AddServiceFilterRestriction(args, req, version, 'vpc')
+def AddVpcAccessibleServices(args, req, version=None):
+  """Hook to add the VpcAccessibleServices to request."""
+  return _AddVpcAccessibleServicesFilter(args, req, version)
 
 
 def AddAccessLevelsGA(ref, args, req):
   return AddAccessLevelsBase(ref, args, req, version='v1')
-
-
-def AddAccessLevelsBeta(ref, args, req):
-  return AddAccessLevelsBase(ref, args, req, version='v1beta')
 
 
 def AddAccessLevelsAlpha(ref, args, req):
@@ -269,6 +253,23 @@ def GetTypeEnumMapper(version=None):
   )
 
 
+def GetPerimeterTypeEnumForShortName(perimeter_type_short_name, api_version):
+  """Returns the PerimeterTypeValueValuesEnum value for the given short name.
+
+  Args:
+    perimeter_type_short_name: Either 'regular' or 'bridge'.
+    api_version: One of 'v1alpha', 'v1beta', or 'v1'.
+
+  Returns:
+    The appropriate value of type PerimeterTypeValueValuesEnum.
+  """
+  if perimeter_type_short_name is None:
+    return None
+
+  return GetTypeEnumMapper(
+      version=api_version).GetEnumForChoice(perimeter_type_short_name)
+
+
 def AddPerimeterUpdateArgs(parser, version=None, track=None):
   """Add args for perimeters update command."""
   args = [
@@ -343,80 +344,65 @@ def ParseRestrictedServices(args, perimeter_result, dry_run=False):
       lambda: _GetConfig(perimeter_result, dry_run).restrictedServices)
 
 
-# Checks if the given filter_type string has an update argument specified in
+# Checks if the service filter  has an update argument specified in
 # args.
-def _IsServiceFilterUpdateSpecified(args, filter_type):
+def _IsServiceFilterUpdateSpecified(args):
   # We leave out the deprecated 'set' arg
   list_command_prefixes = ['remove_', 'add_', 'clear_']
-  list_name = filter_type + '_allowed_services'
+  list_name = 'vpc_allowed_services'
   list_args = [command + list_name for command in list_command_prefixes]
 
-  switch_name = 'enable_' + filter_type + '_service_restriction'
+  switch_name = 'enable_vpc_accessible_services'
   return any([args.IsSpecified(arg) for arg in list_args + [switch_name]])
 
 
-def _AddServiceRestrictionArgs(parser, restriction_type, list_help,
-                               enable_help):
+def _AddVpcAccessibleServicesArgs(parser, list_help, enable_help):
   """Add to the parser arguments for this service restriction type."""
   group = parser.add_argument_group()
   repeated.AddPrimitiveArgs(
       group,
       'perimeter',
-      restriction_type + '-allowed-services',
-      restriction_type + ' allowed services',
-      metavar=restriction_type.upper() + '_SERVICE',
+      'vpc-allowed-services',
+      'vpc allowed services',
+      metavar='VPC_SERVICE',
       include_set=False,
       additional_help=(list_help))
   group.add_argument(
-      '--enable-' + restriction_type + '-service-restriction',
+      '--enable-vpc-accessible-services',
       default=None,
       action='store_true',
       help=enable_help)
 
 
-def _ParseRestriction(args, perimeter_result, version, restriction_type,
-                      dry_run):
+def ParseVpcRestriction(args, perimeter_result, version, dry_run=False):
   """Parse service restriction related arguments."""
-  if _IsServiceFilterUpdateSpecified(args, restriction_type):
+  if _IsServiceFilterUpdateSpecified(args):
     # If there is no service restriction message in the request, make an empty
     # one to populate.
     config = _GetConfig(perimeter_result, dry_run)
-    if getattr(config, restriction_type + 'ServiceRestriction', None) is None:
+    if getattr(config, 'vpcAccessibleServices', None) is None:
       restriction_message = getattr(
           apis.GetMessagesModule('accesscontextmanager', version),
-          restriction_type.capitalize() + 'ServiceRestriction')()
-      setattr(config, restriction_type + 'ServiceRestriction',
-              restriction_message)
+          'VpcAccessibleServices')()
+      setattr(config, 'vpcAccessibleServices', restriction_message)
 
   def FetchAllowed():
     return getattr(
         _GetConfig(perimeter_result, dry_run),
-        restriction_type + 'ServiceRestriction').allowedServices
+        'vpcAccessibleServices').allowedServices
 
-  return repeated.ParsePrimitiveArgs(args,
-                                     restriction_type + '_allowed_services',
-                                     FetchAllowed)
+  return repeated.ParsePrimitiveArgs(args, 'vpc_allowed_services', FetchAllowed)
 
 
 def _AddVpcRestrictionArgs(parser):
-  """Add arguments related to the VPC Service Restriction to 'parser'."""
-  _AddServiceRestrictionArgs(
+  """Add arguments related to the VPC Accessible Services to 'parser'."""
+  _AddVpcAccessibleServicesArgs(
       parser=parser,
-      restriction_type='vpc',
       list_help='Services allowed to be called within the Perimeter when '
-      'VPC Service Restriction is enabled',
+      'VPC Accessible Services is enabled',
       enable_help=('When specified restrict API calls within the Service '
                    'Perimeter to the set of vpc allowed services. To disable '
-                   'use \'--no-enable-vpc-service-restriction\'.'))
-
-
-def ParseVpcRestriction(args, perimeter_result, version, dry_run=False):
-  return _ParseRestriction(
-      args=args,
-      perimeter_result=perimeter_result,
-      version=version,
-      restriction_type='vpc',
-      dry_run=dry_run)
+                   'use \'--no-enable-vpc-accessible-services\'.'))
 
 
 def _AddLevelsUpdate(parser, include_set=True):
@@ -437,6 +423,21 @@ def _GetLevelIdFromLevelName(level_name):
   return REGISTRY.Parse(level_name, collection=levels.COLLECTION).accessLevelsId
 
 
+def ExpandLevelNamesIfNecessary(level_ids, policy_id):
+  """Returns the FULL Access Level names, prepending Policy ID if necessary."""
+  if level_ids is None:
+    return None
+  final_level_ids = []
+  for l in level_ids:
+    if l.startswith('accessPolicies/'):
+      final_level_ids.append(l)
+    else:
+      final_level_ids.append(
+          REGISTRY.Create(
+              levels.COLLECTION, accessPoliciesId=policy_id, accessLevelsId=l))
+  return final_level_ids
+
+
 def ParseLevels(args, perimeter_result, policy_id, dry_run=False):
   """Process repeated level changes."""
 
@@ -447,18 +448,15 @@ def ParseLevels(args, perimeter_result, policy_id, dry_run=False):
     ]
 
   level_ids = repeated.ParsePrimitiveArgs(args, 'access_levels', GetLevelIds)
+  return ExpandLevelNamesIfNecessary(level_ids, policy_id)
 
-  if level_ids is None:
-    return None
-  return [
-      REGISTRY.Create(
-          levels.COLLECTION, accessPoliciesId=policy_id, accessLevelsId=l)
-      for l in level_ids
-  ]
+
+def ParseServicePerimetersAlpha(path):
+  return ParseServicePerimetersBase(path, version='v1alpha')
 
 
 def ParseServicePerimetersBeta(path):
-  return ParseServicePerimetersBase(path, version='v1beta')
+  return ParseServicePerimetersBase(path, version='v1')
 
 
 def ParseServicePerimetersBase(path, version=None):
@@ -490,8 +488,12 @@ def ParseServicePerimetersBase(path, version=None):
   return conditions
 
 
+def ParseReplaceServicePerimetersResponseAlpha(lro, unused_args):
+  return ParseReplaceServicePerimetersResponseBase(lro, version='v1alpha')
+
+
 def ParseReplaceServicePerimetersResponseBeta(lro, unused_args):
-  return ParseReplaceServicePerimetersResponseBase(lro, version='v1beta')
+  return ParseReplaceServicePerimetersResponseBase(lro, version='v1')
 
 
 def ParseReplaceServicePerimetersResponseBase(lro, version):
@@ -509,10 +511,102 @@ def ParseReplaceServicePerimetersResponseBase(lro, version):
     ParseResponseError: if the response could not be parsed into the proper
     object.
   """
-  messages = util.GetMessages(version)
-  message_class = messages.ReplaceServicePerimetersResponse
-  try:
-    return encoding.DictToMessage(
-        encoding.MessageToDict(lro.response), message_class).servicePerimeters
-  except Exception as err:
-    raise ParseResponseError(six.text_type(err))
+  client = util.GetClient(version=version)
+  operation_ref = resources.REGISTRY.Parse(
+      lro.name, collection='accesscontextmanager.operations')
+  poller = common.BulkAPIOperationPoller(
+      client.accessPolicies_servicePerimeters, client.operations, operation_ref)
+
+  return waiter.WaitFor(
+      poller, operation_ref,
+      'Waiting for Replace Service Perimeters operation [{}]'.format(
+          operation_ref.Name()))
+
+
+def _CompareField(status_val, spec_val, field_name, line_prefix=''):
+  """Compares two sets of values and generates a diff."""
+  output = []
+
+  output.append(line_prefix + '{}:'.format(field_name))
+  added = list(spec_val - status_val)
+  removed = list(status_val - spec_val)
+  unchanged = list(spec_val.intersection(status_val))
+  if added:
+    output.extend(
+        sorted((line_prefix + '  +{}'.format(item)) for item in added))
+  if removed:
+    output.extend(
+        sorted((line_prefix + '  -{}'.format(item)) for item in removed))
+  if unchanged:
+    output.extend(
+        sorted((line_prefix + '   {}'.format(item)) for item in unchanged))
+
+  if not status_val and not spec_val:
+    output.append(line_prefix + '   NONE')
+
+  return output
+
+
+def _CompareTopLevelField(status, spec, field_name):
+  status_val = set(getattr(status, field_name, []))
+  spec_val = set(getattr(spec, field_name, []))
+  return _CompareField(status_val, spec_val, field_name)
+
+
+def GenerateDryRunConfigDiff(perimeter, api_version):
+  """Generates a diff string by comparing status with spec."""
+  if perimeter.spec is None and perimeter.useExplicitDryRunSpec:
+    return 'This Service Perimeter has been marked for deletion dry-run mode.'
+  if perimeter.status is None and perimeter.spec is None:
+    return 'This Service Perimeter has no dry-run or enforcement mode config.'
+  output = []
+  status = perimeter.status
+  if not perimeter.useExplicitDryRunSpec:
+    spec = status
+    output.append('This Service Perimeter does not have an explicit '
+                  'dry-run mode configuration. The enforcement config '
+                  'will be used as the dry-run mode configuration.')
+  else:
+    spec = perimeter.spec
+
+  if status is None:
+    messages = util.GetMessages(version=api_version)
+    status = messages.ServicePerimeterConfig()
+
+  output.append('name: {}'.format(perimeter.name[perimeter.name.rfind('/') +
+                                                 1:]))
+  output.append('title: {}'.format(perimeter.title))
+
+  output.append('type: {}'.format(perimeter.perimeterType or
+                                  'PERIMETER_TYPE_REGULAR'))
+
+  output.extend(_CompareTopLevelField(status, spec, 'resources'))
+  output.extend(_CompareTopLevelField(status, spec, 'restrictedServices'))
+  output.extend(_CompareTopLevelField(status, spec, 'accessLevels'))
+
+  status_vpc = status.vpcAccessibleServices
+  spec_vpc = spec.vpcAccessibleServices
+
+  output.append('vpcAccessibleServices:')
+  if status_vpc is None and spec_vpc is None:
+    output.append('   NONE')
+  else:
+    status_enabled = bool(status_vpc and status_vpc.enableRestriction)
+    spec_enabled = bool(spec_vpc and spec_vpc.enableRestriction)
+    output.append('  enableRestriction: {} -> {}'.format(
+        status_enabled, spec_enabled))
+    if status_vpc is not None:
+      status_vpc_services = set(status_vpc.allowedServices)
+    else:
+      status_vpc_services = set()
+    if spec_vpc is not None:
+      spec_vpc_services = set(spec_vpc.allowedServices)
+    else:
+      spec_vpc_services = set()
+    output.extend(
+        _CompareField(
+            status_vpc_services,
+            spec_vpc_services,
+            'allowedServices',
+            line_prefix='  '))
+  return '\n'.join(output)

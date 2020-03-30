@@ -45,7 +45,7 @@ class RemoveLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
         instance_ref, edited_labels, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
     response = self.Run(
@@ -70,7 +70,7 @@ class RemoveLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
         instance_ref, {}, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
     response = self.Run(

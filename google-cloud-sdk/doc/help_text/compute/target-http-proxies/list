@@ -4,13 +4,17 @@ NAME
 
 SYNOPSIS
     gcloud compute target-http-proxies list [NAME ...]
-        [--regexp=REGEXP, -r REGEXP] [--filter=EXPRESSION] [--limit=LIMIT]
-        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+        [--regexp=REGEXP, -r REGEXP] [--global | --regions=[REGION,...]]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute target-http-proxies list displays all Google Compute Engine
     target HTTP proxies in a project.
+
+    By default, global target HTTP proxies and target HTTP proxies from all
+    regions are listed. The results can be narrowed down by providing the
+    --global or --regions flag.
 
 POSITIONAL ARGUMENTS
      [NAME ...]
@@ -27,6 +31,19 @@ FLAGS
         filtered out.
 
         Flag --regexp is deprecated. Use --filter="name~'REGEXP'" instead.
+
+     At most one of these may be specified:
+
+       --global
+          If provided, only global resources are shown.
+
+       --regions=[REGION,...]
+          (DEPRECATED) If provided, only regional resources are shown. If
+          arguments are provided, only resources from the given regions are
+          shown.
+
+          Flag --regions is deprecated. Use --filter="region:( REGION ... )"
+          instead. For example --filter="region:( europe-west1 europe-west2 )".
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -61,8 +78,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To list all target HTTP proxies in a project in table form, run:
@@ -72,6 +90,16 @@ EXAMPLES
     To list the URIs of all target HTTP proxies in a project, run:
 
         $ gcloud compute target-http-proxies list --uri
+
+    To list all global target HTTP proxies in a project, run:
+
+        $ gcloud compute target-http-proxies list --global
+
+    To list all target HTTP proxies in the us-central1 and europe-west1
+    regions, given they are regional resources, run:
+
+        $ gcloud compute target-http-proxies list \
+            --filter="region:( europe-west1 us-central1 )"
 
 NOTES
     These variants are also available:

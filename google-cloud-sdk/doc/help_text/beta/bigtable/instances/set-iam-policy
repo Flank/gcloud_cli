@@ -1,6 +1,6 @@
 NAME
-    gcloud beta bigtable instances set-iam-policy - set the IAM policy for a
-        Cloud Bigtable instance
+    gcloud beta bigtable instances set-iam-policy - set IAM policy for an
+        instance
 
 SYNOPSIS
     gcloud beta bigtable instances set-iam-policy INSTANCE POLICY_FILE
@@ -31,8 +31,19 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will read an IAM policy defined in a JSON file
+    'policy.json' and set it for an instance with identifier 'my-instance-id'
+
+        $ gcloud beta bigtable instances set-iam-policy my-instance-id \
+            policy.json
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of the
+    policy file format and contents.
 
 NOTES
     This command is currently in BETA and may change without notice. These

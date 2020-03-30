@@ -22,9 +22,11 @@ from googlecloudsdk.api_lib.secrets import api as secrets_api
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.secrets import args as secrets_args
 from googlecloudsdk.command_lib.secrets import log as secrets_log
+from googlecloudsdk.command_lib.secrets import util as secrets_util
 from googlecloudsdk.core.console import console_io
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Destroy(base.DeleteCommand):
   r"""Destroy a secret version's metadata and secret data.
 
@@ -57,6 +59,28 @@ class Destroy(base.DeleteCommand):
         throw_if_unattended=True,
         cancel_on_no=True)
 
-    result = secrets_api.Versions().Destroy(version_ref)
+    result = secrets_api.Versions(
+        version=secrets_util.GetVersionFromReleasePath(
+            self.ReleaseTrack())).Destroy(version_ref)
     secrets_log.Versions().Destroyed(version_ref)
     return result
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class DestroyBeta(Destroy):
+  r"""Destroy a secret version's metadata and secret data.
+
+  Destroy a secret version's metadata and secret data. This action is
+  irreversible.
+
+  ## EXAMPLES
+
+  Destroy version '123' of the secret named 'my-secret':
+
+    $ {command} 123 --secret=my-secret
+  """
+
+  @staticmethod
+  def Args(parser):
+    secrets_args.AddBetaVersion(
+        parser, purpose='to destroy', positional=True, required=True)

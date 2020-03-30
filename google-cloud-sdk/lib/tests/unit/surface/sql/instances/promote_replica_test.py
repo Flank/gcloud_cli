@@ -46,24 +46,24 @@ class _BaseInstancesPromoteReplicaTest(object):
                 6,
                 26,
                 785000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=None,
             endTime=None,
             error=None,
             exportContext=None,
             importContext=None,
             targetId='replica-1',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='56dec13c-fe47-449d-9942-921ad3bb8092',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56dec13c-fe47-449d-9942-921ad3bb8092'.
-            format(self.Project()),
-            operationType='PROMOTE_REPLICA',
-            status='PENDING',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/56dec13c-fe47-449d-9942-921ad3bb8092'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .PROMOTE_REPLICA,
+            status=self.messages.Operation.StatusValueValuesEnum.PENDING,
             user='170350250316@developer.gserviceaccount.com',
         ))
     self.mocked_client.operations.Get.Expect(
@@ -81,7 +81,8 @@ class _BaseInstancesPromoteReplicaTest(object):
                 6,
                 26,
                 785000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -90,7 +91,8 @@ class _BaseInstancesPromoteReplicaTest(object):
                 6,
                 27,
                 48000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 8,
@@ -99,22 +101,22 @@ class _BaseInstancesPromoteReplicaTest(object):
                 6,
                 27,
                 48000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='replica-1',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='56dec13c-fe47-449d-9942-921ad3bb8092',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56dec13c-fe47-449d-9942-921ad3bb8092'.
-            format(self.Project()),
-            operationType='PROMOTE_REPLICA',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/56dec13c-fe47-449d-9942-921ad3bb8092'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .PROMOTE_REPLICA,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -124,7 +126,7 @@ class _BaseInstancesPromoteReplicaTest(object):
 
     self.Run('sql instances promote-replica replica-1')
     self.AssertErrContains(
-        'Promoted [https://www.googleapis.com/sql/v1beta4/'
+        'Promoted [https://sqladmin.googleapis.com/sql/v1beta4/'
         'projects/{0}/instances/replica-1].'.format(self.Project()))
 
   def testPromoteAsync(self):
@@ -133,7 +135,7 @@ class _BaseInstancesPromoteReplicaTest(object):
 
     self.Run('sql instances promote-replica replica-1 --async')
     self.AssertErrNotContains(
-        'Promoted [https://www.googleapis.com/sql/v1beta4/'
+        'Promoted [https://sqladmin.googleapis.com/sql/v1beta4/'
         'projects/{0}/instances/replica-1].'.format(self.Project()))
 
   def testPromoteNoConfirmCancels(self):

@@ -184,7 +184,10 @@ class SqlTest(base.SpannerTestBase):
                 value=extra_types.JsonValue(string_value='9')),
             self.msgs.ResultSetStats.QueryStatsValue.AdditionalProperty(
                 key='rows_scanned',
-                value=extra_types.JsonValue(string_value='2000'))
+                value=extra_types.JsonValue(string_value='2000')),
+            self.msgs.ResultSetStats.QueryStatsValue.AdditionalProperty(
+                key='optimizer_version',
+                value=extra_types.JsonValue(string_value='1'))
         ])
     result_stats = self.msgs.ResultSetStats(
         queryPlan=self.msgs.QueryPlan(planNodes=[]), queryStats=query_stats)
@@ -553,11 +556,12 @@ class SqlTest(base.SpannerTestBase):
     results = self._GivenResultsWithQueryStats()
     DisplayQueryAggregateStats(results.stats.queryStats, self.out)
     self.AssertOutputContains(
-        'TOTAL_ELAPSED_TIME | CPU_TIME | ROWS_RETURNED | ROWS_SCANNED',
+        'TOTAL_ELAPSED_TIME | CPU_TIME | ROWS_RETURNED | ROWS_SCANNED | OPTIMIZER_VERSION',
         normalize_space=True)
-    # 1.7 msecs         |  .3 msecs    | 9    | 2000
-    self.AssertOutputMatches(r'1\.7 msecs[\s|]+\.3 msecs[\s|]+9[\s|]+2000',
-                             normalize_space=True)
+    # 1.7 msecs         |  .3 msecs    | 9    | 2000 | 1
+    self.AssertOutputMatches(
+        r'1\.7 msecs[\s|]+\.3 msecs[\s|]+9[\s|]+2000[\s|]+1',
+        normalize_space=True)
 
   def testQueryAggregateStatsKeyNotFound(self):
     # Given stats with an unknown key name.
@@ -566,10 +570,10 @@ class SqlTest(base.SpannerTestBase):
     DisplayQueryAggregateStats(results.stats.queryStats, self.out)
     # Then the unknown column name should be included.
     self.AssertOutputContains(
-        'TOTAL_ELAPSED_TIME | CPU_TIME | ROWS_RETURNED | ROWS_SCANNED',
+        'TOTAL_ELAPSED_TIME | CPU_TIME | ROWS_RETURNED | ROWS_SCANNED | OPTIMIZER_VERSION',
         normalize_space=True)
     # Unknown         |  .3 msecs    | 9    | 2000
-    self.AssertOutputMatches(r'Unknown[\s|]+\.3 msecs[\s|]+9[\s|]+2000',
+    self.AssertOutputMatches(r'Unknown[\s|]+\.3 msecs[\s|]+9[\s|]+2000[\s|]+1',
                              normalize_space=True)
 
   def testDisplayQueryPlan(self):

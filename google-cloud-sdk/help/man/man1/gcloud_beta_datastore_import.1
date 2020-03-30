@@ -89,8 +89,43 @@ $ gcloud beta datastore import \e
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To import all data exported to the output URL
+\f5gs://exampleBucket/exampleExport/exampleExport.overall_export_metadata\fR,
+run:
+
+.RS 2m
+$ gcloud beta datastore import \e
+    gs://exampleBucket/exampleExport/\e
+exampleExport.overall_export_metadata
+.RE
+
+To import all data exported to the output URL
+\f5gs://exampleBucket/exampleExport/exampleExport.overall_export_metadata\fR
+without waiting for the operation to complete, run:
+
+.RS 2m
+$ gcloud beta datastore import \e
+    gs://exampleBucket/exampleExport/\e
+exampleExport.overall_export_metadata \-\-async
+.RE
+
+To import only the \f5exampleKind\fR from the data exported to the output URL
+\f5gs://exampleBucket/exampleExport/exampleExport.overall_export_metadata\fR,
+run:
+
+.RS 2m
+$ gcloud beta datastore import \e
+    gs://exampleBucket/exampleExport/\e
+exampleExport.overall_export_metadata \-\-kinds='exampleKind'
+.RE
 
 
 

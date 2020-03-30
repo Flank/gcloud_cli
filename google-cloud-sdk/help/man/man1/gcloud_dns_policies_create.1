@@ -11,34 +11,13 @@ gcloud dns policies create \- creates a new Cloud DNS policy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud dns policies create\fR \fIPOLICY\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-networks\fR=[\fIURL\fR,...] [\fB\-\-alternative\-name\-servers\fR=[\fIIP_ADDRESS\fR,...]] [\fB\-\-enable\-inbound\-forwarding\fR] [\fB\-\-enable\-logging\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud dns policies create\fR \fIPOLICY\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-networks\fR=[\fINETWORKS\fR,...] [\fB\-\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]] [\fB\-\-enable\-inbound\-forwarding\fR] [\fB\-\-enable\-logging\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-Creates a new Cloud DNS policy.
-
-.SH "EXAMPLES"
-
-To create a new policy with minimal arguments, run:
-
-.RS 2m
-$ gcloud dns policies create mypolicy \e
-\-\-description='My new policy test policy 5' \e
-\-\-networks=''
-.RE
-
-To create a new policy with all optional arguments, run:
-
-.RS 2m
-$ gcloud dns policies create mypolicy \e
-\-\-description='My new policy test policy 5' \e
-\-\-networks=network1,network2 \e
-\-\-alternative\-name\-servers=192.168.1.1,192.168.1.2
-\-\-enable\-inbound\-forwarding
-\-\-enable\-logging
-.RE
+This command creates a new Cloud DNS policy.
 
 
 
@@ -47,12 +26,11 @@ $ gcloud dns policies create mypolicy \e
 .RS 2m
 .TP 2m
 
-Policy resource \- The name of the policy you want to create. This represents a
-Cloud resource. (NOTE) Some attributes are not given arguments in this group but
-can be set in other ways. To set the [project] attribute: provide the argument
-[policy] on the command line with a fully specified name; provide the argument
-[\-\-project] on the command line; set the property [core/project]. This must be
-specified.
+Policy resource \- The policy to create. This represents a Cloud resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [policy] on the
+command line with a fully specified name; set the property [core/project]. This
+must be specified.
 
 .RS 2m
 .TP 2m
@@ -72,7 +50,7 @@ ID of the policy or fully qualified identifier for the policy.
 A description of the policy.
 
 .TP 2m
-\fB\-\-networks\fR=[\fIURL\fR,...]
+\fB\-\-networks\fR=[\fINETWORKS\fR,...]
 The comma separated list of network names to associate with the policy.
 
 
@@ -83,10 +61,10 @@ The comma separated list of network names to associate with the policy.
 
 .RS 2m
 .TP 2m
-\fB\-\-alternative\-name\-servers\fR=[\fIIP_ADDRESS\fR,...]
-List of alternative name servers to forward to. Must be a comma separated list
-of IPv4 addresses. Non\-RFC1918 addresses will forward to the target through the
-Internet. RFC1918 addresses will forward through the VPC.
+\fB\-\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]
+List of alternative name servers to forward to. Non\-RFC1918 addresses will
+forward to the target through the Internet.RFC1918 addresses will forward
+through the VPC.
 
 .TP 2m
 \fB\-\-enable\-inbound\-forwarding\fR
@@ -106,15 +84,32 @@ Specifies whether to enable query logging. Defaults to False.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
-.SH "API REFERENCE"
+.SH "EXAMPLES"
 
-This command uses the \fBdns/v1\fR API. The full documentation for this API can
-be found at: https://developers.google.com/cloud\-dns
+To create a new policy with minimal arguments, run:
+
+.RS 2m
+$ gcloud dns policies create mypolicy \e
+\-\-description='My new policy test policy 5' \e
+\-\-networks=''
+.RE
+
+To create a new policy with all optional arguments, run:
+
+.RS 2m
+$ gcloud dns policies create mypolicy \e
+\-\-description='My new policy test policy 5' \e
+\-\-networks=network1,network2 \e
+\-\-alternative\-name\-servers=192.168.1.1,192.168.1.2 \e
+\-\-enable\-inbound\-forwarding \e
+\-\-enable\-logging
+.RE
 
 
 

@@ -29,6 +29,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import config as core_config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files as file_utils
 from googlecloudsdk.core.util import platforms
 from googlecloudsdk.core.util import times
@@ -122,7 +123,7 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.tmp_home = file_utils.TemporaryDirectory()
     self.assertIsNotNone(self.tmp_home.path)
     self.StartDictPatch('os.environ', {'HOME': self.tmp_home.path})
-    if os.environ.get('KUBECONFIG'):
+    if encoding.GetEncodedValue(os.environ, 'KUBECONFIG'):
       del os.environ['KUBECONFIG']
 
   def TearDown(self):
@@ -304,6 +305,7 @@ class TestBase(cli_test_base.CliTestBase):
         enableTpu=kwargs.get('enableTpu'),
         verticalPodAutoscaling=kwargs.get('verticalPodAutoscaling'),
         autoscaling=kwargs.get('clusterAutoscaling'),
+        shieldedNodes=kwargs.get('shieldedNodes'),
     )
     if kwargs.get('conditions'):
       c.conditions.extend(kwargs.get('conditions'))
@@ -374,12 +376,17 @@ class TestBase(cli_test_base.CliTestBase):
             taints=kwargs.get('nodeTaints', []),
             metadata=kwargs.get('metadata'),
             shieldedInstanceConfig=kwargs.get('shieldedInstanceConfig'),
+            reservationAffinity=kwargs.get('reservationAffinity', None),
+            sandboxConfig=kwargs.get('sandboxConfig'),
+            workloadMetadataConfig=kwargs.get('workloadMetadataConfig'),
         ),
+        locations=kwargs.get('nodePoolLocations', []),
         instanceGroupUrls=kwargs.get('instanceGroupUrls', []),
         autoscaling=kwargs.get('autoscaling'),
         management=(kwargs.get('management') if 'management' in kwargs else
                     self._MakeDefaultNodeManagement()),
         maxPodsConstraint=kwargs.get('maxPodsConstraint'),
+        upgradeSettings=kwargs.get('upgradeSettings'),
     )
 
   # Creates a default node management adaptive to release tracks.
@@ -418,16 +425,26 @@ class TestBase(cli_test_base.CliTestBase):
       policy.servicesSecondaryRangeName = kwargs['servicesSecondaryRangeName']
     return policy
 
+  def _MakeTpuConfig(self, **kwargs):
+    tpu_config = self.messages.TpuConfig()
+    if 'enabled' in kwargs:
+      tpu_config.enabled = kwargs['enabled']
+    if 'ipv4CidrBlock' in kwargs:
+      tpu_config.ipv4CidrBlock = kwargs['ipv4CidrBlock']
+    if 'useServiceNetworking' in kwargs:
+      tpu_config.useServiceNetworking = kwargs['useServiceNetworking']
+    return tpu_config
+
   def _MakePrivateClusterConfig(self, **kwargs):
     config = self.messages.PrivateClusterConfig()
-    if 'enablePeeringRouteSharing' in kwargs:
-      config.enablePeeringRouteSharing = kwargs['enablePeeringRouteSharing']
     if 'enablePrivateNodes' in kwargs:
       config.enablePrivateNodes = kwargs['enablePrivateNodes']
     if 'enablePrivateEndpoint' in kwargs:
       config.enablePrivateEndpoint = kwargs['enablePrivateEndpoint']
     if 'masterIpv4Cidr' in kwargs:
       config.masterIpv4CidrBlock = kwargs['masterIpv4Cidr']
+    if 'masterGlobalAccessConfig' in kwargs:
+      config.masterGlobalAccessConfig = kwargs['masterGlobalAccessConfig']
     return config
 
   def _ServerConfig(self):
@@ -479,6 +496,23 @@ class TestBase(cli_test_base.CliTestBase):
     if 'maxUnavailable' in kwargs:
       settings.maxUnavailable = kwargs['maxUnavailable']
     return settings
+
+  def _MakeReservationAffinity(self, affinity, reservation_name=None):
+    if affinity == 'any':
+      return self.messages.ReservationAffinity(
+          consumeReservationType=self.messages.ReservationAffinity
+          .ConsumeReservationTypeValueValuesEnum.ANY_RESERVATION)
+    if affinity == 'none':
+      return self.messages.ReservationAffinity(
+          consumeReservationType=self.messages.ReservationAffinity
+          .ConsumeReservationTypeValueValuesEnum.NO_RESERVATION)
+    if affinity == 'specific':
+      return self.messages.ReservationAffinity(
+          consumeReservationType=self.messages.ReservationAffinity
+          .ConsumeReservationTypeValueValuesEnum.SPECIFIC_RESERVATION,
+          key='compute.googleapis.com/reservation-name',
+          values=[reservation_name])
+    return None
 
   def ExpectGetCluster(self, cluster, exception=None, zone=None):
     raise NotImplementedError('ExpectGetCluster is not overridden')
@@ -794,6 +828,7 @@ class GATestBase(TestBase):
                                                         self.CLUSTER_NAME,
                                                         node_pool_name),
         workloadMetadataConfig=workload_metadata_config,
+        upgradeSettings=upgrade_settings,
         locations=locations)
     self.mocked_client.projects_locations_clusters_nodePools.Update.Expect(
         msg, response=response, exception=exception)
@@ -1046,21 +1081,20 @@ class BetaTestBase(GATestBase):
   def _MakeCluster(self, **kwargs):
     cluster = GATestBase._MakeCluster(self, **kwargs)
     cluster.verticalPodAutoscaling = kwargs.get('verticalPodAutoscaling')
-    cluster.shieldedNodes = kwargs.get('shieldedNodes')
     if kwargs.get('databaseEncryptionKey'):
       cluster.databaseEncryption = self.messages.DatabaseEncryption(
           keyName=kwargs.get('databaseEncryptionKey'),
           state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
+    if kwargs.get('clusterTelemetry'):
+      cluster.clusterTelemetry = kwargs.get('clusterTelemetry')
     cluster.releaseChannel = kwargs.get('releaseChannel')
 
     return cluster
 
   def _MakeNodePool(self, **kwargs):
     node_pool = GATestBase._MakeNodePool(self, **kwargs)
-    node_pool.config.workloadMetadataConfig = kwargs.get(
-        'workloadMetadataConfig')
     node_pool.config.metadata = kwargs.get('metadata')
-    node_pool.config.sandboxConfig = kwargs.get('sandboxConfig')
+    node_pool.config.bootDiskKmsKey = kwargs.get('bootDiskKmsKey')
     if kwargs.get('nodePoolLocations'):
       node_pool.locations = kwargs.get('nodePoolLocations')
     if 'upgradeSettings' in kwargs:
@@ -1155,7 +1189,6 @@ class AlphaTestBase(BetaTestBase):
     if kwargs.get('localSsdVolumeConfigs') is not None:
       node_pool.config.localSsdVolumeConfigs = kwargs.get(
           'localSsdVolumeConfigs')
-    node_pool.config.sandboxConfig = kwargs.get('sandboxConfig')
     node_pool.config.nodeGroup = kwargs.get('nodeGroup')
     node_pool.config.linuxNodeConfig = kwargs.get('linuxNodeConfig')
     node_pool.config.kubeletConfig = kwargs.get('kubeletConfig')

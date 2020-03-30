@@ -25,19 +25,18 @@ from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import utils
 
 
-class CreateTestBeta(test_base.BaseTest):
+class CreateTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'beta'
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
     self.messages = core_apis.GetMessagesModule('compute', self.api_version)
-    self.compute = self.compute_beta
+    self.compute = self.compute_v1
 
   def testCreate(self):
     expected = self.messages.PacketMirroring(
         name='my-pm',
-        priority=999,
         network=self.messages.PacketMirroringNetworkInfo(
             url=('https://compute.googleapis.com/compute/{0}/'
                  'projects/my-project/global/networks/default'
@@ -72,8 +71,7 @@ class CreateTestBeta(test_base.BaseTest):
 
     self.Run("""\
         compute packet-mirrorings create my-pm --region us-central1
-        --network default --priority 999
-        --mirrored-tags t1,t2
+        --network default --mirrored-tags t1,t2
         --mirrored-instances
         projects/my-project/zones/us-central1-a/instances/i1
         --mirrored-subnets
@@ -135,6 +133,16 @@ class CreateTestBeta(test_base.BaseTest):
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
     api_mock.Stop()
+
+
+class CreateTestBeta(CreateTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.compute = self.compute_beta
 
 
 class CreateTestAlpha(CreateTestBeta):

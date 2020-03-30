@@ -63,8 +63,8 @@ class InstancesMoveTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
 
       self.ExpectMoveInstance(client)
 
-      client.globalOperations.Get.Expect(
-          messages.ComputeGlobalOperationsGetRequest(
+      client.globalOperations.Wait.Expect(
+          messages.ComputeGlobalOperationsWaitRequest(
               operation='operation-X',
               project=self.Project()),
           messages.Operation(

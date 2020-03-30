@@ -73,17 +73,19 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-The following command lists all autoscaling policies in the project:
+The following command lists all autoscaling policies in Dataproc's
+\'us\-central1' region:
 
 .RS 2m
-$ gcloud dataproc autoscaling\-policies list
+$ gcloud dataproc autoscaling\-policies list \-\-region=us\-central1
 .RE
 
 

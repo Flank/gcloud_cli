@@ -1,8 +1,22 @@
+# Copyright 2019 Google LLC. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 title: cloud identity groups update test scenario
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
+  - label: Update Group's display-name and description.
   - command: |
       identity groups update eng-discuss@foo.com
           --display-name "New Engineer Discuss"
@@ -10,24 +24,35 @@ summary:
   - stderr: |
       Updated.
 - execute:
+  - label: Update a group by clearing its display-name.
   - command: |
       identity groups update eng-discuss@foo.com
           --clear-display-name
   - stderr: |
       Updated.
 - execute:
+  - label: Update a group by clearing its description.
   - command: |
       identity groups update eng-discuss@foo.com
           --clear-description
   - stderr: |
       Updated.
 - execute:
+  - label: Update a group which does not exist.
   - command: |
       identity groups update eng-discuss@foo.com
   - error: '1: Invalid value for [email]: There is no such a group associated with
       the specified argument:eng-discuss@foo.com'
 actions:
-- execute_command:   # Test 1: Update Group's display-name and description.
+
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha1
+      BETA: v1beta1
+
+- execute_command:
+    label: Update Group's display-name and description.
     command: |
       identity groups update eng-discuss@foo.com
           --display-name "New Engineer Discuss"
@@ -35,7 +60,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -48,7 +73,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json&updateMask=display_name%2Cdescription
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json&updateMask=display_name%2Cdescription
           method: PATCH
           headers: {}
           body:
@@ -72,14 +97,15 @@ actions:
     - expect_exit:
         code: 0
 
-- execute_command:   # Test 2: Update a group by clearing its display-name.
+- execute_command:
+    label: Update a group by clearing its display-name.
     command: |
       identity groups update eng-discuss@foo.com
           --clear-display-name
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -92,7 +118,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json&updateMask=display_name
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json&updateMask=display_name
           method: PATCH
           headers: {}
           body: null
@@ -112,14 +138,15 @@ actions:
     - expect_exit:
         code: 0
 
-- execute_command:   # Test 3: Update a group by clearing its description.
+- execute_command:
+    label: Update a group by clearing its description.
     command: |
       identity groups update eng-discuss@foo.com
           --clear-description
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -132,7 +159,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json&updateMask=description
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json&updateMask=description
           method: PATCH
           headers: {}
           body: null
@@ -151,13 +178,14 @@ actions:
     - expect_exit:
         code: 0
 
-- execute_command:   # Test 4: Update a group which does not exist.
+- execute_command:
+    label: Update a group which does not exist.
     command: |
       identity groups update eng-discuss@foo.com
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null

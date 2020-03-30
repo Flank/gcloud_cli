@@ -7,19 +7,8 @@ SYNOPSIS
         (--all | --tags=TAG,[TAG,...]) [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute instances remove-tags is used to remove tags to Google
-    Compute Engine virtual machine instances. For example:
-
-        $ gcloud compute instances remove-tags example-instance \
-            --tags tag-1,tag-2
-
-    will remove tags tag-1 and tag-2 from the existing tags of
-    'example-instance'.
-
-    Tags can be used to identify instances when adding network firewall rules.
-    Tags can also be used to get firewall rules that already exist to be
-    applied to the instance. See gcloud compute firewall-rules create(1) for
-    more details.
+    gcloud compute instances remove-tags is used to remove tags from Google
+    Compute Engine virtual machine instances.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
@@ -65,8 +54,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To remove tags tag-1 and tag-2 from an instance named test-instance, run:
+
+        $ gcloud compute instances remove-tags test-instance \
+            --tags=tag-1,tag-2
 
 NOTES
     These variants are also available:

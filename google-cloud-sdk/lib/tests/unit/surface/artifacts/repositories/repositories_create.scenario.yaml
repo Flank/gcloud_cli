@@ -1,0 +1,150 @@
+title: artifacts repositories create
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: artifacts repositories create my-repo --project=my-project --repository-format=maven
+      --location=us-east1 --description="My test repo" --async
+  - stderr: |+
+      Note: Language package support is in Alpha.
+
+  - stderr: |
+      Create request issued for: [my-repo]
+      Check operation [$$operation$$] for status.
+- execute:
+  - command: artifacts repositories create my-repo --project=my-project --repository-format=maven
+      --location=us-east1  --description="My test repo"
+  - stderr: |+
+      Note: Language package support is in Alpha.
+
+  - stderr: |
+      Create request issued for: [my-repo]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created repository [my-repo].
+actions:
+- execute_command:
+    command: artifacts repositories create my-repo --project=my-project --repository-format=maven
+      --location=us-east1 --description="My test repo" --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us-east1
+              locationId: us-east1
+    - expect_stderr: |+
+        Note: Language package support is in Alpha.
+
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: projects/my-project/locations/us-east1/repositories/my-repo
+              format: MAVEN
+              description: My test repo
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": false,
+              "name": "projects/my-project/locations/us-east1/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
+              "response": {
+                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+                "name": "projects/my-project/locations/us-east1/repositories/my-repo",
+                "format": "MAVEN",
+                "description": "My test repo"
+              }
+            }
+    - expect_stderr: |
+        Create request issued for: [my-repo]
+        Check operation [$$operation$$] for status.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts repositories create my-repo --project=my-project --repository-format=maven
+      --location=us-east1  --description="My test repo"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us-east1
+              locationId: us-east1
+    - expect_stderr: |+
+        Note: Language package support is in Alpha.
+
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories?alt=json&repositoryId=my-repo
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: projects/my-project/locations/us-east1/repositories/my-repo
+              format: MAVEN
+              description: My test repo
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": false,
+              "name": "projects/my-project/locations/us-east1/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
+              "response": {
+                "@type": "type.googleapis.com/google.devtools.artifactregistry.v1beta1.Repository",
+                "name": "projects/my-project/locations/us-east1/repositories/my-repo",
+                "format": "MAVEN",
+                "description": "My test repo"
+              }
+            }
+    - expect_stderr: |
+        Create request issued for: [my-repo]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-east1/repositories/my-repo?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "repository":
+                {
+                  "createTime": "2019-05-23T19:35:43.114453Z",
+                  "format": "MAVEN",
+                  "description": "My test repo",
+                  "name": "projects/my-repo/locations/us-east1/repositories/my-repo",
+                  "updateTime": "2019-05-23T19:35:43.114453Z"
+                }
+            }
+    - expect_stderr: |
+        Created repository [my-repo].
+    - expect_exit:
+        code: 0

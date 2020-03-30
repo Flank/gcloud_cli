@@ -28,19 +28,34 @@ gcloud alpha asset search\-iam\-policies \- searches accessible IAM policies tha
 \fB\-\-query\fR=\fIQUERY\fR
 The query statement.
 
-Examples: To find all Cloud IAM policies in your organization that contain
-amy@mycompany.com: 'policy:amy@mydomain.com'
-
-To find all Cloud IAM policies in your organization that contain owners role:
-\'policy : "roles/owner"'
-
+Examples:
+.RS 2m
+.IP "\(em" 2m
+To find all Cloud IAM policies in your organization that contain
+amy@mycompany.com: \f5policy:"amy@mydomain.com"\fR
+.IP "\(em" 2m
+To find all Cloud IAM policies in your organization that contain owner role:
+\f5policy:"roles/owner"\fR
+.IP "\(em" 2m
 To find all Cloud IAM policies in your organization which have
-myuser@mycompany.com in the owners role:
-\'policy."roles/owner":myuser@mycompany.com'
-
-
+myuser@mycompany.com in the owner role: \f5policy:("roles/owner"
+"myuser@mycompany.com")\fR
+.IP "\(em" 2m
+To find all Cloud IAM policies in your organization which have
+myuser@mycompany.com in the owner role or youruser@mycompany.com in the viewer
+role: \f5policy:(("roles/owner" "myuser@mycompany.com") OR ("roles/viewer"
+"youruser@mycompany.com"))\fR
+.IP "\(em" 2m
+To find all Cloud IAM policies that are set on a resource: \f5resource:
+"projects/123"\fR
+.IP "\(em" 2m
+To find all Cloud IAM policies of resources that match a query. \f5resource:
+"\fBproj\fR"\fR
+.RE
 .RE
 .sp
+
+
 
 .SH "OPTIONAL FLAGS"
 
@@ -67,8 +82,9 @@ to those in the previous call.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -77,6 +93,18 @@ help\fR for details.
 This command uses the \fBcloudasset/v1p1alpha1\fR API. The full documentation
 for this API can be found at:
 https://cloud.google.com/resource\-manager/docs/cloud\-asset\-inventory/quickstart\-cloud\-asset\-inventory
+
+
+
+.SH "EXAMPLES"
+
+To search your accessible IAM policies that contains \f5amy@mycompany.com\fR,
+run:
+
+.RS 2m
+$ gcloud alpha asset search\-iam\-policies \e
+  \-\-query='policy:"amy@mydomain.com"'
+.RE
 
 
 

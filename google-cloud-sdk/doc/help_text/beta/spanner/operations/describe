@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud beta spanner operations describe OPERATION-ID --instance=INSTANCE
-        [--database=DATABASE] [GCLOUD_WIDE_FLAG ...]
+        [--backup=BACKUP] [--database=DATABASE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Describe a Cloud Spanner operation.
@@ -18,6 +18,10 @@ REQUIRED FLAGS
         The ID of the instance the operation is executing on.
 
 OPTIONAL FLAGS
+     --backup=BACKUP
+        For a backup operation, the name of the backup the operation is
+        executing on.
+
      --database=DATABASE
         For a database operation, the name of the database the operation is
         executing on.
@@ -26,8 +30,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To describe a Cloud Spanner instance operation, run:
@@ -40,6 +45,12 @@ EXAMPLES
         $ gcloud beta spanner operations describe  _auto_12345 \
             --instance=my-instance-id
             --database=my-database-id
+
+    To describe a Cloud Spanner backup operation, run:
+
+        $ gcloud beta spanner operations describe  _auto_12345 \
+            --instance=my-instance-id
+            --backup=my-backup-id
 
 NOTES
     This command is currently in BETA and may change without notice. These

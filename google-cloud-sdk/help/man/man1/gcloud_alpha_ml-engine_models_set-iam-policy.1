@@ -20,6 +20,9 @@ gcloud alpha ml\-engine models set\-iam\-policy \- set the IAM policy for a mode
 \fB(ALPHA)\fR Sets the IAM policy for the given model as defined in a JSON or
 YAML file.
 
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
+
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -27,9 +30,9 @@ YAML file.
 .RS 2m
 .TP 2m
 
-Model resource \- The model to set the IAM policy for. This represents a Cloud
-resource. (NOTE) Some attributes are not given arguments in this group but can
-be set in other ways. To set the [project] attribute: provide the argument
+Model resource \- The AI Platform model to set IAM policy for. This represents a
+Cloud resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the argument
 [model] on the command line with a fully specified name; provide the argument
 [\-\-project] on the command line; set the property [core/project]. This must be
 specified.
@@ -58,15 +61,9 @@ or YAML file conforming to the structure of a Policy
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
 
-
-
-.SH "API REFERENCE"
-
-This command uses the \fBml/v1\fR API. The full documentation for this API can
-be found at: https://cloud.google.com/ml/
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -75,10 +72,9 @@ be found at: https://cloud.google.com/ml/
 The following command will read am IAM policy defined in a JSON file
 \'policy.json' and set it for the model \f5my_model\fR:
 
+.RS 2m
 $ gcloud alpha ml\-engine models set\-iam\-policy my_model policy.json
-
-See https://cloud.google.com/iam/docs/managing\-policies for details of the
-policy file format and contents.
+.RE
 
 
 

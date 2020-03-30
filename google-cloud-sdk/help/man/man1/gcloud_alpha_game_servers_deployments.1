@@ -26,8 +26,9 @@ gcloud alpha game servers deployments \- deploy and manage Cloud Game Server Dep
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -36,10 +37,6 @@ help\fR for details.
 \f5\fICOMMAND\fR\fR is one of the following:
 
 .RS 2m
-.TP 2m
-\fBcommit\-rollout\fR
-\fB(ALPHA)\fR Commit the ongoing Deployment rollout.
-
 .TP 2m
 \fBcreate\fR
 \fB(ALPHA)\fR Create a Deployment.
@@ -53,26 +50,24 @@ help\fR for details.
 \fB(ALPHA)\fR Describe a Deployment.
 
 .TP 2m
+\fBdescribe\-rollout\fR
+\fB(ALPHA)\fR Describe a Rollout.
+
+.TP 2m
+\fBfetch\-state\fR
+\fB(ALPHA)\fR Fetches the state of a Deployment.
+
+.TP 2m
 \fBlist\fR
 \fB(ALPHA)\fR List Deployments.
 
 .TP 2m
-\fBrevert\-rollout\fR
-\fB(ALPHA)\fR Start rollback of the ongoing Deployment rollout in the specified
-clusters.
-
-.TP 2m
-\fBset\-rollout\-target\fR
-\fB(ALPHA)\fR Set rollout target for the ongoing Deployment rollout in the
-specified clusters.
-
-.TP 2m
-\fBstart\-rollout\fR
-\fB(ALPHA)\fR Start Deployment rollout by providing a new game server template.
-
-.TP 2m
 \fBupdate\fR
 \fB(ALPHA)\fR Update a Deployment.
+
+.TP 2m
+\fBupdate\-rollout\fR
+\fB(ALPHA)\fR Update a Deployment Rollout.
 
 
 .RE
@@ -83,5 +78,9 @@ specified clusters.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta game servers deployments
+.RE
 

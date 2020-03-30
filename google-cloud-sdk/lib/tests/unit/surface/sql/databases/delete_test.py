@@ -31,7 +31,7 @@ from tests.lib.surface.sql import base
 class _BaseDatabasesDeleteTest(object):
 
   def testDelete(self):
-    sqladmin = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
+    sqladmin = core_apis.GetMessagesModule('sql', 'v1beta4')
     prompt_mock = self.StartObjectPatch(
         console_io, 'PromptContinue', return_value=True)
     self.mocked_client.databases.Delete.Expect(
@@ -50,24 +50,24 @@ class _BaseDatabasesDeleteTest(object):
                 38,
                 39,
                 415000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=None,
             endTime=None,
             error=None,
             exportContext=None,
             importContext=None,
             targetId='mock-instance',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='56282116-8e0d-43d4-85d1-692b1f0cf044',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56282116-8e0d-43d4-85d1-692b1f0cf044'.
-            format(self.Project()),
-            operationType='DELETE_DATABASE',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/56282116-8e0d-43d4-85d1-692b1f0cf044'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .DELETE_DATABASE,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
     self.mocked_client.operations.Get.Expect(
@@ -85,7 +85,8 @@ class _BaseDatabasesDeleteTest(object):
                 38,
                 39,
                 415000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -94,7 +95,8 @@ class _BaseDatabasesDeleteTest(object):
                 38,
                 39,
                 525000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 8,
@@ -103,22 +105,22 @@ class _BaseDatabasesDeleteTest(object):
                 39,
                 26,
                 601000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='mock-instance',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='56282116-8e0d-43d4-85d1-692b1f0cf044',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56282116-8e0d-43d4-85d1-692b1f0cf044'.
-            format(self.Project()),
-            operationType='DELETE_DATABASE',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/56282116-8e0d-43d4-85d1-692b1f0cf044'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .DELETE_DATABASE,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 

@@ -30,14 +30,14 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 
-class SecurityPoliciesListPreconfiguredExpressionSetsTest(
+class SecurityPoliciesListPreconfiguredExpressionSetsBetaTest(
     sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'beta'))
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
+    self.resources.RegisterApiByName('compute', 'beta')
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE
@@ -67,8 +67,8 @@ class SecurityPoliciesListPreconfiguredExpressionSetsTest(
 
     # Setup the expected response
     request = (
-        self.messages.
-        ComputeSecurityPoliciesListPreconfiguredExpressionSetsRequest(
+        self.messages
+        .ComputeSecurityPoliciesListPreconfiguredExpressionSetsRequest(
             project=self.Project()))
     response = (
         self.messages.SecurityPoliciesListPreconfiguredExpressionSetsResponse(
@@ -93,6 +93,19 @@ class SecurityPoliciesListPreconfiguredExpressionSetsTest(
             expression-set-2-id-1
             expression-set-2-id-2
         """))
+
+
+class SecurityPoliciesListPreconfiguredExpressionSetsAlphaTest(
+    SecurityPoliciesListPreconfiguredExpressionSetsBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+    self.client.Mock()
+    self.addCleanup(self.client.Unmock)
+    self.messages = self.client.MESSAGES_MODULE
 
 
 if __name__ == '__main__':

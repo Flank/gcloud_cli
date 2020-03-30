@@ -25,19 +25,19 @@ from tests.lib.surface.compute import test_base
 class TargetHTTPProxiesCreateTest(test_base.BaseTest):
 
   def SetUp(self):
-    self._api = 'v1'
-    self.SelectApi(self._api)
+    self._api = ''
+    self.SelectApi('v1')
     self._target_http_proxies_api = self.compute.targetHttpProxies
 
   def RunCreate(self, command):
-    self.Run('compute target-http-proxies create ' + command)
+    self.Run('compute target-http-proxies create %s' % command)
 
   def testSimpleCase(self):
     self.make_requests.side_effect = [[
         self.messages.TargetHttpProxy(
             name='my-proxy',
             urlMap=('https://compute.googleapis.com/compute/{0}/projects/'
-                    'my-project/global/urlMaps/my-map'.format(self._api)))
+                    'my-project/global/urlMaps/my-map'.format(self.api)))
     ]]
 
     self.RunCreate("""
@@ -46,37 +46,39 @@ class TargetHTTPProxiesCreateTest(test_base.BaseTest):
           --url-map my-map
         """)
 
-    self.CheckRequests(
-        [(self._target_http_proxies_api, 'Insert',
-          self.messages.ComputeTargetHttpProxiesInsertRequest(
-              project='my-project',
-              targetHttpProxy=self.messages.TargetHttpProxy(
-                  description='My target HTTP proxy',
-                  name='my-proxy',
-                  urlMap=('https://compute.googleapis.com/compute/{0}/projects/'
-                          'my-project/global/urlMaps/my-map'.format(
-                              self._api)))))],)
+    self.CheckRequests([
+        (self._target_http_proxies_api, 'Insert',
+         self.messages.ComputeTargetHttpProxiesInsertRequest(
+             project='my-project',
+             targetHttpProxy=self.messages.TargetHttpProxy(
+                 description='My target HTTP proxy',
+                 name='my-proxy',
+                 urlMap=('https://compute.googleapis.com/compute/{0}/projects/'
+                         'my-project/global/urlMaps/my-map'.format(
+                             self.api)))))],)
 
-    self.AssertOutputEquals("""\
+    self.AssertOutputEquals(
+        """\
       NAME      URL_MAP
       my-proxy  my-map
-      """, normalize_space=True)
+      """,
+        normalize_space=True)
 
   def testUriSupport(self):
     self.RunCreate("""
           https://compute.googleapis.com/compute/{0}/projects/my-project/global/targetHttpProxies/my-proxy
           --url-map https://compute.googleapis.com/compute/{0}/projects/my-project/global/urlMaps/my-map
-        """.format(self._api))
+        """.format(self.api))
 
-    self.CheckRequests(
-        [(self._target_http_proxies_api, 'Insert',
-          self.messages.ComputeTargetHttpProxiesInsertRequest(
-              project='my-project',
-              targetHttpProxy=self.messages.TargetHttpProxy(
-                  name='my-proxy',
-                  urlMap=('https://compute.googleapis.com/compute/{0}/projects/'
-                          'my-project/global/urlMaps/my-map'.format(
-                              self._api)))))],)
+    self.CheckRequests([
+        (self._target_http_proxies_api, 'Insert',
+         self.messages.ComputeTargetHttpProxiesInsertRequest(
+             project='my-project',
+             targetHttpProxy=self.messages.TargetHttpProxy(
+                 name='my-proxy',
+                 urlMap=('https://compute.googleapis.com/compute/{0}/projects/'
+                         'my-project/global/urlMaps/my-map'.format(
+                             self.api)))))],)
 
   def testWithoutURLMap(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -84,6 +86,36 @@ class TargetHTTPProxiesCreateTest(test_base.BaseTest):
       self.RunCreate('my-proxy')
 
     self.CheckRequests()
+
+  def testDefaultScope(self):
+    self.make_requests.side_effect = [[
+        self.messages.TargetHttpProxy(
+            name='my-proxy',
+            urlMap=('https://compute.googleapis.com/compute/{0}/projects/'
+                    'my-project/global/urlMaps/my-map'.format(
+                        self.api)))]]
+
+    self.Run('{0} compute target-http-proxies create my-proxy '
+             '--description "My target HTTP proxy with default scope" '
+             '--url-map my-map'.format(self._api))
+
+    self.CheckRequests([
+        (self._target_http_proxies_api, 'Insert',
+         self.messages.ComputeTargetHttpProxiesInsertRequest(
+             project='my-project',
+             targetHttpProxy=self.messages.TargetHttpProxy(
+                 description='My target HTTP proxy with default scope',
+                 name='my-proxy',
+                 urlMap=('https://compute.googleapis.com/compute/{0}/projects/'
+                         'my-project/global/urlMaps/my-map'.format(
+                             self.api)))))],)
+
+    self.AssertOutputEquals(
+        """\
+      NAME      URL_MAP
+      my-proxy  my-map
+      """,
+        normalize_space=True)
 
 
 class TargetHTTPProxiesCreateBetaTest(TargetHTTPProxiesCreateTest):
@@ -94,7 +126,7 @@ class TargetHTTPProxiesCreateBetaTest(TargetHTTPProxiesCreateTest):
     self._target_http_proxies_api = self.compute_beta.targetHttpProxies
 
   def RunCreate(self, command):
-    self.Run('beta compute target-http-proxies create --global ' + command)
+    self.Run('beta compute target-http-proxies create %s' % command)
 
 
 class TargetHTTPProxiesCreateAlphaTest(TargetHTTPProxiesCreateBetaTest):
@@ -105,19 +137,19 @@ class TargetHTTPProxiesCreateAlphaTest(TargetHTTPProxiesCreateBetaTest):
     self._target_http_proxies_api = self.compute_alpha.targetHttpProxies
 
   def RunCreate(self, command):
-    self.Run('alpha compute target-http-proxies create --global ' + command)
+    self.Run('alpha compute target-http-proxies create %s' % command)
 
 
-class RegionTargetHTTPProxiesCreateBetaTest(test_base.BaseTest):
+class RegionTargetHTTPProxiesCreateTest(test_base.BaseTest):
 
   def SetUp(self):
-    self._api = 'beta'
+    self._api = 'v1'
     self.SelectApi(self._api)
-    self._target_http_proxies_api = self.compute_beta.regionTargetHttpProxies
+    self._target_http_proxies_api = self.compute.regionTargetHttpProxies
 
   def RunCreate(self, command):
-    self.Run('beta compute target-http-proxies create --region us-west-1 ' +
-             command)
+    self.Run(
+        'compute target-http-proxies create --region us-west-1 %s' % command)
 
   def testSimpleCase(self):
     self.make_requests.side_effect = [[
@@ -125,8 +157,7 @@ class RegionTargetHTTPProxiesCreateBetaTest(test_base.BaseTest):
             name='my-proxy',
             urlMap=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/regions/us-west-1/urlMaps/my-map'.format(
-                        self._api)))
-    ]]
+                        self.api)))]]
 
     self.RunCreate("""
         my-proxy
@@ -142,10 +173,11 @@ class RegionTargetHTTPProxiesCreateBetaTest(test_base.BaseTest):
               targetHttpProxy=self.messages.TargetHttpProxy(
                   description='My target HTTP proxy',
                   name='my-proxy',
-                  urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
-                          'my-project/regions/us-west-1/urlMaps/my-map' % {
-                              'api': self._api
-                          }))))],)
+                  urlMap=(
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
+                      'my-project/regions/us-west-1/urlMaps/my-map' % {
+                          'api': self.api
+                      }))))],)
 
     self.AssertOutputEquals(
         """\
@@ -158,7 +190,7 @@ class RegionTargetHTTPProxiesCreateBetaTest(test_base.BaseTest):
     self.RunCreate("""
           https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/targetHttpProxies/my-proxy
           --url-map https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-map
-        """ % {'api': self._api})
+        """ % {'api': self.api})
 
     self.CheckRequests(
         [(self._target_http_proxies_api, 'Insert',
@@ -167,10 +199,11 @@ class RegionTargetHTTPProxiesCreateBetaTest(test_base.BaseTest):
               region='us-west-1',
               targetHttpProxy=self.messages.TargetHttpProxy(
                   name='my-proxy',
-                  urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
-                          'my-project/regions/us-west-1/urlMaps/my-map' % {
-                              'api': self._api
-                          }))))],)
+                  urlMap=(
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
+                      'my-project/regions/us-west-1/urlMaps/my-map' % {
+                          'api': self.api
+                      }))))],)
 
   def testWithoutURLMap(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -178,6 +211,18 @@ class RegionTargetHTTPProxiesCreateBetaTest(test_base.BaseTest):
       self.RunCreate('my-proxy')
 
     self.CheckRequests()
+
+
+class RegionTargetHTTPProxiesCreateBetaTest(RegionTargetHTTPProxiesCreateTest):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_http_proxies_api = self.compute_beta.regionTargetHttpProxies
+
+  def RunCreate(self, command):
+    self.Run('beta compute target-http-proxies create --region us-west-1 ' +
+             command)
 
 
 class RegionTargetHTTPProxiesCreateAlphaTest(
@@ -197,7 +242,7 @@ class RegionTargetHTTPProxiesCreateAlphaTest(
           https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/targetHttpProxies/my-proxy
           --url-map https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-map
           --proxy-bind
-        """ % {'api': self._api})
+        """ % {'api': self.api})
 
     self.CheckRequests(
         [(self._target_http_proxies_api, 'Insert',
@@ -206,10 +251,11 @@ class RegionTargetHTTPProxiesCreateAlphaTest(
               region='us-west-1',
               targetHttpProxy=self.messages.TargetHttpProxy(
                   name='my-proxy',
-                  urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
-                          'my-project/regions/us-west-1/urlMaps/my-map' % {
-                              'api': self._api
-                          }),
+                  urlMap=(
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
+                      'my-project/regions/us-west-1/urlMaps/my-map' % {
+                          'api': self.api
+                      }),
                   proxyBind=True)))],)
 
 

@@ -11,7 +11,7 @@ gcloud kms keys versions create \- create a new version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud kms keys versions create\fR [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-primary\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud kms keys versions create\fR [\fB\-\-external\-key\-uri\fR=\fIEXTERNAL_KEY_URI\fR] [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-primary\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -24,6 +24,10 @@ Creates a new version within the given key.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-external\-key\-uri\fR=\fIEXTERNAL_KEY_URI\fR
+The URI of the external key for keys with protection level "external".
+
 .TP 2m
 \fB\-\-key\fR=\fIKEY\fR
 The containing key.
@@ -49,8 +53,9 @@ If specified, immediately make the new version primary.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -64,6 +69,19 @@ version:
 $ gcloud kms keys versions create \-\-location=global \e
     \-\-keyring=fellowship \e
     \-\-key=frodo \-\-primary
+.RE
+
+The following command creates a new version within the \f5legolas\fR key,
+\f5fellowship\fR keyring, \f5us\-central1\fR location,
+\f5https://example.kms/v0/some/key/path\fR as the address for its external key,
+and sets it as the key's primary version:
+
+.RS 2m
+$ gcloud kms keys versions create \-\-location=us\-central1 \e
+    \-\-keyring=fellowship \e
+    \-\-key=legolas \e
+    \-\-external\-key\-uri=https://example.kms/v0/some/key/path \e
+    \-\-primary
 .RE
 
 

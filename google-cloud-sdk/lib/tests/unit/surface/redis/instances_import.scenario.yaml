@@ -1,5 +1,5 @@
 title: instances import scenario test
-release_tracks: [BETA, ALPHA]
+release_tracks: [GA, BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -25,7 +25,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://redis.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/instances/my-redis-instance:import?alt=json
+          uri: https://redis.googleapis.com/v1/projects/fake-project/locations/us-central1/instances/my-redis-instance:import?alt=json
           method: POST
           headers: {}
           body:

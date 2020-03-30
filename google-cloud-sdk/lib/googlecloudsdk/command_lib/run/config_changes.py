@@ -95,10 +95,9 @@ class ReplaceServiceChange(ConfigChanger):
       self._service.metadata.resourceVersion = resource.metadata.resourceVersion
       # Knative will complain if you try to edit (incl remove) serving annots.
       # So replicate them here.
-      if not resource.is_managed:
-        for k, v in resource.annotations.items():
-          if k.startswith(k8s_object.SERVING_GROUP):
-            self._service.annotations[k] = v
+      for k, v in resource.annotations.items():
+        if k.startswith(k8s_object.SERVING_GROUP):
+          self._service.annotations[k] = v
     return self._service
 
 
@@ -157,7 +156,7 @@ class VpcConnectorChange(ConfigChanger):
 
   def Adjust(self, resource):
     annotations = k8s_object.AnnotationsFromMetadata(resource.MessagesModule(),
-                                                     resource.metadata)
+                                                     resource.template.metadata)
     annotations['run.googleapis.com/vpc-access-connector'] = (
         self._connector_name)
     return resource
@@ -168,7 +167,7 @@ class ClearVpcConnectorChange(ConfigChanger):
 
   def Adjust(self, resource):
     annotations = k8s_object.AnnotationsFromMetadata(resource.MessagesModule(),
-                                                     resource.metadata)
+                                                     resource.template.metadata)
     if 'run.googleapis.com/vpc-access-connector' in annotations:
       del annotations['run.googleapis.com/vpc-access-connector']
     return resource
@@ -635,19 +634,29 @@ class NoTrafficChange(ConfigChanger):
       raise exceptions.ConfigurationError(
           '--no-traffic not supported when creating a new service.')
 
-    resource.traffic.ZeroLatestTraffic(resource.status.latestReadyRevisionName)
+    resource.spec_traffic.ZeroLatestTraffic(
+        resource.status.latestReadyRevisionName)
     return resource
 
 
 class TrafficChanges(ConfigChanger):
-  """Represents the user intent to change a services traffic assignments."""
+  """Represents the user intent to change a service's traffic assignments."""
 
-  def __init__(self, new_percentages):
+  def __init__(self, new_percentages, tags_to_update=None, tags_to_remove=None,
+               clear_other_tags=False):
     self._new_percentages = new_percentages
+    self._tags_to_update = tags_to_update or {}
+    self._tags_to_remove = tags_to_remove or []
+    self._clear_other_tags = clear_other_tags
 
   def Adjust(self, resource):
-    """Mutates the given services traffic assignments."""
-    resource.traffic.UpdateTraffic(self._new_percentages)
+    """Mutates the given service's traffic assignments."""
+    if self._tags_to_update or self._tags_to_remove or self._clear_other_tags:
+      resource.spec_traffic.UpdateTags(self._tags_to_update,
+                                       self._tags_to_remove,
+                                       self._clear_other_tags)
+    if self._new_percentages:
+      resource.spec_traffic.UpdateTraffic(self._new_percentages)
     return resource
 
 

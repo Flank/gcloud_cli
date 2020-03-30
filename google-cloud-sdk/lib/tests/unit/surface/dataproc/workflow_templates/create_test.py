@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk import calliope
 
+from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.core import properties
 from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import unit_base
@@ -36,9 +37,9 @@ class WorkflowTemplateCreateUnitTest(unit_base.DataprocUnitTestBase,
                                    region=None,
                                    exception=None):
     if not parent:
-      parent = self.WorkflowTemplateParentName()
+      parent = self.WorkflowTemplateParentName(region=region)
     if not workflow_template:
-      workflow_template = self.MakeWorkflowTemplate()
+      workflow_template = self.MakeWorkflowTemplate(region=region)
     if not (response or exception):
       response = workflow_template
     self.mock_client.projects_regions_workflowTemplates.Create.Expect(
@@ -47,12 +48,33 @@ class WorkflowTemplateCreateUnitTest(unit_base.DataprocUnitTestBase,
         response=response,
         exception=exception)
 
-  def testCreateWorkflowTemplates(self):
-    workflow_template = self.MakeWorkflowTemplate()
-    self.ExpectCreateWorkflowTemplate(workflow_template, workflow_template)
-    result = self.RunDataproc(
-        'workflow-templates create {0}'.format(self.WORKFLOW_TEMPLATE))
+  def _testCreateWorkflowTemplates(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+    workflow_template = self.MakeWorkflowTemplate(region=region)
+    self.ExpectCreateWorkflowTemplate(
+        workflow_template, workflow_template, region=region)
+    result = self.RunDataproc('workflow-templates create {0} {1}'.format(
+        self.WORKFLOW_TEMPLATE, region_flag))
     self.AssertMessagesEqual(workflow_template, result)
+
+  def testCreateWorkflowTemplates(self):
+    self._testCreateWorkflowTemplates()
+
+  def testCreateWorkflowTemplates_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self._testCreateWorkflowTemplates(region='us-central1')
+
+  def testCreateWorkflowTemplates_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self._testCreateWorkflowTemplates(
+        region='us-east4', region_flag='--region=us-east4')
+
+  def testCreateWorkflowTemplates_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('workflow-templates create foo', set_region=False)
 
   def testCreateWorkflowTemplatesWithRegion(self):
     properties.VALUES.dataproc.region.Set('us-test1')
@@ -61,18 +83,19 @@ class WorkflowTemplateCreateUnitTest(unit_base.DataprocUnitTestBase,
     workflow_template = self.MakeWorkflowTemplate(name=template_name)
     self.ExpectCreateWorkflowTemplate(workflow_template, workflow_template,
                                       parent)
-    result = self.RunDataproc(
-        'workflow-templates create {0}'.format(self.WORKFLOW_TEMPLATE))
+    result = self.RunDataproc('workflow-templates create {0}'.format(
+        self.WORKFLOW_TEMPLATE))
     self.AssertMessagesEqual(workflow_template, result)
 
   def testCreateWorkflowTemplatesWithLabels(self):
     labels = {'k1': 'v1'}
     workflow_template = self.MakeWorkflowTemplate(labels=labels)
-    self.assertTrue(workflow_template.labels is not None)
+    self.assertIsNotNone(workflow_template.labels)
     self.ExpectCreateWorkflowTemplate(workflow_template, workflow_template)
-    result = self.RunDataproc('workflow-templates create {0} --labels=k1=v1'.
-                              format(self.WORKFLOW_TEMPLATE))
-    self.assertTrue(result.labels is not None)
+    result = self.RunDataproc(
+        'workflow-templates create {0} --labels=k1=v1'.format(
+            self.WORKFLOW_TEMPLATE))
+    self.assertIsNotNone(result.labels)
     self.assertEqual(workflow_template.labels, result.labels)
     self.AssertMessagesEqual(workflow_template, result)
 

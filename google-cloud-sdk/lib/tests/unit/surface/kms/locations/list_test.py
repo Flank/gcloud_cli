@@ -45,28 +45,33 @@ class LocationsListTestGA(base.KmsMockTest):
 
     self.kms.projects_locations.List.Expect(
         self.messages.CloudkmsProjectsLocationsListRequest(
-            name='projects/'+self.Project(), pageSize=100),
+            name='projects/' + self.Project(), pageSize=100),
         self.messages.ListLocationsResponse(locations=[
             self.messages.Location(
                 locationId='global',
+                name=glbl.RelativeName(),
                 metadata=self.messages.Location.MetadataValue(
                     additionalProperties=[
                         self.messages.Location.MetadataValue.AdditionalProperty(
                             key='hsmAvailable',
                             value=extra_types.JsonValue(string_value='True')),
-                    ]),
-                name=glbl.RelativeName()),
+                        self.messages.Location.MetadataValue.AdditionalProperty(
+                            key='ekmAvailable',
+                            value=extra_types.JsonValue(string_value='True')),
+                    ])),
             self.messages.Location(
-                locationId='us-east1', name=east.RelativeName()),
-        ]))
+                locationId='us-east1', name=east.RelativeName())
+        ]),
+    )
 
     self.Run('kms locations list')
     self.AssertOutputContains(
         """\
-LOCATION_ID HSM_AVAILABLE
-global      True
+LOCATION_ID HSM_AVAILABLE EKM_AVAILABLE
+global      True          True
 us-east1
-""", normalize_space=True)
+""",
+        normalize_space=True)
 
 
 class LocationsListTestBeta(LocationsListTestGA):

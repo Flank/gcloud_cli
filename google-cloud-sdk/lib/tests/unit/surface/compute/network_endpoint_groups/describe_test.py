@@ -31,11 +31,12 @@ class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
     self.SelectApi('v1')
+    self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS[0]
+    self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS[
+        0]
 
   def testSimpleCase(self):
-    self.make_requests.side_effect = iter([
-        [test_resources.NETWORK_ENDPOINT_GROUPS[0]]
-    ])
+    self.make_requests.side_effect = iter([[self.zonal_neg_test_resource]])
     result = self.Run('compute network-endpoint-groups describe my-neg1 '
                       '--zone zone-1')
 
@@ -45,40 +46,7 @@ class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
                              project='my-project',
                              zone='zone-1'))],)
 
-    self.assertEqual(test_resources.NETWORK_ENDPOINT_GROUPS[0], result)
-    self.assertMultiLineEqual(
-        self.GetOutput(),
-        textwrap.dedent("""\
-           description: My NEG 1
-           kind: compute#networkEndpointGroup
-           name: my-neg1
-           network: https://compute.googleapis.com/compute/v1/projects/my-project/global/networks/network-1
-           networkEndpointType: GCE_VM_IP_PORT
-           selfLink: https://compute.googleapis.com/compute/{api}/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
-           size: 5
-           zone: zone-1
-            """.format(api=self.api)))
-
-
-class AlphaNetworkEndpointGroupsDescribeTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
-
-  def testSimpleCase(self):
-    self.make_requests.side_effect = iter(
-        [[test_resources.NETWORK_ENDPOINT_GROUPS_ALPHA[0]]])
-    result = self.Run('compute network-endpoint-groups describe my-neg1 '
-                      '--zone zone-1')
-
-    self.CheckRequests([(self.compute.networkEndpointGroups, 'Get',
-                         self.messages.ComputeNetworkEndpointGroupsGetRequest(
-                             networkEndpointGroup='my-neg1',
-                             project='my-project',
-                             zone='zone-1'))],)
-
-    self.assertEqual(test_resources.NETWORK_ENDPOINT_GROUPS_ALPHA[0], result)
+    self.assertEqual(self.zonal_neg_test_resource, result)
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
@@ -93,8 +61,7 @@ class AlphaNetworkEndpointGroupsDescribeTest(test_base.BaseTest):
             """.format(api=self.api)))
 
   def testGlobalCase(self):
-    self.make_requests.side_effect = iter(
-        [[test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA[0]]])
+    self.make_requests.side_effect = iter([[self.global_neg_test_resource]])
     result = self.Run(
         'compute network-endpoint-groups describe my-global-neg --global')
 
@@ -102,8 +69,7 @@ class AlphaNetworkEndpointGroupsDescribeTest(test_base.BaseTest):
         [(self.compute.globalNetworkEndpointGroups, 'Get',
           self.messages.ComputeGlobalNetworkEndpointGroupsGetRequest(
               networkEndpointGroup='my-global-neg', project='my-project'))],)
-    self.assertEqual(test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA[0],
-                     result)
+    self.assertEqual(self.global_neg_test_resource, result)
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
@@ -111,9 +77,61 @@ class AlphaNetworkEndpointGroupsDescribeTest(test_base.BaseTest):
            kind: compute#networkEndpointGroup
            name: my-global-neg
            networkEndpointType: INTERNET_IP_PORT
-           selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/global/networkEndpointGroups/my-global-neg
+           selfLink: https://compute.googleapis.com/compute/{api}/projects/my-project/global/networkEndpointGroups/my-global-neg
            size: 1
-            """))
+            """.format(api=self.api)))
+
+
+class BetaNetworkEndpointGroupsDescribeTest(NetworkEndpointGroupsDescribeTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS_BETA[
+        0]
+    self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_BETA[
+        0]
+
+
+class AlphaNetworkEndpointGroupsDescribeTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.zonal_neg_test_resource = test_resources.NETWORK_ENDPOINT_GROUPS_ALPHA[
+        0]
+    self.global_neg_test_resource = test_resources.GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA[
+        0]
+    self.region_neg_test_resource = test_resources.REGION_NETWORK_ENDPOINT_GROUPS_ALPHA[
+        0]
+
+  def testRegionalCase(self):
+    self.make_requests.side_effect = iter([[self.region_neg_test_resource]])
+    result = self.Run(
+        'compute network-endpoint-groups describe my-cloud-run-neg '
+        '--region region-1')
+
+    self.CheckRequests(
+        [(self.compute.regionNetworkEndpointGroups, 'Get',
+          self.messages.ComputeRegionNetworkEndpointGroupsGetRequest(
+              networkEndpointGroup='my-cloud-run-neg',
+              project='my-project',
+              region='region-1'))],)
+    self.assertEqual(self.region_neg_test_resource, result)
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+            cloudRun:
+              service: cloud-run-service
+              tag: cloud-run-tag
+            description: My Cloud Run Serverless NEG
+            kind: compute#networkEndpointGroup
+            name: my-cloud-run-neg
+            networkEndpointType: SERVERLESS
+            region: region-1
+            selfLink: https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/networkEndpointGroups/my-cloud-run-neg
+            size: 0
+        """.format(api=self.api)))
 
 
 if __name__ == '__main__':

@@ -66,7 +66,7 @@ class UpdateHelper(object):
 
   @classmethod
   def Args(cls, parser, support_l7_internal_load_balancer, support_failover,
-           support_logging):
+           support_logging, support_client_only, support_grpc_protocol):
     """Add all arguments for updating a backend service."""
 
     flags.GLOBAL_REGIONAL_BACKEND_SERVICE_ARG.AddArgument(
@@ -81,13 +81,15 @@ class UpdateHelper(object):
     cls.HTTPS_HEALTH_CHECK_ARG = flags.HttpsHealthCheckArgument()
     cls.HTTPS_HEALTH_CHECK_ARG.AddArgument(
         parser, cust_metavar='HTTPS_HEALTH_CHECK')
+    flags.AddNoHealthChecks(parser)
     cls.SECURITY_POLICY_ARG = (
         security_policy_flags.SecurityPolicyArgumentForTargetResource(
             resource='backend service'))
     cls.SECURITY_POLICY_ARG.AddArgument(parser)
     flags.AddTimeout(parser, default=None)
     flags.AddPortName(parser)
-    flags.AddProtocol(parser, default=None)
+    flags.AddProtocol(
+        parser, default=None, support_grpc_protocol=support_grpc_protocol)
 
     flags.AddConnectionDrainingTimeout(parser)
     flags.AddEnableCdn(parser)
@@ -95,7 +97,7 @@ class UpdateHelper(object):
     flags.AddCacheKeyIncludeHost(parser, default=None)
     flags.AddCacheKeyIncludeQueryString(parser, default=None)
     flags.AddCacheKeyQueryStringList(parser)
-    flags.AddSessionAffinity(parser)
+    flags.AddSessionAffinity(parser, support_client_only=support_client_only)
     flags.AddAffinityCookieTtl(parser)
     signed_url_flags.AddSignedUrlCacheMaxAge(
         parser, required=False, unspecified_help='')
@@ -133,7 +135,7 @@ class UpdateHelper(object):
       replacement.description = args.description
 
     health_checks = flags.GetHealthCheckUris(args, self, resources)
-    if health_checks:
+    if health_checks or args.IsSpecified('no_health_checks'):
       replacement.healthChecks = health_checks
 
     if args.timeout:
@@ -220,6 +222,7 @@ class UpdateHelper(object):
         if self._support_logging else False,
         args.IsSpecified('health_checks'),
         args.IsSpecified('https_health_checks'),
+        args.IsSpecified('no_health_checks')
     ]):
       raise exceptions.ToolException('At least one property must be modified.')
 
@@ -351,9 +354,11 @@ class UpdateGA(base.UpdateCommand):
   *{command}* is used to update backend services.
   """
 
-  _support_l7_internal_load_balancer = False
-  _support_logging = False
-  _support_failover = False
+  _support_l7_internal_load_balancer = True
+  _support_logging = True
+  _support_failover = True
+  _support_client_only = False
+  _support_grpc_protocol = False
 
   @classmethod
   def Args(cls, parser):
@@ -362,7 +367,9 @@ class UpdateGA(base.UpdateCommand):
         support_l7_internal_load_balancer=cls
         ._support_l7_internal_load_balancer,
         support_failover=cls._support_failover,
-        support_logging=cls._support_logging)
+        support_logging=cls._support_logging,
+        support_client_only=cls._support_client_only,
+        support_grpc_protocol=cls._support_grpc_protocol)
 
   def Run(self, args):
     """Issues requests necessary to update the Backend Services."""
@@ -379,9 +386,8 @@ class UpdateBeta(UpdateGA):
   *{command}* is used to update backend services.
   """
 
-  _support_l7_internal_load_balancer = True
-  _support_logging = True
-  _support_failover = True
+  _support_client_only = False
+  _support_grpc_protocol = False
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -391,6 +397,5 @@ class UpdateAlpha(UpdateGA):
   *{command}* is used to update backend services.
   """
 
-  _support_l7_internal_load_balancer = True
-  _support_logging = True
-  _support_failover = True
+  _support_client_only = True
+  _support_grpc_protocol = True

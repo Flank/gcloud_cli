@@ -22,7 +22,6 @@ import copy
 from apitools.base.protorpclite import protojson
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import exceptions as c_exceptions
 from googlecloudsdk.core import properties
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base
@@ -37,11 +36,11 @@ class CreateTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
   def SetUp(self):
     self.StartPatch('time.sleep')  # To speed up tests with polling
 
-    self.mocked_cloudbuild_v1alpha1 = mock.Client(
-        core_apis.GetClientClass('cloudbuild', 'v1alpha1'))
-    self.mocked_cloudbuild_v1alpha1.Mock()
-    self.addCleanup(self.mocked_cloudbuild_v1alpha1.Unmock)
-    self.msg = core_apis.GetMessagesModule('cloudbuild', 'v1alpha1')
+    self.mocked_cloudbuild_v1alpha2 = mock.Client(
+        core_apis.GetClientClass('cloudbuild', 'v1alpha2'))
+    self.mocked_cloudbuild_v1alpha2.Mock()
+    self.addCleanup(self.mocked_cloudbuild_v1alpha2.Unmock)
+    self.msg = core_apis.GetMessagesModule('cloudbuild', 'v1alpha2')
 
     self.project_id = 'my-project'
     properties.VALUES.core.project.Set(self.project_id)
@@ -55,14 +54,18 @@ class CreateTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     wp_in = self.msg.WorkerPool()
     wp_in.workerConfig = self.msg.WorkerConfig()
     wp_in.name = 'fake_name'
+    wp_in.networkConfig = self.msg.NetworkConfig()
+    wp_in.networkConfig.peeredNetwork = 'fake_network'
 
     wp_out = copy.deepcopy(wp_in)
     wp_out.createTime = self.frozen_time_str
-    wp_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
+    wp_out.state = self.msg.WorkerPool.StateValueValuesEnum.RUNNING
 
-    self.mocked_cloudbuild_v1alpha1.projects_workerPools.Create.Expect(
+    self.mocked_cloudbuild_v1alpha2.projects_workerPools.Create.Expect(
         self.msg.CloudbuildProjectsWorkerPoolsCreateRequest(
-            parent=u'projects/{}'.format(self.project_id), workerPool=wp_in),
+            parent=u'projects/{}'.format(self.project_id),
+            workerPool=wp_in,
+            workerPoolId=u'fake_name'),
         response=wp_out)
 
     wp_path = self.Touch(
@@ -74,7 +77,7 @@ class CreateTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     ])
     self.AssertOutputContains(
         """\
-NAME CREATE_TIME STATUS
+NAME CREATE_TIME STATE
 fake_name {} RUNNING
 """.format(self.frozen_time_str),
         normalize_space=True)
@@ -83,10 +86,12 @@ fake_name {} RUNNING
     wp_in = self.msg.WorkerPool()
     wp_in.workerConfig = self.msg.WorkerConfig()
     wp_in.name = 'fake_name'
+    wp_in.networkConfig = self.msg.NetworkConfig()
+    wp_in.networkConfig.peeredNetwork = 'fake_network'
 
     wp_out = copy.deepcopy(wp_in)
     wp_out.createTime = self.frozen_time_str
-    wp_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
+    wp_out.state = self.msg.WorkerPool.StateValueValuesEnum.RUNNING
 
     wp_path = self.Touch(
         '.', 'workerpool.yaml', contents=protojson.encode_message(wp_in))
@@ -107,74 +112,50 @@ fake_name {} RUNNING
 
     wp_out = copy.deepcopy(wp_in)
     wp_out.createTime = self.frozen_time_str
-    wp_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
+    wp_out.state = self.msg.WorkerPool.StateValueValuesEnum.RUNNING
 
-    self.mocked_cloudbuild_v1alpha1.projects_workerPools.Create.Expect(
+    self.mocked_cloudbuild_v1alpha2.projects_workerPools.Create.Expect(
         self.msg.CloudbuildProjectsWorkerPoolsCreateRequest(
-            parent=u'projects/{}'.format(self.project_id), workerPool=wp_in),
+            parent=u'projects/{}'.format(self.project_id),
+            workerPool=wp_in,
+            workerPoolId=u'fake_name'),
         response=wp_out)
 
     self._Run(['alpha', 'builds', 'worker-pools', 'create', wp_in.name])
     self.AssertOutputContains(
         """\
-NAME CREATE_TIME STATUS
+NAME CREATE_TIME STATE
 fake_name {} RUNNING
 """.format(self.frozen_time_str),
         normalize_space=True)
 
-  def testCreateWithWorkerCount(self):
+  def testCreateWithRegion(self):
     wp_in = self.msg.WorkerPool()
     wp_in.workerConfig = self.msg.WorkerConfig()
     wp_in.name = 'fake_name'
-    wp_in.workerCount = 3
+    wp_in.networkConfig = self.msg.NetworkConfig()
+    wp_in.networkConfig.peeredNetwork = 'fake_network'
+
+    wp_in.region = 'fake_region'
 
     wp_out = copy.deepcopy(wp_in)
     wp_out.createTime = self.frozen_time_str
-    wp_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
+    wp_out.state = self.msg.WorkerPool.StateValueValuesEnum.RUNNING
 
-    self.mocked_cloudbuild_v1alpha1.projects_workerPools.Create.Expect(
+    self.mocked_cloudbuild_v1alpha2.projects_workerPools.Create.Expect(
         self.msg.CloudbuildProjectsWorkerPoolsCreateRequest(
-            parent=u'projects/{}'.format(self.project_id), workerPool=wp_in),
+            parent=u'projects/{}'.format(self.project_id),
+            workerPool=wp_in,
+            workerPoolId=u'fake_name'),
         response=wp_out)
 
     self._Run([
         'alpha', 'builds', 'worker-pools', 'create', wp_in.name,
-        '--worker-count',
-        str(wp_in.workerCount)
+        '--peered-network', 'fake_network', '--region', 'fake_region'
     ])
     self.AssertOutputContains(
         """\
-NAME CREATE_TIME STATUS
-fake_name {} RUNNING
-""".format(self.frozen_time_str),
-        normalize_space=True)
-
-  def testCreateWithRegions(self):
-    wp_in = self.msg.WorkerPool()
-    wp_in.workerConfig = self.msg.WorkerConfig()
-    wp_in.name = 'fake_name'
-
-    wp_in.regions = [
-        self.msg.WorkerPool.RegionsValueListEntryValuesEnum.us_central1,
-        self.msg.WorkerPool.RegionsValueListEntryValuesEnum.us_east1
-    ]
-
-    wp_out = copy.deepcopy(wp_in)
-    wp_out.createTime = self.frozen_time_str
-    wp_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
-
-    self.mocked_cloudbuild_v1alpha1.projects_workerPools.Create.Expect(
-        self.msg.CloudbuildProjectsWorkerPoolsCreateRequest(
-            parent=u'projects/{}'.format(self.project_id), workerPool=wp_in),
-        response=wp_out)
-
-    self._Run([
-        'alpha', 'builds', 'worker-pools', 'create', wp_in.name, '--regions',
-        'us-central1,us-east1'
-    ])
-    self.AssertOutputContains(
-        """\
-NAME CREATE_TIME STATUS
+NAME CREATE_TIME STATE
 fake_name {} RUNNING
 """.format(self.frozen_time_str),
         normalize_space=True)
@@ -183,24 +164,30 @@ fake_name {} RUNNING
     wp_in = self.msg.WorkerPool()
     wp_in.workerConfig = self.msg.WorkerConfig()
     wp_in.name = 'fake_name'
+    wp_in.networkConfig = self.msg.NetworkConfig()
+    wp_in.networkConfig.peeredNetwork = 'fake_network'
+
     wp_in.workerConfig.machineType = 'fakemachine'
 
     wp_out = copy.deepcopy(wp_in)
     wp_out.createTime = self.frozen_time_str
-    wp_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
+    wp_out.state = self.msg.WorkerPool.StateValueValuesEnum.RUNNING
 
-    self.mocked_cloudbuild_v1alpha1.projects_workerPools.Create.Expect(
+    self.mocked_cloudbuild_v1alpha2.projects_workerPools.Create.Expect(
         self.msg.CloudbuildProjectsWorkerPoolsCreateRequest(
-            parent='projects/{}'.format(self.project_id), workerPool=wp_in),
+            parent='projects/{}'.format(self.project_id),
+            workerPool=wp_in,
+            workerPoolId=u'fake_name'),
         response=wp_out)
 
     self._Run([
         'alpha', 'builds', 'worker-pools', 'create', wp_in.name,
-        '--worker-machine-type', wp_in.workerConfig.machineType
+        '--peered-network', 'fake_network', '--worker-machine-type',
+        wp_in.workerConfig.machineType
     ])
     self.AssertOutputContains(
         """\
-NAME CREATE_TIME STATUS
+NAME CREATE_TIME STATE
 fake_name {} RUNNING
 """.format(self.frozen_time_str),
         normalize_space=True)
@@ -209,127 +196,30 @@ fake_name {} RUNNING
     wp_in = self.msg.WorkerPool()
     wp_in.workerConfig = self.msg.WorkerConfig()
     wp_in.name = 'fake_name'
+    wp_in.networkConfig = self.msg.NetworkConfig()
+    wp_in.networkConfig.peeredNetwork = 'fake_network'
+
     wp_in.workerConfig.diskSizeGb = 123
 
     wp_out = copy.deepcopy(wp_in)
     wp_out.createTime = self.frozen_time_str
-    wp_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
+    wp_out.state = self.msg.WorkerPool.StateValueValuesEnum.RUNNING
 
-    self.mocked_cloudbuild_v1alpha1.projects_workerPools.Create.Expect(
+    self.mocked_cloudbuild_v1alpha2.projects_workerPools.Create.Expect(
         self.msg.CloudbuildProjectsWorkerPoolsCreateRequest(
-            parent='projects/{}'.format(self.project_id), workerPool=wp_in),
+            parent='projects/{}'.format(self.project_id),
+            workerPool=wp_in,
+            workerPoolId=u'fake_name'),
         response=wp_out)
 
     self._Run([
         'alpha', 'builds', 'worker-pools', 'create', wp_in.name,
-        '--worker-disk-size',
+        '--peered-network', 'fake_network', '--worker-disk-size',
         str(wp_in.workerConfig.diskSizeGb)
     ])
     self.AssertOutputContains(
         """\
-NAME CREATE_TIME STATUS
-fake_name {} RUNNING
-""".format(self.frozen_time_str),
-        normalize_space=True)
-
-  def testCreateWithIncompleteNetwork1(self):
-    with self.assertRaises(c_exceptions.RequiredArgumentException):
-      self._Run([
-          'alpha', 'builds', 'worker-pools', 'create', 'wpname',
-          '--worker-network-name', 'networkname'
-      ])
-
-  def testCreateWithIncompleteNetwork2(self):
-    with self.assertRaises(c_exceptions.RequiredArgumentException):
-      self._Run([
-          'alpha', 'builds', 'worker-pools', 'create', 'wpname',
-          '--worker-network-subnet', 'subnetname'
-      ])
-
-  def testCreateWithIncompleteNetwork3(self):
-    with self.assertRaises(c_exceptions.RequiredArgumentException):
-      self._Run([
-          'alpha', 'builds', 'worker-pools', 'create', 'wpname',
-          '--worker-network-project', 'projectid'
-      ])
-
-  def testCreateWithIncompleteNetwork4(self):
-    with self.assertRaises(c_exceptions.RequiredArgumentException):
-      self._Run([
-          'alpha', 'builds', 'worker-pools', 'create', 'wpname',
-          '--worker-network-name', 'networkname', '--worker-network-subnet',
-          'subnetname'
-      ])
-
-  def testCreateWithIncompleteNetwork5(self):
-    with self.assertRaises(c_exceptions.RequiredArgumentException):
-      self._Run([
-          'alpha', 'builds', 'worker-pools', 'create', 'wpname',
-          '--worker-network-name', 'networkname', '--worker-network-project',
-          'projectid'
-      ])
-
-  def testCreateWithIncompleteNetwork6(self):
-    with self.assertRaises(c_exceptions.RequiredArgumentException):
-      self._Run([
-          'alpha', 'builds', 'worker-pools', 'create', 'wpname',
-          '--worker-network-subnet', 'subnetname', '--worker-network-project',
-          'projectid'
-      ])
-
-  def testCreateWithCompleteNetwork(self):
-    wp_in = self.msg.WorkerPool()
-    wp_in.workerConfig = self.msg.WorkerConfig()
-    wp_in.name = 'fake_name'
-    wp_in.workerConfig.network = self.msg.Network()
-    wp_in.workerConfig.network.network = 'networkname'
-    wp_in.workerConfig.network.subnetwork = 'subnetname'
-    wp_in.workerConfig.network.projectId = 'project'
-
-    wp_out = copy.deepcopy(wp_in)
-    wp_out.createTime = self.frozen_time_str
-    wp_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
-
-    self.mocked_cloudbuild_v1alpha1.projects_workerPools.Create.Expect(
-        self.msg.CloudbuildProjectsWorkerPoolsCreateRequest(
-            parent='projects/{}'.format(self.project_id), workerPool=wp_in),
-        response=wp_out)
-
-    self._Run([
-        'alpha', 'builds', 'worker-pools', 'create', wp_in.name,
-        '--worker-network-name', wp_in.workerConfig.network.network,
-        '--worker-network-subnet', wp_in.workerConfig.network.subnetwork,
-        '--worker-network-project', wp_in.workerConfig.network.projectId
-    ])
-    self.AssertOutputContains(
-        """\
-NAME CREATE_TIME STATUS
-fake_name {} RUNNING
-""".format(self.frozen_time_str),
-        normalize_space=True)
-
-  def testCreateWithTag(self):
-    wp_in = self.msg.WorkerPool()
-    wp_in.workerConfig = self.msg.WorkerConfig()
-    wp_in.name = 'fake_name'
-    wp_in.workerConfig.tag = 'faketag'
-
-    wp_out = copy.deepcopy(wp_in)
-    wp_out.createTime = self.frozen_time_str
-    wp_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
-
-    self.mocked_cloudbuild_v1alpha1.projects_workerPools.Create.Expect(
-        self.msg.CloudbuildProjectsWorkerPoolsCreateRequest(
-            parent='projects/{}'.format(self.project_id), workerPool=wp_in),
-        response=wp_out)
-
-    self._Run([
-        'alpha', 'builds', 'worker-pools', 'create', wp_in.name, '--worker-tag',
-        wp_in.workerConfig.tag
-    ])
-    self.AssertOutputContains(
-        """\
-NAME CREATE_TIME STATUS
+NAME CREATE_TIME STATE
 fake_name {} RUNNING
 """.format(self.frozen_time_str),
         normalize_space=True)

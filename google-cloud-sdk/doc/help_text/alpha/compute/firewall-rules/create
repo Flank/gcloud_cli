@@ -100,11 +100,19 @@ OPTIONAL FLAGS
 
      --enable-logging
         Enable logging for the firewall rule. Logs will be exported to
-        StackDriver. Firewall logging is disabled by default.
+        StackDriver. Firewall logging is disabled by default. To enable logging
+        for an existing rule, run:
+
+            $ gcloud alpha compute firewall-rules create MY-RULE --enable-logging
+
+        To disable logging on an existing rule, run:
+
+            $ gcloud alpha compute firewall-rules create MY-RULE \
+                --no-enable-logging
 
      --logging-metadata=LOGGING_METADATA
-        Can only be specified if --enable-logging is true. Configures whether
-        metadata fields should be added to the reported firewall logs.
+        Configures whether metadata fields should be added to the reported
+        firewall logs. Can only be specified if --enable-logging is true.
         LOGGING_METADATA must be one of: exclude-all, include-all.
 
      --network=NETWORK; default="default"
@@ -203,24 +211,24 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create a firewall rule allowing incoming TCP traffic on port 8080, run:
 
         $ gcloud alpha compute firewall-rules create FooService \
-            --allow tcp:8080 \
-            --description "Allow incoming traffic on TCP port 8080" \
-            --direction INGRESS
+            --allow=tcp:8080
+            --description="Allow incoming traffic on TCP port 8080" --direction=INGRESS
 
     To create a firewall rule that allows TCP traffic through port 80 and
     determines a list of specific IP address blocks that are allowed to make
     inbound connections, run:
 
         $ gcloud alpha compute firewall-rules create "tcp-rule" \
-            --allow tcp:80 --source-ranges="10.0.0.0/22,10.0.0.0/14" \
-            --description="Narrowing TCP traffic"
+            --allow=tcp:80
+            --source-ranges="10.0.0.0/22,10.0.0.0/14" --description="Narrowing TCP traffic"
 
     To list existing firewall rules, run:
 

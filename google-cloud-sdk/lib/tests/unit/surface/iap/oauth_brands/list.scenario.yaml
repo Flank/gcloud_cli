@@ -1,0 +1,46 @@
+title: iap oauth-brands describe test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      iap oauth-brands list
+  - stdout: |
+      ---
+      applicationTitle: Hello world
+      name: projects/1234567890/brands/1234567890
+      orgInternalOnly: true
+      supportEmail: test@test.com
+actions:
+- execute_command:
+    command: |
+      iap oauth-brands list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iap.googleapis.com/v1/projects/fake-project/brands?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "brands": [
+                {
+                  "name": "projects/1234567890/brands/1234567890",
+                  "supportEmail": "test@test.com",
+                  "applicationTitle": "Hello world",
+                  "orgInternalOnly": true
+                }
+              ]
+            }
+    - expect_stdout: |
+        ---
+        applicationTitle: Hello world
+        name: projects/1234567890/brands/1234567890
+        orgInternalOnly: true
+        supportEmail: test@test.com
+    - expect_exit:
+        code: 0

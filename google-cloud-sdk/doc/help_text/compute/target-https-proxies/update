@@ -5,7 +5,12 @@ SYNOPSIS
     gcloud compute target-https-proxies update NAME
         [--quic-override=QUIC_OVERRIDE]
         [--ssl-certificates=SSL_CERTIFICATE,[...]] [--url-map=URL_MAP]
-        [--clear-ssl-policy | --ssl-policy=SSL_POLICY] [GCLOUD_WIDE_FLAG ...]
+        [--clear-ssl-policy | --ssl-policy=SSL_POLICY]
+        [--global | --region=REGION]
+        [--global-ssl-certificates
+          | --ssl-certificates-region=SSL_CERTIFICATES_REGION]
+        [--global-url-map | --url-map-region=URL_MAP_REGION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute target-https-proxies update is used to change the SSL
@@ -44,9 +49,10 @@ FLAGS
         referenced by a target HTTPS proxy.
 
      --url-map=URL_MAP
-        A reference to a URL map resource that defines the mapping of URLs to
-        backend services. The URL map must exist and cannot be deleted while
-        referenced by a target HTTPS proxy.
+        A reference to a URL map resource. A URL map defines the mapping of
+        URLs to backend services. Before you can refer to a URL map, you must
+        create the URL map. To delete a URL map that a target proxy is
+        referring to, you must first delete the target HTTPS proxy.
 
      At most one of these may be specified:
 
@@ -59,12 +65,93 @@ FLAGS
           and the HTTPS proxy load balancer. The SSL policy must exist and
           cannot be deleted while referenced by a target HTTPS proxy.
 
+     At most one of these may be specified:
+
+       --global
+          If set, the target HTTPS proxy is global.
+
+       --region=REGION
+          Region of the target HTTPS proxy to update. If not specified, you may
+          be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+     At most one of these may be specified:
+
+       --global-ssl-certificates
+          If set, the ssl certificates are global.
+
+       --ssl-certificates-region=SSL_CERTIFICATES_REGION
+          Region of the ssl certificates to operate on. If not specified, you
+          may be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+     At most one of these may be specified:
+
+       --global-url-map
+          If set, the URL map is global.
+
+       --url-map-region=URL_MAP_REGION
+          Region of the URL map to operate on. Overrides the default
+          compute/region property value for this command invocation.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    Update the URL map of a global target HTTPS proxy by running:
+
+        $ gcloud compute target-https-proxies update PROXY_NAME \
+            --url-map=URL_MAP
+
+    Update the SSL certificate of a global target HTTPS proxy by running:
+
+        $ gcloud compute target-https-proxies update PROXY_NAME \
+            --ssl-certificates=SSL_CERTIFIFCATE
+
+    Update the URL map of a global target HTTPS proxy by running:
+
+        $ gcloud compute target-https-proxies update PROXY_NAME \
+            --url-map=URL_MAP --region=REGION_NAME
+
+    Update the SSL certificate of a global target HTTPS proxy by running:
+
+        $ gcloud compute target-https-proxies update PROXY_NAME \
+            --ssl-certificates=SSL_CERTIFIFCATE --region=REGION_NAME
 
 NOTES
     These variants are also available:

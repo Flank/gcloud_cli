@@ -17,8 +17,8 @@ gcloud alpha compute machine\-images add\-iam\-policy\-binding \- add IAM policy
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Add an IAM policy binding to the IAM policy of a Google Compute
-Engine machine image. One binding consists of a member and a role.
+\fB(ALPHA)\fR Add an IAM policy binding to the IAM policy of a Compute Engine
+machine image. A policy binding consists of a member and a role.
 
 
 
@@ -37,7 +37,7 @@ specified name; set the property [core/project]; provide the argument
 .RS 2m
 .TP 2m
 \fIMACHINE_IMAGE\fR
-ID of the machine_image or fully qualified identifier for the machine_image.
+ID of the machine image or fully qualified identifier for the machine image.
 
 
 .RE
@@ -82,8 +82,9 @@ Define the role of the member.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -116,5 +117,9 @@ role and member types.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute machine\-images add\-iam\-policy\-binding
+.RE
 

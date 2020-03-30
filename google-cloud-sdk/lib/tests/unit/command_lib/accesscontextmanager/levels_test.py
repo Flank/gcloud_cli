@@ -27,13 +27,17 @@ from googlecloudsdk.core.util import files
 from tests.lib import test_case
 
 
-class LevelsTest(test_case.TestCase):
+class LevelsTestGA(test_case.TestCase):
+
+  def PreSetUp(self):
+    self.api_version = 'v1'
 
   def SetUp(self):
     temp_dir = files.TemporaryDirectory()
     self.temp_path = temp_dir.path
     self.addCleanup(temp_dir.Close)
-    self.messages = apis.GetMessagesModule('accesscontextmanager', 'v1')
+    self.messages = apis.GetMessagesModule('accesscontextmanager',
+                                           self.api_version)
 
   def _MakeFile(self, contents):
     filename = 'test.yaml'
@@ -41,35 +45,32 @@ class LevelsTest(test_case.TestCase):
     files.WriteFileContents(full_path, contents)
     return full_path
 
-  def testParseMissingFile(self):
-    with self.assertRaisesRegex(yaml.FileLoadError,
-                                'Failed to load'):
-      levels.ParseBasicLevelConditions('does-not-exist.yaml')
+  def testBasicParseMissingFile(self):
+    with self.assertRaisesRegex(yaml.FileLoadError, 'Failed to load'):
+      levels.ParseBasicLevelConditions(self.api_version)('does-not-exist.yaml')
 
-  def testParseInvalidYaml(self):
+  def testBasicParseInvalidYaml(self):
     path = self._MakeFile(':')
-    with self.assertRaisesRegex(yaml.YAMLParseError,
-                                'Failed to parse YAML'):
-      levels.ParseBasicLevelConditions(path)
+    with self.assertRaisesRegex(yaml.YAMLParseError, 'Failed to parse YAML'):
+      levels.ParseBasicLevelConditions(self.api_version)(path)
 
-  def testParseEmpty(self):
+  def testBasicParseEmpty(self):
     path = self._MakeFile('')
     with self.assertRaisesRegex(levels.ParseError, 'File is empty'):
-      levels.ParseBasicLevelConditions(path)
+      levels.ParseBasicLevelConditions(self.api_version)(path)
 
-  def testParseValidYamlInvalidObjectEncodeError(self):
+  def testBasicParseValidYamlInvalidObjectEncodeError(self):
     path = self._MakeFile('test')
-    with self.assertRaisesRegex(levels.ParseError,
-                                'Invalid format'):
-      levels.ParseBasicLevelConditions(path)
+    with self.assertRaisesRegex(levels.ParseError, 'Invalid format'):
+      levels.ParseBasicLevelConditions(self.api_version)(path)
 
-  def testParseValidYamlInvalidObjectUnrecognizedField(self):
+  def testBasicParseValidYamlInvalidObjectUnrecognizedField(self):
     path = self._MakeFile('[{"invalid-prop": "value"}]')
     with self.assertRaisesRegex(levels.ParseError,
                                 r'Unrecognized fields: \[invalid-prop\]'):
-      levels.ParseBasicLevelConditions(path)
+      levels.ParseBasicLevelConditions(self.api_version)(path)
 
-  def testParseSuccess(self):
+  def testBasicParseSuccess(self):
     path = self._MakeFile("""\
         - ipSubnetworks:
           - 192.168.100.14/24
@@ -82,21 +83,177 @@ class LevelsTest(test_case.TestCase):
           - accessPolicies/my_policy/accessLevels/other_level
         """)
 
-    conditions = levels.ParseBasicLevelConditions(path)
+    conditions = levels.ParseBasicLevelConditions(self.api_version)(path)
+
+    self.assertEqual(conditions, [
+        self.messages.Condition(
+            ipSubnetworks=['192.168.100.14/24', '2001:db8::/48'], negate=True),
+        self.messages.Condition(members=[
+            'user:user@example.com', 'serviceAccount:serviceacct@gservices.com'
+        ]),
+        self.messages.Condition(requiredAccessLevels=[
+            'accessPolicies/my_policy/accessLevels/other_level'
+        ])
+    ])
+
+  def testLevelsParseMissingFile(self):
+    with self.assertRaisesRegex(yaml.FileLoadError, 'Failed to load'):
+      levels.ParseAccessLevels(self.api_version)('does-not-exist.yaml')
+
+  def testLevelsParseInvalidYaml(self):
+    path = self._MakeFile(':')
+    with self.assertRaisesRegex(yaml.YAMLParseError, 'Failed to parse YAML'):
+      levels.ParseAccessLevels(self.api_version)(path)
+
+  def testLevelsParseEmpty(self):
+    path = self._MakeFile('')
+    with self.assertRaisesRegex(levels.ParseError, 'File is empty'):
+      levels.ParseAccessLevels(self.api_version)(path)
+
+  def testLevelsParseValidYamlInvalidObjectEncodeError(self):
+    path = self._MakeFile('test')
+    with self.assertRaisesRegex(levels.ParseError, 'Invalid format'):
+      levels.ParseAccessLevels(self.api_version)(path)
+
+  def testLevelsParseValidYamlInvalidObjectUnrecognizedField(self):
+    path = self._MakeFile('[{"invalid-prop": "value"}]')
+    with self.assertRaisesRegex(levels.ParseError,
+                                r'Unrecognized fields: \[invalid-prop\]'):
+      levels.ParseAccessLevels(self.api_version)(path)
+
+  def testLevelsParseSuccess(self):
+    path = self._MakeFile("""\
+      - name: accessPolicies/my_policy/accessLevels/my_level
+        title: My Basic Level
+        description: Basic level for foo.
+        basic:
+          combiningFunction: AND
+          conditions:
+            - ipSubnetworks:
+              - 192.168.100.14/24
+              negate: true
+            - members:
+              - user:user@example.com
+      - name: accessPolicies/my_policy/accessLevels/my_other_level
+        title: My Other Basic Level
+        description: Basic level for bar.
+        basic:
+          combiningFunction: OR
+          conditions:
+            - ipSubnetworks:
+              - 2001:db8::/48
+        """)
+
+    access_levels = levels.ParseAccessLevels(self.api_version)(path)
+
+    self.assertEqual(access_levels, [
+        self.messages.AccessLevel(
+            basic=self.messages.BasicLevel(
+                combiningFunction=self.messages.BasicLevel
+                .CombiningFunctionValueValuesEnum('AND'),
+                conditions=[
+                    self.messages.Condition(
+                        ipSubnetworks=['192.168.100.14/24'], negate=True),
+                    self.messages.Condition(members=['user:user@example.com']),
+                ]),
+            name='accessPolicies/my_policy/accessLevels/my_level',
+            title='My Basic Level',
+            description='Basic level for foo.'),
+        self.messages.AccessLevel(
+            basic=self.messages.BasicLevel(
+                combiningFunction=self.messages.BasicLevel
+                .CombiningFunctionValueValuesEnum('OR'),
+                conditions=[
+                    self.messages.Condition(ipSubnetworks=['2001:db8::/48']),
+                ]),
+            name='accessPolicies/my_policy/accessLevels/my_other_level',
+            title='My Other Basic Level',
+            description='Basic level for bar.')
+    ])
+
+
+class LevelsTestBeta(LevelsTestGA):
+
+  def PreSetUp(self):
+    self.api_version = 'v1'
+
+  def testCustomParseMissingFile(self):
+    with self.assertRaisesRegex(yaml.FileLoadError, 'Failed to load'):
+      levels.ParseCustomLevel(self.api_version)('does-not-exist.yaml')
+
+  def testCustomParseInvalidYaml(self):
+    path = self._MakeFile(':')
+    with self.assertRaisesRegex(yaml.YAMLParseError, 'Failed to parse YAML'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testCustomParseEmpty(self):
+    path = self._MakeFile('')
+    with self.assertRaisesRegex(levels.ParseError, 'File is empty'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testCustomParseValidYamlInvalidObjectEncodeError(self):
+    path = self._MakeFile('test')
+    with self.assertRaisesRegex(levels.ParseError, 'Invalid format'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testCustomParseValidYamlInvalidObjectUnrecognizedField(self):
+    path = self._MakeFile('invalid-expression: "value"')
+    with self.assertRaisesRegex(levels.ParseError,
+                                r'Unrecognized fields: \[invalid-expression\]'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testParseSuccess(self):
+    path = self._MakeFile("""\
+        expression: "inIpRange(origin.ip, ['127.0.0.1/24']"
+        """)
+
+    expr = levels.ParseCustomLevel(self.api_version)(path)
 
     self.assertEqual(
-        conditions,
-        [
-            self.messages.Condition(
-                ipSubnetworks=['192.168.100.14/24', '2001:db8::/48'],
-                negate=True),
-            self.messages.Condition(
-                members=['user:user@example.com',
-                         'serviceAccount:serviceacct@gservices.com']),
-            self.messages.Condition(
-                requiredAccessLevels=[
-                    'accessPolicies/my_policy/accessLevels/other_level'])
-        ])
+        expr,
+        self.messages.Expr(expression="inIpRange(origin.ip, ['127.0.0.1/24']"))
+
+
+class LevelsTestAlpha(LevelsTestGA):
+
+  def PreSetUp(self):
+    self.api_version = 'v1alpha'
+
+  def testCustomParseMissingFile(self):
+    with self.assertRaisesRegex(yaml.FileLoadError, 'Failed to load'):
+      levels.ParseCustomLevel(self.api_version)('does-not-exist.yaml')
+
+  def testCustomParseInvalidYaml(self):
+    path = self._MakeFile(':')
+    with self.assertRaisesRegex(yaml.YAMLParseError, 'Failed to parse YAML'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testCustomParseEmpty(self):
+    path = self._MakeFile('')
+    with self.assertRaisesRegex(levels.ParseError, 'File is empty'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testCustomParseValidYamlInvalidObjectEncodeError(self):
+    path = self._MakeFile('test')
+    with self.assertRaisesRegex(levels.ParseError, 'Invalid format'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testCustomParseValidYamlInvalidObjectUnrecognizedField(self):
+    path = self._MakeFile('invalid-expression: "value"')
+    with self.assertRaisesRegex(levels.ParseError,
+                                r'Unrecognized fields: \[invalid-expression\]'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testParseSuccess(self):
+    path = self._MakeFile("""\
+        expression: "inIpRange(origin.ip, ['127.0.0.1/24']"
+        """)
+
+    expr = levels.ParseCustomLevel(self.api_version)(path)
+
+    self.assertEqual(
+        expr,
+        self.messages.Expr(expression="inIpRange(origin.ip, ['127.0.0.1/24']"))
 
 
 if __name__ == '__main__':

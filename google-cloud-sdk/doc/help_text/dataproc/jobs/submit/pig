@@ -75,24 +75,24 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To submit a Pig job with a local script, run:
 
-        $ gcloud dataproc jobs submit pig --cluster my_cluster \
-            --file my_queries.pig
+        $ gcloud dataproc jobs submit pig --cluster=my_cluster \
+            --file=my_queries.pig
 
     To submit a Pig job with inline queries, run:
 
-        $ gcloud dataproc jobs submit pig --cluster my_cluster \
-            -e "LNS = LOAD 'gs://my_bucket/my_file.txt' AS (line)" \
-            -e \
-            "WORDS = FOREACH LNS GENERATE FLATTEN(TOKENIZE(line)) AS word" \
-            -e "GROUPS = GROUP WORDS BY word" \
-            -e "WORD_COUNTS = FOREACH GROUPS GENERATE group, COUNT(WORDS)" \
-            -e "DUMP WORD_COUNTS"
+        $ gcloud dataproc jobs submit pig --cluster=my_cluster
+            -e="LNS = LOAD 'gs://my_bucket/my_file.txt' AS (line)"
+            -e="WORDS = FOREACH LNS GENERATE FLATTEN(TOKENIZE(line)) AS word"
+            -e="GROUPS = GROUP WORDS BY word"
+            -e="WORD_COUNTS = FOREACH GROUPS GENERATE group, COUNT(WORDS)"
+            -e="DUMP WORD_COUNTS"
 
 NOTES
     These variants are also available:

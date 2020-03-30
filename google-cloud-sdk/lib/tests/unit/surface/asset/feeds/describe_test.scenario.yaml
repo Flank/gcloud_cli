@@ -1,5 +1,5 @@
 title: surface unit tests for asset feed describe
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -36,7 +36,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p2beta1/projects/846710131186/feeds/gcloud_feed?alt=json
+          uri: https://cloudasset.googleapis.com/v1/projects/846710131186/feeds/gcloud_feed?alt=json
           method: GET
           headers: {}
           body: null

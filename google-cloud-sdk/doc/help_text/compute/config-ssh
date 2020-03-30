@@ -68,8 +68,19 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To populate SSH config file with Host entries from each running instance,
+    run:
+
+        $ gcloud compute config-ssh
+
+    To remove the change to the SSH config file by this command, run:
+
+        $ gcloud compute config-ssh --remove
 
 NOTES
     These variants are also available:

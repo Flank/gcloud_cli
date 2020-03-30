@@ -137,6 +137,8 @@ class BetaCreate(Create):
 
   @classmethod
   def Args(cls, parser):
+    messages = apis.GetMessagesModule('compute',
+                                      compute_api.COMPUTE_BETA_API_VERSION)
     parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
     cls.FIREWALL_RULE_ARG = flags.FirewallRuleArgument()
     cls.FIREWALL_RULE_ARG.AddArgument(parser, operation_type='create')
@@ -149,6 +151,26 @@ class BetaCreate(Create):
         with_service_account=True)
     firewalls_utils.AddArgsForServiceAccount(parser, for_update=False)
     flags.AddEnableLogging(parser, default=None)
+    flags.AddLoggingMetadata(parser, messages)
+
+  def _CreateFirewall(self, holder, args):
+    client = holder.client
+    firewall, project = super(BetaCreate, self)._CreateFirewall(holder, args)
+
+    if args.IsSpecified('logging_metadata') and not args.enable_logging:
+      raise exceptions.InvalidArgumentException(
+          '--logging-metadata',
+          'cannot toggle logging metadata if logging is not enabled.')
+
+    if args.IsSpecified('enable_logging'):
+      log_config = client.messages.FirewallLogConfig(enable=args.enable_logging)
+
+      if args.IsSpecified('logging_metadata'):
+        log_config.metadata = flags.GetLoggingMetadataArg(
+            client.messages).GetEnumForChoice(args.logging_metadata)
+      firewall.logConfig = log_config
+
+    return firewall, project
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -173,52 +195,31 @@ class AlphaCreate(BetaCreate):
     flags.AddEnableLogging(parser, default=None)
     flags.AddLoggingMetadata(parser, messages)
 
-  def _CreateFirewall(self, holder, args):
-    client = holder.client
-    firewall, project = super(AlphaCreate, self)._CreateFirewall(holder, args)
-
-    if args.IsSpecified('logging_metadata') and not args.enable_logging:
-      raise exceptions.InvalidArgumentException(
-          '--logging-metadata',
-          'cannot toggle logging metadata if logging is not enabled.')
-
-    if args.IsSpecified('enable_logging'):
-      log_config = client.messages.FirewallLogConfig(enable=args.enable_logging)
-
-      if args.IsSpecified('logging_metadata'):
-        log_config.metadata = flags.GetLoggingMetadataArg(
-            client.messages).GetEnumForChoice(args.logging_metadata)
-      firewall.logConfig = log_config
-
-    return firewall, project
-
 
 Create.detailed_help = {
     'brief': 'Create a Google Compute Engine firewall rule.',
-    'DESCRIPTION':
-        """\
-        *{command}* is used to create firewall rules to allow/deny
-        incoming/outgoing traffic.
-        """,
-    'EXAMPLES':
-        """\
-      To create a firewall rule allowing incoming TCP traffic on port 8080, run:
+    'DESCRIPTION': """
+*{command}* is used to create firewall rules to allow/deny
+incoming/outgoing traffic.
+""",
+    'EXAMPLES': """
+To create a firewall rule allowing incoming TCP traffic on port 8080, run:
 
-        $ {command} FooService --allow tcp:8080 \
---description "Allow incoming traffic on TCP port 8080" --direction INGRESS
+  $ {command} FooService --allow=tcp:8080
+      --description="Allow incoming traffic on TCP port 8080" --direction=INGRESS
 
-      To create a firewall rule that allows TCP traffic through port 80 and
-      determines a list of specific IP address blocks that are allowed to make
-      inbound connections, run:
+To create a firewall rule that allows TCP traffic through port 80 and
+determines a list of specific IP address blocks that are allowed to make
+inbound connections, run:
 
-        $ {command} "tcp-rule" --allow tcp:80 \
---source-ranges="10.0.0.0/22,10.0.0.0/14" --description="Narrowing TCP traffic"
+  $ {command} "tcp-rule" --allow=tcp:80
+      --source-ranges="10.0.0.0/22,10.0.0.0/14" --description="Narrowing TCP traffic"
 
-      To list existing firewall rules, run:
+To list existing firewall rules, run:
 
-        $ gcloud compute firewall-rules list
+  $ gcloud compute firewall-rules list
 
-      For more detailed examples see
-      [](https://cloud.google.com/vpc/docs/using-firewalls)
-        """,
+For more detailed examples see
+[](https://cloud.google.com/vpc/docs/using-firewalls)
+  """,
 }

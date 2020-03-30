@@ -11,7 +11,7 @@ gcloud beta data\-catalog entries update \- update a Cloud Data Catalog entry
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta data\-catalog entries update\fR [\fIENTRY\fR\ :\ \fB\-\-entry\-group\fR=\fIENTRY_GROUP\fR\ \fB\-\-location\fR=\fILOCATION\fR] (\fB\-\-schema\fR=[\fICOLUMN_NAME\fR=\fICOLUMN_TYPE\fR,...]\ |\ \fB\-\-schema\-from\-file\fR=\fISCHEMA_FROM_FILE\fR) [\fB\-\-lookup\-entry\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta data\-catalog entries update\fR [\fIENTRY\fR\ :\ \fB\-\-entry\-group\fR=\fIENTRY_GROUP\fR\ \fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-lookup\-entry\fR=\fIRESOURCE\fR] [\fB\-\-add\-file\-patterns\fR=[\fIPATTERN\fR,...]\ \fB\-\-clear\-file\-patterns\fR\ |\ \fB\-\-remove\-file\-patterns\fR=[\fIPATTERN\fR,...]] [\fB\-\-schema\fR=[\fICOLUMN_NAME\fR=\fICOLUMN_TYPE\fR,...]\ |\ \fB\-\-schema\-from\-file\fR=\fISCHEMA_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -54,9 +54,43 @@ Location of the entry.
 .RE
 .sp
 
-.SH "REQUIRED FLAGS"
+.SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Textual description of the entry.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Human\-readable name for the entry.
+
+.TP 2m
+\fB\-\-lookup\-entry\fR=\fIRESOURCE\fR
+The name of the target resource whose entry to update. This can be either the
+Google Cloud Platform resource name or the SQL name of a Google Cloud Platform
+resource. This flag allows one to update the entry corresponding to the lookup
+of the given resource, without needing to specify the entry directly.
+
+.TP 2m
+\fB\-\-add\-file\-patterns\fR=[\fIPATTERN\fR,...]
+A list of file patterns to add to the current list.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-file\-patterns\fR
+If specified, clear the current list of file patterns.
+
+.TP 2m
+\fB\-\-remove\-file\-patterns\fR=[\fIPATTERN\fR,...]
+A list of file patterns to remove from the current list.
+
+.RE
+.sp
 .TP 2m
 
 New column schema for the entry. A schema consists of a list of column names
@@ -86,7 +120,7 @@ along with their types, descriptions, modes, and nested subcolumns. For example:
     type: STRING
 .RE
 
-Exactly one of these must be specified:
+At most one of these may be specified:
 
 
 .RS 2m
@@ -107,27 +141,14 @@ NULLABLE, and nested subcolumns.
 .RE
 .sp
 
-.SH "OPTIONAL FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-lookup\-entry\fR=\fIRESOURCE\fR
-The name of the target resource whose entry to update. This can be either the
-Google Cloud Platform resource name or the SQL name of a Google Cloud Platform
-resource. This flag allows one to update the entry corresponding to the lookup
-of the given resource, without needing to specify the entry directly.
-
-
-.RE
-.sp
-
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -169,10 +190,11 @@ $ gcloud beta data\-catalog entries update \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud data\-catalog entries update
 $ gcloud alpha data\-catalog entries update
 .RE
 

@@ -331,12 +331,40 @@ class ForwardingRulesSetTargetTestBeta(test_base.BaseTest):
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
 
+  #  For Beta and GA, --target-grpc-proxy won't be supported
+  def testTargetGrpcProxy(self):
+    with self.AssertRaisesArgumentErrorMatches('unrecognized arguments'):
+      self.Run("""
+          compute forwarding-rules set-target forwarding-rule-1
+            --global
+            --target-grpc-proxy target-grpc-proxy-1
+          """)
+    self.CheckRequests()
+
 
 class ForwardingRulesSetTargetTestAlpha(ForwardingRulesSetTargetTestBeta):
 
   def SetUp(self):
     self.SelectApi('alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testTargetGrpcProxy(self):
+    self.Run("""
+        compute forwarding-rules set-target forwarding-rule-1
+          --global
+          --target-grpc-proxy target-grpc-proxy-1
+        """)
+    self.CheckRequests([(
+        self.compute.globalForwardingRules, 'SetTarget',
+        self.messages.ComputeGlobalForwardingRulesSetTargetRequest(
+            forwardingRule='forwarding-rule-1',
+            project='my-project',
+            targetReference=self.messages.TargetReference(
+                target=('https://compute.googleapis.com/compute/{api}/projects/'
+                        'my-project/global/targetGrpcProxies/'
+                        'target-grpc-proxy-1').format(api=self.api),)))],)
+    self.AssertOutputEquals('')
+    self.AssertErrEquals('')
 
 
 if __name__ == '__main__':

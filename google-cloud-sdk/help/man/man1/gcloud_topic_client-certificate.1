@@ -1,0 +1,84 @@
+
+.TH "GCLOUD_TOPIC_CLIENT\-CERTIFICATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud topic client\-certificate \- client certificate authorization supplementary help
+
+
+
+.SH "DESCRIPTION"
+
+Client certificate authorization supplementary help.
+
+Device Certificate Authorization (DCA) enables Context\-aware access to identify
+devices by their X.509 certificates. DCA for Google Cloud Platform APIs is the
+second in a series of releases that provides administrators the capability to
+protect access to their Google Cloud Platform resources with device
+certificates. This feature builds on top of the existing Context\-aware access
+suite (Endpoint Verification, Access Context Manager, and VPC Service Controls)
+and ensures that only users on trusted devices with a Google\-generated
+certificate are able to access Google Cloud Platform APIs. This provides a
+stronger signal of device identity (device certificate verification), and
+protects users from credential theft to accidental loss by only granting access
+when credentials and the original device certificate are presented.
+
+To use this feature, organizations can follow the instructions below to install
+an endpoint verification agent to devices:
+
+.RS 2m
+.IP "\(bu" 2m
+Automatically deploy endpoint verification
+(https://support.google.com/a/answer/9007320#)
+.RS 2m
+.IP "\(em" 2m
+Via Chrome Policy for the extension
+.IP "\(em" 2m
+3rd party image/software distribution tools for the Native Helper on macOS and
+Windows
+.RE
+.sp
+.IP "\(bu" 2m
+Let users install endpoint verification themselves from the Chrome Webstore
+(https://support.google.com/a/users/answer/9018161#install)
+.RS 2m
+.IP "\(em" 2m
+Users would also be prompted to install the Native Helper as well
+.RE
+.RE
+.sp
+
+Run \f5\fI$ gcloud config set context_aware/use_client_certificate True\fR\fR so
+that the gcloud CLI will load the certificate and send it to services. Some
+services do not support client certificate authorization yet. When the gcloud
+CLI sends requests to such services, the client certificate will be ignored.
+
+The following is the list of services which support client certificate
+authorization in the installed version of the gcloud CLI.
+
+
+
+.TS
+tab(	);
+lB lB lB
+l l l.
+SERVICE	VERSION	NOTES
+ ---	---	---
+pubsub	v1	
+spanner	v1	
+---	---	---
+iap_tunnel	v4	tunnel connection between gcloud and IAP tunnel service
+.TE
+
+
+See https://cloud.google.com/sdk/gcloud/reference/topic/client\-certificate for
+the support list for the latest version of the gcloud CLI. Please upgrade the
+gcloud command\-line tool if necessary.
+
+Note: iap_tunnel is a special service gcloud CLI uses to create the IAP tunnel.
+For example, \f5\fIgcloud compute start\-iap\-tunnel\fR\fR can start a tunnel to
+Cloud Identity\-Aware Proxy through which another process can create a
+connection (e.g. SSH, RDP) to a Google Compute Engine instance. Client
+certificate authorization is supported in tunnel creation.

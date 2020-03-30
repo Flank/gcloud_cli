@@ -11,7 +11,7 @@ gcloud kms keys create \- create a new key
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud kms keys create\fR \fIKEY\fR \fB\-\-purpose\fR=\fIPURPOSE\fR [\fB\-\-default\-algorithm\fR=\fIDEFAULT_ALGORITHM\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR] [\fB\-\-protection\-level\fR=\fIPROTECTION_LEVEL\fR;\ default="software"] [\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud kms keys create\fR \fIKEY\fR \fB\-\-purpose\fR=\fIPURPOSE\fR [\fB\-\-default\-algorithm\fR=\fIDEFAULT_ALGORITHM\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR] [\fB\-\-protection\-level\fR=\fIPROTECTION_LEVEL\fR;\ default="software"] [\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR] [\fB\-\-skip\-initial\-version\-creation\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -19,24 +19,32 @@ gcloud kms keys create \- create a new key
 
 Creates a new key within the given keyring.
 
-The flag \f5purpose\fR is always required when creating a key. The flag
-\f5default\-algorithm\fR is required when creating an asymmetric key. Algorithm
-and purpose should be compatible.
+The flag \f5\-\-purpose\fR is always required when creating a key. The flag
+\f5\-\-default\-algorithm\fR is required when creating an asymmetric key, or
+when creating an external key. Algorithm and purpose should be compatible.
 
-The optional flags \f5rotation\-period\fR and \f5next\-rotation\-time\fR define
-a rotation schedule for the key. A schedule can also be defined by the
-\f5create\-rotation\-schedule\fR command.
+The optional flags \f5\-\-rotation\-period\fR and \f5\-\-next\-rotation\-time\fR
+define a rotation schedule for the key. A schedule can also be defined by the
+\f5\-\-create\-rotation\-schedule\fR command.
 
-The flag \f5next\-rotation\-time\fR must be in ISO 8601 or RFC3339 format, and
-\f5rotation\-period\fR must be in the form INTEGER[UNIT], where units can be one
-of seconds (s), minutes (m), hours (h) or days (d).
+The flag \f5\-\-next\-rotation\-time\fR must be in ISO 8601 or RFC3339 format,
+and \f5rotation\-period\fR must be in the form INTEGER[UNIT], where units can be
+one of seconds (s), minutes (m), hours (h) or days (d).
 
-The optional flag \f5protection\-level\fR specifies the protection level of the
-created key. The default is software; use "HSM" to create a hardware\-backed
-key.
+The optional flag ``\-\-protection\-level`` specifies the physical environment
+where crypto operations with the key happen. The default is software; use
+\f5\fIhsm\fR\fR to create a hardware\-backed key, or \f5\fIexternal\fR\fR to
+create an externally backed key.
 
-The optional flag \f5labels\fR defines a user specified key/value pair for the
-given key.
+The optional flag \f5\-\-labels\fR defines a user specified key/value pair for
+the given key.
+
+The flag \f5\-\-skip\-initial\-version\-creation\fR creates a CryptoKey with no
+versions. If you import into the CryptoKey, or create a new version in that
+CryptoKey, there will be no primary version until one is set using the
+\f5\-\-set\-primary\-version\fR command. You must include
+``\-\-skip\-initial\-version\-creation`` when creating a CryptoKey with
+protection level \f5\fIexternal\fR\fR.
 
 
 
@@ -68,16 +76,17 @@ The "purpose" of the key. \fIPURPOSE\fR must be one of:
 .RS 2m
 .TP 2m
 \fB\-\-default\-algorithm\fR=\fIDEFAULT_ALGORITHM\fR
-The default algorithm for the crypto key. See
-https://cloud.google.com/kms/docs/algorithms for guidance on choosing an
-algorithm. \fIDEFAULT_ALGORITHM\fR must be one of: \fBec\-sign\-p256\-sha256\fR,
-\fBec\-sign\-p384\-sha384\fR, \fBgoogle\-symmetric\-encryption\fR,
-\fBrsa\-decrypt\-oaep\-2048\-sha256\fR, \fBrsa\-decrypt\-oaep\-3072\-sha256\fR,
-\fBrsa\-decrypt\-oaep\-4096\-sha256\fR, \fBrsa\-decrypt\-oaep\-4096\-sha512\fR,
-\fBrsa\-sign\-pkcs1\-2048\-sha256\fR, \fBrsa\-sign\-pkcs1\-3072\-sha256\fR,
-\fBrsa\-sign\-pkcs1\-4096\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha512\fR,
-\fBrsa\-sign\-pss\-2048\-sha256\fR, \fBrsa\-sign\-pss\-3072\-sha256\fR,
-\fBrsa\-sign\-pss\-4096\-sha256\fR, \fBrsa\-sign\-pss\-4096\-sha512\fR.
+The default algorithm for the crypto key. For more information about choosing an
+algorithm, see https://cloud.google.com/kms/docs/algorithms.
+\fIDEFAULT_ALGORITHM\fR must be one of: \fBec\-sign\-p256\-sha256\fR,
+\fBec\-sign\-p384\-sha384\fR, \fBexternal\-symmetric\-encryption\fR,
+\fBgoogle\-symmetric\-encryption\fR, \fBrsa\-decrypt\-oaep\-2048\-sha256\fR,
+\fBrsa\-decrypt\-oaep\-3072\-sha256\fR, \fBrsa\-decrypt\-oaep\-4096\-sha256\fR,
+\fBrsa\-decrypt\-oaep\-4096\-sha512\fR, \fBrsa\-sign\-pkcs1\-2048\-sha256\fR,
+\fBrsa\-sign\-pkcs1\-3072\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha256\fR,
+\fBrsa\-sign\-pkcs1\-4096\-sha512\fR, \fBrsa\-sign\-pss\-2048\-sha256\fR,
+\fBrsa\-sign\-pss\-3072\-sha256\fR, \fBrsa\-sign\-pss\-4096\-sha256\fR,
+\fBrsa\-sign\-pss\-4096\-sha512\fR.
 
 .TP 2m
 \fB\-\-keyring\fR=\fIKEYRING\fR
@@ -104,12 +113,17 @@ information on time formats.
 .TP 2m
 \fB\-\-protection\-level\fR=\fIPROTECTION_LEVEL\fR; default="software"
 Protection level of the key. \fIPROTECTION_LEVEL\fR must be one of:
-\fBsoftware\fR, \fBhsm\fR.
+\fBsoftware\fR, \fBhsm\fR, \fBexternal\fR.
 
 .TP 2m
 \fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR
 Automatic rotation period of the key. See $ gcloud topic datetimes for
 information on duration formats.
+
+.TP 2m
+\fB\-\-skip\-initial\-version\-creation\fR
+Skip creating the first version in a key and setting it as primary during
+creation.
 
 
 .RE
@@ -120,15 +134,17 @@ information on duration formats.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-The following command creates a key named \f5frodo\fR with protection level
-\f5software\fR within the keyring \f5fellowship\fR and location \f5us\-east1\fR:
+The following command creates a key named \f5\fIfrodo\fR\fR with protection
+level \f5\fIsoftware\fR\fR within the keyring \f5\fIfellowship\fR\fR and
+location \f5\fIus\-east1\fR\fR:
 
 .RS 2m
 $ gcloud kms keys create frodo \e
@@ -137,9 +153,9 @@ $ gcloud kms keys create frodo \e
     \-\-purpose=encryption
 .RE
 
-The following command creates a key named \f5strider\fR with protection level
-\f5software\fR within the keyring \f5rangers\fR and location \f5global\fR with a
-specified rotation schedule:
+The following command creates a key named \f5\fIstrider\fR\fR with protection
+level \f5\fIsoftware\fR\fR within the keyring \f5\fIrangers\fR\fR and location
+\f5\fIglobal\fR\fR with a specified rotation schedule:
 
 .RS 2m
 $ gcloud kms keys create strider \e
@@ -149,9 +165,9 @@ $ gcloud kms keys create strider \e
     \-\-next\-rotation\-time=2017\-10\-12T12:34:56.1234Z
 .RE
 
-The following command creates a key named \f5foo\fR with protection level
-\f5software\fR within the keyring \f5fellowship\fR and location \f5us\-east1\fR
-with two specified labels:
+The following command creates a key named \f5\fIfoo\fR\fR with protection level
+\f5\fIsoftware\fR\fR within the keyring \f5\fIfellowship\fR\fR and location
+\f5\fIus\-east1\fR\fR with two specified labels:
 
 .RS 2m
 $ gcloud kms keys create foo \e
@@ -161,10 +177,10 @@ $ gcloud kms keys create foo \e
     \-\-labels=env=prod,team=kms
 .RE
 
-The following command creates an asymmetric key named \f5samwise\fR with
-protection level \f5software\fR and default algorithm
-\f5ec\-sign\-p256\-sha256\fR within the keyring \f5fellowship\fR and location
-\f5us\-east1\fR:
+The following command creates an asymmetric key named \f5\fIsamwise\fR\fR with
+protection level \f5\fIsoftware\fR\fR and default algorithm
+\f5\fIec\-sign\-p256\-sha256\fR\fR within the keyring \f5\fIfellowship\fR\fR and
+location \f5\fIus\-east1\fR\fR:
 
 .RS 2m
 $ gcloud kms keys create samwise \e
@@ -174,15 +190,32 @@ $ gcloud kms keys create samwise \e
     \-\-default\-algorithm=ec\-sign\-p256\-sha256
 .RE
 
-The following command creates a key named \f5gimli\fR with protection level
-\f5hsm\fR and default algorithm \f5google\-symmetric\-encryption\fR within the
-keyring \f5fellowship\fR and location \f5us\-east1\fR:
+The following command creates a key named \f5\fIgimli\fR\fR with protection
+level \f5\fIhsm\fR\fR and default algorithm
+\f5\fIgoogle\-symmetric\-encryption\fR\fR within the keyring
+\f5\fIfellowship\fR\fR and location \f5\fIus\-east1\fR\fR:
 
 .RS 2m
 $ gcloud kms keys create gimli \e
     \-\-location=us\-east1 \e
     \-\-keyring=fellowship \e
+    \-\-purpose=encryption \e
     \-\-protection\-level=hsm
+.RE
+
+The following command creates a key named \f5\fIlegolas\fR\fR with protection
+level \f5\fIexternal\fR\fR and default algorithm
+\f5\fIexternal\-symmetric\-encryption\fR\fR within the keyring
+\f5\fIfellowship\fR\fR and location \f5\fIus\-central1\fR\fR:
+
+.RS 2m
+$ gcloud kms keys create legolas \e
+    \-\-location=us\-central1 \e
+    \-\-keyring=fellowship \e
+    \-\-purpose=encryption \e
+    \-\-default\-algorithm=external\-symmetric\-encryption \e
+    \-\-protection\-level=external
+    \-\-skip\-initial\-version\-creation
 .RE
 
 

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha logging buckets \- manage Stackdriver Logging buckets
+gcloud alpha logging buckets \- manage Cloud Logging buckets
 
 
 
@@ -17,7 +17,9 @@ gcloud alpha logging buckets \- manage Stackdriver Logging buckets
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Commands for managing Stackdriver Logging buckets.
+\fB(ALPHA)\fR Commands for managing Cloud Logging buckets. A bucket is a
+container of logs that can be managed as a unit, for example by setting the
+retention period.
 
 
 
@@ -26,8 +28,9 @@ gcloud alpha logging buckets \- manage Stackdriver Logging buckets
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -41,12 +44,20 @@ help\fR for details.
 \fB(ALPHA)\fR Creates a bucket.
 
 .TP 2m
+\fBdelete\fR
+\fB(ALPHA)\fR Delete a bucket.
+
+.TP 2m
 \fBdescribe\fR
 \fB(ALPHA)\fR Displays information about a bucket.
 
 .TP 2m
 \fBlist\fR
 \fB(ALPHA)\fR Lists the defined buckets.
+
+.TP 2m
+\fBundelete\fR
+\fB(ALPHA)\fR Undelete a bucket.
 
 .TP 2m
 \fBupdate\fR
@@ -61,5 +72,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta logging buckets
+.RE
 

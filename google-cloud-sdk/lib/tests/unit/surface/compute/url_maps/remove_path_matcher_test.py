@@ -29,6 +29,7 @@ class UrlMapsRemovePathMatcherTest(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi('v1')
+    self._api = ''
     self._url_maps_api = self.compute_v1.urlMaps
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
@@ -63,7 +64,8 @@ class UrlMapsRemovePathMatcherTest(test_base.BaseTest):
     )
 
   def RunRemovePathMatcher(self, command):
-    self.Run('compute url-maps remove-path-matcher ' + command)
+    self.Run(self._api + ' compute url-maps remove-path-matcher --global ' +
+             command)
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
@@ -119,6 +121,7 @@ class UrlMapsRemovePathMatcherBetaTest(UrlMapsRemovePathMatcherTest):
 
   def SetUp(self):
     self.SelectApi('beta')
+    self._api = 'beta'
     self._url_maps_api = self.compute_beta.urlMaps
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
@@ -152,9 +155,6 @@ class UrlMapsRemovePathMatcherBetaTest(UrlMapsRemovePathMatcherTest):
         ],
     )
 
-  def RunRemovePathMatcher(self, command):
-    self.Run('beta compute url-maps remove-path-matcher --global ' + command)
-
 
 class UrlMapsRemovePathMatcherAlphaTest(UrlMapsRemovePathMatcherTest):
 
@@ -164,6 +164,7 @@ class UrlMapsRemovePathMatcherAlphaTest(UrlMapsRemovePathMatcherTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
+    self._api = 'alpha'
     self._url_maps_api = self.compute_alpha.urlMaps
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
@@ -197,20 +198,18 @@ class UrlMapsRemovePathMatcherAlphaTest(UrlMapsRemovePathMatcherTest):
         ],
     )
 
-  def RunRemovePathMatcher(self, command):
-    self.Run('alpha compute url-maps remove-path-matcher --global ' + command)
 
-
-class RegionUrlMapsRemovePathMatcherBetaTest(test_base.BaseTest):
+class RegionUrlMapsRemovePathMatcherTest(test_base.BaseTest):
 
   _V1_URI_PREFIX = (
-      'https://compute.googleapis.com/compute/beta/projects/my-project/')
+      'https://compute.googleapis.com/compute/v1/projects/my-project/')
   _BACKEND_SERVICES_URI_PREFIX = (
       _V1_URI_PREFIX + 'regions/us-west-1/backendServices/')
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self._url_maps_api = self.compute_beta.regionUrlMaps
+    self.SelectApi('v1')
+    self._api = ''
+    self._url_maps_api = self.compute_v1.regionUrlMaps
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
         defaultService=self._BACKEND_SERVICES_URI_PREFIX + 'default-service',
@@ -244,7 +243,8 @@ class RegionUrlMapsRemovePathMatcherBetaTest(test_base.BaseTest):
     )
 
   def RunRemovePathMatcher(self, command):
-    self.Run('beta compute url-maps remove-path-matcher --region us-west-1 ' +
+    self.Run(self._api +
+             ' compute url-maps remove-path-matcher --region us-west-1 ' +
              command)
 
   def testSimpleCase(self):
@@ -297,17 +297,18 @@ class RegionUrlMapsRemovePathMatcherBetaTest(test_base.BaseTest):
                              region='us-west-1'))])
 
 
-class RegionUrlMapsRemovePathMatcherAlphaTest(
-    RegionUrlMapsRemovePathMatcherBetaTest):
+class RegionUrlMapsRemovePathMatcherBetaTest(RegionUrlMapsRemovePathMatcherTest
+                                            ):
 
   _V1_URI_PREFIX = (
-      'https://compute.googleapis.com/compute/alpha/projects/my-project/')
+      'https://compute.googleapis.com/compute/beta/projects/my-project/')
   _BACKEND_SERVICES_URI_PREFIX = (
       _V1_URI_PREFIX + 'regions/us-west-1/backendServices/')
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self._url_maps_api = self.compute_alpha.regionUrlMaps
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._url_maps_api = self.compute_beta.regionUrlMaps
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
         defaultService=self._BACKEND_SERVICES_URI_PREFIX + 'default-service',
@@ -340,9 +341,50 @@ class RegionUrlMapsRemovePathMatcherAlphaTest(
         ],
     )
 
-  def RunRemovePathMatcher(self, command):
-    self.Run('alpha compute url-maps remove-path-matcher --region us-west-1 ' +
-             command)
+
+class RegionUrlMapsRemovePathMatcherAlphaTest(
+    RegionUrlMapsRemovePathMatcherBetaTest):
+
+  _V1_URI_PREFIX = (
+      'https://compute.googleapis.com/compute/alpha/projects/my-project/')
+  _BACKEND_SERVICES_URI_PREFIX = (
+      _V1_URI_PREFIX + 'regions/us-west-1/backendServices/')
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._api = 'alpha'
+    self._url_maps_api = self.compute_alpha.regionUrlMaps
+    self._url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._BACKEND_SERVICES_URI_PREFIX + 'default-service',
+        hostRules=[
+            self.messages.HostRule(
+                hosts=['*.youtube.com', 'youtube.com'], pathMatcher='youtube'),
+            self.messages.HostRule(hosts=['google.com'], pathMatcher='google'),
+            self.messages.HostRule(
+                hosts=['*-youtube.com'], pathMatcher='youtube'),
+        ],
+        pathMatchers=[
+            self.messages.PathMatcher(
+                name='youtube',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'youtube-default',
+                pathRules=[
+                    self.messages.PathRule(
+                        paths=['/search', '/search/*'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-search'),
+                    self.messages.PathRule(
+                        paths=['/watch', '/view', '/preview'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-watch'),
+                ]),
+            self.messages.PathMatcher(
+                name='google',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'google-default'),
+        ],
+    )
 
 
 if __name__ == '__main__':

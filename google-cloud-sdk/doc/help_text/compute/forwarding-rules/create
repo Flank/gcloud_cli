@@ -10,8 +10,9 @@ SYNOPSIS
           | --target-instance=TARGET_INSTANCE | --target-pool=TARGET_POOL
           | --target-ssl-proxy=TARGET_SSL_PROXY
           | --target-tcp-proxy=TARGET_TCP_PROXY
-          | --target-vpn-gateway=TARGET_VPN_GATEWAY)
+          | --target-vpn-gateway=TARGET_VPN_GATEWAY) [--allow-global-access]
         [--description=DESCRIPTION] [--ip-protocol=IP_PROTOCOL]
+        [--is-mirroring-collector]
         [--load-balancing-scheme=LOAD_BALANCING_SCHEME; default="EXTERNAL"]
         [--network=NETWORK] [--network-tier=NETWORK_TIER]
         [--service-label=SERVICE_LABEL] [--subnet=SUBNET]
@@ -23,39 +24,43 @@ SYNOPSIS
         [--address-region=ADDRESS_REGION | --global-address]
         [--backend-service-region=BACKEND_SERVICE_REGION
           | --global-backend-service] [--global | --region=REGION]
+        [--global-target-http-proxy
+          | --target-http-proxy-region=TARGET_HTTP_PROXY_REGION]
+        [--global-target-https-proxy
+          | --target-https-proxy-region=TARGET_HTTPS_PROXY_REGION]
         [--port-range=[PORT | START_PORT-END_PORT] | --ports=ALL | [PORT
           | START_PORT-END_PORT],[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute forwarding-rules create is used to create a forwarding rule.
-    A forwarding rule directs traffic that matches a destination IP address to
-    a forwarding target (load balancer, VPN gateway or VM instance).
+    A forwarding rule directs traffic that matches a destination IP address        (and possibly a TCP or UDP port) to a forwarding target (load balancer,
+        VPN gateway or VM instance).
 
-    Forwarding rules can be either global or regional, specified with the
-    --global or --region=REGION flags. For more information about the scope of
-    a forwarding rule, refer to
-    https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts.
+        Forwarding rules can be either global or regional, specified with the
+        `_--global_` or `_--region=REGION_` flags. For more information about
+        the scope of a forwarding rule, refer to
+        https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts.
 
-    Forwarding rules can be external, internal, internal managed, or internal
-    self-managed, specified with the
-    --load-balancing-scheme=[EXTERNAL|INTERNAL|INTERNAL_MANAGED|INTERNAL_SELF_MANAGED]
-    flag. External forwarding rules are accessible from the internet, while
-    internal forwarding rules are only accessible from within their VPC
-    networks. You can specify a reserved static external or internal IP address
-    with the --address=ADDRESS flag for the forwarding rule. Otherwise, if the
-    flag is unspecified, an ephemeral IP address is automatically assigned
-    (global IP addresses for global forwarding rules and regional IP addresses
-    for regional forwarding rules); an internal forwarding rule is
-    automatically assigned an ephemeral internal IP address from the subnet
-    specified with the --subnet flag. You must provide an IP address for an
-    internal self-managed forwarding rule.
+        Forwarding rules can be external, internal, internal managed, or
+        internal self-managed, specified with the
+        `_--load-balancing-scheme=[EXTERNAL|INTERNAL|INTERNAL_MANAGED|INTERNAL_SELF_MANAGED]_`
+        flag. External forwarding rules are accessible from the internet, while
+        internal forwarding rules are only accessible from within their VPC
+        networks. You can specify a reserved static external or internal IP
+        address with the `_--address=ADDRESS_` flag for the forwarding rule.
+        Otherwise, if the flag is unspecified, an ephemeral IP address is
+        automatically assigned (global IP addresses for global forwarding rules
+        and regional IP addresses for regional forwarding rules); an internal
+        forwarding rule is automatically assigned an ephemeral internal IP
+        address from the subnet specified with the `_--subnet_` flag. You must
+        provide an IP address for an internal self-managed forwarding rule.
 
-    Different types of load balancers work at different layers of the OSI
-    networking model (http://en.wikipedia.org/wiki/Network_layer). Layer 3
-    targets include target pools, target SSL proxies, target TCP proxies, and
-    backend services. Layer 7 targets include target HTTP proxies and target
-    HTTPS proxies. For more information, refer to
-    https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts.
+        Different types of load balancers work at different layers of the OSI
+        networking model (http://en.wikipedia.org/wiki/Network_layer). Layer 3/4
+        targets include target pools, target SSL proxies, target TCP proxies,
+        and backend services. Layer 7 targets include target HTTP proxies and
+        target HTTPS proxies. For more information, refer to
+        https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts.
 
     When creating a forwarding rule, exactly one of --target-instance,
     --target-pool, --target-http-proxy, --target-https-proxy,
@@ -123,6 +128,12 @@ REQUIRED FLAGS
           forwardedtraffic. Acceptable values for --ports flag are: 500, 4500.
 
 OPTIONAL FLAGS
+     --allow-global-access
+        If True, then clients from all regions can access this internal
+        forwarding rule. This can only be specified for forwarding rules with
+        the LOAD_BALANCING_SCHEME set to INTERNAL and the target must be either
+        a backend service or a target instance.
+
      --description=DESCRIPTION
         Optional textual description for the forwarding rule.
 
@@ -137,6 +148,11 @@ OPTIONAL FLAGS
 
         IP_PROTOCOL must be one of: AH, ESP, ICMP, SCTP, TCP, UDP.
 
+     --is-mirroring-collector
+        If set, this forwarding rule can be used as a collector for packet
+        mirroring. This can only be specified for forwarding rules with the
+        LOAD_BALANCING_SCHEME set to INTERNAL.
+
      --load-balancing-scheme=LOAD_BALANCING_SCHEME; default="EXTERNAL"
         This defines the forwarding rule's load balancing scheme.
         LOAD_BALANCING_SCHEME must be one of:
@@ -148,16 +164,20 @@ OPTIONAL FLAGS
             --target-instance.
          INTERNAL
             Internal load balancing or forwarding, used with --backend-service.
+         INTERNAL_MANAGED
+            Internal HTTP(S) Load Balancing, used with --target-http-proxy,
+            --target-https-proxy.
          INTERNAL_SELF_MANAGED
             Traffic director load balancing or forwarding, used with
             --target-http-proxy, --target-https-proxy.
 
      --network=NETWORK
         (Only for --load-balancing-scheme=INTERNAL or
-        --load-balancing-scheme=INTERNAL_SELF_MANAGED) Network that this
-        forwarding rule applies to. If this field is not specified, the default
-        network is used. In the absence of the default network, this field must
-        be specified.
+        --load-balancing-scheme=INTERNAL_SELF_MANAGED or
+        --load-balancing-scheme=INTERNAL_MANAGED) Network that this forwarding
+        rule applies to. If this field is not specified, the default network is
+        used. In the absence of the default network, this field must be
+        specified.
 
      --network-tier=NETWORK_TIER
         Network tier to assign to the forwarding rules. NETWORK_TIER must be
@@ -165,8 +185,8 @@ OPTIONAL FLAGS
 
      --service-label=SERVICE_LABEL
         (Only for Internal Load Balancing):
-        https://cloud.google.com/compute/docs/load-balancing/internal/ The DNS
-        label to use as the prefix of the fully qualified domain name for this
+        https://cloud.google.com/load-balancing/docs/dns-names/ The DNS label
+        to use as the prefix of the fully qualified domain name for this
         forwarding rule. The full name will be internally generated and output
         as dnsName. If this field is not specified, no DNS record will be
         generated and no DNS name will be output.
@@ -215,9 +235,11 @@ OPTIONAL FLAGS
           + global/addresses/address-1
           + address-1
 
-    The load-balancing-scheme ((EXTERNAL, INTERNAL, INTERNAL_MANAGED)) and the
-    forwarding rule's target determine the type of IP address that you can use.
-    For detailed information, refer to
+    The load-balancing-scheme ((EXTERNAL, INTERNAL, INTERNAL_MANAGED,
+    INTERNAL_MANAGED)) and the forwarding rule's target determine the type of
+    IP address that you can use. The address type must be external for
+    load-balancing-scheme EXTERNAL, and for the other load-balancing-schemes
+    the address must be internal. For detailed information, refer to
     https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts#ip_address_specifications.
 
          --ip-version=IP_VERSION
@@ -286,6 +308,56 @@ OPTIONAL FLAGS
 
      At most one of these may be specified:
 
+       --global-target-http-proxy
+          If set, the http proxy is global.
+
+       --target-http-proxy-region=TARGET_HTTP_PROXY_REGION
+          Region of the http proxy to operate on. If not specified, you may be
+          prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+     At most one of these may be specified:
+
+       --global-target-https-proxy
+          If set, the https proxy is global.
+
+       --target-https-proxy-region=TARGET_HTTPS_PROXY_REGION
+          Region of the https proxy to operate on. If not specified, you may be
+          prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+     At most one of these may be specified:
+
        --port-range=[PORT | START_PORT-END_PORT]
           DEPRECATED, use --ports. If specified, only packets addressed to
           ports in the specified range are forwarded. For more information,
@@ -303,24 +375,25 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create a global forwarding rule that will forward all traffic on port
     8080 for IP address ADDRESS to a target http proxy PROXY, run:
 
         $ gcloud compute forwarding-rules create RULE_NAME --global \
-            --target-http-proxy PROXY --ports 8080 --address ADDRESS
+            --target-http-proxy=PROXY --ports=8080 --address=ADDRESS
 
     To create a regional forwarding rule for the subnet SUBNET_NAME on the
     default network that will forward all traffic on ports 80-82 to a backend
     service SERVICE_NAME, run:
 
         $ gcloud compute forwarding-rules create RULE_NAME \
-            --load-balancing-scheme INTERNAL \
-            --backend-service SERVICE_NAME --subnet SUBNET_NAME \
-            --network default --region REGION --ports 80-82
+            --load-balancing-scheme=INTERNAL \
+            --backend-service=SERVICE_NAME --subnet=SUBNET_NAME \
+            --network=default --region=REGION --ports=80-82
 
 NOTES
     These variants are also available:

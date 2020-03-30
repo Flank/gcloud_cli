@@ -273,10 +273,10 @@ class CreateAppEngineTaskTestBeta(CreateAppEngineTaskTest):
     self.track = calliope_base.ReleaseTrack.BETA
 
 
-class CreateHttpTaskTestBeta(test_base.CloudTasksTestBase):
+class CreateHttpTaskTest(test_base.CloudTasksTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.queue_ref = resources.REGISTRY.Create(
@@ -432,11 +432,17 @@ class CreateHttpTaskTestBeta(test_base.CloudTasksTestBase):
     self.assertEqual(actual_task, expected_task)
 
 
-class CreateHttpTaskTestAlpha(CreateHttpTaskTestBeta):
+class CreateHttpTaskTestAlpha(CreateHttpTaskTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_track = calliope_base.ReleaseTrack.BETA
+
+
+class CreateHttpTaskTestBeta(CreateHttpTaskTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

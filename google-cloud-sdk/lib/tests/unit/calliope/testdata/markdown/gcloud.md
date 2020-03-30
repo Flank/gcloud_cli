@@ -22,7 +22,7 @@ Markdown top group docstring description.
 
 The configuration to use for this command invocation. For more
 information on how to use configurations, run:
-`gcloud topic configurations`.  You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME] environment
+`gcloud topic configurations`.  You can also use the CLOUDSDK_ACTIVE_CONFIG_NAME environment
 variable to set the equivalent of this flag for a terminal
 session.
 
@@ -32,7 +32,7 @@ A YAML or JSON file that specifies a *--flag*:*value* dictionary.
 Useful for specifying complex flag values with special characters
 that work with any command interpreter. Additionally, each
 *--flags-file* arg is replaced by its constituent flags. See
-$ link:gcloud[gcloud] topic flags-file for more information.
+$ gcloud topic flags-file for more information.
 
 *--flatten*=[_KEY_,...]::
 
@@ -49,7 +49,7 @@ with other flags that are applied in this order: *--flatten*,
 
 Set the format for printing command output resources. The default is a
 command-specific human-friendly output format. The supported formats
-are: `config`, `csv`, `default`, `diff`, `disable`, `flattened`, `get`, `json`, `list`, `multi`, `none`, `object`, `table`, `text`, `value`, `yaml`. For more details run $ link:gcloud[gcloud] topic formats.
+are: `config`, `csv`, `default`, `diff`, `disable`, `flattened`, `get`, `json`, `list`, `multi`, `none`, `object`, `table`, `text`, `value`, `yaml`. For more details run $ gcloud topic formats.
 
 *--help*::
 

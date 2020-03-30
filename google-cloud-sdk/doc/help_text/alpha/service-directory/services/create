@@ -1,0 +1,63 @@
+NAME
+    gcloud alpha service-directory services create - create a service
+
+SYNOPSIS
+    gcloud alpha service-directory services create
+        (SERVICE : --location=LOCATION --namespace=NAMESPACE)
+        [--metadata=[KEY=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a service.
+
+POSITIONAL ARGUMENTS
+     Service resource - The Service Directory service to create. The service id
+     must be 1-63 characters long and match the regular expression
+     [a-z](?:[-a-z0-9]{0,61}[a-z0-9])? which means the first character must be
+     a lowercase letter, and all following characters must be a dash, lowercase
+     letter, or digit, except the last character, which cannot be a dash. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [service] on the command line with a fully specified name; set
+     the property [core/project]. This must be specified.
+
+       SERVICE
+          ID of the service or fully qualified identifier for the service. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --location=LOCATION
+          The name of the region for the service.
+
+       --namespace=NAMESPACE
+          The name of the namespace for the service.
+
+FLAGS
+     --metadata=[KEY=VALUE,...]
+        Metadata for the service.
+
+        Metadata takes the form of key/value string pairs. The total dictionary
+        is limited to 2000 characters.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a Service Directory service, run:
+
+        $ gcloud alpha service-directory services create my-service \
+            --namespace=my-namespace --location=us-east1 --metadata=a=b,c=d
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta service-directory services create
+

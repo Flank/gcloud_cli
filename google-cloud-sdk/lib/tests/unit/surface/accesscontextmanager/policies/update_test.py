@@ -28,6 +28,7 @@ from tests.lib.surface import accesscontextmanager
 class PoliciesUpdateTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -50,14 +51,14 @@ class PoliciesUpdateTestGA(accesscontextmanager.Base):
                                           policy)
 
   def testUpdate_MissingRequired(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(handlers.ParseError,
                                            'Error parsing [policy]'):
       self.Run(
           'access-context-manager policies update')
 
   def testUpdate(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     policy = self.messages.AccessPolicy(title='My Policy #2')
     self._ExpectPatch('MY_POLICY', policy, 'title')
 
@@ -71,12 +72,14 @@ class PoliciesUpdateTestGA(accesscontextmanager.Base):
 class PoliciesUpdateTestBeta(PoliciesUpdateTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class PoliciesUpdateTestAlpha(PoliciesUpdateTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 

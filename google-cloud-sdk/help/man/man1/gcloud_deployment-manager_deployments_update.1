@@ -78,6 +78,8 @@ composite type directly.
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -116,32 +118,33 @@ Filename of a top\-level jinja or python config template.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To update an existing deployment with a new config yaml file, run:
+To update an existing deployment with a new config YAML file, run:
 
 .RS 2m
 $ gcloud deployment\-manager deployments update my\-deployment \e
-    \-\-config new_config.yaml
+    \-\-config=new_config.yaml
 .RE
 
 To update an existing deployment with a new config template file, run:
 
 .RS 2m
 $ gcloud deployment\-manager deployments update my\-deployment \e
-    \-\-template new_config.{jinja|py}
+    \-\-template=new_config.{jinja|py}
 .RE
 
 To update an existing deployment with a composite type as a new config, run:
 
 .RS 2m
 $ gcloud deployment\-manager deployments update my\-deployment \e
-    \-\-composite\-type <project\-id>/composite:<new\-config>
+    \-\-composite\-type=<project\-id>/composite:<new\-config>
 .RE
 
 
@@ -150,7 +153,7 @@ resources, run:
 
 .RS 2m
 $ gcloud deployment\-manager deployments update my\-deployment \e
-    \-\-config new_config.yaml \-\-preview
+    \-\-config=new_config.yaml \-\-preview
 .RE
 
 To apply an update that has been previewed, provide the name of the previewed
@@ -161,33 +164,33 @@ $ gcloud deployment\-manager deployments update my\-deployment
 .RE
 
 To specify different create, update, or delete policies, include any subset of
-the following flags;
+the following flags:
 
 .RS 2m
 $ gcloud deployment\-manager deployments update my\-deployment \e
-    \-\-config new_config.yaml \-\-create\-policy acquire \e
-    \-\-delete\-policy abandon
+    \-\-config=new_config.yaml \-\-create\-policy=acquire \e
+    \-\-delete\-policy=abandon
 .RE
 
 To perform an update without waiting for the operation to complete, run:
 
 .RS 2m
 $ gcloud deployment\-manager deployments update my\-deployment \e
-    \-\-config new_config.yaml \-\-async
+    \-\-config=new_config.yaml \-\-async
 .RE
 
 To update an existing deployment with a new config file and a fingerprint, run:
 
 .RS 2m
 $ gcloud deployment\-manager deployments update my\-deployment \e
-    \-\-config new_config.yaml \-\-fingerprint deployment\-fingerprint
+    \-\-config=new_config.yaml \-\-fingerprint=deployment\-fingerprint
 .RE
 
-Either the \-\-config, \-\-template, or \-\-composite\-type flag is required
-unless launching an already\-previewed update to a deployment. If you want to
-update a deployment's metadata, such as the labels or description, you must run
-a separate command with \-\-update\-labels, \-\-remove\-labels, or
-\-\-description, as applicable.
+Either the \f5\-\-config\fR, \f5\-\-template\fR, or \f5\-\-composite\-type\fR
+flag is required unless launching an already\-previewed update to a deployment.
+If you want to update a deployment's metadata, such as the labels or
+description, you must run a separate command with \f5\-\-update\-labels\fR,
+\f5\-\-remove\-labels\fR, or \f5\-\-description\fR, as applicable.
 
 More information is available at
 https://cloud.google.com/deployment\-manager/docs/deployments/updating\-deployments.

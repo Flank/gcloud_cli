@@ -1,0 +1,137 @@
+title: patch-deployments describe.
+release_tracks: [GA, BETA, ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      compute os-config patch-deployments describe
+  - stderr: .*argument PATCH_DEPLOYMENT\:\ Must be specified..*$
+  - error: '1: argument PATCH_DEPLOYMENT: Must be specified.'
+- execute:
+  - command: |
+      compute os-config patch-deployments describe my-patch-deployment
+  - stdout: |
+      createTime: '2019-01-01T12:00:00Z'
+      duration: 3600s
+      instanceFilter:
+        instances:
+        - projects/test-project/zones/us-east1-b/instances/instance-1
+      lastExecuteTime: '2019-09-01T12:00:00Z'
+      name: projects/fake-project/patchDeployments/my-patch-deployment
+      oneTimeSchedule:
+        executeTime: '2019-09-01T12:00:00Z'
+      updateTime: '2019-09-01T12:00:00Z'
+- execute:
+  - command: |
+      compute os-config patch-deployments describe projects/fake-project/patchDeployments/my-patch-deployment
+  - stdout: |
+      createTime: '2019-01-01T12:00:00Z'
+      duration: 3600s
+      instanceFilter:
+        instances:
+        - projects/test-project/zones/us-east1-b/instances/instance-1
+      lastExecuteTime: '2019-09-01T12:00:00Z'
+      name: projects/fake-project/patchDeployments/my-patch-deployment
+      oneTimeSchedule:
+        executeTime: '2019-09-01T12:00:00Z'
+      updateTime: '2019-09-01T12:00:00Z'
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta
+      ALPHA: v1alpha2
+- execute_command:
+    command: |
+      compute os-config patch-deployments describe
+    events:
+    - expect_stderr:
+        matches: .*argument PATCH_DEPLOYMENT\:\ Must be specified..*$
+    - expect_exit:
+        code: 1
+        message: 'argument PATCH_DEPLOYMENT: Must be specified.'
+- execute_command:
+    command: |
+      compute os-config patch-deployments describe my-patch-deployment
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/my-patch-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "createTime": "2019-01-01T12:00:00Z",
+              "duration": "3600s",
+              "instanceFilter": {
+                "instances": [
+                  "projects/test-project/zones/us-east1-b/instances/instance-1"
+                ]
+              },
+              "lastExecuteTime": "2019-09-01T12:00:00Z",
+              "name": "projects/fake-project/patchDeployments/my-patch-deployment",
+              "oneTimeSchedule": {
+                "executeTime": "2019-09-01T12:00:00Z"
+              },
+              "updateTime": "2019-09-01T12:00:00Z"
+            }
+    - expect_stdout: |
+        createTime: '2019-01-01T12:00:00Z'
+        duration: 3600s
+        instanceFilter:
+          instances:
+          - projects/test-project/zones/us-east1-b/instances/instance-1
+        lastExecuteTime: '2019-09-01T12:00:00Z'
+        name: projects/fake-project/patchDeployments/my-patch-deployment
+        oneTimeSchedule:
+          executeTime: '2019-09-01T12:00:00Z'
+        updateTime: '2019-09-01T12:00:00Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config patch-deployments describe projects/fake-project/patchDeployments/my-patch-deployment
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/my-patch-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "createTime": "2019-01-01T12:00:00Z",
+              "duration": "3600s",
+              "instanceFilter": {
+                "instances": [
+                  "projects/test-project/zones/us-east1-b/instances/instance-1"
+                ]
+              },
+              "lastExecuteTime": "2019-09-01T12:00:00Z",
+              "name": "projects/fake-project/patchDeployments/my-patch-deployment",
+              "oneTimeSchedule": {
+                "executeTime": "2019-09-01T12:00:00Z"
+              },
+              "updateTime": "2019-09-01T12:00:00Z"
+            }
+    - expect_stdout: |
+        createTime: '2019-01-01T12:00:00Z'
+        duration: 3600s
+        instanceFilter:
+          instances:
+          - projects/test-project/zones/us-east1-b/instances/instance-1
+        lastExecuteTime: '2019-09-01T12:00:00Z'
+        name: projects/fake-project/patchDeployments/my-patch-deployment
+        oneTimeSchedule:
+          executeTime: '2019-09-01T12:00:00Z'
+        updateTime: '2019-09-01T12:00:00Z'
+    - expect_exit:
+        code: 0

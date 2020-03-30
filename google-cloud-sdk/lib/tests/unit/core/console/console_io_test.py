@@ -920,7 +920,7 @@ class MoreThePagerTests(sdk_test_base.WithOutputCapture):
     return self.interactive
 
   def MockPopen(self, *args, **kwargs):
-    self.less_env = os.environ.get('LESS')
+    self.less_env = encoding.GetEncodedValue(os.environ, 'LESS')
     return mock.MagicMock()
 
   def SetExecutables(self, executables):

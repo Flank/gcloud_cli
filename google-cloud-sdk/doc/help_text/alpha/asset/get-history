@@ -18,12 +18,12 @@ REQUIRED FLAGS
         for name format.
 
      --content-type=CONTENT_TYPE
-        Asset content type. Choices are resource, iam-policy and org-policy.
-        Specifying resource will export resource metadata, specifying
-        iam-policy will export IAM policy set on assets, specifying org-policy
-        will export Org Policy set on asset, and specifying access-policy will
-        export Access Policy set on asset. CONTENT_TYPE must be one of:
-        resource, iam-policy, org-policy, access-policy.
+        Asset content type. Specifying resource will export resource metadata,
+        specifying iam-policy will export the IAM policy for each child asset,
+        specifying org-policy will export the Org Policy set on child assets,
+        and specifying access-policy will export the Access Policy set on child
+        assets. CONTENT_TYPE must be one of: resource, iam-policy, org-policy,
+        access-policy.
 
      --start-time=START_TIME
         Start time of the time window (inclusive) for the asset history. Must
@@ -59,8 +59,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To get the history of asset metadata for

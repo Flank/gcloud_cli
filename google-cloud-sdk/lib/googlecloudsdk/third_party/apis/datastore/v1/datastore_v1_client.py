@@ -9,6 +9,7 @@ class DatastoreV1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://datastore.googleapis.com/'
+  MTLS_BASE_URL = u'https://datastore.mtls.googleapis.com/'
 
   _PACKAGE = u'datastore'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform', u'https://www.googleapis.com/auth/datastore']
@@ -498,7 +499,7 @@ that a subset of the data has already been imported to Cloud Datastore.
 
     def ReserveIds(self, request, global_params=None):
       r"""Prevents the supplied keys' IDs from being auto-allocated by Cloud.
-Datastore. Used for imports only; other workloads are not supported.
+Datastore.
 
       Args:
         request: (DatastoreProjectsReserveIdsRequest) input message

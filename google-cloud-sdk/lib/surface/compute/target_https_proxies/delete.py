@@ -22,9 +22,9 @@ from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute import flags as compute_flags
+from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.compute.target_https_proxies import flags
 from googlecloudsdk.command_lib.compute.target_https_proxies import target_https_proxies_utils
-from googlecloudsdk.core import log
 
 
 def _DetailedHelp():
@@ -34,6 +34,16 @@ def _DetailedHelp():
       'DESCRIPTION':
           """\
       *{command}* deletes one or more target HTTPS proxies.
+      """,
+      'EXAMPLES':
+          """\
+      Delete a global target HTTPS proxy by running:
+
+        $ {command} PROXY_NAME
+
+      Delete a regional target HTTPS proxy by running:
+
+        $ {command} PROXY_NAME --region=REGION_NAME
       """,
   }
 
@@ -45,6 +55,7 @@ def _Run(args, holder, target_https_proxy_arg):
   target_https_proxy_refs = target_https_proxy_arg.ResolveAsResource(
       args,
       holder.resources,
+      default_scope=compute_scope.ScopeEnum.GLOBAL,
       scope_lister=compute_flags.GetDefaultScopeLister(client))
 
   utils.PromptForDeletion(target_https_proxy_refs)
@@ -65,11 +76,13 @@ def _Run(args, holder, target_https_proxy_arg):
   return client.MakeRequests(requests)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Delete(base.DeleteCommand):
   """Delete target HTTPS proxies."""
 
-  _include_l7_internal_load_balancing = False
+  # TODO(b/144022508): Remove _include_l7_internal_load_balancing
+  _include_l7_internal_load_balancing = True
 
   TARGET_HTTPS_PROXY_ARG = None
   detailed_help = _DetailedHelp()
@@ -86,19 +99,5 @@ class Delete(base.DeleteCommand):
           flags.TargetHttpsProxiesCompleterAlpha)
 
   def Run(self, args):
-    if self.ReleaseTrack() == base.ReleaseTrack.GA:
-      log.warning('The target-https-proxies delete command will soon require '
-                  'either a --global or --region flag.')
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     return _Run(args, holder, self.TARGET_HTTPS_PROXY_ARG)
-
-
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class DeleteBeta(Delete):
-
-  _include_l7_internal_load_balancing = True
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class DeleteAlpha(DeleteBeta):
-  pass

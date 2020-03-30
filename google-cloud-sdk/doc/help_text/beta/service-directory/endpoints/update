@@ -1,0 +1,72 @@
+NAME
+    gcloud beta service-directory endpoints update - update an endpoint
+
+SYNOPSIS
+    gcloud beta service-directory endpoints update
+        (ENDPOINT
+          : --location=LOCATION --namespace=NAMESPACE --service=SERVICE)
+        [--address=ADDRESS] [--metadata=[KEY=VALUE,...]] [--port=PORT]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Update an endpoint.
+
+POSITIONAL ARGUMENTS
+     Endpoint resource - The Service Directory endpoint to update. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [endpoint] on the command line with a fully specified name; set
+     the property [core/project]. This must be specified.
+
+       ENDPOINT
+          ID of the endpoint or fully qualified identifier for the endpoint.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --location=LOCATION
+          The name of the region for the endpoint.
+
+       --namespace=NAMESPACE
+          The name of the namespace for the endpoint.
+
+       --service=SERVICE
+          The name of the service for the endpoint.
+
+FLAGS
+     --address=ADDRESS
+        IPv4 or IPv6 address of the endpoint. If unspecified, the default is
+        empty string.
+
+     --metadata=[KEY=VALUE,...]
+        Metadata for the endpoint.
+
+        Metadata takes the form of key/value string pairs. The total dictionary
+        is limited to 512 characters.
+
+     --port=PORT
+        Port that the endpoint is running on, must be in the range of [0,
+        65535]. If unspecified, the default is 0.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To update a Service Directory endpoint, run:
+
+        $ gcloud beta service-directory endpoints update my-endpoint \
+            --service=my-service --namespace=my-namespace \
+            --location=us-east1 --address=1.2.3.4 --port=5 \
+            --metadata=a=b,c=d
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha service-directory endpoints update
+

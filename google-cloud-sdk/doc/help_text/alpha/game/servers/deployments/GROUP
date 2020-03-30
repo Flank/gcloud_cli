@@ -12,14 +12,12 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
-
-     commit-rollout
-        (ALPHA) Commit the ongoing Deployment rollout.
 
      create
         (ALPHA) Create a Deployment.
@@ -30,27 +28,26 @@ COMMANDS
      describe
         (ALPHA) Describe a Deployment.
 
+     describe-rollout
+        (ALPHA) Describe a Rollout.
+
+     fetch-state
+        (ALPHA) Fetches the state of a Deployment.
+
      list
         (ALPHA) List Deployments.
 
-     revert-rollout
-        (ALPHA) Start rollback of the ongoing Deployment rollout in the
-        specified clusters.
-
-     set-rollout-target
-        (ALPHA) Set rollout target for the ongoing Deployment rollout in the
-        specified clusters.
-
-     start-rollout
-        (ALPHA) Start Deployment rollout by providing a new game server
-        template.
-
      update
         (ALPHA) Update a Deployment.
+
+     update-rollout
+        (ALPHA) Update a Deployment Rollout.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta game servers deployments
 

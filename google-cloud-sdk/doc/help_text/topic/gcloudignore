@@ -14,8 +14,8 @@ DESCRIPTION
 
     The following gcloud commands respect the .gcloudignore file:
 
-      o gcloud beta app deploy
-      o gcloud beta functions deploy
+      o gcloud app deploy
+      o gcloud functions deploy
       o gcloud builds submit
       o gcloud composer environments storage {dags, data, plugins} import
       o gcloud container builds submit

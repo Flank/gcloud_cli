@@ -39,7 +39,7 @@ def get_mock_insert_time():
       13,
       18,
       875000,
-      tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0)))
+      tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
 
 
 def get_mock_start_time():
@@ -52,7 +52,7 @@ def get_mock_start_time():
       13,
       18,
       925000,
-      tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0)))
+      tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
 
 
 def get_mock_end_time():
@@ -65,10 +65,10 @@ def get_mock_end_time():
       13,
       39,
       764000,
-      tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0)))
+      tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
 
 
-class InstancesImportBakBetaTest(base.SqlMockTestBeta):
+class InstancesImportBakGATest(base.SqlMockTestGA):
   # pylint:disable=g-tzinfo-datetime
 
   def get_mock_operation(self,
@@ -86,14 +86,15 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
         exportContext=None,
         importContext=import_context,
         targetId='testinstance',
-        targetLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
+        targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
         .format(self.Project()),
         targetProject=self.Project(),
         kind='sql#operation',
         name=operation,
-        selfLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/ffa26eae-a675-47f1-a8c8-579849098aeb'
+        selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/ffa26eae-a675-47f1-a8c8-579849098aeb'
         .format(self.Project()),
-        operationType='IMPORT',
+        operationType=self.messages.Operation.OperationTypeValueValuesEnum
+        .IMPORT,
         status=status,
         user='170350250316@developer.gserviceaccount.com')
 
@@ -101,7 +102,7 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
     # Generate BAK import context.
     import_context = self.messages.ImportContext(
         database=database,
-        fileType='BAK',
+        fileType=self.messages.ImportContext.FileTypeValueValuesEnum.BAK,
         kind='sql#importContext',
         uri='gs://speckletest/testinstance.bak')
     if encrypted:
@@ -121,7 +122,7 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
             project=self.Project()),
         self.get_mock_operation(
             operation='ffa26eae-a675-47f1-a8c8-579849098aeb',
-            status='PENDING',
+            status=self.messages.Operation.StatusValueValuesEnum.PENDING,
             import_context=import_context))
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
@@ -129,7 +130,7 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
             project=self.Project()),
         self.get_mock_operation(
             operation='ffa26eae-a675-47f1-a8c8-579849098aeb',
-            status='DONE',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             import_context=import_context))
 
   def testImportMissingDatabases(self):
@@ -144,16 +145,18 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
             instancesImportRequest=self.messages.InstancesImportRequest(
                 importContext=self.messages.ImportContext(
                     database='somedb',
-                    fileType='BAK',
+                    fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                    .BAK,
                     kind='sql#importContext',
                     uri='gs://nosuchbucket/testinstance.bak')),
             project=self.Project()),
         self.get_mock_operation(
             operation='bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
-            status='PENDING',
+            status=self.messages.Operation.StatusValueValuesEnum.PENDING,
             import_context=self.messages.ImportContext(
                 database='somedb',
-                fileType='BAK',
+                fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                .BAK,
                 kind='sql#importContext',
                 uri='gs://nosuchbucket/testinstance.bak')))
     self.mocked_client.operations.Get.Expect(
@@ -162,10 +165,11 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
             project=self.Project()),
         self.get_mock_operation(
             operation='bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
-            status='DONE',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             import_context=self.messages.ImportContext(
                 database='somedb',
-                fileType='BAK',
+                fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                .BAK,
                 kind='sql#importContext',
                 uri='gs://nosuchbucket/testinstance.bak'),
             error=self.messages.OperationErrors(
@@ -201,7 +205,7 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
     self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains('Imported data from '
                            '[gs://speckletest/testinstance.bak] into '
-                           '[https://www.googleapis.com/sql/v1beta4'
+                           '[https://sqladmin.googleapis.com/sql/v1beta4'
                            '/projects/{0}/instances/testinstance].'.format(
                                self.Project()))
 
@@ -215,7 +219,7 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
     self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains('Imported data from '
                            '[gs://speckletest/testinstance.bak] into '
-                           '[https://www.googleapis.com/sql/v1beta4'
+                           '[https://sqladmin.googleapis.com/sql/v1beta4'
                            '/projects/{0}/instances/testinstance].'.format(
                                self.Project()))
 
@@ -271,7 +275,8 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
             instancesImportRequest=self.messages.InstancesImportRequest(
                 importContext=self.messages.ImportContext(
                     database='somedb',
-                    fileType='BAK',
+                    fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                    .BAK,
                     kind='sql#importContext',
                     uri='gs://speckletest/testinstance.bak',
                     bakImportOptions=self.messages.ImportContext
@@ -284,10 +289,11 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
             project=self.Project()),
         self.get_mock_operation(
             operation='bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
-            status='PENDING',
+            status=self.messages.Operation.StatusValueValuesEnum.PENDING,
             import_context=self.messages.ImportContext(
                 database='somedb',
-                fileType='BAK',
+                fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                .BAK,
                 kind='sql#importContext',
                 uri='gs://speckletest/testinstance.bak',
                 bakImportOptions=self.messages.ImportContext
@@ -303,10 +309,11 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
             project=self.Project()),
         self.get_mock_operation(
             operation='bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
-            status='DONE',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             import_context=self.messages.ImportContext(
                 database='somedb',
-                fileType='BAK',
+                fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                .BAK,
                 kind='sql#importContext',
                 uri='gs://speckletest/testinstance.bak',
                 bakImportOptions=self.messages.ImportContext
@@ -338,7 +345,8 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
             instancesImportRequest=self.messages.InstancesImportRequest(
                 importContext=self.messages.ImportContext(
                     database='somedb',
-                    fileType='BAK',
+                    fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                    .BAK,
                     kind='sql#importContext',
                     uri='gs://speckletest/testinstance.bak',
                     bakImportOptions=self.messages.ImportContext
@@ -351,10 +359,11 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
             project=self.Project()),
         self.get_mock_operation(
             operation='bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
-            status='PENDING',
+            status=self.messages.Operation.StatusValueValuesEnum.PENDING,
             import_context=self.messages.ImportContext(
                 database='somedb',
-                fileType='BAK',
+                fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                .BAK,
                 kind='sql#importContext',
                 uri='gs://speckletest/testinstance.bak',
                 bakImportOptions=self.messages.ImportContext
@@ -370,10 +379,11 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
             project=self.Project()),
         self.get_mock_operation(
             operation='bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
-            status='DONE',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             import_context=self.messages.ImportContext(
                 database='somedb',
-                fileType='BAK',
+                fileType=self.messages.ImportContext.FileTypeValueValuesEnum
+                .BAK,
                 kind='sql#importContext',
                 uri='gs://speckletest/testinstance.bak',
                 bakImportOptions=self.messages.ImportContext
@@ -412,7 +422,7 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
     self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains('Imported data from '
                            '[gs://speckletest/testinstance.bak] into '
-                           '[https://www.googleapis.com/sql/v1beta4'
+                           '[https://sqladmin.googleapis.com/sql/v1beta4'
                            '/projects/{0}/instances/testinstance].'.format(
                                self.Project()))
 
@@ -427,7 +437,7 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
     self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains('Imported data from '
                            '[gs://speckletest/testinstance.bak] into '
-                           '[https://www.googleapis.com/sql/v1beta4'
+                           '[https://sqladmin.googleapis.com/sql/v1beta4'
                            '/projects/{0}/instances/testinstance].'.format(
                                self.Project()))
 
@@ -445,9 +455,14 @@ class InstancesImportBakBetaTest(base.SqlMockTestBeta):
     self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertErrContains('Imported data from '
                            '[gs://speckletest/testinstance.bak] into '
-                           '[https://www.googleapis.com/sql/v1beta4'
+                           '[https://sqladmin.googleapis.com/sql/v1beta4'
                            '/projects/{0}/instances/testinstance].'.format(
                                self.Project()))
+
+
+class InstancesImportBakBetaTest(InstancesImportBakGATest,
+                                 base.SqlMockTestBeta):
+  pass
 
 
 class InstancesImportBakAlphaTest(InstancesImportBakBetaTest,

@@ -106,8 +106,22 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To attach a disk named 'my-disk' as a boot disk to an instance named
+    'my-instance', run:
+
+        $ gcloud beta compute instances attach-disk my-instance \
+            --disk=my-disk --boot
+
+    To attach a device named 'my-device' for read-only access to an instance
+    named 'my-instance', run:
+
+        $ gcloud beta compute instances attach-disk my-instance \
+            --device-name=my-device --mode=ro
 
 NOTES
     This command is currently in BETA and may change without notice. These

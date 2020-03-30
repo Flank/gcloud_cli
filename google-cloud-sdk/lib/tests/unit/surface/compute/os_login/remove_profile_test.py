@@ -120,6 +120,26 @@ class RemoveProfileTest(test_base.OsloginBaseTest):
       self.AssertErrContains(
           'The required property [project] is not currently set.')
 
+  def testImpersonateServiceAccount(self, track):
+    self._RunSetUp(track)
+    self.mock_oslogin_client.users.GetLoginProfile.Expect(
+        request=self.messages.OsloginUsersGetLoginProfileRequest(
+            name='users/service_account_user@google.com'),
+        response=self.profiles['profile_with_account_id'])
+
+    self.mock_oslogin_client.users_projects.Delete.Expect(
+        request=self._GetDeleteRequest(
+            track,
+            name='users/service_account_user@google.com/projects/fake-project'),
+        response={})
+
+    self.Run("""
+        compute os-login remove-profile
+            --impersonate-service-account service_account_user@google.com
+        """)
+
+    self.AssertErrContains('Deleted [fake-project] posix account(s)')
+
 
 if __name__ == '__main__':
   test_case.main()

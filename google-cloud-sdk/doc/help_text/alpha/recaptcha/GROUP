@@ -1,0 +1,29 @@
+NAME
+    gcloud alpha recaptcha - manage reCAPTCHA Keys
+
+SYNOPSIS
+    gcloud alpha recaptcha GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands for managing reCAPTCHA Keys.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     keys
+        (ALPHA) Managed reCAPTCHA Keys.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

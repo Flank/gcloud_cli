@@ -154,6 +154,8 @@ class ScenarioTestBase(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD):
     scenario_context = schema.ScenarioContext(
         spec_path, full_spec_path, spec_data, track, execution_mode,
         update_modes, stream_mocker, self.Run, debug)
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
     if execution_mode == session.ExecutionMode.LOCAL:
       self.StartObjectPatch(retry, '_SleepMs')
 

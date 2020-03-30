@@ -25,10 +25,8 @@ summary:
   - stdout: |
       name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890
 - execute:
-  - command: |
-      healthcare dicom-stores export gcs my-store --location us-central1 --dataset
-      my-dataset --gcs-uri-prefix=gs://bucket-id/path/to/fake/dir
-      --mime-type=dicom
+  - command: healthcare dicom-stores export gcs my-store --location us-central1 --dataset
+      my-dataset --gcs-uri-prefix=gs://bucket-id/path/to/fake/dir --mime-type=dicom
   - stderr: |
       Request issued for: [my-store]
   - progress_tracker:
@@ -156,8 +154,7 @@ actions:
         code: 0
 - execute_command:
     command: healthcare dicom-stores export gcs my-store --location us-central1 --dataset
-      my-dataset --gcs-uri-prefix=gs://bucket-id/path/to/fake/dir
-      --mime-type=dicom
+      my-dataset --gcs-uri-prefix=gs://bucket-id/path/to/fake/dir --mime-type=dicom
     events:
     - api_call:
         expect_request:

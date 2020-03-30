@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta bigtable instances set\-iam\-policy \- set the IAM policy for a Cloud Bigtable instance
+gcloud beta bigtable instances set\-iam\-policy \- set IAM policy for an instance
 
 
 
@@ -57,8 +57,25 @@ or YAML file conforming to the structure of a Policy
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will read an IAM policy defined in a JSON file
+\'policy.json' and set it for an instance with identifier 'my\-instance\-id'
+
+.RS 2m
+$ gcloud beta bigtable instances set\-iam\-policy my\-instance\-id \e
+    policy.json
+.RE
+
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
 
 
 

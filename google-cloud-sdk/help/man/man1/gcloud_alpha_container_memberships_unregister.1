@@ -11,32 +11,30 @@ gcloud alpha container memberships unregister \- unregisters a cluster from Goog
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container memberships unregister\fR \fB\-\-context\fR=\fICONTEXT\fR [\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container memberships unregister\fR [\fB\-\-context\fR=\fICONTEXT\fR] [\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR This command unregisters a cluster referenced from a kubeconfig
-file from Google Cloud Platform. It also removes the Connect agent installation
-from the Cluster.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Unregisters a cluster from Google Cloud
+Platform.
+
+This command group is deprecated. Please use \f5gcloud container hub
+memberships\fR command group instead.
+
+This command unregisters a cluster referenced from a kubeconfig file from Google
+Cloud Platform. It also removes the Connect agent installation from the Cluster.
 
 
 
-.SH "REQUIRED FLAGS"
+.SH "FLAGS"
 
 .RS 2m
 .TP 2m
 \fB\-\-context\fR=\fICONTEXT\fR
 The context in the kubeconfig file that specifies the cluster.
 
-
-.RE
-.sp
-
-.SH "OPTIONAL FLAGS"
-
-.RS 2m
 .TP 2m
 \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR
 The kubeconfig file containing an entry for the cluster. Defaults to $KUBECONFIG
@@ -51,8 +49,9 @@ if it is set in the environment, otherwise defaults to to $HOME/.kube/config.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

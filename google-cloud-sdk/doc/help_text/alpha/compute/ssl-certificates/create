@@ -10,10 +10,10 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute ssl-certificates create is used to create SSL
-    certificates which can be used to configure a target HTTPS proxy. An SSL
-    certificate consists of a certificate and private key. The private key is
-    encrypted before it is stored.
+    (ALPHA) gcloud alpha compute ssl-certificates create creates SSL
+    certificates, which you can use in a target HTTPS or target SSL proxy. An
+    SSL certificate resource consists of a certificate and private key. The
+    private key is encrypted before it is stored.
 
     You can create either a managed or a self-managed SslCertificate. A managed
     SslCertificate will be provisioned and renewed for you, when you specify
@@ -80,8 +80,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a certificate 'my-cert' from a certificate placed under path
+    'foo/cert' and a private key placed under path 'foo/pk', run:
+
+        $ gcloud alpha compute ssl-certificates create my-cert \
+          --certificate=foo/cert --private-key=foo/pk
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

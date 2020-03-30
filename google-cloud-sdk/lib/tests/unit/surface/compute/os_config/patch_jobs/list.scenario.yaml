@@ -1,0 +1,272 @@
+title: patch-jobs list.
+release_tracks: [GA, BETA, ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      compute os-config patch-jobs list
+  - stdout: |
+      ID           NAME  DESCRIPTION  CREATE_TIME  UPDATE_TIME  STATE  TARGETED_INSTANCES
+      patch-job-0
+      patch-job-1
+      patch-job-2
+      patch-job-3
+      patch-job-4
+      patch-job-5
+      patch-job-6
+      patch-job-7
+      patch-job-8
+      patch-job-9
+- execute:
+  - command: |
+      compute os-config patch-jobs list --project my-project --limit 1
+  - stdout: |
+      ID                                    NAME         DESCRIPTION       CREATE_TIME           UPDATE_TIME               STATE      TARGETED_INSTANCES
+      68cb687a-de54-40dc-bdc3-c74ebc23346c  patch-job-1  Patch instance-1  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  SUCCEEDED
+- execute:
+  - command: |
+      compute os-config patch-jobs list --page-size 1
+  - stdout: |
+      ID                                    NAME         DESCRIPTION       CREATE_TIME           UPDATE_TIME               STATE      TARGETED_INSTANCES
+      68cb687a-de54-40dc-bdc3-c74ebc23346c  patch-job-1  Patch instance-1  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  SUCCEEDED
+
+      ID                                    NAME         DESCRIPTION       CREATE_TIME           UPDATE_TIME               STATE                  TARGETED_INSTANCES
+      68cb687a-de54-40dc-bdc3-c74ebc23346d  patch-job-2  Patch instance-2  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  COMPLETED_WITH_ERRORS
+- execute:
+  - command: |
+      compute os-config patch-jobs list --sort-by ~name
+  - stdout: |
+      ID                                    NAME         DESCRIPTION       CREATE_TIME           UPDATE_TIME               STATE                  TARGETED_INSTANCES
+      68cb687a-de54-40dc-bdc3-c74ebc23346d  patch-job-2  Patch instance-2  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  COMPLETED_WITH_ERRORS
+      68cb687a-de54-40dc-bdc3-c74ebc23346c  patch-job-1  Patch instance-1  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  SUCCEEDED
+- execute:
+  - command: |
+      compute os-config patch-jobs list --filter "state=SUCCEEDED"
+  - stdout: |
+      ID                                    NAME         DESCRIPTION       CREATE_TIME           UPDATE_TIME               STATE      TARGETED_INSTANCES
+      68cb687a-de54-40dc-bdc3-c74ebc23346c  patch-job-1  Patch instance-1  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  SUCCEEDED
+- execute:
+  - command: |
+      compute os-config patch-jobs list --uri
+  - stdout: |
+      https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+      https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346d
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta
+      ALPHA: v1alpha2
+- define_reference:
+    reference: patch-jobs
+    value: |
+      {
+        "patchJobs" :
+        [
+          {
+            "createTime": "2019-01-01T12:00:00Z",
+            "description": "Patch instance-1",
+            "displayName": "patch-job-1",
+            "instanceFilter": {
+              "instances": [
+                "projects/fake-project/zones/us-east1-b/instances/instance-1"
+              ]
+            },
+            "name": "projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c",
+            "patchConfig": {},
+            "patchDeployment": "projects/fake-project/patchDeployments/patch-deployment-1",
+            "state": "SUCCEEDED",
+            "updateTime": "2019-12-09T23:05:36.421Z"
+          },
+          {
+            "createTime": "2019-01-01T12:00:00Z",
+            "description": "Patch instance-2",
+            "displayName": "patch-job-2",
+            "instanceFilter": {
+              "instances": [
+                "projects/fake-project/zones/us-east1-b/instances/instance-2"
+              ]
+            },
+            "name": "projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346d",
+            "patchConfig": {},
+            "patchDeployment": "projects/fake-project/patchDeployments/patch-deployment-2",
+            "state": "COMPLETED_WITH_ERRORS",
+            "updateTime": "2019-12-09T23:05:36.421Z"
+          }
+        ]
+      }
+- define_reference:
+    reference: empty-patch-jobs
+    value: |
+      {
+        "patchJobs" :
+        [
+          {
+            "name": "projects/fake-project/patchJobs/patch-job-0"
+          },
+          {
+            "name": "projects/fake-project/patchJobs/patch-job-1"
+          },
+          {
+            "name": "projects/fake-project/patchJobs/patch-job-2"
+          },
+          {
+            "name": "projects/fake-project/patchJobs/patch-job-3"
+          },
+          {
+            "name": "projects/fake-project/patchJobs/patch-job-4"
+          },
+          {
+            "name": "projects/fake-project/patchJobs/patch-job-5"
+          },
+          {
+            "name": "projects/fake-project/patchJobs/patch-job-6"
+          },
+          {
+            "name": "projects/fake-project/patchJobs/patch-job-7"
+          },
+          {
+            "name": "projects/fake-project/patchJobs/patch-job-8"
+          },
+          {
+            "name": "projects/fake-project/patchJobs/patch-job-9"
+          },
+          {
+            "name": "projects/fake-project/patchJobs/patch-job-10"
+          }
+        ]
+      }
+- execute_command:
+    command: |
+      compute os-config patch-jobs list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs?alt=json&pageSize=10
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$empty-patch-jobs$$
+    - expect_stdout: |
+        ID           NAME  DESCRIPTION  CREATE_TIME  UPDATE_TIME  STATE  TARGETED_INSTANCES
+        patch-job-0
+        patch-job-1
+        patch-job-2
+        patch-job-3
+        patch-job-4
+        patch-job-5
+        patch-job-6
+        patch-job-7
+        patch-job-8
+        patch-job-9
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config patch-jobs list --project my-project --limit 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/my-project/patchJobs?alt=json&pageSize=1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$patch-jobs$$
+    - expect_stdout: |
+        ID                                    NAME         DESCRIPTION       CREATE_TIME           UPDATE_TIME               STATE      TARGETED_INSTANCES
+        68cb687a-de54-40dc-bdc3-c74ebc23346c  patch-job-1  Patch instance-1  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  SUCCEEDED
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config patch-jobs list --page-size 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs?alt=json&pageSize=1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$patch-jobs$$
+    - expect_stdout: |
+        ID                                    NAME         DESCRIPTION       CREATE_TIME           UPDATE_TIME               STATE      TARGETED_INSTANCES
+        68cb687a-de54-40dc-bdc3-c74ebc23346c  patch-job-1  Patch instance-1  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  SUCCEEDED
+
+        ID                                    NAME         DESCRIPTION       CREATE_TIME           UPDATE_TIME               STATE                  TARGETED_INSTANCES
+        68cb687a-de54-40dc-bdc3-c74ebc23346d  patch-job-2  Patch instance-2  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  COMPLETED_WITH_ERRORS
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config patch-jobs list --sort-by ~name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs?alt=json&pageSize=10
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$patch-jobs$$
+    - expect_stdout: |
+        ID                                    NAME         DESCRIPTION       CREATE_TIME           UPDATE_TIME               STATE                  TARGETED_INSTANCES
+        68cb687a-de54-40dc-bdc3-c74ebc23346d  patch-job-2  Patch instance-2  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  COMPLETED_WITH_ERRORS
+        68cb687a-de54-40dc-bdc3-c74ebc23346c  patch-job-1  Patch instance-1  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  SUCCEEDED
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config patch-jobs list --filter "state=SUCCEEDED"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs?alt=json&pageSize=10
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$patch-jobs$$
+    - expect_stdout: |
+        ID                                    NAME         DESCRIPTION       CREATE_TIME           UPDATE_TIME               STATE      TARGETED_INSTANCES
+        68cb687a-de54-40dc-bdc3-c74ebc23346c  patch-job-1  Patch instance-1  2019-01-01T12:00:00Z  2019-12-09T23:05:36.421Z  SUCCEEDED
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config patch-jobs list --uri
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs?alt=json&pageSize=10
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$patch-jobs$$
+    - expect_stdout: |
+        https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+        https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346d
+    - expect_exit:
+        code: 0

@@ -26,8 +26,9 @@ gcloud alpha data\-catalog entry\-groups \- manage entry groups in Cloud Data Ca
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -57,6 +58,10 @@ help\fR for details.
 \fB(ALPHA)\fR Get the IAM policy for a Cloud Data Catalog entry group.
 
 .TP 2m
+\fBlist\fR
+\fB(ALPHA)\fR List all entry groups in a Cloud Data Catalog location.
+
+.TP 2m
 \fBremove\-iam\-policy\-binding\fR
 \fB(ALPHA)\fR Remove an IAM policy binding from a Cloud Data Catalog entry
 group.
@@ -64,6 +69,10 @@ group.
 .TP 2m
 \fBset\-iam\-policy\fR
 \fB(ALPHA)\fR Set the IAM policy for a Cloud Data Catalog entry group.
+
+.TP 2m
+\fBupdate\fR
+\fB(ALPHA)\fR Update a Cloud Data Catalog entry group.
 
 
 .RE
@@ -74,9 +83,10 @@ group.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud data\-catalog entry\-groups
 $ gcloud beta data\-catalog entry\-groups
 .RE
 

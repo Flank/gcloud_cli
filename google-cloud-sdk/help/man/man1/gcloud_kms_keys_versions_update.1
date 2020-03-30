@@ -1,0 +1,117 @@
+
+.TH "GCLOUD_KMS_KEYS_VERSIONS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud kms keys versions update \- update a key version
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud kms keys versions update\fR \fIVERSION\fR [\fB\-\-external\-key\-uri\fR=\fIEXTERNAL_KEY_URI\fR] [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-state\fR=\fISTATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+gcloud kms keys versions update can be used to update the key versions. Updates
+can be made to the the key versions's state (enabling or disabling it), and to
+its external key URI (if the key version has protection level EXTERNAL).
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIVERSION\fR
+Name of the version to describe.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-external\-key\-uri\fR=\fIEXTERNAL_KEY_URI\fR
+The URI of the external key for keys with protection level "external".
+
+.TP 2m
+\fB\-\-key\fR=\fIKEY\fR
+The containing key.
+
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+Key ring of the key.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the keyring.
+
+.TP 2m
+\fB\-\-state\fR=\fISTATE\fR
+State of the key version.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command enables the key version 8 of key \f5frodo\fR within
+keyring \f5fellowship\fR and location \f5us\-east1\fR:
+
+.RS 2m
+$ gcloud kms keys versions update 8 \-\-location=us\-east1 \e
+              \-\-keyring=fellowship \e
+              \-\-key=frodo \e
+              \-\-state=enabled
+.RE
+
+The following command disables the key version 8 of key \f5frodo\fR within
+keyring \f5fellowship\fR and location \f5us\-east1\fR:
+
+.RS 2m
+$ gcloud kms keys versions update 8 \-\-location=us\-east1 \e
+              \-\-keyring=fellowship \e
+              \-\-key=frodo \e
+              \-\-state=disabled
+.RE
+
+The following command updates the external key URI of version 8 of key
+\f5frodo\fR within keyring \f5fellowship\fR and location \f5us\-east1\fR:
+
+.RS 2m
+$ gcloud kms keys versions update 8 \-\-location=us\-east1 \e
+              \-\-keyring=fellowship \e
+              \-\-key=frodo \e
+              \-\-external\-key\-uri=https://example.kms/v0/some/key/path
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha kms keys versions update
+$ gcloud beta kms keys versions update
+.RE
+

@@ -242,8 +242,7 @@ class InstanceGroupManagersListTest(test_base.BaseTest):
         requests=[
             (self.compute.instanceGroupManagers, 'AggregatedList',
              self.messages.ComputeInstanceGroupManagersAggregatedListRequest(
-                 maxResults=2,
-                 project='my-project',))
+                 maxResults=None, project='my-project', includeAllScopes=True))
         ],
         http=self.mock_http(),
         batch_url=self.batch_url,

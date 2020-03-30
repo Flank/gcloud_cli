@@ -30,8 +30,8 @@ from tests.lib import test_case
 class ListRoutesBetaTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def PreSetUp(self):
-    self.api_version = 'beta'
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.client = mock.Client(

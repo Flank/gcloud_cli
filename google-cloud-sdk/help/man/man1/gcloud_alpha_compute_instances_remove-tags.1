@@ -18,19 +18,7 @@ gcloud alpha compute instances remove\-tags \- remove tags from Google Compute E
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute instances remove\-tags\fR is used to
-remove tags to Google Compute Engine virtual machine instances. For example:
-
-.RS 2m
-$ gcloud alpha compute instances remove\-tags example\-instance \e
-    \-\-tags tag\-1,tag\-2
-.RE
-
-will remove tags \f5\fItag\-1\fR\fR and \f5\fItag\-2\fR\fR from the existing
-tags of 'example\-instance'.
-
-Tags can be used to identify instances when adding network firewall rules. Tags
-can also be used to get firewall rules that already exist to be applied to the
-instance. See \fBgcloud compute firewall\-rules create\fR(1) for more details.
+remove tags from Google Compute Engine virtual machine instances.
 
 
 
@@ -110,8 +98,21 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To remove tags \f5\fItag\-1\fR\fR and \f5\fItag\-2\fR\fR from an instance named
+\f5\fItest\-instance\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha compute instances remove\-tags test\-instance \e
+    \-\-tags=tag\-1,tag\-2
+.RE
 
 
 

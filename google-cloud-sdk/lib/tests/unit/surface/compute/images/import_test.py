@@ -395,6 +395,8 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     )
 
     self._ExpectServiceUsage()
+    self._ExpectIamRolesGet(
+        is_import=True, permissions=missing_permissions, skip_compute=True)
 
     get_request = self.crm_v1_messages \
         .CloudresourcemanagerProjectsGetIamPolicyRequest(
@@ -434,44 +436,189 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
                --source-file {1} --os ubuntu-1604
                """.format(self.image_name, self.source_disk))
 
-  def testAddMissingPermissions(self):
-    admin_permissions_binding = self.crm_v1_messages.Binding(
-        members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
-        role='roles/compute.admin',
-    )
-
-    missing_permissions = self.crm_v1_messages.Policy(
-        bindings=[admin_permissions_binding],
-    )
+  def testAllowFailedServiceAccountPermissionModification(self):
+    actual_permissions = self.crm_v1_messages.Policy(bindings=[
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_USER),
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR),
+    ])
     self.PrepareDaisyMocksWithRegionalBucket(
-        self.GetDaisyImportTranslateStep(),
-        permissions=missing_permissions
-    )
+        self.GetDaisyImportTranslateStep(), permissions=actual_permissions)
     self.AddStorageRewriteMock()
 
-    # Called once for each service account role.
-    for _ in range(0, len(daisy_utils.SERVICE_ACCOUNT_ROLES)):
-      get_request = self.crm_v1_messages \
-          .CloudresourcemanagerProjectsGetIamPolicyRequest(
-              getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(
-                  options=self.crm_v1_messages.GetPolicyOptions(
-                      requestedPolicyVersion=
-                      iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
-              resource='my-project')
+    # mock for 2 service accounts.
+    for _ in range(2):
       self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-          request=get_request,
+          request=(
+              self.crm_v1_messages
+              .CloudresourcemanagerProjectsGetIamPolicyRequest(
+                  getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(
+                      options=self.crm_v1_messages.GetPolicyOptions(
+                          requestedPolicyVersion=iam_util
+                          .MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
+                  resource='my-project')),
           response=self.permissions,
       )
-
       self.mocked_crm_v1.projects.SetIamPolicy.Expect(
           self.crm_v1_messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
               resource='my-project',
               setIamPolicyRequest=self.crm_v1_messages.SetIamPolicyRequest(
-                  policy=self.permissions,
-              ),
+                  policy=self.permissions,),
           ),
-          response=self.permissions,
-      )
+          exception=api_exceptions.HttpForbiddenError('response', 'content',
+                                                      'url'))
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --quiet
+             --os ubuntu-1604
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains(
+        """\
+        [import-image] output
+        """, normalize_space=True)
+
+  def testAllowFailedIamGetRoles(self):
+    self.PrepareDaisyBucketMocksWithRegion()
+    self.AddStorageRewriteMock()
+    self._ExpectServiceUsage()
+
+    self.mocked_crm_v1.projects.Get.Expect(
+        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
+            projectId='my-project',
+        ),
+        response=self.project,
+    )
+
+    get_request = self.crm_v1_messages \
+      .CloudresourcemanagerProjectsGetIamPolicyRequest(
+          getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(
+              options=self.crm_v1_messages.GetPolicyOptions(
+                  requestedPolicyVersion=
+                  iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
+          resource='my-project')
+    actual_permissions = self.crm_v1_messages.Policy(bindings=[])
+    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
+        request=get_request,
+        response=actual_permissions,
+    )
+
+    self.mocked_iam_v1.roles.Get.Expect(
+        self.iam_v1_messages.IamRolesGetRequest(
+            name=daisy_utils.ROLE_COMPUTE_ADMIN),
+        exception=api_exceptions.HttpForbiddenError('response', 'content',
+                                                    'url'))
+    self.mocked_iam_v1.roles.Get.Expect(
+        self.iam_v1_messages.IamRolesGetRequest(
+            name=daisy_utils.ROLE_COMPUTE_STORAGE_ADMIN),
+        exception=api_exceptions.HttpForbiddenError('response', 'content',
+                                                    'url'))
+
+    # Called once for each missed service account role.
+    self._ExpectAddIamPolicyBinding(5)
+
+    self._ExpectCloudBuild(self.GetDaisyImportTranslateStep())
+
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --quiet
+             --os ubuntu-1604
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains(
+        """\
+        [import-image] output
+        """, normalize_space=True)
+
+  def testEditorPermissionIsSufficientForComputeAccount(self):
+    actual_permissions = self.crm_v1_messages.Policy(bindings=[
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_COMPUTE_ADMIN),
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_USER),
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR),
+        self.crm_v1_messages.Binding(
+            members=[
+                'serviceAccount:123456-compute@developer.gserviceaccount.com'
+            ],
+            role=daisy_utils.ROLE_EDITOR),
+    ])
+    self.PrepareDaisyMocksWithRegionalBucket(
+        self.GetDaisyImportTranslateStep(),
+        permissions=actual_permissions
+    )
+    self.AddStorageRewriteMock()
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --quiet
+             --os ubuntu-1604
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains("""\
+        [import-image] output
+        """, normalize_space=True)
+
+  def testCustomRolePermissionIsSufficientForComputeAccount(self):
+    actual_permissions = self.crm_v1_messages.Policy(bindings=[
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_COMPUTE_ADMIN),
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_USER),
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR),
+        self.crm_v1_messages.Binding(
+            members=[
+                'serviceAccount:123456-compute@developer.gserviceaccount.com'
+            ],
+            role='roles/custom'),
+    ])
+    self.PrepareDaisyMocksWithRegionalBucket(
+        self.GetDaisyImportTranslateStep(),
+        permissions=actual_permissions
+    )
+    self.AddStorageRewriteMock()
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --quiet
+             --os ubuntu-1604
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains("""\
+        [import-image] output
+        """, normalize_space=True)
+
+  def testAddMissingPermissions(self):
+    actual_permissions = self.crm_v1_messages.Policy(bindings=[
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_COMPUTE_ADMIN),
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR),
+        self.crm_v1_messages.Binding(
+            members=[
+                'serviceAccount:123456-compute@developer.gserviceaccount.com'
+            ],
+            role=daisy_utils.ROLE_COMPUTE_STORAGE_ADMIN),
+    ])
+    self.PrepareDaisyMocksWithRegionalBucket(
+        self.GetDaisyImportTranslateStep(),
+        permissions=actual_permissions
+    )
+    self.AddStorageRewriteMock()
+
+    # Called once for each missed service account role.
+    self._ExpectAddIamPolicyBinding(2)
 
     self.Run("""
              compute images import {0}
@@ -881,7 +1028,7 @@ class ImageImportTestBeta(ImageImportTest):
 
   def testWindowsByolMapping(self):
     target_workflow = '../workflows/image_import/import_from_image.wf.json'
-    translate_workflow = 'windows/translate_windows_7_byol.wf.json'
+    translate_workflow = 'windows/translate_windows_7_x64_byol.wf.json'
     daisy_step = self.GetImportStepForWindowsByolMapping(target_workflow,
                                                          translate_workflow)
 
@@ -889,7 +1036,7 @@ class ImageImportTestBeta(ImageImportTest):
 
     self.Run("""
              compute images import --source-image {0}
-             --os windows-7-byol
+             --os windows-7-x64-byol
              {1}
              """.format(self.source_image, self.destination_image))
 
@@ -919,7 +1066,7 @@ class ImageImportTestBeta(ImageImportTest):
       self, target_workflow, translate_workflow):
     import_vars = []
     daisy_utils.AppendArg(import_vars, 'source_image', self.source_image)
-    daisy_utils.AppendArg(import_vars, 'os', 'windows-7-byol')
+    daisy_utils.AppendArg(import_vars, 'os', 'windows-7-x64-byol')
     daisy_utils.AppendArg(
         import_vars, 'scratch_bucket_gcs_path',
         'gs://{0}/'.format(self.GetScratchBucketNameWithoutRegion()))

@@ -5,14 +5,21 @@ SYNOPSIS
     gcloud beta firestore GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Manage your Cloud Firestore resources.
+    (BETA) export -- Export data to Google Cloud Storage
+
+    import -- Import data from Google Cloud Storage
+
+    indexes -- Manage your Cloud Firestore indexes
+
+    operations -- Manage Long Running Operations for Cloud Firestore
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:

@@ -47,6 +47,14 @@ class NetworkEndpointGroupsListEndpointsTest(sdk_test_base.WithFakeAuth,
             networkEndpoint=self.messages.NetworkEndpoint(
                 instance='my-instance1')),
     ]
+    self.expected_global_endpoints = [
+        self.messages.NetworkEndpointWithHealthStatus(
+            networkEndpoint=self.messages.NetworkEndpoint(
+                fqdn='www.example.com', port=8888)),
+        self.messages.NetworkEndpointWithHealthStatus(
+            networkEndpoint=self.messages.NetworkEndpoint(
+                fqdn='www.example.net', port=10001)),
+    ]
 
   def _SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
@@ -72,7 +80,7 @@ class NetworkEndpointGroupsListEndpointsTest(sdk_test_base.WithFakeAuth,
 
   def _expectedZonalTableOutput(self):
     return """\
-INSTANCE     IP_ADDRESS PORT
+INSTANCE     IP_ADDRESS PORT FQDN
 my-instance1 127.0.0.1  8888
 my-instance2 10.0.0.1   10001
 my-instance1
@@ -92,34 +100,6 @@ my-instance1
                  'my-neg1 --zone us-central1-a'))
 
     self.assertEqual(self.expected_endpoints, result)
-
-
-class AlphaNetworkEndpointGroupsListEndpointsTest(
-    NetworkEndpointGroupsListEndpointsTest):
-
-  def _SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
-    self.messages = self.client.MESSAGES_MODULE
-
-    self.expected_global_endpoints = [
-        self.messages.NetworkEndpointWithHealthStatus(
-            networkEndpoint=self.messages.NetworkEndpoint(
-                fqdn='www.example.com', port=8888)),
-        self.messages.NetworkEndpointWithHealthStatus(
-            networkEndpoint=self.messages.NetworkEndpoint(
-                fqdn='www.example.net', port=10001)),
-    ]
-
-  def _expectedZonalTableOutput(self):
-    return """\
-INSTANCE     IP_ADDRESS PORT FQDN
-my-instance1 127.0.0.1  8888
-my-instance2 10.0.0.1   10001
-my-instance1
-"""
 
   def testGlobalTableOutput(self):
     self.client.globalNetworkEndpointGroups.ListNetworkEndpoints.Expect(

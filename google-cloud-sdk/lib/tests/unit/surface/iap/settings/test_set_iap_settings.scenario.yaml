@@ -1,0 +1,52 @@
+title: Test set IAP settings
+release_tracks: [BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      iap settings set setting.json --resource-type=compute --project=cloud-gatekeeper-staging
+  - stdout: |
+      status: ok
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1
+- write_file:
+    path: setting.json
+    contents: |
+      {
+       "access_settings":{
+             "oauth_settings":{
+                  "login_hint":{
+                     "value":"test"
+                  }
+             }
+         }
+       }
+- execute_command:
+    command: |
+      iap settings set setting.json --resource-type=compute --project=cloud-gatekeeper-staging
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iap.googleapis.com/$$api-version$$/projects/cloud-gatekeeper-staging/iap_web/compute:iapSettings?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              access_settings:
+                oauth_settings:
+                  login_hint:
+                    value: test
+              name: projects/cloud-gatekeeper-staging/iap_web/compute
+        return_response:
+          headers:
+            status: '200'
+          body:
+            status: ok
+    - expect_stdout: |
+        status: ok
+    - expect_exit:
+        code: 0

@@ -78,8 +78,9 @@ or trailing slashes. If the DESTINATION does not exist, it will be created.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -120,7 +121,7 @@ gs://the\-bucket
 The following command:
 
 .RS 2m
-gcloud composer environments storage data import myenv \-\-source /foo
+gcloud composer environments storage data import myenv \-\-source=/foo
 .RE
 
 would result in the following structure in \f5myenv\fR's Cloud Storage bucket:
@@ -147,7 +148,7 @@ gs://the\-bucket
 If instead we had run
 
 .RS 2m
-gcloud composer environments storage data import myenv \-\-source /foo \-\-destination bar
+gcloud composer environments storage data import myenv \-\-source=/foo \-\-destination=bar
 .RE
 
 the resulting bucket structure would be the following:

@@ -26,6 +26,7 @@ class UrlMapsSetDefaultServiceTest(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi('v1')
+    self._api = ''
     self._url_maps_api = self.compute_v1.urlMaps
     self._backend_buckets_uri_prefix = (
         self.compute_uri + '/projects/my-project/global/backendBuckets/')
@@ -36,7 +37,7 @@ class UrlMapsSetDefaultServiceTest(test_base.BaseTest):
         defaultService=self._backend_buckets_uri_prefix + 'default-bucket',)
 
   def RunSetDefaultService(self, command):
-    self.Run('compute url-maps set-default-service ' + command)
+    self.Run(self._api + ' compute url-maps set-default-service ' + command)
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([[self._url_map], [],])
@@ -74,11 +75,8 @@ class UrlMapsSetDefaultServiceTest(test_base.BaseTest):
                                                  project='my-project'))],
         )
 
-    warning_msg = ('WARNING: The url-maps set-default-service command will '
-                   'soon require either a --global or --region flag.\n'
-                  ) if self.api == 'v1' else ''
     self.AssertErrEquals(
-        warning_msg + 'No change requested; skipping update for [url-map-1].\n',
+        'No change requested; skipping update for [url-map-1].\n',
         normalize_space=True)
 
   def testSimpleBackendBucketCase(self):
@@ -130,6 +128,7 @@ class UrlMapsSetDefaultServiceBetaTest(UrlMapsSetDefaultServiceTest):
 
   def SetUp(self):
     self.SelectApi('beta')
+    self._api = 'beta'
     self._url_maps_api = self.compute_beta.urlMaps
     self._backend_buckets_uri_prefix = (
         self.compute_uri + '/projects/my-project/global/backendBuckets/')
@@ -140,14 +139,12 @@ class UrlMapsSetDefaultServiceBetaTest(UrlMapsSetDefaultServiceTest):
         defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
     )
 
-  def RunSetDefaultService(self, command):
-    self.Run('beta compute url-maps set-default-service --global ' + command)
-
 
 class UrlMapsSetDefaultServiceAlphaTest(UrlMapsSetDefaultServiceTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
+    self._api = 'alpha'
     self._url_maps_api = self.compute_alpha.urlMaps
     self._backend_buckets_uri_prefix = (
         self.compute_uri + '/projects/my-project/global/backendBuckets/')
@@ -157,15 +154,13 @@ class UrlMapsSetDefaultServiceAlphaTest(UrlMapsSetDefaultServiceTest):
         name='url-map-1',
         defaultService=self._backend_buckets_uri_prefix + 'default-bucket',)
 
-  def RunSetDefaultService(self, command):
-    self.Run('alpha compute url-maps set-default-service --global' + command)
 
-
-class RegionUrlMapsSetDefaultServiceBetaTest(test_base.BaseTest):
+class RegionUrlMapsSetDefaultServiceTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self._url_maps_api = self.compute_beta.regionUrlMaps
+    self.SelectApi('v1')
+    self._api = ''
+    self._url_maps_api = self.compute_v1.regionUrlMaps
     self._backend_buckets_uri_prefix = (
         self.compute_uri + '/projects/my-project/global/backendBuckets/')
     self._backend_services_uri_prefix = (
@@ -177,7 +172,8 @@ class RegionUrlMapsSetDefaultServiceBetaTest(test_base.BaseTest):
     )
 
   def RunSetDefaultService(self, command):
-    self.Run('beta compute url-maps set-default-service --region us-west-1' +
+    self.Run(self._api +
+             ' compute url-maps set-default-service --region us-west-1' +
              command)
 
   def _MakeExpectedUrlMapGetRequest(self):
@@ -273,12 +269,13 @@ class RegionUrlMapsSetDefaultServiceBetaTest(test_base.BaseTest):
     self.CheckRequests()
 
 
-class RegionUrlMapsSetDefaultServiceAlphaTest(
-    RegionUrlMapsSetDefaultServiceBetaTest):
+class RegionUrlMapsSetDefaultServiceBetaTest(RegionUrlMapsSetDefaultServiceTest
+                                            ):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self._url_maps_api = self.compute_alpha.regionUrlMaps
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._url_maps_api = self.compute_beta.regionUrlMaps
     self._backend_buckets_uri_prefix = (
         self.compute_uri + '/projects/my-project/global/backendBuckets/')
     self._backend_services_uri_prefix = (
@@ -289,9 +286,23 @@ class RegionUrlMapsSetDefaultServiceAlphaTest(
         defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
     )
 
-  def RunSetDefaultService(self, command):
-    self.Run('alpha compute url-maps set-default-service --region us-west-1' +
-             command)
+
+class RegionUrlMapsSetDefaultServiceAlphaTest(
+    RegionUrlMapsSetDefaultServiceBetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._api = 'alpha'
+    self._url_maps_api = self.compute_alpha.regionUrlMaps
+    self._backend_buckets_uri_prefix = (
+        self.compute_uri + '/projects/my-project/global/backendBuckets/')
+    self._backend_services_uri_prefix = (
+        self.compute_uri + '/projects/my-project/regions/us-west-1/'
+        'backendServices/')
+    self._url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
+    )
 
 
 if __name__ == '__main__':

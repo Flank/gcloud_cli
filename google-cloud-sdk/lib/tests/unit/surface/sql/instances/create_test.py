@@ -21,9 +21,11 @@ from __future__ import unicode_literals
 import argparse
 import getpass
 
+from googlecloudsdk.api_lib.sql import exceptions as sql_exceptions
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import files
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.sql import base
@@ -49,30 +51,223 @@ create-instance1 MYSQL_5_7        us-central db-n1-standard-1 0.0.0.0         - 
 """,
         normalize_space=True)
 
-    # TODO(b/122660263): Remove when V1 instances are no longer supported.
-    # Check that no V1 warning is logged.
-    self.AssertErrNotContains(
-        'First Generation instances will be automatically upgraded '
-        'to Second Generation')
+  # LINT.IfChange(version_tests)
+  def testCreateMySql56(self):
+    diff = {
+        'name':
+            'instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_6,
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance1 --database-version=MYSQL_5_6')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance1 MYSQL_5_6        us-central db-n1-standard-1 0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreateMySql57(self):
+    diff = {
+        'name':
+            'instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance1 --database-version=MYSQL_5_7')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance1 MYSQL_5_7        us-central db-n1-standard-1 0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreatePostgres96(self):
+    diff = {
+        'name':
+            'instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_9_6,
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance1 --database-version=POSTGRES_9_6')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance1 POSTGRES_9_6      us-central db-n1-standard-1 0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreatePostgres10(self):
+    diff = {
+        'name':
+            'instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_10,
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance1 --database-version=POSTGRES_10')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance1 POSTGRES_10      us-central db-n1-standard-1 0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreatePostgres11(self):
+    diff = {
+        'name':
+            'instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_11,
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance1 --database-version=POSTGRES_11')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance1 POSTGRES_11      us-central db-n1-standard-1 0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreateSqlServer2017Express(self):
+    diff = {
+        'name':
+            'instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .SQLSERVER_2017_EXPRESS,
+        'rootPassword':
+            'password',
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance1 '
+             '--database-version=SQLSERVER_2017_EXPRESS '
+             '--root-password=password')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance1 SQLSERVER_2017_EXPRESS   us-central db-n1-standard-1 0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreateSqlServer2017Web(self):
+    diff = {
+        'name':
+            'instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .SQLSERVER_2017_WEB,
+        'rootPassword':
+            'password',
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance1 '
+             '--database-version=SQLSERVER_2017_WEB '
+             '--root-password=password')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance1 SQLSERVER_2017_WEB   us-central db-n1-standard-1 0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreateSqlServer2017Standard(self):
+    diff = {
+        'name':
+            'instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .SQLSERVER_2017_STANDARD,
+        'rootPassword':
+            'password',
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance1 '
+             '--database-version=SQLSERVER_2017_STANDARD '
+             '--root-password=password')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance1 SQLSERVER_2017_STANDARD   us-central db-n1-standard-1 0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreateSqlServer2017Enterprise(self):
+    diff = {
+        'name':
+            'instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .SQLSERVER_2017_ENTERPRISE,
+        'rootPassword':
+            'password',
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance1 '
+             '--database-version=SQLSERVER_2017_ENTERPRISE '
+             '--root-password=password')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION LOCATION   TIER             PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance1 SQLSERVER_2017_ENTERPRISE   us-central db-n1-standard-1 0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+  # LINT.ThenChange(:ga_version_test)
 
   def testCreateActivationPolicy(self):
     diff = {
         'name': 'create-instance1',
         'settings': {
-            'tier': 'D1',
-            'activationPolicy': 'ON_DEMAND'
+            'tier':
+                'db-n1-standard-1',
+            'activationPolicy':
+                self.messages.Settings.ActivationPolicyValueValuesEnum.ON_DEMAND
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
     self.Run('sql instances create create-instance1 --activation-policy '
-             'ON_DEMAND --tier=D1')
-    # pylint:disable=line-too-long
+             'ON_DEMAND --tier=db-n1-standard-1')
     self.AssertOutputContains(
         """\
-NAME              DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
-create-instance1  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
+NAME DATABASE_VERSION LOCATION TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+create-instance1 MYSQL_5_7 us-central db-n1-standard-1 0.0.0.0 - RUNNABLE
 """,
         normalize_space=True)
 
@@ -80,23 +275,24 @@ create-instance1  MYSQL_5_7         us-central  D1    -               -         
     diff = {
         'name': 'create-instance1',
         'settings': {
-            'tier': 'D1'
+            'tier': 'db-n1-standard-1'
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.Run('sql instances create create-instance1 --async --tier=D1')
+    self.Run('sql instances create create-instance1 --async '
+             '--tier=db-n1-standard-1')
     self.AssertOutputContains("""\
 endTime: '2014-08-12T19:39:26.601000+00:00'
 insertTime: '2014-08-12T19:38:39.415000+00:00'
 kind: sql#operation
 name: 344acb84-0000-1111-2222-1e71c6077b34
 operationType: CREATE
-selfLink: https://www.googleapis.com/sql/v1beta4/projects/fake-project/operations/sample
+selfLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/fake-project/operations/sample
 startTime: '2014-08-12T19:38:39.525000+00:00'
 status: DONE
 targetId: create-instance1
-targetLink: https://www.googleapis.com/sql/v1beta4/projects/fake-project
+targetLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/fake-project
 targetProject: fake-project
 user: test@sample.gserviceaccount.com
 """)
@@ -122,19 +318,18 @@ user: test@sample.gserviceaccount.com
                     startTime='23:00',
                 ),
             'tier':
-                'D1'
+                'db-n1-standard-1'
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
     self.Run('sql instances create clone-instance-7 --enable-bin-log '
-             '--backup-start-time=23:00 --tier=D1')
-    # pylint:disable=line-too-long
+             '--backup-start-time=23:00 --tier=db-n1-standard-1')
     self.AssertOutputContains(
         """\
-NAME              DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
-clone-instance-7  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
+NAME DATABASE_VERSION LOCATION TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+clone-instance-7 MYSQL_5_7 us-central db-n1-standard-1 0.0.0.0 - RUNNABLE
 """,
         normalize_space=True)
 
@@ -150,19 +345,18 @@ clone-instance-7  MYSQL_5_7         us-central  D1    -               -         
                     startTime='00:00',
                 ),
             'tier':
-                'D1'
+                'db-n1-standard-1'
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
     self.Run('sql instances create clone-instance-7 --enable-bin-log '
-             '--backup --tier=D1')
-    # pylint:disable=line-too-long
+             '--backup --tier=db-n1-standard-1')
     self.AssertOutputContains(
         """\
-NAME              DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
-clone-instance-7  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
+NAME DATABASE_VERSION LOCATION TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+clone-instance-7 MYSQL_5_7 us-central db-n1-standard-1 0.0.0.0 - RUNNABLE
 """,
         normalize_space=True)
 
@@ -178,45 +372,131 @@ clone-instance-7  MYSQL_5_7         us-central  D1    -               -         
                     startTime='00:00',
                 ),
             'tier':
-                'D1'
+                'db-n1-standard-1'
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
 
-    self.Run('sql instances create backupless-instance1 --no-backup --tier=D1')
-    # pylint:disable=line-too-long
+    self.Run('sql instances create backupless-instance1 --no-backup '
+             '--tier=db-n1-standard-1')
     self.AssertOutputContains(
         """\
-NAME                  DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
-backupless-instance1  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
+NAME DATABASE_VERSION LOCATION TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+backupless-instance1 MYSQL_5_7 us-central db-n1-standard-1 0.0.0.0 - RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreateBackupStartTime(self):
+    diff = {
+        'name': 'instance-1',
+        'settings': {
+            'backupConfiguration':
+                self.messages.BackupConfiguration(
+                    kind='sql#backupConfiguration',
+                    enabled=True,
+                    startTime='23:00',
+                ),
+        },
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance-1 --backup-start-time=23:00')
+    self.AssertOutputContains(
+        """\
+NAME DATABASE_VERSION LOCATION TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance-1 MYSQL_5_7 us-central db-n1-standard-1 0.0.0.0 - RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreateBackupLocation(self):
+    diff = {
+        'name': 'instance-1',
+        'settings': {
+            'backupConfiguration':
+                self.messages.BackupConfiguration(
+                    kind='sql#backupConfiguration',
+                    enabled=True,
+                    location='us',
+                    startTime='00:00',
+                ),
+        },
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance-1 --backup-location=us')
+    self.AssertOutputContains(
+        """\
+NAME DATABASE_VERSION LOCATION TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance-1 MYSQL_5_7 us-central db-n1-standard-1 0.0.0.0 - RUNNABLE
+""",
+        normalize_space=True)
+
+  def testCreateBackupSettings(self):
+    diff = {
+        'name': 'instance-1',
+        'settings': {
+            'backupConfiguration':
+                self.messages.BackupConfiguration(
+                    kind='sql#backupConfiguration',
+                    enabled=True,
+                    location='us',
+                    startTime='23:00',
+                ),
+        },
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances create instance-1 --backup-start-time=23:00 '
+             '--backup-location=us')
+    self.AssertOutputContains(
+        """\
+NAME DATABASE_VERSION LOCATION TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+instance-1 MYSQL_5_7 us-central db-n1-standard-1 0.0.0.0 - RUNNABLE
 """,
         normalize_space=True)
 
   def testCreateReadReplica(self):
     # This test ensures that the replica adopts the db version, tier, and
-    # region get automatically copied from the master to the replica without
-    # specifying.
+    # region from the master to the replica without being specified.
 
     master_diff = {
-        'name': 'create-instance1',
+        'name':
+            'create-instance1',
         'settings': {
-            'tier': 'db-n1-standard-2',
-            'replicationType': 'ASYNCHRONOUS'
+            'tier':
+                'db-n1-standard-2',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS
         },
-        'databaseVersion': 'MYSQL_5_7',
-        'region': 'us-west1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'region':
+            'us-west1',
     }
     replica_diff = {
-        'name': 'create-replica1',
+        'name':
+            'create-replica1',
         'settings': {
-            'tier': 'db-n1-standard-2',
-            'replicationType': 'ASYNCHRONOUS',
+            'tier':
+                'db-n1-standard-2',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
         },
-        'databaseVersion': 'MYSQL_5_7',
-        'region': 'us-west1',
-        'masterInstanceName': 'create-instance1'
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'region':
+            'us-west1',
+        'masterInstanceName':
+            'create-instance1'
     }
     self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
@@ -232,34 +512,106 @@ NAME             DATABASE_VERSION  LOCATION TIER              PRIMARY_ADDRESS PR
 create-replica1  MYSQL_5_7         us-west1 db-n1-standard-2  0.0.0.0         -               RUNNABLE
 """,
         normalize_space=True)
-    # Ensure that the CMEK message doesn't show up by default.
-    self.AssertErrNotContains(
-        'Your replica will be encrypted with the master instance\'s '
-        'customer-managed encryption key. If anyone destroys this key, all '
-        'data encrypted with it will be permanently lost.')
+    # Ensure that the CMEK messaging doesn't show up by default.
+    self.AssertErrNotContains('customer-managed encryption key')
+
+  def testCreateCrossRegionReplica(self):
+    # This test ensures that the replica adopts the db version, tier gets
+    # automatically copied from the master to the replica without being
+    # specified, but that region is overriden.
+
+    master_diff = {
+        'name': 'create-instance1',
+        'settings': {
+            'tier': 'db-n1-standard-2',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
+        },
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'region': 'us-west1',
+    }
+    replica_diff = {
+        'name': 'create-replica1',
+        'settings': {
+            'tier': 'db-n1-standard-2',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
+        },
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'region': 'us-east1',
+        'masterInstanceName': 'create-instance1',
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
+
+    self.Run('sql instances create create-replica1 --master-instance-name '
+             'create-instance1 --region=us-east1')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION  LOCATION TIER              PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+create-replica1  MYSQL_5_7         us-east1 db-n1-standard-2  0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+    # Ensure that the CMEK messaging doesn't show up by default.
+    self.AssertErrNotContains('customer-managed encryption key')
+
+  def testCreateReadReplicaV1(self):
+    # This test ensures that the creating a V1 read replica fails now that
+    # they've been deprecated.
+
+    self.ExpectInstanceGet(self.GetV1Instance('create-instance1'))
+    with self.AssertRaisesExceptionRegexp(
+        sql_exceptions.ArgumentError,
+        r'First Generation instances can no longer be created\.'):
+      self.Run('sql instances create create-replica1 --master-instance-name '
+               'create-instance1')
 
   def testCreateReadReplicaOverridingTier(self):
     # This test ensures that the user is able to specify a tier different than
     # the tier of the master.
 
     master_diff = {
-        'name': 'create-instance1',
+        'name':
+            'create-instance1',
         'settings': {
-            'tier': 'db-n1-standard-2',
-            'replicationType': 'ASYNCHRONOUS'
+            'tier':
+                'db-n1-standard-2',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
         },
-        'databaseVersion': 'MYSQL_5_7',
-        'region': 'us-west1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'region':
+            'us-west1',
     }
     replica_diff = {
-        'name': 'create-replica1',
+        'name':
+            'create-replica1',
         'settings': {
-            'tier': 'db-n1-standard-4',
-            'replicationType': 'ASYNCHRONOUS',
+            'tier':
+                'db-n1-standard-4',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
         },
-        'databaseVersion': 'MYSQL_5_7',
-        'region': 'us-west1',
-        'masterInstanceName': 'create-instance1'
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'region':
+            'us-west1',
+        'masterInstanceName':
+            'create-instance1',
     }
     self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
@@ -279,25 +631,37 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0         - 
   def testCreateReadReplicaWithCmek(self):
     # This test ensures that a warning shows up when a replica of a instance
     # with a customer-managed encryption key is being created.
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
 
     master_diff = {
         'name':
             'create-instance1',
         'diskEncryptionConfiguration':
-            self.messages.DiskEncryptionConfiguration(kmsKeyName='some-key'),
+            self.messages.DiskEncryptionConfiguration(
+                kind='sql#diskEncryptionConfiguration', kmsKeyName='some-key'),
         'settings': {
-            'replicationType': 'ASYNCHRONOUS'
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS
         },
         'databaseVersion':
-            'MYSQL_5_7',
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
     }
     replica_diff = {
-        'name': 'create-replica1',
+        'name':
+            'create-replica1',
         'settings': {
-            'replicationType': 'ASYNCHRONOUS',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
         },
-        'databaseVersion': 'MYSQL_5_7',
-        'masterInstanceName': 'create-instance1'
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'masterInstanceName':
+            'create-instance1'
     }
     self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
     self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
@@ -306,11 +670,117 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0         - 
 
     self.Run('sql instances create create-replica1 --master-instance-name '
              'create-instance1')
-    # Ensure that the CMEK message is showing up.
+    # Check that the CMEK warning was displayed.
+    self.assertEqual(prompt_mock.call_count, 0)
     self.AssertErrContains(
         'Your replica will be encrypted with the master instance\'s '
         'customer-managed encryption key. If anyone destroys this key, all '
         'data encrypted with it will be permanently lost.')
+
+  def testCreateCrossRegionReplicaWithCmek(self):
+    # This test ensures that the create warning shows up when a replica of an
+    # instance with a customer-managed encryption key is being created,
+    # instead of the message indicating that the key will be inherited from
+    # the master instance.
+    key = 'projects/example/locations/us-east1/keyRings/somekey/cryptoKeys/a'
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+
+    master_diff = {
+        'name': 'create-instance1',
+        'diskEncryptionConfiguration':
+            self.messages.DiskEncryptionConfiguration(
+                kind='sql#diskEncryptionConfiguration', kmsKeyName='some-key'),
+        'settings': {
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
+        },
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+    }
+    replica_diff = {
+        'name': 'create-replica1',
+        'region': 'us-east1',
+        'diskEncryptionConfiguration':
+            self.messages.DiskEncryptionConfiguration(
+                kind='sql#diskEncryptionConfiguration', kmsKeyName=key),
+        'settings': {
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
+        },
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'masterInstanceName': 'create-instance1',
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
+
+    self.Run(
+        'sql instances create create-replica1 --master-instance-name '
+        'create-instance1 --region us-east1 --disk-encryption-key="{}"'.format(
+            key))
+    # Check that the CMEK warning was displayed.
+    self.assertEqual(prompt_mock.call_count, 0)
+    self.AssertErrContains(
+        'Your replica will be encrypted with a customer-managed key. If anyone '
+        'destroys this key, all data encrypted with it will be permanently '
+        'lost.')
+
+  def testCreateCrossRegionReplicaMissingCmek(self):
+    # This test ensures that the a disk encryption key has been provided when
+    # creating a cross-region replica of a CMEK instance.
+    master_diff = {
+        'name': 'create-instance1',
+        'diskEncryptionConfiguration':
+            self.messages.DiskEncryptionConfiguration(
+                kind='sql#diskEncryptionConfiguration', kmsKeyName='some-key'),
+        'settings': {
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
+        },
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    with self.AssertRaisesExceptionRegexp(exceptions.RequiredArgumentException,
+                                          r'Missing required argument '
+                                          r'\[--disk-encryption-key\]'):
+      self.Run(
+          'sql instances create create-replica1 --master-instance-name '
+          'create-instance1 --region us-east1')
+
+  def testCreateCrossRegionReplicaExtraneousCmek(self):
+    # This test ensures that the a disk encryption key has not been provided
+    # when creating a cross-region replica of a non-CMEK instance.
+    key = 'projects/example/locations/us-east1/keyRings/somekey/cryptoKeys/a'
+    master_diff = {
+        'name':
+            'create-instance1',
+        'settings': {
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
+        },
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    with self.AssertRaisesExceptionRegexp(
+        sql_exceptions.ArgumentError,
+        r'`--disk-encryption-key` cannot be specified when creating a replica '
+        'of an instance without customer-managed encryption.'):
+      self.Run('sql instances create create-replica1 --master-instance-name '
+               'create-instance1 --region us-east1 --disk-encryption-key="{}"'
+               .format(key))
 
   def testCreateNoMaster(self):
     self.mocked_client.instances.Get.Expect(
@@ -337,7 +807,8 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0         - 
                 self.messages.MaintenanceWindow(
                     day=1,
                     hour=5,
-                    updateTrack='canary',
+                    updateTrack=self.messages.MaintenanceWindow
+                    .UpdateTrackValueValuesEnum.canary,
                     kind='sql#maintenanceWindow'),
             'tier':
                 'db-n1-standard-1'
@@ -368,27 +839,29 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0         - 
                     ipv4Enabled=None,
                     requireSsl=None),
             'tier':
-                'D1'
+                'db-n1-standard-1'
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
 
     self.Run('sql instances create create-instance1 '
-             '--authorized-networks=10.10.10.1/16 --tier=D1')
-    # pylint:disable=line-too-long
+             '--authorized-networks=10.10.10.1/16 --tier=db-n1-standard-1')
     self.AssertOutputContains(
         """\
-NAME              DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
-create-instance1  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
+NAME DATABASE_VERSION LOCATION TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+create-instance1 MYSQL_5_7 us-central db-n1-standard-1 0.0.0.0 - RUNNABLE
 """,
         normalize_space=True)
 
   def testCreateCustomMachine(self):
     diff = {
-        'name': 'custom-instance1',
-        'databaseVersion': 'POSTGRES_9_6',
+        'name':
+            'custom-instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_9_6,
         'settings': {
             'tier': 'db-custom-1-1024'
         }
@@ -430,10 +903,12 @@ custom-instance1 POSTGRES_9_6     us-central db-custom-1-1024 0.0.0.0         - 
                 ipConfiguration=None,
                 kind='sql#settings',
                 locationPreference=None,
-                pricingPlan='PER_USE',
-                replicationType='SYNCHRONOUS',
+                pricingPlan=self.messages.Settings.PricingPlanValueValuesEnum
+                .PER_USE,
+                replicationType=self.messages.Settings
+                .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
                 settingsVersion=None,
-                tier='D1',
+                tier='db-n1-standard-1',
             ),
             state=None,
         ),
@@ -447,14 +922,9 @@ custom-instance1 POSTGRES_9_6     us-central db-custom-1-1024 0.0.0.0         - 
                                               'because the project or creator '
                                               'has reached the max instance '
                                               'per project/creator limit.'):
-      self.Run('sql instances create create-instance1 --tier=D1')
+      self.Run('sql instances create create-instance1 --tier=db-n1-standard-1')
 
     self.AssertErrNotContains('already exists')
-
-  def testCreateConfirmsCancel(self):
-    self.WriteInput('n\n')
-    with self.assertRaises(console_io.OperationCancelledError):
-      self.Run('sql instances create custom-instance --pricing-plan=PACKAGE')
 
   def testInvalidInstanceName(self):
     with self.AssertRaisesArgumentErrorRegexp('Bad value'):
@@ -480,19 +950,6 @@ tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -  
 """,
         normalize_space=True)
 
-  def testCreateWithGaeApps(self):
-    diff = {
-        'name': 'create-instance',
-        'settings': {
-            'authorizedGaeApplications': ['00c61b117c180a15eb9c4cb9986']
-        }
-    }
-    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
-    self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetV2Instance(), diff)
-    self.Run('sql instances create create-instance '
-             '--authorized-gae-apps 00c61b117c180a15eb9c4cb9986')
-
   def testCreateWithRegion(self):
     updated_fields = {'name': 'created-instance', 'region': 'europe-west1'}
     self.ExpectInstanceInsert(self.GetRequestInstance(), updated_fields)
@@ -509,7 +966,8 @@ tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -  
         'region': 'europe-west1',
         'settings': {
             'locationPreference':
-                self.messages.LocationPreference(zone='europe-west1-b')
+                self.messages.LocationPreference(
+                    kind='sql#locationPreference', zone='europe-west1-b')
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), updated_fields)
@@ -526,7 +984,8 @@ tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -  
         'region': 'europe-west1',
         'settings': {
             'locationPreference':
-                self.messages.LocationPreference(zone='europe-west1-b')
+                self.messages.LocationPreference(
+                    kind='sql#locationPreference', zone='europe-west1-b')
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), updated_fields)
@@ -550,11 +1009,16 @@ tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -  
 
   def testCreateHighAvailabilityInstance(self):
     diff = {
-        'name': 'custom-instance1',
-        'databaseVersion': 'POSTGRES_9_6',
+        'name':
+            'custom-instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_9_6,
         'settings': {
-            'availabilityType': 'REGIONAL',
-            'tier': 'db-custom-1-1024'
+            'availabilityType':
+                self.messages.Settings.AvailabilityTypeValueValuesEnum.REGIONAL,
+            'tier':
+                'db-custom-1-1024'
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
@@ -565,26 +1029,11 @@ tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -  
              '--database-version=POSTGRES_9_6 --memory=1024MiB --cpu=1 '
              '--availability-type=REGIONAL')
 
-  # TODO(b/122660263): Remove when V1 instances are no longer supported.
-  def testV1WarningAndPrompt(self):
-    # Mock the prompt to continue creating a V1 instance.
-    prompt_mock = self.StartObjectPatch(
-        console_io, 'PromptContinue', return_value=True)
-    diff = {'name': 'create-instance1', 'settings': {'tier': 'D1',}}
-    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
-    self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetV1Instance(), diff)
-
-    # Create V1 instance.
-    self.Run('sql instances create create-instance1 --tier=D1')
-
-    # Check that a V1 warning is logged.
-    self.AssertErrContains(
-        'First Generation instances will be automatically upgraded '
-        'to Second Generation')
-
-    # Check that the V1 prompt to continue was called.
-    self.assertEqual(prompt_mock.call_count, 1)
+  def testCreateV1Exception(self):
+    with self.AssertRaisesExceptionRegexp(
+        sql_exceptions.ArgumentError,
+        r'First Generation instances can no longer be created\.'):
+      self.Run('sql instances create create-instance1 --tier=D1')
 
   def testCreateWithRootPassword(self):
     diff = {
@@ -596,9 +1045,27 @@ tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -  
     self.ExpectInstanceGet(self.GetExternalMasterInstance(), diff)
     self.Run('sql instances create some-instance --root-password=somepassword')
 
+  def testCreateSqlServerWithoutRootPassword(self):
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.RequiredArgumentException, r'Missing required argument '
+        r'\[--root-password\]'):
+      self.Run('sql instances create some-instance '
+               '--database-version=SQLSERVER_2017_STANDARD')
+
 
 class InstancesCreateGATest(_BaseInstancesCreateTest, base.SqlMockTestGA):
-  pass
+
+  # LINT.IfChange(ga_version_test)
+  def testCreateUnknownVersion(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run('sql instances create instance1 --database-version=UNKNOWN')
+      self.AssertErrContains(
+          "argument --database-version: Invalid choice: 'UNKNOWN'.")
+      self.AssertErrContains(
+          'Valid choices are [MYSQL_5_5, MYSQL_5_6, MYSQL_5_7, POSTGRES_11, '
+          'POSTGRES_9_6, SQLSERVER_2017_ENTERPRISE, SQLSERVER_2017_EXPRESS, '
+          'SQLSERVER_2017_STANDARD, SQLSERVER_2017_WEB].')
+  # LINT.ThenChange(:version_tests)
 
 
 class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
@@ -683,7 +1150,8 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
         'name':
             'xm-instance',
         'onPremisesConfiguration':
-            self.messages.OnPremisesConfiguration(hostPort='127.0.0.1:3306')
+            self.messages.OnPremisesConfiguration(
+                kind='sql#onPremisesConfiguration', hostPort='127.0.0.1:3306')
     }
     self.ExpectInstanceInsert(self.GetExternalMasterRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
@@ -696,7 +1164,8 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
         'name':
             'xm-instance',
         'onPremisesConfiguration':
-            self.messages.OnPremisesConfiguration(hostPort='127.0.0.1:8080')
+            self.messages.OnPremisesConfiguration(
+                kind='sql#onPremisesConfiguration', hostPort='127.0.0.1:8080')
     }
     self.ExpectInstanceInsert(self.GetExternalMasterRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
@@ -706,26 +1175,35 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
 
   def testCreateExternalMasterReplicaWithoutSSL(self):
     master_diff = {
-        'name': 'xm-instance',
-        'databaseVersion': 'MYSQL_5_7',
-        'region': 'us-west1',
+        'name':
+            'xm-instance',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'region':
+            'us-west1',
     }
     replica_diff = {
         'name':
             'xm-instance-replica',
         'settings': {
-            'replicationType': 'ASYNCHRONOUS',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
         },
         'databaseVersion':
-            'MYSQL_5_7',
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
         'region':
             'us-west1',
         'masterInstanceName':
             'xm-instance',
         'replicaConfiguration':
             self.messages.ReplicaConfiguration(
-                mysqlReplicaConfiguration=self.messages.
-                MySqlReplicaConfiguration(
+                kind='sql#demoteMasterMysqlReplicaConfiguration',
+                mysqlReplicaConfiguration=self.messages
+                .MySqlReplicaConfiguration(
+                    kind='sql#mysqlReplicaConfiguration',
                     username='root',
                     password='somepword',
                     dumpFilePath='gs://xm-bucket/dumpfile.sql'))
@@ -743,26 +1221,35 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
     # The password prompt flag should cause getpass to get called.
     self.StartObjectPatch(getpass, 'getpass', return_value='somepword')
     master_diff = {
-        'name': 'xm-instance',
-        'databaseVersion': 'MYSQL_5_7',
-        'region': 'us-west1',
+        'name':
+            'xm-instance',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'region':
+            'us-west1',
     }
     replica_diff = {
         'name':
             'xm-instance-replica',
         'settings': {
-            'replicationType': 'ASYNCHRONOUS',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
         },
         'databaseVersion':
-            'MYSQL_5_7',
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
         'region':
             'us-west1',
         'masterInstanceName':
             'xm-instance',
         'replicaConfiguration':
             self.messages.ReplicaConfiguration(
-                mysqlReplicaConfiguration=self.messages.
-                MySqlReplicaConfiguration(
+                kind='sql#demoteMasterMysqlReplicaConfiguration',
+                mysqlReplicaConfiguration=self.messages
+                .MySqlReplicaConfiguration(
+                    kind='sql#mysqlReplicaConfiguration',
                     username='root',
                     password='somepword',
                     dumpFilePath='gs://xm-bucket/dumpfile.sql'))
@@ -781,26 +1268,35 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
     read_file_mock = self.StartObjectPatch(
         files, 'ReadFileContents', return_value='file_data')
     master_diff = {
-        'name': 'xm-instance',
-        'databaseVersion': 'MYSQL_5_7',
-        'region': 'us-west1',
+        'name':
+            'xm-instance',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'region':
+            'us-west1',
     }
     replica_diff = {
         'name':
             'xm-instance-replica',
         'settings': {
-            'replicationType': 'ASYNCHRONOUS',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
         },
         'databaseVersion':
-            'MYSQL_5_7',
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
         'region':
             'us-west1',
         'masterInstanceName':
             'xm-instance',
         'replicaConfiguration':
             self.messages.ReplicaConfiguration(
-                mysqlReplicaConfiguration=self.messages.
-                MySqlReplicaConfiguration(
+                kind='sql#demoteMasterMysqlReplicaConfiguration',
+                mysqlReplicaConfiguration=self.messages
+                .MySqlReplicaConfiguration(
+                    kind='sql#mysqlReplicaConfiguration',
                     username='root',
                     password='somepword',
                     dumpFilePath='gs://xm-bucket/dumpfile.sql',
@@ -825,26 +1321,35 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
     read_file_mock = self.StartObjectPatch(
         files, 'ReadFileContents', return_value='file_data')
     master_diff = {
-        'name': 'xm-instance',
-        'databaseVersion': 'MYSQL_5_7',
-        'region': 'us-west1',
+        'name':
+            'xm-instance',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'region':
+            'us-west1',
     }
     replica_diff = {
         'name':
             'xm-instance-replica',
         'settings': {
-            'replicationType': 'ASYNCHRONOUS',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
         },
         'databaseVersion':
-            'MYSQL_5_7',
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
         'region':
             'us-west1',
         'masterInstanceName':
             'xm-instance',
         'replicaConfiguration':
             self.messages.ReplicaConfiguration(
-                mysqlReplicaConfiguration=self.messages.
-                MySqlReplicaConfiguration(
+                kind='sql#demoteMasterMysqlReplicaConfiguration',
+                mysqlReplicaConfiguration=self.messages
+                .MySqlReplicaConfiguration(
+                    kind='sql#mysqlReplicaConfiguration',
                     username='root',
                     password='somepword',
                     dumpFilePath='gs://xm-bucket/dumpfile.sql',
@@ -879,9 +1384,13 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
 
   def testCreateExternalMasterReplicaWithoutPassword(self):
     master_diff = {
-        'name': 'xm-instance',
-        'databaseVersion': 'MYSQL_5_7',
-        'region': 'us-west1',
+        'name':
+            'xm-instance',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .MYSQL_5_7,
+        'region':
+            'us-west1',
     }
     self.ExpectInstanceGet(self.GetExternalMasterInstance(), master_diff)
     with self.AssertRaisesExceptionRegexp(
@@ -906,29 +1415,21 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
                         'https://compute.googleapis.com/compute/v1/projects/'
                         'fake-project/global/networks/somenetwork')),
             'tier':
-                'D1'
+                'db-n1-standard-1'
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
 
     self.Run('sql instances create create-instance1 '
-             '--network=somenetwork --tier=D1')
-    # pylint:disable=line-too-long
+             '--network=somenetwork --tier=db-n1-standard-1')
     self.AssertOutputContains(
         """\
-NAME              DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
-create-instance1  MYSQL_5_7         us-central  D1    -               -               RUNNABLE
+NAME DATABASE_VERSION LOCATION TIER PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+create-instance1 MYSQL_5_7 us-central db-n1-standard-1 0.0.0.0 - RUNNABLE
 """,
         normalize_space=True)
-
-  def testCreateSqlServerWithoutRootPassword(self):
-    with self.AssertRaisesExceptionRegexp(
-        exceptions.RequiredArgumentException, r'Missing required argument '
-        r'\[--root-password\]'):
-      self.Run('sql instances create some-instance '
-               '--database-version=SQLSERVER_2017_STANDARD')
 
   def testCreateWithEncryptionKey(self):
     prompt_mock = self.StartObjectPatch(
@@ -943,11 +1444,12 @@ create-instance1  MYSQL_5_7         us-central  D1    -               -         
             'tier': 'db-n1-standard-1'
         },
         'diskEncryptionConfiguration':
-            self.messages.DiskEncryptionConfiguration(kmsKeyName=key)
+            self.messages.DiskEncryptionConfiguration(
+                kind='sql#diskEncryptionConfiguration', kmsKeyName=key)
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
 
     self.Run('sql instances create create-instance1 --region=us-central1 '
              '--disk-encryption-key="{}"'.format(key))
@@ -971,7 +1473,31 @@ class InstancesCreateBetaTest(_BaseInstancesCreateBetaTest,
 
 class InstancesCreateAlphaTest(_BaseInstancesCreateBetaTest,
                                base.SqlMockTestAlpha):
-  pass
+
+  def testCreatePostgresWithPointInTimeRecovery(self):
+    diff = {
+        'name':
+            'custom-instance1',
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_9_6,
+        'settings': {
+            'backupConfiguration':
+                self.messages.BackupConfiguration(
+                    pointInTimeRecoveryEnabled=True,
+                    enabled=True,
+                    kind='sql#backupConfiguration',
+                    startTime='00:00'),
+            'tier':
+                'db-custom-1-1024'
+        }
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
+    self.Run('sql instances create custom-instance1 '
+             '--database-version=POSTGRES_9_6 --memory=1024MiB --cpu=1 '
+             '--enable-point-in-time-recovery')
 
 
 if __name__ == '__main__':

@@ -11,14 +11,12 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
-
-     add-iam-policy-binding
-        (ALPHA) Add an IAM policy binding to a Cloud Data Catalog entry.
 
      create
         (ALPHA) Create a Cloud Data Catalog entry.
@@ -29,17 +27,11 @@ COMMANDS
      describe
         (ALPHA) Describe a Cloud Data Catalog entry.
 
-     get-iam-policy
-        (ALPHA) Get the IAM policy for a Cloud Data Catalog entry.
+     list
+        (ALPHA) List all entries in a Cloud Data Catalog entry group.
 
      lookup
         (ALPHA) Lookup a Cloud Data Catalog entry by its target name.
-
-     remove-iam-policy-binding
-        (ALPHA) Remove an IAM policy binding from a Cloud Data Catalog entry.
-
-     set-iam-policy
-        (ALPHA) Set the IAM policy for a Cloud Data Catalog entry.
 
      update
         (ALPHA) Update a Cloud Data Catalog entry.
@@ -48,7 +40,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud data-catalog entries
         $ gcloud beta data-catalog entries
 

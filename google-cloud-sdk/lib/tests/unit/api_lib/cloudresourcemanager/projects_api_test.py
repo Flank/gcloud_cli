@@ -69,6 +69,18 @@ class ProjectsApiTest(sdk_test_base.WithFakeAuth):
     results = [x for x in results_generator]
     self.assertEqual([test_project], results)
 
+  def testListFilterWithLifecycleState(self):
+    test_project = util.GetTestActiveProject()
+    self.mock_client.projects.List.Expect(
+        self.messages.CloudresourcemanagerProjectsListRequest(
+            pageSize=500,
+            filter='lifecycleState:DELETE_REQUESTED'),
+        self.messages.ListProjectsResponse(projects=[test_project]))
+    results_generator = projects_api.List(
+        filter='lifecycleState:DELETE_REQUESTED')
+    results = [x for x in results_generator]
+    self.assertEqual([test_project], results)
+
   def testGet(self):
     test_project = util.GetTestActiveProject()
     test_project_ref = command_lib_util.ParseProject(test_project.projectId)
@@ -168,6 +180,22 @@ class ProjectsApiTest(sdk_test_base.WithFakeAuth):
         exception=self.HttpError())
     with self.assertRaises(exceptions.HttpError):
       projects_api.Update(test_project_ref, name='new name')
+
+  def testTestIamPermissions(self):
+    requested_permissions = ['storage.buckets.create', 'storage.buckets.delete']
+    expected_permissions = ['storage.buckets.create']
+    test_project = util.GetTestActiveProject()
+    test_project_ref = command_lib_util.ParseProject(test_project.projectId)
+    self.mock_client.projects.TestIamPermissions.Expect(
+        self.messages.CloudresourcemanagerProjectsTestIamPermissionsRequest(
+            resource=test_project_ref.Name(),
+            testIamPermissionsRequest=self.messages.TestIamPermissionsRequest(
+                permissions=requested_permissions)),
+        self.messages.TestIamPermissionsResponse(
+            permissions=expected_permissions))
+    response = projects_api.TestIamPermissions(test_project_ref,
+                                               requested_permissions)
+    self.assertEqual(response.permissions, expected_permissions)
 
 
 if __name__ == '__main__':

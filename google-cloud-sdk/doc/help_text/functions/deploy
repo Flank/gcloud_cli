@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud functions deploy (NAME : --region=REGION) [--allow-unauthenticated]
-        [--entry-point=ENTRY_POINT] [--ignore-file=IGNORE_FILE]
+        [--egress-settings=EGRESS_SETTINGS] [--entry-point=ENTRY_POINT]
+        [--ignore-file=IGNORE_FILE] [--ingress-settings=INGRESS_SETTINGS]
         [--memory=MEMORY] [--retry] [--runtime=RUNTIME]
         [--service-account=SERVICE_ACCOUNT] [--source=SOURCE]
         [--stage-bucket=STAGE_BUCKET] [--timeout=TIMEOUT]
@@ -45,6 +46,11 @@ FLAGS
         If set, makes this a public function. This will allow all callers,
         without checking authentication.
 
+     --egress-settings=EGRESS_SETTINGS
+        Egress settings controls what traffic is diverted through the VPC
+        Access Connector resource. By default private-ranges-only will be used.
+        EGRESS_SETTINGS must be one of: private-ranges-only, all.
+
      --entry-point=ENTRY_POINT
         Name of a Google Cloud Function (as defined in source code) that will
         be executed. Defaults to the resource name suffix, if not specified.
@@ -55,6 +61,11 @@ FLAGS
 
      --ignore-file=IGNORE_FILE
         Override the .gcloudignore file and use the specified file instead.
+
+     --ingress-settings=INGRESS_SETTINGS
+        Ingress settings controls what traffic can reach the function.By
+        default all will be used. INGRESS_SETTINGS must be one of: all,
+        internal-only.
 
      --memory=MEMORY
         Limit on the amount of memory the function can use.
@@ -217,8 +228,10 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.Label keys starting with deployment are reserved for
-          use by deployment tools and cannot be specified manually.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.Label keys starting with deployment
+          are reserved for use by deployment tools and cannot be specified
+          manually.
 
      At most one of these may be specified:
 
@@ -279,8 +292,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     These variants are also available:

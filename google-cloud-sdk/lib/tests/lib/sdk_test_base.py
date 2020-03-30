@@ -53,6 +53,8 @@ from tests.lib import test_case
 from oauth2client import client
 from oauth2client.contrib import gce
 import six
+from google.auth.compute_engine import credentials as gce_google_auth
+from google.oauth2 import credentials
 
 
 def _DefaultStatusUpdate(result, unused_status):
@@ -605,7 +607,11 @@ class WithFakeAuth(SdkBase):
     """
     return 'user_agent'
 
-  def _FakeAuthCredential(self):
+  def _FakeAuthCredential(self, use_google_auth):
+    if use_google_auth:
+      return credentials.Credentials(self.FakeAuthAccessToken(),
+                                     'refresh_token', 'id_token', 'token_uri',
+                                     'client_id')
     return client.OAuth2Credentials(
         self.FakeAuthAccessToken(), 'client_id', 'client_secret',
         'refresh_token', self.FakeAuthExpiryTime(), 'token_uri',
@@ -618,7 +624,18 @@ class WithFakeAuth(SdkBase):
       present: bool, True to have credentials present, False for no credentials.
     """
     if present:
-      self._load_mock.return_value = self._FakeAuthCredential()
+      # pylint:disable=unused-argument
+      # This function must match the signature of store.Load.
+      def _FakeLoad(account=None,
+                    scopes=None,
+                    prevent_refresh=False,
+                    allow_account_impersonation=True,
+                    use_google_auth=False):
+        return self._FakeAuthCredential(use_google_auth)
+
+      # pylint:enable=unused-argument
+
+      self._load_mock.side_effect = _FakeLoad
     else:
       self._load_mock.side_effect = c_store.NoCredentialsForAccountException(
           self.FakeAuthAccount())
@@ -669,7 +686,11 @@ class WithFakeComputeAuth(SdkBase):
     """
     return 'fake-project'
 
-  def _FakeAuthCredential(self):
+  def _FakeAuthCredential(self, use_google_auth):
+    if use_google_auth:
+      cred = gce_google_auth.Credentials()
+      cred.token = self.FakeAuthAccessToken()
+      return cred
     cred = gce.AppAssertionCredentials([])
     cred.access_token = self.FakeAuthAccessToken()
     return cred
@@ -681,7 +702,18 @@ class WithFakeComputeAuth(SdkBase):
       present: bool, True to have credentials present, False for no credentials.
     """
     if present:
-      self._load_mock.return_value = self._FakeAuthCredential()
+      # pylint:disable=unused-argument
+      # This function must match the signature of store.Load.
+      def _FakeLoad(account=None,
+                    scopes=None,
+                    prevent_refresh=False,
+                    allow_account_impersonation=True,
+                    use_google_auth=False):
+        return self._FakeAuthCredential(use_google_auth)
+
+      # pylint:enable=unused-argument
+
+      self._load_mock.side_effect = _FakeLoad
     else:
       self._load_mock.side_effect = c_store.NoCredentialsForAccountException(
           self.FakeAuthAccount())
@@ -771,7 +803,8 @@ class BundledBase(SdkBase):
         env_with_pythonpaths, 'PYTHONPATH', os.pathsep.join(sys.path))
     return env_with_pythonpaths
 
-  def ExecuteScript(self, script_name, args, timeout=None, stdin=None,
+  @classmethod
+  def ExecuteScript(cls, script_name, args, timeout=None, stdin=None,
                     env=None, add_python_paths=True):
     """Execute the given wrapper script with the given args.
 
@@ -792,14 +825,15 @@ class BundledBase(SdkBase):
     """
     args = exec_utils.GetArgsForScript(script_name, args)
     if add_python_paths:
-      env = self._AddPythonPathsToEnv(env)
+      env = cls._AddPythonPathsToEnv(env)
     # pylint: disable=protected-access
     runner = exec_utils._ProcessRunner(
         args, timeout=timeout, stdin=stdin, env=env)
     runner.Run()
     return runner.result
 
-  def ExecuteLegacyScript(self, script_name, args, interpreter=None,
+  @classmethod
+  def ExecuteLegacyScript(cls, script_name, args, interpreter=None,
                           timeout=None, stdin=None, env=None,
                           add_python_paths=True):
     """Execute the given legacy script with the given args.
@@ -820,14 +854,15 @@ class BundledBase(SdkBase):
     args = exec_utils.GetArgsForLegacyScript(
         script_name, args, interpreter=interpreter)
     if add_python_paths:
-      env = self._AddPythonPathsToEnv(env)
+      env = cls._AddPythonPathsToEnv(env)
     # pylint: disable=protected-access
     runner = exec_utils._ProcessRunner(
         args, timeout=timeout, stdin=stdin, env=env)
     runner.Run()
     return runner.result
 
-  def ExecuteScriptAsync(self, script_name, args, match_strings=None,
+  @classmethod
+  def ExecuteScriptAsync(cls, script_name, args, match_strings=None,
                          timeout=None, stdin=None, env=None,
                          add_python_paths=True):
     """Execute the given script asynchronously in another thread.
@@ -854,7 +889,7 @@ class BundledBase(SdkBase):
     """
     args = exec_utils.GetArgsForScript(script_name, args)
     if add_python_paths:
-      env = self._AddPythonPathsToEnv(env)
+      env = cls._AddPythonPathsToEnv(env)
     # pylint: disable=protected-access
     runner = exec_utils._ProcessRunner(
         args, timeout=timeout, stdin=stdin, env=env)
@@ -862,7 +897,8 @@ class BundledBase(SdkBase):
     # pylint: disable=protected-access
     return exec_utils._ProcessContext(runner)
 
-  def ExecuteLegacyScriptAsync(self, script_name, args, interpreter=None,
+  @classmethod
+  def ExecuteLegacyScriptAsync(cls, script_name, args, interpreter=None,
                                match_strings=None, timeout=None, stdin=None,
                                env=None, add_python_paths=True):
     """Execute the given legacy script asynchronously in another thread.
@@ -890,7 +926,7 @@ class BundledBase(SdkBase):
     args = exec_utils.GetArgsForLegacyScript(
         script_name, args, interpreter=interpreter)
     if add_python_paths:
-      env = self._AddPythonPathsToEnv(env)
+      env = cls._AddPythonPathsToEnv(env)
     # pylint: disable=protected-access
     runner = exec_utils._ProcessRunner(
         args, timeout=timeout, stdin=stdin, env=env)

@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import datetime
 import getpass
+import locale
 import os
 
 from googlecloudsdk.command_lib import info_holder
@@ -330,6 +331,29 @@ class AnonymizerTest(sdk_test_base.SdkBase):
   def testProcessRegularURL(self):
     url = 'http://www.test.com/'
     self.assertEqual(url, self.anonymizer.ProcessURL(url))
+
+
+class BasicInfoTest(test_case.Base):
+
+  def SetUp(self):
+    self.environ = {
+        'LC_CTYPE': 'UTF-8',
+        'LANG': 'en_US.UTF-8'
+    }
+    self.StartDictPatch(os.environ, self.environ, clear=True)
+    self.locale_mock = self.StartObjectPatch(locale, 'getdefaultlocale',
+                                             autospec=True)
+
+  def testGetDefaultLocale(self):
+    info = info_holder.BasicInfo()
+    self.assertEqual(info.locale, self.locale_mock())
+
+  def testGetDefaultLocaleBadLocale(self):
+    self.locale_mock.side_effect = ValueError
+
+    info = info_holder.BasicInfo()
+    self.assertEqual(info.locale, 'LC_CTYPE:UTF-8; LANG:en_US.UTF-8')
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -110,8 +110,29 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To enable auto\-delete for a disk named 'my\-disk' on an instance named
+\'my\-instance', run:
+
+.RS 2m
+$ gcloud compute instances set\-disk\-auto\-delete my\-instance \e
+    \-\-auto\-delete \-\-disk=my\-disk
+.RE
+
+To enable auto\-delete for a device named 'my\-device' on an instance named
+\'my\-instance', run:
+
+.RS 2m
+$ gcloud compute instances set\-disk\-auto\-delete my\-instance \e
+    \-\-auto\-delete \-\-device\-name=my\-device
+.RE
 
 
 

@@ -44,6 +44,14 @@ class VpnGatewayDeleteGaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
             self.messages.ComputeRegionOperationsGetRequest(
                 **operation_ref.AsDict()))
 
+  def _MakeOperationWaitRequest(self, operation_ref):
+    return (self.region_operations, 'Wait',
+            self.messages.ComputeRegionOperationsWaitRequest(
+                **operation_ref.AsDict()))
+
+  def _MakeOperationPollingRequest(self, operation_ref):
+    return self._MakeOperationWaitRequest(operation_ref)
+
   def testDeleteSingleVpnGateway(self):
     name = 'my-vpn-gateway'
     vpn_gateway_ref = self.GetVpnGatewayRef(name)
@@ -58,9 +66,9 @@ class VpnGatewayDeleteGaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
     self.ExpectDeleteRequest(vpn_gateway_ref, pending_operation)
 
     self.api_mock.batch_responder.ExpectBatch(
-        [(self._MakeOperationGetRequest(operation_ref), pending_operation)])
+        [(self._MakeOperationPollingRequest(operation_ref), pending_operation)])
     self.api_mock.batch_responder.ExpectBatch(
-        [(self._MakeOperationGetRequest(operation_ref), done_operation)])
+        [(self._MakeOperationPollingRequest(operation_ref), done_operation)])
 
     self.Run('compute vpn-gateways delete {} --region {}'.format(
         name, self.REGION))
@@ -86,10 +94,12 @@ class VpnGatewayDeleteGaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
       pending_operations.append(pending_operation)
       done_operations.append(done_operation)
 
-    self.api_mock.batch_responder.ExpectBatch([(self._MakeOperationGetRequest(
-        operation_refs[n]), pending_operations[n]) for n in range(0, 3)])
-    self.api_mock.batch_responder.ExpectBatch([(self._MakeOperationGetRequest(
-        operation_refs[n]), done_operations[n]) for n in range(0, 3)])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._MakeOperationPollingRequest(
+            operation_refs[n]), pending_operations[n]) for n in range(0, 3)])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._MakeOperationPollingRequest(
+            operation_refs[n]), done_operations[n]) for n in range(0, 3)])
 
     self.Run('compute vpn-gateways delete {} --region {}'.format(
         ' '.join(names), self.REGION))

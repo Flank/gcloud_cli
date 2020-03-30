@@ -1,0 +1,42 @@
+NAME
+    gcloud alpha api-gateway api-configs - manage Cloud API Gateway API Configs
+
+SYNOPSIS
+    gcloud alpha api-gateway api-configs COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud API Gateway API Configs.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Add a new config to an API.
+
+     delete
+        (ALPHA) Deletes a Config from an API.
+
+     describe
+        (ALPHA) Show details about a specific API config.
+
+     list
+        (ALPHA) List configs for an API.
+
+     update
+        (ALPHA) Update an API Gateway API.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

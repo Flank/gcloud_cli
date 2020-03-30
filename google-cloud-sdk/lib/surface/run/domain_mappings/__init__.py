@@ -19,10 +19,45 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.run import exceptions
+from googlecloudsdk.command_lib.run import flags
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class DomainMappings(base.Group):
+  """View and manage your Cloud Run for Anthos domain mappings.
+
+  This set of commands can be used to view and manage your service's domain
+  mappings.
+
+  To view and manage fully managed Cloud Run domain mappings, use
+  `gcloud beta run domain-mappings`.
+  """
+
+  detailed_help = {
+      'DESCRIPTION':
+          '{description}',
+      'EXAMPLES':
+          """\
+          To list your Cloud Run domain mappings, run:
+
+            $ {command} list
+      """,
+  }
+
+  def _CheckPlatform(self):
+    if flags.GetPlatform() == flags.PLATFORM_MANAGED:
+      raise exceptions.PlatformError(
+          'This command group is in beta for fully managed Cloud Run; '
+          'use `gcloud beta run domain-mappings`.')
+
+  def Filter(self, context, args):
+    self._CheckPlatform()
+    return context
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
+class DomainMappingsBeta(base.Group):
   """View and manage your Cloud Run domain mappings.
 
   This set of commands can be used to view and manage your service's domain
@@ -39,3 +74,6 @@ class DomainMappings(base.Group):
             $ {command} list
       """,
   }
+
+  def _CheckPlatform(self):
+    pass

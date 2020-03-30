@@ -20,6 +20,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import google_auth_httplib2
+
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import http
 from googlecloudsdk.core import log
@@ -27,9 +29,9 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import creds as core_creds
 from googlecloudsdk.core.credentials import store
 from googlecloudsdk.core.util import files
-
 from oauth2client import client
 import six
+from google.auth import credentials
 
 ENCODING = None if six.PY2 else 'utf8'
 
@@ -38,9 +40,13 @@ class Error(exceptions.Error):
   """Exceptions for the http module."""
 
 
-def Http(timeout='unset', enable_resource_quota=True,
-         force_resource_quota=False, response_encoding=None, ca_certs=None,
-         allow_account_impersonation=True):
+def Http(timeout='unset',
+         enable_resource_quota=True,
+         force_resource_quota=False,
+         response_encoding=None,
+         ca_certs=None,
+         allow_account_impersonation=True,
+         use_google_auth=False):
   """Get an httplib2.Http client for working with the Google API.
 
   Args:
@@ -60,10 +66,16 @@ def Http(timeout='unset', enable_resource_quota=True,
     allow_account_impersonation: bool, True to allow use of impersonated service
       account credentials for calls made with this client. If False, the active
       user credentials will always be used.
+    use_google_auth: bool, True if the calling command indicates to use
+      google-auth library for authentication. If False, authentication will
+      fallback to using the oauth2client library.
 
   Returns:
-    An authorized httplib2.Http client object, or a regular httplib2.Http object
-    if no credentials are available.
+    1. A regular httplib2.Http object if no credentials are available;
+    2. Or a httplib2.Http client object authorized by oauth2client
+       credentials if use_google_auth==False;
+    3. Or a google_auth_httplib2.AuthorizedHttp client object authorized by
+       google-auth credentials.
 
   Raises:
     c_store.Error: If an error loading the credentials occurs.
@@ -77,48 +89,26 @@ def Http(timeout='unset', enable_resource_quota=True,
       properties.VALUES.auth.authorization_token_file.Get())
   handlers = _GetIAMAuthHandlers(authority_selector, authorization_token_file)
 
-  creds = store.LoadIfEnabled(
-      allow_account_impersonation=allow_account_impersonation)
+  creds = store.LoadIfEnabled(allow_account_impersonation, use_google_auth)
   if creds:
     # Inject the resource project header for quota unless explicitly disabled.
     if enable_resource_quota or force_resource_quota:
-      quota_project = _GetQuotaProject(creds, force_resource_quota)
+      quota_project = core_creds.GetQuotaProject(creds, force_resource_quota)
       if quota_project:
         handlers.append(http.Modifiers.Handler(
             http.Modifiers.SetHeader('X-Goog-User-Project', quota_project)))
 
-    http_client = creds.authorize(http_client)
+    if isinstance(creds, credentials.Credentials):
+      http_client = google_auth_httplib2.AuthorizedHttp(creds, http_client)
+    else:
+      http_client = creds.authorize(http_client)
+
     # Wrap the request method to put in our own error handling.
-    http_client = http.Modifiers.WrapRequest(
-        http_client, handlers, _HandleAuthError, client.AccessTokenRefreshError)
+    http_client = http.Modifiers.WrapRequest(http_client, handlers,
+                                             _HandleAuthError,
+                                             client.AccessTokenRefreshError)
 
   return http_client
-
-
-def _GetQuotaProject(credentials, force_resource_quota):
-  """Gets the value to use for the X-Goog-User-Project header.
-
-  Args:
-    credentials: The credentials that are going to be used for requests.
-    force_resource_quota: bool, If true, resource project quota will be used
-      even if gcloud is set to use legacy mode for quota. This should be set
-      when calling newer APIs that would not work without resource quota.
-
-  Returns:
-    str, The project id to send in the header or None to not populate the
-    header.
-  """
-  if not core_creds.CredentialType.FromCredentials(credentials).is_user:
-    return None
-
-  quota_project = properties.VALUES.billing.quota_project.Get()
-  if quota_project == properties.VALUES.billing.CURRENT_PROJECT:
-    return properties.VALUES.core.project.Get()
-  elif quota_project == properties.VALUES.billing.LEGACY:
-    if force_resource_quota:
-      return properties.VALUES.core.project.Get()
-    return None
-  return quota_project
 
 
 def _GetIAMAuthHandlers(authority_selector, authorization_token_file):

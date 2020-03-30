@@ -607,7 +607,7 @@ class GetListCommandFrontendPrototypeTests(test_case.TestCase):
     frontend = lister._GetListCommandFrontendPrototype(args)
 
     self.assertEqual(frontend.filter, (None, r'name eq ".*\basdf\b.*"'))
-    self.assertEqual(frontend.max_results, 123)
+    self.assertEqual(frontend.max_results, None)
     self.assertIsNone(frontend.scope_set)
 
 
@@ -1206,12 +1206,15 @@ class MultiScopeListerTests(cli_test_base.CliTestBase):
     self.assertListEqual(result, [1, 2, 3])
 
     self.list_json.assert_called_once_with(
-        requests=[(self.api_mock.adapter.apitools_client.instances,
-                   'AggregatedList', self.api_mock.adapter.messages.
-                   ComputeInstancesAggregatedListRequest(
-                       filter='filter',
-                       maxResults=123,
-                       project='lister-project'))],
+        requests=[
+            (self.api_mock.adapter.apitools_client.instances, 'AggregatedList',
+             self.api_mock.adapter.messages
+             .ComputeInstancesAggregatedListRequest(
+                 filter='filter',
+                 maxResults=123,
+                 project='lister-project',
+                 includeAllScopes=True))
+        ],
         http=self.api_mock.adapter.apitools_client.http,
         batch_url=self.api_mock.adapter.batch_url,
         errors=[])

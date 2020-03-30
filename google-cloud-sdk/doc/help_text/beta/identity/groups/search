@@ -1,0 +1,65 @@
+NAME
+    gcloud beta identity groups search - search groups
+
+SYNOPSIS
+    gcloud beta identity groups search --labels=LABELS
+        --organization=ORGANIZATION [--page-size=PAGE_SIZE]
+        [--page-token=PAGE_TOKEN] [--view=VIEW; default="basic"]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Search groups.
+
+REQUIRED FLAGS
+     --labels=LABELS
+        Labels of the group resource. Example of labels "--labels
+        cloudidentity.googleapis.com/groups.discussion_forum"
+
+     --organization=ORGANIZATION
+        The organization the Group being searched.
+
+OPTIONAL FLAGS
+     --page-size=PAGE_SIZE
+        The default page size is 200 (max 1000) for the BASIC view, and 50 (max
+        500) for the FULL view.
+
+     --page-token=PAGE_TOKEN
+        The next_page_token value returned from a previous search request, if
+        any.
+
+     --view=VIEW; default="basic"
+        There are two possible views, 'basic' and 'full', default is 'basic'.
+        VIEW must be one of:
+
+         basic
+            Response only basic information of the groups.
+
+         full
+            Response includes all the fields of the groups.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the cloudidentity/v1beta1 API. The full documentation for
+    this API can be found at: https://cloud.google.com/identity/
+
+EXAMPLES
+    To Search groups:
+
+        $ gcloud beta identity groups search --organization="5149234212"  \
+            --labels="cloudidentity.googleapis.com/groups.discussion_forum"  \
+            --page-size=3  \
+            --page-token="ala9glealanal908"
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha identity groups search
+

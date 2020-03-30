@@ -7,8 +7,10 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Run $ gcloud alpha firebase test network-profiles --help for
-    descriptions of the network profile parameters.
+    (ALPHA) Describe a network profile.
+
+    Run $ gcloud alpha firebase test network-profiles --help for descriptions
+    of the network profile parameters.
 
 POSITIONAL ARGUMENTS
      PROFILE_ID
@@ -19,8 +21,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To describe a network profile, run:
+
+        gcloud alpha firebase test network-profiles describe GSM
+
+    To describe a network profiles in JSON format, run:
+
+        gcloud alpha firebase test network-profiles describe GSM --format=json
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute os\-config guest\-policies \- manage guest OS policies for Compute Engine VMs
+gcloud alpha compute os\-config guest\-policies \- manage guest OS policies for Compute Engine VM instances
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha compute os\-config guest\-policies \- manage guest OS policies for 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Manage guest OS policies for Compute Engine VMs.
+\fB(ALPHA)\fR Manage guest OS policies for Compute Engine VM instances.
 
 
 
@@ -26,8 +26,9 @@ gcloud alpha compute os\-config guest\-policies \- manage guest OS policies for 
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -42,11 +43,11 @@ help\fR for details.
 
 .TP 2m
 \fBdelete\fR
-\fB(ALPHA)\fR Delete the given guest policy.
+\fB(ALPHA)\fR Delete the specified guest policy.
 
 .TP 2m
 \fBdescribe\fR
-\fB(ALPHA)\fR Describe the given guest policy.
+\fB(ALPHA)\fR Describe the specified guest policy.
 
 .TP 2m
 \fBlist\fR
@@ -54,12 +55,11 @@ help\fR for details.
 
 .TP 2m
 \fBlookup\fR
-\fB(ALPHA)\fR Display the combination of guest policies that apply to a given
-instance.
+\fB(ALPHA)\fR Display the guest policies that are applied to an instance.
 
 .TP 2m
 \fBupdate\fR
-\fB(ALPHA)\fR Update the given guest policy for a project, a folder, or an
+\fB(ALPHA)\fR Update the specified guest policy for a project, a folder, or an
 organization.
 
 
@@ -71,5 +71,9 @@ organization.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute os\-config guest\-policies
+.RE
 

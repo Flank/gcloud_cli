@@ -94,8 +94,9 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -106,7 +107,7 @@ To remove the path matcher named \f5\fIMY\-MATCHER\fR\fR from the URL map named
 
 .RS 2m
 $ gcloud alpha compute url\-maps remove\-path\-matcher MY\-URL\-MAP \e
-    \-\-path\-matcher MY\-MATCHER
+    \-\-path\-matcher\-name=MY\-MATCHER
 .RE
 
 

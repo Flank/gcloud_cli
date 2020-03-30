@@ -26,7 +26,7 @@ from tests.lib.surface.sql import base
 class _BaseDatabasesListTest(object):
 
   def testDatabasesList(self):
-    sqladmin = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
+    sqladmin = core_apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.databases.List.Expect(
         sqladmin.SqlDatabasesListRequest(
             project=self.Project(), instance='mock-instance'),
@@ -40,11 +40,9 @@ class _BaseDatabasesListTest(object):
                     name='mock-db-1',
                     charset='utf-8',
                     collation='some-collation',
-                    selfLink=
-                    'https://www.googleapis.com/sql/v1beta4/projects/{0}/databases/mock-db-name'.
-                    format(self.Project()),
-                    etag=
-                    '\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
+                    selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/databases/mock-db-name'
+                    .format(self.Project()),
+                    etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
                     kind='sql#database'),
                 sqladmin.Database(
                     # pylint:disable=line-too-long
@@ -53,11 +51,9 @@ class _BaseDatabasesListTest(object):
                     name='mock-db-2',
                     charset='utf-8',
                     collation='some-collation',
-                    selfLink=
-                    'https://www.googleapis.com/sql/v1beta4/projects/{0}/databases/mock-db-name'.
-                    format(self.Project()),
-                    etag=
-                    '\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahe\"',
+                    selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/databases/mock-db-name'
+                    .format(self.Project()),
+                    etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahe\"',
                     kind='sql#database'),
             ]),
     )

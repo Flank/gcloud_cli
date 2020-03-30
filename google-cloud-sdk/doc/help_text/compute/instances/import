@@ -6,8 +6,9 @@ SYNOPSIS
     gcloud compute instances import INSTANCE_NAME --source-uri=SOURCE_URI
         [--async] [--can-ip-forward] [--deletion-protection]
         [--description=DESCRIPTION] [--no-guest-environment]
-        [--labels=[KEY=VALUE,...]] [--machine-type=MACHINE_TYPE]
-        [--network=NETWORK] [--network-tier=NETWORK_TIER] [--os=OS]
+        [--hostname=HOSTNAME] [--labels=[KEY=VALUE,...]]
+        [--machine-type=MACHINE_TYPE] [--network=NETWORK]
+        [--network-tier=NETWORK_TIER] [--os=OS]
         [--private-network-ip=PRIVATE_NETWORK_IP] [--no-restart-on-failure]
         [--subnet=SUBNET] [--tags=TAG,[TAG,...]]
         [--timeout=TIMEOUT; default="2h"] [--zone=ZONE]
@@ -39,8 +40,8 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --source-uri=SOURCE_URI
-        Google Cloud Storage path to one of: OVF descriptor OVA file Directory
-        with OVF package
+        Cloud Storage path to one of: OVF descriptor OVA file Directory with
+        OVF package
 
 OPTIONAL FLAGS
      --async
@@ -58,8 +59,15 @@ OPTIONAL FLAGS
         Specifies a textual description of the instances.
 
      --guest-environment
-        Google Guest Environment will be installed on the instance. Enabled by
+        The guest environment will be installed on the instance. Enabled by
         default, use --no-guest-environment to disable.
+
+     --hostname=HOSTNAME
+        Specify the hostname of the instance to be imported. The specified
+        hostname must be RFC1035 compliant. If hostname is not specified, the
+        default hostname is [INSTANCE_NAME].c.[PROJECT_ID].internal when using
+        the global DNS, and [INSTANCE_NAME].[ZONE].c.[PROJECT_ID].internal when
+        using zonal DNS.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -88,10 +96,12 @@ OPTIONAL FLAGS
      --os=OS
         Specifies the OS of the image being imported. OS must be one of:
         centos-6, centos-7, debian-8, debian-9, rhel-6, rhel-6-byol, rhel-7,
-        rhel-7-byol, ubuntu-1404, ubuntu-1604, windows-10-byol, windows-2008r2,
+        rhel-7-byol, ubuntu-1404, ubuntu-1604, ubuntu-1804,
+        windows-10-x64-byol, windows-10-x86-byol, windows-2008r2,
         windows-2008r2-byol, windows-2012, windows-2012-byol, windows-2012r2,
         windows-2012r2-byol, windows-2016, windows-2016-byol, windows-2019,
-        windows-2019-byol, windows-7-byol, windows-8-1-x64-byol.
+        windows-2019-byol, windows-7-x64-byol, windows-7-x86-byol,
+        windows-8-x64-byol, windows-8-x86-byol.
 
      --private-network-ip=PRIVATE_NETWORK_IP
         Specifies the RFC1918 IP to assign to the instance. The IP should be in
@@ -204,12 +214,13 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To import an OVF package from Google Could Storage into a VM named
-    my-instance, run:
+    To import an OVF package from Cloud Storage into a VM named my-instance,
+    run:
 
         $ gcloud compute instances import my-instance \
             --source-uri=gs://my-bucket/my-dir

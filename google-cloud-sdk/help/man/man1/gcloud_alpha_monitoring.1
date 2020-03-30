@@ -20,7 +20,16 @@ gcloud alpha monitoring \- manage Stackdriver Monitoring alerting policies and n
 \fB(ALPHA)\fR Manage Stackdriver Monitoring alerting policies and notification
 channels.
 
-More information can be found here: https://cloud.google.com/monitoring/api/v3/
+More information can be found here:
+.RS 2m
+.IP "\(bu" 2m
+https://cloud.google.com/monitoring/api/v3/
+.IP "\(bu" 2m
+https://cloud.google.com/monitoring/alerts/using\-alerting\-api
+.IP "\(bu" 2m
+https://cloud.google.com/monitoring/alerts/using\-channels\-api
+.RE
+.sp
 
 
 
@@ -29,8 +38,9 @@ More information can be found here: https://cloud.google.com/monitoring/api/v3/
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -48,6 +58,10 @@ help\fR for details.
 \fB(ALPHA)\fR Manage Stackdriver Monitoring notification channels.
 
 .TP 2m
+\fBdashboards\fR
+\fB(ALPHA)\fR Manage Stackdriver Monitoring dashboards.
+
+.TP 2m
 \fBpolicies\fR
 \fB(ALPHA)\fR Manage Stackdriver Monitoring alerting policies.
 
@@ -60,5 +74,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta monitoring
+.RE
 

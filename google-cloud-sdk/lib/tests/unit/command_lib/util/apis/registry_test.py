@@ -23,6 +23,7 @@ from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.util.apis import registry
+from googlecloudsdk.core.credentials import http
 from tests.lib import sdk_test_base
 from tests.lib.command_lib.util.apis import base
 
@@ -109,8 +110,10 @@ class NonMockedTests(base.Base):
     # Flat path resource
     c = registry.GetMethods('compute.instances')
     self.assertGreater(len(c), 10)
-    c = registry.GetMethods('compute.instances', 'v1')
+    self.assertFalse(c[0].use_google_auth)
+    c = registry.GetMethods('compute.instances', 'v1', True)
     self.assertGreater(len(c), 10)
+    self.assertTrue(c[0].use_google_auth)
 
     with self.assertRaises(registry.UnknownAPIError):
       registry.GetMethods('junk.foo')
@@ -133,6 +136,7 @@ class NonMockedTests(base.Base):
     # Flat path resource.
     m = registry.GetMethod('compute.instances', 'get')
     self.assertEqual(m.collection.full_name, 'compute.instances')
+    self.assertFalse(m.use_google_auth)
     self.assertEqual(m.name, 'get')
     self.assertEqual(m.path,
                      'projects/{project}/zones/{zone}/instances/{instance}')
@@ -159,8 +163,10 @@ class NonMockedTests(base.Base):
                      ['project', 'zone', 'instance'])
 
     # Atomic name resource.
-    m = registry.GetMethod('pubsub.projects.topics', 'get')
+    m = registry.GetMethod(
+        'pubsub.projects.topics', 'get', use_google_auth=True)
     self.assertEqual(m.collection.full_name, 'pubsub.projects.topics')
+    self.assertTrue(m.use_google_auth)
     self.assertEqual(m.name, 'get')
     self.assertEqual(m.path, '{+topic}')
     self.assertEqual(m.params, ['topic'])
@@ -190,6 +196,7 @@ class NonMockedTests(base.Base):
     # Flat path resource.
     m = registry.GetMethod('compute.instances', 'list')
     self.assertEqual(m.collection.full_name, 'compute.instances')
+    self.assertFalse(m.use_google_auth)
     self.assertEqual(m.name, 'list')
     self.assertEqual(m.path, 'projects/{project}/zones/{zone}/instances')
     self.assertEqual(m.params, ['project', 'zone'])
@@ -216,8 +223,10 @@ class NonMockedTests(base.Base):
         m.resource_argument_collection.detailed_params, ['project', 'zone'])
 
     # Atomic name resource.
-    m = registry.GetMethod('pubsub.projects.topics', 'list')
+    m = registry.GetMethod(
+        'pubsub.projects.topics', 'list', use_google_auth=True)
     self.assertEqual(m.collection.full_name, 'pubsub.projects.topics')
+    self.assertTrue(m.use_google_auth)
     self.assertEqual(m.name, 'list')
     self.assertEqual(m.path, '{+project}/topics')
     self.assertEqual(m.params, ['project'])
@@ -248,6 +257,7 @@ class NonMockedTests(base.Base):
     # Flat path resource.
     m = registry.GetMethod('compute.instances', 'insert')
     self.assertEqual(m.collection.full_name, 'compute.instances')
+    self.assertFalse(m.use_google_auth)
     self.assertEqual(m.name, 'insert')
     self.assertEqual(m.path, 'projects/{project}/zones/{zone}/instances')
     self.assertEqual(m.params, ['project', 'zone'])
@@ -275,9 +285,13 @@ class NonMockedTests(base.Base):
                      ['project', 'zone', 'instance'])
 
     # Atomic name resource.
-    m = registry.GetMethod('cloudiot.projects.locations.registries', 'create')
+    m = registry.GetMethod(
+        'cloudiot.projects.locations.registries',
+        'create',
+        use_google_auth=True)
     self.assertEqual(m.collection.full_name,
                      'cloudiot.projects.locations.registries')
+    self.assertTrue(m.use_google_auth)
     self.assertEqual(m.name, 'create')
     self.assertEqual(m.path, '{+parent}/registries')
     self.assertEqual(m.params, ['parent'])
@@ -310,6 +324,7 @@ class NonMockedTests(base.Base):
     # Atomic name resource done differently for some reason.
     m = registry.GetMethod('pubsub.projects.topics', 'create')
     self.assertEqual(m.collection.full_name, 'pubsub.projects.topics')
+    self.assertFalse(m.use_google_auth)
     self.assertEqual(m.name, 'create')
     self.assertEqual(m.path, '{+name}')
     self.assertEqual(m.params, ['name'])
@@ -355,6 +370,7 @@ class CallTests(sdk_test_base.WithFakeAuth):
     self.messages = client.MESSAGES_MODULE
     self.mocked_client.Mock()
     self.addCleanup(self.mocked_client.Unmock)
+    self.mocked_http = self.StartObjectPatch(http, 'Http')
 
   def testDescribe(self):
     self.MockAPI('compute', 'v1')
@@ -363,6 +379,8 @@ class CallTests(sdk_test_base.WithFakeAuth):
     self.mocked_client.instances.Get.Expect(request, response={'foo': 'bar'},
                                             enable_type_checking=False)
     registry.GetMethod('compute.instances', 'get').Call(request)
+    self.mocked_http.assert_called_once_with(
+        response_encoding=http.ENCODING, use_google_auth=False)
 
   def testRawList(self):
     self.MockAPI('compute', 'v1')
@@ -373,11 +391,14 @@ class CallTests(sdk_test_base.WithFakeAuth):
         items=[self.messages.Instance(name='instance-1'),
                self.messages.Instance(name='instance-2')])
     self.mocked_client.instances.List.Expect(request, response)
-    actual = registry.GetMethod('compute.instances', 'list').Call(
-        request, raw=True)
+    actual = registry.GetMethod(
+        'compute.instances', 'list', use_google_auth=True).Call(
+            request, raw=True)
     self.assertEqual(len(actual.items), 2)
     self.assertEqual(actual.items[0].name, 'instance-1')
     self.assertEqual(actual.items[1].name, 'instance-2')
+    self.mocked_http.assert_called_once_with(
+        response_encoding=http.ENCODING, use_google_auth=True)
 
   def testFlatList(self):
     self.MockAPI('compute', 'v1')
@@ -394,6 +415,8 @@ class CallTests(sdk_test_base.WithFakeAuth):
     self.assertEqual(len(actual), 2)
     self.assertEqual(actual[0].name, 'instance-1')
     self.assertEqual(actual[1].name, 'instance-2')
+    self.mocked_http.assert_called_once_with(
+        response_encoding=http.ENCODING, use_google_auth=False)
 
   def testRawListNonPageable(self):
     self.MockAPI('container', 'v1')
@@ -404,12 +427,15 @@ class CallTests(sdk_test_base.WithFakeAuth):
                   self.messages.Cluster(name='c-2')])
     self.mocked_client.projects_locations_clusters.List.Expect(
         request, response)
-    actual = registry.GetMethod('container.projects.locations.clusters',
-                                'list').Call(
-                                    request, raw=True)
+    actual = registry.GetMethod(
+        'container.projects.locations.clusters', 'list',
+        use_google_auth=True).Call(
+            request, raw=True)
     self.assertEqual(len(actual.clusters), 2)
     self.assertEqual(actual.clusters[0].name, 'c-1')
     self.assertEqual(actual.clusters[1].name, 'c-2')
+    self.mocked_http.assert_called_once_with(
+        response_encoding=http.ENCODING, use_google_auth=True)
 
   def testFlatListNonPageable(self):
     self.MockAPI('container', 'v1')
@@ -426,6 +452,8 @@ class CallTests(sdk_test_base.WithFakeAuth):
     self.assertEqual(len(actual), 2)
     self.assertEqual(actual[0].name, 'c-1')
     self.assertEqual(actual[1].name, 'c-2')
+    self.mocked_http.assert_called_once_with(
+        response_encoding=http.ENCODING, use_google_auth=False)
 
   def testRawListNoPageSize(self):
     self.MockAPI('bigtableadmin', 'v2')
@@ -435,11 +463,14 @@ class CallTests(sdk_test_base.WithFakeAuth):
         instances=[self.messages.Instance(name='instance-1'),
                    self.messages.Instance(name='instance-2')])
     self.mocked_client.projects_instances.List.Expect(request, response)
-    actual = registry.GetMethod('bigtableadmin.projects.instances',
-                                'list').Call(request, raw=True)
+    actual = registry.GetMethod(
+        'bigtableadmin.projects.instances', 'list', use_google_auth=True).Call(
+            request, raw=True)
     self.assertEqual(len(actual.instances), 2)
     self.assertEqual(actual.instances[0].name, 'instance-1')
     self.assertEqual(actual.instances[1].name, 'instance-2')
+    self.mocked_http.assert_called_once_with(
+        response_encoding=http.ENCODING, use_google_auth=True)
 
   def testFlatListNoPageSize(self):
     self.MockAPI('bigtableadmin', 'v2')
@@ -455,6 +486,8 @@ class CallTests(sdk_test_base.WithFakeAuth):
     self.assertEqual(len(actual), 2)
     self.assertEqual(actual[0].name, 'instance-1')
     self.assertEqual(actual[1].name, 'instance-2')
+    self.mocked_http.assert_called_once_with(
+        response_encoding=http.ENCODING, use_google_auth=False)
 
   def testInsert(self):
     self.MockAPI('compute', 'v1')
@@ -469,8 +502,12 @@ class CallTests(sdk_test_base.WithFakeAuth):
         project='foo'
     )
     self.mocked_client.instances.Insert.Expect(request, {})
-    self.assertEqual({}, registry.GetMethod('compute.instances', 'insert').Call(
-        request))
+    self.assertEqual({},
+                     registry.GetMethod(
+                         'compute.instances', 'insert',
+                         use_google_auth=True).Call(request))
+    self.mocked_http.assert_called_once_with(
+        response_encoding=http.ENCODING, use_google_auth=True)
 
   def testGetMessagesByName(self):
     self.MockAPI('compute', 'v1')

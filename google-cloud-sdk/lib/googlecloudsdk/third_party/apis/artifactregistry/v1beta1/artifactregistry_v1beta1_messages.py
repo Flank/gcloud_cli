@@ -13,6 +13,32 @@ from apitools.base.py import extra_types
 package = 'artifactregistry'
 
 
+class ArtifactregistryProjectsLocationsGetRequest(_messages.Message):
+  r"""A ArtifactregistryProjectsLocationsGetRequest object.
+
+  Fields:
+    name: Resource name for the location.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class ArtifactregistryProjectsLocationsListRequest(_messages.Message):
+  r"""A ArtifactregistryProjectsLocationsListRequest object.
+
+  Fields:
+    filter: The standard list filter.
+    name: The resource that owns the locations collection, if applicable.
+    pageSize: The standard list page size.
+    pageToken: The standard list page token.
+  """
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+
+
 class ArtifactregistryProjectsLocationsOperationsGetRequest(_messages.Message):
   r"""A ArtifactregistryProjectsLocationsOperationsGetRequest object.
 
@@ -115,6 +141,16 @@ class ArtifactregistryProjectsLocationsRepositoriesGetIamPolicyRequest(_messages
 
   options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   resource = _messages.StringField(2, required=True)
+
+
+class ArtifactregistryProjectsLocationsRepositoriesGetRequest(_messages.Message):
+  r"""A ArtifactregistryProjectsLocationsRepositoriesGetRequest object.
+
+  Fields:
+    name: The name of the repository to retrieve.
+  """
+
+  name = _messages.StringField(1, required=True)
 
 
 class ArtifactregistryProjectsLocationsRepositoriesListRequest(_messages.Message):
@@ -269,11 +305,28 @@ class ArtifactregistryProjectsLocationsRepositoriesPackagesVersionsGetRequest(_m
   ArtifactregistryProjectsLocationsRepositoriesPackagesVersionsGetRequest
   object.
 
+  Enums:
+    ViewValueValuesEnum: The view that should be returned in the response.
+
   Fields:
     name: The name of the version to retrieve.
+    view: The view that should be returned in the response.
   """
 
+  class ViewValueValuesEnum(_messages.Enum):
+    r"""The view that should be returned in the response.
+
+    Values:
+      VERSION_VIEW_UNSPECIFIED: <no description>
+      BASIC: <no description>
+      FULL: <no description>
+    """
+    VERSION_VIEW_UNSPECIFIED = 0
+    BASIC = 1
+    FULL = 2
+
   name = _messages.StringField(1, required=True)
+  view = _messages.EnumField('ViewValueValuesEnum', 2)
 
 
 class ArtifactregistryProjectsLocationsRepositoriesPackagesVersionsListRequest(_messages.Message):
@@ -281,16 +334,33 @@ class ArtifactregistryProjectsLocationsRepositoriesPackagesVersionsListRequest(_
   ArtifactregistryProjectsLocationsRepositoriesPackagesVersionsListRequest
   object.
 
+  Enums:
+    ViewValueValuesEnum: The view that should be returned in the response.
+
   Fields:
     pageSize: The maximum number of versions to return.
     pageToken: The next_page_token value returned from a previous list
       request, if any.
     parent: The name of the parent resource whose versions will be listed.
+    view: The view that should be returned in the response.
   """
+
+  class ViewValueValuesEnum(_messages.Enum):
+    r"""The view that should be returned in the response.
+
+    Values:
+      VERSION_VIEW_UNSPECIFIED: <no description>
+      BASIC: <no description>
+      FULL: <no description>
+    """
+    VERSION_VIEW_UNSPECIFIED = 0
+    BASIC = 1
+    FULL = 2
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(2)
   parent = _messages.StringField(3, required=True)
+  view = _messages.EnumField('ViewValueValuesEnum', 4)
 
 
 class ArtifactregistryProjectsLocationsRepositoriesPatchRequest(_messages.Message):
@@ -342,16 +412,6 @@ class ArtifactregistryProjectsLocationsRepositoriesTestIamPermissionsRequest(_me
   testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
 
 
-class ArtifactregistryProjectsRepositoriesLocationsGetRequest(_messages.Message):
-  r"""A ArtifactregistryProjectsRepositoriesLocationsGetRequest object.
-
-  Fields:
-    name: The name of the repository to retrieve.
-  """
-
-  name = _messages.StringField(1, required=True)
-
-
 class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
@@ -373,7 +433,7 @@ class Binding(_messages.Message):
       that represents a Google group.    For example, `admins@example.com`.  *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
-      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
       recovered, this value reverts to `user:{emailid}` and the recovered user
       retains the role in the binding.  *
       `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
@@ -410,21 +470,33 @@ class Empty(_messages.Message):
 
 
 class Expr(_messages.Message):
-  r"""Represents an expression text. Example:      title: "User account
-  presence"     description: "Determines whether the request has a user
-  account"     expression: "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit"     description: "Determines if a summary is
+  less than 100 chars"     expression: "document.summary.size() < 100"
+  Example (Equality):      title: "Requestor is owner"     description:
+  "Determines if requestor is the document owner"     expression:
+  "document.owner == request.auth.claims.email"  Example (Logic):      title:
+  "Public documents"     description: "Determine whether the document should
+  be publicly visible"     expression: "document.type != 'private' &&
+  document.type != 'internal'"  Example (Data Manipulation):      title:
+  "Notification string"     description: "Create a notification string with a
+  timestamp."     expression: "'New message received at ' +
+  string(document.create_time)"  The exact variables and functions that may be
+  referenced within an expression are determined by the service that evaluates
+  it. See the service documentation for additional information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
@@ -493,6 +565,19 @@ class ListFilesResponse(_messages.Message):
   nextPageToken = _messages.StringField(2)
 
 
+class ListLocationsResponse(_messages.Message):
+  r"""The response message for Locations.ListLocations.
+
+  Fields:
+    locations: A list of locations that matches the specified filter in the
+      request.
+    nextPageToken: The standard List next-page token.
+  """
+
+  locations = _messages.MessageField('Location', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
 class ListOperationsResponse(_messages.Message):
   r"""The response message for Operations.ListOperations.
 
@@ -556,6 +641,86 @@ class ListVersionsResponse(_messages.Message):
 
   nextPageToken = _messages.StringField(1)
   versions = _messages.MessageField('Version', 2, repeated=True)
+
+
+class Location(_messages.Message):
+  r"""A resource that represents Google Cloud Platform location.
+
+  Messages:
+    LabelsValue: Cross-service attributes for the location. For example
+      {"cloud.googleapis.com/region": "us-east1"}
+    MetadataValue: Service-specific metadata. For example the available
+      capacity at the given location.
+
+  Fields:
+    displayName: The friendly name for this location, typically a nearby city
+      name. For example, "Tokyo".
+    labels: Cross-service attributes for the location. For example
+      {"cloud.googleapis.com/region": "us-east1"}
+    locationId: The canonical id for this location. For example: `"us-east1"`.
+    metadata: Service-specific metadata. For example the available capacity at
+      the given location.
+    name: Resource name for the location, which may vary between
+      implementations. For example: `"projects/example-project/locations/us-
+      east1"`
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Cross-service attributes for the location. For example
+    {"cloud.googleapis.com/region": "us-east1"}
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class MetadataValue(_messages.Message):
+    r"""Service-specific metadata. For example the available capacity at the
+    given location.
+
+    Messages:
+      AdditionalProperty: An additional property for a MetadataValue object.
+
+    Fields:
+      additionalProperties: Properties of the object. Contains field @type
+        with type URL.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a MetadataValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  displayName = _messages.StringField(1)
+  labels = _messages.MessageField('LabelsValue', 2)
+  locationId = _messages.StringField(3)
+  metadata = _messages.MessageField('MetadataValue', 4)
+  name = _messages.StringField(5)
 
 
 class Operation(_messages.Message):
@@ -685,15 +850,16 @@ class Package(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.   A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**      {       "bindings": [         {
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.   A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**      {       "bindings": [         {
   "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-project-
@@ -702,22 +868,23 @@ class Policy(_messages.Message):
   ["user:eve@example.com"],           "condition": {             "title":
   "expirable access",             "description": "Does not grant access after
   Sep 2020",             "expression": "request.time <
-  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
-  **YAML Example**      bindings:     - members:       - user:mike@example.com
-  - group:admins@example.com       - domain:google.com       - serviceAccount
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
+  "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
+  bindings:     - members:       - user:mike@example.com       -
+  group:admins@example.com       - domain:google.com       - serviceAccount
   :my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
   grant access after Sep 2020         expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  timestamp('2020-10-01T00:00:00.000Z')     - etag: BwWWja0YfJA=     -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -725,19 +892,24 @@ class Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy   that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
   bindings = _messages.MessageField('Binding', 1, repeated=True)
@@ -998,13 +1170,16 @@ class Version(_messages.Message):
       metadata.
     name: The name of the version, for example: "projects/p1/locations/us-
       central1/repositories/repo1/packages/pkg1/versions/art1".
+    relatedTags: Output only. A list of related tags. Will contain up to 100
+      tags that reference this version.
     updateTime: The time when the version was last updated.
   """
 
   createTime = _messages.StringField(1)
   description = _messages.StringField(2)
   name = _messages.StringField(3)
-  updateTime = _messages.StringField(4)
+  relatedTags = _messages.MessageField('Tag', 4, repeated=True)
+  updateTime = _messages.StringField(5)
 
 
 encoding.AddCustomJsonFieldMapping(

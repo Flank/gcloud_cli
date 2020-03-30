@@ -1,0 +1,54 @@
+title: recaptcha keys delete test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      recaptcha keys delete mytestkey
+  - prompt:
+    - message: You are about to delete key [mytestkey]
+    - input: y
+  - stderr: |
+      Deleted key [mytestkey].
+actions:
+- execute_command:
+    command: |
+      recaptcha keys delete mytestkey
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete key [mytestkey]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '123456789'
+            projectId: fake-project
+            lifecycleState: ACTIVE
+            name: Fake Project
+            labels:
+              service-account-downloaded-notification-opt-out: 'true'
+            createTime: '2014-09-30T14:51:18.935Z'
+            parent:
+              type: folder
+              id: '396521612403'
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/123456789/keys/mytestkey?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Deleted key [mytestkey].
+    - expect_exit:
+        code: 0

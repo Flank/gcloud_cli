@@ -74,8 +74,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    The following command updates the device 'my-device' in device registry
+    'my-registry' in region 'us-central1'. It blocks the device and sets
+    metadata values.
+
+        $ gcloud iot devices update my-device --region=us-central1 \
+            --registry=my-registry --blocked \
+            --metadata=key1=value1,key2=value2
 
 NOTES
     These variants are also available:

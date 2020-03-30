@@ -17,7 +17,7 @@ SYNOPSIS
           [interface=INTERFACE],[size=SIZE]] [--machine-type=MACHINE_TYPE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
-        [--min-cpu-platform=PLATFORM] [--min-node-cpus=MIN_NODE_CPUS]
+        [--min-cpu-platform=PLATFORM] [--min-node-cpu=MIN_NODE_CPU]
         [--network=NETWORK] [--network-interface=[PROPERTY=VALUE,...]]
         [--network-tier=NETWORK_TIER] [--preemptible]
         [--private-network-ip=PRIVATE_NETWORK_IP] [--region=REGION]
@@ -36,6 +36,9 @@ SYNOPSIS
           | --image-family=IMAGE_FAMILY]
         [--maintenance-policy=MAINTENANCE_POLICY
           | --on-host-maintenance=MAINTENANCE_POLICY]
+        [--mesh=[mode=MODE],[workload-ports=WORKLOAD-PORTS]
+          --mesh-labels=[KEY=VALUE,
+          ...,...] --mesh-proxy-config=[KEY=VALUE, ...,...]]
         [--node=NODE | --node-affinity-file=NODE_AFFINITY_FILE
           | --node-group=NODE_GROUP]
         [--reservation=RESERVATION
@@ -46,13 +49,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instance-templates create facilitates the
-    creation of Google Compute Engine virtual machine instance templates. For
-    example, running:
-
-        $ gcloud alpha compute instance-templates create INSTANCE-TEMPLATE
-
-    will create one instance templates called 'INSTANCE-TEMPLATE'.
-
+    creation of Google Compute Engine virtual machine instance templates.
     Instance templates are global resources, and can be used to create
     instances in any zone.
 
@@ -198,7 +195,7 @@ FLAGS
             If yes, this persistent disk will be automatically deleted when the
             instance is deleted. However, if the disk is later detached from
             the instance, this option won't apply. The default value for this
-            is no.
+            is yes.
 
          kms-key
             Fully qualified Cloud KMS cryptokey name that will protect the
@@ -324,10 +321,11 @@ FLAGS
      --metadata=KEY=VALUE,[KEY=VALUE,...]
         Metadata to be made available to the guest operating system running on
         the instances. Each metadata entry is a key/value pair separated by an
-        equals sign. Metadata keys must be unique and less than 128 bytes in
-        length. Values must be less than or equal to 32,768 bytes in length.
+        equals sign. Each metadata key must be unique and have a max of 128
+        bytes in length. Each value must have a max of 256 KB in length.
         Multiple arguments can be passed to this flag, e.g., --metadata
-        key-1=value-1,key-2=value-2,key-3=value-3.
+        key-1=value-1,key-2=value-2,key-3=value-3. The combined total size for
+        all metadata entries is 512 KB.
 
         In images that have Compute Engine tools installed on them, such as the
         official images (https://cloud.google.com/compute/docs/images), the
@@ -362,7 +360,7 @@ FLAGS
         You can find more information on-line:
         https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
 
-     --min-node-cpus=MIN_NODE_CPUS
+     --min-node-cpu=MIN_NODE_CPU
         Minimum number of virtual CPUs this instance will consume when running
         on a sole-tenant node.
 
@@ -521,8 +519,12 @@ FLAGS
           instance.
 
        --no-address
-          If provided, the instances will not be assigned external IP
-          addresses.
+          If provided, the instances are not assigned external IP addresses. To
+          pull container images, you must configure private Google access if
+          using Container Registry or configure Cloud NAT for instances to
+          access container images directly. For more information, see:
+          + https://cloud.google.com/vpc/docs/configure-private-google-access
+          + https://cloud.google.com/nat/docs/using-nat
 
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the disk. The arguments in this group can be used to
@@ -629,6 +631,29 @@ FLAGS
               migration event.
            TERMINATE
               The instances should be terminated.
+
+     --mesh=[mode=MODE],[workload-ports=WORKLOAD-PORTS]
+        Enables mesh and specifies mesh-level configuration. "cloud-platform"
+        scope will be enabled to allow connection to Traffic Director API.
+        Therefore --no-scopes flag should not be present.
+
+         mode
+            If ON, the mesh software will be installed on the instance when
+            created. It will be configured to work with TrafficDirector.
+            Allowed values of the flags are: ON and OFF for Alpha.
+
+         workload-ports
+            List of the ports inside quotes ("), separated by ';', on which the
+            customer's workload is running. Used to intercept the incoming
+            traffic to the workload. If not provided, no incoming traffic is
+            intercepted.
+
+     --mesh-labels=[KEY=VALUE, ...,...]
+        Specifies the mesh-level labels as key-value pairs.
+
+     --mesh-proxy-config=[KEY=VALUE, ...,...]
+        Specifies per-proxy configuration as key-value pairs. See all options
+        at http://cloud/traffic-director/docs/traffic-director-per-proxy-config
 
      Sole Tenancy. At most one of these may be specified:
 
@@ -741,8 +766,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create an instance template named 'INSTANCE-TEMPLATE' with the 'n2' vm
+    type, '9GB' memory, and 2 CPU cores, run:
+
+        $ gcloud alpha compute instance-templates create INSTANCE-TEMPLATE \
+            --custom-vm-type=n2 --custom-cpu=2 --custom-memory=9GB
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

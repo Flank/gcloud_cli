@@ -24,20 +24,17 @@ from googlecloudsdk.core.util import times
 
 import six
 
-_IMAGE = 'gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA'
-_VERSION = '$SHORT_SHA'
+_VERSION = '$COMMIT_SHA'
 
 _DEFAULT_TAGS = [
     'gcp-cloud-build-deploy',
     'gcp-cloud-build-deploy-gcloud'
 ]
 _DEFAULT_PR_PREVIEW_TAGS = [
-    'gcp-cloud-build-deploy',
     'gcp-cloud-build-deploy-gcloud',
     'gcp-cloud-build-deploy-pr-preview',
 ]
 _DEFAULT_CLEAN_PREVIEW_TAGS = [
-    'gcp-cloud-build-deploy',
     'gcp-cloud-build-deploy-gcloud',
     'gcp-cloud-build-deploy-clean-preview',
 ]
@@ -59,20 +56,29 @@ _K8S_ANNOTATIONS_SUB_VAR = '_K8S_ANNOTATIONS'
 _K8S_NAMESPACE_SUB_VAR = '_K8S_NAMESPACE'
 _PREVIEW_EXPIRY_SUB_VAR = '_PREVIEW_EXPIRY'
 
+_EXPANDED_CONFIGS_PATH_DYNAMIC = _EXPANDED_CONFIGS_PATH.format(
+    '$' + _OUTPUT_BUCKET_PATH_SUB_VAR, '$BUILD_ID')
+_SUGGESTED_CONFIGS_PATH_DYNAMIC = _SUGGESTED_CONFIGS_PATH.format(
+    '$' + _OUTPUT_BUCKET_PATH_SUB_VAR, '$BUILD_ID')
+
 _SAVE_CONFIGS_SCRIPT = '''
 set -e
 
-gsutil cp -r output/suggested gs://{0}
-echo "Copied suggested base configs to gs://{0}"
-echo "View suggested base configs at https://console.cloud.google.com/storage/browser/{0}/"
-gsutil cp -r output/expanded gs://{1}
-echo "Copied expanded configs to gs://{1}"
-echo "View expanded configs at https://console.cloud.google.com/storage/browser/{1}/"
+if [[ "${output_bucket_path}" ]]; then
+  gsutil -m cp output/expanded/* gs://{expanded}
+  echo "Copied expanded configs to gs://{expanded}"
+  echo "View expanded configs at https://console.cloud.google.com/storage/browser/{expanded}/"
+  if [[ ! "${k8s_yaml_path}" ]]; then
+    gsutil -m cp output/suggested/* gs://{suggested}
+    echo "Copied suggested base configs to gs://{suggested}"
+    echo "View suggested base configs at https://console.cloud.google.com/storage/browser/{suggested}/"
+  fi
+fi
 '''.format(
-    _SUGGESTED_CONFIGS_PATH.format(
-        '$' + _OUTPUT_BUCKET_PATH_SUB_VAR, '$BUILD_ID'),
-    _EXPANDED_CONFIGS_PATH.format(
-        '$' + _OUTPUT_BUCKET_PATH_SUB_VAR, '$BUILD_ID'),
+    output_bucket_path=_OUTPUT_BUCKET_PATH_SUB_VAR,
+    expanded=_EXPANDED_CONFIGS_PATH_DYNAMIC,
+    k8s_yaml_path=_K8S_YAML_PATH_SUB_VAR,
+    suggested=_SUGGESTED_CONFIGS_PATH_DYNAMIC,
 )
 
 _PREPARE_PREVIEW_DEPLOY_SCRIPT = '''
@@ -98,21 +104,14 @@ fi
 
 /gke-deploy prepare \\
   --filename=${k8s_yaml_path} \\
-  --image=gcr.io/$PROJECT_ID/$REPO_NAME \\
+  --image={image} \\
   --app=${app_name} \\
-  --version=$SHORT_SHA \\
+  --version=$COMMIT_SHA \\
   --namespace=$$NAMESPACE \\
   --output=output \\
   --annotation=gcb-build-id=$BUILD_ID,${k8s_annotations} \\
   --expose=${expose_port}
-'''.format(
-    cluster=_GKE_CLUSTER_SUB_VAR,
-    location=_GKE_LOCATION_SUB_VAR,
-    k8s_yaml_path=_K8S_YAML_PATH_SUB_VAR,
-    app_name=_APP_NAME_SUB_VAR,
-    k8s_annotations=_K8S_ANNOTATIONS_SUB_VAR,
-    expose_port=_EXPOSE_PORT_SUB_VAR,
-)
+'''
 
 _APPLY_PREVIEW_DEPLOY_SCRIPT = '''
 set -e
@@ -142,13 +141,16 @@ kubectl annotate namespace $$NAMESPACE preview/repo-name=$REPO_NAME preview/expi
 '''.format(
     cluster=_GKE_CLUSTER_SUB_VAR,
     location=_GKE_LOCATION_SUB_VAR,
-    preview_expiry=_PREVIEW_EXPIRY_SUB_VAR
+    preview_expiry=_PREVIEW_EXPIRY_SUB_VAR,
 )
 
 _CLEANUP_PREVIEW_SCRIPT = '''
+set -e
+
 gcloud container clusters get-credentials ${cluster} --zone=${location} --project=$PROJECT_ID
 
-NAMESPACES=$$(kubectl get namespace -o=jsonpath="{{range .items[?(@.metadata.annotations.preview/repo-name==\\"$REPO_NAME\\")]}}{{.metadata.name}},{{.metadata.annotations.preview/expiry}}{{end}}")
+IFS=
+NAMESPACES="$$(kubectl get namespace -o=jsonpath="{{range .items[?(@.metadata.annotations.preview/repo-name==\\"$REPO_NAME\\")]}}{{.metadata.name}},{{.metadata.annotations.preview/expiry}}{{\\"\\n\\"}}{{end}}")"
 
 if [[ -z $$NAMESPACES ]]; then
   echo "No preview environments found"
@@ -156,10 +158,10 @@ if [[ -z $$NAMESPACES ]]; then
 fi
 
 while read -r i; do
-  NAMESPACE=$(echo $$i | cut -d"," -f1)
-  EXPIRY=$(echo $$i | cut -d"," -f2)
+  NAMESPACE=$$(echo $$i | cut -d"," -f1)
+  EXPIRY=$$(echo $$i | cut -d"," -f2)
 
-  if [[ $(date "+%s") -ge $$EXPIRY ]]; then
+  if [[ $$(date "+%s") -ge $$EXPIRY ]]; then
     echo "Deleting expired preview environment in namespace $$NAMESPACE"
     kubectl delete namespace $$NAMESPACE
   else
@@ -175,7 +177,7 @@ done <<< $$NAMESPACES
 _BUILD_BUILD_STEP_ID = 'Build'
 _PUSH_BUILD_STEP_ID = 'Push'
 _PREPARE_DEPLOY_BUILD_STEP_ID = 'Prepare deploy'
-_SAVE_CONFIGS_BUILD_STEP_ID = 'Save configs'
+_SAVE_CONFIGS_BUILD_STEP_ID = 'Save generated Kubernetes configs'
 _APPLY_DEPLOY_BUILD_STEP_ID = 'Apply deploy'
 _ANNOTATE_PREVIEW_NAMESPACE_BUILD_STEP_ID = 'Annotate preview namespace'
 _CLEANUP_PREVIEW_BUILD_STEP_ID = 'Delete expired preview environments'
@@ -248,7 +250,7 @@ def CreateBuild(
     staged_source: An optional GCS object for a staged source repository. The
       object must have bucket, name, and generation fields. If this value is
       None, the created build will not have a source.
-    image: The image that will deployed and optionally built beforehand. The
+    image: The image that will be deployed and optionally built beforehand. The
       image can include a tag or digest.
     dockerfile_path: An optional path to the source repository's Dockerfile,
       relative to the source repository's root directory. If this value is not
@@ -367,6 +369,16 @@ def CreateBuild(
   build.options = messages.BuildOptions()
   build.options.substitutionOption = messages.BuildOptions.SubstitutionOptionValueValuesEnum.ALLOW_LOOSE
 
+  if build_and_push:
+    build.images = [image]
+
+  build.artifacts = messages.Artifacts(
+      objects=messages.ArtifactObjects(
+          location='gs://' + _EXPANDED_CONFIGS_PATH_DYNAMIC,
+          paths=['output/expanded/*']
+      )
+  )
+
   return build
 
 
@@ -374,7 +386,7 @@ def CreateGitPushBuildTrigger(
     messages, name, description, build_timeout,
     csr_repo_name, github_repo_owner, github_repo_name,
     branch_pattern, tag_pattern,
-    dockerfile_path, app_name, config_path, namespace,
+    image, dockerfile_path, app_name, config_path, namespace,
     expose_port, gcs_config_staging_path, cluster, location, build_tags,
     build_trigger_tags
 ):
@@ -407,6 +419,8 @@ def CreateGitPushBuildTrigger(
     tag_pattern: An optional regex value to be used to trigger. If this value
       if provided, branch_pattern should not be provided. branch_pattern or
       tag_pattern must be provided.
+    image: The image that will be built and deployed. The image can include a
+      tag or digest.
     dockerfile_path: An optional path to the source repository's Dockerfile,
       relative to the source repository's root directory that is set to a
       substitution variable. If this value is not provided, 'Dockerfile' is
@@ -449,7 +463,7 @@ def CreateGitPushBuildTrigger(
   build_trigger = messages.BuildTrigger(
       name=name,
       description=description,
-      build=CreateBuild(messages, build_timeout, True, None, _IMAGE,
+      build=CreateBuild(messages, build_timeout, True, None, image,
                         dockerfile_path, app_name, _VERSION, config_path,
                         namespace, expose_port, gcs_config_staging_path,
                         cluster, location, build_tags),
@@ -486,7 +500,7 @@ def CreatePRPreviewBuildTrigger(
     messages, name, description, build_timeout,
     github_repo_owner, github_repo_name,
     pr_pattern, preview_expiry_days, comment_control,
-    dockerfile_path, app_name, config_path, expose_port,
+    image, dockerfile_path, app_name, config_path, expose_port,
     gcs_config_staging_path, cluster, location, build_tags,
     build_trigger_tags
 ):
@@ -505,11 +519,14 @@ def CreatePRPreviewBuildTrigger(
       field.
     github_repo_name: A GitHub repo name to be used in the trigger's github
       field.
-    pr_pattern: A regex value to be used to trigger.
+    pr_pattern: A regex value that is the base branch that the PR is targeting,
+      which triggers the creation of the PR preview deployment.
     preview_expiry_days: How long a deployed preview application can exist
       before it is expired, in days, that is set to a substitution variable.
     comment_control: Whether or not a user must comment /gcbrun to trigger
       the deployment build.
+    image: The image that will be built and deployed. The image can include a
+      tag or digest.
     dockerfile_path: An optional path to the source repository's Dockerfile,
       relative to the source repository's root directory that is set to a
       substitution variable. If this value is not provided, 'Dockerfile' is
@@ -546,15 +563,23 @@ def CreatePRPreviewBuildTrigger(
 
   build = messages.Build(
       steps=[
-          _BuildBuildStep(messages, _IMAGE),
-          _PushBuildStep(messages, _IMAGE),
+          _BuildBuildStep(messages, image),
+          _PushBuildStep(messages, image),
           messages.BuildStep(
               id=_PREPARE_DEPLOY_BUILD_STEP_ID,
               name=_GKE_DEPLOY_PROD,
               entrypoint='sh',
               args=[
                   '-c',
-                  _PREPARE_PREVIEW_DEPLOY_SCRIPT
+                  _PREPARE_PREVIEW_DEPLOY_SCRIPT.format(
+                      image=image,
+                      cluster=_GKE_CLUSTER_SUB_VAR,
+                      location=_GKE_LOCATION_SUB_VAR,
+                      k8s_yaml_path=_K8S_YAML_PATH_SUB_VAR,
+                      app_name=_APP_NAME_SUB_VAR,
+                      k8s_annotations=_K8S_ANNOTATIONS_SUB_VAR,
+                      expose_port=_EXPOSE_PORT_SUB_VAR,
+                  )
               ]
           ),
           _SaveConfigsBuildStep(messages),
@@ -582,6 +607,13 @@ def CreatePRPreviewBuildTrigger(
       options=messages.BuildOptions(
           substitutionOption=messages.BuildOptions
           .SubstitutionOptionValueValuesEnum.ALLOW_LOOSE
+      ),
+      images=[image],
+      artifacts=messages.Artifacts(
+          objects=messages.ArtifactObjects(
+              location='gs://' + _EXPANDED_CONFIGS_PATH_DYNAMIC,
+              paths=['output/expanded/*']
+          )
       )
   )
 
@@ -628,8 +660,9 @@ def CreatePRPreviewBuildTrigger(
 
 
 def CreateCleanPreviewBuildTrigger(messages, name, description,
-                                   github_repo_owner, github_repo_name, cluster,
-                                   location, build_tags, build_trigger_tags):
+                                   github_repo_owner, github_repo_name,
+                                   cluster, location, build_tags,
+                                   build_trigger_tags):
   """Creates the Cloud BuildTrigger config that deletes expired preview deployments.
 
   Args:
@@ -655,7 +688,7 @@ def CreateCleanPreviewBuildTrigger(messages, name, description,
 
   substitutions = {
       _GKE_CLUSTER_SUB_VAR: cluster,
-      _GKE_LOCATION_SUB_VAR: location
+      _GKE_LOCATION_SUB_VAR: location,
   }
 
   build_trigger = messages.BuildTrigger(
@@ -804,7 +837,7 @@ def _SaveConfigsBuildStep(messages):
   return messages.BuildStep(
       id=_SAVE_CONFIGS_BUILD_STEP_ID,
       name='gcr.io/cloud-builders/gsutil',
-      entrypoint='sh',
+      entrypoint='bash',
       args=[
           '-c',
           _SAVE_CONFIGS_SCRIPT

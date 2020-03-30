@@ -21,8 +21,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -37,7 +38,17 @@ COMMANDS
      revoke
         Revoke previously generated Application Default Credentials.
 
+     set-quota-project
+        Update or add a quota project in application default credentials (ADC).
+
 EXAMPLES
+    To use your own user credentials for your application to access an API,
+    run:
+
+        $ gcloud auth application-default login
+
+    This will take you through a web flow to acquire new user credentials.
+
     To create a service account and have your application use it for API
     access, run:
 
@@ -46,12 +57,6 @@ EXAMPLES
           --iam-account=my-account@my-project.iam.gserviceaccount.com
         $ export GOOGLE_APPLICATION_CREDENTIALS=key.json
         $ ./my_application.sh
-
-    To temporarily use your own user credentials, run:
-
-        $ gcloud auth application-default login
-
-    This will take you through a web flow to acquire new user credentials.
 
 NOTES
     This variant is also available:

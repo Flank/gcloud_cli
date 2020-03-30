@@ -13,8 +13,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -31,6 +32,10 @@ COMMANDS
 
      create
         Create a Compute Engine managed instance group.
+
+     create-instance
+        Create a new virtual machine instance in a managed instance group with
+        a defined name.
 
      delete
         Delete Google Compute Engine managed instance groups.
@@ -74,8 +79,18 @@ COMMANDS
      update
         Update Google Compute Engine managed instance groups.
 
+     update-autoscaling
+        Update autoscaling parameters of a managed instance group.
+
+     update-instances
+        Immediately update selected instances in a Google Compute Engine
+        managed instance group.
+
+     wait-until
+        Wait until the managed instance group reaches the desired state.
+
      wait-until-stable
-        Waits until state of managed instance group is stable.
+        (DEPRECATED) Waits until state of managed instance group is stable.
 
 NOTES
     These variants are also available:

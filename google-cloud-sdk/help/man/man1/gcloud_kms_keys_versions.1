@@ -27,8 +27,9 @@ material.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -62,12 +63,20 @@ Enable a given version.
 Get the public key for a given version.
 
 .TP 2m
+\fBimport\fR
+Import a version into an existing crypto key.
+
+.TP 2m
 \fBlist\fR
 List the versions within a key.
 
 .TP 2m
 \fBrestore\fR
 Restore a version scheduled for destruction.
+
+.TP 2m
+\fBupdate\fR
+Update a key version.
 
 
 .RE

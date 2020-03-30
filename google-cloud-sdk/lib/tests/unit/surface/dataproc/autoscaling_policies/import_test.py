@@ -22,7 +22,9 @@ import copy
 import os
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.command_lib.export import util as export_util
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
@@ -38,9 +40,11 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
   # N.B. this test suite assumes edge cases around reading the YAML files and
   # resolving duration fields is already taken care of in util_test.py.
 
-  def testImportAutoscalingPolicies_create(self):
-    policy = self.MakeAutoscalingPolicy('fake-project', 'antarctica-north42',
-                                        'policy-1')
+  def _testImportAutoscalingPolicies_create(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+
+    policy = self.MakeAutoscalingPolicy('fake-project', region, 'policy-1')
 
     self.WriteInput(
         export_util.Export(
@@ -50,42 +54,43 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
     expected_request_policy.name = None
 
     response_policy = copy.deepcopy(expected_request_policy)
-    response_policy.name = 'projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1'
+    response_policy.name = ('projects/fake-project/regions/{0}/'
+                            'autoscalingPolicies/policy-1'.format(region))
 
     self.mock_client.projects_regions_autoscalingPolicies.Create.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesCreateRequest(
-            parent='projects/fake-project/regions/antarctica-north42',
-            autoscalingPolicy=expected_request_policy,
-        ),
-        response=response_policy)
-
-    result = self.RunDataproc('autoscaling-policies import policy-1')
-    self.AssertMessagesEqual(response_policy, result)
-
-  def testImportAutoscalingPolicies_create_regionFlag(self):
-    policy = self.MakeAutoscalingPolicy('fake-project', 'cool-region',
-                                        'policy-1')
-
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
-
-    expected_request_policy = copy.deepcopy(policy)
-    expected_request_policy.name = None
-
-    response_policy = copy.deepcopy(expected_request_policy)
-    response_policy.name = 'projects/fake-project/regions/cool-region/autoscalingPolicies/policy-1'
-
-    self.mock_client.projects_regions_autoscalingPolicies.Create.Expect(
-        self.messages.DataprocProjectsRegionsAutoscalingPoliciesCreateRequest(
-            parent='projects/fake-project/regions/cool-region',
+            parent='projects/fake-project/regions/{0}'.format(region),
             autoscalingPolicy=expected_request_policy,
         ),
         response=response_policy)
 
     result = self.RunDataproc(
-        'autoscaling-policies import policy-1 --region cool-region')
+        'autoscaling-policies import policy-1 {0}'.format(region_flag))
     self.AssertMessagesEqual(response_policy, result)
+
+  def testImportAutoscalingPolicies_create(self):
+    self._testImportAutoscalingPolicies_create()
+
+  def testImportAutoscalingPolicies_create_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('cool-region')
+    self._testImportAutoscalingPolicies_create(region='cool-region')
+
+  def testImportAutoscalingPolicies_create_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testImportAutoscalingPolicies_create(
+        region='cool-region', region_flag='--region=cool-region')
+
+  def testImportAutoscalingPolicies_create_withoutRegionProperty(self):
+    policy = self.MakeAutoscalingPolicy('fake-project', 'foobar', 'policy-1')
+
+    self.WriteInput(
+        export_util.Export(
+            message=policy, schema_path=self.autoscaling_policy_schema_path))
+
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('autoscaling-policies import policy-1', set_region=False)
 
   def testImportAutoscalingPolicies_create_uri(self):
     policy = self.MakeAutoscalingPolicy('cool-project', 'cool-region',

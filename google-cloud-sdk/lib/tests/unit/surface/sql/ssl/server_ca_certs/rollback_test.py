@@ -55,7 +55,7 @@ class _BaseServerCaCertsRollbackTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0)))),
+                            datetime.timedelta(0))).isoformat()),
                 data.GetSslCert(
                     instance_name, 'two',
                     datetime.datetime(
@@ -67,31 +67,33 @@ class _BaseServerCaCertsRollbackTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))))
+                            datetime.timedelta(0))).isoformat())
             ],
             kind='sql#sslCertsList',
         ))
     self.mocked_client.instances.RotateServerCa.Expect(
         self.messages.SqlInstancesRotateServerCaRequest(
             instance=instance_name,
-            instancesRotateServerCaRequest=self.messages.
-            InstancesRotateServerCaRequest(
+            instancesRotateServerCaRequest=self.messages
+            .InstancesRotateServerCaRequest(
                 rotateServerCaContext=self.messages.RotateServerCaContext(
                     nextVersion='one',),),
             project=self.Project(),
         ),
         data.GetOperation(
             self.Project(),
-            self.messages.DatabaseInstance(name=instance_name),
-            'UPDATE',
-            'PENDING'))
+            self.messages.DatabaseInstance(
+                kind='sql#instance', name=instance_name),
+            self.messages.Operation.OperationTypeValueValuesEnum.UPDATE,
+            self.messages.Operation.StatusValueValuesEnum.PENDING))
     self.mocked_client.operations.Get.Expect(
         data.GetOperationGetRequest(self.Project()),
         data.GetOperation(
             self.Project(),
-            self.messages.DatabaseInstance(name=instance_name),
-            'UPDATE',
-            'DONE'))
+            self.messages.DatabaseInstance(
+                kind='sql#instance', name=instance_name),
+            self.messages.Operation.OperationTypeValueValuesEnum.UPDATE,
+            self.messages.Operation.StatusValueValuesEnum.DONE))
     self.Run(
         'sql ssl server-ca-certs rollback --instance={}'.format(instance_name))
     self.AssertOutputContains(
@@ -125,7 +127,7 @@ one              2024-02-02T21:10:29.402000+00:00
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))))
+                            datetime.timedelta(0))).isoformat())
             ],
             kind='sql#sslCertsList',
         ))

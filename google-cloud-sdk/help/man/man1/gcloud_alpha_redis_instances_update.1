@@ -97,9 +97,15 @@ numbers.
 A list of Redis config KEY=VALUE pairs to update according to
 http://cloud.google.com/memorystore/docs/reference/redis\-configs. If a config
 parameter is already set, its value is modified; otherwise a new Redis config
-parameter is added. Currently, the only supported parameters are: maxmemory\-gb,
-maxmemory\-policy, notify\-keyspace\-events, activedefrag, lfu\-log\-factor,
-lfu\-decay\-time.
+parameter is added. Currently, the only supported parameters are:
+
+Redis version 3.2 and newer: maxmemory\-policy, notify\-keyspace\-events.
+
+Redis version 4.0 and newer: activedefrag, lfu\-decay\-time, lfu\-log\-factor,
+maxmemory\-gb.
+
+Redis version 5.0 and newer: stream\-node\-max\-bytes,
+stream\-node\-max\-entries.
 
 .TP 2m
 
@@ -127,6 +133,8 @@ $ gcloud alpha redis instances update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 
 .RE
@@ -138,8 +146,9 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

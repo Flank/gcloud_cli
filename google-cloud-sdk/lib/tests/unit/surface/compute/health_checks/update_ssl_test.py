@@ -61,11 +61,7 @@ class HealthChecksUpdateSslTest(test_base.BaseTest, test_case.WithOutputCapture,
               project='my-project'))],
     )
 
-    warning_msg = ('WARNING: The health-checks update ssl command will soon '
-                   'require either a --global or --region flag.\n'
-                  ) if self.track == calliope_base.ReleaseTrack.GA else ''
     self.AssertErrEquals(
-        warning_msg +
         'No change requested; skipping update for [my-health-check].\n',
         normalize_space=True)
 
@@ -936,9 +932,6 @@ class HealthChecksUpdateSslBetaTest(HealthChecksUpdateSslTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
-  def Run(self, cmd):
-    super(HealthChecksUpdateSslBetaTest, self).Run(cmd + ' --global')
-
   def testUriSupport(self):
     # This is the same as testRequestOption, but uses a full URI.
     self.make_requests.side_effect = iter([
@@ -954,7 +947,7 @@ class HealthChecksUpdateSslBetaTest(HealthChecksUpdateSslTest):
 
     self.Run("""
         compute health-checks update ssl
-          https://compute.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/my-health-check
           --request req
         """)
 
@@ -1013,16 +1006,6 @@ class HealthChecksUpdateSslBetaTest(HealthChecksUpdateSslTest):
 
     # By default, the resource should not be displayed
     self.assertFalse(self.GetOutput())
-
-
-class HealthChecksUpdateSslAlphaTest(HealthChecksUpdateSslBetaTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
-
-  def Run(self, cmd):
-    super(HealthChecksUpdateSslAlphaTest, self).Run(cmd + ' --global')
 
   @parameterized.named_parameters(
       ('DisableLogging', '--no-enable-logging', False),
@@ -1098,12 +1081,22 @@ class HealthChecksUpdateSslAlphaTest(HealthChecksUpdateSslBetaTest):
     )
 
 
-class RegionHealthChecksUpdateSslBetaTest(test_base.BaseTest,
-                                          test_case.WithOutputCapture):
+class HealthChecksUpdateSslAlphaTest(HealthChecksUpdateSslBetaTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
+
+  def Run(self, cmd):
+    super(HealthChecksUpdateSslAlphaTest, self).Run(cmd + ' --global')
+
+
+class RegionHealthChecksUpdateSslTest(test_base.BaseTest,
+                                      test_case.WithOutputCapture,
+                                      parameterized.TestCase):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testUriSupport(self):
     # This is the same as testRequestOption, but uses a full URI.
@@ -1185,6 +1178,91 @@ class RegionHealthChecksUpdateSslBetaTest(test_base.BaseTest,
 
     # By default, the resource should not be displayed
     self.assertFalse(self.GetOutput())
+
+
+class RegionHealthChecksUpdateSslBetaTest(RegionHealthChecksUpdateSslTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+
+  @parameterized.named_parameters(
+      ('DisableLogging', '--no-enable-logging', False),
+      ('EnableLogging', '--enable-logging', True))
+  def testLogConfig(self, enable_logs_flag, enable_logs):
+
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(
+                    port=80, portName='happy-port'))
+        ],
+        [],
+    ])
+
+    self.Run("""
+    compute health-checks update ssl my-health-check --region us-west-1 {0}"""
+             .format(enable_logs_flag))
+
+    expected_log_config = self.messages.HealthCheckLogConfig(enable=enable_logs)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      port=80, portName='happy-port'),
+                  logConfig=expected_log_config),
+              project='my-project',
+              region='us-west-1'))],
+    )
+
+  def testEnableToDisableLogConfig(self):
+    log_config = self.messages.HealthCheckLogConfig(enable=True)
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                sslHealthCheck=self.messages.SSLHealthCheck(
+                    port=80, portName='happy-port'),
+                logConfig=log_config)
+        ],
+        [],
+    ])
+
+    self.Run("""compute health-checks update ssl my-health-check
+             --region us-west-1 --no-enable-logging""")
+
+    expected_log_config = self.messages.HealthCheckLogConfig(enable=False)
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Get',
+          self.messages.ComputeRegionHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project',
+              region='us-west-1'))],
+        [(self.compute.regionHealthChecks, 'Update',
+          self.messages.ComputeRegionHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      port=80, portName='happy-port'),
+                  logConfig=expected_log_config),
+              project='my-project',
+              region='us-west-1'))],
+    )
 
 
 class RegionHealthChecksUpdateSslAlphaTest(RegionHealthChecksUpdateSslBetaTest):

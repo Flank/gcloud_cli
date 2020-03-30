@@ -70,7 +70,7 @@ class BaseAttestationsTest(
               publicKeys=[],
           ))
 
-    self.request_occurrence = self.CreateGenericRequestOccurrence(
+    self.request_occurrence = self.CreateRequestAttestationOccurrence(
         project_ref=self.project_ref,
         artifact_url=self.artifact_url,
         note_ref=resources.REGISTRY.ParseRelativeName(
@@ -83,7 +83,7 @@ class BaseAttestationsTest(
 
 
 class CreateTest(
-    binauthz_test_base.WithMockBetaContaineranalysis,
+    binauthz_test_base.WithMockV1Containeranalysis,
     binauthz_test_base.WithMockGaBinauthz,
     BaseAttestationsTest,
 ):
@@ -153,7 +153,7 @@ class CreateTest(
         self.artifact_url)[:-1]
     response_occurrence = self.ExpectProjectsOccurrencesCreate(
         project_ref=self.project_ref,
-        request_occurrence=self.CreateGenericRequestOccurrence(
+        request_occurrence=self.CreateRequestAttestationOccurrence(
             project_ref=self.project_ref,
             artifact_url=self.artifact_url,
             note_ref=resources.REGISTRY.ParseRelativeName(
@@ -202,7 +202,6 @@ class CreateBetaTest(
 class CreateAlphaTest(
     binauthz_test_base.WithMockKms,
     binauthz_test_base.WithMockAlphaBinauthz,
-    binauthz_test_base.WithMockV1Containeranalysis,
     CreateTest,
 ):
 
@@ -476,7 +475,7 @@ class CreateAlphaTest(
 class SignAndCreateTestBeta(
     binauthz_test_base.WithMockKms,
     binauthz_test_base.WithMockBetaBinauthz,
-    binauthz_test_base.WithMockBetaContaineranalysis,
+    binauthz_test_base.WithMockV1Containeranalysis,
     BaseAttestationsTest,
 ):
 
@@ -704,7 +703,6 @@ class SignAndCreateTestBeta(
 
 class SignAndCreateTestAlpha(
     binauthz_test_base.WithMockAlphaBinauthz,
-    binauthz_test_base.WithMockV1Containeranalysis,
     SignAndCreateTestBeta,
 ):
 
@@ -853,8 +851,8 @@ class SignAndCreateTestAlpha(
 
 
 class ListTest(
+    binauthz_test_base.WithMockV1Containeranalysis,
     binauthz_test_base.WithMockGaBinauthz,
-    binauthz_test_base.WithMockBetaContaineranalysis,
     BaseAttestationsTest,
 ):
 
@@ -947,7 +945,6 @@ class ListBetaTest(
 
 class ListAlphaTest(
     binauthz_test_base.WithMockAlphaBinauthz,
-    binauthz_test_base.WithMockV1Containeranalysis,
     ListBetaTest,
 ):
 

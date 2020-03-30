@@ -23,6 +23,7 @@ from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import apis_internal
 from googlecloudsdk.api_lib.util import apis_util
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.credentials import http
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from googlecloudsdk.third_party.apis import apis_map
@@ -40,11 +41,9 @@ class ApisTest(sdk_test_base.SdkBase):
     apis.AddToApisMap('compute', 'alpha', False)
     apis.AddToApisMap('dns', 'v1', True)
     apis.AddToApisMap('dns', 'v1beta1', False)
-    apis.AddToApisMap('sqladmin', 'v1beta3', True)
-    apis.AddToApisMap('sqladmin', 'v1beta4', False)
+    apis.AddToApisMap('sql', 'v1beta4', True)
 
     self.StartObjectPatch(apis_util, '_API_NAME_ALIASES', {
-        'sql': 'sqladmin',
     })
 
   def testConstructAPIDef(self):
@@ -128,16 +127,6 @@ class ApisTest(sdk_test_base.SdkBase):
     actual_api_def = apis_internal._GetApiDef('compute', 'v1')
     self.assertEqual(expected_api_def, actual_api_def)
 
-    expected_api_def = apis.ConstructApiDef('sql', 'v1beta4', False)
-    properties.VALUES.api_client_overrides.sql.Set('v1beta4')
-    actual_api_def = apis_internal._GetApiDef('sql', 'v1beta3')
-    self.assertEqual(expected_api_def, actual_api_def)
-
-  def testGetApiDefWithAlias(self):
-    sqladmin_api_def = apis_internal._GetApiDef('sqladmin', 'v1beta3')
-    also_sqladmin_api_def = apis_internal._GetApiDef('sql', 'v1beta3')
-    self.assertEqual(sqladmin_api_def, also_sqladmin_api_def)
-
   def testGetApiDefUnknownAPI(self):
     with self.assertRaisesRegex(
         apis_util.UnknownAPIError,
@@ -171,20 +160,36 @@ class ApisTest(sdk_test_base.SdkBase):
 
     override = 'http://localhost:1234/'
     properties.VALUES.api_endpoint_overrides.sql.Set(override)
-    client = apis.GetClientInstance('sql', 'v1beta3', no_http=True)
+    client = apis.GetClientInstance('sql', 'v1beta4', no_http=True)
     self.assertEqual(override, client._url)
 
+  def testGetClientWithGoogleAuth(self):
+    # By default, google-auth is not used for authentication.
+    http_mock = self.StartObjectPatch(http, 'Http')
+    apis.GetClientInstance('compute', 'v1')
+    http_mock.assert_called_once_with(
+        response_encoding=http.ENCODING, use_google_auth=False)
+
+    # google-auth will be used for authentication if GetClientInstance method
+    # indicates so.
+    http_mock.reset_mock()
+    apis.GetClientInstance('compute', 'v1', use_google_auth=True)
+    http_mock.assert_called_once_with(
+        response_encoding=http.ENCODING, use_google_auth=True)
+
   def testGetDefaultEndpointForUrl(self):
-    url = 'https://www.googleapis.com/sql/v1beta3/path/to/resource'
+    url = 'https://sqladmin.googleapis.com/sql/v1beta3/path/to/resource'
     default_endpoint_url = apis_internal._GetDefaultEndpointUrl(url)
     self.assertEqual(url, default_endpoint_url)
 
   def testGetDefaultEndpointForUrl_Override(self):
     override = 'http://localhost:1234/'
     properties.VALUES.api_endpoint_overrides.sql.Set(override)
+    # sql v1beta4 on One Platform moves the sql/v1beta4 string into the resource
+    # definitions.
     endpoint = apis_internal._GetDefaultEndpointUrl(
-        override + 'path/to/resource')
-    self.assertEqual('https://www.googleapis.com/sql/v1beta3/path/to/resource',
+        override + 'sql/v1beta4/path/to/resource')
+    self.assertEqual('https://sqladmin.googleapis.com/sql/v1beta4/path/to/resource',
                      endpoint)
 
   def testGetDefaultMessagesModule(self):

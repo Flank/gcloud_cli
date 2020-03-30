@@ -1,54 +1,53 @@
 NAME
-    gcloud beta compute sole-tenancy node-groups - read Google Compute Engine
+    gcloud beta compute sole-tenancy node-groups - read Compute Engine
         sole-tenancy node groups
 
 SYNOPSIS
     gcloud beta compute sole-tenancy node-groups COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Read Google Compute Engine sole-tenancy node groups.
+    (BETA) Read Compute Engine sole-tenancy node groups.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add IAM policy binding to a Google Compute Engine node group.
+        (BETA) Add IAM policy binding to a Compute Engine node group.
 
      create
-        (BETA) Creates a Google Compute Engine node group.
+        (BETA) Create a Compute Engine node group.
 
      delete
-        (BETA) Deletes a Google Compute Engine node group.
+        (BETA) Delete a Compute Engine node group.
 
      describe
-        (BETA) Describes a Google Compute Engine node group.
+        (BETA) Describe a Compute Engine node group.
 
      get-iam-policy
-        (BETA) Get the IAM policy for a Google Compute Engine node group.
+        (BETA) Get the IAM policy for a Compute Engine node group.
 
      list
         (BETA) List Google Compute Engine node groups.
 
      list-nodes
-        (BETA) List Google Compute Engine sole-tenant nodes present in a node
-        group.
+        (BETA) List Compute Engine sole-tenant nodes present in a nodegroup.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding from a Google Compute Engine node
-        group.
+        (BETA) Remove IAM policy binding from a Compute Engine node group.
 
      set-iam-policy
-        (BETA) Set the IAM policy for a Google Compute Engine node group.
+        (BETA) Set the IAM policy for a Compute Engine node group.
 
      update
-        (BETA) Updates a Google Compute Engine node group.
+        (BETA) Update a Compute Engine node group.
 
 NOTES
     This command is currently in BETA and may change without notice. These

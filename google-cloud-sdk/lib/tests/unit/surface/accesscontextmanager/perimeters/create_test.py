@@ -29,6 +29,7 @@ from six import text_type
 class PerimetersCreateTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -56,14 +57,14 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
         get_req_type(name=perimeter.name), perimeter)
 
   def testCreate_MissingRequired(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must be specified'):
       self.Run('access-context-manager perimeters create my_perimeter '
                '    --policy 123 --title "My Title"')
 
   def testCreate(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter_kwargs = {
         'title': 'My Perimeter Title',
         'description': None,
@@ -86,7 +87,7 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
 
   def testCreate_PolicyFromProperty(self):
 
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
 
@@ -113,7 +114,7 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
     self.assertEqual(result, perimeter)
 
   def testCreate_AllParamsRestrictedServices(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter_kwargs = {
         'title': 'My Perimeter Title',
         'description': None,
@@ -150,16 +151,18 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
 class PerimetersCreateTestBeta(PerimetersCreateTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class PerimetersCreateTestAlpha(PerimetersCreateTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testCreate_ServiceFilterCreation(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter_kwargs = {
         'title': 'My Perimeter Title',
         'description': None,
@@ -168,7 +171,7 @@ class PerimetersCreateTestAlpha(PerimetersCreateTestGA):
         'access_levels': ['MY_LEVEL', 'MY_LEVEL_2'],
         'type_': 'PERIMETER_TYPE_BRIDGE',
         'vpc_allowed_services': ['foo-vpc.googleapis.com'],
-        'enable_vpc_service_restriction': True,
+        'enable_vpc_accessible_services': True,
     }
 
     perimeter = self._MakePerimeter('MY_PERIMETER', **perimeter_kwargs)
@@ -182,7 +185,7 @@ class PerimetersCreateTestAlpha(PerimetersCreateTestGA):
         '    --title "My Perimeter Title" '
         '    --resources projects/12345,projects/67890'
         '    --vpc-allowed-services foo-vpc.googleapis.com'
-        '    --enable-vpc-service-restriction')
+        '    --enable-vpc-accessible-services')
 
     self.assertEqual(result, perimeter)
 

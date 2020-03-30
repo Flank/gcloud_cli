@@ -21,15 +21,19 @@ from __future__ import unicode_literals
 import time
 
 from apitools.base.py import encoding
+from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.cloudbuild import logs as cb_logs
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
+from googlecloudsdk.api_lib.compute import instance_utils
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.api_lib.services import enable_api as services_api
 from googlecloudsdk.api_lib.storage import storage_util
+from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.cloudbuild import execution
 from googlecloudsdk.command_lib.compute.sole_tenancy import util as sole_tenancy_util
 from googlecloudsdk.command_lib.projects import util as projects_util
@@ -42,16 +46,40 @@ from googlecloudsdk.core.console import console_io
 import six
 
 _IMAGE_IMPORT_BUILDER = 'gcr.io/compute-image-tools/gce_vm_image_import:{}'
-
 _IMAGE_EXPORT_BUILDER = 'gcr.io/compute-image-tools/gce_vm_image_export:{}'
-
 _OVF_IMPORT_BUILDER = 'gcr.io/compute-image-tools/gce_ovf_import:{}'
 
 _DEFAULT_BUILDER_VERSION = 'release'
 
-SERVICE_ACCOUNT_ROLES = [
-    'roles/iam.serviceAccountUser',
-    'roles/iam.serviceAccountTokenCreator']
+ROLE_COMPUTE_STORAGE_ADMIN = 'roles/compute.storageAdmin'
+ROLE_STORAGE_OBJECT_VIEWER = 'roles/storage.objectViewer'
+ROLE_STORAGE_OBJECT_ADMIN = 'roles/storage.objectAdmin'
+ROLE_COMPUTE_ADMIN = 'roles/compute.admin'
+ROLE_IAM_SERVICE_ACCOUNT_USER = 'roles/iam.serviceAccountUser'
+ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR = 'roles/iam.serviceAccountTokenCreator'
+ROLE_EDITOR = 'roles/editor'
+
+IMPORT_ROLES_FOR_COMPUTE_SERVICE_ACCOUNT = frozenset({
+    ROLE_COMPUTE_STORAGE_ADMIN,
+    ROLE_STORAGE_OBJECT_VIEWER,
+})
+
+EXPORT_ROLES_FOR_COMPUTE_SERVICE_ACCOUNT = frozenset({
+    ROLE_COMPUTE_STORAGE_ADMIN,
+    ROLE_STORAGE_OBJECT_ADMIN,
+})
+
+IMPORT_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT = frozenset({
+    ROLE_COMPUTE_ADMIN,
+    ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR,
+    ROLE_IAM_SERVICE_ACCOUNT_USER,
+})
+
+EXPORT_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT = frozenset({
+    ROLE_COMPUTE_ADMIN,
+    ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR,
+    ROLE_IAM_SERVICE_ACCOUNT_USER,
+})
 
 
 class FilteredLogTailer(cb_logs.LogTailer):
@@ -138,7 +166,7 @@ class ImageOperation(object):
   EXPORT = 'export'
 
 
-def AddCommonDaisyArgs(parser, add_log_location=True):
+def AddCommonDaisyArgs(parser, add_log_location=True, operation='a build'):
   """Common arguments for Daisy builds."""
 
   if add_log_location:
@@ -153,11 +181,11 @@ def AddCommonDaisyArgs(parser, add_log_location=True):
       '--timeout',
       type=arg_parsers.Duration(),
       default='2h',
-      help="""\
-          Maximum time a build can last before it fails as "TIMEOUT".
+      help=("""\
+          Maximum time {} can last before it fails as "TIMEOUT".
           For example, specifying `2h` fails the process after 2 hours.
           See $ gcloud topic datetimes for information about duration formats.
-          """)
+          """).format(operation))
   base.ASYNC_FLAG.AddToParser(parser)
 
 
@@ -177,17 +205,43 @@ def AddExtraCommonDaisyArgs(parser):
   )
 
 
-def _CheckIamPermissions(project_id):
+def AddOVFSourceUriArg(parser):
+  """Adds OVF Source URI arg."""
+  parser.add_argument(
+      '--source-uri',
+      required=True,
+      help=('Cloud Storage path to one of:\n  OVF descriptor\n  '
+            'OVA file\n  Directory with OVF package'))
+
+
+def AddGuestEnvironmentArg(parser, resource='instance'):
+  """Adds Google Guest environment arg."""
+  parser.add_argument(
+      '--guest-environment',
+      action='store_true',
+      default=True,
+      help='The guest environment will be installed on the {}.'.format(
+          resource)
+  )
+
+
+def _CheckIamPermissions(project_id, cloudbuild_service_account_roles,
+                         compute_service_account_roles):
   """Check for needed IAM permissions and prompt to add if missing.
 
   Args:
-    project_id: A string with the name of the project.
+    project_id: A string with the id of the project.
+    cloudbuild_service_account_roles: A set of roles required for cloudbuild
+      service account.
+    compute_service_account_roles: A set of roles required for compute service
+      account.
   """
   project = projects_api.Get(project_id)
   # If the user's project doesn't have cloudbuild enabled yet, then the service
   # account won't even exist. If so, then ask to enable it before continuing.
   # Also prompt them to enable Stackdriver Logging if they haven't yet.
-  expected_services = ['cloudbuild.googleapis.com', 'logging.googleapis.com']
+  expected_services = ['cloudbuild.googleapis.com', 'logging.googleapis.com',
+                       'compute.googleapis.com']
   for service_name in expected_services:
     if not services_api.IsServiceEnabled(project.projectId, service_name):
       # TODO(b/112757283): Split this out into a separate library.
@@ -201,23 +255,61 @@ def _CheckIamPermissions(project_id):
           cancel_on_no=True)
       services_api.EnableService(project.projectId, service_name)
 
-  # Now that we're sure the service account exists, actually check permissions.
-  service_account = 'serviceAccount:{0}@cloudbuild.gserviceaccount.com'.format(
+  build_account = 'serviceAccount:{0}@cloudbuild.gserviceaccount.com'.format(
       project.projectNumber)
-  expected_permissions = {'roles/compute.admin': service_account}
-  for role in SERVICE_ACCOUNT_ROLES:
-    expected_permissions[role] = service_account
+  # https://cloud.google.com/compute/docs/access/service-accounts#default_service_account
+  compute_account = (
+      'serviceAccount:{0}-compute@developer.gserviceaccount.com'.format(
+          project.projectNumber))
 
-  permissions = projects_api.GetIamPolicy(project_id)
-  for binding in permissions.bindings:
-    if expected_permissions.get(binding.role) in binding.members:
-      del expected_permissions[binding.role]
+  # Now that we're sure the service account exists, actually check permissions.
+  try:
+    policy = projects_api.GetIamPolicy(project_id)
+  except apitools_exceptions.HttpForbiddenError:
+    log.warning(
+        'Your account does not have permission to check roles for the '
+        'service account {0}. If import fails, '
+        'ensure "{0}" has the roles "{1}" and "{2}" has the roles "{3}" before '
+        'retrying.'.format(build_account, cloudbuild_service_account_roles,
+                           compute_account, compute_service_account_roles))
+    return
 
-  if expected_permissions:
-    ep_table = [
-        '{0} {1}'.format(role, account)
-        for role, account in expected_permissions.items()
-    ]
+  _VerifyRolesAndPromptIfMissing(project_id, build_account,
+                                 _CurrentRolesForAccount(policy, build_account),
+                                 cloudbuild_service_account_roles)
+
+  current_compute_account_roles = _CurrentRolesForAccount(
+      policy, compute_account)
+
+  # By default, the Compute Engine service account has the role `roles/editor`
+  # applied to it, which is sufficient for import and export. If that's not
+  # present, then request the minimal number of permissions.
+  if ROLE_EDITOR not in current_compute_account_roles:
+    _VerifyRolesAndPromptIfMissing(
+        project_id, compute_account, current_compute_account_roles,
+        compute_service_account_roles)
+
+
+def _VerifyRolesAndPromptIfMissing(project_id, account, applied_roles,
+                                   required_roles):
+  """Check for IAM permissions for an account and prompt to add if missing.
+
+  Args:
+    project_id: A string with the id of the project.
+    account: A string with the identifier of an account.
+    applied_roles: A set of strings containing the current roles for the
+      account.
+    required_roles: A set of strings containing the required roles for the
+      account. If a role isn't found, then the user is prompted to add the role.
+  """
+  # If there were unsatisfied roles, then prompt the user to add them.
+  try:
+    missing_roles = _FindMissingRoles(applied_roles, required_roles)
+  except apitools_exceptions.HttpForbiddenError:
+    missing_roles = required_roles - applied_roles
+
+  if missing_roles:
+    ep_table = ['{0} {1}'.format(role, account) for role in missing_roles]
     prompt_message = (
         'The following IAM permissions are needed for this operation:\n'
         '[{0}]\n'.format('\n'.join(ep_table)))
@@ -225,11 +317,74 @@ def _CheckIamPermissions(project_id):
         message=prompt_message,
         prompt_string='Would you like to add the permissions',
         throw_if_unattended=True,
-        cancel_on_no=True)
+        cancel_on_no=False)
 
-    for role, account in expected_permissions.items():
+    for role in sorted(missing_roles):
       log.info('Adding [{0}] to [{1}]'.format(account, role))
-      projects_api.AddIamPolicyBinding(project_id, account, role)
+      try:
+        projects_api.AddIamPolicyBinding(project_id, account, role)
+      except apitools_exceptions.HttpForbiddenError:
+        log.warning(
+            'Your account does not have permission to add roles to the '
+            'service account {0}. If import fails, '
+            'ensure "{0}" has the roles "{1}" before retrying.'.format(
+                account, required_roles))
+        return
+
+
+def _FindMissingRoles(applied_roles, required_roles):
+  """Check which required roles were not covered by given roles.
+
+  Args:
+    applied_roles: A set of strings containing the current roles for the
+      account.
+    required_roles: A set of strings containing the required roles for the
+      account.
+
+  Returns:
+    A set of missing roles that is not covered.
+  """
+  # A quick check without checking detailed permissions by IAM API.
+  if required_roles.issubset(applied_roles):
+    return None
+
+  iam_messages = apis.GetMessagesModule('iam', 'v1')
+  required_role_permissions = {}
+  required_permissions = set()
+  applied_permissions = set()
+  unsatisfied_roles = set()
+  for role in sorted(required_roles):
+    request = iam_messages.IamRolesGetRequest(name=role)
+    role_permissions = set(apis.GetClientInstance(
+        'iam', 'v1').roles.Get(request).includedPermissions)
+    required_role_permissions[role] = role_permissions
+    required_permissions = required_permissions.union(role_permissions)
+
+  for applied_role in sorted(applied_roles):
+    request = iam_messages.IamRolesGetRequest(name=applied_role)
+    applied_role_permissions = set(apis.GetClientInstance(
+        'iam', 'v1').roles.Get(request).includedPermissions)
+    applied_permissions = applied_permissions.union(
+        applied_role_permissions)
+
+  unsatisfied_permissions = required_permissions - applied_permissions
+  for role in required_roles:
+    if unsatisfied_permissions.intersection(required_role_permissions[role]):
+      unsatisfied_roles.add(role)
+
+  return unsatisfied_roles
+
+
+def _CurrentRolesForAccount(project_iam_policy, account):
+  """Returns a set containing the roles for `account`.
+
+  Args:
+    project_iam_policy: The response from GetIamPolicy.
+    account: A string with the identifier of an account.
+  """
+  return set(binding.role
+             for binding in project_iam_policy.bindings
+             if account in binding.members)
 
 
 def _CreateCloudBuild(build_config, client, messages):
@@ -329,7 +484,10 @@ def AppendNetworkAndSubnetArgs(args, builder_args):
     AppendArg(builder_args, 'network', args.network.lower())
 
 
-def RunImageImport(args, import_args, tags, output_filter,
+def RunImageImport(args,
+                   import_args,
+                   tags,
+                   output_filter,
                    docker_image_tag=_DEFAULT_BUILDER_VERSION):
   """Run a build over gce_vm_image_import on Google Cloud Builder.
 
@@ -351,10 +509,15 @@ def RunImageImport(args, import_args, tags, output_filter,
     FailedBuildException: If the build is completed and not 'SUCCESS'.
   """
   builder = _IMAGE_IMPORT_BUILDER.format(docker_image_tag)
-  return RunImageCloudBuild(args, builder, import_args, tags, output_filter)
+  return RunImageCloudBuild(args, builder, import_args, tags, output_filter,
+                            IMPORT_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT,
+                            IMPORT_ROLES_FOR_COMPUTE_SERVICE_ACCOUNT)
 
 
-def RunImageExport(args, export_args, tags, output_filter,
+def RunImageExport(args,
+                   export_args,
+                   tags,
+                   output_filter,
                    docker_image_tag=_DEFAULT_BUILDER_VERSION):
   """Run a build over gce_vm_image_export on Google Cloud Builder.
 
@@ -376,10 +539,14 @@ def RunImageExport(args, export_args, tags, output_filter,
     FailedBuildException: If the build is completed and not 'SUCCESS'.
   """
   builder = _IMAGE_EXPORT_BUILDER.format(docker_image_tag)
-  return RunImageCloudBuild(args, builder, export_args, tags, output_filter)
+  return RunImageCloudBuild(args, builder, export_args, tags, output_filter,
+                            EXPORT_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT,
+                            EXPORT_ROLES_FOR_COMPUTE_SERVICE_ACCOUNT)
 
 
-def RunImageCloudBuild(args, builder, builder_args, tags, output_filter):
+def RunImageCloudBuild(args, builder, builder_args, tags, output_filter,
+                       cloudbuild_service_account_roles,
+                       compute_service_account_roles):
   """Run a build related to image on Google Cloud Builder.
 
   Args:
@@ -391,6 +558,9 @@ def RunImageCloudBuild(args, builder, builder_args, tags, output_filter):
     output_filter: A list of strings indicating what lines from the log should
       be output. Only lines that start with one of the strings in output_filter
       will be displayed.
+    cloudbuild_service_account_roles: roles required for cloudbuild service
+      account.
+    compute_service_account_roles: roles required for compute service account.
 
   Returns:
     A build object that either streams the output or is displayed as a
@@ -402,7 +572,8 @@ def RunImageCloudBuild(args, builder, builder_args, tags, output_filter):
   project_id = projects_util.ParseProject(
       properties.VALUES.core.project.GetOrFail())
 
-  _CheckIamPermissions(project_id)
+  _CheckIamPermissions(project_id, cloudbuild_service_account_roles,
+                       compute_service_account_roles)
 
   return _RunCloudBuild(args, builder, builder_args,
                         ['gce-daisy'] + tags, output_filter, args.log_location)
@@ -497,8 +668,8 @@ def RunOVFImportBuild(args, compute_client, instance_name, source_uri,
                       description, labels, machine_type, network, network_tier,
                       subnet, private_network_ip, no_restart_on_failure, os,
                       tags, zone, project, output_filter,
-                      compute_release_track):
-  """Run a OVF import build on Google Cloud Builder.
+                      compute_release_track, hostname):
+  """Run a OVF into VM instance import build on Google Cloud Build.
 
   Args:
     args: an argparse namespace. All the arguments that were provided to this
@@ -531,6 +702,7 @@ def RunOVFImportBuild(args, compute_client, instance_name, source_uri,
       will be displayed.
     compute_release_track: release track to be used for Compute API calls. One
       of - "alpha", "beta" or ""
+    hostname: hostname of the instance to be imported
 
   Returns:
     A build object that either streams the output or is displayed as a
@@ -542,7 +714,8 @@ def RunOVFImportBuild(args, compute_client, instance_name, source_uri,
   project_id = projects_util.ParseProject(
       properties.VALUES.core.project.GetOrFail())
 
-  _CheckIamPermissions(project_id)
+  _CheckIamPermissions(project_id, IMPORT_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT,
+                       IMPORT_ROLES_FOR_COMPUTE_SERVICE_ACCOUNT)
 
   # Make OVF import time-out before gcloud by shaving off 2% from the timeout
   # time, up to a max of 5m (300s).
@@ -577,8 +750,85 @@ def RunOVFImportBuild(args, compute_client, instance_name, source_uri,
   _AppendNodeAffinityLabelArgs(ovf_importer_args, args, compute_client.messages)
   if compute_release_track:
     AppendArg(ovf_importer_args, 'release-track', compute_release_track)
+  AppendArg(ovf_importer_args, 'hostname', hostname)
 
   build_tags = ['gce-ovf-import']
+
+  backoff = lambda elapsed: 2 if elapsed < 30 else 15
+
+  return _RunCloudBuild(args, _OVF_IMPORT_BUILDER.format(args.docker_image_tag),
+                        ovf_importer_args, build_tags, output_filter,
+                        backoff=backoff)
+
+
+def RunMachineImageOVFImportBuild(args, output_filter, compute_release_track):
+  """Run a OVF into VM instance import build on Google Cloud Builder.
+
+  Args:
+    args: an argparse namespace. All the arguments that were provided to this
+      command invocation.
+    output_filter: A list of strings indicating what lines from the log should
+      be output. Only lines that start with one of the strings in output_filter
+      will be displayed.
+    compute_release_track: release track to be used for Compute API calls. One
+      of - "alpha", "beta" or ""
+
+  Returns:
+    A build object that either streams the output or is displayed as a
+    link to the build.
+
+  Raises:
+    FailedBuildException: If the build is completed and not 'SUCCESS'.
+  """
+  project_id = projects_util.ParseProject(
+      properties.VALUES.core.project.GetOrFail())
+
+  _CheckIamPermissions(project_id, IMPORT_ROLES_FOR_CLOUDBUILD_SERVICE_ACCOUNT,
+                       IMPORT_ROLES_FOR_COMPUTE_SERVICE_ACCOUNT)
+
+  # Make OVF import time-out before gcloud by shaving off 2% from the timeout
+  # time, up to a max of 5m (300s).
+  two_percent = int(args.timeout * 0.02)
+  ovf_import_timeout = args.timeout - min(two_percent, 300)
+
+  machine_type = None
+  if args.machine_type or args.custom_cpu or args.custom_memory:
+    machine_type = instance_utils.InterpretMachineType(
+        machine_type=args.machine_type,
+        custom_cpu=args.custom_cpu,
+        custom_memory=args.custom_memory,
+        ext=getattr(args, 'custom_extensions', None),
+        vm_type=getattr(args, 'custom_vm_type', None))
+
+  ovf_importer_args = []
+  AppendArg(ovf_importer_args, 'machine-image-name', args.IMAGE)
+  AppendArg(ovf_importer_args, 'machine-image-storage-location',
+            args.storage_location)
+  AppendArg(ovf_importer_args, 'client-id', 'gcloud')
+  AppendArg(ovf_importer_args, 'ovf-gcs-path', args.source_uri)
+  AppendBoolArg(ovf_importer_args, 'no-guest-environment',
+                not args.guest_environment)
+  AppendBoolArg(ovf_importer_args, 'can-ip-forward', args.can_ip_forward)
+  AppendArg(ovf_importer_args, 'description', args.description)
+  if args.labels:
+    AppendArg(ovf_importer_args, 'labels',
+              ','.join(['{}={}'.format(k, v) for k, v in args.labels.items()]))
+  AppendArg(ovf_importer_args, 'machine-type', machine_type)
+  AppendArg(ovf_importer_args, 'network', args.network)
+  AppendArg(ovf_importer_args, 'network-tier', args.network_tier)
+  AppendArg(ovf_importer_args, 'subnet', args.subnet)
+  AppendBoolArg(ovf_importer_args, 'no-restart-on-failure',
+                not args.restart_on_failure)
+  AppendArg(ovf_importer_args, 'os', args.os)
+  if args.tags:
+    AppendArg(ovf_importer_args, 'tags', ','.join(args.tags))
+  AppendArg(ovf_importer_args, 'zone', properties.VALUES.compute.zone.Get())
+  AppendArg(ovf_importer_args, 'timeout', ovf_import_timeout, '-{0}={1}s')
+  AppendArg(ovf_importer_args, 'project', args.project)
+  if compute_release_track:
+    AppendArg(ovf_importer_args, 'release-track', compute_release_track)
+
+  build_tags = ['gce-ovf-machine-image-import']
 
   backoff = lambda elapsed: 2 if elapsed < 30 else 15
 
@@ -614,15 +864,7 @@ def AppendBoolArg(args, name, arg=True):
 
 
 def MakeGcsUri(uri):
-  obj_ref = resources.REGISTRY.Parse(uri)
-  return 'gs://{0}/{1}'.format(obj_ref.bucket, obj_ref.object)
-
-
-def MakeGcsObjectOrPathUri(uri):
   """Creates Google Cloud Storage URI for an object or a path.
-
-  Raises storage_util.InvalidObjectNameError if a path contains only bucket
-  name.
 
   Args:
     uri: a string to a Google Cloud Storage object or a path. Can be a gs:// or
@@ -635,4 +877,48 @@ def MakeGcsObjectOrPathUri(uri):
   if hasattr(obj_ref, 'object'):
     return 'gs://{0}/{1}'.format(obj_ref.bucket, obj_ref.object)
   else:
+    return 'gs://{0}/'.format(obj_ref.bucket)
+
+
+def MakeGcsObjectUri(uri):
+  """Creates Google Cloud Storage URI for an object.
+
+  Raises storage_util.InvalidObjectNameError if a path contains only bucket
+  name.
+
+  Args:
+    uri: a string to a Google Cloud Storage object. Can be a gs:// or
+         an https:// variant.
+
+  Returns:
+    Google Cloud Storage URI for an object.
+  """
+  obj_ref = resources.REGISTRY.Parse(uri)
+  if hasattr(obj_ref, 'object'):
+    return 'gs://{0}/{1}'.format(obj_ref.bucket, obj_ref.object)
+  else:
     raise storage_util.InvalidObjectNameError(uri, 'Missing object name')
+
+
+def ValidateZone(args, compute_client):
+  """Validate Compute Engine zone from args.zone.
+
+  If not present in args, returns early.
+  Args:
+    args: CLI args dictionary
+    compute_client: Compute Client
+
+  Raises:
+    InvalidArgumentException: when args.zone is an invalid GCE zone
+  """
+  if not args.zone:
+    return
+
+  requests = [(compute_client.apitools_client.zones, 'Get',
+               compute_client.messages.ComputeZonesGetRequest(
+                   project=properties.VALUES.core.project.GetOrFail(),
+                   zone=args.zone))]
+  try:
+    compute_client.MakeRequests(requests)
+  except calliope_exceptions.ToolException:
+    raise calliope_exceptions.InvalidArgumentException('--zone', args.zone)

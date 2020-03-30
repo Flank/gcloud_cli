@@ -30,24 +30,26 @@ from tests.lib.surface.compute import test_resources
 import mock
 
 
-class MachineImagesListTest(test_base.BaseTest,
-                            completer_test_base.CompleterBase):
+class MachineImagesListTestBeta(test_base.BaseTest,
+                                completer_test_base.CompleterBase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
+    self.api_version = 'beta'
     lister_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
         autospec=True)
     self.addCleanup(lister_patcher.stop)
     self.mock_get_global_resources = lister_patcher.start()
     self.mock_get_global_resources.return_value = (
-        resource_projector.MakeSerializable(test_resources.MACHINE_IMAGES))
+        resource_projector.MakeSerializable(
+            test_resources.MakeMachineImages(self.messages, self.api_version)))
 
   def testTableOutput(self):
     self.Run('compute machine-images list')
     self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute_alpha.machineImages,
+        service=self.compute.machineImages,
         project='my-project',
         filter_expr=None,
         http=self.mock_http(),
@@ -58,13 +60,14 @@ class MachineImagesListTest(test_base.BaseTest,
             NAME STATUS
             machine-image-1 READY
             machine-image-2 CREATING
-            """), normalize_space=True)
+            """),
+        normalize_space=True)
 
   def testMachineImagesCompleter(self):
     self.RunCompleter(
         completers.MachineImagesCompleter,
         expected_command=[
-            'alpha',
+            'beta',
             'compute',
             'machine-images',
             'list',
@@ -72,19 +75,32 @@ class MachineImagesListTest(test_base.BaseTest,
             '--quiet',
             '--format=disable',
         ],
-        expected_completions=[
-            'machine-image-1',
-            'machine-image-2'
-        ],
-        cli=self.cli,
-    )
+        expected_completions=['machine-image-1', 'machine-image-2'],
+        cli=self.cli)
     self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute_alpha.machineImages,
+        service=self.compute.machineImages,
         project='my-project',
         filter_expr=None,
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
+
+
+class MachineImagesListTestAlpha(test_base.BaseTest,
+                                 completer_test_base.CompleterBase):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+    self.api_version = 'alpha'
+    lister_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
+        autospec=True)
+    self.addCleanup(lister_patcher.stop)
+    self.mock_get_global_resources = lister_patcher.start()
+    self.mock_get_global_resources.return_value = (
+        resource_projector.MakeSerializable(
+            test_resources.MakeMachineImages(self.messages, self.api_version)))
 
 
 if __name__ == '__main__':

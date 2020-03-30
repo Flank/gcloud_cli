@@ -3,19 +3,23 @@ NAME
         Google Cloud Platform
 
 SYNOPSIS
-    gcloud beta container memberships unregister --context=CONTEXT
+    gcloud beta container memberships unregister [--context=CONTEXT]
         [--kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) This command unregisters a cluster referenced from a kubeconfig file
-    from Google Cloud Platform. It also removes the Connect agent installation
-    from the Cluster.
+    (BETA) (DEPRECATED) Unregisters a cluster from Google Cloud Platform.
 
-REQUIRED FLAGS
+    This command group is deprecated. Please use gcloud container hub
+    memberships command group instead.
+
+    This command unregisters a cluster referenced from a kubeconfig file from
+    Google Cloud Platform. It also removes the Connect agent installation from
+    the Cluster.
+
+FLAGS
      --context=CONTEXT
         The context in the kubeconfig file that specifies the cluster.
 
-OPTIONAL FLAGS
      --kubeconfig=KUBECONFIG
         The kubeconfig file containing an entry for the cluster. Defaults to
         $KUBECONFIG if it is set in the environment, otherwise defaults to to
@@ -25,8 +29,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     Unregister a cluster referenced from the default kubeconfig file:

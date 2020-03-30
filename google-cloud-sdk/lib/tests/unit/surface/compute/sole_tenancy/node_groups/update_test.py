@@ -28,7 +28,7 @@ from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
 
 
-class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
+class NodeGroupsUpdateTest(sdk_test_base.WithFakeAuth,
                            cli_test_base.CliTestBase, waiter_test_base.Base):
 
   def PreSetUp(self):
@@ -52,8 +52,9 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
     return self.messages.Operation(
         name=operation_name,
         status=status,
-        selfLink='https://compute.googleapis.com/compute/v1/projects/{0}/zones/'
-        '{1}/operations/{2}'.format(self.Project(), self.zone, operation_name),
+        selfLink='https://compute.googleapis.com/compute/{0}/projects/{1}/zones/'
+        '{2}/operations/{3}'.format(self.api_version, self.Project(), self.zone,
+                                    operation_name),
         targetLink=resource_uri)
 
   def _ExpectSetNodeTemplate(self, node_template, operation_suffix='X'):
@@ -95,10 +96,10 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
 
   def _ExpectSetAutoscalingPolicy(self, autoscaling_policy,
                                   operation_suffix='X'):
-    autoscaling_request_class = self.messages.NodeGroupsSetAutoscalingPolicyRequest
-    self.client.nodeGroups.SetAutoscalingPolicy.Expect(
-        self.messages.ComputeNodeGroupsSetAutoscalingPolicyRequest(
-            nodeGroupsSetAutoscalingPolicyRequest=autoscaling_request_class(
+    autoscaling_request_class = self.messages.NodeGroup
+    self.client.nodeGroups.Patch.Expect(
+        self.messages.ComputeNodeGroupsPatchRequest(
+            nodeGroupResource=autoscaling_request_class(
                 autoscalingPolicy=autoscaling_policy),
             nodeGroup='my-node-group',
             project=self.Project(),
@@ -107,8 +108,8 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
                                   self.operation_status_enum.PENDING))
 
   def _ExpectPollAndGet(self, operation_suffix='X'):
-    self.client.zoneOperations.Get.Expect(
-        self.messages.ComputeZoneOperationsGetRequest(
+    self.client.zoneOperations.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
             operation='operation-' + operation_suffix,
             zone=self.zone,
             project=self.Project()),
@@ -118,6 +119,7 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
             'https://compute.googleapis.com/compute/v1/projects/{0}/zones/'
             '{1}/nodeGroups/{2}'.format(self.Project(), self.zone,
                                         'my-node-group')))
+
     self.client.nodeGroups.Get.Expect(
         self.messages.ComputeNodeGroupsGetRequest(
             nodeGroup='my-node-group', project=self.Project(), zone=self.zone),
@@ -184,80 +186,93 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
                '--add-nodes 2 --delete-nodes node-2,node-5 --zone ' + self.zone)
 
 
-class NodeGroupsCreateTestBeta(NodeGroupsCreateTest):
+class NodeGroupsUpdateTestBeta(NodeGroupsUpdateTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'beta'
 
-
-class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_version = 'alpha'
-
   def testUpdate_SetAutoscalingPolicy(self):
     mode = self.messages.NodeGroupAutoscalingPolicy.ModeValueValuesEnum('ON')
     self._ExpectSetAutoscalingPolicy({'mode': mode,
-                                      'minSize': 10,
-                                      'maxSize': 60})
+                                      'minNodes': 10,
+                                      'maxNodes': 60})
     self._ExpectPollAndGet()
     self.Run('compute sole-tenancy node-groups update my-node-group '
-             '--mode=on --min-size=10 --max-size=60 '
+             '--autoscaler-mode=on --min-nodes=10 --max-nodes=60 '
              '--zone ' + self.zone)
     self.AssertErrContains(
-        'Setting autoscaling policy on [my-node-group] to '
-        '[mode=on,min-size=10,max-size=60].')
+        'Updating autoscaling policy on [my-node-group] to '
+        '[autoscaler-mode=on,min-nodes=10,max-nodes=60].')
 
   def testUpdate_SetAutoscalingPolicyMode(self):
     mode = self.messages.NodeGroupAutoscalingPolicy.ModeValueValuesEnum('ON')
     self._ExpectSetAutoscalingPolicy({'mode': mode})
     self._ExpectPollAndGet()
     self.Run('compute sole-tenancy node-groups update my-node-group '
-             '--mode=on '
+             '--autoscaler-mode=on '
              '--zone ' + self.zone)
     self.AssertErrContains(
-        'Setting autoscaling policy on [my-node-group] to '
-        '[mode=on].')
-
-  def testUpdate_SetAutoscalingPolicyNoMode(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --max-size --min-size: --mode must be specified.'):
-      self.Run('compute sole-tenancy node-groups update my-node-group '
-               '--min-size=10 --max-size=60 '
-               '--zone ' + self.zone)
+        'Updating autoscaling policy on [my-node-group] to '
+        '[autoscaler-mode=on].')
 
   def testUpdate_SetAutoscalingPolicyWrongMode(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --mode: [mode] must be one of [off,on]'):
+    with self.AssertRaisesArgumentErrorRegexp(
+        r"argument --autoscaler-mode: Invalid choice: 'foo'\." '\n\n'
+        r'Valid choices are \[off, on, only-scale-out\]'):
       self.Run('compute sole-tenancy node-groups update my-node-group '
-               '--mode=foo '
+               '--autoscaler-mode=foo '
                '--zone ' + self.zone)
 
   def testUpdate_SetAutoscalingPolicyModeMin(self):
     mode = self.messages.NodeGroupAutoscalingPolicy.ModeValueValuesEnum('ON')
     self._ExpectSetAutoscalingPolicy({'mode': mode,
-                                      'minSize': 10})
+                                      'minNodes': 10})
     self._ExpectPollAndGet()
     self.Run('compute sole-tenancy node-groups update my-node-group '
-             '--mode=on --min-size=10 '
+             '--autoscaler-mode=on --min-nodes=10 '
              '--zone ' + self.zone)
     self.AssertErrContains(
-        'Setting autoscaling policy on [my-node-group] to '
-        '[mode=on,min-size=10].')
+        'Updating autoscaling policy on [my-node-group] to '
+        '[autoscaler-mode=on,min-nodes=10].')
 
   def testUpdate_SetAutoscalingPolicyModeMax(self):
     mode = self.messages.NodeGroupAutoscalingPolicy.ModeValueValuesEnum('ON')
     self._ExpectSetAutoscalingPolicy({'mode': mode,
-                                      'maxSize': 60})
+                                      'maxNodes': 60})
     self._ExpectPollAndGet()
     self.Run('compute sole-tenancy node-groups update my-node-group '
-             '--mode=on --max-size=60 '
+             '--autoscaler-mode=on --max-nodes=60 '
              '--zone ' + self.zone)
     self.AssertErrContains(
-        'Setting autoscaling policy on [my-node-group] to '
-        '[mode=on,max-size=60].')
+        'Updating autoscaling policy on [my-node-group] to '
+        '[autoscaler-mode=on,max-nodes=60].')
+
+  def testUpdate_PatchAutoscalingNoMode(self):
+    self._ExpectSetAutoscalingPolicy({'maxNodes': 60})
+    self._ExpectPollAndGet()
+    self.Run('compute sole-tenancy node-groups update my-node-group '
+             '--max-nodes=60 '
+             '--zone ' + self.zone)
+    self.AssertErrContains(
+        'Updating autoscaling policy on [my-node-group] to '
+        '[max-nodes=60].')
+
+  def testUpdate_MinNodesZero(self):
+    self._ExpectSetAutoscalingPolicy({'minNodes': 0})
+    self._ExpectPollAndGet()
+    self.Run('compute sole-tenancy node-groups update my-node-group '
+             '--min-nodes=0 '
+             '--zone ' + self.zone)
+    self.AssertErrContains(
+        'Updating autoscaling policy on [my-node-group] to [min-nodes=0].')
+
+
+class NodeGroupsUpdateTestAlpha(NodeGroupsUpdateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
 if __name__ == '__main__':
   test_case.main()

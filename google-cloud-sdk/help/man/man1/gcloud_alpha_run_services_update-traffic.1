@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud alpha run services update\-traffic \- adjust the trafic assignments for a Cloud Run service
+gcloud alpha run services update\-traffic \- adjust the traffic assignments for a Cloud Run service
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha run services update\-traffic\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-async\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-to\-latest\fR\ |\ \fB\-\-to\-revisions\fR=[\fIREVISION\-NAME\fR=\fIPERCENTAGE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha run services update\-traffic\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-async\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-clear\-tags\fR\ |\ \fB\-\-set\-tags\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-tags\fR=[\fIKEY\fR,...]\ \fB\-\-update\-tags\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-to\-latest\fR\ |\ \fB\-\-to\-revisions\fR=[\fIREVISION\-NAME\fR=\fIPERCENTAGE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Adjust the trafic assignments for a Cloud Run service.
+\fB(ALPHA)\fR Adjust the traffic assignments for a Cloud Run service.
 
 
 
@@ -75,6 +75,48 @@ connecting.
 .sp
 
 
+.TP 2m
+
+Specify traffic tags. Traffic tags can be assigned to a revision by name or to
+the latest ready revision. Assigning a tag to a revision generates a URL
+prefixed with the tag that allows addressing that revision directly, regardless
+of the percent traffic specified. Keys are tags. Values are revision names or
+"LATEST" for the latest ready revision. For example,
+\-\-set\-tags=candidate=LATEST,current=myservice\-v1 assigns the tag "candidate"
+to the latest ready revision and the tag "current" to the revision with name
+"service\-nw9hs" and clears any existing tags. Changing tags does not affect the
+traffic percentage assigned to revisions. When using a tags flag and one or more
+of \-\-to\-latest and \-\-to\-revisions, in the same command, the tags change
+occurs first, then the traffic percentage change occurs. At most one of these
+may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-tags\fR
+Remove all tags.
+
+.TP 2m
+\fB\-\-set\-tags\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as tags. All existing tags will be removed
+first.
+
+.TP 2m
+
+Only \-\-update\-tags and \-\-remove\-tags can be used together. If both are
+specified, \-\-remove\-tags will be applied first.
+
+.RS 2m
+.TP 2m
+\fB\-\-remove\-tags\fR=[\fIKEY\fR,...]
+List of tags to be removed.
+
+.TP 2m
+\fB\-\-update\-tags\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as tags.
+
+.RE
+.RE
+.sp
 .TP 2m
 
 Arguments to locate resources, depending on the platform used. At most one of
@@ -145,12 +187,6 @@ $KUBECONFIG is unset, this defaults to \f5~/.kube/config\fR.
 .sp
 .TP 2m
 
-Only applicable if connecting to Cloud Run for Anthos deployed on Google Cloud.
-Specify \f5\-\-platform=gke\fR to use:
-
-.RS 2m
-.TP 2m
-
 At most one of these may be specified:
 
 .RS 2m
@@ -183,7 +219,6 @@ latest ready revision.
 
 .RE
 .RE
-.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
@@ -191,8 +226,9 @@ latest ready revision.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -243,5 +279,10 @@ $ gcloud alpha run services update\-traffic myservice \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud run services update\-traffic
+$ gcloud beta run services update\-traffic
+.RE
 

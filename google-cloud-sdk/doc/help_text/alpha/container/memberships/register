@@ -3,14 +3,19 @@ NAME
         Google Cloud Platform
 
 SYNOPSIS
-    gcloud alpha container memberships register CLUSTER_NAME --context=CONTEXT
-        --service-account-key-file=SERVICE_ACCOUNT_KEY_FILE
+    gcloud alpha container memberships register CLUSTER_NAME
+        --service-account-key-file=SERVICE_ACCOUNT_KEY_FILE [--context=CONTEXT]
         [--kubeconfig=KUBECONFIG] [--manifest-output-file=MANIFEST_OUTPUT_FILE]
         [--proxy=PROXY] [--version=VERSION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) This command registers a cluster referenced from a kubeconfig file
-    with Google Cloud Platform. It also installs the Connect agent into this
+    (ALPHA) (DEPRECATED) Registers a cluster with Google Cloud Platform.
+
+    This command group is deprecated. Please use gcloud container hub
+    memberships command group instead.
+
+    This command registers a cluster referenced from a kubeconfig file with
+    Google Cloud Platform. It also installs the Connect agent into this
     cluster, or updates the Connect agent in a previously-registered cluster.
 
 POSITIONAL ARGUMENTS
@@ -18,13 +23,13 @@ POSITIONAL ARGUMENTS
         The name of the cluster being registered.
 
 REQUIRED FLAGS
-     --context=CONTEXT
-        The context in the kubeconfig file that specifies the cluster.
-
      --service-account-key-file=SERVICE_ACCOUNT_KEY_FILE
         The JSON file of a Google Cloud service account private key.
 
 OPTIONAL FLAGS
+     --context=CONTEXT
+        The context in the kubeconfig file that specifies the cluster.
+
      --kubeconfig=KUBECONFIG
         The kubeconfig file containing an entry for the cluster. Defaults to
         $KUBECONFIG if it is set in the environment, otherwise defaults to to
@@ -49,8 +54,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     Register a cluster referenced from the default kubeconfig file, installing

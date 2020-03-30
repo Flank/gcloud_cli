@@ -36,7 +36,7 @@ class DescribeTestGA(test_base.BaseTest, test_case.WithOutputCapture):
   def SetUp(self):
     self.SelectApi('v1')
 
-  def testDescribeWithInventoryData(self):
+  def testDescribeWithRegularInventoryData(self):
     installed_packages = (
         b'{"deb":[{"Name":"test-package","Arch":"all","Version":"v1"}]}')
     self.make_requests.side_effect = iter([[
@@ -81,6 +81,164 @@ class DescribeTestGA(test_base.BaseTest, test_case.WithOutputCapture):
           +----------------------+--------------+-----------------+
           | test-package         | all          | v1              |
           +----------------------+--------------+-----------------+
+          Architecture: x86_64
+          ShortName: debian
+        """))
+    self.AssertErrEquals('')
+
+  def testDescribeWithWindowsUpdateAgentInventoryData(self):
+    installed_packages = (
+        b'{"wua":[{"Categories":["Updates"],'
+        b'"CategoryIDs":["abc"],'
+        b'"Description":"Test","KBArticleIDs":["4530715"],'
+        b'"LastDeploymentChangeTime":"2019-12-10","RevisionNumber":1,'
+        b'"SupportURL":"https://abc",'
+        b'"Title":"Title","UpdateID":"12345"}]}')
+    self.make_requests.side_effect = iter([[
+        self.messages.GuestAttributes(
+            kind='compute#guestAttributes',
+            queryPath='guestInventory/',
+            queryValue=self.messages.GuestAttributesValue(items=[
+                self.messages.GuestAttributesEntry(
+                    key='Architecture',
+                    namespace='guestInventory',
+                    value='x86_64'),
+                self.messages.GuestAttributesEntry(
+                    key='ShortName', namespace='guestInventory',
+                    value='debian'),
+                self.messages.GuestAttributesEntry(
+                    key='InstalledPackages',
+                    namespace='guestInventory',
+                    value=base64.b64encode(zlib.compress(installed_packages)))
+            ]),
+            selfLink='link-to-instance?')
+    ]])
+
+    self.Run(
+        """compute instances os-inventory describe test-instance --zone zone-1"""
+    )
+
+    service = self.compute.instances
+    method = 'GetGuestAttributes'
+    request = self.messages.ComputeInstancesGetGuestAttributesRequest(
+        instance='test-instance',
+        project='my-project',
+        queryPath='guestInventory/',
+        zone='zone-1')
+    self.CheckRequests([(service, method, request)])
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+          +---------------------------------------------------------------------+
+          |              Installed Packages (Windows Update Agent)              |
+          +-------+------------+----------------+-------------+-----------------+
+          | TITLE | CATEGORIES | KB_ARTICLE_IDS | SUPPORT_URL | LAST_DEPLOYMENT |
+          +-------+------------+----------------+-------------+-----------------+
+          | Title | Updates    | 4530715        | https://abc | 2019-12-10      |
+          +-------+------------+----------------+-------------+-----------------+
+          Architecture: x86_64
+          ShortName: debian
+        """))
+    self.AssertErrEquals('')
+
+  def testDescribeWithWindowsQuickFixEngineeringInventoryData(self):
+    installed_packages = (b'{"qfe":[{"Caption":"http://abc",'
+                          b'"Description":"Update","HotFixID":"KB4480979",'
+                          b'"InstalledOn":"1/9/2019"}]}')
+    self.make_requests.side_effect = iter([[
+        self.messages.GuestAttributes(
+            kind='compute#guestAttributes',
+            queryPath='guestInventory/',
+            queryValue=self.messages.GuestAttributesValue(items=[
+                self.messages.GuestAttributesEntry(
+                    key='Architecture',
+                    namespace='guestInventory',
+                    value='x86_64'),
+                self.messages.GuestAttributesEntry(
+                    key='ShortName', namespace='guestInventory',
+                    value='debian'),
+                self.messages.GuestAttributesEntry(
+                    key='InstalledPackages',
+                    namespace='guestInventory',
+                    value=base64.b64encode(zlib.compress(installed_packages)))
+            ]),
+            selfLink='link-to-instance?')
+    ]])
+
+    self.Run(
+        """compute instances os-inventory describe test-instance --zone zone-1"""
+    )
+
+    service = self.compute.instances
+    method = 'GetGuestAttributes'
+    request = self.messages.ComputeInstancesGetGuestAttributesRequest(
+        instance='test-instance',
+        project='my-project',
+        queryPath='guestInventory/',
+        zone='zone-1')
+    self.CheckRequests([(service, method, request)])
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+          +------------------------------------------------------+
+          |      Installed Packages (Quick Fix Engineering)      |
+          +------------+-------------+------------+--------------+
+          |  CAPTION   | DESCRIPTION | HOT_FIX_ID | INSTALLED_ON |
+          +------------+-------------+------------+--------------+
+          | http://abc | Update      | KB4480979  | 1/9/2019     |
+          +------------+-------------+------------+--------------+
+          Architecture: x86_64
+          ShortName: debian
+        """))
+    self.AssertErrEquals('')
+
+  def testDescribeWithZypperPatchesInventoryData(self):
+    installed_packages = (
+        b'{"Zypper_patches":[{"Name":"SUSE-SLE-Module-Basesystem-15-2019-2992",'
+        b'"Category":"recommended","Severity":"moderate",'
+        b'"Summary":"Update"}]}')
+    self.make_requests.side_effect = iter([[
+        self.messages.GuestAttributes(
+            kind='compute#guestAttributes',
+            queryPath='guestInventory/',
+            queryValue=self.messages.GuestAttributesValue(items=[
+                self.messages.GuestAttributesEntry(
+                    key='Architecture',
+                    namespace='guestInventory',
+                    value='x86_64'),
+                self.messages.GuestAttributesEntry(
+                    key='ShortName', namespace='guestInventory',
+                    value='debian'),
+                self.messages.GuestAttributesEntry(
+                    key='InstalledPackages',
+                    namespace='guestInventory',
+                    value=base64.b64encode(zlib.compress(installed_packages)))
+            ]),
+            selfLink='link-to-instance?')
+    ]])
+
+    self.Run(
+        """compute instances os-inventory describe test-instance --zone zone-1"""
+    )
+
+    service = self.compute.instances
+    method = 'GetGuestAttributes'
+    request = self.messages.ComputeInstancesGetGuestAttributesRequest(
+        instance='test-instance',
+        project='my-project',
+        queryPath='guestInventory/',
+        zone='zone-1')
+    self.CheckRequests([(service, method, request)])
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+          +----------------------------------------------------------------------------+
+          |                         Installed Patches (Zypper)                         |
+          +-----------------------------------------+-------------+----------+---------+
+          |                   NAME                  |   CATEGORY  | SEVERITY | SUMMARY |
+          +-----------------------------------------+-------------+----------+---------+
+          | SUSE-SLE-Module-Basesystem-15-2019-2992 | recommended | moderate | Update  |
+          +-----------------------------------------+-------------+----------+---------+
           Architecture: x86_64
           ShortName: debian
         """))

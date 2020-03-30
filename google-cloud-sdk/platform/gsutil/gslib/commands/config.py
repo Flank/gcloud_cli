@@ -526,9 +526,9 @@ CONFIG_INPUTLESS_GSUTIL_SECTION_CONTENT = """
 # that is done we will re-enable parallel composite uploads by default in
 # gsutil.
 #
-# Note: Parallel composite uploads should not be used with NEARLINE or COLDLINE
-# storage class buckets, as doing this incurs an early deletion charge for
-# each component object.
+# Note: Parallel composite uploads should not be used with NEARLINE, COLDLINE,
+# or ARCHIVE storage class buckets, as doing this incurs an early deletion
+# charge for each component object.
 #
 # Note: Parallel composite uploads are not enabled with Cloud KMS encrypted
 # objects as a source or destination, as composition with KMS objects is not yet
@@ -1145,7 +1145,8 @@ class ConfigCommand(Command):
 # version to use. If not set below gsutil defaults to API version 1.
 """)
     api_version = 2
-    if cred_type == CredTypes.HMAC: api_version = 1
+    if cred_type == CredTypes.HMAC:
+      api_version = 1
 
     config_file.write('default_api_version = %d\n' % api_version)
 

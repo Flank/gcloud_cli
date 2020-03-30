@@ -1,0 +1,308 @@
+filters:
+  skip:
+    reason: flaking
+    bug: b/151422059
+title: Issue a certificate from an existing root, describe it, and revoke it.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: privateca certificates create $$ca-cert-name$$ --issuer $$root-certificate-authority$$
+      --issuer-location $$location$$ --csr test_csr.pem --validity P30D
+  - progress_tracker:
+    - message: Creating Certificate.
+    - status: SUCCESS
+  - stderr: |
+      Created Certificate [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$].
+- execute:
+  - command: privateca certificates describe $$ca-cert-name$$ --issuer $$root-certificate-authority$$
+      --issuer-location $$location$$ --format "yaml(pemCsr, name, lifetime)"
+  - stdout: |
+      lifetime: 2592000s
+      name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$
+      pemCsr: |
+        -----BEGIN CERTIFICATE REQUEST-----
+        MIIC/DCCAeQCAQAwgZQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9u
+        MREwDwYDVQQHDAhLaXJrbGFuZDEPMA0GA1UECgwGR29vZ2xlMQwwCgYDVQQLDANM
+        TEMxEzARBgNVBAMMCmdvb2dsZS5jb20xKTAnBgkqhkiG9w0BCQEWGnByaXZhdGUt
+        Y2EtdGVhbUBnb29nbGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+        AQEA7havZEbOFnmOTOCGhpHRM6WEWg8XGdAUbO123rIQ/ncHHAawPQNxFH72S/Aa
+        dIvC859FQnrtBuOLwUaeBU8KOjtAfFSmhIpcRE9Goh7w0Xb3eHHx13XICm4zIfX0
+        w3FNSEMLUZVtGPSr5qElr8uYdfQdC4m1q+O03z1BGOvBidRZE85XP8ZoFsb1/yC4
+        Sh86BuDSjuwdZ+2I2k+v7ydAgf4yJ7JWo6rHuUzAU5pePrw5uGRe/WJjif7CeaXl
+        qJn9FxciucYy3PgxtG4T5d2pvINP85K6R/e+MoUXexcKDhSTtVaqoiQUxznY4JQJ
+        TU0qa1kbSb4nEzuT1cX99mbjzwIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNV
+        HRMECDAGAQH/AgEAMA0GCSqGSIb3DQEBCwUAA4IBAQBeaZAaSdVU9sg3Ca9oUMYs
+        RcKuXJP9LCsXjbFRpxXYzNV+4UT/3ZfPpBgcK+tdHYHmvOG0mFZDSNqQ93WKOZ9p
+        FaVV64EewvvlJ9HWWHdfSqlEARgJApWO87dArqDDCnPbqEhQXAXW4eFm3tSO5GRI
+        owQVQOEWhchTQHmX00HIUu+W6I0Ronc9Izrjj+294V77+FJMPVeL0tiQUDkic034
+        OwXTcca2p4uaz2wgAo0NTRQVcXm1udFf5INeCOQr5MaRblnln9YNNvUDFffOhJUz
+        k3gbXlCvaMdcQ5F/Ogh40WDlTMQsY4KIHwADb9EkvCq50GcvwLkInTvWTLU2FnOf
+        -----END CERTIFICATE REQUEST-----
+- execute:
+  - command: privateca certificates revoke --certificate $$ca-cert-name$$ --issuer
+      $$root-certificate-authority$$ --issuer-location $$location$$ --reason key-compromise
+  - progress_tracker:
+    - message: Revoking Certificate.
+    - status: SUCCESS
+  - stdout: |-
+      Revoked certificate \[[^\]]+\] at \d{4}-\d{2}-\d{2}T[0-9-.:]+.
+      $
+actions:
+- define_reference:
+    reference: project
+    value: cloud-sdk-integration-testing
+- define_reference:
+    reference: location
+    value: us-central1
+- define_reference:
+    reference: root-certificate-authority
+    value: gcloud_test_root
+- load_resource:
+    path: tests/e2e/surface/privateca/test_data/test_csr.pem
+- generate_resource_id:
+    reference: ca-cert-name
+    prefix: gcloud_test
+    delimiter: _
+    requires_cleanup: false
+- execute_command:
+    command: privateca certificates create $$ca-cert-name$$ --issuer $$root-certificate-authority$$
+      --issuer-location $$location$$ --csr test_csr.pem --validity P30D
+    validation_only: true
+    events:
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://privateca\.googleapis\.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates\?alt=json&certificateId=$$ca-cert-name$$&requestId=[^&]+$
+          method: POST
+          headers: {}
+          body:
+            json:
+              lifetime: 2592000s
+              name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$
+              pemCsr: |
+                -----BEGIN CERTIFICATE REQUEST-----
+                MIIC/DCCAeQCAQAwgZQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9u
+                MREwDwYDVQQHDAhLaXJrbGFuZDEPMA0GA1UECgwGR29vZ2xlMQwwCgYDVQQLDANM
+                TEMxEzARBgNVBAMMCmdvb2dsZS5jb20xKTAnBgkqhkiG9w0BCQEWGnByaXZhdGUt
+                Y2EtdGVhbUBnb29nbGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+                AQEA7havZEbOFnmOTOCGhpHRM6WEWg8XGdAUbO123rIQ/ncHHAawPQNxFH72S/Aa
+                dIvC859FQnrtBuOLwUaeBU8KOjtAfFSmhIpcRE9Goh7w0Xb3eHHx13XICm4zIfX0
+                w3FNSEMLUZVtGPSr5qElr8uYdfQdC4m1q+O03z1BGOvBidRZE85XP8ZoFsb1/yC4
+                Sh86BuDSjuwdZ+2I2k+v7ydAgf4yJ7JWo6rHuUzAU5pePrw5uGRe/WJjif7CeaXl
+                qJn9FxciucYy3PgxtG4T5d2pvINP85K6R/e+MoUXexcKDhSTtVaqoiQUxznY4JQJ
+                TU0qa1kbSb4nEzuT1cX99mbjzwIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNV
+                HRMECDAGAQH/AgEAMA0GCSqGSIb3DQEBCwUAA4IBAQBeaZAaSdVU9sg3Ca9oUMYs
+                RcKuXJP9LCsXjbFRpxXYzNV+4UT/3ZfPpBgcK+tdHYHmvOG0mFZDSNqQ93WKOZ9p
+                FaVV64EewvvlJ9HWWHdfSqlEARgJApWO87dArqDDCnPbqEhQXAXW4eFm3tSO5GRI
+                owQVQOEWhchTQHmX00HIUu+W6I0Ronc9Izrjj+294V77+FJMPVeL0tiQUDkic034
+                OwXTcca2p4uaz2wgAo0NTRQVcXm1udFf5INeCOQr5MaRblnln9YNNvUDFffOhJUz
+                k3gbXlCvaMdcQ5F/Ogh40WDlTMQsY4KIHwADb9EkvCq50GcvwLkInTvWTLU2FnOf
+                -----END CERTIFICATE REQUEST-----
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '546'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/$$project$$/locations/$$location$$/operations/operation-1584057829302-5a0b134382020-66f9c627-5639cd77
+            metadata:
+              '@type': type.googleapis.com/google.cloud.security.privateca.v1alpha1.OperationMetadata
+              createTime: '2020-03-12T16:13:46.441888581Z'
+              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$
+              verb: create
+              requestedCancellation: false
+              apiVersion: v1alpha1
+            done: true
+            response:
+              name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$
+    - expect_progress_tracker:
+        message: Creating Certificate.
+        status: SUCCESS
+    - expect_stderr: |
+        Created Certificate [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca certificates describe $$ca-cert-name$$ --issuer $$root-certificate-authority$$
+      --issuer-location $$location$$ --format "yaml(pemCsr, name, lifetime)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '5976'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$
+            pemCsr: |
+              -----BEGIN CERTIFICATE REQUEST-----
+              MIIC/DCCAeQCAQAwgZQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9u
+              MREwDwYDVQQHDAhLaXJrbGFuZDEPMA0GA1UECgwGR29vZ2xlMQwwCgYDVQQLDANM
+              TEMxEzARBgNVBAMMCmdvb2dsZS5jb20xKTAnBgkqhkiG9w0BCQEWGnByaXZhdGUt
+              Y2EtdGVhbUBnb29nbGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+              AQEA7havZEbOFnmOTOCGhpHRM6WEWg8XGdAUbO123rIQ/ncHHAawPQNxFH72S/Aa
+              dIvC859FQnrtBuOLwUaeBU8KOjtAfFSmhIpcRE9Goh7w0Xb3eHHx13XICm4zIfX0
+              w3FNSEMLUZVtGPSr5qElr8uYdfQdC4m1q+O03z1BGOvBidRZE85XP8ZoFsb1/yC4
+              Sh86BuDSjuwdZ+2I2k+v7ydAgf4yJ7JWo6rHuUzAU5pePrw5uGRe/WJjif7CeaXl
+              qJn9FxciucYy3PgxtG4T5d2pvINP85K6R/e+MoUXexcKDhSTtVaqoiQUxznY4JQJ
+              TU0qa1kbSb4nEzuT1cX99mbjzwIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNV
+              HRMECDAGAQH/AgEAMA0GCSqGSIb3DQEBCwUAA4IBAQBeaZAaSdVU9sg3Ca9oUMYs
+              RcKuXJP9LCsXjbFRpxXYzNV+4UT/3ZfPpBgcK+tdHYHmvOG0mFZDSNqQ93WKOZ9p
+              FaVV64EewvvlJ9HWWHdfSqlEARgJApWO87dArqDDCnPbqEhQXAXW4eFm3tSO5GRI
+              owQVQOEWhchTQHmX00HIUu+W6I0Ronc9Izrjj+294V77+FJMPVeL0tiQUDkic034
+              OwXTcca2p4uaz2wgAo0NTRQVcXm1udFf5INeCOQr5MaRblnln9YNNvUDFffOhJUz
+              k3gbXlCvaMdcQ5F/Ogh40WDlTMQsY4KIHwADb9EkvCq50GcvwLkInTvWTLU2FnOf
+              -----END CERTIFICATE REQUEST-----
+            lifetime: 2592000s
+            pemCertificate: |
+              -----BEGIN CERTIFICATE-----
+              MIIELjCCAuKgAwIBAgIVAJduQlOwSeO3g7ebgD51zK5fchK/MEEGCSqGSIb3DQEB
+              CjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgwDQYJYIZIAWUDBAIB
+              BQCiAwIBIDBiMQkwBwYDVQQGEwAxCTAHBgNVBAgTADEJMAcGA1UEBxMAMQkwBwYD
+              VQQJEwAxCTAHBgNVBBETADEJMAcGA1UEChMAMQkwBwYDVQQLEwAxEzARBgNVBAMT
+              Cmdvb2dsZS5jb20wHhcNMjAwMzEyMTYxMzQ2WhcNMjAwNDExMTYxMzQ2WjB/MQsw
+              CQYDVQQGEwJVUzETMBEGA1UECBMKV2FzaGluZ3RvbjERMA8GA1UEBxMIS2lya2xh
+              bmQxCTAHBgNVBAkTADEJMAcGA1UEERMAMQ8wDQYDVQQKEwZHb29nbGUxDDAKBgNV
+              BAsTA0xMQzETMBEGA1UEAxMKZ29vZ2xlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQAD
+              ggEPADCCAQoCggEBAO4Wr2RGzhZ5jkzghoaR0TOlhFoPFxnQFGztdt6yEP53BxwG
+              sD0DcRR+9kvwGnSLwvOfRUJ67Qbji8FGngVPCjo7QHxUpoSKXERPRqIe8NF293hx
+              8dd1yApuMyH19MNxTUhDC1GVbRj0q+ahJa/LmHX0HQuJtavjtN89QRjrwYnUWRPO
+              Vz/GaBbG9f8guEofOgbg0o7sHWftiNpPr+8nQIH+MieyVqOqx7lMwFOaXj68Obhk
+              Xv1iY4n+wnml5aiZ/RcXIrnGMtz4MbRuE+XdqbyDT/OSukf3vjKFF3sXCg4Uk7VW
+              qqIkFMc52OCUCU1NKmtZG0m+JxM7k9XF/fZm488CAwEAAaNWMFQwEgYDVR0TAQH/
+              BAgwBgEB/wIBADAdBgNVHQ4EFgQUWCvt6PKU+cyZ6GhbWCNRDm/y9oEwHwYDVR0j
+              BBgwFoAUcoKGE1cKNNtqq4HvPNpm5TAZlQswQQYJKoZIhvcNAQEKMDSgDzANBglg
+              hkgBZQMEAgEFAKEcMBoGCSqGSIb3DQEBCDANBglghkgBZQMEAgEFAKIDAgEgA4IB
+              AQAe4bijdBA0pQnMoG4gXpcWVPXlHZ3UuRAHlVtJHGwnVj27FfRJ6Aw+LNum3Lrz
+              oP7fpp/gsCMZ39EF2Qjx0JbJBJttDqJ9dAehtG68SPOVvYCcpsxNZQuvx8QS4lQh
+              5/GJibUUMjux69qklKRZpIpD50RLarmtmQzVwVpO8epoQgbi3iN2CwjB0gIFW5Cy
+              ZHh1zuIXCebwoZYKVm26bNjMdYQHmW7BjSnIwSebPGaj77rVvcRcxXEtZ1LIzEa0
+              kBCembs7VY31xOxisxtTAYqTPSzaIHhRNZI9KhFNSUgU6fyuqMHMFX7BFcs+nKXY
+              957Kx4eZnuzn6PMwvD5GDwYV
+              -----END CERTIFICATE-----
+            certificateDescription:
+              subjectDescription:
+                subject:
+                  countryCode: US
+                  organization: Google
+                  organizationalUnit: LLC
+                  locality: Kirkland
+                  province: Washington
+                commonName: google.com
+                hexSerialNumber: 976e4253b049e3b783b79b803e75ccae5f7212bf
+                lifetime: 2592000s
+                notBeforeTime: '2020-03-12T16:13:46.714281406Z'
+                notAfterTime: '2020-04-11T16:13:46.714281406Z'
+              configValues:
+                caOptions:
+                  isCa: true
+                  maxIssuerPathLength: 0
+              publicKey:
+                type: PEM_RSA_KEY
+                key: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUE3aGF2WkViT0ZubU9UT0NHaHBIUgpNNldFV2c4WEdkQVViTzEyM3JJUS9uY0hIQWF3UFFOeEZINzJTL0FhZEl2Qzg1OUZRbnJ0QnVPTHdVYWVCVThLCk9qdEFmRlNtaElwY1JFOUdvaDd3MFhiM2VISHgxM1hJQ200eklmWDB3M0ZOU0VNTFVaVnRHUFNyNXFFbHI4dVkKZGZRZEM0bTFxK08wM3oxQkdPdkJpZFJaRTg1WFA4Wm9Gc2IxL3lDNFNoODZCdURTanV3ZForMkkyayt2N3lkQQpnZjR5SjdKV282ckh1VXpBVTVwZVBydzV1R1JlL1dKamlmN0NlYVhscUpuOUZ4Y2l1Y1l5M1BneHRHNFQ1ZDJwCnZJTlA4NUs2Ui9lK01vVVhleGNLRGhTVHRWYXFvaVFVeHpuWTRKUUpUVTBxYTFrYlNiNG5FenVUMWNYOTltYmoKendJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
+              subjectKeyId:
+                keyId: 582bede8f294f9cc99e8685b5823510e6ff2f681
+              authorityKeyId:
+                keyId: 72828613570a34db6aab81ef3cda66e53019950b
+            pemCertificateChain:
+            - |
+              -----BEGIN CERTIFICATE-----
+              MIIEEDCCAsSgAwIBAgIUGj9OUsA489OQV1RcAVyEFxZE/KUwQQYJKoZIhvcNAQEK
+              MDSgDzANBglghkgBZQMEAgEFAKEcMBoGCSqGSIb3DQEBCDANBglghkgBZQMEAgEF
+              AKIDAgEgMGIxCTAHBgNVBAYTADEJMAcGA1UECBMAMQkwBwYDVQQHEwAxCTAHBgNV
+              BAkTADEJMAcGA1UEERMAMQkwBwYDVQQKEwAxCTAHBgNVBAsTADETMBEGA1UEAxMK
+              Z29vZ2xlLmNvbTAeFw0yMDAzMDkxOTA3MzFaFw0zMDAzMTAwNTE1MTJaMGIxCTAH
+              BgNVBAYTADEJMAcGA1UECBMAMQkwBwYDVQQHEwAxCTAHBgNVBAkTADEJMAcGA1UE
+              ERMAMQkwBwYDVQQKEwAxCTAHBgNVBAsTADETMBEGA1UEAxMKZ29vZ2xlLmNvbTCC
+              ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALWMh6/adQZoPSMsizt43RuE
+              kB0Dh3A64apCAy4lnCNb7dBo0lA5Wx7D26KtWo//WQ6CVlsWkq217gbMec1lliGG
+              YwgG4SXfU0PC2ryiRwf9KcFYfUzQuzWaSY77CbOvWxCzqiPULF+trEagJblVJW19
+              4o9mvwNj7sUb5Pq5Y5w0OLylnSBdlKderWninddyl4qIjIjj4DUQ74+yRK37BnkU
+              iTClNVuFAcogAgMTn7l2qygDgHHZtQAgpfeGcjueVFWioBzbUThKeIy4BVuDPXhg
+              g+l4jZ8oqHdrrGWLrsxxaOrcMHxFA+yOLGvgYMod1IDqjtu/rhQ1/2aMR+Pm6v0C
+              AwEAAaNWMFQwEgYDVR0TAQH/BAgwBgEB/wIBADAdBgNVHQ4EFgQUcoKGE1cKNNtq
+              q4HvPNpm5TAZlQswHwYDVR0jBBgwFoAUcoKGE1cKNNtqq4HvPNpm5TAZlQswQQYJ
+              KoZIhvcNAQEKMDSgDzANBglghkgBZQMEAgEFAKEcMBoGCSqGSIb3DQEBCDANBglg
+              hkgBZQMEAgEFAKIDAgEgA4IBAQAXVXmR0LYSPVl2jOABYKsIxT3GyleF+tGer+fb
+              mNRhvd7eeehI6qGBO/tGcUw9hHdQnJHvazaTXlnbK3YawN3FdR1jz9ve14ifE3yc
+              lBENK+MsqRfx1NdqwUzNVktkO4FXbgy9lI8qFhvT2tbhA93rhF91/6tQVjmglKyD
+              ypEQQyJuuj37hVzO+42lOxpFMOfCBK1NGqutja8Zge6mIDHt5f1sfiOV9DesxYAv
+              392k3iOlaxvVgpyRIuAMtm4Ig+lJ7BuQSRWFsNS9NGJc52mhqjfAgTZupnWtDKhC
+              +lqa5Cma/nHFZyCnzeA69ePsyW29zmwjoaa9tkGYGvmh/zCj
+              -----END CERTIFICATE-----
+            createTime: '2020-03-12T16:13:46.431941052Z'
+            updateTime: '2020-03-12T16:13:47.544521971Z'
+    - expect_stdout: |
+        lifetime: 2592000s
+        name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$
+        pemCsr: |
+          -----BEGIN CERTIFICATE REQUEST-----
+          MIIC/DCCAeQCAQAwgZQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9u
+          MREwDwYDVQQHDAhLaXJrbGFuZDEPMA0GA1UECgwGR29vZ2xlMQwwCgYDVQQLDANM
+          TEMxEzARBgNVBAMMCmdvb2dsZS5jb20xKTAnBgkqhkiG9w0BCQEWGnByaXZhdGUt
+          Y2EtdGVhbUBnb29nbGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+          AQEA7havZEbOFnmOTOCGhpHRM6WEWg8XGdAUbO123rIQ/ncHHAawPQNxFH72S/Aa
+          dIvC859FQnrtBuOLwUaeBU8KOjtAfFSmhIpcRE9Goh7w0Xb3eHHx13XICm4zIfX0
+          w3FNSEMLUZVtGPSr5qElr8uYdfQdC4m1q+O03z1BGOvBidRZE85XP8ZoFsb1/yC4
+          Sh86BuDSjuwdZ+2I2k+v7ydAgf4yJ7JWo6rHuUzAU5pePrw5uGRe/WJjif7CeaXl
+          qJn9FxciucYy3PgxtG4T5d2pvINP85K6R/e+MoUXexcKDhSTtVaqoiQUxznY4JQJ
+          TU0qa1kbSb4nEzuT1cX99mbjzwIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNV
+          HRMECDAGAQH/AgEAMA0GCSqGSIb3DQEBCwUAA4IBAQBeaZAaSdVU9sg3Ca9oUMYs
+          RcKuXJP9LCsXjbFRpxXYzNV+4UT/3ZfPpBgcK+tdHYHmvOG0mFZDSNqQ93WKOZ9p
+          FaVV64EewvvlJ9HWWHdfSqlEARgJApWO87dArqDDCnPbqEhQXAXW4eFm3tSO5GRI
+          owQVQOEWhchTQHmX00HIUu+W6I0Ronc9Izrjj+294V77+FJMPVeL0tiQUDkic034
+          OwXTcca2p4uaz2wgAo0NTRQVcXm1udFf5INeCOQr5MaRblnln9YNNvUDFffOhJUz
+          k3gbXlCvaMdcQ5F/Ogh40WDlTMQsY4KIHwADb9EkvCq50GcvwLkInTvWTLU2FnOf
+          -----END CERTIFICATE REQUEST-----
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca certificates revoke --certificate $$ca-cert-name$$ --issuer
+      $$root-certificate-authority$$ --issuer-location $$location$$ --reason key-compromise
+    validation_only: true
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$:revoke?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              reason: KEY_COMPROMISE
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '546'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/atrefai-test/locations/$$location$$/operations/operation-1584029629110-5a0aaa35b57e5-37e78e15-3bfbeaab
+            metadata:
+              '@type': type.googleapis.com/google.cloud.security.privateca.v1alpha1.OperationMetadata
+              createTime: '2020-03-12T16:13:49.121821064Z'
+              target: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$
+              verb: revoke
+              requestedCancellation: false
+              apiVersion: v1alpha1
+            done: true
+            response:
+              name: projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$
+              revocationDetails:
+                revocationState: REVOCATION_REASON_UNSPECIFIED
+                revocationTime: '2020-04-17T15:14:00.105-07:00'
+    - expect_progress_tracker:
+        message: Revoking Certificate.
+        status: SUCCESS
+    - expect_stdout:
+        matches: |
+          Revoked certificate \[[^\]]+\] at \d{4}-\d{2}-\d{2}T[0-9-.:]+.
+    - expect_exit:
+        code: 0

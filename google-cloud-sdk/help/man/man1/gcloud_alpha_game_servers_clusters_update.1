@@ -11,13 +11,34 @@ gcloud alpha game servers clusters update \- update a Game Server Cluster
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha game servers clusters update\fR (\fICLUSTER\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-realm\fR=\fIREALM\fR) [\fB\-\-async\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha game servers clusters update\fR (\fICLUSTER\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-realm\fR=\fIREALM\fR) \fB\-\-dry\-run\fR [\fB\-\-preview\-time\fR=\fIPREVIEW_TIME\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR Update a Cloud Game Server Cluster.
+
+
+.SH "EXAMPLES"
+
+To update labels for Game Server Cluster 'my\-cluster' in project 'my\-project',
+realm 'my\-realm', and location in 'my\-location' run:
+
+.RS 2m
+$ gcloud alpha game servers clusters update my\-cluster \e
+    \-\-project=my\-project \-\-realm=my\-realm \-\-location=my\-location \e
+    \-\-update\-labels="key1=val1"  \-\-no\-dry\-run
+.RE
+
+To preview Game Server Cluster label update for 'my\-cluster' in project
+\'my\-project', realm 'my\-realm', and location in 'my\-location' run:
+
+.RS 2m
+$ gcloud alpha game servers clusters update my\-cluster \e
+    \-\-project=my\-project \-\-realm=my\-realm \-\-location=my\-location \e
+    \-\-update\-labels="key1=val1"  \-\-dry\-run
+.RE
 
 
 
@@ -53,12 +74,24 @@ Cloud Game Servers Realm.
 .RE
 .sp
 
-.SH "FLAGS"
+.SH "REQUIRED FLAGS"
 
 .RS 2m
 .TP 2m
-\fB\-\-async\fR
-Return immediately, without waiting for the operation in progress to complete.
+\fB\-\-dry\-run\fR
+Validate the changes, but do not execute it.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-preview\-time\fR=\fIPREVIEW_TIME\fR
+This attribute is only relevant for preview (\-\-dry\-run). It is used to
+validate the state for a future time.
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -96,6 +129,8 @@ $ gcloud alpha game servers clusters update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 
 .RE
@@ -107,8 +142,9 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -124,5 +160,9 @@ this API can be found at: https://cloud.google.com/solutions/gaming/
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta game servers clusters update
+.RE
 

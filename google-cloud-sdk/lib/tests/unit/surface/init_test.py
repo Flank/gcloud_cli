@@ -1586,6 +1586,8 @@ class InitNoAuthTest(
         _GetWelcomeMessage() +
         _GetCurrentSettings('active-one') +
         _GetPickConfigurationMessage([], 'active-one', new_config=False) +
+        'WARNING: Property [account] is overridden by environment setting '
+        '[CLOUDSDK_CORE_ACCOUNT=fake_account]\n' +
         _GetCurrentConfigMessage('active-one') +
         _GetDiagnosticsMessage() +
         _GetLoginPromptMessage(),
@@ -1790,10 +1792,7 @@ class InitNoAuthTest(
 
   def testGsutilConfig_BotoAlreadyExists(self):
     # Create a ~/.boto file.
-    boto_file = self.Touch(files.GetHomeDir(),
-                           name='.boto',
-                           contents='foo')
-    self.StartObjectPatch(files, 'ExpandHomeDir', return_value=boto_file)
+    self.Touch(files.GetHomeDir(), name='.boto', contents='foo')
     self.RunScenario(
         self.WithConfigurations([]) +
         self.WithAuth([], login='foo@google.com') +

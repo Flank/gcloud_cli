@@ -71,14 +71,15 @@ The fingerprint of the recommendation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "API REFERENCE"
 
-This command uses the \fBrecommender/v1alpha1\fR API. The full documentation for
+This command uses the \fBrecommender/v1alpha2\fR API. The full documentation for
 this API can be found at: https://cloud.google.com/recommender/docs/
 
 
@@ -90,7 +91,8 @@ To mark a recommenation as ACTIVE:
 .RS 2m
 $ gcloud alpha recommender recommendations mark\-active abcd\-1234 \e
     \-\-project=project\-name \-\-location=global \e
-    \-\-recommender=google.iam.policy.RoleRecommender \-\-etag=abc123
+    \-\-recommender=google.compute.instance.MachineTypeRecommender \e
+    \-\-etag=abc123
 .RE
 
 

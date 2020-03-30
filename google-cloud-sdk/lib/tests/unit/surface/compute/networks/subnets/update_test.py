@@ -392,13 +392,6 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
              subnetwork='subnet-1',
              subnetworkResource=expected_subnetwork_resource))])
 
-
-class SubnetsUpdateTestBeta(SubnetsUpdateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-
   def testSetRoleToActive(self):
     """Tests setting the role of a subnet to ACTIVE."""
     subnetwork_resource = {
@@ -466,6 +459,115 @@ class SubnetsUpdateTestBeta(SubnetsUpdateTest):
              subnetwork='subnet-1',
              subnetworkResource=subnetwork_resource,
              drainTimeoutSeconds=10))])
+
+
+class SubnetsUpdateTestBeta(SubnetsUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+
+  def testPrivateIpv6GoogleAccessWithDisableGoogleAccess(self):
+    """Tests set DISABLE_GOOGLE_ACCESS private ipv6 access on a subnet."""
+    subnetwork_resource = {
+        'name':
+            'subnet-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+          --private-ipv6-google-access-type disable
+          --region us-central2
+        """)
+    subnetwork_resource['privateIpv6GoogleAccess'] = (
+        self.messages.Subnetwork.PrivateIpv6GoogleAccessValueValuesEnum
+        .DISABLE_GOOGLE_ACCESS)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource))])
+
+  def testPrivateIpv6GoogleAccessWithEnableOutbound(self):
+    """Tests set ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE private ipv6 access on a subnet."""
+    subnetwork_resource = {
+        'name':
+            'subnet-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+          --private-ipv6-google-access-type enable-outbound-vm-access
+          --region us-central2
+        """)
+    subnetwork_resource['privateIpv6GoogleAccess'] = (
+        self.messages.Subnetwork.PrivateIpv6GoogleAccessValueValuesEnum
+        .ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource))])
+
+  def testPrivateIpv6GoogleAccessWithEnableBidirectional(self):
+    """Tests set ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE private ipv6 access on a subnet."""
+    subnetwork_resource = {
+        'name':
+            'subnet-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+          --private-ipv6-google-access-type enable-bidirectional-access
+          --region us-central2
+        """)
+    subnetwork_resource['privateIpv6GoogleAccess'] = (
+        self.messages.Subnetwork.PrivateIpv6GoogleAccessValueValuesEnum
+        .ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource))])
 
 
 class SubnetsUpdateTestAlpha(SubnetsUpdateTest):

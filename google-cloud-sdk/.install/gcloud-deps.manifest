@@ -258,6 +258,13 @@ lib/third_party/google/protobuf/unittest_proto3_arena_pb2.py
 lib/third_party/google/protobuf/util/__init__.py
 lib/third_party/google/protobuf/util/json_format_proto3_pb2.py
 lib/third_party/google/protobuf/wrappers_pb2.py
+lib/third_party/google_auth_httplib2/LICENSE
+lib/third_party/google_auth_httplib2/__init__.py
+lib/third_party/google_auth_oauthlib/LICENSE
+lib/third_party/google_auth_oauthlib/__init__.py
+lib/third_party/google_auth_oauthlib/flow.py
+lib/third_party/google_auth_oauthlib/helpers.py
+lib/third_party/google_auth_oauthlib/interactive.py
 lib/third_party/httplib2shim/LICENSE
 lib/third_party/httplib2shim/__init__.py
 lib/third_party/idna/LICENSE

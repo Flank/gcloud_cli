@@ -26,8 +26,9 @@ gcloud alpha bigtable instances tables \- query Cloud Bigtable tables
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -37,8 +38,24 @@ help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBadd\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Add an IAM policy binding to a Cloud Bigtable table.
+
+.TP 2m
+\fBget\-iam\-policy\fR
+\fB(ALPHA)\fR Get an IAM policy on a Cloud Bigtable table.
+
+.TP 2m
 \fBlist\fR
 \fB(ALPHA)\fR List existing Bigtable instance tables.
+
+.TP 2m
+\fBremove\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Remove an IAM policy binding from a Cloud Bigtable table.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+\fB(ALPHA)\fR Set an IAM policy on a Cloud Bigtable table.
 
 
 .RE
@@ -49,9 +66,10 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud bigtable instances tables
 $ gcloud beta bigtable instances tables
 .RE
 

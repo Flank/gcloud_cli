@@ -3,16 +3,47 @@ NAME
         Engine network endpoint groups
 
 SYNOPSIS
-    gcloud beta compute network-endpoint-groups list [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud beta compute network-endpoint-groups list [NAME ...]
+        [--regexp=REGEXP, -r REGEXP] [--global | --zones=[ZONE,...]]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute network-endpoint-groups list displays all Google
     Compute Engine network endpoint groups in a project.
 
-    By default, network endpoint groups from all zones are listed. The results
-    can be narrowed down using a filter: --filter="zone:( ZONE ... )".
+    By default, global network endpoint groups and network endpoint groups from
+    all zones are listed. The results can be narrowed down by providing the
+    --global or --zones flag.
+
+POSITIONAL ARGUMENTS
+     [NAME ...]
+        (DEPRECATED) If provided, show details for the specified names and/or
+        URIs of resources.
+
+        Argument NAME is deprecated. Use --filter="name=( 'NAME' ... )"
+        instead.
+
+FLAGS
+     --regexp=REGEXP, -r REGEXP
+        (DEPRECATED) Regular expression to filter the names of the results on.
+        Any names that do not match the entire regular expression will be
+        filtered out.
+
+        Flag --regexp is deprecated. Use --filter="name~'REGEXP'" instead.
+
+     At most one of these may be specified:
+
+       --global
+          If provided, only global resources are shown.
+
+       --zones=[ZONE,...]
+          (DEPRECATED) If provided, only zonal resources are shown. If
+          arguments are provided, only resources from the given zones are
+          shown.
+
+          Flag --zones is deprecated. Use --filter="zone:( ZONE ... )" instead.
+          For example --filter="zone:( europe-west1-b europe-west1-c )".
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -47,8 +78,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To list all network endpoint groups in a project in table form, run:
@@ -59,11 +91,15 @@ EXAMPLES
 
         $ gcloud beta compute network-endpoint-groups list --uri
 
-    To list all network endpoint groups in the us-central1-b and europe-west1-d
-    zones, run:
+    To list all global network endpoint groups in a project, run:
+
+        $ gcloud beta compute network-endpoint-groups list --global
+
+    To list all network endpoint groups in zones us-central1-b and
+    europe-west1-d, given they are zonal resources, run:
 
         $ gcloud beta compute network-endpoint-groups list \
-            --filter="zone:( us-central1-b europe-west1-d )"
+            --filter="zone:( europe-west1-d us-central1-b )"
 
 NOTES
     This command is currently in BETA and may change without notice. These

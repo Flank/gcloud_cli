@@ -1,0 +1,355 @@
+filters:
+  skipAlways:
+    reason: To mitgate request latency spike for now
+    bug: b/151437013
+title: Cloud Game Servers deployments rollout dry-run test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers realms create -q --no-user-output-enabled $$realm-id-1$$ --time-zone EST --location $$location$$
+- execute:
+  - command: |
+      game servers clusters create -q --no-user-output-enabled $$gsc-id-1$$ --location $$location$$ --realm
+        $$realm-id-1$$ --gke-cluster $$gke-cluster-id$$
+        --namespace default --no-dry-run
+- execute:
+  - command: |
+      game servers deployments create -q --no-user-output-enabled $$deployment-id-1$$ --location global
+- execute:
+  - command: |
+      game servers configs create -q --no-user-output-enabled $$config-id-1$$ --deployment $$deployment-id-1$$ --location global --fleet-configs-file fleet_configs.json --scaling-configs-file scaling_configs.json
+- execute:
+  - command: |
+      game servers deployments update-rollout $$deployment-id-1$$ --config-overrides-file config_overrides.yaml --dry-run --location global
+  - stdout: |-
+      .*
+      targetState:
+        details:.*
+        - fleetDetails:
+          - autoscaler:
+              name: autoscaler-$$deployment-id-1$$-config-.+
+              specSource:
+                gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                name: sc2
+            fleet:
+              name: fleet-$$deployment-id-1$$-config-.+
+              specSource:
+                gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                name: .+
+          gameServerClusterName: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$/gameServerClusters/$$gsc-id-1$$
+          gameServerDeploymentName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$.*
+      $
+- execute:
+  - command: |
+      game servers deployments update-rollout $$deployment-id-1$$ --default-config $$config-id-1$$ --dry-run --location global
+  - stdout: |-
+      .*
+      targetState:
+        details:.*
+        - fleetDetails:
+          - autoscaler:
+              name: autoscaler-$$deployment-id-1$$-config-.+
+              specSource:
+                gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                name: sc2
+            fleet:
+              name: fleet-$$deployment-id-1$$-config-.+
+              specSource:
+                gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                name: .+
+          gameServerClusterName: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$/gameServerClusters/$$gsc-id-1$$
+          gameServerDeploymentName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$.*
+      $
+- execute:
+  - command: |
+      game servers configs delete -q --no-user-output-enabled $$config-id-1$$ --deployment $$deployment-id-1$$ --location global
+- execute:
+  - command: |
+      game servers deployments delete -q --no-user-output-enabled $$deployment-id-1$$ --location global
+- execute:
+  - command: |
+      game servers clusters delete -q --no-user-output-enabled $$gsc-id-1$$ --realm=$$realm-id-1$$ --location $$location$$ --no-dry-run
+- execute:
+  - command: |
+      game servers realms delete -q --no-user-output-enabled $$realm-id-1$$ --location $$location$$
+actions:
+- generate_resource_id:
+    reference: gsc-id-1
+    prefix: gsc
+- generate_resource_id:
+    reference: realm-id-1
+    prefix: realm
+- generate_resource_id:
+    reference: deployment-id-1
+    prefix: deployment
+- generate_resource_id:
+    reference: config-id-1
+    prefix: config
+
+- define_reference:
+    reference: location
+    value: us-east1
+- define_reference:
+    reference: gke-cluster-id
+    value: projects/mcgs-component-autopush/locations/us-central1/clusters/gke-shared-agones-reference-only
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha
+      BETA: v1beta
+
+- write_file:
+    path: fleet_configs.json
+    contents: |
+      [{
+         "name": "test",
+         "fleetSpec": {
+           "replicas": 2,
+           "scheduling": "Packed",
+           "strategy": {
+             "type": "RollingUpdate",
+             "rollingUpdate": {
+               "maxSurge": "25%",
+               "maxUnavailable": "25%"
+             }
+           },
+           "template": {
+             "metadata": {
+               "labels": {
+                 "foo": "bar"
+               }
+             },
+             "spec": {
+               "ports": [{
+                 "name": "default",
+                 "portPolicy": "Dynamic",
+                 "containerPort": 26000
+               }],
+               "health": {
+                 "initialDelaySeconds": 30,
+                 "periodSeconds": 60
+               },
+               "sdkServer": {
+                 "logLevel": "Info",
+                 "grpcPort": 9357,
+                 "httpPort": 9358
+               },
+               "template": {
+                 "spec": {
+                   "containers": [{
+                     "name": "simple-udp",
+                     "image": "gcr.io/agones-images/udp-server:0.18"
+                   }]
+                 }
+               }
+             }
+           }
+         }
+       }]
+- write_file:
+    path: scaling_configs.json
+    contents: |
+      [
+        {
+          "name": "sc1",
+          "fleetAutoscalerSpec": {"replicas": 100},
+          "schedules":[
+            {
+              "cronJobDuration": "3600s",
+              "cronSpec": "10 0 1-7 5,12 *"
+            }
+          ]
+        },
+        {
+          "name": "sc2",
+          "fleetAutoscalerSpec": {"replicas": 200}
+        }
+      ]
+- write_file:
+    path: config_overrides.yaml
+    contents: |
+      - realmsSelector:
+          realms:
+          - projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+        configVersion: $$config-id-1$$
+
+- execute_command:
+    command: |
+      game servers realms create -q --no-user-output-enabled $$realm-id-1$$ --time-zone EST --location $$location$$
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers clusters create -q --no-user-output-enabled $$gsc-id-1$$ --location $$location$$ --realm
+        $$realm-id-1$$ --gke-cluster $$gke-cluster-id$$
+        --namespace default --no-dry-run
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments create -q --no-user-output-enabled $$deployment-id-1$$ --location global
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create -q --no-user-output-enabled $$config-id-1$$ --deployment $$deployment-id-1$$ --location global --fleet-configs-file fleet_configs.json --scaling-configs-file scaling_configs.json
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update-rollout $$deployment-id-1$$ --config-overrides-file config_overrides.yaml --dry-run --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/rollout:preview?alt=json&updateMask=gameServerConfigOverrides
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              gameServerConfigOverrides:
+              - configVersion: $$config-id-1$$
+                realmsSelector:
+                  realms:
+                  - projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1293'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            etag: hDMd1ssaT6IAQKfTi5-txmsgOx8sgMQWWCfnFOLsGsQ
+            targetState:
+              details:
+              - gameServerClusterName: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$/gameServerClusters/$$gsc-id-1$$
+                gameServerDeploymentName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$
+                fleetDetails:
+                - fleet:
+                    name: fleet-$$deployment-id-1$$-config-20200317--f9b6ab8a
+                    specSource:
+                      gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                      name: test
+                  autoscaler:
+                    name: autoscaler-$$deployment-id-1$$-config-2020-327c7bd3
+                    specSource:
+                      gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                      name: sc2
+    - expect_stdout:
+        matches: |
+          .*
+          targetState:
+            details:.*
+            - fleetDetails:
+              - autoscaler:
+                  name: autoscaler-$$deployment-id-1$$-config-.+
+                  specSource:
+                    gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                    name: sc2
+                fleet:
+                  name: fleet-$$deployment-id-1$$-config-.+
+                  specSource:
+                    gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                    name: .+
+              gameServerClusterName: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$/gameServerClusters/$$gsc-id-1$$
+              gameServerDeploymentName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update-rollout $$deployment-id-1$$ --default-config $$config-id-1$$ --dry-run --location global
+    events:
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/rollout:preview?alt=json&updateMask=defaultGameServerConfig
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              defaultGameServerConfig: $$config-id-1$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1293'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            etag: hDMd1ssaT6IAQKfTi5-txmsgOx8sgMQWWCfnFOLsGsQ
+            targetState:
+              details:
+              - gameServerClusterName: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$/gameServerClusters/$$gsc-id-1$$
+                gameServerDeploymentName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$
+                fleetDetails:
+                - fleet:
+                    name: fleet-$$deployment-id-1$$-config-20200317--f9b6ab8a
+                    specSource:
+                      gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                      name: test
+                  autoscaler:
+                    name: autoscaler-$$deployment-id-1$$-config-2020-327c7bd3
+                    specSource:
+                      gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                      name: sc2
+    - expect_stdout:
+        matches: |
+          .*
+          targetState:
+            details:.*
+            - fleetDetails:
+              - autoscaler:
+                  name: autoscaler-$$deployment-id-1$$-config-.+
+                  specSource:
+                    gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                    name: sc2
+                fleet:
+                  name: fleet-$$deployment-id-1$$-config-.+
+                  specSource:
+                    gameServerConfigName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+                    name: .+
+              gameServerClusterName: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$/gameServerClusters/$$gsc-id-1$$
+              gameServerDeploymentName: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$.*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      game servers configs delete -q --no-user-output-enabled $$config-id-1$$ --deployment $$deployment-id-1$$ --location global
+    cleanup_for: config-id-1
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments delete -q --no-user-output-enabled $$deployment-id-1$$ --location global
+    cleanup_for: deployment-id-1
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers clusters delete -q --no-user-output-enabled $$gsc-id-1$$ --realm=$$realm-id-1$$ --location $$location$$ --no-dry-run
+    cleanup_for: gsc-id-1
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers realms delete -q --no-user-output-enabled $$realm-id-1$$ --location $$location$$
+    cleanup_for: realm-id-1
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0

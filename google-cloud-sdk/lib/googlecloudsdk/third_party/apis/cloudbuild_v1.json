@@ -17,6 +17,7 @@
   "documentationLink": "https://cloud.google.com/cloud-build/docs/",
   "protocol": "rest",
   "rootUrl": "https://cloudbuild.googleapis.com/",
+  "mtlsRootUrl": "https://cloudbuild.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://cloudbuild.googleapis.com/",
   "batchPath": "batch",
@@ -226,7 +227,8 @@
             "Build or step failed to complete successfully.",
             "Build or step failed due to an internal cause.",
             "Build or step took longer than was allowed.",
-            "Build or step was canceled by a user."
+            "Build or step was canceled by a user.",
+            "Build was enqueued for longer than the value of `queue_ttl`."
           ],
           "type": "string",
           "enum": [
@@ -237,7 +239,8 @@
             "FAILURE",
             "INTERNAL_ERROR",
             "TIMEOUT",
-            "CANCELLED"
+            "CANCELLED",
+            "EXPIRED"
           ]
         },
         "statusDetail": {
@@ -285,6 +288,11 @@
           "items": {
             "type": "string"
           }
+        },
+        "queueTtl": {
+          "description": "TTL in queue for this build. If provided and the build is enqueued longer\nthan this value, the build will expire and the build status will be\n`EXPIRED`.\n\nThe TTL starts ticking from create_time.",
+          "type": "string",
+          "format": "google-duration"
         },
         "artifacts": {
           "description": "Artifacts produced by the build that should be uploaded upon\nsuccessful completion of all build steps.",
@@ -385,7 +393,7 @@
           "type": "string"
         },
         "repoName": {
-          "description": "Name of the Cloud Source Repository. If omitted, the name \"default\" is\nassumed.",
+          "description": "Required. Name of the Cloud Source Repository.",
           "type": "string"
         },
         "branchName": {
@@ -403,6 +411,17 @@
         "dir": {
           "description": "Directory, relative to the source root, in which to run the build.\n\nThis must be a relative path. If a step's `dir` is specified and is an\nabsolute path, this value is ignored for that step's execution.",
           "type": "string"
+        },
+        "invertRegex": {
+          "description": "Only trigger a build if the revision regex does NOT match the revision\nregex.",
+          "type": "boolean"
+        },
+        "substitutions": {
+          "description": "Substitutions to use in a triggered build.\nShould only be used with RunBuildTrigger",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
@@ -485,7 +504,8 @@
             "Build or step failed to complete successfully.",
             "Build or step failed due to an internal cause.",
             "Build or step took longer than was allowed.",
-            "Build or step was canceled by a user."
+            "Build or step was canceled by a user.",
+            "Build was enqueued for longer than the value of `queue_ttl`."
           ],
           "type": "string",
           "enum": [
@@ -496,7 +516,8 @@
             "FAILURE",
             "INTERNAL_ERROR",
             "TIMEOUT",
-            "CANCELLED"
+            "CANCELLED",
+            "EXPIRED"
           ]
         }
       }
@@ -776,7 +797,7 @@
           ]
         },
         "workerPool": {
-          "description": "Option to specify a `WorkerPool` for the build. User specifies the pool\nwith the format \"[WORKERPOOL_PROJECT_ID]\/[WORKERPOOL_NAME]\".\nThis is an experimental field.",
+          "description": "Option to specify a `WorkerPool` for the build.\nFormat: projects\/{project}\/workerPools\/{workerPool}\n\nThis field is experimental.",
           "type": "string"
         },
         "logging": {
@@ -881,7 +902,7 @@
           "type": "string"
         },
         "name": {
-          "description": "User assigned name of the trigger. Must be unique within the project.",
+          "description": "User-assigned name of the trigger. Must be unique within the project.\nTrigger names must meet the following requirements:\n\n+ They must contain only alphanumeric characters and dashes.\n+ They can be 1-64 characters long.\n+ They must begin and end with an alphanumeric character.",
           "type": "string"
         },
         "tags": {
@@ -917,14 +938,14 @@
           "type": "boolean"
         },
         "substitutions": {
-          "description": "Substitutions data for Build resource.",
+          "description": "Substitutions for Build resource. The keys must match the following\nregular expression: `^_[A-Z0-9_]+$`.The keys cannot conflict with the\nkeys in bindings.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
         "ignoredFiles": {
-          "description": "ignored_files and included_files are file glob matches using\nhttp:\/\/godoc\/pkg\/path\/filepath#Match extended with support for \"**\".\n\nIf ignored_files and changed files are both empty, then they are\nnot used to determine whether or not to trigger a build.\n\nIf ignored_files is not empty, then we ignore any files that match\nany of the ignored_file globs. If the change has no files that are\noutside of the ignored_files globs, then we do not trigger a build.",
+          "description": "ignored_files and included_files are file glob matches using\nhttps:\/\/golang.org\/pkg\/path\/filepath\/#Match extended with support for \"**\".\n\nIf ignored_files and changed files are both empty, then they are\nnot used to determine whether or not to trigger a build.\n\nIf ignored_files is not empty, then we ignore any files that match\nany of the ignored_file globs. If the change has no files that are\noutside of the ignored_files globs, then we do not trigger a build.",
           "type": "array",
           "items": {
             "type": "string"
@@ -977,7 +998,7 @@
           "type": "string"
         },
         "commentControl": {
-          "description": "Whether to block builds on a \"\/gcbrun\" comment from a repository owner or\ncollaborator.",
+          "description": "Whether to block builds on a \"\/gcbrun\" comment from a repository admin or\ncollaborator.",
           "enumDescriptions": [
             "Do not require comments on Pull Requests before builds are triggered.",
             "Enforce that repository owners or collaborators must comment on Pull\nRequests before builds are triggered."
@@ -987,6 +1008,10 @@
             "COMMENTS_DISABLED",
             "COMMENTS_ENABLED"
           ]
+        },
+        "invertRegex": {
+          "description": "If true, branches that do NOT match the git_ref will trigger a build.",
+          "type": "boolean"
         }
       }
     },
@@ -1002,6 +1027,10 @@
         "tag": {
           "description": "Regexes matching tags to build.\n\nThe syntax of the regular expressions accepted is the syntax accepted by\nRE2 and described at https:\/\/github.com\/google\/re2\/wiki\/Syntax",
           "type": "string"
+        },
+        "invertRegex": {
+          "description": "When true, only trigger a build if the revision regex does NOT match the\ngit_ref regex.",
+          "type": "boolean"
         }
       }
     },
@@ -1107,7 +1136,7 @@
               "description": "The name of the operation resource.",
               "location": "path",
               "required": true,
-              "pattern": "^operations\/.+$",
+              "pattern": "^operations\/.*$",
               "type": "string"
             }
           },
@@ -1132,7 +1161,7 @@
               "description": "The name of the operation resource to be cancelled.",
               "location": "path",
               "required": true,
-              "pattern": "^operations\/.+$",
+              "pattern": "^operations\/.*$",
               "type": "string"
             }
           },

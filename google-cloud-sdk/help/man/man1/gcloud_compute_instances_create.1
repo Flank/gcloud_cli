@@ -18,16 +18,7 @@ gcloud compute instances create \- create Google Compute Engine virtual machine 
 .SH "DESCRIPTION"
 
 \fBgcloud compute instances create\fR facilitates the creation of Google Compute
-Engine virtual machines. For example, running:
-
-.RS 2m
-$ gcloud compute instances create example\-instance\-1 \e
-    example\-instance\-2 example\-instance\-3 \-\-zone us\-central1\-a
-.RE
-
-will create three instances called \f5example\-instance\-1\fR,
-\f5example\-instance\-2\fR, and \f5example\-instance\-3\fR in the
-\f5us\-central1\-a\fR zone.
+Engine virtual machines.
 
 When an instance is in RUNNING state and the system begins to boot, the instance
 creation is considered finished, and the command returns with a list of new
@@ -185,7 +176,7 @@ used.
 \fBauto\-delete\fR
 If \f5\fIyes\fR\fR, this persistent disk will be automatically deleted when the
 instance is deleted. However, if the disk is later detached from the instance,
-this option won't apply. The default value for this is \f5\fIno\fR\fR.
+this option won't apply. The default value for this is \f5\fIyes\fR\fR.
 
 .TP 2m
 \fBkms\-key\fR
@@ -367,10 +358,11 @@ The instances should be terminated.
 \fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
 Metadata to be made available to the guest operating system running on the
 instances. Each metadata entry is a key/value pair separated by an equals sign.
-Metadata keys must be unique and less than 128 bytes in length. Values must be
-less than or equal to 32,768 bytes in length. Multiple arguments can be passed
-to this flag, e.g., \f5\fI\-\-metadata
-key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR.
+Each metadata key must be unique and have a max of 128 bytes in length. Each
+value must have a max of 256 KB in length. Multiple arguments can be passed to
+this flag, e.g., \f5\fI\-\-metadata
+key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR. The combined total size
+for all metadata entries is 512 KB.
 
 In images that have Compute Engine tools installed on them, such as the official
 images (https://cloud.google.com/compute/docs/images), the following metadata
@@ -613,10 +605,21 @@ only be used when creating a single instance.
 
 .TP 2m
 \fB\-\-no\-address\fR
-If provided, the instances will not be assigned external IP addresses.
-
+If provided, the instances are not assigned external IP addresses. To pull
+container images, you must configure private Google access if using Container
+Registry or configure Cloud NAT for instances to access container images
+directly. For more information, see:
+.RS 2m
+.IP "\(bu" 2m
+https://cloud.google.com/vpc/docs/configure\-private\-google\-access
+.IP "\(bu" 2m
+https://cloud.google.com/nat/docs/using\-nat
+.RE
+.RE
 .RE
 .sp
+
+.RS 2m
 .TP 2m
 
 Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
@@ -928,20 +931,29 @@ Create instance without service account
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To create an instance with the latest \f5\fIRed Hat Enterprise Linux 8\fR\fR
-image available, run:
+To create an instance with the latest 'Red Hat Enterprise Linux 8' image
+available, run:
 
 .RS 2m
 $ gcloud compute instances create example\-instance \e
     \-\-image\-family=rhel\-8 \-\-image\-project=rhel\-cloud \e
     \-\-zone=us\-central1\-a
+.RE
+
+To create instances called 'example\-instance\-1', 'example\-instance\-2', and
+\'example\-instance\-3' in the 'us\-central1\-a' zone, run:
+
+.RS 2m
+$ gcloud compute instances create example\-instance\-1 \e
+    example\-instance\-2 example\-instance\-3 \-\-zone=us\-central1\-a
 .RE
 
 

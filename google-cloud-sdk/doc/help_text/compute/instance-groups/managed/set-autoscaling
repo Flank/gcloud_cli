@@ -10,7 +10,7 @@ SYNOPSIS
           [utilization-target=UTILIZATION-TARGET],
           [utilization-target-type=UTILIZATION-TARGET-TYPE]]
         [--description=DESCRIPTION] [--min-num-replicas=MIN_NUM_REPLICAS]
-        [--scale-based-on-cpu] [--scale-based-on-load-balancing]
+        [--mode=MODE] [--scale-based-on-cpu] [--scale-based-on-load-balancing]
         [--target-cpu-utilization=TARGET_CPU_UTILIZATION]
         [--target-load-balancing-utilization=TARGET_LOAD_BALANCING_UTILIZATION]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -59,6 +59,25 @@ OPTIONAL FLAGS
      --min-num-replicas=MIN_NUM_REPLICAS
         Minimum number of replicas Autoscaler will set.
 
+     --mode=MODE
+        Set the mode of an autoscaler for a managed instance group.
+
+        You can turn off or restrict MIG autoscaler activities without
+        affecting your autoscaler configuration. The autoscaler configuration
+        persists while the activities are turned off or restricted, and the
+        activities resume when the autoscaler is turned on again or when the
+        restrictions are lifted.
+
+        MODE must be one of:
+
+         off
+            To turn off autoscaling, while keeping the new configuration.
+         on
+            To permit autoscaling to scale up and down (default for new
+            autoscalers).
+         only-up
+            To permit autoscaling to scale only up and not down.
+
      --scale-based-on-cpu
         Autoscaler will be based on CPU utilization.
 
@@ -101,8 +120,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     These variants are also available:

@@ -9,6 +9,7 @@ class RunV1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://run.googleapis.com/'
+  MTLS_BASE_URL = u'https://run.mtls.googleapis.com/'
 
   _PACKAGE = u'run'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
@@ -35,8 +36,11 @@ class RunV1(base_api.BaseApiClient):
         default_global_params=default_global_params,
         additional_http_headers=additional_http_headers,
         response_encoding=response_encoding)
+    self.api_v1_namespaces_secrets = self.ApiV1NamespacesSecretsService(self)
+    self.api_v1_namespaces = self.ApiV1NamespacesService(self)
+    self.api_v1 = self.ApiV1Service(self)
+    self.api = self.ApiService(self)
     self.namespaces_authorizeddomains = self.NamespacesAuthorizeddomainsService(self)
-    self.namespaces_autodomainmappings = self.NamespacesAutodomainmappingsService(self)
     self.namespaces_configurations = self.NamespacesConfigurationsService(self)
     self.namespaces_domainmappings = self.NamespacesDomainmappingsService(self)
     self.namespaces_revisions = self.NamespacesRevisionsService(self)
@@ -44,14 +48,197 @@ class RunV1(base_api.BaseApiClient):
     self.namespaces_services = self.NamespacesServicesService(self)
     self.namespaces = self.NamespacesService(self)
     self.projects_locations_authorizeddomains = self.ProjectsLocationsAuthorizeddomainsService(self)
-    self.projects_locations_autodomainmappings = self.ProjectsLocationsAutodomainmappingsService(self)
     self.projects_locations_configurations = self.ProjectsLocationsConfigurationsService(self)
     self.projects_locations_domainmappings = self.ProjectsLocationsDomainmappingsService(self)
+    self.projects_locations_namespaces = self.ProjectsLocationsNamespacesService(self)
     self.projects_locations_revisions = self.ProjectsLocationsRevisionsService(self)
     self.projects_locations_routes = self.ProjectsLocationsRoutesService(self)
+    self.projects_locations_secrets = self.ProjectsLocationsSecretsService(self)
     self.projects_locations_services = self.ProjectsLocationsServicesService(self)
     self.projects_locations = self.ProjectsLocationsService(self)
     self.projects = self.ProjectsService(self)
+
+  class ApiV1NamespacesSecretsService(base_api.BaseApiService):
+    """Service class for the api_v1_namespaces_secrets resource."""
+
+    _NAME = u'api_v1_namespaces_secrets'
+
+    def __init__(self, client):
+      super(RunV1.ApiV1NamespacesSecretsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Create(self, request, global_params=None):
+      r"""Creates a new secret.
+
+      Args:
+        request: (RunApiV1NamespacesSecretsCreateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Secret) The response message.
+      """
+      config = self.GetMethodConfig('Create')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Create.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'api/v1/namespaces/{namespacesId}/secrets',
+        http_method=u'POST',
+        method_id=u'run.api.v1.namespaces.secrets.create',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'api/v1/{+parent}/secrets',
+        request_field=u'secret',
+        request_type_name=u'RunApiV1NamespacesSecretsCreateRequest',
+        response_type_name=u'Secret',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Rpc to get information about a secret.
+
+      Args:
+        request: (RunApiV1NamespacesSecretsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Secret) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'api/v1/namespaces/{namespacesId}/secrets/{secretsId}',
+        http_method=u'GET',
+        method_id=u'run.api.v1.namespaces.secrets.get',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'api/v1/{+name}',
+        request_field='',
+        request_type_name=u'RunApiV1NamespacesSecretsGetRequest',
+        response_type_name=u'Secret',
+        supports_download=False,
+    )
+
+    def ReplaceSecret(self, request, global_params=None):
+      r"""Rpc to replace a secret.
+
+Only the spec and metadata labels and annotations are modifiable. After
+the Update request, Cloud Run will work to make the 'status'
+match the requested 'spec'.
+
+May provide metadata.resourceVersion to enforce update from last read for
+optimistic concurrency control.
+
+      Args:
+        request: (RunApiV1NamespacesSecretsReplaceSecretRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Secret) The response message.
+      """
+      config = self.GetMethodConfig('ReplaceSecret')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ReplaceSecret.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'api/v1/namespaces/{namespacesId}/secrets/{secretsId}',
+        http_method=u'PUT',
+        method_id=u'run.api.v1.namespaces.secrets.replaceSecret',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'api/v1/{+name}',
+        request_field=u'secret',
+        request_type_name=u'RunApiV1NamespacesSecretsReplaceSecretRequest',
+        response_type_name=u'Secret',
+        supports_download=False,
+    )
+
+  class ApiV1NamespacesService(base_api.BaseApiService):
+    """Service class for the api_v1_namespaces resource."""
+
+    _NAME = u'api_v1_namespaces'
+
+    def __init__(self, client):
+      super(RunV1.ApiV1NamespacesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Get(self, request, global_params=None):
+      r"""Rpc to get information about a namespace.
+
+      Args:
+        request: (RunApiV1NamespacesGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Namespace) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'api/v1/namespaces/{namespacesId}',
+        http_method=u'GET',
+        method_id=u'run.api.v1.namespaces.get',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'api/v1/{+name}',
+        request_field='',
+        request_type_name=u'RunApiV1NamespacesGetRequest',
+        response_type_name=u'Namespace',
+        supports_download=False,
+    )
+
+    def Patch(self, request, global_params=None):
+      r"""Rpc to update a namespace.
+
+      Args:
+        request: (RunApiV1NamespacesPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Namespace) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'api/v1/namespaces/{namespacesId}',
+        http_method=u'PATCH',
+        method_id=u'run.api.v1.namespaces.patch',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[u'updateMask'],
+        relative_path=u'api/v1/{+name}',
+        request_field=u'namespace',
+        request_type_name=u'RunApiV1NamespacesPatchRequest',
+        response_type_name=u'Namespace',
+        supports_download=False,
+    )
+
+  class ApiV1Service(base_api.BaseApiService):
+    """Service class for the api_v1 resource."""
+
+    _NAME = u'api_v1'
+
+    def __init__(self, client):
+      super(RunV1.ApiV1Service, self).__init__(client)
+      self._upload_configs = {
+          }
+
+  class ApiService(base_api.BaseApiService):
+    """Service class for the api resource."""
+
+    _NAME = u'api'
+
+    def __init__(self, client):
+      super(RunV1.ApiService, self).__init__(client)
+      self._upload_configs = {
+          }
 
   class NamespacesAuthorizeddomainsService(base_api.BaseApiService):
     """Service class for the namespaces_authorizeddomains resource."""
@@ -90,158 +277,6 @@ class RunV1(base_api.BaseApiClient):
         supports_download=False,
     )
 
-  class NamespacesAutodomainmappingsService(base_api.BaseApiService):
-    """Service class for the namespaces_autodomainmappings resource."""
-
-    _NAME = u'namespaces_autodomainmappings'
-
-    def __init__(self, client):
-      super(RunV1.NamespacesAutodomainmappingsService, self).__init__(client)
-      self._upload_configs = {
-          }
-
-    def Create(self, request, global_params=None):
-      r"""Creates a new auto domain mapping.
-
-      Args:
-        request: (RunNamespacesAutodomainmappingsCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (AutoDomainMapping) The response message.
-      """
-      config = self.GetMethodConfig('Create')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/domains.cloudrun.com/v1/namespaces/{namespacesId}/autodomainmappings',
-        http_method=u'POST',
-        method_id=u'run.namespaces.autodomainmappings.create',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[],
-        relative_path=u'apis/domains.cloudrun.com/v1/{+parent}/autodomainmappings',
-        request_field=u'autoDomainMapping',
-        request_type_name=u'RunNamespacesAutodomainmappingsCreateRequest',
-        response_type_name=u'AutoDomainMapping',
-        supports_download=False,
-    )
-
-    def Delete(self, request, global_params=None):
-      r"""Delete an auto domain mapping.
-
-      Args:
-        request: (RunNamespacesAutodomainmappingsDeleteRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
-      """
-      config = self.GetMethodConfig('Delete')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Delete.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/domains.cloudrun.com/v1/namespaces/{namespacesId}/autodomainmappings/{autodomainmappingsId}',
-        http_method=u'DELETE',
-        method_id=u'run.namespaces.autodomainmappings.delete',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[u'apiVersion', u'kind', u'propagationPolicy'],
-        relative_path=u'apis/domains.cloudrun.com/v1/{+name}',
-        request_field='',
-        request_type_name=u'RunNamespacesAutodomainmappingsDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
-        supports_download=False,
-    )
-
-    def Get(self, request, global_params=None):
-      r"""Get information about an auto domain mapping.
-
-      Args:
-        request: (RunNamespacesAutodomainmappingsGetRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (AutoDomainMapping) The response message.
-      """
-      config = self.GetMethodConfig('Get')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Get.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/domains.cloudrun.com/v1/namespaces/{namespacesId}/autodomainmappings/{autodomainmappingsId}',
-        http_method=u'GET',
-        method_id=u'run.namespaces.autodomainmappings.get',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'apis/domains.cloudrun.com/v1/{+name}',
-        request_field='',
-        request_type_name=u'RunNamespacesAutodomainmappingsGetRequest',
-        response_type_name=u'AutoDomainMapping',
-        supports_download=False,
-    )
-
-    def List(self, request, global_params=None):
-      r"""List auto domain mappings.
-
-      Args:
-        request: (RunNamespacesAutodomainmappingsListRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (ListAutoDomainMappingsResponse) The response message.
-      """
-      config = self.GetMethodConfig('List')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    List.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/domains.cloudrun.com/v1/namespaces/{namespacesId}/autodomainmappings',
-        http_method=u'GET',
-        method_id=u'run.namespaces.autodomainmappings.list',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[u'continue_', u'fieldSelector', u'includeUninitialized', u'labelSelector', u'limit', u'resourceVersion', u'watch'],
-        relative_path=u'apis/domains.cloudrun.com/v1/{+parent}/autodomainmappings',
-        request_field='',
-        request_type_name=u'RunNamespacesAutodomainmappingsListRequest',
-        response_type_name=u'ListAutoDomainMappingsResponse',
-        supports_download=False,
-    )
-
-    def ReplaceAutoDomainMapping(self, request, global_params=None):
-      r"""Replace an auto domain mapping.
-
-Only the spec and metadata labels and annotations are modifiable. After
-the Update request, Cloud Run will work to make the 'status'
-match the requested 'spec'.
-
-May provide metadata.resourceVersion to enforce update from last read for
-optimistic concurrency control.
-
-      Args:
-        request: (RunNamespacesAutodomainmappingsReplaceAutoDomainMappingRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (AutoDomainMapping) The response message.
-      """
-      config = self.GetMethodConfig('ReplaceAutoDomainMapping')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    ReplaceAutoDomainMapping.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/domains.cloudrun.com/v1/namespaces/{namespacesId}/autodomainmappings/{autodomainmappingsId}',
-        http_method=u'PUT',
-        method_id=u'run.namespaces.autodomainmappings.replaceAutoDomainMapping',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'apis/domains.cloudrun.com/v1/{+name}',
-        request_field=u'autoDomainMapping',
-        request_type_name=u'RunNamespacesAutodomainmappingsReplaceAutoDomainMappingRequest',
-        response_type_name=u'AutoDomainMapping',
-        supports_download=False,
-    )
-
   class NamespacesConfigurationsService(base_api.BaseApiService):
     """Service class for the namespaces_configurations resource."""
 
@@ -251,63 +286,6 @@ optimistic concurrency control.
       super(RunV1.NamespacesConfigurationsService, self).__init__(client)
       self._upload_configs = {
           }
-
-    def Create(self, request, global_params=None):
-      r"""Create a configuration.
-
-      Args:
-        request: (RunNamespacesConfigurationsCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Configuration) The response message.
-      """
-      config = self.GetMethodConfig('Create')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/serving.knative.dev/v1/namespaces/{namespacesId}/configurations',
-        http_method=u'POST',
-        method_id=u'run.namespaces.configurations.create',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[],
-        relative_path=u'apis/serving.knative.dev/v1/{+parent}/configurations',
-        request_field=u'configuration',
-        request_type_name=u'RunNamespacesConfigurationsCreateRequest',
-        response_type_name=u'Configuration',
-        supports_download=False,
-    )
-
-    def Delete(self, request, global_params=None):
-      r"""delete a configuration.
-This will cause the configuration to delete all child revisions. Prior to
-calling this, any route referencing the configuration (or revision
-from the configuration) must be deleted.
-
-      Args:
-        request: (RunNamespacesConfigurationsDeleteRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
-      """
-      config = self.GetMethodConfig('Delete')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Delete.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/serving.knative.dev/v1/namespaces/{namespacesId}/configurations/{configurationsId}',
-        http_method=u'DELETE',
-        method_id=u'run.namespaces.configurations.delete',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[u'apiVersion', u'kind', u'propagationPolicy'],
-        relative_path=u'apis/serving.knative.dev/v1/{+name}',
-        request_field='',
-        request_type_name=u'RunNamespacesConfigurationsDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
-        supports_download=False,
-    )
 
     def Get(self, request, global_params=None):
       r"""Get information about a configuration.
@@ -363,40 +341,6 @@ from the configuration) must be deleted.
         supports_download=False,
     )
 
-    def ReplaceConfiguration(self, request, global_params=None):
-      r"""Replace a configuration.
-
-Only the spec and metadata labels and annotations are modifiable. After
-the Update request, Cloud Run will work to make the 'status'
-match the requested 'spec'.
-
-May provide metadata.resourceVersion to enforce update from last read for
-optimistic concurrency control.
-
-      Args:
-        request: (RunNamespacesConfigurationsReplaceConfigurationRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Configuration) The response message.
-      """
-      config = self.GetMethodConfig('ReplaceConfiguration')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    ReplaceConfiguration.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/serving.knative.dev/v1/namespaces/{namespacesId}/configurations/{configurationsId}',
-        http_method=u'PUT',
-        method_id=u'run.namespaces.configurations.replaceConfiguration',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'apis/serving.knative.dev/v1/{+name}',
-        request_field=u'configuration',
-        request_type_name=u'RunNamespacesConfigurationsReplaceConfigurationRequest',
-        response_type_name=u'Configuration',
-        supports_download=False,
-    )
-
   class NamespacesDomainmappingsService(base_api.BaseApiService):
     """Service class for the namespaces_domainmappings resource."""
 
@@ -441,7 +385,7 @@ optimistic concurrency control.
         request: (RunNamespacesDomainmappingsDeleteRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
+        (Status) The response message.
       """
       config = self.GetMethodConfig('Delete')
       return self._RunMethod(
@@ -457,7 +401,7 @@ optimistic concurrency control.
         relative_path=u'apis/domains.cloudrun.com/v1/{+name}',
         request_field='',
         request_type_name=u'RunNamespacesDomainmappingsDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
+        response_type_name=u'Status',
         supports_download=False,
     )
 
@@ -515,40 +459,6 @@ optimistic concurrency control.
         supports_download=False,
     )
 
-    def ReplaceDomainMapping(self, request, global_params=None):
-      r"""Replace a domain mapping.
-
-Only the spec and metadata labels and annotations are modifiable. After
-the Update request, Cloud Run will work to make the 'status'
-match the requested 'spec'.
-
-May provide metadata.resourceVersion to enforce update from last read for
-optimistic concurrency control.
-
-      Args:
-        request: (RunNamespacesDomainmappingsReplaceDomainMappingRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (DomainMapping) The response message.
-      """
-      config = self.GetMethodConfig('ReplaceDomainMapping')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    ReplaceDomainMapping.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/domains.cloudrun.com/v1/namespaces/{namespacesId}/domainmappings/{domainmappingsId}',
-        http_method=u'PUT',
-        method_id=u'run.namespaces.domainmappings.replaceDomainMapping',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'apis/domains.cloudrun.com/v1/{+name}',
-        request_field=u'domainMapping',
-        request_type_name=u'RunNamespacesDomainmappingsReplaceDomainMappingRequest',
-        response_type_name=u'DomainMapping',
-        supports_download=False,
-    )
-
   class NamespacesRevisionsService(base_api.BaseApiService):
     """Service class for the namespaces_revisions resource."""
 
@@ -566,7 +476,7 @@ optimistic concurrency control.
         request: (RunNamespacesRevisionsDeleteRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
+        (Status) The response message.
       """
       config = self.GetMethodConfig('Delete')
       return self._RunMethod(
@@ -582,7 +492,7 @@ optimistic concurrency control.
         relative_path=u'apis/serving.knative.dev/v1/{+name}',
         request_field='',
         request_type_name=u'RunNamespacesRevisionsDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
+        response_type_name=u'Status',
         supports_download=False,
     )
 
@@ -650,61 +560,6 @@ optimistic concurrency control.
       self._upload_configs = {
           }
 
-    def Create(self, request, global_params=None):
-      r"""Create a route.
-
-      Args:
-        request: (RunNamespacesRoutesCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Route) The response message.
-      """
-      config = self.GetMethodConfig('Create')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/serving.knative.dev/v1/namespaces/{namespacesId}/routes',
-        http_method=u'POST',
-        method_id=u'run.namespaces.routes.create',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[],
-        relative_path=u'apis/serving.knative.dev/v1/{+parent}/routes',
-        request_field=u'route',
-        request_type_name=u'RunNamespacesRoutesCreateRequest',
-        response_type_name=u'Route',
-        supports_download=False,
-    )
-
-    def Delete(self, request, global_params=None):
-      r"""Delete a route.
-This will cause the route to stop serving traffic.
-
-      Args:
-        request: (RunNamespacesRoutesDeleteRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
-      """
-      config = self.GetMethodConfig('Delete')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Delete.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/serving.knative.dev/v1/namespaces/{namespacesId}/routes/{routesId}',
-        http_method=u'DELETE',
-        method_id=u'run.namespaces.routes.delete',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[u'apiVersion', u'kind', u'propagationPolicy'],
-        relative_path=u'apis/serving.knative.dev/v1/{+name}',
-        request_field='',
-        request_type_name=u'RunNamespacesRoutesDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
-        supports_download=False,
-    )
-
     def Get(self, request, global_params=None):
       r"""Get information about a route.
 
@@ -759,40 +614,6 @@ This will cause the route to stop serving traffic.
         supports_download=False,
     )
 
-    def ReplaceRoute(self, request, global_params=None):
-      r"""Replace a route.
-
-Only the spec and metadata labels and annotations are modifiable. After
-the Update request, Cloud Run will work to make the 'status'
-match the requested 'spec'.
-
-May provide metadata.resourceVersion to enforce update from last read for
-optimistic concurrency control.
-
-      Args:
-        request: (RunNamespacesRoutesReplaceRouteRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Route) The response message.
-      """
-      config = self.GetMethodConfig('ReplaceRoute')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    ReplaceRoute.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/serving.knative.dev/v1/namespaces/{namespacesId}/routes/{routesId}',
-        http_method=u'PUT',
-        method_id=u'run.namespaces.routes.replaceRoute',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'apis/serving.knative.dev/v1/{+name}',
-        request_field=u'route',
-        request_type_name=u'RunNamespacesRoutesReplaceRouteRequest',
-        response_type_name=u'Route',
-        supports_download=False,
-    )
-
   class NamespacesServicesService(base_api.BaseApiService):
     """Service class for the namespaces_services resource."""
 
@@ -839,7 +660,7 @@ child entities like Routes, Configurations and Revisions.
         request: (RunNamespacesServicesDeleteRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
+        (Status) The response message.
       """
       config = self.GetMethodConfig('Delete')
       return self._RunMethod(
@@ -855,7 +676,7 @@ child entities like Routes, Configurations and Revisions.
         relative_path=u'apis/serving.knative.dev/v1/{+name}',
         request_field='',
         request_type_name=u'RunNamespacesServicesDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
+        response_type_name=u'Status',
         supports_download=False,
     )
 
@@ -910,38 +731,6 @@ child entities like Routes, Configurations and Revisions.
         request_field='',
         request_type_name=u'RunNamespacesServicesListRequest',
         response_type_name=u'ListServicesResponse',
-        supports_download=False,
-    )
-
-    def Patch(self, request, global_params=None):
-      r"""Update a service.
-Only the metadata and spec are modifiable but after the Update request,
-Cloud Run will work to make the ServiceStatus match the
-requested ServiceSpec.
-May use metadata.resourceVersion to enforce update from last read for
-concurrency control.
-
-      Args:
-        request: (RunNamespacesServicesPatchRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Service) The response message.
-      """
-      config = self.GetMethodConfig('Patch')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Patch.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'apis/serving.knative.dev/v1/namespaces/{namespacesId}/services/{servicesId}',
-        http_method=u'PATCH',
-        method_id=u'run.namespaces.services.patch',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'apis/serving.knative.dev/v1/{+name}',
-        request_field=u'httpBody',
-        request_type_name=u'RunNamespacesServicesPatchRequest',
-        response_type_name=u'Service',
         supports_download=False,
     )
 
@@ -1026,158 +815,6 @@ optimistic concurrency control.
         supports_download=False,
     )
 
-  class ProjectsLocationsAutodomainmappingsService(base_api.BaseApiService):
-    """Service class for the projects_locations_autodomainmappings resource."""
-
-    _NAME = u'projects_locations_autodomainmappings'
-
-    def __init__(self, client):
-      super(RunV1.ProjectsLocationsAutodomainmappingsService, self).__init__(client)
-      self._upload_configs = {
-          }
-
-    def Create(self, request, global_params=None):
-      r"""Creates a new auto domain mapping.
-
-      Args:
-        request: (RunProjectsLocationsAutodomainmappingsCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (AutoDomainMapping) The response message.
-      """
-      config = self.GetMethodConfig('Create')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/autodomainmappings',
-        http_method=u'POST',
-        method_id=u'run.projects.locations.autodomainmappings.create',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[],
-        relative_path=u'v1/{+parent}/autodomainmappings',
-        request_field=u'autoDomainMapping',
-        request_type_name=u'RunProjectsLocationsAutodomainmappingsCreateRequest',
-        response_type_name=u'AutoDomainMapping',
-        supports_download=False,
-    )
-
-    def Delete(self, request, global_params=None):
-      r"""Delete an auto domain mapping.
-
-      Args:
-        request: (RunProjectsLocationsAutodomainmappingsDeleteRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
-      """
-      config = self.GetMethodConfig('Delete')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Delete.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/autodomainmappings/{autodomainmappingsId}',
-        http_method=u'DELETE',
-        method_id=u'run.projects.locations.autodomainmappings.delete',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[u'apiVersion', u'kind', u'propagationPolicy'],
-        relative_path=u'v1/{+name}',
-        request_field='',
-        request_type_name=u'RunProjectsLocationsAutodomainmappingsDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
-        supports_download=False,
-    )
-
-    def Get(self, request, global_params=None):
-      r"""Get information about an auto domain mapping.
-
-      Args:
-        request: (RunProjectsLocationsAutodomainmappingsGetRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (AutoDomainMapping) The response message.
-      """
-      config = self.GetMethodConfig('Get')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Get.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/autodomainmappings/{autodomainmappingsId}',
-        http_method=u'GET',
-        method_id=u'run.projects.locations.autodomainmappings.get',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1/{+name}',
-        request_field='',
-        request_type_name=u'RunProjectsLocationsAutodomainmappingsGetRequest',
-        response_type_name=u'AutoDomainMapping',
-        supports_download=False,
-    )
-
-    def List(self, request, global_params=None):
-      r"""List auto domain mappings.
-
-      Args:
-        request: (RunProjectsLocationsAutodomainmappingsListRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (ListAutoDomainMappingsResponse) The response message.
-      """
-      config = self.GetMethodConfig('List')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    List.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/autodomainmappings',
-        http_method=u'GET',
-        method_id=u'run.projects.locations.autodomainmappings.list',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[u'continue_', u'fieldSelector', u'includeUninitialized', u'labelSelector', u'limit', u'resourceVersion', u'watch'],
-        relative_path=u'v1/{+parent}/autodomainmappings',
-        request_field='',
-        request_type_name=u'RunProjectsLocationsAutodomainmappingsListRequest',
-        response_type_name=u'ListAutoDomainMappingsResponse',
-        supports_download=False,
-    )
-
-    def ReplaceAutoDomainMapping(self, request, global_params=None):
-      r"""Replace an auto domain mapping.
-
-Only the spec and metadata labels and annotations are modifiable. After
-the Update request, Cloud Run will work to make the 'status'
-match the requested 'spec'.
-
-May provide metadata.resourceVersion to enforce update from last read for
-optimistic concurrency control.
-
-      Args:
-        request: (RunProjectsLocationsAutodomainmappingsReplaceAutoDomainMappingRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (AutoDomainMapping) The response message.
-      """
-      config = self.GetMethodConfig('ReplaceAutoDomainMapping')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    ReplaceAutoDomainMapping.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/autodomainmappings/{autodomainmappingsId}',
-        http_method=u'PUT',
-        method_id=u'run.projects.locations.autodomainmappings.replaceAutoDomainMapping',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1/{+name}',
-        request_field=u'autoDomainMapping',
-        request_type_name=u'RunProjectsLocationsAutodomainmappingsReplaceAutoDomainMappingRequest',
-        response_type_name=u'AutoDomainMapping',
-        supports_download=False,
-    )
-
   class ProjectsLocationsConfigurationsService(base_api.BaseApiService):
     """Service class for the projects_locations_configurations resource."""
 
@@ -1187,63 +824,6 @@ optimistic concurrency control.
       super(RunV1.ProjectsLocationsConfigurationsService, self).__init__(client)
       self._upload_configs = {
           }
-
-    def Create(self, request, global_params=None):
-      r"""Create a configuration.
-
-      Args:
-        request: (RunProjectsLocationsConfigurationsCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Configuration) The response message.
-      """
-      config = self.GetMethodConfig('Create')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/configurations',
-        http_method=u'POST',
-        method_id=u'run.projects.locations.configurations.create',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[],
-        relative_path=u'v1/{+parent}/configurations',
-        request_field=u'configuration',
-        request_type_name=u'RunProjectsLocationsConfigurationsCreateRequest',
-        response_type_name=u'Configuration',
-        supports_download=False,
-    )
-
-    def Delete(self, request, global_params=None):
-      r"""delete a configuration.
-This will cause the configuration to delete all child revisions. Prior to
-calling this, any route referencing the configuration (or revision
-from the configuration) must be deleted.
-
-      Args:
-        request: (RunProjectsLocationsConfigurationsDeleteRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
-      """
-      config = self.GetMethodConfig('Delete')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Delete.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/configurations/{configurationsId}',
-        http_method=u'DELETE',
-        method_id=u'run.projects.locations.configurations.delete',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[u'apiVersion', u'kind', u'propagationPolicy'],
-        relative_path=u'v1/{+name}',
-        request_field='',
-        request_type_name=u'RunProjectsLocationsConfigurationsDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
-        supports_download=False,
-    )
 
     def Get(self, request, global_params=None):
       r"""Get information about a configuration.
@@ -1299,40 +879,6 @@ from the configuration) must be deleted.
         supports_download=False,
     )
 
-    def ReplaceConfiguration(self, request, global_params=None):
-      r"""Replace a configuration.
-
-Only the spec and metadata labels and annotations are modifiable. After
-the Update request, Cloud Run will work to make the 'status'
-match the requested 'spec'.
-
-May provide metadata.resourceVersion to enforce update from last read for
-optimistic concurrency control.
-
-      Args:
-        request: (RunProjectsLocationsConfigurationsReplaceConfigurationRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Configuration) The response message.
-      """
-      config = self.GetMethodConfig('ReplaceConfiguration')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    ReplaceConfiguration.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/configurations/{configurationsId}',
-        http_method=u'PUT',
-        method_id=u'run.projects.locations.configurations.replaceConfiguration',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1/{+name}',
-        request_field=u'configuration',
-        request_type_name=u'RunProjectsLocationsConfigurationsReplaceConfigurationRequest',
-        response_type_name=u'Configuration',
-        supports_download=False,
-    )
-
   class ProjectsLocationsDomainmappingsService(base_api.BaseApiService):
     """Service class for the projects_locations_domainmappings resource."""
 
@@ -1377,7 +923,7 @@ optimistic concurrency control.
         request: (RunProjectsLocationsDomainmappingsDeleteRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
+        (Status) The response message.
       """
       config = self.GetMethodConfig('Delete')
       return self._RunMethod(
@@ -1393,7 +939,7 @@ optimistic concurrency control.
         relative_path=u'v1/{+name}',
         request_field='',
         request_type_name=u'RunProjectsLocationsDomainmappingsDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
+        response_type_name=u'Status',
         supports_download=False,
     )
 
@@ -1451,37 +997,67 @@ optimistic concurrency control.
         supports_download=False,
     )
 
-    def ReplaceDomainMapping(self, request, global_params=None):
-      r"""Replace a domain mapping.
+  class ProjectsLocationsNamespacesService(base_api.BaseApiService):
+    """Service class for the projects_locations_namespaces resource."""
 
-Only the spec and metadata labels and annotations are modifiable. After
-the Update request, Cloud Run will work to make the 'status'
-match the requested 'spec'.
+    _NAME = u'projects_locations_namespaces'
 
-May provide metadata.resourceVersion to enforce update from last read for
-optimistic concurrency control.
+    def __init__(self, client):
+      super(RunV1.ProjectsLocationsNamespacesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Get(self, request, global_params=None):
+      r"""Rpc to get information about a namespace.
 
       Args:
-        request: (RunProjectsLocationsDomainmappingsReplaceDomainMappingRequest) input message
+        request: (RunProjectsLocationsNamespacesGetRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (DomainMapping) The response message.
+        (Namespace) The response message.
       """
-      config = self.GetMethodConfig('ReplaceDomainMapping')
+      config = self.GetMethodConfig('Get')
       return self._RunMethod(
           config, request, global_params=global_params)
 
-    ReplaceDomainMapping.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/domainmappings/{domainmappingsId}',
-        http_method=u'PUT',
-        method_id=u'run.projects.locations.domainmappings.replaceDomainMapping',
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/namespaces/{namespacesId}',
+        http_method=u'GET',
+        method_id=u'run.projects.locations.namespaces.get',
         ordered_params=[u'name'],
         path_params=[u'name'],
         query_params=[],
         relative_path=u'v1/{+name}',
-        request_field=u'domainMapping',
-        request_type_name=u'RunProjectsLocationsDomainmappingsReplaceDomainMappingRequest',
-        response_type_name=u'DomainMapping',
+        request_field='',
+        request_type_name=u'RunProjectsLocationsNamespacesGetRequest',
+        response_type_name=u'Namespace',
+        supports_download=False,
+    )
+
+    def Patch(self, request, global_params=None):
+      r"""Rpc to update a namespace.
+
+      Args:
+        request: (RunProjectsLocationsNamespacesPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Namespace) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/namespaces/{namespacesId}',
+        http_method=u'PATCH',
+        method_id=u'run.projects.locations.namespaces.patch',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[u'updateMask'],
+        relative_path=u'v1/{+name}',
+        request_field=u'namespace',
+        request_type_name=u'RunProjectsLocationsNamespacesPatchRequest',
+        response_type_name=u'Namespace',
         supports_download=False,
     )
 
@@ -1502,7 +1078,7 @@ optimistic concurrency control.
         request: (RunProjectsLocationsRevisionsDeleteRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
+        (Status) The response message.
       """
       config = self.GetMethodConfig('Delete')
       return self._RunMethod(
@@ -1518,7 +1094,7 @@ optimistic concurrency control.
         relative_path=u'v1/{+name}',
         request_field='',
         request_type_name=u'RunProjectsLocationsRevisionsDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
+        response_type_name=u'Status',
         supports_download=False,
     )
 
@@ -1586,61 +1162,6 @@ optimistic concurrency control.
       self._upload_configs = {
           }
 
-    def Create(self, request, global_params=None):
-      r"""Create a route.
-
-      Args:
-        request: (RunProjectsLocationsRoutesCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Route) The response message.
-      """
-      config = self.GetMethodConfig('Create')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/routes',
-        http_method=u'POST',
-        method_id=u'run.projects.locations.routes.create',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[],
-        relative_path=u'v1/{+parent}/routes',
-        request_field=u'route',
-        request_type_name=u'RunProjectsLocationsRoutesCreateRequest',
-        response_type_name=u'Route',
-        supports_download=False,
-    )
-
-    def Delete(self, request, global_params=None):
-      r"""Delete a route.
-This will cause the route to stop serving traffic.
-
-      Args:
-        request: (RunProjectsLocationsRoutesDeleteRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
-      """
-      config = self.GetMethodConfig('Delete')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Delete.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/routes/{routesId}',
-        http_method=u'DELETE',
-        method_id=u'run.projects.locations.routes.delete',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[u'apiVersion', u'kind', u'propagationPolicy'],
-        relative_path=u'v1/{+name}',
-        request_field='',
-        request_type_name=u'RunProjectsLocationsRoutesDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
-        supports_download=False,
-    )
-
     def Get(self, request, global_params=None):
       r"""Get information about a route.
 
@@ -1695,8 +1216,72 @@ This will cause the route to stop serving traffic.
         supports_download=False,
     )
 
-    def ReplaceRoute(self, request, global_params=None):
-      r"""Replace a route.
+  class ProjectsLocationsSecretsService(base_api.BaseApiService):
+    """Service class for the projects_locations_secrets resource."""
+
+    _NAME = u'projects_locations_secrets'
+
+    def __init__(self, client):
+      super(RunV1.ProjectsLocationsSecretsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Create(self, request, global_params=None):
+      r"""Creates a new secret.
+
+      Args:
+        request: (RunProjectsLocationsSecretsCreateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Secret) The response message.
+      """
+      config = self.GetMethodConfig('Create')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Create.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/secrets',
+        http_method=u'POST',
+        method_id=u'run.projects.locations.secrets.create',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'v1/{+parent}/secrets',
+        request_field=u'secret',
+        request_type_name=u'RunProjectsLocationsSecretsCreateRequest',
+        response_type_name=u'Secret',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Rpc to get information about a secret.
+
+      Args:
+        request: (RunProjectsLocationsSecretsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Secret) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/secrets/{secretsId}',
+        http_method=u'GET',
+        method_id=u'run.projects.locations.secrets.get',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1/{+name}',
+        request_field='',
+        request_type_name=u'RunProjectsLocationsSecretsGetRequest',
+        response_type_name=u'Secret',
+        supports_download=False,
+    )
+
+    def ReplaceSecret(self, request, global_params=None):
+      r"""Rpc to replace a secret.
 
 Only the spec and metadata labels and annotations are modifiable. After
 the Update request, Cloud Run will work to make the 'status'
@@ -1706,26 +1291,26 @@ May provide metadata.resourceVersion to enforce update from last read for
 optimistic concurrency control.
 
       Args:
-        request: (RunProjectsLocationsRoutesReplaceRouteRequest) input message
+        request: (RunProjectsLocationsSecretsReplaceSecretRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (Route) The response message.
+        (Secret) The response message.
       """
-      config = self.GetMethodConfig('ReplaceRoute')
+      config = self.GetMethodConfig('ReplaceSecret')
       return self._RunMethod(
           config, request, global_params=global_params)
 
-    ReplaceRoute.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/routes/{routesId}',
+    ReplaceSecret.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/secrets/{secretsId}',
         http_method=u'PUT',
-        method_id=u'run.projects.locations.routes.replaceRoute',
+        method_id=u'run.projects.locations.secrets.replaceSecret',
         ordered_params=[u'name'],
         path_params=[u'name'],
         query_params=[],
         relative_path=u'v1/{+name}',
-        request_field=u'route',
-        request_type_name=u'RunProjectsLocationsRoutesReplaceRouteRequest',
-        response_type_name=u'Route',
+        request_field=u'secret',
+        request_type_name=u'RunProjectsLocationsSecretsReplaceSecretRequest',
+        response_type_name=u'Secret',
         supports_download=False,
     )
 
@@ -1775,7 +1360,7 @@ child entities like Routes, Configurations and Revisions.
         request: (RunProjectsLocationsServicesDeleteRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (K8sIoApimachineryPkgApisMetaV1Status) The response message.
+        (Status) The response message.
       """
       config = self.GetMethodConfig('Delete')
       return self._RunMethod(
@@ -1791,7 +1376,7 @@ child entities like Routes, Configurations and Revisions.
         relative_path=u'v1/{+name}',
         request_field='',
         request_type_name=u'RunProjectsLocationsServicesDeleteRequest',
-        response_type_name=u'K8sIoApimachineryPkgApisMetaV1Status',
+        response_type_name=u'Status',
         supports_download=False,
     )
 
@@ -1874,38 +1459,6 @@ Cloud Run service. This result does not include any inherited policies.
         request_field='',
         request_type_name=u'RunProjectsLocationsServicesListRequest',
         response_type_name=u'ListServicesResponse',
-        supports_download=False,
-    )
-
-    def Patch(self, request, global_params=None):
-      r"""Update a service.
-Only the metadata and spec are modifiable but after the Update request,
-Cloud Run will work to make the ServiceStatus match the
-requested ServiceSpec.
-May use metadata.resourceVersion to enforce update from last read for
-concurrency control.
-
-      Args:
-        request: (RunProjectsLocationsServicesPatchRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Service) The response message.
-      """
-      config = self.GetMethodConfig('Patch')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Patch.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/services/{servicesId}',
-        http_method=u'PATCH',
-        method_id=u'run.projects.locations.services.patch',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1/{+name}',
-        request_field=u'httpBody',
-        request_type_name=u'RunProjectsLocationsServicesPatchRequest',
-        response_type_name=u'Service',
         supports_download=False,
     )
 
@@ -2009,33 +1562,6 @@ There are no permissions required for making this API call.
       super(RunV1.ProjectsLocationsService, self).__init__(client)
       self._upload_configs = {
           }
-
-    def Get(self, request, global_params=None):
-      r"""Gets information about a location.
-
-      Args:
-        request: (RunProjectsLocationsGetRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Location) The response message.
-      """
-      config = self.GetMethodConfig('Get')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Get.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}',
-        http_method=u'GET',
-        method_id=u'run.projects.locations.get',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1/{+name}',
-        request_field='',
-        request_type_name=u'RunProjectsLocationsGetRequest',
-        response_type_name=u'Location',
-        supports_download=False,
-    )
 
     def List(self, request, global_params=None):
       r"""Lists information about the supported locations for this service.

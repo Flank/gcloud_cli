@@ -49,9 +49,8 @@ class DockerHelperTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     return cred_mock
 
   def SetMockLoadCreds(self, expiry_time):
-    mock_load = self.StartObjectPatch(c_store, 'Load', autospec=True)
     fake_cred = self.GetFakeCred(expiry_time)
-    mock_load.return_value = fake_cred
+    self.StartObjectPatch(c_store, 'Load', return_value=fake_cred)
 
   def testGet(self):
     self.WriteInput('gcr.io\n')

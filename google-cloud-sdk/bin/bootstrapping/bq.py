@@ -60,7 +60,7 @@ def main():
         # Don't have any credentials we can pass.
         raise store.NoCredentialsForAccountException(account)
 
-    _MaybeAddOption(args, 'project', project)
+    _MaybeAddOption(args, 'project_id', project)
 
   bootstrapping.CheckUpdates('bq')
 

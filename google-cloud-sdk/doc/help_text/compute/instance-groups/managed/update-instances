@@ -1,0 +1,114 @@
+NAME
+    gcloud compute instance-groups managed update-instances - immediately
+        update selected instances in a Google Compute Engine managed instance
+        group
+
+SYNOPSIS
+    gcloud compute instance-groups managed update-instances NAME
+        --instances=INSTANCE,[INSTANCE,...]
+        [--minimal-action=MINIMAL_ACTION; default="none"]
+        [--most-disruptive-allowed-action=MOST_DISRUPTIVE_ALLOWED_ACTION;
+          default="replace"] [--region=REGION | --zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    When using a managed instance group, it's possible that your intended
+    specification for a VM is different from the current state of that VM. For
+    example, this can happen due to changes to the group's target instance
+    template. This command enables you to initiate the update process on the
+    given set of instances instantly, thus when your Managed Instance Group is
+    stable you can be sure that all the changes were applied.
+
+    gcloud compute instance-groups managed update-instances allows you to
+    specify the least and the most disruptive actions that can be performed
+    while updating the instances. This way you can reduce the risk of rolling
+    out too many changes at once. Possible actions are: none, refresh, restart
+    and replace. The level of disruption to the instance is ordered as: none <
+    refresh < restart < replace.
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the managed instance group to operate on.
+
+REQUIRED FLAGS
+     --instances=INSTANCE,[INSTANCE,...]
+        Names of instances to update.
+
+OPTIONAL FLAGS
+     --minimal-action=MINIMAL_ACTION; default="none"
+        Perform at least this action on each instance while updating.
+        MINIMAL_ACTION must be one of:
+
+         none
+            No action
+         refresh
+            Apply properties that are possible to apply without stopping the
+            instance
+         replace
+            Delete the instance and create it again
+         restart
+            Stop the instance and start it again
+
+     --most-disruptive-allowed-action=MOST_DISRUPTIVE_ALLOWED_ACTION; default="replace"
+        Perform at most this action on each instance while updating. If the
+        update requires a more disruptive action than the one specified here,
+        then the update will fail and no changes will be made.
+        MOST_DISRUPTIVE_ALLOWED_ACTION must be one of:
+
+         none
+            No action
+         refresh
+            Apply properties that are possible to apply without stopping the
+            instance
+         replace
+            Delete the instance and create it again
+         restart
+            Stop the instance and start it again
+
+     At most one of these may be specified:
+
+       --region=REGION
+          Region of the managed instance group to operate on. If not specified,
+          you may be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          Zone of the managed instance group to operate on. If not specified,
+          you may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To update instances instance-1, instance-2 in my-group, with
+    minimal-action=none and most-disruptive-allowed-action=restart, run:
+
+        $ gcloud compute instance-groups managed update-instances \
+              my-group --instances=instance-1,instance2 \
+              --minimal-action=none
+              --most-disruptive-allowed-action=restart
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute instance-groups managed update-instances
+        $ gcloud beta compute instance-groups managed update-instances
+

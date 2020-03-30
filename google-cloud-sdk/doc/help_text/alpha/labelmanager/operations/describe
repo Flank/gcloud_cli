@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha labelmanager operations describe - describes a label manager
+    gcloud alpha labelmanager operations describe - describes a LabelManager
         long running operation
 
 SYNOPSIS
@@ -14,11 +14,13 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To get details about a label manager long running operation, run:
+    To get details about a LabelManager long running operation with name
+    'operations/clk.12345', run:
 
         $ gcloud alpha labelmanager operations describe operations/clk.12345
 

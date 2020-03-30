@@ -60,20 +60,21 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To see the list of all jobs, run:
+    To see the list of all jobs in Dataproc's 'us-central1' region, run:
 
-        $ gcloud dataproc jobs list
+        $ gcloud dataproc jobs list --region=us-central1
 
-    To see a list of all active jobs in cluster my_cluster with a label of
-    env=staging, run:
+    To see a list of all active jobs in cluster 'mycluster' with a label
+    env=staging located in 'us-central1', run:
 
-        $ gcloud dataproc jobs list \
-            --filter='status.state = ACTIVE AND placement.clusterName =
-         my_cluster AND labels.env = staging'
+        $ gcloud dataproc jobs list --region=us-central1 \
+            --filter='status.state = ACTIVE AND
+            placement.clusterName = 'mycluster' AND labels.env = staging'
 
 NOTES
     These variants are also available:

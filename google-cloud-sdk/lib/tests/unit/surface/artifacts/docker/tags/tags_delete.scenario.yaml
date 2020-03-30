@@ -1,0 +1,150 @@
+title: artifacts docker tags delete
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: artifacts docker tags delete us-west1-docker.pkg.dev/my-project/docker-repo/my-image:my-tag
+  - prompt:
+    - message: You are about to delete tag [us-west1-docker.pkg.dev/my-project/docker-repo/my-image:my-tag]
+    - input: y
+  - stderr: |
+      Deleted tag [us-west1-docker.pkg.dev/my-project/docker-repo/my-image:my-tag].
+- execute:
+  - command: artifacts docker tags delete us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/my-image:my-tag
+  - prompt:
+    - message: You are about to delete tag [us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/my-image:my-tag]
+    - input: y
+  - stderr: |
+      Deleted tag [us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/my-image:my-tag].
+- execute:
+  - command: artifacts docker tags delete us-west1-docker.pkg.dev/my-project/not-docker-repo/my-image:my-tag
+  - error: '1: ^Invalid repository type NPM. The `artifacts docker` command group.*$'
+actions:
+- execute_command:
+    command: artifacts docker tags delete us-west1-docker.pkg.dev/my-project/docker-repo/my-image:my-tag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us-west1
+              locationId: us-west1
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/my-project/locations/us-west1/repositories/docker-repo",
+              "format": "DOCKER"
+            }
+    - expect_prompt_continue:
+        message: You are about to delete tag [us-west1-docker.pkg.dev/my-project/docker-repo/my-image:my-tag]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/my-image/tags/my-tag?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Deleted tag [us-west1-docker.pkg.dev/my-project/docker-repo/my-image:my-tag].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts docker tags delete us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/my-image:my-tag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us-west1
+              locationId: us-west1
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/my-project/locations/us-west1/repositories/docker-repo",
+              "format": "DOCKER"
+            }
+    - expect_prompt_continue:
+        message: You are about to delete tag [us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/my-image:my-tag]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/docker-repo/packages/nested1%252Fnested2%252Fmy-image/tags/my-tag?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Deleted tag [us-west1-docker.pkg.dev/my-project/docker-repo/nested1/nested2/my-image:my-tag].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts docker tags delete us-west1-docker.pkg.dev/my-project/not-docker-repo/my-image:my-tag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-project/locations/us-west1
+              locationId: us-west1
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-project/locations/us-west1/repositories/not-docker-repo?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/my-project/locations/us-west1/repositories/not-docker-repo",
+              "format": "NPM"
+            }
+    - expect_exit:
+        code: 1
+        message:
+          matches: ^Invalid repository type NPM. The `artifacts docker` command group.*

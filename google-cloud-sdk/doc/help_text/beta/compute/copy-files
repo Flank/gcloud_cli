@@ -21,20 +21,7 @@ DESCRIPTION
 
     To denote a remote file, prefix the file name with the virtual machine
     instance name (e.g., example-instance:~/FILE). To denote a local file, do
-    not add a prefix to the file name (e.g., ~/FILE). For example, to copy a
-    remote directory to your local host, run:
-
-        $ gcloud beta compute copy-files example-instance:~/REMOTE-DIR \
-            ~/LOCAL-DIR --zone us-central1-a
-
-    In the above example, ~/REMOTE-DIR from example-instance is copied into the
-    ~/LOCAL-DIR directory.
-
-    Conversely, files from your local computer can be copied to a virtual
-    machine:
-
-        $ gcloud beta compute copy-files ~/LOCAL-FILE-1 ~/LOCAL-FILE-2 \
-            example-instance:~/REMOTE-DIR --zone us-central1-a
+    not add a prefix to the file name (e.g., ~/FILE).
 
     If a file contains a colon (``:''), you must specify it by either using an
     absolute path or a path that begins with ``./''.
@@ -121,8 +108,21 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To copy a remote directory '~/REMOTE-DIR' on the instance of
+    'example-instance' to '~/LOCAL-DIR' on the local host, run:
+
+        $ gcloud beta compute copy-files example-instance:~/REMOTE-DIR \
+            ~/LOCAL-DIR --zone=us-central1-a
+
+    To copy files from your local host to a virtual machine, run:
+
+        $ gcloud beta compute copy-files ~/LOCAL-FILE-1 ~/LOCAL-FILE-2 \
+            example-instance:~/REMOTE-DIR --zone=us-central1-a
 
 NOTES
     This command is currently in BETA and may change without notice. These

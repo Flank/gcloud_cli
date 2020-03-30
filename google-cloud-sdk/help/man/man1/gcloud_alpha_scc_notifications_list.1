@@ -1,0 +1,117 @@
+
+.TH "GCLOUD_ALPHA_SCC_NOTIFICATIONS_LIST" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha scc notifications list \- list Cloud Security Command Center notification configs
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha scc notifications list\fR [\fIORGANIZATION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR List Cloud Security Command Center notification configs.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Organization resource \- The organization to be used for the SCC (Security
+Command Center) command. This represents a Cloud resource.
+
+.RS 2m
+.TP 2m
+[\fIORGANIZATION\fR]
+ID of the organization or fully qualified identifier for the organization.
+
+
+.RE
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBsecuritycenter/v1\fR API. The full documentation for
+this API can be found at:
+https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview
+
+
+
+.SH "EXAMPLES"
+
+List notification configs from organization 123456
+
+.RS 2m
+$ gcloud alpha scc notifications list 123456
+.RE
+
+.RS 2m
+$ gcloud alpha scc notifications list organizations/123456
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

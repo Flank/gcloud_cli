@@ -26,19 +26,20 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resources import InvalidResourceException
 from tests.lib import test_case
-from tests.lib.surface.compute import daisy_test_base
+from tests.lib.surface.compute import ovf_import_test_base
 from tests.lib.surface.compute import test_resources
 
 _DEFAULT_TIMEOUT = '7056s'
 
 
-class InstanceImportTest(daisy_test_base.DaisyBaseTest):
+class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.instance_name = 'my-instance'
+    self.resource_name = self.instance_name
     self.source_uri = 'gs://31dd/source-vm.ova'
     self.https_source_disk = ('https://storage.googleapis.com/'
                               '31dd/source-vm.ova')
@@ -48,6 +49,39 @@ class InstanceImportTest(daisy_test_base.DaisyBaseTest):
     self.tags = ['gce-ovf-import']
     self.zone = 'us-west1-c'
     properties.VALUES.compute.zone.Set(self.zone)
+
+  def PrepareZonalMocksForValidZone(self, zone):
+    # The empty list is for the response of _CheckForExistingInstance, i.e.
+    # no existing instance with given name, so validation can proceed to zone
+    # validation.
+    self.make_requests.side_effect = iter([
+        [],
+        [self.compute_v1_messages.Zone(name=zone)],
+    ])
+
+  def PrepareZonalMocksForInvalidZone(self, zone):
+    # Need to use a closure to mock MakeRequests due to the combination of
+    # a return value and an exception for the two calls that are being mocked
+    def make_requests_mock(requests,
+                           errors_to_collect=None,
+                           progress_tracker=None,
+                           followup_overrides=None,
+                           http=None,
+                           errors=None,
+                           batch_url=None):
+      del errors_to_collect, progress_tracker, followup_overrides, http, errors, batch_url
+
+      # Easier to check type of the request using strings due to different
+      # release tracks having different implementations for each request type
+      if requests and requests[0][1] == 'Get' and str.endswith(
+          type(requests[0][2]).__name__, 'ComputeInstancesGetRequest'):
+        # For the call to _CheckForExistingInstances
+        return []
+      else:
+        # For the call to daisy_utils.ValidateZone
+        raise exceptions.ToolException('')
+
+    self.make_requests.side_effect = make_requests_mock
 
   def GetOVFImportStep(self, instance_names=None):
     return self.GetOVFImportStepForArgs([
@@ -84,10 +118,7 @@ class InstanceImportTest(daisy_test_base.DaisyBaseTest):
                    permissions=None,
                    timeout='7200s'):
     self.PrepareDaisyMocks(
-        step,
-        async_flag=async_flag,
-        permissions=permissions,
-        timeout=timeout)
+        step, async_flag=async_flag, permissions=permissions, timeout=timeout)
 
   def testCommonCase(self):
     self.PrepareMocks(self.GetOVFImportStep())
@@ -95,20 +126,35 @@ class InstanceImportTest(daisy_test_base.DaisyBaseTest):
              {0} --source-uri {1} --os {2}
              """.format(self.instance_name, self.source_uri, self.os))
 
-  def testHttpsLinkToGcsImage(self):
-    """Make sure https:// URIs are converted correctly to gs:// ones.
+  def testHttpsLinkToGcsImageNoAPIVersion(self):
+    self.doTestHttpLinkToGcsImage(
+        'https://storage.googleapis.com/31dd/source-vm.ova')
+
+  def testHttpsLinkToGcsImageWithAPIVersion(self):
+    self.doTestHttpLinkToGcsImage(
+        'https://www.googleapis.com/storage/v1/b/31dd/o/source-vm.ova')
+
+  def testHttpLinkToGcsImageWithAPIVersion(self):
+    self.doTestHttpLinkToGcsImage(
+        'http://www.googleapis.com/storage/v1/b/31dd/o/source-vm.ova')
+
+  def doTestHttpLinkToGcsImage(self, http_url):
+    """Make sure http(s):// URIs are converted correctly to gs:// ones.
 
     This test should behave *exactly* like testCommonCase. gcloud ought to
     recognize a URI like https://storage.googleapis.com/bucket/image.ova
     and translate it to gs://bucket/image.ova automatically.
+
+    Args:
+      http_url: HTTP style GCS URI.
     """
     self.PrepareMocks(self.GetOVFImportStep())
     self._RunAndAssertSuccess("""
                {0} --source-uri {1} --os {2}
-               """.format(self.instance_name, self.https_source_disk, self.os))
+               """.format(self.instance_name, http_url, self.os))
 
   def testNonGcsHttpsUriFails(self):
-    """Ensure that only "https://" URLs that point to GCS are accepted."""
+    """Ensure that only "http(s)://" URLs that point to GCS are accepted."""
     with self.assertRaises(InvalidResourceException):
       self._RunFlags("""
                {0} --source-uri {1} --os {2}
@@ -163,6 +209,8 @@ class InstanceImportTest(daisy_test_base.DaisyBaseTest):
         response=self.project,
     )
     self._ExpectServiceUsage()
+    self._ExpectIamRolesGet(
+        is_import=True, permissions=missing_permissions, skip_compute=True)
     get_request = self.crm_v1_messages \
         .CloudresourcemanagerProjectsGetIamPolicyRequest(
             getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(
@@ -179,40 +227,6 @@ class InstanceImportTest(daisy_test_base.DaisyBaseTest):
                {0} --source-uri {1} --os {2}
                """.format(self.instance_name, self.source_uri, self.os))
 
-  def testAddMissingPermissions(self):
-    admin_permissions_binding = self.crm_v1_messages.Binding(
-        members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
-        role='roles/compute.admin',
-    )
-    missing_permissions = self.crm_v1_messages.Policy(
-        bindings=[admin_permissions_binding])
-    self.PrepareMocks(self.GetOVFImportStep(), permissions=missing_permissions)
-
-    # Called once for each service account role.
-    for _ in range(0, len(daisy_utils.SERVICE_ACCOUNT_ROLES)):
-      get_request = self.crm_v1_messages \
-          .CloudresourcemanagerProjectsGetIamPolicyRequest(
-              getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(
-                  options=self.crm_v1_messages.GetPolicyOptions(
-                      requestedPolicyVersion=
-                      iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
-              resource='my-project')
-      self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-          request=get_request,
-          response=self.permissions,
-      )
-      self.mocked_crm_v1.projects.SetIamPolicy.Expect(
-          self.crm_v1_messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
-              resource='my-project',
-              setIamPolicyRequest=self.crm_v1_messages.SetIamPolicyRequest(
-                  policy=self.permissions),
-          ),
-          response=self.permissions,
-      )
-    self._RunAndAssertSuccess("""
-               {0} --source-uri {1} --os {2} --quiet
-               """.format(self.instance_name, self.source_uri, self.os))
-
   def testOVFImportUsesZoneArg(self):
     self.doZoneFlagTest()
 
@@ -220,26 +234,44 @@ class InstanceImportTest(daisy_test_base.DaisyBaseTest):
     properties.VALUES.compute.zone.Set('us-west1-c')
     self.doZoneFlagTest(add_zone_cli_arg=False)
 
-  def doZoneFlagTest(self, add_zone_cli_arg=True):
-    zone = properties.VALUES.compute.zone.Get()
+  def doZoneFlagTest(self,
+                     add_zone_cli_arg=True,
+                     zone='us-central1-b',
+                     is_valid_zone=True):
+
+    flags = '{0} --source-uri {1} --os {2}'
+    zone_arg = properties.VALUES.compute.zone.Get()
     if add_zone_cli_arg:
-      zone = 'us-central1-b'
+      # Testing if zone is being used from CLI arg (vs. global config property)
+      zone_arg = zone
+      properties.VALUES.compute.zone.Set('')
+      flags += ' --zone ' + zone_arg
+
     ovf_import_step_with_zone = self.GetOVFImportStepForArgs([
         '-instance-names={0}'.format(self.instance_name),
         '-client-id=gcloud',
         '-ovf-gcs-path={0}'.format(self.source_uri),
         '-os={0}'.format(self.os),
-        '-zone={0}'.format(zone),
+        '-zone={0}'.format(zone_arg),
         '-timeout={0}'.format(_DEFAULT_TIMEOUT),
         '-release-track={0}'.format(self.track.id.lower()),
     ])
-    self.PrepareMocks(ovf_import_step_with_zone)
-    flags = '{0} --source-uri {1} --os {2}'
-    if add_zone_cli_arg:
-      properties.VALUES.compute.zone.Set('')
-      flags += ' --zone us-central1-b'
-    self._RunAndAssertSuccess(
-        flags.format(self.instance_name, self.source_uri, self.os))
+
+    # Setting up mocks
+    if is_valid_zone:
+      self.PrepareZonalMocksForValidZone(zone)
+      self.PrepareMocks(ovf_import_step_with_zone)
+    else:
+      # No standard mocks are needed for invalid zone as the logic terminates
+      # before any of the mocks are called.
+      self.PrepareZonalMocksForInvalidZone(zone)
+
+    if is_valid_zone:
+      self._RunAndAssertSuccess(
+          flags.format(self.instance_name, self.source_uri, self.os))
+    else:
+      # Assertion to be done by calling function
+      self._RunFlags(flags.format(self.instance_name, self.source_uri, self.os))
 
   def testMissingSourceUri(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -492,15 +524,18 @@ class InstanceImportTest(daisy_test_base.DaisyBaseTest):
   def testExistingInstance(self):
     self.make_requests.side_effect = iter([
         [test_resources.INSTANCES_V1[0]],
+        [self.compute_v1_messages.Zone(name=self.zone)],
     ])
-    name = 'my-instance'
-    error = r'The instance \[{0}\] already exists'.format(name)
+    instance_name = 'my-instance'
+    error = (r'The instance \[{instance_name}\] already exists in zone '
+             r'\[{zone}\]').format(
+                 instance_name=instance_name, zone=self.zone)
 
     with self.AssertRaisesExceptionRegexp(exceptions.InvalidArgumentException,
                                           error):
       self._RunFlags("""
           {0} --source-uri {1} --os {2}
-          """.format(name, self.source_uri, self.os))
+          """.format(instance_name, self.source_uri, self.os))
 
   def testTags(self):
     tags = 't1,t2,t3'
@@ -580,13 +615,50 @@ class InstanceImportTest(daisy_test_base.DaisyBaseTest):
                           node_affinity_file))
 
   def testSourceFileBucketOnlyGCSPath(self):
+    self.doTestSourceFileBucketOnly('gs://bucket-name')
+
+  def testSourceFileBucketOnlyWithTrailingSlashGCSPath(self):
+    self.doTestSourceFileBucketOnly('gs://bucket-name/')
+
+  def testSourceFileBucketOnlyHttpsGcsPath(self):
+    self.doTestSourceFileBucketOnly(
+        'https://www.googleapis.com/storage/v1/b/bucket-name')
+
+  def testSourceFileBucketOnlyWithTrailingSlashHttpsGcsPath(self):
+    self.doTestSourceFileBucketOnly(
+        'https://www.googleapis.com/storage/v1/b/bucket-name/')
+
+  def testSourceFileBucketOnlyHttpGcsPath(self):
+    self.doTestSourceFileBucketOnly(
+        'http://www.googleapis.com/storage/v1/b/bucket-name')
+
+  def testSourceFileBucketOnlyWithTrailingSlashHttpGcsPath(self):
+    self.doTestSourceFileBucketOnly(
+        'http://www.googleapis.com/storage/v1/b/bucket-name/')
+
+  def doTestSourceFileBucketOnly(self, bucket_path):
+    ovf_import_step = self.GetOVFImportStepForArgs([
+        '-instance-names={0}'.format(self.instance_name),
+        '-client-id=gcloud',
+        '-ovf-gcs-path={0}'.format('gs://bucket-name/'),
+        '-os={0}'.format(self.os),
+        '-zone={0}'.format(self.zone),
+        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-release-track={0}'.format(self.track.id.lower()),
+    ])
+    self.PrepareMocks(ovf_import_step)
+    self._RunAndAssertSuccess("""
+             {0} --source-uri {1} --os {2}
+             """.format(self.instance_name, bucket_path, self.os))
+
+  def testSourceFileErrorOnInvalidGCSPath(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         r'Invalid value for [source-uri]: must be a path to an object or a directory in Google Cloud Storage'
     ):
       self._RunFlags("""
                {0} --source-uri {1} --os {2}
-               """.format(self.instance_name, 'gs://bucket', self.os))
+               """.format(self.instance_name, 'not-a-gcs-path', self.os))
 
   def testDockerImageTag(self):
     self.ovf_builder = daisy_utils._OVF_IMPORT_BUILDER.format(
@@ -609,6 +681,35 @@ class InstanceImportTest(daisy_test_base.DaisyBaseTest):
         """\
         [import-ovf] output
         """, normalize_space=True)
+
+  def testOVFImportFailsOnInvalidZoneArg(self):
+    invalid_zone = 'not-a-zone'
+    error = r'Invalid value for \[--zone\]: {0}'.format(invalid_zone)
+
+    with self.AssertRaisesExceptionRegexp(exceptions.InvalidArgumentException,
+                                          error):
+      self.doZoneFlagTest(zone=invalid_zone, is_valid_zone=False)
+
+  def testHostname(self):
+    hostname = 'a-hostname.a-domain'
+    step = self.GetOVFImportStepForArgs([
+        '-instance-names={0}'.format(self.instance_name),
+        '-client-id=gcloud',
+        '-ovf-gcs-path={0}'.format(self.source_uri),
+        '-os={0}'.format(self.os),
+        '-zone={0}'.format(self.zone),
+        '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+        '-release-track={0}'.format(self.track.id.lower()),
+        '-hostname={0}'.format(hostname),
+    ],)
+    self.PrepareMocks(step)
+    self.Run("""
+                 compute instances import {0}
+                 --source-uri {1} --os {2} --hostname {3}
+                 """.format(self.instance_name, self.source_uri, self.os,
+                            hostname))
+    self.AssertErrContains('Created [https://cloudbuild.googleapis.com/'
+                           'v1/projects/my-project/builds/1234]')
 
 
 class InstanceImportTestBeta(InstanceImportTest):

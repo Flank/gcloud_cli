@@ -13,42 +13,43 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      RESOURCE
         Full resource name that access is checked against. See:
-        https://cloud.google.com/apis/design/resource_names#full_resource_name.
+        https://cloud.google.com/iam/docs/resource-names.
 
 REQUIRED FLAGS
      --permission=PERMISSION
         Cloud IAM permission to check, e.g. "resourcemanager.projects.get".
 
      --principal-email=PRINCIPAL_EMAIL
-        Principal email address of the member to check against. The format is
-        the email addresses associated with its gaia account and it must be
-        either a user account or a service account, other principal types are
-        not supported.
+        Email address that identifies the member to check. Only Google Accounts
+        and service accounts are supported.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
-    This command uses the policytroubleshooter/v1beta API. The full
-    documentation for this API can be found at: https://cloud.google.com/iam/
+    This command uses the policytroubleshooter/v1 API. The full documentation
+    for this API can be found at: https://cloud.google.com/iam/
 
 EXAMPLES
     To troubleshoot a permission of a member on a resource, run:
 
-        $ gcloud beta policy-troubleshoot iam projects/project-id
+        $ gcloud beta policy-troubleshoot iam \
+            //cloudresourcemanager.googleapis.com/projects/project-id
         --principal-email=my-iam-account@somedomain.com
-        --permission=iam.roles.list
+        --permission=resourcemanager.projects.get
 
-    See https://cloud.google.com/iam/docs/managing-policies for details of
-    policy role and member types.
+    See https://cloud.google.com/iam/docs/policies for more information about
+    IAM policies.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud policy-troubleshoot iam
         $ gcloud alpha policy-troubleshoot iam
 

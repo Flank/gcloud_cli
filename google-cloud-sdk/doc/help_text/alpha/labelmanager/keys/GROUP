@@ -15,14 +15,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (ALPHA) Adds a policy binding to the IAM policy of a LabelKey.
+
      create
-        (ALPHA) Creates a label key resource under the specified label parent.
+        (ALPHA) Creates a LabelKey resource under the specified label parent.
 
      delete
         (ALPHA) Deletes the specified LabelKey resource.
@@ -31,10 +35,16 @@ COMMANDS
         (ALPHA) Describes a LabelKey resource.
 
      get-iam-policy
-        (ALPHA) Gets IAM policy for a LabelKey resource.
+        (ALPHA) Gets the IAM policy for a LabelKey resource.
 
      list
-        (ALPHA) Lists label keys under the specified parent resource.
+        (ALPHA) Lists LabelKeys under the specified parent resource.
+
+     remove-iam-policy-binding
+        (ALPHA) Removes a policy binding from the IAM policy of a LabelKey.
+
+     set-iam-policy
+        (ALPHA) Sets IAM policy for a LabelKey resource.
 
      undelete
         (ALPHA) Undeletes the specified LabelKey resource.

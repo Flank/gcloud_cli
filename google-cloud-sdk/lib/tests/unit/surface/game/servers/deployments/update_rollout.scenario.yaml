@@ -1,0 +1,1350 @@
+title: Cloud Game Servers deployments rollout test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.json --no-dry-run
+  - stderr: |
+      Update rollout request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+        to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated rollout for: [my-deployment]
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+        apiVersion: $$api-version$$
+        createTime: '2019-06-17T19:37:58.958728294Z'
+        endTime: '2019-06-17T19:37:59.569152907Z'
+        requestedCancellation: false
+        target: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+        verb: updateRollout
+      name: projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d
+      response:
+        '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout
+        createTime: '2019-06-17T19:24:41.122744767Z'
+        default_config_version: cfg-version1
+        etag: 35325325352efsdfsdfewfsdfsdf
+        game_server_config_overrides:
+        - configVersion: version2
+          realmsSelector:
+            realms:
+            - realm1
+            - realm2
+        - configVersion: version3
+          realmsSelector:
+            realms:
+            - realm3
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+        updateTime: '2019-06-17T19:37:58.961626920Z'
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.yaml --no-dry-run
+  - stderr: |
+      Update rollout request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+        to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated rollout for: [my-deployment]
+  - stdout: |
+      {}
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file invalid_config_overrides.txt  --no-dry-run
+  - stderr: |
+      Update rollout request issued for: [my-deployment]
+  - error: '1: Invalid schema: unexpected game server config override(s) format.'
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.json --dry-run
+  - stdout: |
+      deployedState:
+        fleets:
+        - autoscalerDetails: {}
+          fleetName: fleet-my-deployment-my-config4
+          gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc2
+          gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+        - autoscalerDetails: {}
+          fleetName: fleet-my-deployment-my-config4
+          gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc1
+          gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.yaml --dry-run
+  - stdout: |
+      deployedState:
+        fleets:
+        - autoscalerDetails: {}
+          fleetName: fleet-my-deployment-my-config4
+          gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc2
+          gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+        - autoscalerDetails: {}
+          fleetName: fleet-my-deployment-my-config4
+          gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc1
+          gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.json --dry-run --preview-time '2020-01-01T12:24:00.0Z'
+  - stdout: |
+      deployedState:
+        fleets:
+        - autoscalerDetails: {}
+          fleetName: fleet-my-deployment-my-config4
+          gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc2
+          gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+        - autoscalerDetails: {}
+          fleetName: fleet-my-deployment-my-config4
+          gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc1
+          gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --location global --clear-config-overrides --no-dry-run
+  - stderr: |
+      Update rollout request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+        to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated rollout for: [my-deployment]
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+        apiVersion: $$api-version$$
+        createTime: '2019-06-17T19:37:58.958728294Z'
+        endTime: '2019-06-17T19:37:59.569152907Z'
+        requestedCancellation: false
+        target: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+        verb: updateRollout
+      name: projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d
+      response:
+        '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout
+        createTime: '2019-06-17T19:24:41.122744767Z'
+        default_config_version: cfg-version1
+        etag: 35325325352efsdfsdfewfsdfsdf
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+        updateTime: '2019-06-17T19:37:58.961626920Z'
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --location global --default-config "" --no-dry-run
+  - stderr: |
+      Update rollout request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+        to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated rollout for: [my-deployment]
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+        apiVersion: $$api-version$$
+        createTime: '2019-06-17T19:37:58.958728294Z'
+        endTime: '2019-06-17T19:37:59.569152907Z'
+        requestedCancellation: false
+        target: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+        verb: updateRollout
+      name: projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d
+      response:
+        '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout
+        createTime: '2019-06-17T19:24:41.122744767Z'
+        default_config_version: ''
+        etag: 35325325352efsdfsdfewfsdfsdf
+        game_server_config_overrides: []
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+        updateTime: '2019-06-17T19:37:58.961626920Z'
+- execute:
+  - command: |
+      game servers deployments update-rollout my-deployment --location global --clear-default-config --no-dry-run
+  - stderr: |
+      Update rollout request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+        to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated rollout for: [my-deployment]
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+        apiVersion: $$api-version$$
+        createTime: '2019-06-17T19:37:58.958728294Z'
+        endTime: '2019-06-17T19:37:59.569152907Z'
+        requestedCancellation: false
+        target: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+        verb: updateRollout
+      name: projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d
+      response:
+        '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout
+        createTime: '2019-06-17T19:24:41.122744767Z'
+        etag: 35325325352efsdfsdfewfsdfsdf
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+        updateTime: '2019-06-17T19:37:58.961626920Z'
+- execute:
+  - command: |
+      game servers deployments fetch-state my-deployment
+  - stdout: |
+      clusterState:
+      - cluster: projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+        fleetDetails:
+        - fleet:
+            agonesSpec: |-
+              {
+                "replicas": 1,
+                "strategy": {},
+                "scheduling": "Packed",
+                "template": {
+                  "metadata": {
+                    "name": "game-server-template-spec-1",
+                    "creationTimestamp": null,
+                    "labels": {
+                      "game-server-template-label-key": "game-server-template-label-1"
+                    },
+                    "annotations": {
+                      "game-server-template-annotation-key": "game-server-template-annotation-1"
+                    }
+                  },
+                  "spec": {
+                    "ports": [
+                      {
+                        "name": "default",
+                        "portPolicy": "Dynamic",
+                        "containerPort": 26000
+                      }
+                    ],
+                    "health": {
+                      "periodSeconds": 10,
+                      "failureThreshold": 10,
+                      "initialDelaySeconds": 60
+                    },
+                    "sdkServer": {},
+                    "template": {
+                      "metadata": {
+                        "name": "pod-template-spec-1",
+                        "creationTimestamp": null,
+                        "labels": {
+                          "gameservices.googleapis.com/fleet": "fleet-my-gsd-my-config",
+                          "gameservices.googleapis.com/gameServerCluster": "my-gsc",
+                          "gameservices.googleapis.com/gameServerClusterLocation": "us-central1",
+                          "gameservices.googleapis.com/gameServerConfig": "my-config",
+                          "gameservices.googleapis.com/gameServerDeployment": "my-gsd",
+                          "gameservices.googleapis.com/managed": "true",
+                          "gameservices.googleapis.com/realm": "my-realm",
+                          "pod-template-label-key": "pod-template-label-1"
+                        },
+                        "annotations": {
+                          "gameservices.googleapis.com/fleetConfig": "ccb11aff-a86c-4f6d-8b07-5286f54f00d3",
+                          "gameservices.googleapis.com/gameServerCluster": "projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
+                          "gameservices.googleapis.com/gameServerClusterUUID": "14f7e3f2-3503-4cf5-9514-720d62cb7caa",
+                          "gameservices.googleapis.com/gameServerConfig": "projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config",
+                          "gameservices.googleapis.com/gameServerDeployment": "projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd",
+                          "gameservices.googleapis.com/scalingConfig": "",
+                          "gameservices.googleapis.com/version": "MTU3OTEyOTc3MzkwMjMzNzAwMA==",
+                          "pod-template-annotation-key": "pod-template-annotation-1"
+                        }
+                      },
+                      "spec": {
+                        "containers": [
+                          {
+                            "name": "simple-udp-server",
+                            "image": "gcr.io/agones-images/udp-server:0.14",
+                            "resources": {}
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            fleet: fleet-my-gsd-my-config
+            specSource:
+              gameServerConfigName: projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config
+              name: ccb11aff-a86c-4f6d-8b07-5286f54f00d3
+            status:
+              replicas: '1'
+- execute:
+  - command: |
+      game servers deployments update-rollout fake-deployment --location global --config-overrides-file config_overrides.yaml --dry-run
+  - stdout: |
+      createTime: '2020-02-20T06:01:05.081638883Z'
+      etag: cCaWwTAbutfZnY25-80ZxJdq_aPHcTDtX0rsVEzywZ8
+      gameServerConfigOverrides:
+      - configVersion: projects/fake-project/locations/global/gameServerDeployments/fake-deployment/configs/fake-config
+        realmsSelector:
+          realms:
+          - projects/fake-project/locations/fake-location/realms/fake-realm
+      name: projects/fake-project/locations/global/gameServerDeployments/fake-deployment/rollout
+      updateTime: '2020-02-20T06:01:05.668149037Z'
+- execute:
+  - command: |
+      game servers deployments update-rollout fake-deployment --location global --config-overrides-file config_overrides.yaml --no-dry-run
+  - stderr: |
+      Update rollout request issued for: [fake-deployment]
+  - progress_tracker:
+    - message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+        to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated rollout for: [fake-deployment]
+  - stdout: |
+      {}
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha
+      BETA: v1beta
+
+- write_file:
+    path: config_overrides.json
+    contents: |
+      [
+        {
+          "realmsSelector": {
+            "realms": ["realm1", "realm2"]
+          },
+          "configVersion": "version2"
+        },
+        {
+          "realmsSelector": {
+            "realms": ["realm3"]
+          },
+          "configVersion": "version3"
+        }
+      ]
+- write_file:
+    path: config_overrides.yaml
+    contents: |
+      - realmsSelector:
+          realms:
+          - realm1
+          - realm2
+        configVersion: version2
+      - realmsSelector:
+          realms:
+          - realm4
+        configVersion: version3
+- write_file:
+    path: invalid_config_overrides.txt
+    contents: blah
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.json --no-dry-run
+    events:
+    - expect_stderr: |
+        Update rollout request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout?alt=json&updateMask=defaultGameServerConfig%2CgameServerConfigOverrides
+          method: PATCH
+          headers: {}
+          body: |
+            {
+               "defaultGameServerConfig": "cfg-version1",
+               "gameServerConfigOverrides": [
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm1", "realm2"]
+                    },
+                    "configVersion": "version2"
+                  },
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm3"]
+                    },
+                    "configVersion": "version3"
+                  }
+               ]
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "done": true
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z",
+                "etag": "ZMjCrpx9B11roG5rk4G7a-FW7W6a0bu1jrUFBhMmcfk"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+          to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated rollout for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T19:37:58.958728294Z",
+                "endTime": "2019-06-17T19:37:59.569152907Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout",
+                "verb": "updateRollout",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout",
+                "createTime": "2019-06-17T19:24:41.122744767Z",
+                "updateTime": "2019-06-17T19:37:58.961626920Z",
+                "default_config_version": "cfg-version1",
+                "game_server_config_overrides": [
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm1", "realm2"]
+                    },
+                    "configVersion": "version2"
+                  },
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm3"]
+                    },
+                    "configVersion": "version3"
+                  }
+                ],
+                "etag": "35325325352efsdfsdfewfsdfsdf"
+              }
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+          apiVersion: $$api-version$$
+          createTime: '2019-06-17T19:37:58.958728294Z'
+          endTime: '2019-06-17T19:37:59.569152907Z'
+          requestedCancellation: false
+          target: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+          verb: updateRollout
+        name: projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d
+        response:
+          '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout
+          createTime: '2019-06-17T19:24:41.122744767Z'
+          default_config_version: cfg-version1
+          etag: 35325325352efsdfsdfewfsdfsdf
+          game_server_config_overrides:
+          - configVersion: version2
+            realmsSelector:
+              realms:
+              - realm1
+              - realm2
+          - configVersion: version3
+            realmsSelector:
+              realms:
+              - realm3
+          name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+          updateTime: '2019-06-17T19:37:58.961626920Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.yaml --no-dry-run
+    events:
+    - expect_stderr: |
+        Update rollout request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout?alt=json&updateMask=defaultGameServerConfig%2CgameServerConfigOverrides
+          method: PATCH
+          headers: {}
+          body: |
+            {
+               "defaultGameServerConfig": "cfg-version1",
+               "gameServerConfigOverrides": [
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm1", "realm2"]
+                    },
+                    "configVersion": "version2"
+                  },
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm3"]
+                    },
+                    "configVersion": "version3"
+                  }
+               ]
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "done": true
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T19:37:58.958728294Z",
+                "endTime": "2019-06-17T19:37:59.569152907Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z",
+                "etag": "ZMjCrpx9B11roG5rk4G7a-FW7W6a0bu1jrUFBhMmcfk"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+          to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated rollout for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file invalid_config_overrides.txt  --no-dry-run
+    events:
+    - expect_stderr: |
+        Update rollout request issued for: [my-deployment]
+    - expect_exit:
+        code: 1
+        message: 'Invalid schema: unexpected game server config override(s) format.'
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.json --dry-run
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout:preview?alt=json&updateMask=defaultGameServerConfig%2CgameServerConfigOverrides
+          method: PATCH
+          headers: {}
+          body: |
+            {
+               "default_config_version": "cfg-version1",
+               "game_server_config_overrides": [
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm1", "realm2"]
+                    },
+                    "configVersion": "version2"
+                  },
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm3"]
+                    },
+                    "configVersion": "version3"
+                  }
+               ]
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+               "deployedState": {
+                  "fleets": [
+                     {
+                        "autoscalerDetails": {},
+                        "fleetName": "fleet-my-deployment-my-config4",
+                        "gameServerClusterName": "projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc2",
+                        "gameServerConfigName": "projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4"
+                     },
+                     {
+                        "autoscalerDetails": {},
+                        "fleetName": "fleet-my-deployment-my-config4",
+                        "gameServerClusterName": "projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc1",
+                        "gameServerConfigName": "projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4"
+                     }
+                  ]
+               }
+            }
+    - expect_stdout: |
+        deployedState:
+          fleets:
+          - autoscalerDetails: {}
+            fleetName: fleet-my-deployment-my-config4
+            gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc2
+            gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+          - autoscalerDetails: {}
+            fleetName: fleet-my-deployment-my-config4
+            gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc1
+            gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.yaml --dry-run
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout:preview?alt=json&updateMask=defaultGameServerConfig%2CgameServerConfigOverrides
+          method: PATCH
+          headers: {}
+          body: |
+            {
+               "default_config_version": "cfg-version1",
+               "game_server_config_overrides": [
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm1", "realm2"]
+                    },
+                    "configVersion": "version2"
+                  },
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm3"]
+                    },
+                    "configVersion": "version3"
+                  }
+               ]
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+               "deployedState": {
+                  "fleets": [
+                     {
+                        "autoscalerDetails": {},
+                        "fleetName": "fleet-my-deployment-my-config4",
+                        "gameServerClusterName": "projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc2",
+                        "gameServerConfigName": "projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4"
+                     },
+                     {
+                        "autoscalerDetails": {},
+                        "fleetName": "fleet-my-deployment-my-config4",
+                        "gameServerClusterName": "projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc1",
+                        "gameServerConfigName": "projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4"
+                     }
+                  ]
+               }
+            }
+    - expect_stdout: |
+        deployedState:
+          fleets:
+          - autoscalerDetails: {}
+            fleetName: fleet-my-deployment-my-config4
+            gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc2
+            gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+          - autoscalerDetails: {}
+            fleetName: fleet-my-deployment-my-config4
+            gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc1
+            gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --location global --default-config cfg-version1 --config-overrides-file config_overrides.json --dry-run --preview-time '2020-01-01T12:24:00.0Z'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout:preview?alt=json&previewTime=2020-01-01T12%3A24%3A00.0Z&updateMask=defaultGameServerConfig%2CgameServerConfigOverrides
+          method: PATCH
+          headers: {}
+          body: |
+            {
+               "default_config_version": "cfg-version1",
+               "game_server_config_overrides": [
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm1", "realm2"]
+                    },
+                    "configVersion": "version2"
+                  },
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm3"]
+                    },
+                    "configVersion": "version3"
+                  }
+               ]
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+               "deployedState": {
+                  "fleets": [
+                     {
+                        "autoscalerDetails": {},
+                        "fleetName": "fleet-my-deployment-my-config4",
+                        "gameServerClusterName": "projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc2",
+                        "gameServerConfigName": "projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4"
+                     },
+                     {
+                        "autoscalerDetails": {},
+                        "fleetName": "fleet-my-deployment-my-config4",
+                        "gameServerClusterName": "projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc1",
+                        "gameServerConfigName": "projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4"
+                     }
+                  ]
+               }
+            }
+    - expect_stdout: |
+        deployedState:
+          fleets:
+          - autoscalerDetails: {}
+            fleetName: fleet-my-deployment-my-config4
+            gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc2
+            gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+          - autoscalerDetails: {}
+            fleetName: fleet-my-deployment-my-config4
+            gameServerClusterName: projects/gameservices-test-project-87/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc1
+            gameServerConfigName: projects/gameservices-test-project-87/locations/global/gameServerDeployments/my-deployment/configs/my-config4
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --location global --clear-config-overrides --no-dry-run
+    events:
+    - expect_stderr: |
+        Update rollout request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout?alt=json&updateMask=gameServerConfigOverrides
+          method: PATCH
+          headers: {}
+          body: |
+            {
+               "gameServerConfigOverrides": []
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "done": true
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z",
+                "etag": "ZMjCrpx9B11roG5rk4G7a-FW7W6a0bu1jrUFBhMmcfk"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+          to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated rollout for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T19:37:58.958728294Z",
+                "endTime": "2019-06-17T19:37:59.569152907Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout",
+                "verb": "updateRollout",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout",
+                "createTime": "2019-06-17T19:24:41.122744767Z",
+                "updateTime": "2019-06-17T19:37:58.961626920Z",
+                "default_config_version": "cfg-version1",
+                "etag": "35325325352efsdfsdfewfsdfsdf"
+              }
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+          apiVersion: $$api-version$$
+          createTime: '2019-06-17T19:37:58.958728294Z'
+          endTime: '2019-06-17T19:37:59.569152907Z'
+          requestedCancellation: false
+          target: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+          verb: updateRollout
+        name: projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d
+        response:
+          '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout
+          createTime: '2019-06-17T19:24:41.122744767Z'
+          default_config_version: cfg-version1
+          etag: 35325325352efsdfsdfewfsdfsdf
+          name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+          updateTime: '2019-06-17T19:37:58.961626920Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --location global --default-config "" --no-dry-run
+    events:
+    - expect_stderr: |
+        Update rollout request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout?alt=json&updateMask=defaultGameServerConfig
+          method: PATCH
+          headers: {}
+          body: |
+            {
+               "defaultGameServerConfig": ""
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "done": true
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z",
+                "etag": "ZMjCrpx9B11roG5rk4G7a-FW7W6a0bu1jrUFBhMmcfk"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+          to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated rollout for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T19:37:58.958728294Z",
+                "endTime": "2019-06-17T19:37:59.569152907Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout",
+                "verb": "updateRollout",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout",
+                "createTime": "2019-06-17T19:24:41.122744767Z",
+                "updateTime": "2019-06-17T19:37:58.961626920Z",
+                "default_config_version": "",
+                "game_server_config_overrides": [],
+                "etag": "35325325352efsdfsdfewfsdfsdf"
+              }
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+          apiVersion: $$api-version$$
+          createTime: '2019-06-17T19:37:58.958728294Z'
+          endTime: '2019-06-17T19:37:59.569152907Z'
+          requestedCancellation: false
+          target: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+          verb: updateRollout
+        name: projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d
+        response:
+          '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout
+          createTime: '2019-06-17T19:24:41.122744767Z'
+          default_config_version: ''
+          etag: 35325325352efsdfsdfewfsdfsdf
+          game_server_config_overrides: []
+          name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+          updateTime: '2019-06-17T19:37:58.961626920Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update-rollout my-deployment --location global --clear-default-config --no-dry-run
+    events:
+    - expect_stderr: |
+        Update rollout request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout?alt=json&updateMask=defaultGameServerConfig
+          method: PATCH
+          headers: {}
+          body: |
+            {
+               "defaultGameServerConfig": ''
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "done": true
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z",
+                "etag": "ZMjCrpx9B11roG5rk4G7a-FW7W6a0bu1jrUFBhMmcfk"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+          to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated rollout for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T19:37:58.958728294Z",
+                "endTime": "2019-06-17T19:37:59.569152907Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout",
+                "verb": "updateRollout",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout",
+                "createTime": "2019-06-17T19:24:41.122744767Z",
+                "updateTime": "2019-06-17T19:37:58.961626920Z",
+                "etag": "35325325352efsdfsdfewfsdfsdf"
+              }
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+          apiVersion: $$api-version$$
+          createTime: '2019-06-17T19:37:58.958728294Z'
+          endTime: '2019-06-17T19:37:59.569152907Z'
+          requestedCancellation: false
+          target: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+          verb: updateRollout
+        name: projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d
+        response:
+          '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeploymentRollout
+          createTime: '2019-06-17T19:24:41.122744767Z'
+          etag: 35325325352efsdfsdfewfsdfsdf
+          name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/rollout
+          updateTime: '2019-06-17T19:37:58.961626920Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments fetch-state my-deployment
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment:fetchDeploymentState?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+               "clusterState": [
+                {
+                  "cluster": "projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
+                  "fleetDetails": [
+                    {
+                      "fleet": {
+                        "fleet": "fleet-my-gsd-my-config",
+                        "agonesSpec": "{\n  \"replicas\": 1,\n  \"strategy\": {},\n  \"scheduling\": \"Packed\",\n  \"template\": {\n    \"metadata\": {\n      \"name\": \"game-server-template-spec-1\",\n      \"creationTimestamp\": null,\n      \"labels\": {\n        \"game-server-template-label-key\": \"game-server-template-label-1\"\n      },\n      \"annotations\": {\n        \"game-server-template-annotation-key\": \"game-server-template-annotation-1\"\n      }\n    },\n    \"spec\": {\n      \"ports\": [\n        {\n          \"name\": \"default\",\n          \"portPolicy\": \"Dynamic\",\n          \"containerPort\": 26000\n        }\n      ],\n      \"health\": {\n        \"periodSeconds\": 10,\n        \"failureThreshold\": 10,\n        \"initialDelaySeconds\": 60\n      },\n      \"sdkServer\": {},\n      \"template\": {\n        \"metadata\": {\n          \"name\": \"pod-template-spec-1\",\n          \"creationTimestamp\": null,\n          \"labels\": {\n            \"gameservices.googleapis.com/fleet\": \"fleet-my-gsd-my-config\",\n            \"gameservices.googleapis.com/gameServerCluster\": \"my-gsc\",\n            \"gameservices.googleapis.com/gameServerClusterLocation\": \"us-central1\",\n            \"gameservices.googleapis.com/gameServerConfig\": \"my-config\",\n            \"gameservices.googleapis.com/gameServerDeployment\": \"my-gsd\",\n            \"gameservices.googleapis.com/managed\": \"true\",\n            \"gameservices.googleapis.com/realm\": \"my-realm\",\n            \"pod-template-label-key\": \"pod-template-label-1\"\n          },\n          \"annotations\": {\n            \"gameservices.googleapis.com/fleetConfig\": \"ccb11aff-a86c-4f6d-8b07-5286f54f00d3\",\n            \"gameservices.googleapis.com/gameServerCluster\": \"projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc\",\n            \"gameservices.googleapis.com/gameServerClusterUUID\": \"14f7e3f2-3503-4cf5-9514-720d62cb7caa\",\n            \"gameservices.googleapis.com/gameServerConfig\": \"projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config\",\n            \"gameservices.googleapis.com/gameServerDeployment\": \"projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd\",\n            \"gameservices.googleapis.com/scalingConfig\": \"\",\n            \"gameservices.googleapis.com/version\": \"MTU3OTEyOTc3MzkwMjMzNzAwMA==\",\n            \"pod-template-annotation-key\": \"pod-template-annotation-1\"\n          }\n        },\n        \"spec\": {\n          \"containers\": [\n            {\n              \"name\": \"simple-udp-server\",\n              \"image\": \"gcr.io/agones-images/udp-server:0.14\",\n              \"resources\": {}\n            }\n          ]\n        }\n      }\n    }\n  }\n}",
+                        "specSource": {
+                          "gameServerConfigName": "projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config",
+                          "name": "ccb11aff-a86c-4f6d-8b07-5286f54f00d3"
+                        },
+                        "status": {
+                          "replicas": "1"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+    - expect_stdout: |
+        clusterState:
+        - cluster: projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc
+          fleetDetails:
+          - fleet:
+              agonesSpec: |-
+                {
+                  "replicas": 1,
+                  "strategy": {},
+                  "scheduling": "Packed",
+                  "template": {
+                    "metadata": {
+                      "name": "game-server-template-spec-1",
+                      "creationTimestamp": null,
+                      "labels": {
+                        "game-server-template-label-key": "game-server-template-label-1"
+                      },
+                      "annotations": {
+                        "game-server-template-annotation-key": "game-server-template-annotation-1"
+                      }
+                    },
+                    "spec": {
+                      "ports": [
+                        {
+                          "name": "default",
+                          "portPolicy": "Dynamic",
+                          "containerPort": 26000
+                        }
+                      ],
+                      "health": {
+                        "periodSeconds": 10,
+                        "failureThreshold": 10,
+                        "initialDelaySeconds": 60
+                      },
+                      "sdkServer": {},
+                      "template": {
+                        "metadata": {
+                          "name": "pod-template-spec-1",
+                          "creationTimestamp": null,
+                          "labels": {
+                            "gameservices.googleapis.com/fleet": "fleet-my-gsd-my-config",
+                            "gameservices.googleapis.com/gameServerCluster": "my-gsc",
+                            "gameservices.googleapis.com/gameServerClusterLocation": "us-central1",
+                            "gameservices.googleapis.com/gameServerConfig": "my-config",
+                            "gameservices.googleapis.com/gameServerDeployment": "my-gsd",
+                            "gameservices.googleapis.com/managed": "true",
+                            "gameservices.googleapis.com/realm": "my-realm",
+                            "pod-template-label-key": "pod-template-label-1"
+                          },
+                          "annotations": {
+                            "gameservices.googleapis.com/fleetConfig": "ccb11aff-a86c-4f6d-8b07-5286f54f00d3",
+                            "gameservices.googleapis.com/gameServerCluster": "projects/gameservices-test-project-91/locations/us-central1/realms/my-realm/gameServerClusters/my-gsc",
+                            "gameservices.googleapis.com/gameServerClusterUUID": "14f7e3f2-3503-4cf5-9514-720d62cb7caa",
+                            "gameservices.googleapis.com/gameServerConfig": "projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config",
+                            "gameservices.googleapis.com/gameServerDeployment": "projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd",
+                            "gameservices.googleapis.com/scalingConfig": "",
+                            "gameservices.googleapis.com/version": "MTU3OTEyOTc3MzkwMjMzNzAwMA==",
+                            "pod-template-annotation-key": "pod-template-annotation-1"
+                          }
+                        },
+                        "spec": {
+                          "containers": [
+                            {
+                              "name": "simple-udp-server",
+                              "image": "gcr.io/agones-images/udp-server:0.14",
+                              "resources": {}
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              fleet: fleet-my-gsd-my-config
+              specSource:
+                gameServerConfigName: projects/gameservices-test-project-91/locations/global/gameServerDeployments/my-gsd/configs/my-config
+                name: ccb11aff-a86c-4f6d-8b07-5286f54f00d3
+              status:
+                replicas: '1'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      game servers deployments update-rollout fake-deployment --location global --config-overrides-file config_overrides.yaml --dry-run
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/fake-deployment/rollout:preview?alt=json&updateMask=gameServerConfigOverrides
+          method: PATCH
+          headers: {}
+          body: |
+            {
+               "game_server_config_overrides": [
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm1", "realm2"]
+                    },
+                    "configVersion": "version2"
+                  },
+                  {
+                    "realmsSelector": {
+                      "realms": ["realm3"]
+                    },
+                    "configVersion": "version3"
+                  }
+               ]
+            }
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/global/gameServerDeployments/fake-deployment/rollout
+            createTime: '2020-02-20T06:01:05.081638883Z'
+            updateTime: '2020-02-20T06:01:05.668149037Z'
+            gameServerConfigOverrides:
+            - realmsSelector:
+                realms:
+                - projects/fake-project/locations/fake-location/realms/fake-realm
+              configVersion: projects/fake-project/locations/global/gameServerDeployments/fake-deployment/configs/fake-config
+            etag: cCaWwTAbutfZnY25-80ZxJdq_aPHcTDtX0rsVEzywZ8
+    - expect_stdout: |
+        createTime: '2020-02-20T06:01:05.081638883Z'
+        etag: cCaWwTAbutfZnY25-80ZxJdq_aPHcTDtX0rsVEzywZ8
+        gameServerConfigOverrides:
+        - configVersion: projects/fake-project/locations/global/gameServerDeployments/fake-deployment/configs/fake-config
+          realmsSelector:
+            realms:
+            - projects/fake-project/locations/fake-location/realms/fake-realm
+        name: projects/fake-project/locations/global/gameServerDeployments/fake-deployment/rollout
+        updateTime: '2020-02-20T06:01:05.668149037Z'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      game servers deployments update-rollout fake-deployment --location global --config-overrides-file config_overrides.yaml --no-dry-run
+    events:
+    - expect_stderr: |
+        Update rollout request issued for: [fake-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/fake-deployment/rollout?alt=json&updateMask=gameServerConfigOverrides
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              gameServerConfigOverrides:
+              - configVersion: version2
+                realmsSelector:
+                  realms:
+                  - realm1
+                  - realm2
+              - configVersion: version3
+                realmsSelector:
+                  realms:
+                  - realm4
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "done": true
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T19:37:58.958728294Z",
+                "endTime": "2019-06-17T19:37:59.569152907Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z",
+                "etag": "ZMjCrpx9B11roG5rk4G7a-FW7W6a0bu1jrUFBhMmcfk"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for [operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+          to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated rollout for: [fake-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/fake-deployment/rollout?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0

@@ -52,7 +52,7 @@ class _BaseServerCaCertsListTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0)))),
+                            datetime.timedelta(0))).isoformat()),
                 data.GetSslCert(
                     instance_name, 'two',
                     datetime.datetime(
@@ -64,7 +64,7 @@ class _BaseServerCaCertsListTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))))
+                            datetime.timedelta(0))).isoformat())
             ],
             kind='sql#sslCertsList',
         ))

@@ -56,16 +56,17 @@ class TpusTests(e2e_base.WithServiceAuth):
     return next(generator)
 
   @contextlib.contextmanager
-  def _CreateTPU(self):
+  def _CreateTPU(self, cidr=None):
     """Creates Test TPU and deletes on exit."""
     tpu_id = self._GetTpuName()
-    cidr = _GetRandomCidr()
     command = ("compute tpus create {name} --zone {zone} "
                "--network {network} "
-               "--range '{cidr}' --accelerator-type 'v2-8' "
+               "--accelerator-type 'v2-8' "
                "--description 'Test TF Node {name}' "
                "--version '1.11'".format(
-                   zone=self.zone, name=tpu_id, cidr=cidr, network=NETWORK))
+                   zone=self.zone, name=tpu_id, network=NETWORK))
+    if cidr:
+      command += " --range '{cidr}'".format(cidr=cidr)
     try:
       self.Run(command)
       yield tpu_id
@@ -90,6 +91,18 @@ class TpusTests(e2e_base.WithServiceAuth):
   def testWorkflow(self):
     """Test of Basic TPU CRUD Workflow."""
     with self._CreateTPU() as tpu_name:
+      self.Run('compute tpus list')
+      self.AssertOutputContains(tpu_name)
+      result = self.Run('compute tpus describe {}'.format(tpu_name))
+      self.assertIsNotNone(result)
+      self.assertEqual(result.description,
+                       _TPU_DESCRIPTION.format(tpu_name=tpu_name))
+    self.AssertErrContains(_DELETE_MESSAGE.format(tpu_name=tpu_name))
+
+  def testWorkflowWithCIDR(self):
+    """Test of TPU CRUD Workflow with user-defined CIDR."""
+    cidr = _GetRandomCidr()
+    with self._CreateTPU(cidr) as tpu_name:
       self.Run('compute tpus list')
       self.AssertOutputContains(tpu_name)
       result = self.Run('compute tpus describe {}'.format(tpu_name))

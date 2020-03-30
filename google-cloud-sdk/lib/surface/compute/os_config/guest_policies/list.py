@@ -23,22 +23,23 @@ from googlecloudsdk.api_lib.compute.os_config import utils as osconfig_api_utils
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.os_config import utils as osconfig_command_utils
 from googlecloudsdk.core import properties
-from googlecloudsdk.core import resources
 
 
 def _TransformGuestPolicyDescription(resource):
+  """Returns a length-limited guest policy description."""
+
   max_len = 30  # Show only the first 30 characters if description is long.
   description = resource.get('description', '')
   return (description[:max_len] +
           '..') if len(description) > max_len else description
 
 
-def _MakeGetUriFunc():
-  """Return a transformation function from a guest policy resource to an URI."""
+def _MakeGetUriFunc(registry):
+  """Returns a transformation function from a guest policy resource to URI."""
 
   def UriFunc(resource):
     parent_type = resource.name.split('/')[0]
-    ref = resources.REGISTRY.Parse(
+    ref = registry.Parse(
         resource.name,
         collection='osconfig.{}.guestPolicies'.format(parent_type))
     return ref.SelfLink()
@@ -46,8 +47,65 @@ def _MakeGetUriFunc():
   return UriFunc
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+def _Args(parser, release_track):
+  """Parses input flags and sets up output formats."""
+
+  parser.display_info.AddFormat("""
+        table(
+          name.basename(),
+          description(),
+          create_time,
+          update_time
+        )
+      """)
+  parser.display_info.AddTransforms(
+      {'description': _TransformGuestPolicyDescription})
+  registry = osconfig_api_utils.GetRegistry(release_track)
+  parser.display_info.AddUriFunc(_MakeGetUriFunc(registry))
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
 class List(base.ListCommand):
+  """List guest policies in a project.
+
+  ## EXAMPLES
+
+    To list guest policies in the current project, run:
+
+          $ {command}
+
+  """
+
+  @staticmethod
+  def Args(parser):
+    """See base class."""
+    _Args(parser, base.ReleaseTrack.BETA)
+
+  def Run(self, args):
+    """See base class."""
+    release_track = self.ReleaseTrack()
+    client = osconfig_api_utils.GetClientInstance(release_track)
+    messages = osconfig_api_utils.GetClientMessages(release_track)
+
+    project = properties.VALUES.core.project.GetOrFail()
+    request = messages.OsconfigProjectsGuestPoliciesListRequest(
+        pageSize=args.page_size,
+        parent=osconfig_command_utils.GetProjectUriPath(project),
+    )
+    service = client.projects_guestPolicies
+
+    return list_pager.YieldFromList(
+        service,
+        request,
+        limit=args.limit,
+        batch_size=osconfig_command_utils.GetListBatchSize(args),
+        field='guestPolicies',
+        batch_size_attribute='pageSize',
+    )
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ListAlpha(base.ListCommand):
   """List guest policies in a project, a folder, or an organization.
 
   ## EXAMPLES
@@ -56,7 +114,7 @@ class List(base.ListCommand):
 
           $ {command}
 
-    To list guest policies in the organization '12345', run:
+    To list guest policies in the organization `12345`, run:
 
           $ {command} --organization=12345
 
@@ -64,21 +122,13 @@ class List(base.ListCommand):
 
   @staticmethod
   def Args(parser):
+    """See base class."""
+    _Args(parser, base.ReleaseTrack.ALPHA)
     osconfig_command_utils.AddResourceParentArgs(parser, 'guest policies',
                                                  'to list')
-    parser.display_info.AddFormat("""
-          table(
-            name.basename(),
-            description(),
-            create_time,
-            update_time
-          )
-        """)
-    parser.display_info.AddTransforms(
-        {'description': _TransformGuestPolicyDescription})
-    parser.display_info.AddUriFunc(_MakeGetUriFunc())
 
   def Run(self, args):
+    """See base class."""
     release_track = self.ReleaseTrack()
     client = osconfig_api_utils.GetClientInstance(release_track)
     messages = osconfig_api_utils.GetClientMessages(release_track)
@@ -108,7 +158,7 @@ class List(base.ListCommand):
         service,
         request,
         limit=args.limit,
-        batch_size=args.page_size,
+        batch_size=osconfig_command_utils.GetListBatchSize(args),
         field='guestPolicies',
         batch_size_attribute='pageSize',
     )

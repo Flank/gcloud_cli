@@ -8,7 +8,6 @@ to Google and make API calls.
 
 from apitools.base.protorpclite import messages as _messages
 from apitools.base.py import encoding
-from apitools.base.py import extra_types
 
 
 package = 'iam'
@@ -205,7 +204,7 @@ class Binding(_messages.Message):
       that represents a Google group.    For example, `admins@example.com`.  *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
-      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
       recovered, this value reverts to `user:{emailid}` and the recovered user
       retains the role in the binding.  *
       `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
@@ -360,7 +359,7 @@ class CreateServiceAccountRequest(_messages.Message):
       project, must be 6-30 characters long, and match the regular expression
       `[a-z]([-a-z0-9]*[a-z0-9])` to comply with RFC1035.
     serviceAccount: The ServiceAccount resource to create. Currently, only the
-      following values are user assignable: `display_name` .
+      following values are user assignable: `display_name` and `description`.
   """
 
   accountId = _messages.StringField(1)
@@ -386,21 +385,33 @@ class EnableServiceAccountRequest(_messages.Message):
 
 
 class Expr(_messages.Message):
-  r"""Represents an expression text. Example:      title: "User account
-  presence"     description: "Determines whether the request has a user
-  account"     expression: "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit"     description: "Determines if a summary is
+  less than 100 chars"     expression: "document.summary.size() < 100"
+  Example (Equality):      title: "Requestor is owner"     description:
+  "Determines if requestor is the document owner"     expression:
+  "document.owner == request.auth.claims.email"  Example (Logic):      title:
+  "Public documents"     description: "Determine whether the document should
+  be publicly visible"     expression: "document.type != 'private' &&
+  document.type != 'internal'"  Example (Data Manipulation):      title:
+  "Notification string"     description: "Create a notification string with a
+  timestamp."     expression: "'New message received at ' +
+  string(document.create_time)"  The exact variables and functions that may be
+  referenced within an expression are determined by the service that evaluates
+  it. See the service documentation for additional information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
@@ -858,9 +869,9 @@ class IamProjectsServiceAccountsDeleteRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsDeleteRequest object.
 
   Fields:
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID` will infer the project from the account.
+    name: Required. The resource name of the service account in the following
+      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as
+      a wildcard for the `PROJECT_ID` will infer the project from the account.
       The `ACCOUNT` value can be the `email` address or the `unique_id` of the
       service account.
   """
@@ -924,9 +935,9 @@ class IamProjectsServiceAccountsGetRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsGetRequest object.
 
   Fields:
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID` will infer the project from the account.
+    name: Required. The resource name of the service account in the following
+      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as
+      a wildcard for the `PROJECT_ID` will infer the project from the account.
       The `ACCOUNT` value can be the `email` address or the `unique_id` of the
       service account.
   """
@@ -1000,9 +1011,9 @@ class IamProjectsServiceAccountsKeysCreateRequest(_messages.Message):
   Fields:
     createServiceAccountKeyRequest: A CreateServiceAccountKeyRequest resource
       to be passed as the request body.
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID` will infer the project from the account.
+    name: Required. The resource name of the service account in the following
+      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as
+      a wildcard for the `PROJECT_ID` will infer the project from the account.
       The `ACCOUNT` value can be the `email` address or the `unique_id` of the
       service account.
   """
@@ -1015,10 +1026,11 @@ class IamProjectsServiceAccountsKeysDeleteRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsKeysDeleteRequest object.
 
   Fields:
-    name: The resource name of the service account key in the following
-      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
-      Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
-      the account. The `ACCOUNT` value can be the `email` address or the
+    name: Required. The resource name of the service account key in the
+      following format:
+      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`. Using `-`
+      as a wildcard for the `PROJECT_ID` will infer the project from the
+      account. The `ACCOUNT` value can be the `email` address or the
       `unique_id` of the service account.
   """
 
@@ -1033,10 +1045,11 @@ class IamProjectsServiceAccountsKeysGetRequest(_messages.Message):
       requested. X509_PEM is the default output format.
 
   Fields:
-    name: The resource name of the service account key in the following
-      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
-      Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
-      the account. The `ACCOUNT` value can be the `email` address or the
+    name: Required. The resource name of the service account key in the
+      following format:
+      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.  Using `-`
+      as a wildcard for the `PROJECT_ID` will infer the project from the
+      account. The `ACCOUNT` value can be the `email` address or the
       `unique_id` of the service account.
     publicKeyType: The output format of the public key requested. X509_PEM is
       the default output format.
@@ -1071,11 +1084,11 @@ class IamProjectsServiceAccountsKeysListRequest(_messages.Message):
     keyTypes: Filters the types of keys the user wants to include in the list
       response. Duplicate key types are not allowed. If no key type is
       provided, all keys are returned.
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.  Using `-` as a
-      wildcard for the `PROJECT_ID`, will infer the project from the account.
-      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
-      service account.
+    name: Required. The resource name of the service account in the following
+      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.  Using `-` as
+      a wildcard for the `PROJECT_ID`, will infer the project from the
+      account. The `ACCOUNT` value can be the `email` address or the
+      `unique_id` of the service account.
   """
 
   class KeyTypesValueValuesEnum(_messages.Enum):
@@ -1169,9 +1182,9 @@ class IamProjectsServiceAccountsSignBlobRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsSignBlobRequest object.
 
   Fields:
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID` will infer the project from the account.
+    name: Required. The resource name of the service account in the following
+      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as
+      a wildcard for the `PROJECT_ID` will infer the project from the account.
       The `ACCOUNT` value can be the `email` address or the `unique_id` of the
       service account.
     signBlobRequest: A SignBlobRequest resource to be passed as the request
@@ -1186,9 +1199,9 @@ class IamProjectsServiceAccountsSignJwtRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsSignJwtRequest object.
 
   Fields:
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID` will infer the project from the account.
+    name: Required. The resource name of the service account in the following
+      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as
+      a wildcard for the `PROJECT_ID` will infer the project from the account.
       The `ACCOUNT` value can be the `email` address or the `unique_id` of the
       service account.
     signJwtRequest: A SignJwtRequest resource to be passed as the request
@@ -1322,24 +1335,10 @@ class IamRolesListRequest(_messages.Message):
 
 
 class LintPolicyRequest(_messages.Message):
-  r"""The request to lint a Cloud IAM policy object. LintPolicy is currently
-  functional only for `lint_object` of type `condition`.
-
-  Messages:
-    ContextValue: `context` contains additional *permission-controlled* data
-      that any lint unit may depend on, in form of `{key: value}` pairs.
-      Currently, this field is non-operational and it will not be used during
-      the lint operation.
+  r"""The request to lint a Cloud IAM policy object.
 
   Fields:
-    binding: Binding object to be linted. The functionality of linting a
-      binding is not yet implemented and if this field is set, it returns
-      NOT_IMPLEMENTED error.
     condition: google.iam.v1.Binding.condition object to be linted.
-    context: `context` contains additional *permission-controlled* data that
-      any lint unit may depend on, in form of `{key: value}` pairs. Currently,
-      this field is non-operational and it will not be used during the lint
-      operation.
     fullResourceName: The full resource name of the policy this lint request
       is about.  The name follows the Google Cloud Platform (GCP) resource
       format. For example, a GCP project with ID `my-project` will be named
@@ -1347,43 +1346,10 @@ class LintPolicyRequest(_messages.Message):
       resource name is not used to read the policy instance from the Cloud IAM
       database. The candidate policy for lint has to be provided in the same
       request object.
-    policy: Policy object to be linted. The functionality of linting a policy
-      is not yet implemented and if this field is set, it returns
-      NOT_IMPLEMENTED error.
   """
 
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class ContextValue(_messages.Message):
-    r"""`context` contains additional *permission-controlled* data that any
-    lint unit may depend on, in form of `{key: value}` pairs. Currently, this
-    field is non-operational and it will not be used during the lint
-    operation.
-
-    Messages:
-      AdditionalProperty: An additional property for a ContextValue object.
-
-    Fields:
-      additionalProperties: Properties of the object.
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a ContextValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A extra_types.JsonValue attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.MessageField('extra_types.JsonValue', 2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  binding = _messages.MessageField('Binding', 1)
-  condition = _messages.MessageField('Expr', 2)
-  context = _messages.MessageField('ContextValue', 3)
-  fullResourceName = _messages.StringField(4)
-  policy = _messages.MessageField('Policy', 5)
+  condition = _messages.MessageField('Expr', 1)
+  fullResourceName = _messages.StringField(2)
 
 
 class LintPolicyResponse(_messages.Message):
@@ -1391,13 +1357,8 @@ class LintPolicyResponse(_messages.Message):
   operation was able to fully execute and no lint issue was found.
 
   Fields:
-    lintResults: List of lint results sorted by a composite <severity,
-      binding_ordinal> key, descending order of severity and ascending order
-      of binding_ordinal. There is no certain order among the same keys.  For
-      cross-binding results (only if the input object to lint is instance of
-      google.iam.v1.Policy), there will be a google.iam.admin.v1.LintResult
-      for each of the involved bindings, and the associated debug_message may
-      enumerate the other involved binding ordinal number(s).
+    lintResults: List of lint results sorted by `severity` in descending
+      order.
   """
 
   lintResults = _messages.MessageField('LintResult', 1, repeated=True)
@@ -1411,22 +1372,13 @@ class LintResult(_messages.Message):
     SeverityValueValuesEnum: The validation unit severity.
 
   Fields:
-    bindingOrdinal: 0-based index ordinality of the binding in the input
-      object associated with this result. This field is populated only if the
-      input object to lint is of type google.iam.v1.Policy, which can comprise
-      more than one binding. It is set to -1 if the result is not associated
-      with any particular binding and only targets the policy as a whole, such
-      as results about policy size violations.
     debugMessage: Human readable debug message associated with the issue.
     fieldName: The name of the field for which this lint result is about.  For
-      nested messages, `field_name` consists of names of the embedded fields
+      nested messages `field_name` consists of names of the embedded fields
       separated by period character. The top-level qualifier is the input
-      object to lint in the request. For instance, if the lint request is on a
-      google.iam.v1.Policy and this lint result is about a condition
-      expression of one of the input policy bindings, the field would be
-      populated as `policy.bindings.condition.expression`.  This field does
-      not identify the ordinality of the repetitive fields (for instance
-      bindings in a policy).
+      object to lint in the request. For example, the `field_name` value
+      `condition.expression` identifies a lint result for the `expression`
+      field of the provided condition.
     level: The validation unit level.
     locationOffset: 0-based character position of problematic construct within
       the object identified by `field_name`. Currently, this is populated only
@@ -1441,20 +1393,11 @@ class LintResult(_messages.Message):
 
     Values:
       LEVEL_UNSPECIFIED: Level is unspecified.
-      POLICY: A validation unit which operates on a policy. It is executed
-        only if the input object to lint is of type google.iam.v1.Policy.
-      BINDING: A validation unit which operates on an individual binding. It
-        is executed in both cases where the input object to lint is of type
-        google.iam.v1.Policy or google.iam.v1.Binding.
       CONDITION: A validation unit which operates on an individual condition
-        within a binding. It is executed in all three cases where the input
-        object to lint is of type google.iam.v1.Policy, google.iam.v1.Binding
-        or google.iam.v1.Binding.condition.
+        within a binding.
     """
     LEVEL_UNSPECIFIED = 0
-    POLICY = 1
-    BINDING = 2
-    CONDITION = 3
+    CONDITION = 1
 
   class SeverityValueValuesEnum(_messages.Enum):
     r"""The validation unit severity.
@@ -1488,13 +1431,12 @@ class LintResult(_messages.Message):
     INFO = 4
     DEPRECATED = 5
 
-  bindingOrdinal = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  debugMessage = _messages.StringField(2)
-  fieldName = _messages.StringField(3)
-  level = _messages.EnumField('LevelValueValuesEnum', 4)
-  locationOffset = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  severity = _messages.EnumField('SeverityValueValuesEnum', 6)
-  validationUnitName = _messages.StringField(7)
+  debugMessage = _messages.StringField(1)
+  fieldName = _messages.StringField(2)
+  level = _messages.EnumField('LevelValueValuesEnum', 3)
+  locationOffset = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  severity = _messages.EnumField('SeverityValueValuesEnum', 5)
+  validationUnitName = _messages.StringField(6)
 
 
 class ListRolesResponse(_messages.Message):
@@ -1629,15 +1571,16 @@ class PermissionDelta(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.   A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**      {       "bindings": [         {
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.   A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**      {       "bindings": [         {
   "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-project-
@@ -1646,23 +1589,24 @@ class Policy(_messages.Message):
   ["user:eve@example.com"],           "condition": {             "title":
   "expirable access",             "description": "Does not grant access after
   Sep 2020",             "expression": "request.time <
-  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
-  **YAML Example**      bindings:     - members:       - user:mike@example.com
-  - group:admins@example.com       - domain:google.com       - serviceAccount
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
+  "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
+  bindings:     - members:       - user:mike@example.com       -
+  group:admins@example.com       - domain:google.com       - serviceAccount
   :my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
   grant access after Sep 2020         expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  timestamp('2020-10-01T00:00:00.000Z')     - etag: BwWWja0YfJA=     -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
     auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1670,19 +1614,24 @@ class Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy   that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
   auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
@@ -2083,7 +2032,7 @@ class SignBlobRequest(_messages.Message):
   r"""The service account sign blob request.
 
   Fields:
-    bytesToSign: The bytes to sign.
+    bytesToSign: Required. The bytes to sign.
   """
 
   bytesToSign = _messages.BytesField(1)
@@ -2105,7 +2054,7 @@ class SignJwtRequest(_messages.Message):
   r"""The service account sign JWT request.
 
   Fields:
-    payload: The JWT payload to sign, a JSON JWT Claim set.
+    payload: Required. The JWT payload to sign, a JSON JWT Claim set.
   """
 
   payload = _messages.StringField(1)

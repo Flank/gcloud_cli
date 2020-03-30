@@ -118,6 +118,22 @@ class AddressesLabelsTestBase(sdk_test_base.WithFakeAuth,
               region=operation_ref.region,
               project=self.Project()), operation)
 
+  def _ExpectOperationWaitRequest(self, operation_ref, operation):
+    if operation_ref.Collection() == 'compute.globalOperations':
+      self.global_operations.Wait.Expect(
+          self.messages.ComputeGlobalOperationsWaitRequest(
+              operation=operation_ref.operation, project=self.Project()),
+          operation)
+    else:
+      self.region_operations.Wait.Expect(
+          self.messages.ComputeRegionOperationsWaitRequest(
+              operation=operation_ref.operation,
+              region=operation_ref.region,
+              project=self.Project()), operation)
+
+  def _ExpectOperationPollingRequest(self, operation_ref, operation):
+    self._ExpectOperationWaitRequest(operation_ref, operation)
+
   def _ExpectLabelsSetRequest(self,
                               address_ref,
                               labels,

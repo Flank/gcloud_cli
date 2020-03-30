@@ -1,0 +1,178 @@
+
+.TH "GCLOUD_BETA_COMPUTE_INSTANCE\-GROUPS_MANAGED_LIST\-ERRORS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute instance\-groups managed list\-errors \- list errors produced by managed instances in a managed instance group
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute instance\-groups managed list\-errors\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute instance\-groups managed list\-errors\fR
+List errors that are produced by managed instances in a managed instance group.
+
+The required permission to execute this command is
+\f5compute.instanceGroupManagers.list\fR. If needed, you can include this
+permission in a custom IAM role, or choose any of the following preexisting IAM
+roles that contain this particular permission:
+
+.RS 2m
+.IP "\(bu" 2m
+Compute Admin
+.IP "\(bu" 2m
+Compute Viewer
+.IP "\(bu" 2m
+Compute Instance Admin (v1)
+.IP "\(bu" 2m
+Compute Instance Admin (beta)
+.IP "\(bu" 2m
+Compute Network Admin
+.IP "\(bu" 2m
+Editor
+.IP "\(bu" 2m
+Owner
+.IP "\(bu" 2m
+Security Reviewer
+.IP "\(bu" 2m
+Viewer
+.RE
+.sp
+
+For more information regarding permissions required by managed instance groups,
+refer to Compute Engine's access control guide :
+https://cloud.google.com/compute/docs/access/iam\-permissions#instancegroupmanagers_collection.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the managed instance group to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the managed instance group to operate on. If not specified, you may be
+prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the managed instance group to operate on. If not specified, you may be
+prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-uri\fR
+Print a list of resource URIs instead of the default output.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list errors on managed instance group 'my\-group', run:
+
+.RS 2m
+$ gcloud beta compute instance\-groups managed list\-errors \e
+      my\-group \-\-format=yaml
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed list\-errors
+.RE
+

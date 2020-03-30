@@ -29,6 +29,7 @@ from six import text_type
 class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     # BETA and GA tracks are currently not supported.
     self.track = calliope_base.ReleaseTrack.ALPHA
 
@@ -63,25 +64,15 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
     self._ExpectGet(policy, perimeter_after)
 
   def testUpdate_MissingRequired(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run(
           'access-context-manager perimeters update-dry-run-config --policy 123'
       )
 
-  def testUpdate_NoUpdates(self):
-    self.SetUpForTrack(self.track)
-    # No patch message sent, because nothing is changed.
-
-    self.Run(
-        'access-context-manager perimeters update-dry-run-config MY_PERIMETER '
-        '    --policy 123')
-    self.AssertErrContains(
-        'The update specified results in an identical resource.')
-
   def testUpdate_SpecifyingTitleForbidden(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'unrecognized arguments'):
 
@@ -90,7 +81,7 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
           '    --policy 123 --title "My Perimeter Title"')
 
   def testUpdate_ClearRepeatingFields(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -101,12 +92,12 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
         type_='PERIMETER_TYPE_BRIDGE',
         dry_run=True)
     perimeter_update = self.messages.ServicePerimeter(
-        dryRun=True,
+        useExplicitDryRunSpec=True,
         spec=self.messages.ServicePerimeterConfig(
             restrictedServices=[], accessLevels=[], resources=[]))
     self._ExpectPatch(
-        perimeter_update, perimeter, 'dryRun,spec.accessLevels,spec.resources,'
-        'spec.restrictedServices', '123')
+        perimeter_update, perimeter, 'spec.accessLevels,spec.resources,'
+        'spec.restrictedServices,useExplicitDryRunSpec', '123')
 
     result = self.Run(
         'access-context-manager perimeters update-dry-run-config MY_PERIMETER '
@@ -116,7 +107,7 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
     self.assertEqual(result, perimeter)
 
   def testUpdate_SetRepeatingFields(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter_before = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -136,7 +127,7 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
         type_='PERIMETER_TYPE_BRIDGE',
         dry_run=True)
     perimeter_update = self.messages.ServicePerimeter(
-        dryRun=True,
+        useExplicitDryRunSpec=True,
         spec=self.messages.ServicePerimeterConfig(
             restrictedServices=perimeter.spec.restrictedServices,
             accessLevels=[  # _MakePerimeter has sugar for resource names
@@ -146,8 +137,8 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
             resources=perimeter.spec.resources))
     self._ExpectGet('123', perimeter_before)
     self._ExpectPatch(
-        perimeter_update, perimeter, 'dryRun,spec.accessLevels,spec.resources,'
-        'spec.restrictedServices', '123')
+        perimeter_update, perimeter, 'spec.accessLevels,spec.resources,'
+        'spec.restrictedServices,useExplicitDryRunSpec', '123')
 
     result = self.Run(
         'access-context-manager perimeters update-dry-run-config MY_PERIMETER '
@@ -159,7 +150,7 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
     self.assertEqual(result, perimeter)
 
   def testUpdate_AddRemoveRepeatingFields(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter_before = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -178,13 +169,15 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
         type_='PERIMETER_TYPE_BRIDGE',
         dry_run=True)
     perimeter_update = self.messages.ServicePerimeter(
-        dryRun=True,
+        useExplicitDryRunSpec=True,
         spec=self.messages.ServicePerimeterConfig(
             restrictedServices=perimeter_after.spec.restrictedServices,
             accessLevels=perimeter_after.spec.accessLevels))
     self._ExpectGet('123', perimeter_before)
-    self._ExpectPatch(perimeter_update, perimeter_after,
-                      'dryRun,spec.accessLevels,spec.restrictedServices', '123')
+    self._ExpectPatch(
+        perimeter_update, perimeter_after,
+        'spec.accessLevels,spec.restrictedServices,'
+        'useExplicitDryRunSpec', '123')
 
     result = self.Run(
         'access-context-manager perimeters update-dry-run-config MY_PERIMETER '
@@ -196,7 +189,7 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
     self.assertEqual(result, perimeter_after)
 
   def testUpdate_PolicyFromProperty(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     policy = '123'
     properties.VALUES.access_context_manager.policy.Set(policy)
     perimeter_before = self._MakePerimeter(
@@ -218,13 +211,15 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
         type_='PERIMETER_TYPE_BRIDGE',
         dry_run=True)
     perimeter_update = self.messages.ServicePerimeter(
-        dryRun=True,
+        useExplicitDryRunSpec=True,
         spec=self.messages.ServicePerimeterConfig(
             restrictedServices=perimeter_after.spec.restrictedServices,
             accessLevels=perimeter_after.spec.accessLevels))
     self._ExpectGet('123', perimeter_before)
-    self._ExpectPatch(perimeter_update, perimeter_after,
-                      'dryRun,spec.accessLevels,spec.restrictedServices', '123')
+    self._ExpectPatch(
+        perimeter_update, perimeter_after,
+        'spec.accessLevels,spec.restrictedServices,'
+        'useExplicitDryRunSpec', '123')
 
     result = self.Run(
         'access-context-manager perimeters update-dry-run-config MY_PERIMETER '
@@ -244,7 +239,7 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
     self.assertIn('set to the policy number', text_type(ex.exception))
 
   def testUpdate_AddServiceFilterFields(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
 
     perimeter_before = self._MakePerimeter(
         'MY_PERIMETER',
@@ -263,13 +258,14 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
         dry_run=True,
     )
     perimeter_update = self.messages.ServicePerimeter(
-        dryRun=True,
+        useExplicitDryRunSpec=True,
         spec=self.messages.ServicePerimeterConfig(
-            vpcServiceRestriction=perimeter_after.spec.vpcServiceRestriction))
+            vpcAccessibleServices=perimeter_after.spec.vpcAccessibleServices))
     self._ExpectGet('123', perimeter_before)
     self._ExpectPatch(
-        perimeter_update, perimeter_after, 'dryRun,'
-        'spec.vpcServiceRestriction.allowedServices', '123')
+        perimeter_update, perimeter_after,
+        'spec.vpcAccessibleServices.allowedServices,'
+        'useExplicitDryRunSpec', '123')
 
     result = self.Run(
         'access-context-manager perimeters update-dry-run-config MY_PERIMETER '
@@ -279,7 +275,7 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
     self.assertEqual(result, perimeter_after)
 
   def testUpdate_EnableServiceFilters(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
 
     perimeter_before = self._MakePerimeter(
         'MY_PERIMETER',
@@ -294,36 +290,39 @@ class PerimetersUpdateDryRunConfigTest(accesscontextmanager.Base):
         description='foo bar',
         restricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
         type_='PERIMETER_TYPE_BRIDGE',
-        enable_vpc_service_restriction=True,
+        enable_vpc_accessible_services=True,
         dry_run=True,
     )
     perimeter_update = self.messages.ServicePerimeter(
-        dryRun=True,
+        useExplicitDryRunSpec=True,
         spec=self.messages.ServicePerimeterConfig(
-            vpcServiceRestriction=perimeter_after.spec.vpcServiceRestriction))
+            vpcAccessibleServices=perimeter_after.spec.vpcAccessibleServices))
 
     self._ExpectGet('123', perimeter_before)
     self._ExpectPatch(
-        perimeter_update, perimeter_after, 'dryRun,'
-        'spec.vpcServiceRestriction.enableRestriction', '123')
+        perimeter_update, perimeter_after,
+        'spec.vpcAccessibleServices.enableRestriction,'
+        'useExplicitDryRunSpec', '123')
 
     result = self.Run(
         'access-context-manager perimeters update-dry-run-config MY_PERIMETER '
         '   --policy 123 '
-        '   --enable-vpc-service-restriction ')
+        '   --enable-vpc-accessible-services ')
 
     self.assertEqual(result, perimeter_after)
 
   def testUpdate_ClearDryRun(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter_after = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
         description='foo bar',
         type_='PERIMETER_TYPE_BRIDGE')
-    perimeter_update = self.messages.ServicePerimeter(dryRun=False, spec=None)
+    perimeter_update = self.messages.ServicePerimeter(
+        useExplicitDryRunSpec=False, spec=None)
 
-    self._ExpectPatch(perimeter_update, perimeter_after, 'dryRun,spec', '123')
+    self._ExpectPatch(perimeter_update, perimeter_after, 'spec,'
+                      'useExplicitDryRunSpec', '123')
 
     result = self.Run(
         'access-context-manager perimeters update-dry-run-config MY_PERIMETER '

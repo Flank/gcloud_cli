@@ -1,0 +1,434 @@
+title: notebooks instances update test scenario
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      notebooks instances update projects/cloudsdktest/locations/us-central1-b/instances/test-instance3 --accelerator-core-count=3 --labels=k3=v3 --machine-type=n1-standard-8
+  - progress_tracker:
+    - message: Waiting for operation on Instance [projects/cloudsdktest/locations/us-central1-b/instances/test-instance3]
+        to be updated with [projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572131656-59e6e75181358-1ca8c77f-b7acb7ef]
+    - status: SUCCESS
+  - stderr: |
+      Updated notebooks instance projects/cloudsdktest/locations/us-central1-b/instances/test-instance3 [https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572131656-59e6e75181358-1ca8c77f-b7acb7ef].
+  - progress_tracker:
+    - message: Waiting for operation on Instance [projects/cloudsdktest/locations/us-central1-b/instances/test-instance3]
+        to be updated with [projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572145245-59e6e75e76c4f-09db1f29-c240a37f]
+    - status: SUCCESS
+  - stderr: |
+      Updated notebooks instance projects/cloudsdktest/locations/us-central1-b/instances/test-instance3 [https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572145245-59e6e75e76c4f-09db1f29-c240a37f].
+  - progress_tracker:
+    - message: Waiting for operation on Instance [projects/cloudsdktest/locations/us-central1-b/instances/test-instance3]
+        to be updated with [projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572153878-59e6e766b26e9-95d700a6-b9fa73d1]
+    - status: SUCCESS
+  - stderr: |
+      Updated notebooks instance projects/cloudsdktest/locations/us-central1-b/instances/test-instance3 [https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572153878-59e6e766b26e9-95d700a6-b9fa73d1].
+actions:
+- execute_command:
+    command: |
+      notebooks instances update projects/cloudsdktest/locations/us-central1-b/instances/test-instance3 --accelerator-core-count=3 --labels=k3=v3 --machine-type=n1-standard-8
+    events:
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/instances/test-instance3:setAccelerator?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              coreCount: '3'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572131656-59e6e75181358-1ca8c77f-b7acb7ef",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.notebooks.v1beta1.OperationMetadata",
+                "createTime": "2020-02-13T05:35:31.669381237Z",
+                "target": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1beta1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572131656-59e6e75181358-1ca8c77f-b7acb7ef?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572131656-59e6e75181358-1ca8c77f-b7acb7ef",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.notebooks.v1beta1.OperationMetadata",
+                "createTime": "2020-02-13T05:35:31.669381237Z",
+                "endTime": "2020-02-13T05:35:38.985935633Z",
+                "target": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1beta1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.notebooks.v1beta1.Instance",
+                "name": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+                "containerImage": {
+                  "repository": "gcr.io/deeplearning-platform-release/base-cpu",
+                  "tag": "test-tag"
+                },
+                "postStartupScript": "gs://exampledir/examplefile",
+                "serviceAccount": "test-shyamm-service-account@cloudsdktest.iam.gserviceaccount.com",
+                "machineType": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-b/machineTypes/n1-standard-4",
+                "state": "STOPPED",
+                "customGpuDriverPath": "test-gpu-driver-path",
+                "noPublicIp": true,
+                "noProxyAccess": true,
+                "network": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/networks/datalab-network",
+                "subnet": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1/subnetworks/datalab-network",
+                "labels": {
+                  "k2": "v2",
+                  "k1": "v1"
+                },
+                "metadata": {
+                  "proxy-mode": "none",
+                  "nvidia-driver-gcs-path": "test-gpu-driver-path",
+                  "k1": "v1",
+                  "post-startup-script": "gs://exampledir/examplefile",
+                  "notebooks-api": "PROD",
+                  "enable-oslogin": "TRUE",
+                  "k2": "v2",
+                  "proxy-user-mail": "shyamm@google.com",
+                  "install-nvidia-driver": "",
+                  "container": "gcr.io/deeplearning-platform-release/base-cpu:test-tag",
+                  "shutdown-script": "timeout 30 gcloud compute instances remove-metadata test-instance3 --keys=proxy-url --zone us-central1-b"
+                },
+                "createTime": "2020-02-13T04:17:04.640622140Z",
+                "updateTime": "2020-02-13T05:35:31.673880322Z"
+              }
+            }
+
+        repeatable: true
+    - expect_progress_tracker:
+        message: Waiting for operation on Instance [projects/cloudsdktest/locations/us-central1-b/instances/test-instance3]
+          to be updated with [projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572131656-59e6e75181358-1ca8c77f-b7acb7ef]
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/instances/test-instance3?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+              "containerImage": {
+                "repository": "gcr.io/deeplearning-platform-release/base-cpu",
+                "tag": "test-tag"
+              },
+              "postStartupScript": "gs://exampledir/examplefile",
+              "serviceAccount": "test-shyamm-service-account@cloudsdktest.iam.gserviceaccount.com",
+              "machineType": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-b/machineTypes/n1-standard-4",
+              "state": "STOPPED",
+              "customGpuDriverPath": "test-gpu-driver-path",
+              "noPublicIp": true,
+              "noProxyAccess": true,
+              "network": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/networks/datalab-network",
+              "subnet": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1/subnetworks/datalab-network",
+              "labels": {
+                "k1": "v1",
+                "k2": "v2"
+              },
+              "metadata": {
+                "k2": "v2",
+                "container": "gcr.io/deeplearning-platform-release/base-cpu:test-tag",
+                "k1": "v1",
+                "notebooks-api": "PROD",
+                "post-startup-script": "gs://exampledir/examplefile",
+                "enable-oslogin": "TRUE",
+                "proxy-mode": "none",
+                "proxy-user-mail": "shyamm@google.com",
+                "install-nvidia-driver": "",
+                "nvidia-driver-gcs-path": "test-gpu-driver-path",
+                "shutdown-script": "timeout 30 gcloud compute instances remove-metadata test-instance3 --keys=proxy-url --zone us-central1-b"
+              },
+              "createTime": "2020-02-13T04:17:04.640622140Z",
+              "updateTime": "2020-02-13T05:35:31.673880322Z"
+            }
+    - expect_stderr: |
+        Updated notebooks instance projects/cloudsdktest/locations/us-central1-b/instances/test-instance3 [https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572131656-59e6e75181358-1ca8c77f-b7acb7ef].
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/instances/test-instance3:setLabels?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              labels:
+                k3: v3
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572145245-59e6e75e76c4f-09db1f29-c240a37f",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.notebooks.v1beta1.OperationMetadata",
+                "createTime": "2020-02-13T05:35:45.256414496Z",
+                "target": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1beta1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572145245-59e6e75e76c4f-09db1f29-c240a37f?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572145245-59e6e75e76c4f-09db1f29-c240a37f",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.notebooks.v1beta1.OperationMetadata",
+                "createTime": "2020-02-13T05:35:45.256414496Z",
+                "endTime": "2020-02-13T05:35:49.848032211Z",
+                "target": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1beta1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.notebooks.v1beta1.Instance",
+                "name": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+                "containerImage": {
+                  "repository": "gcr.io/deeplearning-platform-release/base-cpu",
+                  "tag": "test-tag"
+                },
+                "postStartupScript": "gs://exampledir/examplefile",
+                "serviceAccount": "test-shyamm-service-account@cloudsdktest.iam.gserviceaccount.com",
+                "machineType": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-b/machineTypes/n1-standard-4",
+                "state": "STOPPED",
+                "customGpuDriverPath": "test-gpu-driver-path",
+                "noPublicIp": true,
+                "noProxyAccess": true,
+                "network": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/networks/datalab-network",
+                "subnet": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1/subnetworks/datalab-network",
+                "labels": {
+                  "k3": "v3"
+                },
+                "metadata": {
+                  "post-startup-script": "gs://exampledir/examplefile",
+                  "proxy-mode": "none",
+                  "k1": "v1",
+                  "install-nvidia-driver": "",
+                  "nvidia-driver-gcs-path": "test-gpu-driver-path",
+                  "container": "gcr.io/deeplearning-platform-release/base-cpu:test-tag",
+                  "shutdown-script": "timeout 30 gcloud compute instances remove-metadata test-instance3 --keys=proxy-url --zone us-central1-b",
+                  "notebooks-api": "PROD",
+                  "enable-oslogin": "TRUE",
+                  "k2": "v2",
+                  "proxy-user-mail": "shyamm@google.com"
+                },
+                "updateTime": "2020-02-13T05:35:45.259748572Z"
+              }
+            }
+        repeatable: true
+    - expect_progress_tracker:
+        message: Waiting for operation on Instance [projects/cloudsdktest/locations/us-central1-b/instances/test-instance3]
+          to be updated with [projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572145245-59e6e75e76c4f-09db1f29-c240a37f]
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/instances/test-instance3?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+              "containerImage": {
+                "repository": "gcr.io/deeplearning-platform-release/base-cpu",
+                "tag": "test-tag"
+              },
+              "postStartupScript": "gs://exampledir/examplefile",
+              "serviceAccount": "test-shyamm-service-account@cloudsdktest.iam.gserviceaccount.com",
+              "machineType": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-b/machineTypes/n1-standard-4",
+              "state": "STOPPED",
+              "customGpuDriverPath": "test-gpu-driver-path",
+              "noPublicIp": true,
+              "noProxyAccess": true,
+              "network": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/networks/datalab-network",
+              "subnet": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1/subnetworks/datalab-network",
+              "labels": {
+                "k3": "v3"
+              },
+              "metadata": {
+                "k2": "v2",
+                "shutdown-script": "timeout 30 gcloud compute instances remove-metadata test-instance3 --keys=proxy-url --zone us-central1-b",
+                "notebooks-api": "PROD",
+                "nvidia-driver-gcs-path": "test-gpu-driver-path",
+                "container": "gcr.io/deeplearning-platform-release/base-cpu:test-tag",
+                "k1": "v1",
+                "post-startup-script": "gs://exampledir/examplefile",
+                "enable-oslogin": "TRUE",
+                "proxy-mode": "none",
+                "proxy-user-mail": "shyamm@google.com",
+                "install-nvidia-driver": ""
+              },
+              "createTime": "2020-02-13T04:17:04.640622140Z",
+              "updateTime": "2020-02-13T05:35:45.259748572Z"
+            }
+    - expect_stderr: |
+        Updated notebooks instance projects/cloudsdktest/locations/us-central1-b/instances/test-instance3 [https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572145245-59e6e75e76c4f-09db1f29-c240a37f].
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/instances/test-instance3:setMachineType?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              machineType: n1-standard-8
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572153878-59e6e766b26e9-95d700a6-b9fa73d1",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.notebooks.v1beta1.OperationMetadata",
+                "createTime": "2020-02-13T05:35:53.888259563Z",
+                "target": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1beta1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572153878-59e6e766b26e9-95d700a6-b9fa73d1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572153878-59e6e766b26e9-95d700a6-b9fa73d1",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.notebooks.v1beta1.OperationMetadata",
+                "createTime": "2020-02-13T05:35:53.888259563Z",
+                "endTime": "2020-02-13T05:35:57.918343369Z",
+                "target": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1beta1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.notebooks.v1beta1.Instance",
+                "name": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+                "containerImage": {
+                  "repository": "gcr.io/deeplearning-platform-release/base-cpu",
+                  "tag": "test-tag"
+                },
+                "postStartupScript": "gs://exampledir/examplefile",
+                "serviceAccount": "test-shyamm-service-account@cloudsdktest.iam.gserviceaccount.com",
+                "machineType": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-b/machineTypes/n1-standard-8",
+                "state": "STOPPED",
+                "customGpuDriverPath": "test-gpu-driver-path",
+                "noPublicIp": true,
+                "noProxyAccess": true,
+                "network": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/networks/datalab-network",
+                "subnet": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1/subnetworks/datalab-network",
+                "labels": {
+                  "k3": "v3"
+                },
+                "metadata": {
+                  "container": "gcr.io/deeplearning-platform-release/base-cpu:test-tag",
+                  "notebooks-api": "PROD",
+                  "post-startup-script": "gs://exampledir/examplefile",
+                  "proxy-mode": "none",
+                  "proxy-user-mail": "shyamm@google.com",
+                  "install-nvidia-driver": "",
+                  "nvidia-driver-gcs-path": "test-gpu-driver-path",
+                  "k2": "v2",
+                  "k1": "v1",
+                  "shutdown-script": "timeout 30 gcloud compute instances remove-metadata test-instance3 --keys=proxy-url --zone us-central1-b",
+                  "enable-oslogin": "TRUE"
+                },
+                "createTime": "2020-02-13T04:17:04.640622140Z",
+                "updateTime": "2020-02-13T05:35:53.891096199Z"
+              }
+            }
+        repeatable: true
+    - expect_progress_tracker:
+        message: Waiting for operation on Instance [projects/cloudsdktest/locations/us-central1-b/instances/test-instance3]
+          to be updated with [projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572153878-59e6e766b26e9-95d700a6-b9fa73d1]
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/instances/test-instance3?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/cloudsdktest/locations/us-central1-b/instances/test-instance3",
+              "containerImage": {
+                "repository": "gcr.io/deeplearning-platform-release/base-cpu",
+                "tag": "test-tag"
+              },
+              "postStartupScript": "gs://exampledir/examplefile",
+              "serviceAccount": "test-shyamm-service-account@cloudsdktest.iam.gserviceaccount.com",
+              "machineType": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-b/machineTypes/n1-standard-8",
+              "state": "STOPPED",
+              "customGpuDriverPath": "test-gpu-driver-path",
+              "noPublicIp": true,
+              "noProxyAccess": true,
+              "network": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/networks/datalab-network",
+              "subnet": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1/subnetworks/datalab-network",
+              "labels": {
+                "k3": "v3"
+              },
+              "metadata": {
+                "container": "gcr.io/deeplearning-platform-release/base-cpu:test-tag",
+                "enable-oslogin": "TRUE",
+                "k2": "v2",
+                "proxy-mode": "none",
+                "proxy-user-mail": "shyamm@google.com",
+                "shutdown-script": "timeout 30 gcloud compute instances remove-metadata test-instance3 --keys=proxy-url --zone us-central1-b",
+                "notebooks-api": "PROD",
+                "post-startup-script": "gs://exampledir/examplefile",
+                "install-nvidia-driver": "",
+                "nvidia-driver-gcs-path": "test-gpu-driver-path",
+                "k1": "v1"
+              },
+              "createTime": "2020-02-13T04:17:04.640622140Z",
+              "updateTime": "2020-02-13T05:35:53.891096199Z"
+            }
+    - expect_stderr: |
+        Updated notebooks instance projects/cloudsdktest/locations/us-central1-b/instances/test-instance3 [https://notebooks.googleapis.com/v1beta1/projects/cloudsdktest/locations/us-central1-b/operations/operation-1581572153878-59e6e766b26e9-95d700a6-b9fa73d1].
+    - expect_exit:
+        code: 0

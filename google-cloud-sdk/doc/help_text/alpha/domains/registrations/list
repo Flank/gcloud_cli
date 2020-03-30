@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha domains registrations list - list domain registrations
+    gcloud alpha domains registrations list - list Cloud Domains registrations
 
 SYNOPSIS
     gcloud alpha domains registrations list [--filter=EXPRESSION]
@@ -7,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Lists domain registrations in the project.
+    (ALPHA) List Cloud Domains registrations in the project.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -42,8 +42,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To list all registrations in the project, run:

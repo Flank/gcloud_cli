@@ -24,7 +24,16 @@ from googlecloudsdk.calliope import base
 
 
 class List(base.ListCommand):
-  """List Google Compute Engine node types."""
+  """List Compute Engine node types."""
+
+  detailed_help = {
+      'brief': 'List Compute Engine node types.',
+      'EXAMPLES': """
+         To list node types, run:
+
+           $ {command}
+       """
+  }
 
   @staticmethod
   def Args(parser):
@@ -34,7 +43,6 @@ class List(base.ListCommand):
           zone.basename(),
           guestCpus:label=CPUs,
           memoryMb,
-          localSsdGb,
           deprecated.state:label=DEPRECATED
         )""")
 

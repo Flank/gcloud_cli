@@ -69,20 +69,20 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
 
   def _GetFakeConfiguration(self, json_str=_EMPTY_JSON_OBJECT_STRING):
     """Builds Test Configuration object from json_str."""
-    return cred_utils.Configuration.FromJson(json_str,
-                                             self.test_config)
+    return cred_utils.Configuration.FromJson(json_str, self.test_config)
 
   def testGetGcloudCredentialHelperConfig(self):
     self.assertEqual(cred_utils.GetGcloudCredentialHelperConfig(),
                      _TEST_CRED_HELPERS_CONTENT_DICT)
 
-  def testGetOrderedCredentialHelperRegistries(self):
-    self.assertEqual(_TEST_MAPPINGS,
-                     cred_utils.GetOrderedCredentialHelperRegistries())
+  def testDefaultAuthenticatedRegistries(self):
+    self.assertEqual(
+        _TEST_MAPPINGS,
+        cred_utils.BuildOrderedCredentialHelperRegistries(
+            cred_utils.DefaultAuthenticatedRegistries()))
 
   def testGetRegisteredCredentialHelpers(self):
-    docker_info = self._GetFakeConfiguration(
-        _TEST_CRED_HELPERS_CONTENT_STRING)
+    docker_info = self._GetFakeConfiguration(_TEST_CRED_HELPERS_CONTENT_STRING)
     self.assertEqual(_TEST_CRED_HELPERS_CONTENT_DICT,
                      docker_info.GetRegisteredCredentialHelpers())
 
@@ -99,9 +99,8 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
 
   def testRegisterCredentialHelpersBadMappings(self):
     docker_info = self._GetFakeConfiguration('{"credHelpers": {"foo": "bar"}}')
-    with self.assertRaisesRegex(
-        ValueError,
-        r'Invalid Docker credential helpers mappings'):
+    with self.assertRaisesRegex(ValueError,
+                                r'Invalid Docker credential helpers mappings'):
       docker_info.RegisterCredentialHelpers(['foo'])
 
   def testRegisterCredentialHelpersError(self):
@@ -114,9 +113,10 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
   def testRegisterCredentialHelpersNotSupported(self):
     docker_info = self._GetFakeConfiguration()
     self.mock_get_docker_version.return_value = '1.01'
-    with self.assertRaisesRegex(cred_utils.DockerConfigUpdateError,
-                                r'Credential Helpers not supported for this '
-                                r'Docker client version 1.0'):
+    with self.assertRaisesRegex(
+        cred_utils.DockerConfigUpdateError,
+        r'Credential Helpers not supported for this '
+        r'Docker client version 1.0'):
       docker_info.RegisterCredentialHelpers()
 
   def testReadFromDisk(self):
@@ -154,16 +154,17 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
 
   def testWriteToDiskError(self):
     self.StartObjectPatch(files, 'WriteFileAtomically').side_effect = IOError()
-    with self.assertRaisesRegex(cred_utils.DockerConfigUpdateError,
-                                r'Error writing Docker configuration '
-                                r'to disk:'):
+    with self.assertRaisesRegex(
+        cred_utils.DockerConfigUpdateError,
+        r'Error writing Docker configuration '
+        r'to disk:'):
       self._GetFakeConfiguration().WriteToDisk()
 
   def testFromJson(self):
     json_str = '{"credHelpers": {"foo": "bar"}}'
     parsed_config = self._GetFakeConfiguration(json_str)
-    expected_config = cred_utils.Configuration(json.loads(json_str),
-                                               self.test_config)
+    expected_config = cred_utils.Configuration(
+        json.loads(json_str), self.test_config)
     self.assertEqual(parsed_config, expected_config)
 
   def testToJson(self):

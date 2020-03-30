@@ -1,0 +1,111 @@
+
+.TH "GCLOUD_BETA_ACCESS\-CONTEXT\-MANAGER_PERIMETERS_DRY\-RUN_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta access\-context\-manager perimeters dry\-run describe \- display the dry\-run mode configuration for a Service Perimeter
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta access\-context\-manager perimeters dry\-run describe\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR The dry\-run mode configuration is presented as a diff against the
+enforcement mode configuration. '+' indicates additions, '\-' indicates removals
+and entries without either of those indicate that they are the same across the
+dry\-run and the enforcement mode configurations. When a particular field is
+completely empty, it is displayed as 'NONE'.
+
+Note: When this command is executed on a Service Perimeter with no explicit
+dry\-run mode configuration, the effective dry\-run mode configuration is
+inherited from the enforcement mode configuration, and thus, the enforcement
+mode configuration is displayed in such cases.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Perimeter resource \- The service perimeter to describe. The arguments in this
+group can be used to specify the attributes of this resource. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fIPERIMETER\fR
+ID of the perimeter or fully qualified identifier for the perimeter. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-policy\fR=\fIPOLICY\fR
+The ID of the access policy.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To display the dry\-run mode configuration for a Service Perimeter:
+
+.RS 2m
+$ gcloud beta access\-context\-manager perimeters dry\-run describe \e
+    my\-perimeter
+.RE
+
+Sample output:
+
+.RS 2m
+name: my_perimeter
+title: My Perimeter
+type: PERIMETER_TYPE_REGULAR
+resources:
+   +projects/123
+   \-projects/456
+    projects/789
+restrictedServices:
+  +bigquery.googleapis.com
+  \-storage.googleapis.com
+   bigtable.googleapis.com
+accessLevels:
+   NONE
+vpcAccessibleServices:
+  enableRestriction: False \-> True
+  allowedServices:
+    +bigquery.googleapis.com
+    \-storage.googleapis.com
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha access\-context\-manager perimeters dry\-run describe
+.RE
+

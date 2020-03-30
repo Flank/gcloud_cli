@@ -19,207 +19,484 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import base64
 import datetime
 import json
 import os
-import textwrap
 
+from googlecloudsdk.api_lib.iamcredentials import util as iamcredentials_util
 from googlecloudsdk.core import config
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import creds
-from googlecloudsdk.core.util import files
+from googlecloudsdk.core.credentials import devshell
+from googlecloudsdk.core.credentials import store as c_store
+from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+from tests.lib.core.credentials import credentials_test_base
+from tests.lib.core.credentials import devshell_test_base
 
-
+import httplib2
+import mock
 from oauth2client import client
 from oauth2client import crypt
 from oauth2client import service_account
+from oauth2client.contrib import gce as oauth2client_gce
+import requests
+import sqlite3
+from google.auth import compute_engine
+from google.auth import crypt as google_auth_crypt
+from google.auth import jwt
+from google.auth.transport import requests as google_auth_requests
+from google.oauth2 import credentials as google_auth_credentials
+from google.oauth2 import service_account as google_auth_service_account
 
 
-def _GetJsonUserADC():
-  return textwrap.dedent("""\
-      {
-        "client_id": "foo.apps.googleusercontent.com",
-        "client_secret": "file-secret",
-        "refresh_token": "file-token",
-        "type": "authorized_user"
-      }""")
+_FAKE_CREDENTIALS_REFRESH_RESPONSE_CONTENT = (
+    b'{"access_token": "REFRESHED-ACCESS-TOKEN","expires_in": 3599}')
 
 
-def _GetJsonServiceADC():
-  return textwrap.dedent("""\
-      {
-        "client_email": "bar@developer.gserviceaccount.com",
-        "client_id": "bar.apps.googleusercontent.com",
-        "private_key": "-----BEGIN PRIVATE KEY-----\\nasdf\\n-----END PRIVATE KEY-----\\n",
-        "private_key_id": "key-id",
-        "type": "service_account"
-      }""")
+def _MakeFakeOauth2clientCredsRefreshResponse():
+  """Returns a fake response for oauth2client credentials refresh."""
+  response = mock.Mock(status=200)
+  content = _FAKE_CREDENTIALS_REFRESH_RESPONSE_CONTENT
+  return response, content
 
 
-def _GetJsonP12ServiceADC():
-  # Note that there is no such format, this is what gcloud uses to store it.
-  return textwrap.dedent("""\
-      {
-        "client_email": "p12owner@developer.gserviceaccount.com",
-        "password": "key-password",
-        "private_key": "QkFTRTY0RU5DT0RFRA==",
-        "type": "service_account_p12"
-      }""")
+def _MakeFakeGoogleAuthCredsRefreshResponse():
+  """Returns a fake response for google-auth credentials refresh."""
+  return mock.Mock(
+      status_code=200, content=_FAKE_CREDENTIALS_REFRESH_RESPONSE_CONTENT)
 
 
-class CredsSerializationTests(test_case.Base):
+def _RefreshCredentials(credentials):
+  """Refreshes the input credentials.
 
-  def testToJson_UserAccount(self):
-    json_data = _GetJsonUserADC()
-    credentials = creds.FromJson(json_data)
-    self.assertMultiLineEqual(json_data, creds.ToJson(credentials))
+  Different logic will be executed for oauth2client and google-auth
+  credentials.
 
-  def testToJson_ServiceAccount(self):
-    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    json_data = _GetJsonServiceADC()
-    with files.TemporaryDirectory() as tmp_dir:
-      cred_file = self.Touch(tmp_dir, contents=json_data)
-      credentials = client.GoogleCredentials.from_stream(cred_file)
-
-    self.assertMultiLineEqual(json_data, creds.ToJson(credentials))
-
-  def testToJson_P12ServiceAccount(self):
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
-    json_data = _GetJsonP12ServiceADC()
-    json_key = json.loads(json_data)
-
-    credentials = (
-        service_account.ServiceAccountCredentials._from_p12_keyfile_contents(
-            service_account_email=json_key['client_email'],
-            private_key_pkcs12=base64.b64decode(json_key['private_key']),
-            private_key_password=json_key['password']))
-
-    self.assertMultiLineEqual(json_data, creds.ToJson(credentials))
-
-  def testFromJson_UserAccount(self):
-    credentials = creds.FromJson(_GetJsonUserADC())
-    self.assertEqual('foo.apps.googleusercontent.com', credentials.client_id)
-    self.assertEqual('file-secret', credentials.client_secret)
-    self.assertEqual('file-token', credentials.refresh_token)
-    creds_type = creds.CredentialType.FromCredentials(credentials)
-    self.assertEqual(creds.CredentialType.USER_ACCOUNT, creds_type)
-
-  def testFromJson_ServiceAccount(self):
-    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    credentials = creds.FromJson(_GetJsonServiceADC())
-    self.assertEqual('bar.apps.googleusercontent.com', credentials.client_id)
-    self.assertEqual('bar@developer.gserviceaccount.com',
-                     credentials._service_account_email)
-    self.assertEqual('key-id', credentials._private_key_id)
-    self.assertEqual(
-        '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
-        credentials._private_key_pkcs8_pem)
-    creds_type = creds.CredentialType.FromCredentials(credentials)
-    self.assertEqual(creds.CredentialType.SERVICE_ACCOUNT, creds_type)
-
-  def testFromJson_P12ServiceAccount(self):
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
-
-    credentials = creds.FromJson(_GetJsonP12ServiceADC())
-    self.assertEqual('p12owner@developer.gserviceaccount.com',
-                     credentials._service_account_email)
-    self.assertEqual('key-password', credentials._private_key_password)
-    self.assertEqual(b'BASE64ENCODED', credentials._private_key_pkcs12)
-
-    creds_type = creds.CredentialType.FromCredentials(credentials)
-    self.assertEqual(creds.CredentialType.P12_SERVICE_ACCOUNT, creds_type)
+  Args:
+    credentials: google.auth.credentials.Credentials or
+      client.OAuth2Credentials, the credentials to refresh.
+  """
+  if isinstance(credentials, client.OAuth2Credentials):
+    credentials.refresh(httplib2.Http())
+  else:
+    credentials.refresh(google_auth_requests.Request())
 
 
-class StoreTests(sdk_test_base.SdkBase):
+def _RefreshCredentialsDict(creds_dict):
+  """Updates the credentials dict with the refreshed access token."""
+  if 'access_token' in creds_dict:  # oauth2client credentials
+    creds_dict['access_token'] = 'REFRESHED-ACCESS-TOKEN'
+  else:  # google-auth credentials
+    creds_dict['token'] = 'REFRESHED-ACCESS-TOKEN'
+
+
+class StoreOperationsTests(sdk_test_base.SdkBase,
+                           credentials_test_base.CredentialsTestBase):
+  """Tests for credentials store operations.
+
+  The store that is tested by this class is built by creds.GetCredentialStore(),
+  and is an instance of CredentialStoreWithCache. This class covers the
+  following 4 cases,
+  1. Stores oauth2client creds and refreshes the creds loaded with
+     'use_google_auth' to be False.
+  2. Stores oauth2client creds and refreshes the creds loaded with
+     'use_google_auth' to be True.
+  3. Stores google-auth creds and refreshes the creds loaded with
+     'use_google_auth' to be True.
+  4. Stores google-auth creds and refreshes the creds loaded with
+     'use_google_auth' to be False.
+  """
 
   def SetUp(self):
-    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
-    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
-
-  def _MakeCredentials(self):
-    expiry = datetime.datetime(2001, 2, 3, 14, 15, 16)
-    # client.GoogleCredentials cannot serialize token-expiry.
-    # use OAuth2Credentials. We generaly do not store GoogleCredentials.
-    # credentials = creds.FromJson(_GetJsonUserADC())
-    return client.OAuth2Credentials(
-        'access-token', 'client_id', 'client_secret',
-        'fake-token', expiry, 'token_uri', 'user_agent',
-        rapt_token='rapt_token5')
-
-  def _MakeServiceAccountCredentials(self):
-    expiry = datetime.datetime(2001, 2, 3, 14, 15, 16)
-    credentials = creds.FromJson(_GetJsonServiceADC())
-    credentials.access_token = 'access_token'
-    credentials.token_expiry = expiry
-    return credentials
-
-  def _MakeP12ServiceAccountCredentials(self):
-    expiry = datetime.datetime(2001, 2, 3, 14, 15, 16)
-    credentials = creds.FromJson(_GetJsonP12ServiceADC())
-    credentials.access_token = 'access_token'
-    credentials.token_expiry = expiry
-    return credentials
-
-  def checkCredentialStore(self, expected_type):
     store_file = os.path.join(self.temp_path, 'credentials.db')
     access_token_file = os.path.join(self.temp_path, 'access_token.db')
-    store = creds.GetCredentialStore(store_file, access_token_file)
-    self.assertIsInstance(store, expected_type)
-    self.assertEqual(set([]), store.GetAccounts())
-    self.assertIsNone(store.Load('test_account'))
-    store.Remove('test_account')  # Does nothing, does not fail.
+    self.store = creds.GetCredentialStore(store_file, access_token_file)
+    self.fake_account = 'test_account'
 
-    credentials = self._MakeCredentials()
-    store.Store('test_account', credentials)
-    service_account_credentials = self._MakeServiceAccountCredentials()
-    store.Store('service_account', service_account_credentials)
+    # Mocks the refresh of oauth2client credentials.
+    self.StartObjectPatch(
+        httplib2.Http,
+        'request',
+        return_value=_MakeFakeOauth2clientCredsRefreshResponse())
 
-    self.assertEqual({'test_account', 'service_account'}, store.GetAccounts())
+    # Mocks the refresh of google-auth credentials.
+    self.StartObjectPatch(
+        requests.Session,
+        'request',
+        return_value=_MakeFakeGoogleAuthCredsRefreshResponse())
 
-    loaded_credentials = store.Load('test_account')
-    self.assertEqual(credentials.client_id, loaded_credentials.client_id)
-    self.assertEqual(credentials.client_secret,
-                     loaded_credentials.client_secret)
-    self.assertEqual('access-token', loaded_credentials.access_token)
+    # Mocks the signer of oauth2client credentials.
+    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
+    self.StartObjectPatch(
+        crypt, 'make_signed_jwt', return_value=b'fake_assertion')
 
-    self.assertEqual(credentials.token_expiry, loaded_credentials.token_expiry)
-    self.assertEqual('rapt_token5', loaded_credentials.rapt_token)
+    # Mocks the signer of google-auth credentials.
+    self.StartObjectPatch(google_auth_crypt.RSASigner,
+                          'from_service_account_info')
+    self.StartObjectPatch(jwt, 'encode', return_value=b'fake_assertion')
 
-    store.Remove('test_account')
-    self.assertEqual(set(['service_account']), store.GetAccounts())
-    self.assertIsNone(store.Load('test_account'))
-    loaded_service_account_credentials = store.Load('service_account')
-    self.assertFalse(hasattr(loaded_service_account_credentials, 'rapt_token'))
+  def TestStoreOperations(self, creds_stored, expected_loaded_type,
+                          expected_loaded_type_google_auth,
+                          expected_loaded_dict,
+                          expected_loaded_dict_google_auth,
+                          refresh_google_auth):
+    """Tests credentials store operations.
 
-  def AssertCredentialsEqual(self, expected_cred, actual_cred):
-    self.assertEqual(type(expected_cred), type(actual_cred))
-    fields = [
-        'access_token',
-        'client_id',
-        'client_secret',
-        'id_token',
-        'invalid',
-        'rapt_token',
-        'refresh_token',
-        'revoke_uri',
-        'token_expiry',
-        'token_response',
-        'token_uri',
-        'user_agent'
-    ]
-    for f in fields:
-      expected_has, actual_has = (hasattr(expected_cred, f),
-                                  hasattr(actual_cred, f))
-      self.assertEqual(expected_has, actual_has, f)
-      if expected_has:
-        self.assertEqual(getattr(expected_cred, f), getattr(actual_cred, f), f)
+    This test runs through the following steps:
+    1. Creates a credentials store and verifies it is initially empty.
+    2. Stores creds_stored and verifies.
+    3. Loads two credentials from the store with 'use_google_auth' to be False
+       and True respectively. Verifies the loaded credentials.
+    4. Refreshes one of the loaded credentials which will populate the access
+       token cache with the refreshed access token.
+    5. Loads another two credentials from the store and verifies the access
+       tokens of both are updated correctly.
+    6. Removes the credentials from the store and verifies the store is empty.
 
-  def testCredentialStoreWithCache(self):
-    self.checkCredentialStore(creds.CredentialStoreWithCache)
+    Args:
+      creds_stored: google.auth.credentials.Credentials or
+        client.OAuth2Credentials, the credentials to be stored.
+      expected_loaded_type: creds.CredentialType, the expected type of the
+        credentials loaded with 'use_google_auth' to be False.
+      expected_loaded_type_google_auth: creds.CredentialTypeGoogleAuth or
+        creds.CredentialType, the expected type of the credentials loaded with
+        'use_google_auth' to be True. If the credentials type is not supported
+        in the cache, for example, P12 service account credentials, the value of
+        this argument will be creds.CredentialType. Otherwise, the argument will
+        be creds.CredentialTypeGoogleAuth.
+      expected_loaded_dict: dict, the expected values of the credentials loaded
+        with 'use_google_auth' to be False, in the form of a dict.
+      expected_loaded_dict_google_auth: dict, the expected values of the
+        credentials loaded with 'use_google_auth' to be True, in the form of a
+        dict.
+      refresh_google_auth: bool, True to refresh the credentials loaded with
+        'use_google_auth' to be True. False to refresh the credentials loaded
+        with 'use_google_auth' to be False.
+    """
+    # Verifies the store is initially empty.
+    self.assertIsInstance(self.store, creds.CredentialStoreWithCache)
+    self.assertEqual(self.store.GetAccounts(), set([]))
+    self.assertIsNone(self.store.Load(self.fake_account))
+    self.store.Remove(self.fake_account)  # Verifies removal does not throws
+
+    # Stores credentials and verifies.
+    self.store.Store(self.fake_account, creds_stored)
+    self.assertEqual(self.store.GetAccounts(), {self.fake_account})
+
+    # Loads two credentials with 'use_google_auth' to be False and True
+    # respectively. Verifies the loaded credentials against the expectations.
+    creds_loaded = self.store.Load(self.fake_account)
+    creds_loaded_use_google_auth = self.store.Load(self.fake_account, True)
+    self.AssertCredentials(creds_loaded, expected_loaded_type,
+                           expected_loaded_dict, True)
+    self.AssertCredentials(creds_loaded_use_google_auth,
+                           expected_loaded_type_google_auth,
+                           expected_loaded_dict_google_auth, True)
+
+    # Refreshes loaded credentials. This will update the access token cache
+    # with the refreshed access token.
+    if refresh_google_auth:
+      _RefreshCredentials(creds_loaded_use_google_auth)
+    else:
+      _RefreshCredentials(creds_loaded)
+
+    # Loads another two credentials with 'use_google_auth' to be False and True
+    # respectively. Verifies the both credentials have the refreshed access
+    # token.
+    creds_loaded = self.store.Load(self.fake_account)
+    creds_loaded_use_google_auth = self.store.Load(self.fake_account, True)
+    _RefreshCredentialsDict(expected_loaded_dict)
+    _RefreshCredentialsDict(expected_loaded_dict_google_auth)
+    self.AssertCredentials(creds_loaded, expected_loaded_type,
+                           expected_loaded_dict, False)
+    self.AssertCredentials(creds_loaded_use_google_auth,
+                           expected_loaded_type_google_auth,
+                           expected_loaded_dict_google_auth, False)
+
+    # Removes the credentials from the store and verifies.
+    self.store.Remove(self.fake_account)
+    self.assertEqual(self.store.GetAccounts(), set([]))
+    self.assertIsNone(self.store.Load(self.fake_account))
+
+  def testStoreOauth2client_RefreshOauth2client_UserCreds(self):
+    creds_stored = self.MakeUserCredentials()
+    expected_loaded_type = creds.CredentialType.USER_ACCOUNT
+    # Credentails cache does not currently support user credentails.
+    # TODO(b/147893169): Changes expected_loaded_type_google_auth to
+    # creds.CredentialTypeGoogleAuth.USER_ACCOUNT once credentials cache is
+    # ready to support google-auth user credentials.
+    expected_loaded_type_google_auth = creds.CredentialType.USER_ACCOUNT
+    expected_loaded_dict = {
+        'access_token': 'access-token',
+        'client_id': 'client_id',
+        'client_secret': 'client_secret',
+        'refresh_token': 'fake-token',
+        'token_uri': 'token_uri',
+        'rapt_token': 'rapt_token5',
+        'user_agent': 'user_agent',
+    }
+    expected_loaded_dict_google_auth = expected_loaded_dict.copy()
+    refresh_google_auth = False
+
+    self.TestStoreOperations(creds_stored, expected_loaded_type,
+                             expected_loaded_type_google_auth,
+                             expected_loaded_dict,
+                             expected_loaded_dict_google_auth,
+                             refresh_google_auth)
+
+  def testStoreOauth2client_RefreshOauth2client_ServiceAccountCreds(self):
+    creds_stored = self.MakeServiceAccountCredentials()
+    expected_loaded_type = creds.CredentialType.SERVICE_ACCOUNT
+    expected_loaded_type_google_auth = (
+        creds.CredentialTypeGoogleAuth.SERVICE_ACCOUNT)
+    expected_loaded_dict = {
+        'access_token':
+            'access_token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        '_private_key_id':
+            'key-id',
+        '_private_key_pkcs8_pem':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'token_uri':
+            'https://www.googleapis.com/oauth2/v4/token'
+    }
+    expected_loaded_dict_google_auth = {
+        'token':
+            'access_token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        'private_key':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'private_key_id':
+            'key-id',
+        '_token_uri':
+            'https://oauth2.googleapis.com/token'
+    }
+    refresh_google_auth = False
+
+    self.TestStoreOperations(creds_stored, expected_loaded_type,
+                             expected_loaded_type_google_auth,
+                             expected_loaded_dict,
+                             expected_loaded_dict_google_auth,
+                             refresh_google_auth)
+
+  def testStoreOauth2client_RefreshOauth2client_P12ServiceAccountCreds(self):
+    creds_stored = self.MakeP12ServiceAccountCredentials()
+    expected_loaded_type = creds.CredentialType.P12_SERVICE_ACCOUNT
+    # P12 servivce account creds are not supported by google-auth.
+    expected_loaded_type_google_auth = (
+        creds.CredentialType.P12_SERVICE_ACCOUNT)
+    expected_loaded_dict = {
+        'access_token': 'access_token',
+        'service_account_email': 'p12owner@developer.gserviceaccount.com',
+        '_private_key_pkcs12': b'BASE64ENCODED',
+        '_private_key_password': 'key-password',
+        'token_uri': 'https://www.googleapis.com/oauth2/v4/token'
+    }
+    expected_loaded_dict_google_auth = expected_loaded_dict.copy()
+    refresh_google_auth = False
+
+    self.TestStoreOperations(creds_stored, expected_loaded_type,
+                             expected_loaded_type_google_auth,
+                             expected_loaded_dict,
+                             expected_loaded_dict_google_auth,
+                             refresh_google_auth)
+
+  def testStoreOauth2client_RefreshGoogleAuth_UserCreds(self):
+    creds_stored = self.MakeUserCredentials()
+    expected_loaded_type = creds.CredentialType.USER_ACCOUNT
+    # Credentails cache does not currently support user credentails.
+    # TODO(b/147893169): Changes expected_loaded_type_google_auth to
+    # creds.CredentialTypeGoogleAuth.USER_ACCOUNT once credentials cache is
+    # ready to support google-auth user credentials.
+    expected_loaded_type_google_auth = creds.CredentialType.USER_ACCOUNT
+    expected_loaded_dict = {
+        'access_token': 'access-token',
+        'client_id': 'client_id',
+        'client_secret': 'client_secret',
+        'refresh_token': 'fake-token',
+        'token_uri': 'token_uri',
+        'rapt_token': 'rapt_token5',
+        'user_agent': 'user_agent',
+    }
+    expected_loaded_dict_google_auth = expected_loaded_dict.copy()
+    refresh_google_auth = True
+
+    self.TestStoreOperations(creds_stored, expected_loaded_type,
+                             expected_loaded_type_google_auth,
+                             expected_loaded_dict,
+                             expected_loaded_dict_google_auth,
+                             refresh_google_auth)
+
+  def testStoreOauth2client_RefreshGoogleAuth_ServiceAccountCreds(self):
+    creds_stored = self.MakeServiceAccountCredentials()
+    expected_loaded_type = creds.CredentialType.SERVICE_ACCOUNT
+    expected_loaded_type_google_auth = (
+        creds.CredentialTypeGoogleAuth.SERVICE_ACCOUNT)
+    expected_loaded_dict = {
+        'access_token':
+            'access_token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        '_private_key_id':
+            'key-id',
+        '_private_key_pkcs8_pem':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'token_uri':
+            'https://www.googleapis.com/oauth2/v4/token'
+    }
+    expected_loaded_dict_google_auth = {
+        'token':
+            'access_token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        'private_key':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'private_key_id':
+            'key-id',
+        '_token_uri':
+            'https://oauth2.googleapis.com/token'
+    }
+    refresh_google_auth = True
+
+    self.TestStoreOperations(creds_stored, expected_loaded_type,
+                             expected_loaded_type_google_auth,
+                             expected_loaded_dict,
+                             expected_loaded_dict_google_auth,
+                             refresh_google_auth)
+
+  def testStoreOauth2client_RefreshGoogleAuth_P12ServiceAccountCreds(self):
+    creds_stored = self.MakeP12ServiceAccountCredentials()
+    expected_loaded_type = creds.CredentialType.P12_SERVICE_ACCOUNT
+    # P12 servivce account creds are not supported by google-auth.
+    expected_loaded_type_google_auth = (
+        creds.CredentialType.P12_SERVICE_ACCOUNT)
+    expected_loaded_dict = {
+        'access_token': 'access_token',
+        'service_account_email': 'p12owner@developer.gserviceaccount.com',
+        '_private_key_pkcs12': b'BASE64ENCODED',
+        '_private_key_password': 'key-password',
+        'token_uri': 'https://www.googleapis.com/oauth2/v4/token'
+    }
+    expected_loaded_dict_google_auth = expected_loaded_dict.copy()
+    refresh_google_auth = True
+
+    self.TestStoreOperations(creds_stored, expected_loaded_type,
+                             expected_loaded_type_google_auth,
+                             expected_loaded_dict,
+                             expected_loaded_dict_google_auth,
+                             refresh_google_auth)
+
+  def testStoreGoogleAuth_RefreshGoogleAuth_ServiceAccountCreds(self):
+    creds_stored = self.MakeServiceAccountCredentialsGoogleAuth()
+    expected_loaded_type = creds.CredentialType.SERVICE_ACCOUNT
+    expected_loaded_type_google_auth = (
+        creds.CredentialTypeGoogleAuth.SERVICE_ACCOUNT)
+    expected_loaded_dict = {
+        'access_token':
+            'access_token',
+        'id_tokenb64':
+            'id-token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        '_private_key_id':
+            'key-id',
+        '_private_key_pkcs8_pem':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'token_uri':
+            'https://oauth2.googleapis.com/token'
+    }
+    expected_loaded_dict_google_auth = {
+        'token':
+            'access_token',
+        'id_tokenb64':
+            'id-token',
+        '_id_token':
+            'id-token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        'private_key':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'private_key_id':
+            'key-id',
+        'project_id':
+            'bar-test',
+        '_token_uri':
+            'https://oauth2.googleapis.com/token'
+    }
+    refresh_google_auth = True
+
+    self.TestStoreOperations(creds_stored, expected_loaded_type,
+                             expected_loaded_type_google_auth,
+                             expected_loaded_dict,
+                             expected_loaded_dict_google_auth,
+                             refresh_google_auth)
+
+  def testStoreGoogleAuth_RefreshOauth2client_ServiceAccountCreds(self):
+    creds_stored = self.MakeServiceAccountCredentialsGoogleAuth()
+    expected_loaded_type = creds.CredentialType.SERVICE_ACCOUNT
+    expected_loaded_type_google_auth = (
+        creds.CredentialTypeGoogleAuth.SERVICE_ACCOUNT)
+    expected_loaded_dict = {
+        'access_token':
+            'access_token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        '_private_key_id':
+            'key-id',
+        '_private_key_pkcs8_pem':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'token_uri':
+            'https://oauth2.googleapis.com/token'
+    }
+    expected_loaded_dict_google_auth = {
+        'token':
+            'access_token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        'private_key':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'private_key_id':
+            'key-id',
+        'project_id':
+            'bar-test',
+        '_token_uri':
+            'https://oauth2.googleapis.com/token'
+    }
+    refresh_google_auth = False
+
+    self.TestStoreOperations(creds_stored, expected_loaded_type,
+                             expected_loaded_type_google_auth,
+                             expected_loaded_dict,
+                             expected_loaded_dict_google_auth,
+                             refresh_google_auth)
+
+
+class StoreCreationConcurrencyTests(sdk_test_base.SdkBase):
+  """Concurrency tests of credentials store creation process.
+
+  The store that is tested by this class is built by creds.GetCredentialStore().
+  """
 
   @test_case.Filters.DoNotRunOnWindows(
       'Checking file permissions in the Windows test env is non-trivial')
@@ -262,7 +539,8 @@ class StoreTests(sdk_test_base.SdkBase):
               os.path.basename(path)))
 
 
-class Sqlite3Tests(sdk_test_base.SdkBase, test_case.WithOutputCapture):
+class Sqlite3Tests(sdk_test_base.WithLogCapture,
+                   credentials_test_base.CredentialsTestBase):
 
   def SetUp(self):
     signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
@@ -281,7 +559,7 @@ class Sqlite3Tests(sdk_test_base.SdkBase, test_case.WithOutputCapture):
   def testAttachAccessTokenCacheStore(self):
     access_token_cache = creds.AccessTokenCache(
         config.Paths().access_token_db_path)
-    credentials = creds.FromJson(_GetJsonServiceADC())
+    credentials = creds.FromJson(self.SERVICE_ACCOUNT_CREDENTIALS_JSON)
     credentials.token_response = json.loads("""{"id_token": "woweee"}""")
     self.assertIsNone(credentials.access_token)
     access_token_cache.Store(
@@ -295,6 +573,323 @@ class Sqlite3Tests(sdk_test_base.SdkBase, test_case.WithOutputCapture):
     new_cred = creds.MaybeAttachAccessTokenCacheStore(credentials)
     self.assertIsNone(new_cred.token_response)
     self.assertEqual('token1', new_cred.access_token)
+
+  def testAccessTokenCacheReadonlyStore(self):
+    access_token_cache = creds.AccessTokenCache(
+        config.Paths().access_token_db_path)
+    credentials = creds.FromJson(self.SERVICE_ACCOUNT_CREDENTIALS_JSON)
+    credentials.token_response = json.loads("""{"id_token": "woweee"}""")
+    self.assertIsNone(credentials.access_token)
+    self.StartObjectPatch(
+        access_token_cache,
+        '_Execute',
+        side_effect=sqlite3.OperationalError(
+            'attempt to write to read-only database'))
+    access_token_cache.Store(
+        credentials.service_account_email,
+        access_token='token1',
+        token_expiry=datetime.datetime.utcnow() +
+        datetime.timedelta(seconds=3600),
+        rapt_token=None,
+        id_token=None)
+    self.AssertLogContains('Could not store access token in cache: '
+                           'attempt to write to read-only database')
+
+  def testAccessTokenCacheReadonlyRemove(self):
+    access_token_cache = creds.AccessTokenCache(
+        config.Paths().access_token_db_path)
+    credentials = creds.FromJson(self.SERVICE_ACCOUNT_CREDENTIALS_JSON)
+    self.StartObjectPatch(
+        access_token_cache,
+        '_Execute',
+        side_effect=sqlite3.OperationalError(
+            'attempt to write to read-only database'))
+    access_token_cache.Remove(credentials.service_account_email)
+    self.AssertLogContains('Could not delete access token from cache: '
+                           'attempt to write to read-only database')
+
+
+class ADCTests(cli_test_base.CliTestBase,
+               credentials_test_base.CredentialsTestBase):
+
+  def SetUp(self):
+    self.adc_file_path = os.path.join(self.temp_path,
+                                      'application_default_credentials.json')
+    self.StartObjectPatch(
+        config, 'ADCFilePath', return_value=self.adc_file_path)
+    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+    self.user_creds = creds.FromJson(self.USER_CREDENTIALS_JSON)
+    self.service_creds = creds.FromJson(self.SERVICE_ACCOUNT_CREDENTIALS_JSON)
+
+  def testDumpADCToFile_UserCreds(self):
+    adc = creds.ADC(self.user_creds)
+    adc.DumpADCToFile()
+    self.AssertFileEquals(self.USER_CREDENTIALS_JSON, self.adc_file_path)
+
+  def testDumpADCToFile_ServiceCreds(self):
+    adc = creds.ADC(self.service_creds)
+    adc.DumpADCToFile()
+    self.AssertFileEquals(self.SERVICE_ACCOUNT_CREDENTIALS_JSON,
+                          self.adc_file_path)
+
+  def testDumpExtendedADCToFile_UserCreds(self):
+    adc = creds.ADC(self.user_creds)
+    adc.DumpExtendedADCToFile(quota_project='my project')
+    self.AssertFileEquals(self.EXTENDED_USER_CREDENTIALS_JSON,
+                          self.adc_file_path)
+
+  def testDumpExtendedADCToFile_ServiceCreds(self):
+    adc = creds.ADC(self.service_creds)
+    with self.AssertRaisesExceptionRegexp(creds.CredentialFileSaveError,
+                                          'The credential is not .*'):
+      adc.DumpExtendedADCToFile(quota_project='my project')
+
+  def testDumpExtendedADCToFile_QuotaProjectNotFound(self):
+    self.StartObjectPatch(creds, 'GetQuotaProject', return_value=None)
+    adc = creds.ADC(self.user_creds)
+    adc.DumpExtendedADCToFile()
+    self.AssertFileEquals(self.USER_CREDENTIALS_JSON, self.adc_file_path)
+    self.AssertErrContains('Cannot find a project')
+
+
+class CredentialsConversionTests(sdk_test_base.SdkBase,
+                                 credentials_test_base.CredentialsTestBase):
+
+  def SetUp(self):
+    self.fake_cred = client.OAuth2Credentials(
+        'access-token',
+        'client_id',
+        'client_secret',
+        'fake-token',
+        datetime.datetime(2017, 1, 8, 0, 0, 0),
+        'token_uri',
+        'user_agent',
+        scopes=config.CLOUDSDK_SCOPES)
+    self.json_file = self.Touch(
+        self.root_path,
+        contents="""\
+{
+    "private_key_id": "key-id",
+    "private_key": "-----BEGIN PRIVATE KEY-----\\nasdf\\n-----END PRIVATE KEY-----\\n",
+    "client_email": "bar@developer.gserviceaccount.com",
+    "client_id": "bar.apps.googleusercontent.com",
+    "type": "service_account",
+    "token_uri": "https://oauth2.googleapis.com/token"
+  }""")
+    self.adc_file = self.Touch(
+        self.root_path,
+        contents="""\
+{
+  "client_id": "foo.apps.googleusercontent.com",
+  "client_secret": "file-secret",
+  "refresh_token": "file-token",
+  "type": "authorized_user"
+}""")
+    self.rsa_mock = self.StartObjectPatch(google_auth_crypt.RSASigner,
+                                          'from_service_account_info')
+    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+    response = mock.Mock(status=200)
+    content = b'{"id_token": "id-token"}'
+    self.StartObjectPatch(
+        httplib2.Http,
+        'request',
+        autospec=True,
+        return_value=(response, content))
+    self.StartObjectPatch(client.OAuth2Credentials, 'refresh')
+    self.StartObjectPatch(crypt, 'make_signed_jwt')
+
+  def testMaybeConvertUserCredsToGoogleAuthCreds(self):
+    self.assertIsInstance(self.fake_cred, client.OAuth2Credentials)
+    google_auth_cred = creds.MaybeConvertToGoogleAuthCredentials(
+        self.fake_cred, True)
+
+    self.assertIsInstance(google_auth_cred, google_auth_credentials.Credentials)
+    self.AssertCredentialsEqual(
+        google_auth_cred, {
+            'token': 'access-token',
+            'expiry': datetime.datetime(2017, 1, 8, 0, 0, 0),
+            'client_id': 'client_id',
+            'client_secret': 'client_secret',
+            'refresh_token': 'fake-token',
+            'token_uri': 'token_uri',
+        })
+
+  def testMaybeConvertServiceAccountCredsToGoogleAuthCreds(self):
+    properties.VALUES.auth.credential_file_override.Set(self.json_file)
+    cred = c_store.Load()
+    cred.access_token = 'access-token'
+    cred.token_expiry = datetime.datetime(2017, 1, 8, 0, 0, 0)
+    cred.scopes = set(config.CLOUDSDK_SCOPES)
+    self.assertIsInstance(cred, service_account.ServiceAccountCredentials)
+    google_auth_cred = creds.MaybeConvertToGoogleAuthCredentials(cred, True)
+
+    self.assertIsInstance(google_auth_cred,
+                          google_auth_service_account.Credentials)
+    self.AssertCredentialsEqual(
+        google_auth_cred, {
+            'token': 'access-token',
+            'expiry': datetime.datetime(2017, 1, 8, 0, 0, 0),
+            '_scopes': config.CLOUDSDK_SCOPES,
+            'service_account_email': 'bar@developer.gserviceaccount.com',
+            '_token_uri': 'https://www.googleapis.com/oauth2/v4/token',
+        })
+
+  # Some oauth2client credentials, for example the service account variant,
+  # store the scopes in a field other than 'self.scopes' and have 'self.scopes
+  #  to be an empty set.
+  def testMaybeConvertServiceAccountCredsToGoogleAuthCreds_ScopeOfInputCredsIsEmpty(
+      self):
+    properties.VALUES.auth.credential_file_override.Set(self.json_file)
+    cred = c_store.Load()
+    cred.access_token = 'access-token'
+    cred.token_expiry = datetime.datetime(2017, 1, 8, 0, 0, 0)
+    cred.scopes = set([])
+    self.assertIsInstance(cred, service_account.ServiceAccountCredentials)
+    google_auth_cred = creds.MaybeConvertToGoogleAuthCredentials(cred, True)
+
+    self.assertIsInstance(google_auth_cred,
+                          google_auth_service_account.Credentials)
+    self.AssertCredentialsEqual(
+        google_auth_cred, {
+            'token': 'access-token',
+            'expiry': datetime.datetime(2017, 1, 8, 0, 0, 0),
+            '_scopes': config.CLOUDSDK_SCOPES,
+            'service_account_email': 'bar@developer.gserviceaccount.com',
+            '_token_uri': 'https://www.googleapis.com/oauth2/v4/token',
+        })
+
+  def testMaybeConvertADCToGoogleAuthCreds(self):
+    properties.VALUES.auth.credential_file_override.Set(self.adc_file)
+    cred = c_store.Load()
+    cred.access_token = 'access-token'
+    cred.token_expiry = datetime.datetime(2017, 1, 8, 0, 0, 0)
+    cred.scopes = set(config.CLOUDSDK_SCOPES)
+    self.assertIsInstance(cred, client.GoogleCredentials)
+    google_auth_cred = creds.MaybeConvertToGoogleAuthCredentials(cred, True)
+
+    self.assertIsInstance(google_auth_cred, google_auth_credentials.Credentials)
+    self.AssertCredentialsEqual(
+        google_auth_cred, {
+            'token': 'access-token',
+            'expiry': datetime.datetime(2017, 1, 8, 0, 0, 0),
+            '_scopes': config.CLOUDSDK_SCOPES,
+            'client_id': 'foo.apps.googleusercontent.com',
+            'client_secret': 'file-secret',
+            'refresh_token': 'file-token',
+        })
+
+  def testMaybeConvertGceCredsToGoogleAuthCreds(self):
+    cred = oauth2client_gce.AppAssertionCredentials(
+        'from_gce@developer.gserviceaccount.com')
+    cred.access_token = 'access-token'
+    cred.token_expiry = datetime.datetime(2017, 1, 8, 0, 0, 0)
+    cred.scopes = set(config.CLOUDSDK_SCOPES)
+    google_auth_cred = creds.MaybeConvertToGoogleAuthCredentials(cred, True)
+
+    self.assertIsInstance(google_auth_cred, compute_engine.Credentials)
+    self.AssertCredentialsEqual(
+        google_auth_cred, {
+            'token': 'access-token',
+            'expiry': datetime.datetime(2017, 1, 8, 0, 0, 0),
+            '_scopes': config.CLOUDSDK_SCOPES,
+            'service_account_email': 'from_gce@developer.gserviceaccount.com',
+        })
+
+  def testMaybeConvertImpersonationCredsToGoogleAuthCreds(self):
+    google_auth_cred = creds.MaybeConvertToGoogleAuthCredentials(
+        iamcredentials_util.ImpersonationCredentials('service-account-id',
+                                                     'access-token',
+                                                     '2016-01-08T00:00:00Z',
+                                                     config.CLOUDSDK_SCOPES),
+        True)
+
+    self.assertIsInstance(
+        google_auth_cred,
+        iamcredentials_util.ImpersonationCredentialsGoogleAuth)
+    self.AssertCredentialsEqual(
+        google_auth_cred, {
+            'token': 'access-token',
+            'expiry': datetime.datetime(2016, 1, 8, 0, 0, 0),
+            '_scopes': config.CLOUDSDK_SCOPES,
+            '_service_account_id': 'service-account-id',
+        })
+
+  def testMaybeConvertP12ServiceAccountCredsToGoogleAuthCreds(self):
+    cred_p12 = service_account.ServiceAccountCredentials(
+        'service_account_email', None, config.CLOUDSDK_SCOPES, 'private_key_id',
+        'client_id', None, 'token_uri')
+    cred_p12.access_token = 'access-token'
+    cred_p12.token_expiry = datetime.datetime(2017, 1, 8, 0, 0, 0)
+    cred_p12._private_key_pkcs12 = '_private_key_pkcs12'
+    cred_returned = creds.MaybeConvertToGoogleAuthCredentials(cred_p12, True)
+
+    self.assertIsInstance(cred_returned,
+                          service_account.ServiceAccountCredentials)
+    self.AssertCredentialsEqual(
+        cred_returned, {
+            'access_token': 'access-token',
+            'token_expiry': datetime.datetime(2017, 1, 8, 0, 0, 0),
+            'client_id': 'client_id',
+            '_private_key_id': 'private_key_id',
+            '_private_key_pkcs12': '_private_key_pkcs12',
+            'token_uri': 'token_uri',
+        })
+
+  def testMaybeConvertToGoogleAuthCredsNotUseGoogleAuth(self):
+    self.assertIsInstance(self.fake_cred, client.OAuth2Credentials)
+    cred_returned = creds.MaybeConvertToGoogleAuthCredentials(
+        self.fake_cred, False)
+
+    self.assertIsInstance(cred_returned, client.OAuth2Credentials)
+    self.AssertCredentialsEqual(
+        cred_returned, {
+            'access_token': 'access-token',
+            'token_expiry': datetime.datetime(2017, 1, 8, 0, 0, 0),
+            'scopes': config.CLOUDSDK_SCOPES,
+            'client_id': 'client_id',
+            'client_secret': 'client_secret',
+            'refresh_token': 'fake-token',
+            'token_uri': 'token_uri',
+        })
+
+  def testMaybeConvertToGoogleAuthCredsInputGoogleAuthCreds(self):
+    google_auth_cred = creds.MaybeConvertToGoogleAuthCredentials(
+        self.fake_cred, True)
+
+    self.assertIsInstance(google_auth_cred, google_auth_credentials.Credentials)
+    cred_returned = creds.MaybeConvertToGoogleAuthCredentials(
+        google_auth_cred, True)
+    self.assertIsInstance(cred_returned, google_auth_credentials.Credentials)
+    self.AssertCredentialsEqual(
+        google_auth_cred, {
+            'token': 'access-token',
+            'expiry': datetime.datetime(2017, 1, 8, 0, 0, 0),
+            '_scopes': config.CLOUDSDK_SCOPES,
+            'client_id': 'client_id',
+            'client_secret': 'client_secret',
+            'refresh_token': 'fake-token',
+            'token_uri': 'token_uri',
+        })
+
+
+@test_case.Filters.RunOnlyOnLinux
+@test_case.Filters.SkipInDebPackage(
+    'Socket conflict in docker container in test environment', 'b/37959415')
+@test_case.Filters.SkipInRpmPackage(
+    'Socket conflict in docker container in test environment', 'b/37959415')
+class DevshellTests(devshell_test_base.DevshellTestBase):
+
+  def testConvertDevShellCredsToGoogleAuthCreds(self):
+    cred = c_store.Load()
+    self.assertIsInstance(cred, devshell.DevshellCredentials)
+
+    google_auth_cred = creds.MaybeConvertToGoogleAuthCredentials(cred, True)
+    self.assertIsInstance(google_auth_cred,
+                          devshell.DevShellCredentialsGoogleAuth)
+    self.assertEqual(google_auth_cred.token, cred.access_token)
+    self.assertEqual(google_auth_cred.id_tokenb64, cred.id_tokenb64)
+    self.assertEqual(google_auth_cred.id_token, cred.id_tokenb64)
+    self.assertEqual(google_auth_cred.expiry, cred.token_expiry)
 
 
 if __name__ == '__main__':

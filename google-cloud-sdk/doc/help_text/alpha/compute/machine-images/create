@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute machine-images create - create Google Compute Engine
-        machine images
+    gcloud alpha compute machine-images create - create a Compute Engine
+        machine image
 
 SYNOPSIS
     gcloud alpha compute machine-images create IMAGE
@@ -15,7 +15,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Create Google Compute Engine machine images.
+    (ALPHA) Create a Compute Engine machine image.
 
 POSITIONAL ARGUMENTS
      IMAGE
@@ -37,7 +37,7 @@ OPTIONAL FLAGS
         for more details.
 
      --description=DESCRIPTION
-        Specifies a textual description of the machine image.
+        Specifies a text description of the machine image.
 
      --guest-flush
         Create an application-consistent machine image by informing the OS to
@@ -114,12 +114,22 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a machine image, run:
+
+        $ gcloud alpha compute machine-images create my-machine-image \
+            --source-instance=example-source \
+            --source-instance-zone=us-central1-a
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute machine-images create
 

@@ -22,22 +22,23 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.events import exceptions
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core import yaml
 
 
-def AddCategoryFlag(parser):
-  """Adds a source flag."""
+def AddSourceFlag(parser):
+  """Adds a source flag. This refers to a source kind, not instance."""
   parser.add_argument(
-      '--category',
+      '--source',
       required=False,
-      help='Events type category by which to filter results.')
+      help='Events source kind by which to filter results.')
 
 
 def AddEventTypePositionalArg(parser):
   """Adds event type positional arg."""
   parser.add_argument(
       'event_type',
-      help='Type of event (e.g. com.google.gc.object.finalize).')
+      help='Type of event (e.g. com.google.cloud.auditlog.event).')
 
 
 def AddTargetServiceFlag(parser, required=False):
@@ -45,7 +46,8 @@ def AddTargetServiceFlag(parser, required=False):
   parser.add_argument(
       '--target-service',
       required=required,
-      help='Name of the Cloud Run service to receive events at.')
+      help='Name or absolute uri of the Cloud Run service at which '
+      'events should be received.')
 
 
 def AddEventTypeFlagArg(parser):
@@ -53,7 +55,7 @@ def AddEventTypeFlagArg(parser):
   parser.add_argument(
       '--type',
       required=True,
-      help='Type of event (e.g. com.google.gc.object.finalize).')
+      help='Type of event (e.g. com.google.cloud.auditlog.event).')
 
 
 def AddBrokerFlag(parser):
@@ -63,6 +65,32 @@ def AddBrokerFlag(parser):
       default='default',
       help='Name of the Broker to send events to. '
       'Defaults to \'default\' if not specified.')
+
+
+def AddBrokerArg(parser):
+  """Adds broker arg."""
+  parser.add_argument(
+      'BROKER',
+      help='Name of the Broker to create.')
+
+
+def AddServiceAccountFlag(parser):
+  """Adds service account flag."""
+  parser.add_argument(
+      '--service-account',
+      required=True,
+      type=iam_util.GetIamAccountFormatValidator(),
+      help='Email address of an IAM service account which represents the '
+      'identity of the internal events operator.')
+
+
+def AddCustomEventTypeFlag(parser):
+  """Adds custom event type boolean flag."""
+  parser.add_argument(
+      '--custom-type',
+      action='store_true',
+      help='If specified, the provided event type should be interpreted as a '
+      'custom event type.')
 
 
 _PARAMETERS_FLAG_NAME = 'parameters'
@@ -133,13 +161,11 @@ def _CheckUnknownParameters(event_type, known_params, given_params):
         unknown_parameters, event_type)
 
 
-def _CheckMissingRequiredParameters(event_type,
-                                    required_params,
-                                    given_params=None):
+def _CheckMissingRequiredParameters(event_type, required_params, given_params):
   """Raises an error if any required params are missing."""
   missing_parameters = (
       set(required_params) -
-      set(given_params if given_params is not None else {}))
+      set(given_params))
   if missing_parameters:
     raise exceptions.MissingRequiredEventTypeParameters(
         missing_parameters, event_type)
@@ -160,24 +186,19 @@ def _ValidateParameters(event_type, parameters, properties='properties'):
 
 def GetAndValidateParameters(args, event_type):
   """Validates all source parameters and returns a dict of values."""
-  parameters = {}
-
   # Check the passed parameters for unknown keys or missing required keys
+  parameters = {}
   from_file_flag = '{}_from_file'.format(_PARAMETERS_FLAG_NAME)
   if args.IsSpecified(from_file_flag):
-    _ValidateParameters(event_type, getattr(args, from_file_flag))
     parameters.update(getattr(args, from_file_flag))
-  elif args.IsSpecified(_PARAMETERS_FLAG_NAME):
-    _ValidateParameters(event_type, getattr(args, _PARAMETERS_FLAG_NAME))
+  if args.IsSpecified(_PARAMETERS_FLAG_NAME):
     parameters.update(getattr(args, _PARAMETERS_FLAG_NAME))
-  else:
-    _CheckMissingRequiredParameters(
-        event_type, [p.name for p in event_type.crd.properties if p.required])
+  _ValidateParameters(event_type, parameters)
 
   # Check the passed secret parameters for unknown keys or missing required keys
   secret_parameters = _ParseSecretParameters(args)
   _ValidateParameters(
       event_type, secret_parameters, properties='secret_properties')
-  parameters.update(secret_parameters)
 
+  parameters.update(secret_parameters)
   return parameters

@@ -1,5 +1,6 @@
 NAME
-    gcloud beta debug snapshots create - create debug snapshots
+    gcloud beta debug snapshots create - create debug snapshots for a Cloud
+        Debugger debug target (debuggee)
 
 SYNOPSIS
     gcloud beta debug snapshots create LOCATION [--condition=CONDITION]
@@ -7,9 +8,10 @@ SYNOPSIS
         [--wait=WAIT; default=10] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) This command creates a debug snapshot on a Cloud Debugger debug
-    target. Snapshots allow you to capture stack traces and local variables
-    from your running service without interfering with normal operations.
+    (BETA) gcloud beta debug snapshots create is used to create a debug
+    snapshot on a Cloud Debugger debug target. Snapshots allow you to capture
+    stack traces and local variables from your running service without
+    interfering with normal operations.
 
     When any instance of the target executes the snapshot location, the
     optional condition expression is evaluated. If the result is true (or if
@@ -17,9 +19,8 @@ DESCRIPTION
     reports it back to Cloud Debugger. Once any instance captures a snapshot,
     the snapshot is marked as completed, and it will not be captured again.
 
-    You can most easily view snapshot results in the developer console. It is
-    also possible to inspect snapshot results with the "snapshots describe"
-    command.
+    You can view snapshot results in the developer console. It is also possible
+    to inspect snapshot results with the "snapshots describe" command.
 
 POSITIONAL ARGUMENTS
      LOCATION
@@ -57,8 +58,30 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a snapshot with no conditions or expressions at line 41 of file
+    main.py of a debug target (debuggee), run:
+
+        $ gcloud beta debug snapshots create main.py:41 \
+            --target=<debuggee_id>
+
+    To create a snapshot at line 41 of file main.py on a debug target
+    (debuggee) that will only trigger if the variable name has the value of
+    'foo', run:
+
+        $ gcloud beta debug snapshots create main.py:41 \
+            --target=<debuggee_id> --condition="name == 'foo'"
+
+    To create a snapshot at line 41 of file main.py on a debug target
+    (debuggee) with the expressions name[0] and name[1], run:
+
+        $ gcloud beta debug snapshots create main.py:41 \
+            --target=<debuggee_id> --expression="name[0]" \
+            --expression="name[1]"
 
 NOTES
     This command is currently in BETA and may change without notice. This

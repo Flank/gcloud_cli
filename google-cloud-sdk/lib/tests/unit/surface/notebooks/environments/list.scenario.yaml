@@ -1,0 +1,52 @@
+title: notebooks environment list test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      notebooks environments list --location=us-central1-a
+  - stdout: |
+      NAME       LOCATION       PROJECT       IMAGE_FAMILY                    IMAGE_NAME                        REPOSITORY
+      test-env5  us-central1-a  cloudsdktest  caffe1-latest-cpu-experimental
+      test-env4  us-central1-a  cloudsdktest                                  tf2-2-1-cu101-notebooks-20200110
+actions:
+- execute_command:
+    command: |
+      notebooks environments list --location=us-central1-a
+    events:
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/fake-project/locations/us-central1-a/environments?alt=json&pageSize=100
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "environments": [
+                {
+                  "name": "projects/cloudsdktest/locations/us-central1-a/environments/test-env5",
+                  "vmImage": {
+                    "project": "deeplearning-platform-release",
+                    "imageFamily": "caffe1-latest-cpu-experimental"
+                  },
+                  "createTime": "2020-01-30T19:17:47.860083064Z"
+                },
+                {
+                  "name": "projects/cloudsdktest/locations/us-central1-a/environments/test-env4",
+                  "vmImage": {
+                    "project": "deeplearning-platform-release",
+                    "imageName": "tf2-2-1-cu101-notebooks-20200110"
+                  },
+                  "createTime": "2020-02-03T21:51:10.635401806Z"
+                }
+              ]
+            }
+    - expect_stdout: |
+        NAME       LOCATION       PROJECT       IMAGE_FAMILY                    IMAGE_NAME                        REPOSITORY
+        test-env5  us-central1-a  cloudsdktest  caffe1-latest-cpu-experimental
+        test-env4  us-central1-a  cloudsdktest                                  tf2-2-1-cu101-notebooks-20200110
+    - expect_exit:
+        code: 0

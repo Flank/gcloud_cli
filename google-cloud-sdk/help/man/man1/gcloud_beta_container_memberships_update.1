@@ -17,7 +17,10 @@ gcloud beta container memberships update \- update a membership
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Update an existing membership in Google Kubernetes Hub.
+\fB(BETA)\fR \fB(DEPRECATED)\fR This command group is deprecated. Please use
+\f5gcloud container hub memberships\fR command group instead.
+
+Update an existing membership in Google Kubernetes Hub.
 
 
 
@@ -106,6 +109,8 @@ $ gcloud beta container memberships update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 
 .RE
@@ -117,8 +122,9 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

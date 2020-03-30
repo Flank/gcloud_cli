@@ -24,20 +24,21 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
 
      create
-        Create debug logpoints.
+        Add debug logpoints to a Cloud Debugger debug target (debuggee).
 
      delete
-        Delete debug logpoints.
+        Delete debug logpoints for a Cloud Debugger debug target (debuggee).
 
      list
-        List debug logpoints.
+        List the debug logpoints for a Cloud Debugger debug target (debuggee).
 
 EXAMPLES
     The following command would log the value of the "name" attribute of the

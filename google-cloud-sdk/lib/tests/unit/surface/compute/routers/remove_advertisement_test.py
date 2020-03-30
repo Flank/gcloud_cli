@@ -22,21 +22,24 @@ import copy
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.routers import router_utils
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import router_test_base
 from tests.lib.surface.compute import router_test_utils
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'),
-                          (calliope_base.ReleaseTrack.GA, 'v1'))
-class RemoveAdvertisementBetaTest(parameterized.TestCase,
-                                  router_test_base.RouterTestBase):
+class RemoveAdvertisementTestGA(router_test_base.RouterTestBase):
 
-  def testRemoveAdvertisementGroups_success(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def SetUp(self):
+    self.messages = getattr(self, self.api_version + '_messages')
+    self.mock_client = getattr(self, 'compute_' + self.api_version)
+    self.mock_client.Mock()
+    self.addCleanup(self.mock_client.Unmock)
+
+  def testRemoveAdvertisementGroups_success(self):
 
     # Start with a router in custom mode.
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -46,7 +49,7 @@ class RemoveAdvertisementBetaTest(parameterized.TestCase,
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -56,9 +59,7 @@ class RemoveAdvertisementBetaTest(parameterized.TestCase,
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating router [my-router]')
 
-  def testRemoveAdvertisementGroups_groupNotFoundError(self, track,
-                                                       api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisementGroups_groupNotFoundError(self):
 
     # Start with a router in custom mode.
     orig = router_test_utils.CreateEmptyCustomRouterMessage(self.messages)
@@ -73,8 +74,7 @@ class RemoveAdvertisementBetaTest(parameterized.TestCase,
           --remove-advertisement-groups=ALL_SUBNETS
           """)
 
-  def testRemoveAdvertisementRanges_success(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisementRanges_success(self):
 
     # Start with a router in custom mode.
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -88,7 +88,7 @@ class RemoveAdvertisementBetaTest(parameterized.TestCase,
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -98,8 +98,7 @@ class RemoveAdvertisementBetaTest(parameterized.TestCase,
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating router [my-router]')
 
-  def testRemoveAdvertisementRanges_multiSuccess(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisementRanges_multiSuccess(self):
 
     # Start with a router in custom mode.
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -110,7 +109,7 @@ class RemoveAdvertisementBetaTest(parameterized.TestCase,
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -120,9 +119,7 @@ class RemoveAdvertisementBetaTest(parameterized.TestCase,
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating router [my-router]')
 
-  def testRemoveAdvertisementRanges_ipRangeNotFoundError(
-      self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisementRanges_ipRangeNotFoundError(self):
 
     # Start with a router in custom mode.
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -137,8 +134,7 @@ class RemoveAdvertisementBetaTest(parameterized.TestCase,
           --remove-advertisement-ranges=192.168.0.0/30
           """)
 
-  def testRemoveAdvertisement_mutallyExclusiveError(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisement_mutallyExclusiveError(self):
 
     error_msg = ('argument --remove-advertisement-groups: At most one of '
                  '--add-advertisement-groups | --add-advertisement-ranges | '
@@ -151,8 +147,7 @@ class RemoveAdvertisementBetaTest(parameterized.TestCase,
           --remove-advertisement-ranges=10.10.10.10/30
           """)
 
-  def testRemoveAdvertisement_defaultModeError(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisement_defaultModeError(self):
 
     # Start with a router in default mode.
     orig = router_test_utils.CreateDefaultRouterMessage(self.messages)
@@ -167,6 +162,20 @@ class RemoveAdvertisementBetaTest(parameterized.TestCase,
           compute routers update my-router --region us-central1
           --remove-advertisement-groups=ALL_SUBNETS
           """)
+
+
+class RemoveAdvertisementTestBeta(RemoveAdvertisementTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class RemoveAdvertisementTestAlpha(RemoveAdvertisementTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
 
 if __name__ == '__main__':

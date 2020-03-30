@@ -107,7 +107,8 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
     """Tests creating resource from the collection with no config overrides."""
     with self.AssertRaisesExceptionMatches(
         concepts.ResourceConfigurationError,
-        'unknown attribute(s): [junk]'):
+        'unknown attribute(s): Expected [projectsId, shelvesId, booksId], '
+        'Found [junk]'):
       concepts.ResourceSpec(
           'example.projects.shelves.books',
           resource_name='book',

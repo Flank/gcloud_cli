@@ -107,6 +107,21 @@ class Service(k8s_object.KubernetesObject):
   def serving_revisions(self):
     return [t.revisionName for t in self.status.traffic if t.percent]
 
+  def _ShouldIncludeInLatestPercent(self, target):
+    """Returns True if the target's percent is part of the latest percent."""
+    is_latest_by_name = (
+        self.status.latestReadyRevisionName and
+        target.revisionName == self.status.latestReadyRevisionName)
+    return target.percent and (target.latestRevision or is_latest_by_name)
+
+  @property
+  def latest_percent_traffic(self):
+    """The percent of traffic the latest ready revision is serving."""
+    return sum(
+        target.percent
+        for target in self.status.traffic
+        if self._ShouldIncludeInLatestPercent(target))
+
   @property
   def domain(self):
     return self._m.status.url or self._m.status.domain
@@ -127,15 +142,14 @@ class Service(k8s_object.KubernetesObject):
     return self.annotations.get(u'serving.knative.dev/lastModifier')
 
   @property
-  def last_transition_time(self):
-    return next((c.lastTransitionTime
-                 for c in self.status.conditions
-                 if c.type == u'Ready'), None)
-
-  @property
-  def traffic(self):
+  def spec_traffic(self):
     self.AssertFullObject()
     return traffic.TrafficTargets(self._messages, self.spec.traffic)
+
+  @property
+  def status_traffic(self):
+    self.AssertFullObject()
+    return traffic.TrafficTargets(self._messages, self.status.traffic)
 
   @property
   def vpc_connector(self):

@@ -1,16 +1,16 @@
 NAME
     gcloud iam service-accounts add-iam-policy-binding - add an IAM policy
-        binding to an IAM Service Account
+        binding to an IAM service account
 
 SYNOPSIS
     gcloud iam service-accounts add-iam-policy-binding SERVICE_ACCOUNT
         --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Add an IAM policy binding to an IAM Service Account.
+    Add an IAM policy binding to an IAM service account.
 
     When managing IAM roles, you can treat a service account either as a
-    resource or as an identity. This command is to add iam policy bindings to a
+    resource or as an identity. This command adds iam policy bindings to a
     service account resource. There are other gcloud commands to manage IAM
     policies for other types of resources. For example, to manage IAM policies
     on a project, use the $ gcloud projects commands.
@@ -50,8 +50,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the iam/v1 API. The full documentation for this API can

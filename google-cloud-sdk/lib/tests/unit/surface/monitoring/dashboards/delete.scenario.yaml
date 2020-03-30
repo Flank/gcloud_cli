@@ -1,0 +1,69 @@
+title: dashboards delete test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Describe a dashboard
+  - command: monitoring dashboards delete test-dashboard-id
+  - prompt:
+    - message: You are about to delete dashboard [test-dashboard-id]
+    - input: y
+  - stderr: |
+      Deleted dashboard [test-dashboard-id].
+- execute:
+  - label: Delete a dashboard that doesn't exist
+  - command: monitoring dashboards delete nonexistent-dashboard-id
+  - prompt:
+    - message: You are about to delete dashboard [nonexistent-dashboard-id]
+    - input: y
+  - error: '1: NOT_FOUND: Requested entity was not found.'
+actions:
+- execute_command:
+    label: Describe a dashboard
+    command: monitoring dashboards delete test-dashboard-id
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete dashboard [test-dashboard-id]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://monitoring.googleapis.com/v1/projects/fake-project/dashboards/test-dashboard-id?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {}
+    - expect_stderr: |
+        Deleted dashboard [test-dashboard-id].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: Delete a dashboard that doesn't exist
+    command: monitoring dashboards delete nonexistent-dashboard-id
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete dashboard [nonexistent-dashboard-id]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://monitoring.googleapis.com/v1/projects/fake-project/dashboards/nonexistent-dashboard-id?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+          body: |
+            {
+              "error": {
+                "code": 404,
+                "message": "Requested entity was not found.",
+                "status": "NOT_FOUND"
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: 'NOT_FOUND: Requested entity was not found.'

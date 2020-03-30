@@ -1,0 +1,34 @@
+NAME
+    gcloud alpha services api-keys describe - describe an API key's metadata
+
+SYNOPSIS
+    gcloud alpha services api-keys describe KEY [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Describe an API key's metadata.
+
+POSITIONAL ARGUMENTS
+     Key resource - The name of the key to describe. This represents a Cloud
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [key] on the command line with a fully specified name; provide
+     the argument [--project] on the command line; set the property
+     [core/project]. This must be specified.
+
+       KEY
+          ID of the key or fully qualified identifier for the key.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

@@ -48,7 +48,8 @@ class _BaseOperationsListTest(object):
                     23,
                     12,
                     672000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(
+                        0))).isoformat(),
                 startTime=datetime.datetime(
                     2014,
                     7,
@@ -57,7 +58,8 @@ class _BaseOperationsListTest(object):
                     23,
                     13,
                     672000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(
+                        0))).isoformat(),
                 endTime=datetime.datetime(
                     2014,
                     7,
@@ -66,22 +68,22 @@ class _BaseOperationsListTest(object):
                     23,
                     16,
                     342000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(
+                        0))).isoformat(),
                 error=None,
                 exportContext=None,
                 importContext=None,
                 targetId='integration-test',
-                targetLink=
-                'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
-                format(self.Project()),
+                targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'
+                .format(self.Project()),
                 targetProject=self.Project(),
                 kind='sql#operation',
                 name='1cb8a924-898d-41ec-b695-39a6dc018d16',
-                selfLink=
-                'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'.
-                format(self.Project()),
-                operationType='CREATE_USER',
-                status='DONE',
+                selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'
+                .format(self.Project()),
+                operationType=self.messages.Operation
+                .OperationTypeValueValuesEnum.CREATE_USER,
+                status=self.messages.Operation.StatusValueValuesEnum.DONE,
                 user='170350250316@developer.gserviceaccount.com',
             ),
             self.messages.Operation(
@@ -93,7 +95,8 @@ class _BaseOperationsListTest(object):
                     23,
                     1,
                     104000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(
+                        0))).isoformat(),
                 startTime=datetime.datetime(
                     2014,
                     7,
@@ -102,7 +105,8 @@ class _BaseOperationsListTest(object):
                     23,
                     2,
                     165000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(
+                        0))).isoformat(),
                 endTime=datetime.datetime(
                     2014,
                     7,
@@ -111,22 +115,22 @@ class _BaseOperationsListTest(object):
                     23,
                     3,
                     165000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(
+                        0))).isoformat(),
                 error=None,
                 exportContext=None,
                 importContext=None,
                 targetId='integration-test',
-                targetLink=
-                'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
-                format(self.Project()),
+                targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'
+                .format(self.Project()),
                 targetProject=self.Project(),
                 kind='sql#operation',
                 name='27e060bf-4e4b-4fbb-b451-a9ee6c8a433a',
-                selfLink=
-                'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/27e060bf-4e4b-4fbb-b451-a9ee6c8a433a'.
-                format(self.Project()),
-                operationType='RESTART',
-                status='DONE',
+                selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/27e060bf-4e4b-4fbb-b451-a9ee6c8a433a'
+                .format(self.Project()),
+                operationType=self.messages.Operation
+                .OperationTypeValueValuesEnum.RESTART,
+                status=self.messages.Operation.StatusValueValuesEnum.DONE,
                 user='1@developer.gserviceaccount.com',
             ),
         ]))
@@ -141,14 +145,24 @@ NAME                                  TYPE         START                        
   def testOperationsListWithErrors(self):
     self.instance = self.GetV2Instance('some-instance')
     first_op = self.GetOperation(
-        'CREATE', 'DONE',
+        self.messages.Operation.OperationTypeValueValuesEnum.CREATE,
+        self.messages.Operation.StatusValueValuesEnum.DONE,
         self.messages.OperationErrors(
-            errors=[self.messages.OperationError(code='problem')]))
+            kind='sql#operationErrors',
+            errors=[
+                self.messages.OperationError(
+                    kind='sql#operationError', code='problem')
+            ]))
     first_op.name = 'operation-1'
     second_op = self.GetOperation(
-        'EXPORT', 'DONE',
+        self.messages.Operation.OperationTypeValueValuesEnum.EXPORT,
+        self.messages.Operation.StatusValueValuesEnum.DONE,
         self.messages.OperationErrors(
-            errors=[self.messages.OperationError(code='badbadnotgood')]))
+            kind='sql#operationErrors',
+            errors=[
+                self.messages.OperationError(
+                    kind='sql#operationError', code='badbadnotgood')
+            ]))
     second_op.name = 'operation-2'
     self.mocked_client.operations.List.Expect(
         self.messages.SqlOperationsListRequest(

@@ -34,7 +34,7 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
     self._target_https_proxies_api = self.compute.targetHttpsProxies
 
   def RunUpdate(self, command):
-    self.Run('compute target-https-proxies update ' + command)
+    self.Run('compute target-https-proxies update %s' % command)
 
   def testSimpleCase(self):
     messages = self.messages
@@ -253,9 +253,6 @@ class TargetHTTPSProxiesUpdateBetaTest(TargetHTTPSProxiesUpdateGATest):
     self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
     self._target_https_proxies_api = self.compute.targetHttpsProxies
 
-  def RunUpdate(self, command):
-    self.Run('compute target-https-proxies update --global ' + command)
-
 
 class TargetHTTPSProxiesUpdateAlphaTest(TargetHTTPSProxiesUpdateBetaTest):
 
@@ -263,19 +260,16 @@ class TargetHTTPSProxiesUpdateAlphaTest(TargetHTTPSProxiesUpdateBetaTest):
     self._SetUpReleaseTrack('alpha', calliope_base.ReleaseTrack.ALPHA)
     self._target_https_proxies_api = self.compute.targetHttpsProxies
 
-  def RunUpdate(self, command):
-    self.Run('compute target-https-proxies update --global ' + command)
 
-
-class RegionTargetHTTPSProxiesUpdateBetaTest(test_base.BaseTest):
+class RegionTargetHTTPSProxiesUpdateTest(test_base.BaseTest):
 
   def SetUp(self):
-    self._api = 'beta'
-    self.SelectApi(self._api)
+    self._api = ''
+    self.SelectApi('v1')
     self._target_https_proxies_api = self.compute.regionTargetHttpsProxies
 
   def RunUpdate(self, command):
-    self.Run('beta compute target-https-proxies update --region us-west-1 ' +
+    self.Run('compute target-https-proxies update --region us-west-1 ' +
              command)
 
   def testSimpleCase(self):
@@ -285,62 +279,68 @@ class RegionTargetHTTPSProxiesUpdateBetaTest(test_base.BaseTest):
                 --url-map my-map
                 """)
 
-    self.CheckRequests([(
-        self._target_https_proxies_api, 'SetSslCertificates',
-        self.messages.ComputeRegionTargetHttpsProxiesSetSslCertificatesRequest(
-            project='my-project',
-            region='us-west-1',
-            targetHttpsProxy='target-https-proxy-1',
-            regionTargetHttpsProxiesSetSslCertificatesRequest=(
-                self.messages.RegionTargetHttpsProxiesSetSslCertificatesRequest(
-                    sslCertificates=[
-                        self.compute_uri +
-                        '/projects/my-project/regions/us-west-1/'
-                        'sslCertificates/my-cert', self.compute_uri +
-                        '/projects/my-project/regions/us-west-1/'
-                        'sslCertificates/my-cert2'
-                    ])))
-    ), (self._target_https_proxies_api, 'SetUrlMap',
-        self.messages.ComputeRegionTargetHttpsProxiesSetUrlMapRequest(
-            project='my-project',
-            region='us-west-1',
-            targetHttpsProxy='target-https-proxy-1',
-            urlMapReference=self.messages.UrlMapReference(
-                urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
-                        'my-project/regions/us-west-1/urlMaps/my-map' % {
-                            'api': self._api
-                        }))))],)
+    self.CheckRequests([
+        (self._target_https_proxies_api, 'SetSslCertificates',
+         self.messages.ComputeRegionTargetHttpsProxiesSetSslCertificatesRequest(
+             project='my-project',
+             region='us-west-1',
+             targetHttpsProxy='target-https-proxy-1',
+             regionTargetHttpsProxiesSetSslCertificatesRequest=(
+                 self.messages
+                 .RegionTargetHttpsProxiesSetSslCertificatesRequest(
+                     sslCertificates=[
+                         self.compute_uri +
+                         '/projects/my-project/regions/us-west-1/'
+                         'sslCertificates/my-cert', self.compute_uri +
+                         '/projects/my-project/regions/us-west-1/'
+                         'sslCertificates/my-cert2'
+                     ])))),
+        (self._target_https_proxies_api, 'SetUrlMap',
+         self.messages.ComputeRegionTargetHttpsProxiesSetUrlMapRequest(
+             project='my-project',
+             region='us-west-1',
+             targetHttpsProxy='target-https-proxy-1',
+             urlMapReference=self.messages.UrlMapReference(
+                 urlMap=(
+                     'https://compute.googleapis.com/compute/%(api)s/projects/'
+                     'my-project/regions/us-west-1/urlMaps/my-map' % {
+                         'api': self.api
+                     }))))
+    ],)
 
   def testUriSupport(self):
     self.RunUpdate("""
           https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/targetHttpsProxies/target-https-proxy-1
           --ssl-certificates https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/sslCertificates/my-cert
           --url-map https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-map
-        """ % {'api': self._api})
+        """ % {'api': self.api})
 
-    self.CheckRequests([(
-        self._target_https_proxies_api, 'SetSslCertificates',
-        self.messages.ComputeRegionTargetHttpsProxiesSetSslCertificatesRequest(
-            project='my-project',
-            region='us-west-1',
-            targetHttpsProxy='target-https-proxy-1',
-            regionTargetHttpsProxiesSetSslCertificatesRequest=(
-                self.messages.RegionTargetHttpsProxiesSetSslCertificatesRequest(
-                    sslCertificates=[
-                        self.compute_uri +
-                        '/projects/my-project/regions/us-west-1/'
-                        'sslCertificates/my-cert'
-                    ])))
-    ), (self._target_https_proxies_api, 'SetUrlMap',
-        self.messages.ComputeRegionTargetHttpsProxiesSetUrlMapRequest(
-            project='my-project',
-            region='us-west-1',
-            targetHttpsProxy='target-https-proxy-1',
-            urlMapReference=self.messages.UrlMapReference(
-                urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
-                        'my-project/regions/us-west-1/urlMaps/my-map' % {
-                            'api': self._api
-                        }))))],)
+    self.CheckRequests([
+        (self._target_https_proxies_api, 'SetSslCertificates',
+         self.messages.ComputeRegionTargetHttpsProxiesSetSslCertificatesRequest(
+             project='my-project',
+             region='us-west-1',
+             targetHttpsProxy='target-https-proxy-1',
+             regionTargetHttpsProxiesSetSslCertificatesRequest=(
+                 self.messages
+                 .RegionTargetHttpsProxiesSetSslCertificatesRequest(
+                     sslCertificates=[
+                         self.compute_uri +
+                         '/projects/my-project/regions/us-west-1/'
+                         'sslCertificates/my-cert'
+                     ])))),
+        (self._target_https_proxies_api, 'SetUrlMap',
+         self.messages.ComputeRegionTargetHttpsProxiesSetUrlMapRequest(
+             project='my-project',
+             region='us-west-1',
+             targetHttpsProxy='target-https-proxy-1',
+             urlMapReference=self.messages.UrlMapReference(
+                 urlMap=(
+                     'https://compute.googleapis.com/compute/%(api)s/projects/'
+                     'my-project/regions/us-west-1/urlMaps/my-map' % {
+                         'api': self.api
+                     }))))
+    ],)
 
   def testSimpleCaseWithQuicOverrideAndSslPolicy(self):
     quic_enum = (
@@ -362,8 +362,8 @@ class RegionTargetHTTPSProxiesUpdateBetaTest(test_base.BaseTest):
              region='us-west-1',
              targetHttpsProxy='target-https-proxy-1',
              regionTargetHttpsProxiesSetSslCertificatesRequest=(
-                 self.messages.
-                 RegionTargetHttpsProxiesSetSslCertificatesRequest(
+                 self.messages
+                 .RegionTargetHttpsProxiesSetSslCertificatesRequest(
                      sslCertificates=[
                          self.compute_uri +
                          '/projects/my-project/regions/us-west-1/'
@@ -377,10 +377,11 @@ class RegionTargetHTTPSProxiesUpdateBetaTest(test_base.BaseTest):
              region='us-west-1',
              targetHttpsProxy='target-https-proxy-1',
              urlMapReference=self.messages.UrlMapReference(
-                 urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
-                         'my-project/regions/us-west-1/urlMaps/my-map' % {
-                             'api': self._api
-                         })))),
+                 urlMap=(
+                     'https://compute.googleapis.com/compute/%(api)s/projects/'
+                     'my-project/regions/us-west-1/urlMaps/my-map' % {
+                         'api': self.api
+                     })))),
         # Only targetHttpsProxies have
         # SetQuicOverride and SetSslPolicy requests.
         (self.compute.targetHttpsProxies, 'SetQuicOverride',
@@ -399,6 +400,19 @@ class RegionTargetHTTPSProxiesUpdateBetaTest(test_base.BaseTest):
                             '/projects/my-project/global/sslPolicies/'
                             'my-ssl-policy')))),
     ])
+
+
+class RegionTargetHTTPSProxiesUpdateBetaTest(RegionTargetHTTPSProxiesUpdateTest
+                                            ):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_https_proxies_api = self.compute.regionTargetHttpsProxies
+
+  def RunUpdate(self, command):
+    self.Run('beta compute target-https-proxies update --region us-west-1 ' +
+             command)
 
 
 class RegionTargetHTTPSProxiesUpdateAlphaTest(

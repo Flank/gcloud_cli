@@ -80,7 +80,7 @@ class GoogleCloudMlV1AblationAttribution(_messages.Message):
   delta per feature. The term "ablation" is in reference to running an
   "ablation study" to analyze input effects on the outcome of interest, which
   in this case is the model's output. This attribution method is supported for
-  Tensorflow and XGBoost models.
+  TensorFlow and XGBoost models.
 
   Fields:
     numFeatureInteractions: Number of feature interactions to account for in
@@ -138,6 +138,16 @@ class GoogleCloudMlV1AcceleratorConfig(_messages.Message):
   type = _messages.EnumField('TypeValueValuesEnum', 2)
 
 
+class GoogleCloudMlV1AddTrialMeasurementRequest(_messages.Message):
+  r"""The request message for the AddTrialMeasurement service method.
+
+  Fields:
+    measurement: Required. The measurement to be added to a trial.
+  """
+
+  measurement = _messages.MessageField('GoogleCloudMlV1Measurement', 1)
+
+
 class GoogleCloudMlV1AutoScaling(_messages.Message):
   r"""Options for automatically scaling a model.
 
@@ -173,6 +183,54 @@ class GoogleCloudMlV1AutoScaling(_messages.Message):
   """
 
   minNodes = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+
+
+class GoogleCloudMlV1AutomatedStoppingConfig(_messages.Message):
+  r"""Configuration for Automated Early Stopping of Trials. If no
+  implementation_config is set, automated early stopping will not be run.
+
+  Fields:
+    decayCurveStoppingConfig: A
+      GoogleCloudMlV1AutomatedStoppingConfigDecayCurveAutomatedStoppingConfig
+      attribute.
+    medianAutomatedStoppingConfig: A
+      GoogleCloudMlV1AutomatedStoppingConfigMedianAutomatedStoppingConfig
+      attribute.
+  """
+
+  decayCurveStoppingConfig = _messages.MessageField('GoogleCloudMlV1AutomatedStoppingConfigDecayCurveAutomatedStoppingConfig', 1)
+  medianAutomatedStoppingConfig = _messages.MessageField('GoogleCloudMlV1AutomatedStoppingConfigMedianAutomatedStoppingConfig', 2)
+
+
+class GoogleCloudMlV1AutomatedStoppingConfigDecayCurveAutomatedStoppingConfig(_messages.Message):
+  r"""A
+  GoogleCloudMlV1AutomatedStoppingConfigDecayCurveAutomatedStoppingConfig
+  object.
+
+  Fields:
+    useElapsedTime: True if measurement.elapsed_time is used as the x-axis of
+      each Trials Decay Curve. Otherwise, Measurement.steps will be used as
+      the x-axis.
+  """
+
+  useElapsedTime = _messages.BooleanField(1)
+
+
+class GoogleCloudMlV1AutomatedStoppingConfigMedianAutomatedStoppingConfig(_messages.Message):
+  r"""The median automated stopping rule stops a pending trial if the trial's
+  best objective_value is strictly below the median 'performance' of all
+  completed trials reported up to the trial's last measurement. Currently,
+  'performance' refers to the running average of the objective values reported
+  by the trial in each measurement.
+
+  Fields:
+    useElapsedTime: True if median automated stopping rule applies on
+      measurement.use_elapsed_time. it means that elapsed_time field of latest
+      measurement of current trial is used to compute median objective value
+      for each completed trials.
+  """
+
+  useElapsedTime = _messages.BooleanField(1)
 
 
 class GoogleCloudMlV1BuiltInAlgorithmOutput(_messages.Message):
@@ -254,6 +312,62 @@ class GoogleCloudMlV1Capability(_messages.Message):
   type = _messages.EnumField('TypeValueValuesEnum', 2)
 
 
+class GoogleCloudMlV1CheckTrialEarlyStoppingStateMetatdata(_messages.Message):
+  r"""This message will be placed in the metadata field of a
+  google.longrunning.Operation associated with a CheckTrialEarlyStoppingState
+  request.
+
+  Fields:
+    createTime: The time operation was submitted.
+    study: The name of the study that the trial belongs to.
+    trial: The Trial name.
+  """
+
+  createTime = _messages.StringField(1)
+  study = _messages.StringField(2)
+  trial = _messages.StringField(3)
+
+
+class GoogleCloudMlV1CheckTrialEarlyStoppingStateRequest(_messages.Message):
+  r"""The request message for the CheckTrialEarlyStoppingState service method.
+  """
+
+
+
+class GoogleCloudMlV1CheckTrialEarlyStoppingStateResponse(_messages.Message):
+  r"""The message will be placed in the response field of a completed
+  google.longrunning.Operation associated with a CheckTrialEarlyStoppingState
+  request.
+
+  Fields:
+    endTime: The time operation processing completed.
+    shouldStop: True if the Trial should stop.
+    startTime: The time operation was started.
+  """
+
+  endTime = _messages.StringField(1)
+  shouldStop = _messages.BooleanField(2)
+  startTime = _messages.StringField(3)
+
+
+class GoogleCloudMlV1CompleteTrialRequest(_messages.Message):
+  r"""The request message for the CompleteTrial service method.
+
+  Fields:
+    finalMeasurement: Optional. If provided, it will be used as the completed
+      trial's final_measurement; Otherwise, the service will auto-select a
+      previously reported measurement as the final-measurement
+    infeasibleReason: Optional. A human readable reason why the Trial was
+      infeasible. This should only be provided if `trial_infeasible` is true.
+    trialInfeasible: Optional. True if the trial cannot be run with the given
+      Parameter, and final_measurement will be ignored.
+  """
+
+  finalMeasurement = _messages.MessageField('GoogleCloudMlV1Measurement', 1)
+  infeasibleReason = _messages.StringField(2)
+  trialInfeasible = _messages.BooleanField(3)
+
+
 class GoogleCloudMlV1Config(_messages.Message):
   r"""A GoogleCloudMlV1Config object.
 
@@ -262,6 +376,92 @@ class GoogleCloudMlV1Config(_messages.Message):
   """
 
   tpuServiceAccount = _messages.StringField(1)
+
+
+class GoogleCloudMlV1ContainerPort(_messages.Message):
+  r"""ContainerPort represents a network port in a single container.
+
+  Fields:
+    containerPort: Number of port to expose on the pod's IP address. This must
+      be a valid port number, 0 < x < 65536.
+  """
+
+  containerPort = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+
+
+class GoogleCloudMlV1ContainerSpec(_messages.Message):
+  r"""Specify a custom container to deploy. Our ContainerSpec is a subset of
+  the Kubernetes Container specification.
+  https://kubernetes.io/docs/reference/generated/kubernetes-
+  api/v1.10/#container-v1-core
+
+  Fields:
+    args: Immutable. Arguments to the entrypoint. The docker image's CMD is
+      used if this is not provided. Variable references $(VAR_NAME) are
+      expanded using the container's environment. If a variable cannot be
+      resolved, the reference in the input string will be unchanged. The
+      $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME).
+      Escaped references will never be expanded, regardless of whether the
+      variable exists or not. More info: https://kubernetes.io/docs/tasks
+      /inject-data-application/define-command-argument-container/#running-a
+      -command-in-a-shell
+    command: Immutable. Entrypoint array. Not executed within a shell. The
+      docker image's ENTRYPOINT is used if this is not provided. Variable
+      references $(VAR_NAME) are expanded using the container's environment.
+      If a variable cannot be resolved, the reference in the input string will
+      be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$,
+      ie: $$(VAR_NAME). Escaped references will never be expanded, regardless
+      of whether the variable exists or not. More info:
+      https://kubernetes.io/docs/tasks/inject-data-application/define-command-
+      argument-container/#running-a-command-in-a-shell
+    env: Immutable. List of environment variables to set in the container.
+    image: Docker image name. More info:
+      https://kubernetes.io/docs/concepts/containers/images
+    ports: Immutable. List of ports to expose from the container. Exposing a
+      port here gives the system additional information about the network
+      connections a container uses, but is primarily informational. Not
+      specifying a port here DOES NOT prevent that port from being exposed.
+      Any port which is listening on the default "0.0.0.0" address inside a
+      container will be accessible from the network.
+  """
+
+  args = _messages.StringField(1, repeated=True)
+  command = _messages.StringField(2, repeated=True)
+  env = _messages.MessageField('GoogleCloudMlV1EnvVar', 3, repeated=True)
+  image = _messages.StringField(4)
+  ports = _messages.MessageField('GoogleCloudMlV1ContainerPort', 5, repeated=True)
+
+
+class GoogleCloudMlV1EncryptionConfig(_messages.Message):
+  r"""Represents a custom encryption key configuration that can be applied to
+  a resource.
+
+  Fields:
+    kmsKeyName: The Cloud KMS resource identifier of the customer managed
+      encryption key used to protect a resource, such as a training job. Has
+      the form: `projects/my-project/locations/my-region/keyRings/my-
+      kr/cryptoKeys/my-key`.
+  """
+
+  kmsKeyName = _messages.StringField(1)
+
+
+class GoogleCloudMlV1EnvVar(_messages.Message):
+  r"""EnvVar represents an environment variable present in a Container.
+
+  Fields:
+    name: Name of the environment variable. Must be a C_IDENTIFIER.
+    value: Variable references $(VAR_NAME) are expanded using the previous
+      defined environment variables in the container and any service
+      environment variables. If a variable cannot be resolved, the reference
+      in the input string will be unchanged. The $(VAR_NAME) syntax can be
+      escaped with a double $$, ie: $$(VAR_NAME). Escaped references will
+      never be expanded, regardless of whether the variable exists or not.
+      Defaults to "".
+  """
+
+  name = _messages.StringField(1)
+  value = _messages.StringField(2)
 
 
 class GoogleCloudMlV1ExplainRequest(_messages.Message):
@@ -276,29 +476,48 @@ class GoogleCloudMlV1ExplainRequest(_messages.Message):
 
 class GoogleCloudMlV1ExplanationConfig(_messages.Message):
   r"""Message holding configuration options for explaining model predictions.
-  Currently, the only supported mechanism to explain a model's prediction is
-  through attributing its output back to its inputs which is essentially a
-  credit assignment task. We support multiple attribution methods, some
-  specific to particular frameworks like Tensorflow and XGBoost. Next idx: 7.
+  There are two feature attribution methods supported for TensorFlow models:
+  integrated gradients and sampled Shapley. [Learn more about feature
+  attributions.](/ml-engine/docs/ai-explanations/overview)
 
   Fields:
-    ablationAttribution: Tensorflow framework explanation methods.
-    integratedGradientsAttribution: A
-      GoogleCloudMlV1IntegratedGradientsAttribution attribute.
-    saabasAttribution: A GoogleCloudMlV1SaabasAttribution attribute.
-    sampledShapleyAttribution: A GoogleCloudMlV1SampledShapleyAttribution
-      attribute.
-    samplingShapAttribution: A GoogleCloudMlV1SamplingShapAttribution
-      attribute.
-    treeShapAttribution: XGBoost Framework explanation methods.
+    ablationAttribution: TensorFlow framework explanation methods. Attributes
+      credit to model inputs by ablating features (ie. setting them to their
+      default/missing values) and computing corresponding model score delta
+      per feature. The term "ablation" is in reference to running an "ablation
+      study" to analyze input effects on the outcome of interest, which in
+      this case is the model's output. This attribution method is supported
+      for TensorFlow and XGBoost models.
+    integratedGradientsAttribution: Attributes credit by computing the Aumann-
+      Shapley value taking advantage of the model's fully differentiable
+      structure. Refer to this paper for more details:
+      http://proceedings.mlr.press/v70/sundararajan17a.html
+    saabasAttribution: Attributes credit by running a faster aproximation to
+      the TreeShap method. Please refer to this link for more details:
+      https://blog.datadive.net/interpreting-random-forests/ This attribution
+      method is only supported for XGBoost models.
+    sampledShapleyAttribution: An attribution method that approximates Shapley
+      values for features that contribute to the label being predicted. A
+      sampling strategy is used to approximate the value rather than
+      considering all subsets of features.
+    treeShapAttribution: XGBoost framework explanation methods. Attributes
+      credit by computing the Shapley value taking advantage of the model's
+      tree ensemble structure. Refer to this paper for more details:
+      http://papers.nips.cc/paper/7062-a-unified-approach-to-interpreting-
+      model-predictions.pdf. This attribution method is supported for XGBoost
+      models.
+    xraiAttribution: Attributes credit by computing the XRAI taking advantage
+      of the model's fully differentiable structure. Refer to this paper for
+      more details: https://arxiv.org/abs/1906.02825 Currently only
+      implemented for models with natural image inputs.
   """
 
   ablationAttribution = _messages.MessageField('GoogleCloudMlV1AblationAttribution', 1)
   integratedGradientsAttribution = _messages.MessageField('GoogleCloudMlV1IntegratedGradientsAttribution', 2)
   saabasAttribution = _messages.MessageField('GoogleCloudMlV1SaabasAttribution', 3)
   sampledShapleyAttribution = _messages.MessageField('GoogleCloudMlV1SampledShapleyAttribution', 4)
-  samplingShapAttribution = _messages.MessageField('GoogleCloudMlV1SamplingShapAttribution', 5)
-  treeShapAttribution = _messages.MessageField('GoogleCloudMlV1TreeShapAttribution', 6)
+  treeShapAttribution = _messages.MessageField('GoogleCloudMlV1TreeShapAttribution', 5)
+  xraiAttribution = _messages.MessageField('GoogleCloudMlV1XraiAttribution', 6)
 
 
 class GoogleCloudMlV1ExplanationInput(_messages.Message):
@@ -630,10 +849,12 @@ class GoogleCloudMlV1HyperparameterSpec(_messages.Message):
         search, all parameters must be `INTEGER`, `CATEGORICAL`, or
         `DISCRETE`.
       RANDOM_SEARCH: Simple random search within the feasible space.
+      POPULATION_BASED_TRAINING: Population Based Training Algorithm.
     """
     ALGORITHM_UNSPECIFIED = 0
     GRID_SEARCH = 1
     RANDOM_SEARCH = 2
+    POPULATION_BASED_TRAINING = 3
 
   class GoalValueValuesEnum(_messages.Enum):
     r"""Required. The type of goal to use for tuning. Available types are
@@ -822,6 +1043,26 @@ class GoogleCloudMlV1ListModelsResponse(_messages.Message):
   nextPageToken = _messages.StringField(2)
 
 
+class GoogleCloudMlV1ListStudiesResponse(_messages.Message):
+  r"""A GoogleCloudMlV1ListStudiesResponse object.
+
+  Fields:
+    studies: The Studies associated with the project.
+  """
+
+  studies = _messages.MessageField('GoogleCloudMlV1Study', 1, repeated=True)
+
+
+class GoogleCloudMlV1ListTrialsResponse(_messages.Message):
+  r"""The response message for the ListTrials method.
+
+  Fields:
+    trials: The trials associated with the study.
+  """
+
+  trials = _messages.MessageField('GoogleCloudMlV1Trial', 1, repeated=True)
+
+
 class GoogleCloudMlV1ListVersionsResponse(_messages.Message):
   r"""Response message for the ListVersions method.
 
@@ -860,6 +1101,35 @@ class GoogleCloudMlV1ManualScaling(_messages.Message):
   nodes = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
+class GoogleCloudMlV1Measurement(_messages.Message):
+  r"""A message representing a Measurement.
+
+  Fields:
+    elapsedTime: Time that the Trial has been running at the point of this
+      Measurement.
+    metrics: Provides a list of metrics that act as inputs into the objective
+      function.
+    stepCount: The number of steps a machine learning model has been trained
+      for. Must be non-negative.
+  """
+
+  elapsedTime = _messages.StringField(1)
+  metrics = _messages.MessageField('GoogleCloudMlV1MeasurementMetric', 2, repeated=True)
+  stepCount = _messages.IntegerField(3)
+
+
+class GoogleCloudMlV1MeasurementMetric(_messages.Message):
+  r"""A message representing a metric in the measurement.
+
+  Fields:
+    metric: Required. Metric name.
+    value: Required. The value for this metric.
+  """
+
+  metric = _messages.StringField(1)
+  value = _messages.FloatField(2)
+
+
 class GoogleCloudMlV1Model(_messages.Message):
   r"""Represents a machine learning solution.  A model can have multiple
   versions, each of which is a deployed, trained model ready to receive
@@ -876,8 +1146,7 @@ class GoogleCloudMlV1Model(_messages.Message):
     defaultVersion: Output only. The default version of the model. This
       version will be used to handle prediction requests that do not specify a
       version.  You can change the default version by calling
-      [projects.methods.versions.setDefault](/ml-
-      engine/reference/rest/v1/projects.models.versions/setDefault).
+      projects.models.versions.setDefault.
     description: Optional. The description specified for the model when it was
       created.
     etag: `etag` is used for optimistic concurrency control as a way to help
@@ -910,8 +1179,8 @@ class GoogleCloudMlV1Model(_messages.Message):
       prediction requests at a high queries per second rate (QPS). Estimate
       your costs before enabling this option.  Default is false.
     regions: Optional. The list of regions where the model is going to be
-      deployed. Currently only one region per model is supported. Defaults to
-      'us-central1' if nothing is set. See the <a href="/ml-
+      deployed. Only one region per model is supported. Defaults to 'us-
+      central1' if nothing is set. See the <a href="/ml-
       engine/docs/tensorflow/regions">available regions</a> for AI Platform
       services. Note: *   No matter where a model is deployed, it can always
       be accessed by     users from anywhere, both for online and batch
@@ -1295,7 +1564,9 @@ class GoogleCloudMlV1PredictRequest(_messages.Message):
   r"""Request for predictions to be issued against a trained model.
 
   Fields:
-    httpBody:  Required. The prediction request body.
+    httpBody:  Required. The prediction request body. Refer to the [request
+      body details section](#request-body-details) for more information on how
+      to structure your request.
   """
 
   httpBody = _messages.MessageField('GoogleApiHttpBody', 1)
@@ -1481,11 +1752,11 @@ class GoogleCloudMlV1ReplicaConfig(_messages.Message):
   Fields:
     acceleratorConfig: Represents the type and number of accelerators used by
       the replica. [Learn about restrictions on accelerator configurations for
-      training.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-
+      training.](/ai-platform/training/docs/using-gpus#compute-engine-machine-
       types-with-gpu)
     imageUri: The Docker image to run on the replica. This image must be in
       Container Registry. Learn more about [configuring custom containers
-      ](/ml-engine/docs/distributed-training-containers).
+      ](/ai-platform/training/docs/distributed-training-containers).
     tpuTfVersion: The AI Platform runtime version that includes a TensorFlow
       version matching the one used in the custom container. This field is
       required if the replica is a TPU worker that uses a custom container.
@@ -1521,9 +1792,9 @@ class GoogleCloudMlV1RequestLoggingConfig(_messages.Message):
     bigqueryTableName: Required. Fully qualified BigQuery table name in the
       following format:
       "<var>project_id</var>.<var>dataset_name</var>.<var>table_name</var>"
-      The specifcied table must already exist, and the "Cloud ML Service
-      Agent" for your project must have permission to write to it. The table
-      must have the following [schema](/bigquery/docs/schemas):  <table>
+      The specified table must already exist, and the "Cloud ML Service Agent"
+      for your project must have permission to write to it. The table must
+      have the following [schema](/bigquery/docs/schemas):  <table>
       <tr><th>Field name</th><th style="display: table-cell">Type</th>     <th
       style="display: table-cell">Mode</th></tr>
       <tr><td>model</td><td>STRING</td><td>REQUIRED</td></tr>
@@ -1542,6 +1813,20 @@ class GoogleCloudMlV1RequestLoggingConfig(_messages.Message):
   samplingPercentage = _messages.FloatField(2)
 
 
+class GoogleCloudMlV1RouteMap(_messages.Message):
+  r"""RouteMap is used to override HTTP paths sent to a Custom Container. If
+  specified, the HTTP server implemented in the ContainerSpec must support the
+  route. If unspecified, standard HTTP paths will be used.
+
+  Fields:
+    health: HTTP path to send health check requests.
+    predict: HTTP path to send prediction requests.
+  """
+
+  health = _messages.StringField(1)
+  predict = _messages.StringField(2)
+
+
 class GoogleCloudMlV1SaabasAttribution(_messages.Message):
   r"""Attributes credit by running a faster aproximation to the TreeShap
   method. Please refer to this link for more details:
@@ -1558,32 +1843,385 @@ class GoogleCloudMlV1SampledShapleyAttribution(_messages.Message):
 
   Fields:
     numPaths: The number of feature permutations to consider when
-      approximating the shapley values.
+      approximating the Shapley values.
   """
 
   numPaths = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
-class GoogleCloudMlV1SamplingShapAttribution(_messages.Message):
-  r"""DEPRECATED - use SampledShapleyAttribution.
+class GoogleCloudMlV1Scheduling(_messages.Message):
+  r"""All parameters related to scheduling of training jobs.
 
   Fields:
-    numPaths: A integer attribute.
+    maxRunningTime: Optional. The maximum job running time, expressed in
+      seconds. The field can contain up to nine fractional digits, terminated
+      by `s`. By default there is no limit to the running time.  If the
+      training job is still running after this duration, AI Platform Training
+      cancels it.  For example, if you want to ensure your job runs for no
+      more than 2 hours, set this field to `7200s` (2 hours * 60 minutes /
+      hour * 60 seconds / minute).  If you submit your training job using the
+      `gcloud` tool, you can [provide this field in a `config.yaml` file](/ai-
+      platform/training/docs/training-
+      jobs#formatting_your_configuration_parameters). For example:  ```yaml
+      trainingInput:   ...   scheduling:     maxRunningTime: 7200s   ... ```
   """
 
-  numPaths = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  maxRunningTime = _messages.StringField(1)
 
 
 class GoogleCloudMlV1SetDefaultVersionRequest(_messages.Message):
   r"""Request message for the SetDefaultVersion request."""
 
 
+class GoogleCloudMlV1StopTrialRequest(_messages.Message):
+  r"""A GoogleCloudMlV1StopTrialRequest object."""
+
+
+class GoogleCloudMlV1Study(_messages.Message):
+  r"""A message representing a Study.
+
+  Enums:
+    StateValueValuesEnum: Output only. The detailed state of a study.
+
+  Fields:
+    createTime: Output only. Time that the study was created.
+    inactiveReason: Output only. A human readable reason why the Study is
+      inactive. This should be empty if a study is ACTIVE or COMPLETED.
+    name: Output only. The name of a study.
+    state: Output only. The detailed state of a study.
+    studyConfig: Required. Configuration of the study.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Output only. The detailed state of a study.
+
+    Values:
+      STATE_UNSPECIFIED: The study state is unspecified.
+      ACTIVE: The study is active.
+      INACTIVE: The study is stopped due to an internal error.
+      COMPLETED: The study is done when the service exhausts the parameter
+        search space or max_trial_count is reached.
+    """
+    STATE_UNSPECIFIED = 0
+    ACTIVE = 1
+    INACTIVE = 2
+    COMPLETED = 3
+
+  createTime = _messages.StringField(1)
+  inactiveReason = _messages.StringField(2)
+  name = _messages.StringField(3)
+  state = _messages.EnumField('StateValueValuesEnum', 4)
+  studyConfig = _messages.MessageField('GoogleCloudMlV1StudyConfig', 5)
+
+
+class GoogleCloudMlV1StudyConfig(_messages.Message):
+  r"""Represents configuration of a study.
+
+  Enums:
+    AlgorithmValueValuesEnum: The search algorithm specified for the study.
+
+  Fields:
+    algorithm: The search algorithm specified for the study.
+    automatedStoppingConfig: Configuration for automated stopping of
+      unpromising Trials.
+    metrics: A GoogleCloudMlV1StudyConfigMetricSpec attribute.
+    parameters: Required. The set of parameters to tune.
+  """
+
+  class AlgorithmValueValuesEnum(_messages.Enum):
+    r"""The search algorithm specified for the study.
+
+    Values:
+      ALGORITHM_UNSPECIFIED: The default algorithm used by the Cloud AI
+        Platform Optimization service.
+      GAUSSIAN_PROCESS_BANDIT: Gaussian Process Bandit.
+      GRID_SEARCH: Simple grid search within the feasible space. To use grid
+        search, all parameters must be `INTEGER`, `CATEGORICAL`, or
+        `DISCRETE`.
+      RANDOM_SEARCH: Simple random search within the feasible space.
+    """
+    ALGORITHM_UNSPECIFIED = 0
+    GAUSSIAN_PROCESS_BANDIT = 1
+    GRID_SEARCH = 2
+    RANDOM_SEARCH = 3
+
+  algorithm = _messages.EnumField('AlgorithmValueValuesEnum', 1)
+  automatedStoppingConfig = _messages.MessageField('GoogleCloudMlV1AutomatedStoppingConfig', 2)
+  metrics = _messages.MessageField('GoogleCloudMlV1StudyConfigMetricSpec', 3, repeated=True)
+  parameters = _messages.MessageField('GoogleCloudMlV1StudyConfigParameterSpec', 4, repeated=True)
+
+
+class GoogleCloudMlV1StudyConfigMetricSpec(_messages.Message):
+  r"""Represents a metric to optimize.
+
+  Enums:
+    GoalValueValuesEnum: Required. The optimization goal of the metric.
+
+  Fields:
+    goal: Required. The optimization goal of the metric.
+    metric: Required. The name of the metric.
+  """
+
+  class GoalValueValuesEnum(_messages.Enum):
+    r"""Required. The optimization goal of the metric.
+
+    Values:
+      GOAL_TYPE_UNSPECIFIED: Goal Type will default to maximize.
+      MAXIMIZE: Maximize the goal metric.
+      MINIMIZE: Minimize the goal metric.
+    """
+    GOAL_TYPE_UNSPECIFIED = 0
+    MAXIMIZE = 1
+    MINIMIZE = 2
+
+  goal = _messages.EnumField('GoalValueValuesEnum', 1)
+  metric = _messages.StringField(2)
+
+
+class GoogleCloudMlV1StudyConfigParameterSpec(_messages.Message):
+  r"""Represents a single parameter to optimize.
+
+  Enums:
+    ScaleTypeValueValuesEnum: How the parameter should be scaled. Leave unset
+      for categorical parameters.
+    TypeValueValuesEnum: Required. The type of the parameter.
+
+  Fields:
+    categoricalValueSpec: The value spec for a 'CATEGORICAL' parameter.
+    childParameterSpecs: A child node is active if the parameter's value
+      matches the child node's matching_parent_values.  If two items in
+      child_parameter_specs have the same name, they must have disjoint
+      matching_parent_values.
+    discreteValueSpec: The value spec for a 'DISCRETE' parameter.
+    doubleValueSpec: The value spec for a 'DOUBLE' parameter.
+    integerValueSpec: The value spec for an 'INTEGER' parameter.
+    parameter: Required. The parameter name must be unique amongst all
+      ParameterSpecs.
+    parentCategoricalValues: A
+      GoogleCloudMlV1StudyConfigParameterSpecMatchingParentCategoricalValueSpe
+      c attribute.
+    parentDiscreteValues: A
+      GoogleCloudMlV1StudyConfigParameterSpecMatchingParentDiscreteValueSpec
+      attribute.
+    parentIntValues: A
+      GoogleCloudMlV1StudyConfigParameterSpecMatchingParentIntValueSpec
+      attribute.
+    scaleType: How the parameter should be scaled. Leave unset for categorical
+      parameters.
+    type: Required. The type of the parameter.
+  """
+
+  class ScaleTypeValueValuesEnum(_messages.Enum):
+    r"""How the parameter should be scaled. Leave unset for categorical
+    parameters.
+
+    Values:
+      SCALE_TYPE_UNSPECIFIED: By default, no scaling is applied.
+      UNIT_LINEAR_SCALE: Scales the feasible space to (0, 1) linearly.
+      UNIT_LOG_SCALE: Scales the feasible space logarithmically to (0, 1). The
+        entire feasible space must be strictly positive.
+      UNIT_REVERSE_LOG_SCALE: Scales the feasible space "reverse"
+        logarithmically to (0, 1). The result is that values close to the top
+        of the feasible space are spread out more than points near the bottom.
+        The entire feasible space must be strictly positive.
+    """
+    SCALE_TYPE_UNSPECIFIED = 0
+    UNIT_LINEAR_SCALE = 1
+    UNIT_LOG_SCALE = 2
+    UNIT_REVERSE_LOG_SCALE = 3
+
+  class TypeValueValuesEnum(_messages.Enum):
+    r"""Required. The type of the parameter.
+
+    Values:
+      PARAMETER_TYPE_UNSPECIFIED: You must specify a valid type. Using this
+        unspecified type will result in an error.
+      DOUBLE: Type for real-valued parameters.
+      INTEGER: Type for integral parameters.
+      CATEGORICAL: The parameter is categorical, with a value chosen from the
+        categories field.
+      DISCRETE: The parameter is real valued, with a fixed set of feasible
+        points. If `type==DISCRETE`, feasible_points must be provided, and
+        {`min_value`, `max_value`} will be ignored.
+    """
+    PARAMETER_TYPE_UNSPECIFIED = 0
+    DOUBLE = 1
+    INTEGER = 2
+    CATEGORICAL = 3
+    DISCRETE = 4
+
+  categoricalValueSpec = _messages.MessageField('GoogleCloudMlV1StudyConfigParameterSpecCategoricalValueSpec', 1)
+  childParameterSpecs = _messages.MessageField('GoogleCloudMlV1StudyConfigParameterSpec', 2, repeated=True)
+  discreteValueSpec = _messages.MessageField('GoogleCloudMlV1StudyConfigParameterSpecDiscreteValueSpec', 3)
+  doubleValueSpec = _messages.MessageField('GoogleCloudMlV1StudyConfigParameterSpecDoubleValueSpec', 4)
+  integerValueSpec = _messages.MessageField('GoogleCloudMlV1StudyConfigParameterSpecIntegerValueSpec', 5)
+  parameter = _messages.StringField(6)
+  parentCategoricalValues = _messages.MessageField('GoogleCloudMlV1StudyConfigParameterSpecMatchingParentCategoricalValueSpec', 7)
+  parentDiscreteValues = _messages.MessageField('GoogleCloudMlV1StudyConfigParameterSpecMatchingParentDiscreteValueSpec', 8)
+  parentIntValues = _messages.MessageField('GoogleCloudMlV1StudyConfigParameterSpecMatchingParentIntValueSpec', 9)
+  scaleType = _messages.EnumField('ScaleTypeValueValuesEnum', 10)
+  type = _messages.EnumField('TypeValueValuesEnum', 11)
+
+
+class GoogleCloudMlV1StudyConfigParameterSpecCategoricalValueSpec(_messages.Message):
+  r"""A GoogleCloudMlV1StudyConfigParameterSpecCategoricalValueSpec object.
+
+  Fields:
+    values: Must be specified if type is `CATEGORICAL`. The list of possible
+      categories.
+  """
+
+  values = _messages.StringField(1, repeated=True)
+
+
+class GoogleCloudMlV1StudyConfigParameterSpecDiscreteValueSpec(_messages.Message):
+  r"""A GoogleCloudMlV1StudyConfigParameterSpecDiscreteValueSpec object.
+
+  Fields:
+    values: Must be specified if type is `DISCRETE`. A list of feasible
+      points. The list should be in strictly increasing order. For instance,
+      this parameter might have possible settings of 1.5, 2.5, and 4.0. This
+      list should not contain more than 1,000 values.
+  """
+
+  values = _messages.FloatField(1, repeated=True)
+
+
+class GoogleCloudMlV1StudyConfigParameterSpecDoubleValueSpec(_messages.Message):
+  r"""A GoogleCloudMlV1StudyConfigParameterSpecDoubleValueSpec object.
+
+  Fields:
+    maxValue: Must be specified if type is `DOUBLE`. Maximum value of the
+      parameter.
+    minValue: Must be specified if type is `DOUBLE`. Minimum value of the
+      parameter.
+  """
+
+  maxValue = _messages.FloatField(1)
+  minValue = _messages.FloatField(2)
+
+
+class GoogleCloudMlV1StudyConfigParameterSpecIntegerValueSpec(_messages.Message):
+  r"""A GoogleCloudMlV1StudyConfigParameterSpecIntegerValueSpec object.
+
+  Fields:
+    maxValue: Must be specified if type is `INTEGER`. Maximum value of the
+      parameter.
+    minValue: Must be specified if type is `INTEGER`. Minimum value of the
+      parameter.
+  """
+
+  maxValue = _messages.IntegerField(1)
+  minValue = _messages.IntegerField(2)
+
+
+class GoogleCloudMlV1StudyConfigParameterSpecMatchingParentCategoricalValueSpec(_messages.Message):
+  r"""Represents the spec to match categorical values from parent parameter.
+
+  Fields:
+    values: Matches values of the parent parameter with type 'CATEGORICAL'.
+      All values must exist in `categorical_value_spec` of parent parameter.
+  """
+
+  values = _messages.StringField(1, repeated=True)
+
+
+class GoogleCloudMlV1StudyConfigParameterSpecMatchingParentDiscreteValueSpec(_messages.Message):
+  r"""Represents the spec to match discrete values from parent parameter.
+
+  Fields:
+    values: Matches values of the parent parameter with type 'DISCRETE'. All
+      values must exist in `discrete_value_spec` of parent parameter.
+  """
+
+  values = _messages.FloatField(1, repeated=True)
+
+
+class GoogleCloudMlV1StudyConfigParameterSpecMatchingParentIntValueSpec(_messages.Message):
+  r"""Represents the spec to match integer values from parent parameter.
+
+  Fields:
+    values: Matches values of the parent parameter with type 'INTEGER'. All
+      values must lie in `integer_value_spec` of parent parameter.
+  """
+
+  values = _messages.IntegerField(1, repeated=True)
+
+
+class GoogleCloudMlV1SuggestTrialsMetadata(_messages.Message):
+  r"""Metadata field of a google.longrunning.Operation associated with a
+  SuggestTrialsRequest.
+
+  Fields:
+    clientId: The identifier of the client that is requesting the suggestion.
+    createTime: The time operation was submitted.
+    study: The name of the study that the trial belongs to.
+    suggestionCount: The number of suggestions requested.
+  """
+
+  clientId = _messages.StringField(1)
+  createTime = _messages.StringField(2)
+  study = _messages.StringField(3)
+  suggestionCount = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+
+
+class GoogleCloudMlV1SuggestTrialsRequest(_messages.Message):
+  r"""The request message for the SuggestTrial service method.
+
+  Fields:
+    clientId: Required. The identifier of the client that is requesting the
+      suggestion.  If multiple SuggestTrialsRequests have the same
+      `client_id`, the service will return the identical suggested trial if
+      the trial is pending, and provide a new trial if the last suggested
+      trial was completed.
+    suggestionCount: Required. The number of suggestions requested.
+  """
+
+  clientId = _messages.StringField(1)
+  suggestionCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+
+
+class GoogleCloudMlV1SuggestTrialsResponse(_messages.Message):
+  r"""This message will be placed in the response field of a completed
+  google.longrunning.Operation associated with a SuggestTrials request.
+
+  Enums:
+    StudyStateValueValuesEnum: The state of the study.
+
+  Fields:
+    endTime: The time operation processing completed.
+    startTime: The time operation was started.
+    studyState: The state of the study.
+    trials: A list of Trials.
+  """
+
+  class StudyStateValueValuesEnum(_messages.Enum):
+    r"""The state of the study.
+
+    Values:
+      STATE_UNSPECIFIED: The study state is unspecified.
+      ACTIVE: The study is active.
+      INACTIVE: The study is stopped due to an internal error.
+      COMPLETED: The study is done when the service exhausts the parameter
+        search space or max_trial_count is reached.
+    """
+    STATE_UNSPECIFIED = 0
+    ACTIVE = 1
+    INACTIVE = 2
+    COMPLETED = 3
+
+  endTime = _messages.StringField(1)
+  startTime = _messages.StringField(2)
+  studyState = _messages.EnumField('StudyStateValueValuesEnum', 3)
+  trials = _messages.MessageField('GoogleCloudMlV1Trial', 4, repeated=True)
+
+
 class GoogleCloudMlV1TrainingInput(_messages.Message):
   r"""Represents input parameters for a training job. When using the gcloud
   command to submit your training job, you can specify the input parameters as
   command-line arguments and/or in a YAML configuration file referenced from
-  the --config command-line argument. For details, see the guide to <a href
-  ="/ml-engine/docs/tensorflow/training-jobs">submitting a training job</a>.
+  the --config command-line argument. For details, see the guide to
+  [submitting a training job](/ai-platform/training/docs/training-jobs).
 
   Enums:
     ScaleTierValueValuesEnum: Required. Specifies the machine types, the
@@ -1591,6 +2229,31 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
 
   Fields:
     args: Optional. Command line arguments to pass to the program.
+    encryptionConfig: Custom encryption key options for a training job. If
+      this is set, then all resources created by the training job will be
+      encrypted with the provided encryption key.
+    evaluatorConfig: Optional. The configuration for evaluators.  You should
+      only set `evaluatorConfig.acceleratorConfig` if `evaluatorType` is set
+      to a Compute Engine machine type. [Learn about restrictions on
+      accelerator configurations for training.](/ai-platform/training/docs
+      /using-gpus#compute-engine-machine-types-with-gpu)  Set
+      `evaluatorConfig.imageUri` only if you build a custom image for your
+      evaluator. If `evaluatorConfig.imageUri` has not been set, AI Platform
+      uses the value of `masterConfig.imageUri`. Learn more about [configuring
+      custom containers](/ai-platform/training/docs/distributed-training-
+      containers).
+    evaluatorCount: Optional. The number of evaluator replicas to use for the
+      training job. Each replica in the cluster will be of the type specified
+      in `evaluator_type`.  This value can only be used when `scale_tier` is
+      set to `CUSTOM`. If you set this value, you must also set
+      `evaluator_type`.  The default value is zero.
+    evaluatorType: Optional. Specifies the type of virtual machine to use for
+      your training job's evaluator nodes.  The supported values are the same
+      as those described in the entry for `masterType`.  This value must be
+      consistent with the category of machine type that `masterType` uses. In
+      other words, both must be Compute Engine machine types or both must be
+      legacy machine types.  This value must be present when `scaleTier` is
+      set to `CUSTOM` and `evaluatorCount` is greater than zero.
     hyperparameters: Optional. The set of Hyperparameters to tune.
     jobDir: Optional. A Google Cloud Storage path in which to store training
       outputs and other data needed for training. This path is passed to your
@@ -1600,12 +2263,12 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
     masterConfig: Optional. The configuration for your master worker.  You
       should only set `masterConfig.acceleratorConfig` if `masterType` is set
       to a Compute Engine machine type. Learn about [restrictions on
-      accelerator configurations for training.](/ml-engine/docs/tensorflow
+      accelerator configurations for training.](/ai-platform/training/docs
       /using-gpus#compute-engine-machine-types-with-gpu)  Set
       `masterConfig.imageUri` only if you build a custom image. Only one of
       `masterConfig.imageUri` and `runtimeVersion` should be set. Learn more
-      about [configuring custom containers](/ml-engine/docs/distributed-
-      training-containers).
+      about [configuring custom containers](/ai-platform/training/docs
+      /distributed-training-containers).
     masterType: Optional. Specifies the type of virtual machine to use for
       your training job's master worker. You must specify this field when
       `scaleTier` is set to `CUSTOM`.  You can use certain Compute Engine
@@ -1633,18 +2296,18 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
       number of package URIs is 100.
     parameterServerConfig: Optional. The configuration for parameter servers.
       You should only set `parameterServerConfig.acceleratorConfig` if
-      `parameterServerConfigType` is set to a Compute Engine machine type.
-      [Learn about restrictions on accelerator configurations for training
-      .](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-
-      with-gpu)  Set `parameterServerConfig.imageUri` only if you build a
-      custom image for your parameter server. If
-      `parameterServerConfig.imageUri` has not been set, AI Platform uses the
-      value of `masterConfig.imageUri`. Learn more about [configuring custom
-      containers](/ml-engine/docs/distributed-training-containers).
+      `parameterServerType` is set to a Compute Engine machine type. [Learn
+      about restrictions on accelerator configurations for training.](/ai-
+      platform/training/docs/using-gpus#compute-engine-machine-types-with-gpu)
+      Set `parameterServerConfig.imageUri` only if you build a custom image
+      for your parameter server. If `parameterServerConfig.imageUri` has not
+      been set, AI Platform uses the value of `masterConfig.imageUri`. Learn
+      more about [configuring custom containers](/ai-platform/training/docs
+      /distributed-training-containers).
     parameterServerCount: Optional. The number of parameter server replicas to
       use for the training job. Each replica in the cluster will be of the
       type specified in `parameter_server_type`.  This value can only be used
-      when `scale_tier` is set to `CUSTOM`.If you set this value, you must
+      when `scale_tier` is set to `CUSTOM`. If you set this value, you must
       also set `parameter_server_type`.  The default value is zero.
     parameterServerType: Optional. Specifies the type of virtual machine to
       use for your training job's parameter server.  The supported values are
@@ -1656,33 +2319,40 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
       than zero.
     pythonModule: Required. The Python module name to run after installing the
       packages.
-    pythonVersion: Optional. The version of Python used in training. If not
-      set, the default version is '2.7'. Python '3.5' is available when
-      `runtime_version` is set to '1.4' and above. Python '2.7' works with all
-      supported <a href="/ml-engine/docs/runtime-version-list">runtime
-      versions</a>.
-    region: Required. The Google Compute Engine region to run the training job
-      in. See the <a href="/ml-engine/docs/tensorflow/regions">available
-      regions</a> for AI Platform services.
+    pythonVersion: Optional. The version of Python used in training. You must
+      either specify this field or specify `masterConfig.imageUri`.  The
+      following Python versions are available:  * Python '3.7' is available
+      when `runtime_version` is set to '1.15' or   later. * Python '3.5' is
+      available when `runtime_version` is set to a version   from '1.4' to
+      '1.14'. * Python '2.7' is available when `runtime_version` is set to
+      '1.15' or   earlier.  Read more about the Python versions available for
+      [each runtime version](/ml-engine/docs/runtime-version-list).
+    region: Required. The region to run the training job in. See the
+      [available regions](/ai-platform/training/docs/regions) for AI Platform
+      Training.
     runtimeVersion: Optional. The AI Platform runtime version to use for
-      training. If not set, AI Platform uses the default stable version, 1.0.
-      For more information, see the <a href="/ml-engine/docs/runtime-version-
-      list">runtime version list</a> and <a href="/ml-
-      engine/docs/versioning">how to manage runtime versions</a>.
+      training. You must either specify this field or specify
+      `masterConfig.imageUri`.  For more information, see the [runtime version
+      list](/ai-platform/training/docs/runtime-version-list) and learn [how to
+      manage runtime versions](/ai-platform/training/docs/versioning).
     scaleTier: Required. Specifies the machine types, the number of replicas
       for workers and parameter servers.
-    useChiefInTfConfig: Optional. Use 'chief' instead of 'master' in TF_CONFIG
-      when Custom Container is used and evaluator is not specified.  Defaults
-      to false.
+    scheduling: Optional. Scheduling options for a training job.
+    useChiefInTfConfig: Optional. Use `chief` instead of `master` in the
+      `TF_CONFIG` environment variable when training with a custom container.
+      Defaults to `false`. [Learn more about this field.](/ai-
+      platform/training/docs/distributed-training-details#chief-versus-master)
+      This field has no effect for training jobs that don't use a custom
+      container.
     workerConfig: Optional. The configuration for workers.  You should only
       set `workerConfig.acceleratorConfig` if `workerType` is set to a Compute
       Engine machine type. [Learn about restrictions on accelerator
-      configurations for training.](/ml-engine/docs/tensorflow/using-gpus
+      configurations for training.](/ai-platform/training/docs/using-gpus
       #compute-engine-machine-types-with-gpu)  Set `workerConfig.imageUri`
       only if you build a custom image for your worker. If
       `workerConfig.imageUri` has not been set, AI Platform uses the value of
       `masterConfig.imageUri`. Learn more about [configuring custom containers
-      ](/ml-engine/docs/distributed-training-containers).
+      ](/ai-platform/training/docs/distributed-training-containers).
     workerCount: Optional. The number of worker replicas to use for the
       training job. Each replica in the cluster will be of the type specified
       in `worker_type`.  This value can only be used when `scale_tier` is set
@@ -1710,8 +2380,8 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
         datasets.
       STANDARD_1: Many workers and a few parameter servers.
       PREMIUM_1: A large number of workers with many parameter servers.
-      BASIC_GPU: A single worker instance [with a GPU](/ml-
-        engine/docs/tensorflow/using-gpus).
+      BASIC_GPU: A single worker instance [with a GPU](/ai-
+        platform/training/docs/using-gpus).
       BASIC_TPU: A single worker instance with a [Cloud TPU](/ml-
         engine/docs/tensorflow/using-tpus).
       CUSTOM: The CUSTOM tier is not a set tier, but rather enables you to use
@@ -1740,24 +2410,29 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
     CUSTOM = 5
 
   args = _messages.StringField(1, repeated=True)
-  hyperparameters = _messages.MessageField('GoogleCloudMlV1HyperparameterSpec', 2)
-  jobDir = _messages.StringField(3)
-  masterConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 4)
-  masterType = _messages.StringField(5)
-  nasJobSpec = _messages.MessageField('GoogleCloudMlV1NasSpec', 6)
-  packageUris = _messages.StringField(7, repeated=True)
-  parameterServerConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 8)
-  parameterServerCount = _messages.IntegerField(9)
-  parameterServerType = _messages.StringField(10)
-  pythonModule = _messages.StringField(11)
-  pythonVersion = _messages.StringField(12)
-  region = _messages.StringField(13)
-  runtimeVersion = _messages.StringField(14)
-  scaleTier = _messages.EnumField('ScaleTierValueValuesEnum', 15)
-  useChiefInTfConfig = _messages.BooleanField(16)
-  workerConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 17)
-  workerCount = _messages.IntegerField(18)
-  workerType = _messages.StringField(19)
+  encryptionConfig = _messages.MessageField('GoogleCloudMlV1EncryptionConfig', 2)
+  evaluatorConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 3)
+  evaluatorCount = _messages.IntegerField(4)
+  evaluatorType = _messages.StringField(5)
+  hyperparameters = _messages.MessageField('GoogleCloudMlV1HyperparameterSpec', 6)
+  jobDir = _messages.StringField(7)
+  masterConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 8)
+  masterType = _messages.StringField(9)
+  nasJobSpec = _messages.MessageField('GoogleCloudMlV1NasSpec', 10)
+  packageUris = _messages.StringField(11, repeated=True)
+  parameterServerConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 12)
+  parameterServerCount = _messages.IntegerField(13)
+  parameterServerType = _messages.StringField(14)
+  pythonModule = _messages.StringField(15)
+  pythonVersion = _messages.StringField(16)
+  region = _messages.StringField(17)
+  runtimeVersion = _messages.StringField(18)
+  scaleTier = _messages.EnumField('ScaleTierValueValuesEnum', 19)
+  scheduling = _messages.MessageField('GoogleCloudMlV1Scheduling', 20)
+  useChiefInTfConfig = _messages.BooleanField(21)
+  workerConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 22)
+  workerCount = _messages.IntegerField(23)
+  workerType = _messages.StringField(24)
 
 
 class GoogleCloudMlV1TrainingOutput(_messages.Message):
@@ -1800,12 +2475,82 @@ class GoogleCloudMlV1TreeShapAttribution(_messages.Message):
 
 
 
+class GoogleCloudMlV1Trial(_messages.Message):
+  r"""A message representing a Trial.
+
+  Enums:
+    StateValueValuesEnum: The detailed state of a trial.
+
+  Fields:
+    clientId: Output only. The identifier of the client that originally
+      requested this trial.
+    endTime: Output only. Time the Trial's status changed to COMPLETED.
+    finalMeasurement: The final Measurement containing the objective value.
+    infeasibleReason: Output only. A human readable string describing why the
+      Trial is infeasible. This should only be set if trial_infeasible is
+      true.
+    measurements: A list of measurements that are strictly lexicographically
+      ordered by their induced tuples (steps, elapsed_time). These are used
+      for early stopping computations.
+    name: Output only. Name of the trial assigned by the service.
+    parameters: The parameters of the Trial.
+    startTime: Output only. Time the Trial was started.
+    state: The detailed state of a trial.
+    trialInfeasible: Output only. True if the parameters in this trial should
+      not be attempted again.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""The detailed state of a trial.
+
+    Values:
+      STATE_UNSPECIFIED: The trial state is unspecified.
+      REQUESTED: Indicates that a specific Trial has been requested, but it
+        has not yet been suggested by the service.
+      ACTIVE: Indicates that the Trial has been suggested.
+      COMPLETED: Indicates that the Trial is done, and either has a
+        final_measurement set, or is marked as trial_infeasible.
+      STOPPING: Indicates that the Trial should stop according to the service.
+    """
+    STATE_UNSPECIFIED = 0
+    REQUESTED = 1
+    ACTIVE = 2
+    COMPLETED = 3
+    STOPPING = 4
+
+  clientId = _messages.StringField(1)
+  endTime = _messages.StringField(2)
+  finalMeasurement = _messages.MessageField('GoogleCloudMlV1Measurement', 3)
+  infeasibleReason = _messages.StringField(4)
+  measurements = _messages.MessageField('GoogleCloudMlV1Measurement', 5, repeated=True)
+  name = _messages.StringField(6)
+  parameters = _messages.MessageField('GoogleCloudMlV1TrialParameter', 7, repeated=True)
+  startTime = _messages.StringField(8)
+  state = _messages.EnumField('StateValueValuesEnum', 9)
+  trialInfeasible = _messages.BooleanField(10)
+
+
+class GoogleCloudMlV1TrialParameter(_messages.Message):
+  r"""A message representing a parameter to be tuned.
+
+  Fields:
+    floatValue: Must be set if ParameterType is DOUBLE or DISCRETE.
+    intValue: Must be set if ParameterType is INTEGER
+    parameter: The name of the parameter.
+    stringValue: Must be set if ParameterTypeis CATEGORICAL
+  """
+
+  floatValue = _messages.FloatField(1)
+  intValue = _messages.IntegerField(2)
+  parameter = _messages.StringField(3)
+  stringValue = _messages.StringField(4)
+
+
 class GoogleCloudMlV1Version(_messages.Message):
   r"""Represents a version of the model.  Each version is a trained model
   deployed in the cloud, ready to handle prediction requests. A model can have
   multiple versions. You can get information about all of the versions of a
-  given model by calling [projects.models.versions.list](/ml-
-  engine/reference/rest/v1/projects.models.versions/list).
+  given model by calling projects.models.versions.list.
 
   Enums:
     FrameworkValueValuesEnum: Optional. The machine learning framework AI
@@ -1841,16 +2586,16 @@ class GoogleCloudMlV1Version(_messages.Message):
       that you cannot use AutoScaling if your version uses
       [GPUs](#Version.FIELDS.accelerator_config). Instead, you must use
       specify `manual_scaling`.
+    container: A GoogleCloudMlV1ContainerSpec attribute.
     createTime: Output only. The time the version was created.
     deploymentUri: Required. The Cloud Storage location of the trained model
       used to create the version. See the [guide to model deployment](/ml-
       engine/docs/tensorflow/deploying-models) for more information.  When
-      passing Version to [projects.models.versions.create](/ml-
-      engine/reference/rest/v1/projects.models.versions/create) the model
-      service uses the specified location as the source of the model. Once
-      deployed, the model version is hosted by the prediction service, so this
-      location is useful only as a historical record. The total number of
-      model files can't exceed 1000.
+      passing Version to projects.models.versions.create the model service
+      uses the specified location as the source of the model. Once deployed,
+      the model version is hosted by the prediction service, so this location
+      is useful only as a historical record. The total number of model files
+      can't exceed 1000.
     description: Optional. The description specified for the version when it
       was created.
     errorMessage: Output only. The details of a failure or a cancellation.
@@ -1879,8 +2624,7 @@ class GoogleCloudMlV1Version(_messages.Message):
       This image must be in Google Container Registry.
     isDefault: Output only. If true, this version will be used to handle
       prediction requests that do not specify a version.  You can change the
-      default version by calling [projects.methods.versions.setDefault](/ml-
-      engine/reference/rest/v1/projects.models.versions/setDefault).
+      default version by calling projects.methods.versions.setDefault.
     labels: Optional. One or more labels that you can add, to organize your
       model versions. Each label is a key-value pair, where both the key and
       the value are arbitrary strings that you supply. For more information,
@@ -1950,15 +2694,20 @@ class GoogleCloudMlV1Version(_messages.Message):
       "     raise NotImplementedError() </pre>  Learn more about [the
       Predictor interface and custom prediction routines](/ml-
       engine/docs/tensorflow/custom-prediction-routines).
-    pythonVersion: Optional. The version of Python used in prediction. If not
-      set, the default version is '2.7'. Python '3.5' is available when
-      `runtime_version` is set to '1.4' and above. Python '2.7' works with all
-      supported runtime versions.
-    requestLoggingConfig: Optional. Configures the request-response pair
-      logging on predictions from this Version.
-    runtimeVersion: Optional. The AI Platform runtime version to use for this
-      deployment. If not set, AI Platform uses the default stable version,
-      1.0. For more information, see the [runtime version list](/ml-
+    pythonVersion: Required. The version of Python used in prediction.  The
+      following Python versions are available:  * Python '3.7' is available
+      when `runtime_version` is set to '1.15' or   later. * Python '3.5' is
+      available when `runtime_version` is set to a version   from '1.4' to
+      '1.14'. * Python '2.7' is available when `runtime_version` is set to
+      '1.15' or   earlier.  Read more about the Python versions available for
+      [each runtime version](/ml-engine/docs/runtime-version-list).
+    requestLoggingConfig: Optional. *Only* specify this field in a
+      projects.models.versions.patch request. Specifying it in a
+      projects.models.versions.create request has no effect.  Configures the
+      request-response pair logging on predictions from this Version.
+    routes: A GoogleCloudMlV1RouteMap attribute.
+    runtimeVersion: Required. The AI Platform runtime version to use for this
+      deployment.  For more information, see the [runtime version list](/ml-
       engine/docs/runtime-version-list) and [how to manage runtime versions
       ](/ml-engine/docs/versioning).
     serviceAccount: Optional. Specifies the service account for resource
@@ -2045,28 +2794,45 @@ class GoogleCloudMlV1Version(_messages.Message):
 
   acceleratorConfig = _messages.MessageField('GoogleCloudMlV1AcceleratorConfig', 1)
   autoScaling = _messages.MessageField('GoogleCloudMlV1AutoScaling', 2)
-  createTime = _messages.StringField(3)
-  deploymentUri = _messages.StringField(4)
-  description = _messages.StringField(5)
-  errorMessage = _messages.StringField(6)
-  etag = _messages.BytesField(7)
-  explanationConfig = _messages.MessageField('GoogleCloudMlV1ExplanationConfig', 8)
-  framework = _messages.EnumField('FrameworkValueValuesEnum', 9)
-  imageUri = _messages.StringField(10)
-  isDefault = _messages.BooleanField(11)
-  labels = _messages.MessageField('LabelsValue', 12)
-  lastUseTime = _messages.StringField(13)
-  machineType = _messages.StringField(14)
-  manualScaling = _messages.MessageField('GoogleCloudMlV1ManualScaling', 15)
-  modelClass = _messages.StringField(16)
-  name = _messages.StringField(17)
-  packageUris = _messages.StringField(18, repeated=True)
-  predictionClass = _messages.StringField(19)
-  pythonVersion = _messages.StringField(20)
-  requestLoggingConfig = _messages.MessageField('GoogleCloudMlV1RequestLoggingConfig', 21)
-  runtimeVersion = _messages.StringField(22)
-  serviceAccount = _messages.StringField(23)
-  state = _messages.EnumField('StateValueValuesEnum', 24)
+  container = _messages.MessageField('GoogleCloudMlV1ContainerSpec', 3)
+  createTime = _messages.StringField(4)
+  deploymentUri = _messages.StringField(5)
+  description = _messages.StringField(6)
+  errorMessage = _messages.StringField(7)
+  etag = _messages.BytesField(8)
+  explanationConfig = _messages.MessageField('GoogleCloudMlV1ExplanationConfig', 9)
+  framework = _messages.EnumField('FrameworkValueValuesEnum', 10)
+  imageUri = _messages.StringField(11)
+  isDefault = _messages.BooleanField(12)
+  labels = _messages.MessageField('LabelsValue', 13)
+  lastUseTime = _messages.StringField(14)
+  machineType = _messages.StringField(15)
+  manualScaling = _messages.MessageField('GoogleCloudMlV1ManualScaling', 16)
+  modelClass = _messages.StringField(17)
+  name = _messages.StringField(18)
+  packageUris = _messages.StringField(19, repeated=True)
+  predictionClass = _messages.StringField(20)
+  pythonVersion = _messages.StringField(21)
+  requestLoggingConfig = _messages.MessageField('GoogleCloudMlV1RequestLoggingConfig', 22)
+  routes = _messages.MessageField('GoogleCloudMlV1RouteMap', 23)
+  runtimeVersion = _messages.StringField(24)
+  serviceAccount = _messages.StringField(25)
+  state = _messages.EnumField('StateValueValuesEnum', 26)
+
+
+class GoogleCloudMlV1XraiAttribution(_messages.Message):
+  r"""Attributes credit by computing the XRAI taking advantage of the model's
+  fully differentiable structure. Refer to this paper for more details:
+  https://arxiv.org/abs/1906.02825 Currently only implemented for models with
+  natural image inputs.
+
+  Fields:
+    numIntegralSteps: Number of steps for approximating the path integral. A
+      good value to start is 50 and gradually increase until the sum to diff
+      property is met within the desired error range.
+  """
+
+  numIntegralSteps = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
 class GoogleIamV1AuditConfig(_messages.Message):
@@ -2158,7 +2924,7 @@ class GoogleIamV1Binding(_messages.Message):
       that represents a Google group.    For example, `admins@example.com`.  *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
-      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
       recovered, this value reverts to `user:{emailid}` and the recovered user
       retains the role in the binding.  *
       `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
@@ -2185,15 +2951,16 @@ class GoogleIamV1Binding(_messages.Message):
 
 
 class GoogleIamV1Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.   A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**      {       "bindings": [         {
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.   A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**      {       "bindings": [         {
   "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-project-
@@ -2202,23 +2969,24 @@ class GoogleIamV1Policy(_messages.Message):
   ["user:eve@example.com"],           "condition": {             "title":
   "expirable access",             "description": "Does not grant access after
   Sep 2020",             "expression": "request.time <
-  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
-  **YAML Example**      bindings:     - members:       - user:mike@example.com
-  - group:admins@example.com       - domain:google.com       - serviceAccount
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
+  "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
+  bindings:     - members:       - user:mike@example.com       -
+  group:admins@example.com       - domain:google.com       - serviceAccount
   :my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
   grant access after Sep 2020         expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  timestamp('2020-10-01T00:00:00.000Z')     - etag: BwWWja0YfJA=     -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
     auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -2226,19 +2994,24 @@ class GoogleIamV1Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy   that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
   auditConfigs = _messages.MessageField('GoogleIamV1AuditConfig', 1, repeated=True)
@@ -2472,21 +3245,33 @@ class GoogleRpcStatus(_messages.Message):
 
 
 class GoogleTypeExpr(_messages.Message):
-  r"""Represents an expression text. Example:      title: "User account
-  presence"     description: "Determines whether the request has a user
-  account"     expression: "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit"     description: "Determines if a summary is
+  less than 100 chars"     expression: "document.summary.size() < 100"
+  Example (Equality):      title: "Requestor is owner"     description:
+  "Determines if requestor is the document owner"     expression:
+  "document.owner == request.auth.claims.email"  Example (Logic):      title:
+  "Public documents"     description: "Determine whether the document should
+  be publicly visible"     expression: "document.type != 'private' &&
+  document.type != 'internal'"  Example (Data Manipulation):      title:
+  "Notification string"     description: "Create a notification string with a
+  timestamp."     expression: "'New message received at ' +
+  string(document.create_time)"  The exact variables and functions that may be
+  referenced within an expression are determined by the service that evaluates
+  it. See the service documentation for additional information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
@@ -2688,6 +3473,184 @@ class MlProjectsLocationsListRequest(_messages.Message):
   parent = _messages.StringField(3, required=True)
 
 
+class MlProjectsLocationsOperationsCancelRequest(_messages.Message):
+  r"""A MlProjectsLocationsOperationsCancelRequest object.
+
+  Fields:
+    name: The name of the operation resource to be cancelled.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class MlProjectsLocationsOperationsGetRequest(_messages.Message):
+  r"""A MlProjectsLocationsOperationsGetRequest object.
+
+  Fields:
+    name: The name of the operation resource.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class MlProjectsLocationsStudiesCreateRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesCreateRequest object.
+
+  Fields:
+    googleCloudMlV1Study: A GoogleCloudMlV1Study resource to be passed as the
+      request body.
+    parent: Required. The project and location that the study belongs to.
+      Format: projects/{project}/locations/{location}
+    studyId: Required. The ID to use for the study, which will become the
+      final component of the study's resource name.
+  """
+
+  googleCloudMlV1Study = _messages.MessageField('GoogleCloudMlV1Study', 1)
+  parent = _messages.StringField(2, required=True)
+  studyId = _messages.StringField(3)
+
+
+class MlProjectsLocationsStudiesDeleteRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesDeleteRequest object.
+
+  Fields:
+    name: Required. The study name.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class MlProjectsLocationsStudiesGetRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesGetRequest object.
+
+  Fields:
+    name: Required. The study name.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class MlProjectsLocationsStudiesListRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesListRequest object.
+
+  Fields:
+    parent: Required. The project and location that the study belongs to.
+      Format: projects/{project}/locations/{location}
+  """
+
+  parent = _messages.StringField(1, required=True)
+
+
+class MlProjectsLocationsStudiesTrialsAddMeasurementRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesTrialsAddMeasurementRequest object.
+
+  Fields:
+    googleCloudMlV1AddTrialMeasurementRequest: A
+      GoogleCloudMlV1AddTrialMeasurementRequest resource to be passed as the
+      request body.
+    name: Required. The trial name.
+  """
+
+  googleCloudMlV1AddTrialMeasurementRequest = _messages.MessageField('GoogleCloudMlV1AddTrialMeasurementRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class MlProjectsLocationsStudiesTrialsCheckEarlyStoppingStateRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesTrialsCheckEarlyStoppingStateRequest object.
+
+  Fields:
+    googleCloudMlV1CheckTrialEarlyStoppingStateRequest: A
+      GoogleCloudMlV1CheckTrialEarlyStoppingStateRequest resource to be passed
+      as the request body.
+    name: Required. The trial name.
+  """
+
+  googleCloudMlV1CheckTrialEarlyStoppingStateRequest = _messages.MessageField('GoogleCloudMlV1CheckTrialEarlyStoppingStateRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class MlProjectsLocationsStudiesTrialsCompleteRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesTrialsCompleteRequest object.
+
+  Fields:
+    googleCloudMlV1CompleteTrialRequest: A GoogleCloudMlV1CompleteTrialRequest
+      resource to be passed as the request body.
+    name: Required. The trial name.
+  """
+
+  googleCloudMlV1CompleteTrialRequest = _messages.MessageField('GoogleCloudMlV1CompleteTrialRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class MlProjectsLocationsStudiesTrialsCreateRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesTrialsCreateRequest object.
+
+  Fields:
+    googleCloudMlV1Trial: A GoogleCloudMlV1Trial resource to be passed as the
+      request body.
+    parent: Required. The name of the study that the trial belongs to.
+  """
+
+  googleCloudMlV1Trial = _messages.MessageField('GoogleCloudMlV1Trial', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class MlProjectsLocationsStudiesTrialsDeleteRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesTrialsDeleteRequest object.
+
+  Fields:
+    name: Required. The trial name.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class MlProjectsLocationsStudiesTrialsGetRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesTrialsGetRequest object.
+
+  Fields:
+    name: Required. The trial name.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class MlProjectsLocationsStudiesTrialsListRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesTrialsListRequest object.
+
+  Fields:
+    parent: Required. The name of the study that the trial belongs to.
+  """
+
+  parent = _messages.StringField(1, required=True)
+
+
+class MlProjectsLocationsStudiesTrialsStopRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesTrialsStopRequest object.
+
+  Fields:
+    googleCloudMlV1StopTrialRequest: A GoogleCloudMlV1StopTrialRequest
+      resource to be passed as the request body.
+    name: Required. The trial name.
+  """
+
+  googleCloudMlV1StopTrialRequest = _messages.MessageField('GoogleCloudMlV1StopTrialRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class MlProjectsLocationsStudiesTrialsSuggestRequest(_messages.Message):
+  r"""A MlProjectsLocationsStudiesTrialsSuggestRequest object.
+
+  Fields:
+    googleCloudMlV1SuggestTrialsRequest: A GoogleCloudMlV1SuggestTrialsRequest
+      resource to be passed as the request body.
+    parent: Required. The name of the study that the trial belongs to.
+  """
+
+  googleCloudMlV1SuggestTrialsRequest = _messages.MessageField('GoogleCloudMlV1SuggestTrialsRequest', 1)
+  parent = _messages.StringField(2, required=True)
+
+
 class MlProjectsModelsCreateRequest(_messages.Message):
   r"""A MlProjectsModelsCreateRequest object.
 
@@ -2831,8 +3794,7 @@ class MlProjectsModelsVersionsDeleteRequest(_messages.Message):
 
   Fields:
     name: Required. The name of the version. You can get the names of all the
-      versions of a model by calling [projects.models.versions.list](/ml-
-      engine/reference/rest/v1/projects.models.versions/list).
+      versions of a model by calling projects.models.versions.list.
   """
 
   name = _messages.StringField(1, required=True)
@@ -2882,9 +3844,10 @@ class MlProjectsModelsVersionsPatchRequest(_messages.Message):
       be specified as `description`, and the `PATCH` request body would
       specify the new value, as follows:  ``` {   "description": "foo" } ```
       Currently the only supported update mask fields are `description`,
-      `autoScaling.minNodes`, and `manualScaling.nodes`. However, you can only
-      update `manualScaling.nodes` if the version uses a [Compute Engine (N1)
-      machine type](/ml-engine/docs/machine-types-online-prediction).
+      `requestLoggingConfig`, `autoScaling.minNodes`, and
+      `manualScaling.nodes`. However, you can only update
+      `manualScaling.nodes` if the version uses a [Compute Engine (N1) machine
+      type](/ml-engine/docs/machine-types-online-prediction).
   """
 
   googleCloudMlV1Version = _messages.MessageField('GoogleCloudMlV1Version', 1)
@@ -2901,8 +3864,7 @@ class MlProjectsModelsVersionsSetDefaultRequest(_messages.Message):
       request body.
     name: Required. The name of the version to make the default for the model.
       You can get the names of all the versions of a model by calling
-      [projects.models.versions.list](/ml-
-      engine/reference/rest/v1/projects.models.versions/list).
+      projects.models.versions.list.
   """
 
   googleCloudMlV1SetDefaultVersionRequest = _messages.MessageField('GoogleCloudMlV1SetDefaultVersionRequest', 1)

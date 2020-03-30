@@ -22,9 +22,11 @@ import copy
 
 from googlecloudsdk.api_lib.orgpolicy import utils as org_policy_utils
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.labelmanager import arguments as label_manager_arguments
 from googlecloudsdk.command_lib.org_policies import arguments
 from googlecloudsdk.command_lib.org_policies import exceptions
 from googlecloudsdk.command_lib.org_policies import interfaces
+from googlecloudsdk.command_lib.org_policies import utils
 
 
 @base.Hidden
@@ -38,22 +40,49 @@ class DisableEnforce(interfaces.OrgPolicyGetAndUpdateCommand):
 
   ## EXAMPLES
 
-  To disable enforcement of the constraint `iam.disableServiceAccountCreation`
-  on the project `foo-project`, run:
+  To disable enforcement of the constraint 'iam.disableServiceAccountCreation'
+  on the Project 'foo-project', run:
 
     $ {command} iam.disableServiceAccountCreation --project=foo-project
 
-  To only disable enforcement for resources that have the label value `2222`
-  associated with the label key `1111`, run:
+  To only disable enforcement for resources that have the LabelValue '2222'
+  associated with the LabelKey '1111', run:
 
     $ {command} iam.disableServiceAccountCreation --project=foo-project \
     --condition='resource.matchLabels("labelKeys/1111", "labelValues/2222")'
+
+  To disable enforcement of the policy behavior for the Project 'foo-project'
+  conditioned on the LabelValue 'dev' under LabelKey 'env' that lives under
+  'organizations/123' run:
+
+    $ {command} iam.disableServiceAccountCreation --project=foo-project \
+    --condition='resource.matchLabels("env", "dev")' \
+    --label-parent='organizations/123'
   """
 
   @staticmethod
   def Args(parser):
     super(DisableEnforce, DisableEnforce).Args(parser)
     arguments.AddConditionFlagToParser(parser)
+    label_manager_arguments.AddLabelParentArgToParser(
+        parser, False,
+        ('This flag must be specified as the parent of the LabelKey when the '
+         'input for a condition expression is set as the LabelKey and '
+         'LabelValue display names.')
+    )
+
+  def Run(self, args):
+    """Extends the superclass method to process label aliasing.
+
+    Args:
+      args: argparse.Namespace, An object that contains the values for the
+        arguments specified in the Args method.
+    """
+
+    if args.IsSpecified('condition') and args.IsSpecified('label_parent'):
+      utils.TransformLabelDisplayNameConditionToLabelNameCondition(args)
+
+    return super(DisableEnforce, self).Run(args)
 
   def UpdatePolicy(self, policy, args):
     """Disables enforcement by removing old rules containing the specified condition and creating a new rule with enforce set to False.

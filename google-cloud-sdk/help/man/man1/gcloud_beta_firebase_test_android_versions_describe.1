@@ -38,23 +38,18 @@ versions list.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To describe an Android OS version available for testing, run:
+To see attributes of the Android OS version 'my\-version', run:
 
 .RS 2m
-gcloud beta firebase test android versions describe Q
-.RE
-
-To describe an Android OS version available for testing in JSON format, run:
-
-.RS 2m
-gcloud beta firebase test android versions describe Q \-\-format=json
+$ gcloud beta firebase test android versions describe my\-version
 .RE
 
 

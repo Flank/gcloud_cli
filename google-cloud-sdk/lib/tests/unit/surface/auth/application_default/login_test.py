@@ -18,10 +18,12 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import os
+import textwrap
 
 from googlecloudsdk.api_lib.auth import util as auth_util
 from googlecloudsdk.core import config
 from googlecloudsdk.core.console import console_io
+from googlecloudsdk.core.credentials import creds
 from googlecloudsdk.core.credentials import gce
 from googlecloudsdk.core.credentials import store
 from googlecloudsdk.core.util import files
@@ -32,6 +34,27 @@ from tests.lib import test_case
 import mock
 from mock import patch
 from oauth2client import client
+
+
+def _GetJsonUserADC():
+  return textwrap.dedent("""\
+      {
+        "client_id": "foo.apps.googleusercontent.com",
+        "client_secret": "file-secret",
+        "refresh_token": "file-token",
+        "type": "authorized_user"
+      }""")
+
+
+def _GetJsonUserExtendedADC():
+  return textwrap.dedent("""\
+      {
+        "client_id": "foo.apps.googleusercontent.com",
+        "client_secret": "file-secret",
+        "quota_project_id": "fake-project",
+        "refresh_token": "file-token",
+        "type": "authorized_user"
+      }""")
 
 
 class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
@@ -49,7 +72,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_browser = self.StartPatch('webbrowser.get', autospec=True)
     self.mock_browser.return_value.name = 'Chrome'
 
-    self.mock_adc_file_path = self.StartObjectPatch(auth_util, 'ADCFilePath')
+    self.mock_adc_file_path = self.StartObjectPatch(config, 'ADCFilePath')
     self.mock_adc_file_path.return_value = os.path.join(
         self.temp_path, 'ADC')
 
@@ -154,8 +177,8 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.return_value = fake_cred
     self.StartObjectPatch(
         files, 'PrivatizeFile').side_effect = files.Error('Error')
-    with self.assertRaisesRegex(
-        store.CredentialFileSaveError, 'Error saving Application'):
+    with self.assertRaisesRegex(creds.CredentialFileSaveError,
+                                'Error saving Application'):
       self.Login()
 
   def testBrowserBlacklist(self):
@@ -296,6 +319,27 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.Login()
     self.AssertErrContains('Credentials saved to file')
     self.AssertFileExists(self.temp_path, 'junk', 'ADC')
+
+  def testLoginWithQuotaProject(self):
+    self.mock_webflow.return_value = creds.FromJson(_GetJsonUserADC())
+    self.Login('--add-quota-project')
+    self.AssertFileEquals(_GetJsonUserExtendedADC(),
+                          os.path.join(self.temp_path, 'ADC'))
+    self.AssertErrContains("Quota project 'fake-project' was added to ADC")
+
+  def testLoginWithoutQuotaProject(self):
+    self.mock_webflow.return_value = creds.FromJson(_GetJsonUserADC())
+    self.Login()
+    self.AssertFileEquals(_GetJsonUserADC(),
+                          os.path.join(self.temp_path, 'ADC'))
+
+  def testLoginWithQuotaProject_WithClientID(self):
+    client_id_file = self.Resource('tests', 'unit', 'surface', 'auth',
+                                   'test_data', 'client_id_file.json')
+    self.mock_run_webflow.return_value = creds.FromJson(_GetJsonUserADC())
+    self.Login(more_args='--client-id-file {file}'.format(file=client_id_file))
+    self.AssertFileEquals(_GetJsonUserADC(),
+                          os.path.join(self.temp_path, 'ADC'))
 
 
 if __name__ == '__main__':

@@ -20,6 +20,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.dataproc import exceptions
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
@@ -29,24 +31,31 @@ from tests.lib.surface.dataproc import unit_base
 class ClustersDeleteUnitTest(unit_base.DataprocUnitTestBase):
   """Tests for dataproc clusters delete."""
 
-  def ExpectDeleteCluster(
-      self, cluster_name=None, response=None, exception=None):
+  def ExpectDeleteCluster(self,
+                          cluster_name=None,
+                          response=None,
+                          exception=None,
+                          region=None,
+                          use_default_region=True):
     if not cluster_name:
       cluster_name = self.CLUSTER_NAME
+    if region is None and use_default_region:
+      region = self.REGION
     if not (response or exception):
       response = self.MakeOperation()
     self.mock_client.projects_regions_clusters.Delete.Expect(
         self.messages.DataprocProjectsRegionsClustersDeleteRequest(
             clusterName=cluster_name,
-            region=self.REGION,
+            region=region,
             projectId=self.Project(),
             requestId=self.REQUEST_ID),
         response=response,
         exception=exception)
 
-  def ExpectDeleteCalls(self, error=None):
+  def ExpectDeleteCalls(self, error=None, region=None, use_default_region=True):
     # Create cluster returns operation pending
-    self.ExpectDeleteCluster()
+    self.ExpectDeleteCluster(
+        region=region, use_default_region=use_default_region)
     # Initial get operation returns pending
     self.ExpectGetOperation()
     # Second get operation returns done
@@ -121,6 +130,35 @@ class ClustersDeleteUnitTest(unit_base.DataprocUnitTestBase):
     with self.AssertRaisesHttpExceptionMatches(
         'Permission denied API reason: Permission denied.'):
       self.RunDataproc('clusters delete {0}'.format(self.CLUSTER_NAME))
+
+  def testDeleteClusterWithRegionProperty(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self.ExpectDeleteCalls(region='us-central1')
+    expected = self.MakeCompletedOperation()
+    self.WriteInput('y\n')
+    result = self.RunDataproc('clusters delete {}'.format(self.CLUSTER_NAME))
+    self.AssertErrContains(
+        "The cluster 'test-cluster' and all attached disks will be deleted.")
+    self.AssertErrContains('PROMPT_CONTINUE')
+    self.AssertMessagesEqual(expected, result)
+
+  def testDeleteClusterWithRegionFlag(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self.ExpectDeleteCalls(region='us-east1')
+    expected = self.MakeCompletedOperation()
+    self.WriteInput('y\n')
+    result = self.RunDataproc('clusters delete {} --region us-east1'.format(
+        self.CLUSTER_NAME))
+    self.AssertErrContains(
+        "The cluster 'test-cluster' and all attached disks will be deleted.")
+    self.AssertErrContains('PROMPT_CONTINUE')
+    self.AssertMessagesEqual(expected, result)
+
+  def testDeleteClusterWithoutRegion(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('clusters delete ' + self.CLUSTER_NAME, set_region=False)
 
 
 class ClustersDeleteUnitTestBeta(ClustersDeleteUnitTest,

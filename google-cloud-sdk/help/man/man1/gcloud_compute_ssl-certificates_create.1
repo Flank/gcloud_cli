@@ -11,16 +11,16 @@ gcloud compute ssl\-certificates create \- create a Google Compute Engine SSL ce
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute ssl\-certificates create\fR \fINAME\fR \fB\-\-certificate\fR=\fILOCAL_FILE_PATH\fR \fB\-\-private\-key\fR=\fILOCAL_FILE_PATH\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute ssl\-certificates create\fR \fINAME\fR \fB\-\-certificate\fR=\fILOCAL_FILE_PATH\fR \fB\-\-private\-key\fR=\fILOCAL_FILE_PATH\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fBgcloud compute ssl\-certificates create\fR is used to create SSL certificates
-which can be used to configure a target HTTPS proxy. An SSL certificate consists
-of a certificate and private key. The private key is encrypted before it is
-stored. For more information, see:
+\fBgcloud compute ssl\-certificates create\fR creates SSL certificates, which
+you can use in a target HTTPS or target SSL proxy. An SSL certificate resource
+consists of a certificate and private key. The private key is encrypted before
+it is stored. For more information, see:
 https://cloud.google.com/load\-balancing/docs/ssl\-certificates
 
 
@@ -61,7 +61,44 @@ use RSA or ECDSA encryption.
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional, textual description for the SSL certificate.
 
+.TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the SSL certificate is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the SSL certificate to create. If not specified, you may be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
 .RE
 .sp
 
@@ -70,8 +107,21 @@ An optional, textual description for the SSL certificate.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a certificate 'my\-cert' from a certificate placed under path
+\'foo/cert' and a private key placed under path 'foo/pk', run:
+
+.RS 2m
+$ gcloud compute ssl\-certificates create my\-cert \e
+  \-\-certificate=foo/cert \-\-private\-key=foo/pk
+.RE
 
 
 

@@ -41,37 +41,38 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create or update a variable named "my-var", run:
 
         $ gcloud beta runtime-config configs variables set \
-            --config-name my-config my-var "my value"
+            --config-name=my-config my-var "my value"
 
     To create or update a variable with a hierarchical name, such as
     "results/task1", run:
 
         $ gcloud beta runtime-config configs variables set \
-            --config-name my-config results/task1 "my value"
+            --config-name=my-config results/task1 "my value"
 
     To create a variable, but fail if it already exists, run:
 
         $ gcloud beta runtime-config configs variables set \
-            --config-name my-config my-var "my-value" --fail-if-present
+            --config-name=my-config my-var "my-value" --fail-if-present
 
     To update a variable, but fail if it does not exist, run:
 
         $ gcloud beta runtime-config configs variables set \
-            --config-name my-config my-var "my-value" --fail-if-absent
+            --config-name=my-config my-var "my-value" --fail-if-absent
 
     It is possible to provide --is-text flag if the value contains only text
     (UTF-8 encoded). This affects how the variable is transmitted on the wire
     and requires less quota on the backend.
 
         $ gcloud beta runtime-config configs variables set \
-            --config-name my-config --is-text my-var "my value"
+            --config-name=my-config --is-text my-var "my value"
 
     If the variable's value parameter is not specified, the value will be read
     from standard input. This allows setting variables to large values or

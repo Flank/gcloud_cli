@@ -39,7 +39,7 @@ class Create(base.CreateCommand):
       'EXAMPLES': """\
           To create a cluster, run:
 
-            $ {command} my_cluster
+            $ {command} my_cluster --region=us-central1
       """
   }
 
@@ -48,7 +48,11 @@ class Create(base.CreateCommand):
     dataproc = dp.Dataproc(cls.ReleaseTrack())
     base.ASYNC_FLAG.AddToParser(parser)
     flags.AddClusterResourceArg(parser, 'create', dataproc.api_version)
-    clusters.ArgsForClusterRef(parser, cls.BETA, include_ttl_config=True)
+    clusters.ArgsForClusterRef(
+        parser,
+        cls.BETA,
+        include_ttl_config=True,
+        include_gke_platform_args=cls.BETA)
     # Add gce-pd-kms-key args
     kms_flag_overrides = {
         'kms-key': '--gce-pd-kms-key',
@@ -61,23 +65,14 @@ class Create(base.CreateCommand):
 
   @staticmethod
   def ValidateArgs(args):
-
-    if args.single_node:
-      # --num-workers and --num-preemptible-workers must be None (unspecified)
-      # or 0
-      if args.num_workers:
-        raise exceptions.ConflictingArgumentsException(
-            '--single-node', '--num-workers')
-      if args.num_preemptible_workers:
-        raise exceptions.ConflictingArgumentsException(
-            '--single-node', '--num-preemptible-workers')
-
     if constants.ALLOW_ZERO_WORKERS_PROPERTY in args.properties:
       raise exceptions.InvalidArgumentException(
           '--properties',
           'Instead of %s, use gcloud beta dataproc clusters create '
           '--single-node to deploy single node clusters' %
           constants.ALLOW_ZERO_WORKERS_PROPERTY)
+
+    clusters.ValidateReservationAffinityGroup(args)
 
   def Run(self, args):
     self.ValidateArgs(args)
@@ -95,7 +90,8 @@ class Create(base.CreateCommand):
         cluster_ref.projectId,
         compute_resources,
         self.BETA,
-        include_ttl_config=True)
+        include_ttl_config=True,
+        include_gke_platform_args=self.BETA)
 
     cluster = dataproc.messages.Cluster(
         config=cluster_config,
@@ -104,8 +100,13 @@ class Create(base.CreateCommand):
 
     self.ConfigureCluster(dataproc.messages, args, cluster)
 
-    return clusters.CreateCluster(dataproc, cluster_ref, cluster, args.async_,
-                                  args.timeout)
+    return clusters.CreateCluster(
+        dataproc,
+        cluster_ref,
+        cluster,
+        args.async_,
+        args.timeout,
+        enable_create_on_gke=self.BETA)
 
   @staticmethod
   def ConfigureCluster(messages, args, cluster):

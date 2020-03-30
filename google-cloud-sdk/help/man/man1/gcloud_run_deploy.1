@@ -11,7 +11,7 @@ gcloud run deploy \- deploy a container to Cloud Run
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud run deploy\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] \fB\-\-image\fR=\fIIMAGE\fR [\fB\-\-async\fR] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-[no\-]allow\-unauthenticated\fR\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud run deploy\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] \fB\-\-image\fR=\fIIMAGE\fR [\fB\-\-args\fR=[\fIARG\fR,...]] [\fB\-\-async\fR] [\fB\-\-command\fR=[\fICOMMAND\fR,...]] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR\ \fB\-\-no\-traffic\fR\ \fB\-\-[no\-]use\-http2\fR\ \fB\-\-clear\-config\-maps\fR\ |\ \fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]\ \fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-secrets\fR\ |\ \fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]\ \fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-[no\-]allow\-unauthenticated\fR\ \fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -58,8 +58,21 @@ Name of the container image to deploy (e.g. \f5gcr.io/cloudrun/hello:latest\fR).
 
 .RS 2m
 .TP 2m
+\fB\-\-args\fR=[\fIARG\fR,...]
+Comma\-separated arguments passed to the command run by the container image. If
+not specified and no '\-\-command' is provided, the container image's default
+Cmd is used. Otherwise, if not specified, no arguments are passed. To reset this
+field to its default, pass an empty string.
+
+.TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-command\fR=[\fICOMMAND\fR,...]
+Entrypoint for the container image. If not specified, the container image's
+default Entrypoint is run. To reset this field to its default, pass an empty
+string.
 
 .TP 2m
 \fB\-\-concurrency\fR=\fICONCURRENCY\fR
@@ -68,9 +81,13 @@ concurrency of 0 or unspecified indicates any number of concurrent requests are
 allowed. To unset this field, provide the special value \f5default\fR.
 
 .TP 2m
+\fB\-\-cpu\fR=\fICPU\fR
+Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
+
+.TP 2m
 \fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR
-The maximum number of container instances of the Service to run or 'default' to
-remove any maximum.
+The maximum number of container instances of the Service to run. Use 'default'
+to unset the limit and use the platform default.
 
 .TP 2m
 \fB\-\-memory\fR=\fIMEMORY\fR
@@ -100,6 +117,12 @@ connecting.
 .RE
 .sp
 
+
+.TP 2m
+\fB\-\-port\fR=\fIPORT\fR
+Container port to receive requests at. Also sets the $PORT environment variable.
+Must be a number between 1 and 65535, inclusive. To unset this field, pass the
+special value "default".
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR
@@ -163,6 +186,8 @@ $ gcloud run deploy \-\-clear\-labels \-\-update\-labels foo=bar,baz=qux
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 .RE
 .sp
@@ -209,9 +234,102 @@ Visible only within the cluster.
 
 
 .TP 2m
-\fB\-\-cpu\fR=\fICPU\fR
-Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
+\fB\-\-min\-instances\fR=\fIMIN_INSTANCES\fR
+The minimum number of container instances of the Service to run or 'default' to
+remove any minimum.
 
+.TP 2m
+\fB\-\-no\-traffic\fR
+True to avoid sending traffic to the revision beign deployed. Setting this flag
+assigns any traffic assigned to the LATEST revision to the specific revision
+bound to LATEST before the deployment. The effect is that the revsion being
+deployed will not receive traffic. After a deployment with this flag the LATEST
+revision will not recieve traffic on future deployments.
+
+.TP 2m
+\fB\-\-[no\-]use\-http2\fR
+Whether to use HTTP/2 for connections to the service. Use \fB\-\-use\-http2\fR
+to enable and \fB\-\-no\-use\-http2\fR to disable.
+
+.TP 2m
+
+Specify config map to mount or provide as environment variables. Keys starting
+with a forward slash '/' are mount paths. All other keys correspond to
+environment variables. The values associated with each of these should be in the
+form CONFIG_MAP_NAME:KEY_IN_CONFIG_MAP; you may omit the key within the config
+map to specify a mount of all keys within the config map. For example:
+\'\-\-update\-config\-maps=/my/path=myconfig,ENV=otherconfig:key.json' will
+create a volume with config map 'myconfig' and mount that volume at '/my/path'.
+Because no config map key was specified, all keys in 'myconfig' will be
+included. An environment variable named ENV will also be created whose value is
+the value of 'key.json' in 'otherconfig'. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-config\-maps\fR
+Remove all config\-maps.
+
+.TP 2m
+\fB\-\-set\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as config\-maps. All existing config\-maps will
+be removed first.
+
+.TP 2m
+
+Only \-\-update\-config\-maps and \-\-remove\-config\-maps can be used together.
+If both are specified, \-\-remove\-config\-maps will be applied first.
+
+.RS 2m
+.TP 2m
+\fB\-\-remove\-config\-maps\fR=[\fIKEY\fR,...]
+List of config\-maps to be removed.
+
+.TP 2m
+\fB\-\-update\-config\-maps\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as config\-maps.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+Specify secrets to mount or provide as environment variables. Keys starting with
+a forward slash '/' are mount paths. All other keys correspond to environment
+variables. The values associated with each of these should be in the form
+SECRET_NAME:KEY_IN_SECRET; you may omit the key within the secret to specify a
+mount of all keys within the secret. For example:
+\'\-\-update\-secrets=/my/path=mysecret,ENV=othersecret:key.json' will create a
+volume with secret 'mysecret' and mount that volume at '/my/path'. Because no
+secret key was specified, all keys in 'mysecret' will be included. An
+environment variable named ENV will also be created whose value is the value of
+\'key.json' in 'othersecret'. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-secrets\fR
+Remove all secrets.
+
+.TP 2m
+\fB\-\-set\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as secrets. All existing secrets will be removed
+first.
+
+.TP 2m
+
+Only \-\-update\-secrets and \-\-remove\-secrets can be used together. If both
+are specified, \-\-remove\-secrets will be applied first.
+
+.RS 2m
+.TP 2m
+\fB\-\-remove\-secrets\fR=[\fIKEY\fR,...]
+List of secrets to be removed.
+
+.TP 2m
+\fB\-\-update\-secrets\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as secrets.
+
+.RE
+.RE
 .RE
 .sp
 .TP 2m
@@ -225,6 +343,13 @@ Only applicable if connecting to Cloud Run (fully managed). Specify
 Whether to enable allowing unauthenticated access to the service. This may take
 a few moments to take effect. Use \fB\-\-allow\-unauthenticated\fR to enable and
 \fB\-\-no\-allow\-unauthenticated\fR to disable.
+
+.TP 2m
+\fB\-\-revision\-suffix\fR=\fIREVISION_SUFFIX\fR
+Specify the suffix of the revision name. Revision names always start with the
+service name automatically. For example, specifying [\-\-revision\-suffix=v1]
+for a service named 'helloworld', would lead to a revision named
+\'helloworld\-v1'.
 
 .TP 2m
 \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
@@ -336,8 +461,9 @@ $KUBECONFIG is unset, this defaults to \f5~/.kube/config\fR.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

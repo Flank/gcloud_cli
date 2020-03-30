@@ -440,16 +440,6 @@ class BetaFirewallRulesCreateTest(FirewallRulesCreateTest):
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'beta')
 
-
-class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):
-
-  def SetUp(self):
-    self.api_version = 'alpha'
-    self.SelectApi(self.api_version)
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
-
   def testToggleLoggingMetadata(self):
     self.Run("""
         compute firewall-rules create firewall-1
@@ -479,6 +469,16 @@ class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):
         ' --action allow'
         ' --rules 123'
         ' --logging-metadata exclude-all')
+
+
+class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):
+
+  def SetUp(self):
+    self.api_version = 'alpha'
+    self.SelectApi(self.api_version)
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
 
 
 if __name__ == '__main__':

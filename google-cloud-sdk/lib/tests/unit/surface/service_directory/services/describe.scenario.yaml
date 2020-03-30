@@ -1,0 +1,92 @@
+title: service directory namespaces describe test scenario
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      service-directory services describe my-service --namespace my-namespace --location us-east1
+  - stdout: |
+      name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service
+- execute:
+  - command: |
+      service-directory services describe projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service
+  - stdout: |
+      name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service
+- execute:
+  - command: |
+      service-directory services describe my-service --namespace my-namespace --location us-east1
+  - stdout: |
+      metadata:
+        a: b
+      name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service
+actions:
+- execute_command:
+    command: |
+      service-directory services describe my-service --namespace my-namespace --location us-east1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service"
+            }
+
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      service-directory services describe projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service"
+            }
+
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      service-directory services describe my-service --namespace my-namespace --location us-east1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service",
+              "metadata": {
+                "a": "b"
+              }
+            }
+    - expect_stdout: |
+        metadata:
+          a: b
+        name: projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service
+    - expect_exit:
+        code: 0

@@ -26,7 +26,7 @@ class UrlMapsAddPathMatcherGaTest(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi('v1')
-    self._api = 'v1'
+    self._api = ''
     self._backend_services_uri_prefix = (
         self.compute_uri + '/projects/my-project/global/backendServices/')
     self._backend_buckets_uri_prefix = (
@@ -64,7 +64,7 @@ class UrlMapsAddPathMatcherGaTest(test_base.BaseTest):
         ],)
 
   def RunAddPathMatcher(self, command):
-    self.Run('compute url-maps add-path-matcher ' + command)
+    self.Run(self._api + ' compute url-maps add-path-matcher ' + command)
 
   def _MakeExpectedUrlMapGetRequest(self):
     return self.messages.ComputeUrlMapsGetRequest(
@@ -291,7 +291,7 @@ class UrlMapsAddPathMatcherGaTest(test_base.BaseTest):
           --backend-service-path-rules /search=https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/search-service,/search/*=https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/search-service,/images/*=https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/images-service
           --backend-bucket-path-rules /static/*=https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/static-bucket
           --new-hosts google.com
-        """ % {'api': self._api})
+        """ % {'api': self.api})
 
     expected_url_map = self.messages.UrlMap(
         name='url-map-1',
@@ -511,11 +511,8 @@ class UrlMapsAddPathMatcherBetaTest(UrlMapsAddPathMatcherGaTest):
         ],
     )
 
-  def RunAddPathMatcher(self, command):
-    self.Run('beta compute url-maps add-path-matcher --global' + command)
 
-
-class UrlMapsAddPathMatcherAlphaTest(UrlMapsAddPathMatcherGaTest):
+class UrlMapsAddPathMatcherAlphaTest(UrlMapsAddPathMatcherBetaTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
@@ -556,22 +553,19 @@ class UrlMapsAddPathMatcherAlphaTest(UrlMapsAddPathMatcherGaTest):
                 ]),
         ],)
 
-  def RunAddPathMatcher(self, command):
-    self.Run('alpha compute url-maps add-path-matcher --global' + command)
 
-
-class RegionUrlMapsAddPathMatcherBetaTest(test_base.BaseTest):
+class RegionUrlMapsAddPathMatcherTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self._api = 'beta'
+    self.SelectApi('v1')
+    self._api = ''
     self._backend_services_uri_prefix = (
         self.compute_uri +
         '/projects/my-project/regions/us-west-1/backendServices/')
     self._backend_buckets_uri_prefix = (
         self.compute_uri + '/projects/my-project/global/backendBuckets/')
 
-    self._url_maps_api = self.compute_beta.regionUrlMaps
+    self._url_maps_api = self.compute_v1.regionUrlMaps
 
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
@@ -616,8 +610,8 @@ class RegionUrlMapsAddPathMatcherBetaTest(test_base.BaseTest):
         region='us-west-1')
 
   def RunAddPathMatcher(self, command):
-    self.Run('beta compute url-maps add-path-matcher --region us-west-1 ' +
-             command)
+    self.Run(self._api +
+             ' compute url-maps add-path-matcher --region us-west-1 ' + command)
 
   def testWithPathRules(self):
     self.make_requests.side_effect = iter([
@@ -854,7 +848,7 @@ class RegionUrlMapsAddPathMatcherBetaTest(test_base.BaseTest):
           --backend-service-path-rules /search=https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/search-service,/search/*=https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/search-service,/images/*=https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/images-service
           --backend-bucket-path-rules /static/*=https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/static-bucket
           --new-hosts google.com
-        """ % {'api': self._api})
+        """ % {'api': self.api})
 
     expected_url_map = self.messages.UrlMap(
         name='url-map-1',
@@ -1050,6 +1044,51 @@ class RegionUrlMapsAddPathMatcherBetaTest(test_base.BaseTest):
         [(self._url_maps_api, 'Get', self._MakeExpectedUrlMapGetRequest())],)
 
 
+class RegionUrlMapsAddPathMatcherBetaTest(RegionUrlMapsAddPathMatcherTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._backend_services_uri_prefix = (
+        self.compute_uri +
+        '/projects/my-project/regions/us-west-1/backendServices/')
+    self._backend_buckets_uri_prefix = (
+        self.compute_uri + '/projects/my-project/global/backendBuckets/')
+
+    self._url_maps_api = self.compute_beta.regionUrlMaps
+
+    self._url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
+        region=self.compute_uri + '/projects/my-project/regions/us-west-1',
+        hostRules=[
+            self.messages.HostRule(
+                hosts=['*.youtube.com', 'youtube.com', '*-youtube.com'],
+                pathMatcher='youtube'),
+        ],
+        pathMatchers=[
+            self.messages.PathMatcher(
+                name='youtube',
+                defaultService=(self._backend_services_uri_prefix +
+                                'youtube-default'),
+                pathRules=[
+                    self.messages.PathRule(
+                        paths=['/search', '/search/*'],
+                        service=(self._backend_services_uri_prefix +
+                                 'youtube-search')),
+                    self.messages.PathRule(
+                        paths=['/static', '/static/*'],
+                        service=(self._backend_buckets_uri_prefix +
+                                 'static-bucket')),
+                    self.messages.PathRule(
+                        paths=['/watch', '/view', '/preview'],
+                        service=(self._backend_services_uri_prefix +
+                                 'youtube-watch')),
+                ]),
+        ],
+    )
+
+
 class RegionUrlMapsAddPathMatcherAlphaTest(RegionUrlMapsAddPathMatcherBetaTest):
 
   def SetUp(self):
@@ -1093,10 +1132,6 @@ class RegionUrlMapsAddPathMatcherAlphaTest(RegionUrlMapsAddPathMatcherBetaTest):
                 ]),
         ],
     )
-
-  def RunAddPathMatcher(self, command):
-    self.Run('alpha compute url-maps add-path-matcher --region us-west-1 ' +
-             command)
 
 
 if __name__ == '__main__':

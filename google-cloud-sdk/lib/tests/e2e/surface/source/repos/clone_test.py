@@ -26,6 +26,7 @@ import sys
 import gcloud
 from googlecloudsdk.api_lib.auth import service_account
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 from tests.lib import cli_test_base
@@ -52,7 +53,7 @@ class CloneTest(cli_test_base.CliTestBase):
     # credential manager. Overriding global to be empty will override system and
     # global setting.
     home_dir = os.path.join(self.temp_path, 'home')
-    self.prev_home_dir = os.environ.get('HOME')
+    self.prev_home_dir = encoding.GetEncodedValue(os.environ, 'HOME')
     os.environ['HOME'] = home_dir
     self.Touch(home_dir, '.gitconfig', contents=GIT_CONFIG, makedirs=True)
 

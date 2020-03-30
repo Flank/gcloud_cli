@@ -19,6 +19,27 @@ gcloud alpha monitoring channels list \- list notification channels
 
 \fB(ALPHA)\fR List notification channels.
 
+This operation supports both \-\-filter and \-\-sort\-by arguments.
+
+
+.SH "EXAMPLES"
+The following command lists all notification channels where the user label
+"team" has value "foo" and where the notification channel is of an "email" type:
+
+.RS 2m
+$ gcloud alpha monitoring channels list \e
+    \-\-filter='type="email" AND userLabels.team="foo"'
+.RE
+
+The following command lists all of the email addresses alphabetically:
+
+.RS 2m
+$ gcloud alpha monitoring channels list \e
+  \-\-filter='type="email"' \e
+  \-\-sort\-by=labels.email_address \e
+  \-\-format='value(labels.email_address)'
+.RE
+
 
 
 .SH "FLAGS"
@@ -77,8 +98,9 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -94,5 +116,9 @@ API can be found at: https://cloud.google.com/monitoring/api/
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta monitoring channels list
+.RE
 

@@ -70,13 +70,13 @@ different project for quota and billing, use \f5\-\-billing\-project\fR or
 .RS 2m
 .TP 2m
 \fB\-\-file\fR=\fIFILE\fR
-The Yaml file you want to use to update a role. Can not be specified with other
+The YAML file you want to use to update a role. Can not be specified with other
 flags except role\-id.
 
 .TP 2m
 
 The following flags determine the fields need to be updated. You can update a
-role by specifying the following flags, or you can update a role from a Yaml
+role by specifying the following flags, or you can update a role from a YAML
 file by specifying the file flag.
 
 .RS 2m
@@ -114,25 +114,26 @@ The title of the role you want to update.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To update a role from a Yaml file, run:
+To update the role \f5\fIProjectUpdater\fR\fR from a YAML file, run:
 
 .RS 2m
-$ gcloud beta iam roles update viewer \-\-organization 123 \e
-    \-\-file role_file_path
+$ gcloud beta iam roles update roles/ProjectUpdater \e
+    \-\-organization=123 \-\-file=role_file_path
 .RE
 
-To update a role with flags, run:
+To update the role \f5\fIProjectUpdater\fR\fR with flags, run:
 
 .RS 2m
-$ gcloud beta iam roles update viewer \-\-project myproject \e
-    \-\-permissions permission1,permission2
+$ gcloud beta iam roles update roles/ProjectUpdater \e
+    \-\-project=myproject \-\-permissions=permission1,permission2
 .RE
 
 

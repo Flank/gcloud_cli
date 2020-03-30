@@ -1,0 +1,184 @@
+title: Cloud API Gateway operations list test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway operations list --location global
+  - stdout: |
+      NAME                                                              DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+      projects/fake-project/locations/global/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+- execute:
+  - command: |
+      api-gateway operations list --location projects/project/locations/global
+  - stdout: |
+      NAME                                                              DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+      projects/fake-project/locations/global/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+- execute:
+  - command: api-gateway operations list
+  - stdout: |
+      NAME                                                                   DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+      projects/fake-project/locations/us-central1/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/us-central1/apis/fake-api
+      projects/fake-project/locations/global/operations/fake-operation       True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+actions:
+- execute_command:
+    command: |
+      api-gateway operations list --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "operations": [
+                {
+                  "name": "projects/fake-project/locations/global/operations/fake-operation",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata",
+                    "createTime": "2019-11-12T17:11:58.294467322Z",
+                    "endTime": "2019-11-12T17:11:58.339702050Z",
+                    "target": "projects/fake-project/locations/global/apis/fake-api",
+                    "verb": "create",
+                    "requestedCancellation": false,
+                    "apiVersion": "v1alpha1"
+                  },
+                  "done": true,
+                  "response": {
+                    "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.Api",
+                    "name": "projects/fake-project/locations/global/apis/fake-api",
+                    "createTime": "2019-11-12T17:11:58.287899825Z",
+                    "updateTime": "2019-11-12T17:11:58.297158524Z",
+                    "apiController": {
+                      "managedService": "fake-api.endpoints.fake-project.cloud.goog"
+                    },
+                    "state": "ACTIVE"
+                  }
+                }
+              ]
+            }
+    - expect_stdout: |
+        NAME                                                              DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+        projects/fake-project/locations/global/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      api-gateway operations list --location projects/project/locations/global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/project/locations/global/operations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "operations": [
+                {
+                  "name": "projects/fake-project/locations/global/operations/fake-operation",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata",
+                    "createTime": "2019-11-12T17:11:58.294467322Z",
+                    "endTime": "2019-11-12T17:11:58.339702050Z",
+                    "target": "projects/fake-project/locations/global/apis/fake-api",
+                    "verb": "create",
+                    "requestedCancellation": false,
+                    "apiVersion": "v1alpha1"
+                  },
+                  "done": true,
+                  "response": {
+                    "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.Api",
+                    "name": "projects/fake-project/locations/global/apis/fake-api",
+                    "createTime": "2019-11-12T17:11:58.287899825Z",
+                    "updateTime": "2019-11-12T17:11:58.297158524Z",
+                    "apiController": {
+                      "managedService": "fake-api.endpoints.fake-project.cloud.goog"
+                    },
+                    "state": "ACTIVE"
+                  }
+                }
+              ]
+            }
+    - expect_stdout: |
+        NAME                                                              DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+        projects/fake-project/locations/global/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: api-gateway operations list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/-/operations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+                "operations": [
+                  {
+                    "name": "projects/fake-project/locations/us-central1/operations/fake-operation",
+                    "metadata": {
+                      "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata",
+                      "createTime": "2019-11-12T17:11:58.294467322Z",
+                      "endTime": "2019-11-12T17:11:58.339702050Z",
+                      "target": "projects/fake-project/locations/us-central1/apis/fake-api",
+                      "verb": "create",
+                      "requestedCancellation": false,
+                      "apiVersion": "v1alpha1"
+                    },
+                    "done": true,
+                    "response": {
+                      "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.Api",
+                      "name": "projects/fake-project/locations/us-central1/apis/fake-api",
+                      "createTime": "2019-11-12T17:11:58.287899825Z",
+                      "updateTime": "2019-11-12T17:11:58.297158524Z",
+                      "apiController": {
+                        "managedService": "fake-api.endpoints.fake-project.cloud.goog"
+                      },
+                      "state": "ACTIVE"
+                    }
+                  },
+                  {
+                    "name": "projects/fake-project/locations/global/operations/fake-operation",
+                    "metadata": {
+                      "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.OperationMetadata",
+                      "createTime": "2019-11-12T17:11:58.294467322Z",
+                      "endTime": "2019-11-12T17:11:58.339702050Z",
+                      "target": "projects/fake-project/locations/global/apis/fake-api",
+                      "verb": "create",
+                      "requestedCancellation": false,
+                      "apiVersion": "v1alpha1"
+                    },
+                    "done": true,
+                    "response": {
+                      "@type": "type.googleapis.com/google.cloud.apigateway.v1alpha1.Api",
+                      "name": "projects/fake-project/locations/global/apis/fake-api",
+                      "createTime": "2019-11-12T17:11:58.287899825Z",
+                      "updateTime": "2019-11-12T17:11:58.297158524Z",
+                      "apiController": {
+                        "managedService": "fake-api.endpoints.fake-project.cloud.goog"
+                      },
+                      "state": "ACTIVE"
+                    }
+                  }
+                ]
+              }
+    - expect_stdout: |
+        NAME                                                                   DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+        projects/fake-project/locations/us-central1/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/us-central1/apis/fake-api
+        projects/fake-project/locations/global/operations/fake-operation       True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+    - expect_exit:
+        code: 0

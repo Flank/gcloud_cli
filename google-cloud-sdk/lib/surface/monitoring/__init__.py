@@ -21,17 +21,21 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Monitoring(base.Group):
   # pylint: disable=line-too-long
   """Manage Stackdriver Monitoring alerting policies and notification channels."""
+  category = base.MONITORING_CATEGORY
 
   detailed_help = {
-      'DESCRIPTION': """\
+      'DESCRIPTION':
+          """\
           Manage Stackdriver Monitoring alerting policies and notification
           channels.
 
           More information can be found here:
-          https://cloud.google.com/monitoring/api/v3/
+              * https://cloud.google.com/monitoring/api/v3/
+              * https://cloud.google.com/monitoring/alerts/using-alerting-api
+              * https://cloud.google.com/monitoring/alerts/using-channels-api
       """
   }

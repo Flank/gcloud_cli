@@ -1,0 +1,33 @@
+NAME
+    gcloud alpha access-approval - manage Access Approval requests and settings
+
+SYNOPSIS
+    gcloud alpha access-approval GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Access Approval enables customers to require explicit approval
+    whenever Google support and engineering needs to access customer data.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     requests
+        (ALPHA) Manage Access Approval requests.
+
+     settings
+        (ALPHA) Manage Access Approval settings.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

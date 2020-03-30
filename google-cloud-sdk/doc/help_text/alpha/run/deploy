@@ -2,23 +2,22 @@ NAME
     gcloud alpha run deploy - deploy a container to Cloud Run
 
 SYNOPSIS
-    gcloud alpha run deploy [[SERVICE] --namespace=NAMESPACE] --image=IMAGE
+    gcloud alpha run deploy [[SERVICE] --namespace=NAMESPACE]
         [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
-        [--concurrency=CONCURRENCY] [--max-instances=MAX_INSTANCES]
-        [--memory=MEMORY] [--platform=PLATFORM] [--port=PORT]
-        [--timeout=TIMEOUT] [--no-traffic]
+        [--concurrency=CONCURRENCY] [--cpu=CPU] [--image=IMAGE]
+        [--max-instances=MAX_INSTANCES] [--memory=MEMORY]
+        [--min-instances=MIN_INSTANCES] [--platform=PLATFORM] [--port=PORT]
+        [--service-account=SERVICE_ACCOUNT] [--timeout=TIMEOUT] [--no-traffic]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
           | --update-labels=[KEY=VALUE,...]]
-        [--connectivity=CONNECTIVITY --cpu=CPU
-          --min-instances=MIN_INSTANCES --[no-]use-http2 --clear-config-maps
+        [--connectivity=CONNECTIVITY --[no-]use-http2 --clear-config-maps
           | --set-config-maps=[KEY=VALUE,...] | --remove-config-maps=[KEY,...]
           --update-config-maps=[KEY=VALUE,...] --clear-secrets
           | --set-secrets=[KEY=VALUE,...]
           | --remove-secrets=[KEY,...] --update-secrets=[KEY=VALUE,...]]
         [--[no-]allow-unauthenticated --revision-suffix=REVISION_SUFFIX
-          --service-account=SERVICE_ACCOUNT
           --add-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
           | --clear-cloudsql-instances
           | --remove-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
@@ -41,12 +40,7 @@ POSITIONAL ARGUMENTS
           Specific to Cloud Run for Anthos: Kubernetes namespace for the
           service.
 
-REQUIRED FLAGS
-     --image=IMAGE
-        Name of the container image to deploy (e.g.
-        gcr.io/cloudrun/hello:latest).
-
-OPTIONAL FLAGS
+FLAGS
      --args=[ARG,...]
         Comma-separated arguments passed to the command run by the container
         image. If not specified and no '--command' is provided, the container
@@ -68,12 +62,23 @@ OPTIONAL FLAGS
         requests are allowed. To unset this field, provide the special value
         default.
 
+     --cpu=CPU
+        Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
+
+     --image=IMAGE
+        Name of the container image to deploy (e.g.
+        gcr.io/cloudrun/hello:latest).
+
      --max-instances=MAX_INSTANCES
-        The maximum number of container instances of the Service to run or
-        'default' to remove any maximum.
+        The maximum number of container instances of the Service to run. Use
+        'default' to unset the limit and use the platform default.
 
      --memory=MEMORY
         Set a memory limit. Ex: 1Gi, 512Mi.
+
+     --min-instances=MIN_INSTANCES
+        The minimum number of container instances of the Service to run or
+        'default' to remove any minimum.
 
      --platform=PLATFORM
         Target platform for running commands. Alternatively, set the property
@@ -98,22 +103,29 @@ OPTIONAL FLAGS
         variable. Must be a number between 1 and 65535, inclusive. To unset
         this field, pass the special value "default".
 
+     --service-account=SERVICE_ACCOUNT
+        The service account associated with the revision of the service. The
+        service account represents the identity of the running revision, and
+        determines what permissions the revision has. For the managed platform,
+        this is the email address of an IAM service account. For the
+        Kubernetes-based platforms (gke, kubernetes), this is the name of a
+        Kubernetes service account in the same namespace as the service. If not
+        provided, the revision will use the default service account of the
+        project, or default Kubernetes namespace service account respectively.
+
      --timeout=TIMEOUT
         Set the maximum request execution time (timeout). It is specified as a
         duration; for example, "10m5s" is ten minutes, and five seconds. If you
         don't specify a unit, seconds is assumed. For example, "10" is 10
         seconds.
 
-     Only applicable if connecting to Cloud Run for Anthos deployed on Google
-     Cloud. Specify --platform=gke to use:
-
-       --no-traffic
-          True to avoid sending traffic to the revision beign deployed. Setting
-          this flag assigns any traffic assigned to the LATEST revision to the
-          specific revision bound to LATEST before the deployment. The effect
-          is that the revsion being deployed will not receive traffic. After a
-          deployment with this flag the LATEST revision will not recieve
-          traffic on future deployments.
+     --no-traffic
+        True to avoid sending traffic to the revision beign deployed. Setting
+        this flag assigns any traffic assigned to the LATEST revision to the
+        specific revision bound to LATEST before the deployment. The effect is
+        that the revsion being deployed will not receive traffic. After a
+        deployment with this flag the LATEST revision will not recieve traffic
+        on future deployments.
 
      At most one of these may be specified:
 
@@ -150,7 +162,8 @@ OPTIONAL FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
 
      At most one of these may be specified:
 
@@ -176,13 +189,6 @@ OPTIONAL FLAGS
               Visible from outside the cluster.
            internal
               Visible only within the cluster.
-
-       --cpu=CPU
-          Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
-
-       --min-instances=MIN_INSTANCES
-          The minimum number of container instances of the Service to run or
-          'default' to remove any minimum.
 
        --[no-]use-http2
           Whether to use HTTP/2 for connections to the service. Use --use-http2
@@ -262,13 +268,6 @@ OPTIONAL FLAGS
           [--revision-suffix=v1] for a service named 'helloworld', would lead
           to a revision named 'helloworld-v1'.
 
-       --service-account=SERVICE_ACCOUNT
-          Email address of the IAM service account associated with the revision
-          of the service. The service account represents the identity of the
-          running revision, and determines what permissions the revision has.
-          If not provided, the revision will use the project's default service
-          account.
-
        These flags modify the Cloud SQL instances this Service connects to. You
        can specify a name of a Cloud SQL instance if it's in the same project
        and region as your Cloud Run service; otherwise specify
@@ -335,8 +334,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To deploy a container to the service my-backend on Cloud Run:

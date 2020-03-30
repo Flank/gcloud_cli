@@ -1,0 +1,54 @@
+NAME
+    gcloud alpha access-approval settings delete - delete Access Approval
+        settings
+
+SYNOPSIS
+    gcloud alpha access-approval settings delete
+        [--folder=FOLDER | --organization=ORGANIZATION | --project=PROJECT]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Delete the Access Approval settings associated with a project, a
+    folder, or organization.
+
+FLAGS
+     At most one of these may be specified:
+
+       --folder=FOLDER
+          folder number. only one of --project, --folder, or --organization can
+          be provided. If none are provided then it uses config property
+          [core/project].
+
+       --organization=ORGANIZATION
+          organization number. either --project, --folder, or --organization
+          must be provided. If none are provided then it uses config property
+          [core/project].
+
+       --project=PROJECT
+          project number or id. only one of --project, --folder, or
+          --organization can be provided. If none are provided then it uses
+          config property [core/project].
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To delete the settings for the current project use
+
+        $ gcloud alpha access-approval settings delete
+
+    To delete the settings for folder f1 use
+
+        $ gcloud alpha access-approval settings delete --folder=f1
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

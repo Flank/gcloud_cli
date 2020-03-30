@@ -46,15 +46,13 @@ class ErrorTest(sdk_test_base.SdkBase):
                    AppengineAppUpdateApiClient(self.mocked_client))
 
   def ExpectPatchApplication(self, update_mask,
-                             split_health_checks=None,
-                             use_container_optimized_os=None):
+                             split_health_checks=None):
     self.mocked_client.apps.Patch.Expect(
         request=self.messages.AppengineAppsPatchRequest(
             name='apps/fakeproject',
             application=self.messages.Application(
                 featureSettings=self.messages.FeatureSettings(
-                    splitHealthChecks=split_health_checks,
-                    useContainerOptimizedOs=use_container_optimized_os)),
+                    splitHealthChecks=split_health_checks)),
             updateMask=update_mask),
         response=self.messages.Operation(done=True))
 
@@ -63,21 +61,6 @@ class ErrorTest(sdk_test_base.SdkBase):
                                 split_health_checks=True)
 
     self.client.PatchApplication(split_health_checks=True)
-
-  def testPatchApplication_useContainerOptimizedOs(self):
-    self.ExpectPatchApplication('featureSettings.useContainerOptimizedOs,',
-                                use_container_optimized_os=True)
-
-    self.client.PatchApplication(use_container_optimized_os=True)
-
-  def testPatchApplication_multipleFeatureChanges(self):
-    self.ExpectPatchApplication('featureSettings.splitHealthChecks,'
-                                'featureSettings.useContainerOptimizedOs,',
-                                split_health_checks=False,
-                                use_container_optimized_os=True)
-
-    self.client.PatchApplication(split_health_checks=False,
-                                 use_container_optimized_os=True)
 
 
 if __name__ == '__main__':

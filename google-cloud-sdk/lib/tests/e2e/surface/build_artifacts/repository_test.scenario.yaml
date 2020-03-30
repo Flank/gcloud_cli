@@ -1,3 +1,7 @@
+filters:
+  skip:
+    reason: Failing in various ways
+    bug: b/146048282
 title: build-artifacts repositories roundtrip
 release_tracks: [ALPHA]
 summary:

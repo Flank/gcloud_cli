@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute sole-tenancy node-templates delete - deletes a Google
+    gcloud alpha compute sole-tenancy node-templates delete - delete a Google
         Compute Engine node template
 
 SYNOPSIS
@@ -7,7 +7,7 @@ SYNOPSIS
         [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Deletes a Google Compute Engine node template.
+    (ALPHA) Delete a Compute Engine node template.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -38,8 +38,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To delete a node template, run:
+
+        $ gcloud alpha compute sole-tenancy node-templates delete \
+            my-node-template
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -30,6 +30,7 @@ from six.moves import range
 class PerimetersListTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -51,7 +52,7 @@ class PerimetersListTestGA(accesscontextmanager.Base):
         m.ListServicePerimetersResponse(servicePerimeters=perimeters))
 
   def testList(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeters = self._MakePerimeters()
     self._ExpectList(perimeters, '123')
 
@@ -60,7 +61,7 @@ class PerimetersListTestGA(accesscontextmanager.Base):
     self.assertEqual(results, perimeters)
 
   def testList_PolicyFromProperty(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeters = self._MakePerimeters()
     policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
@@ -71,7 +72,7 @@ class PerimetersListTestGA(accesscontextmanager.Base):
     self.assertEqual(results, perimeters)
 
   def testList_Format(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     properties.VALUES.core.user_output_enabled.Set(True)
     perimeters = self._MakePerimeters()
     self._ExpectList(perimeters, '123')
@@ -98,12 +99,14 @@ class PerimetersListTestGA(accesscontextmanager.Base):
 class PerimetersListTestBeta(PerimetersListTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class PerimetersListTestAlpha(PerimetersListTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 

@@ -36,7 +36,7 @@ us\-central1\-a \-\-format='value(metadata)'
 where example\-instance is the name of the virtual machine instance you're
 querying custom metadata from. For more information about querying custom
 instance or project metadata through the Cloud Platform Console or the API, see
-https://cloud.google.com/compute/docs/storing\-retrieving\-metadata#querying_custom_metadata
+https://cloud.google.com/compute/docs/storing\-retrieving\-metadata#querying_custom_metadata.
 
 
 If you are using this command to manage SSH keys for your project, please note
@@ -44,7 +44,7 @@ the risks
 (https://cloud.google.com/compute/docs/instances/adding\-removing\-ssh\-keys#risks)
 of manual SSH key management as well as the required format for SSH key
 metadata, available at
-https://cloud.google.com/compute/docs/instances/adding\-removing\-ssh\-keys
+https://cloud.google.com/compute/docs/instances/adding\-removing\-ssh\-keys.
 
 
 
@@ -68,10 +68,11 @@ https://cloud.google.com/compute/docs/reference/rest/v1/instances
 \fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
 Metadata to be made available to the guest operating system running on the
 instances. Each metadata entry is a key/value pair separated by an equals sign.
-Metadata keys must be unique and less than 128 bytes in length. Values must be
-less than or equal to 32,768 bytes in length. Multiple arguments can be passed
-to this flag, e.g., \f5\fI\-\-metadata
-key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR.
+Each metadata key must be unique and have a max of 128 bytes in length. Each
+value must have a max of 256 KB in length. Multiple arguments can be passed to
+this flag, e.g., \f5\fI\-\-metadata
+key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR. The combined total size
+for all metadata entries is 512 KB.
 
 In images that have Compute Engine tools installed on them, such as the official
 images (https://cloud.google.com/compute/docs/images), the following metadata
@@ -146,8 +147,29 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To add metadata under key \f5\fIimportant\-data\fR\fR to an instance named
+\f5\fItest\-instance\fR\fR, run:
+
+.RS 2m
+$ gcloud alpha compute instances add\-metadata test\-instance \e
+    \-\-metadata=important\-data="2 plus 2 equals 4"
+.RE
+
+To add multiple key\-value pairs at once, separate them with commas:
+
+.RS 2m
+$ gcloud alpha compute instances add\-metadata test\-instance \e
+    \-\-metadata=important\-data="2 plus 2 equals\e
+ 4",unimportant\-data=zero
+.RE
 
 
 

@@ -32,7 +32,7 @@ class HealthChecksCreateTcpTest(test_base.BaseTest, parameterized.TestCase):
     self._health_check_api = self.compute.healthChecks
 
   def RunCreate(self, command):
-    self.Run('compute health-checks create tcp ' + command)
+    self.Run('compute health-checks create tcp %s' % command)
 
   def testUseServingPortOption(self):
     self.RunCreate('my-health-check --use-serving-port')
@@ -366,18 +366,6 @@ class HealthChecksCreateTcpTestBetaTest(HealthChecksCreateTcpTest):
     self._health_check_api = self.compute_beta.healthChecks
     self._api = 'beta'
 
-  def RunCreate(self, command):
-    self.Run('compute health-checks create tcp --global ' + command)
-
-
-class HealthChecksCreateTcpTestAlphaTest(HealthChecksCreateTcpTestBetaTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
-    self._api = 'alpha'
-    self._health_check_api = self.compute_alpha.healthChecks
-
   @parameterized.named_parameters(
       ('DisableLogging', '--no-enable-logging', False),
       ('EnableLogging', '--enable-logging', True))
@@ -408,17 +396,24 @@ class HealthChecksCreateTcpTestAlphaTest(HealthChecksCreateTcpTestBetaTest):
               project='my-project'))],)
 
 
-class RegionHealthChecksCreateTcpBetaTest(test_base.BaseTest,
-                                          parameterized.TestCase):
+class HealthChecksCreateTcpTestAlphaTest(HealthChecksCreateTcpTestBetaTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
-    self._api = 'beta'
-    self._health_check_api = self.compute_beta.regionHealthChecks
+    self._api = 'alpha'
+    self._health_check_api = self.compute_alpha.healthChecks
+
+
+class RegionHealthChecksCreateTcpTest(test_base.BaseTest,
+                                      parameterized.TestCase):
+
+  def SetUp(self):
+    self._api = 'v1'
+    self._health_check_api = self.compute.regionHealthChecks
 
   def RunCreate(self, command):
-    self.Run('compute health-checks create tcp --region us-west-1 ' + command)
+    self.Run('compute health-checks create tcp --region us-west-1 %s' % command)
 
   def testDefaultOptions(self):
     self.RunCreate('my-health-check')
@@ -701,6 +696,45 @@ class RegionHealthChecksCreateTcpBetaTest(test_base.BaseTest,
                   timeoutSec=5,
                   healthyThreshold=2,
                   unhealthyThreshold=2),
+              project='my-project',
+              region='us-west-1'))],)
+
+
+class RegionHealthChecksCreateTcpBetaTest(RegionHealthChecksCreateTcpTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+    self._api = 'beta'
+    self._health_check_api = self.compute_beta.regionHealthChecks
+
+  @parameterized.named_parameters(
+      ('DisableLogging', '--no-enable-logging', False),
+      ('EnableLogging', '--enable-logging', True))
+  def testLogConfig(self, enable_logs_flag, enable_logs):
+
+    self.RunCreate("""my-health-check {0}""".format(enable_logs_flag))
+
+    expected_log_config = self.messages.HealthCheckLogConfig(enable=enable_logs)
+
+    self.CheckRequests(
+        [(self.compute.regionHealthChecks, 'Insert',
+          self.messages.ComputeRegionHealthChecksInsertRequest(
+              healthCheck=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.TCP,
+                  tcpHealthCheck=self.messages.TCPHealthCheck(
+                      port=80,
+                      portSpecification=(
+                          self.messages.TCPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
+                      proxyHeader=(self.messages.TCPHealthCheck
+                                   .ProxyHeaderValueValuesEnum.NONE)),
+                  checkIntervalSec=5,
+                  timeoutSec=5,
+                  healthyThreshold=2,
+                  unhealthyThreshold=2,
+                  logConfig=expected_log_config),
               project='my-project',
               region='us-west-1'))],)
 

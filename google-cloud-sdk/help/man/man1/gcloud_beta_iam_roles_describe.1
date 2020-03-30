@@ -80,29 +80,34 @@ different project for quota and billing, use \f5\-\-billing\-project\fR or
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To print metadata for a role of an organization, run:
+To print metadata for the role \f5\fIspanner.databaseAdmin\fR\fR of the
+organization \f5\fI1234567\fR\fR, run:
 
 .RS 2m
-$ gcloud beta iam roles describe \-\-organization 1234567 viewer
+$ gcloud beta iam roles describe roles/spanner.databaseAdmin \e
+    \-\-organization=1234567
 .RE
 
-To print metadata for a role of a project, run:
+To print metadata for the role \f5\fIspanner.databaseAdmin\fR\fR of the project
+\f5\fImyproject\fR\fR, run:
 
 .RS 2m
-$ gcloud beta iam roles describe \-\-project myproject viewer
+$ gcloud beta iam roles describe roles/spanner.databaseAdmin \e
+    \-\-project=myproject
 .RE
 
-To print metadata for a predefined role, run:
+To print metadata for a predefined role, \f5\fIspanner.databaseAdmin\fR\fR, run:
 
 .RS 2m
-$ gcloud beta iam roles describe roles/viewer
+$ gcloud beta iam roles describe roles/spanner.databaseAdmin
 .RE
 
 

@@ -8,13 +8,42 @@ summary:
 - execute:
   - command: run services describe aahello
   - stdout: |-
-      \+ Service aahello in namespace default\n*
-      http://helloworld-go.default.example.com.*
-      Traffic:
+      \+ Service aahello in namespace default\n\s*
+      Traffic:\s+http://helloworld-go.default.example.com
         70%\s+gchello-hwk6z
         30%\s+gchello-vdcjl.*
       Last updated on 2019-07-23T20:10:28Z by .*developer.gserviceaccount.com:
         Revision service-name-20190711-192405-ul07-rnchc
+        Image:\s+gcr.io/knative-samples/helloworld-go.*
+        Env vars:
+          TARGET\s+Go Sample v1
+        Secrets:
+          /var/baz\s+githubsecret:secretToken
+          /var/quux\s+githubsecret
+          FOO\s+githubsecret:accessToken
+        Config Maps:
+          /var/game\s+game-config
+          GAME\s+game-config:game.properties
+        Timeout:\s+300s
+      $
+- set_property: run/platform managed
+- set_property: run/region us-central1
+- execute:
+  - command: run services describe aahello
+  - stdout: |-
+      \+ Service aahello in region us-central1\n\s+
+      Traffic:\s+https://aahello-irvkrntpmq-uc.a.run.app
+        70%\s+gchello-hwk6z\s+prod
+          https://prod---aahello-irvkrntpmq-uc.a.run.app
+        10%\s+gchello-k4z38
+        20%\s+gchello-vdcjl\s+candidate, release
+          https://candidate---aahello-irvkrntpmq-uc.a.run.app
+          https://release---aahello-irvkrntpmq-uc.a.run.app
+        0%\s+LATEST \(currently gchello-aaa12\)\s+head
+          https://head---aahello-irvkrntpmq-uc.a.run.app
+      \s+
+      Last updated on 2019-07-23T20:10:28Z by .*developer.gserviceaccount.com:
+        Revision gchello-aaa12
         Image:\s+gcr.io/knative-samples/helloworld-go.*
         Env vars:
           TARGET\s+Go Sample v1
@@ -134,7 +163,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services/aahello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -144,7 +173,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/v1
             kind: Service
             metadata:
               annotations:
@@ -156,7 +185,7 @@ actions:
               name: aahello
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/aahello
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
@@ -225,7 +254,6 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
               domainInternal: aahello.default.svc.cluster.local
               latestCreatedRevisionName: service-name-20190711-192405-ul07-rnchc
               latestReadyRevisionName: service-name-20190711-192405-ul07-rnchc
@@ -240,13 +268,174 @@ actions:
               url: http://helloworld-go.default.example.com
     - expect_stdout:
         matches: |
-          \+ Service aahello in namespace default\n*
-          http://helloworld-go.default.example.com.*
-          Traffic:
+          \+ Service aahello in namespace default\n\s*
+          Traffic:\s+http://helloworld-go.default.example.com
             70%\s+gchello-hwk6z
             30%\s+gchello-vdcjl.*
           Last updated on 2019-07-23T20:10:28Z by .*developer.gserviceaccount.com:
             Revision service-name-20190711-192405-ul07-rnchc
+            Image:\s+gcr.io/knative-samples/helloworld-go.*
+            Env vars:
+              TARGET\s+Go Sample v1
+            Secrets:
+              /var/baz\s+githubsecret:secretToken
+              /var/quux\s+githubsecret
+              FOO\s+githubsecret:accessToken
+            Config Maps:
+              /var/game\s+game-config
+              GAME\s+game-config:game.properties
+            Timeout:\s+300s
+    - expect_exit:
+        code: 0
+- set_property:
+    run/platform: managed
+    run/region: us-central1
+- execute_command:
+    command: run services describe aahello  # Test that we describe a traffic split with tags
+    events:
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/fake-project/services/aahello\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            content-length: '1775'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1
+            kind: Service
+            metadata:
+              labels:
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 1
+              name: aahello
+              namespace: '123456789'
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1/namespaces/123456789/services/aahello
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  labels:
+                    client.knative.dev/nonce: dmwqrjmbba
+                spec:
+                  containers:
+                  - env:
+                    - name: TARGET
+                      value: Go Sample v1
+                    - name: FOO
+                      valueFrom:
+                        secretKeyRef:
+                          key: accessToken
+                          name: githubsecret
+                    - name: GAME
+                      valueFrom:
+                        configMapKeyRef:
+                          key: game.properties
+                          name: game-config
+                    image: gcr.io/knative-samples/helloworld-go@sha256:5ea96ba4b872685ff4ddb5cd8d1a97ec18c18fae79ee8df0d29f446c5efe5f50
+                    name: ''
+                    resources: {}
+                    volumeMounts:
+                    - mountPath: /var/baz
+                      name: githubsecret-tel-ruk-ziz
+                      readOnly: true
+                    - mountPath: /var/quux
+                      name: githubsecret-tul-qec-hos
+                      readOnly: true
+                    - mountPath: /var/game
+                      name: game-config-xid-qug-dul
+                      readOnly: true
+                  timeoutSeconds: 300
+                  volumes:
+                  - name: githubsecret-tel-ruk-ziz
+                    secret:
+                      items:
+                      - key: secretToken
+                        path: secretToken
+                      secretName: githubsecret
+                  - name: githubsecret-tul-qec-hos
+                    secret:
+                      secretName: githubsecret
+                  - configMap:
+                      name: game-config
+                    name: game-config-xid-qug-dul
+              traffic:
+              - percent: 70
+                revisionName: gchello-hwk6z
+              - percent: 10
+                revisionName: gchello-k4z38
+              - percent: 20
+                revisionName: gchello-vdcjl
+              - tag: prod
+                revisionName: gchello-hwk6z
+              - tag: candidate
+                revisionName: gchello-vdcjl
+              - tag: release
+                revisionName: gchello-vdcjl
+              - tag: head
+                latestRevision: true
+            status:
+              address:
+                url: https://aahello-irvkrntpmq-uc.a.run.app
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:28Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:28Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:28Z'
+                status: 'True'
+                type: RoutesReady
+              latestCreatedRevisionName: gchello-aaa12
+              latestReadyRevisionName: gchello-aaa12
+              observedGeneration: 1
+              traffic:
+              - percent: 70
+                revisionName: gchello-hwk6z
+              - percent: 10
+                revisionName: gchello-k4z38
+              - percent: 20
+                revisionName: gchello-vdcjl
+              - tag: prod
+                revisionName: gchello-hwk6z
+                url: https://prod---aahello-irvkrntpmq-uc.a.run.app
+              - tag: candidate
+                revisionName: gchello-vdcjl
+                url: https://candidate---aahello-irvkrntpmq-uc.a.run.app
+              - tag: release
+                revisionName: gchello-vdcjl
+                url: https://release---aahello-irvkrntpmq-uc.a.run.app
+              - tag: head
+                latestRevision: true
+                revisionName: gchello-aaa12
+                url: https://head---aahello-irvkrntpmq-uc.a.run.app
+              url: https://aahello-irvkrntpmq-uc.a.run.app
+    - expect_stdout:
+        matches: |
+          \+ Service aahello in region us-central1\n\s+
+          Traffic:\s+https://aahello-irvkrntpmq-uc.a.run.app
+            70%\s+gchello-hwk6z\s+prod
+              https://prod---aahello-irvkrntpmq-uc.a.run.app
+            10%\s+gchello-k4z38
+            20%\s+gchello-vdcjl\s+candidate, release
+              https://candidate---aahello-irvkrntpmq-uc.a.run.app
+              https://release---aahello-irvkrntpmq-uc.a.run.app
+            0%\s+LATEST \(currently gchello-aaa12\)\s+head
+              https://head---aahello-irvkrntpmq-uc.a.run.app
+          \s+
+          Last updated on 2019-07-23T20:10:28Z by .*developer.gserviceaccount.com:
+            Revision gchello-aaa12
             Image:\s+gcr.io/knative-samples/helloworld-go.*
             Env vars:
               TARGET\s+Go Sample v1

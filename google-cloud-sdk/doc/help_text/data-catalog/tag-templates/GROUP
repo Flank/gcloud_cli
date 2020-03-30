@@ -1,0 +1,57 @@
+NAME
+    gcloud data-catalog tag-templates - manage tag templates in Cloud Data
+        Catalog
+
+SYNOPSIS
+    gcloud data-catalog tag-templates GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage tag templates in Cloud Data Catalog.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     fields
+        Manage tag template fields in Cloud Data Catalog.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        Add IAM policy binding to a Cloud Data Catalog tag template.
+
+     create
+        Create a Cloud Data Catalog tag template.
+
+     delete
+        Delete a Cloud Data Catalog tag template.
+
+     describe
+        Describe a Cloud Data Catalog tag template.
+
+     get-iam-policy
+        Get the IAM policy for a Cloud Data Catalog tag template.
+
+     remove-iam-policy-binding
+        Remove IAM policy binding from a Cloud Data Catalog tag template.
+
+     set-iam-policy
+        Set the IAM policy for a Cloud Data Catalog tag template.
+
+     update
+        Update a Cloud Data Catalog tag template.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha data-catalog tag-templates
+        $ gcloud beta data-catalog tag-templates
+

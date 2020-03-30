@@ -83,8 +83,9 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -95,14 +96,14 @@ about each, run:
 
 .RS 2m
 $ gcloud alpha deployment\-manager resources list \e
-    \-\-deployment my\-deployment
+    \-\-deployment=my\-deployment
 .RE
 
 To print only the name of each resource, run:
 
 .RS 2m
 $ gcloud alpha deployment\-manager resources list \e
-    \-\-deployment my\-deployment \-\-simple\-list
+    \-\-deployment=my\-deployment \-\-simple\-list
 .RE
 
 

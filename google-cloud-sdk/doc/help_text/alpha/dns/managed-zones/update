@@ -7,8 +7,10 @@ SYNOPSIS
         [--denial-of-existence=DENIAL_OF_EXISTENCE] [--description=DESCRIPTION]
         [--dnssec-state=DNSSEC_STATE] [--forwarding-targets=[IP_ADDRESSES,...]]
         [--ksk-algorithm=KSK_ALGORITHM] [--ksk-key-length=KSK_KEY_LENGTH]
-        [--networks=[NETWORK,...]] [--update-labels=[KEY=VALUE,...]]
-        [--zsk-algorithm=ZSK_ALGORITHM] [--zsk-key-length=ZSK_KEY_LENGTH]
+        [--managed-reverse-lookup] [--networks=[NETWORK,...]]
+        [--private-forwarding-targets=[IP_ADDRESSES,...]]
+        [--update-labels=[KEY=VALUE,...]] [--zsk-algorithm=ZSK_ALGORITHM]
+        [--zsk-key-length=ZSK_KEY_LENGTH]
         [--clear-labels | --remove-labels=[KEY,...]]
         [--target-network=TARGET_NETWORK --target-project=TARGET_PROJECT]
         [GCLOUD_WIDE_FLAG ...]
@@ -63,9 +65,18 @@ FLAGS
      --ksk-key-length=KSK_KEY_LENGTH
         Length of the key-signing key in bits. Requires DNSSEC enabled.
 
+     --managed-reverse-lookup
+        Whether this zone is a managed reverse lookup zone, required for Cloud
+        DNS to correctly resolve Non-RFC1918 PTR records.
+
      --networks=[NETWORK,...]
         List of networks that the zone should be visible in if the zone
         visibility is [private].
+
+     --private-forwarding-targets=[IP_ADDRESSES,...]
+        List of IPv4 addresses of target name servers that the zone will
+        forward queries to. Ignored for public visibility. All addresses
+        specified for this parameter will be reached through the VPC.
 
      --update-labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to update. If a label exists its value is
@@ -101,7 +112,8 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
 
      --target-network=TARGET_NETWORK
         Network ID of the Google Compute Engine private network to forward
@@ -115,8 +127,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To change the description of a managed-zone, run:

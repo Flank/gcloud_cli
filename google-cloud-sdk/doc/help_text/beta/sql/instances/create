@@ -4,23 +4,21 @@ NAME
 SYNOPSIS
     gcloud beta sql instances create INSTANCE
         [--activation-policy=ACTIVATION_POLICY] [--[no-]assign-ip] [--async]
-        [--authorized-gae-apps=APP,[APP,...]]
         [--authorized-networks=NETWORK,[NETWORK,...]]
         [--availability-type=AVAILABILITY_TYPE] [--no-backup]
+        [--backup-location=BACKUP_LOCATION]
         [--backup-start-time=BACKUP_START_TIME] [--cpu=CPU]
         [--database-flags=FLAG=VALUE,[FLAG=VALUE,...]]
         [--database-version=DATABASE_VERSION] [--enable-bin-log]
         [--failover-replica-name=FAILOVER_REPLICA_NAME]
-        [--follow-gae-app=FOLLOW_GAE_APP] [--labels=[KEY=VALUE,...]]
+        [--labels=[KEY=VALUE,...]]
         [--maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL]
         [--maintenance-window-day=MAINTENANCE_WINDOW_DAY]
         [--maintenance-window-hour=MAINTENANCE_WINDOW_HOUR]
         [--master-instance-name=MASTER_INSTANCE_NAME] [--memory=MEMORY]
-        [--network=NETWORK]
-        [--pricing-plan=PRICING_PLAN, -p PRICING_PLAN; default="PER_USE"]
-        [--replica-type=REPLICA_TYPE] [--replication=REPLICATION]
-        [--require-ssl] [--root-password=ROOT_PASSWORD]
-        [--storage-auto-increase]
+        [--network=NETWORK] [--replica-type=REPLICA_TYPE]
+        [--replication=REPLICATION] [--require-ssl]
+        [--root-password=ROOT_PASSWORD] [--storage-auto-increase]
         [--storage-auto-increase-limit=STORAGE_AUTO_INCREASE_LIMIT]
         [--storage-size=STORAGE_SIZE] [--storage-type=STORAGE_TYPE]
         [--tier=TIER, -t TIER]
@@ -65,11 +63,6 @@ FLAGS
         Return immediately, without waiting for the operation in progress to
         complete.
 
-     --authorized-gae-apps=APP,[APP,...]
-        First Generation instances only. List of project IDs for App Engine
-        applications running in the Standard environment that can access this
-        instance.
-
      --authorized-networks=NETWORK,[NETWORK,...]
         The list of external networks that are allowed to connect to the
         instance. Specified in CIDR notation, also known as 'slash' notation
@@ -87,6 +80,10 @@ FLAGS
 
      --backup
         Enables daily backup. Enabled by default, use --no-backup to disable.
+
+     --backup-location=BACKUP_LOCATION
+        Choose where to store your backups. Backups are stored in the closest
+        multi-region location to you by default. Only customize if needed.
 
      --backup-start-time=BACKUP_START_TIME
         Start time of daily backups, specified in the 24 hour format - HH:MM,
@@ -116,10 +113,6 @@ FLAGS
 
      --failover-replica-name=FAILOVER_REPLICA_NAME
         Also create a failover replica with the specified name.
-
-     --follow-gae-app=FOLLOW_GAE_APP
-        First Generation instances only. The App Engine app this instance
-        should follow. It must be in the same region as the instance.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -170,10 +163,6 @@ FLAGS
         network, 'testsharednetwork', this would be of the
         form:--network=projects/testproject/global/networks/testsharednetwork
 
-     --pricing-plan=PRICING_PLAN, -p PRICING_PLAN; default="PER_USE"
-        First Generation instances only. The pricing plan for this instance.
-        PRICING_PLAN must be one of: PER_USE, PACKAGE.
-
      --replica-type=REPLICA_TYPE
         The type of replica to create. REPLICA_TYPE must be one of: READ,
         FAILOVER.
@@ -216,10 +205,6 @@ FLAGS
         instances, only shared-core machine types (e.g., db-f1-micro) apply. A
         complete list of tiers is available here:
         https://cloud.google.com/sql/pricing.
-
-        IMPORTANT: First Generation instances are deprecated. If you're
-        considering any First Generation tiers, we recommend using Second
-        Generation instead.
 
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the instance. The 'Compute Engine Service Agent'
@@ -320,8 +305,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

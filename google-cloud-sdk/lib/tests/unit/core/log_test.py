@@ -362,8 +362,8 @@ X??????? X?????
 
   def testVerbosityNames(self):
     names = log.OrderedVerbosityNames()
-    self.assertTrue(isinstance(names, list))
-    self.assertTrue('debug' in names)
+    self.assertIsInstance(names, list)
+    self.assertIn('debug', names)
 
   def testLogDir(self):
     # Save this before we patch over datetime.datetime
@@ -1337,6 +1337,12 @@ class LogAcceptsTypedTextTest(style_test_base.StyleTestBase,
     self.blue_bold = ''
     self.blue_bold_italics = ''
     self.bold_italics = ''
+    self.no_italics = ''
+    self.no_bold = ''
+    self.no_blue_italics = ''
+    self.no_blue_bold = ''
+    self.no_blue_bold_italics = ''
+    self.no_bold_italics = ''
     self.reset = ''
 
   def SetUp(self):
@@ -1441,10 +1447,12 @@ class LogAcceptsTypedTextTest(style_test_base.StyleTestBase,
         'italics', style_test_base.TestTextTypes.ITALICS)
     log_method(blue_text, italics_text)
 
-    # TODO(b/113600762): Reset more selectively.
     self.AssertErrContains(
-        '{blue}[blue -{italics}italics{reset}-]{reset}'.format(
-            blue=self.blue, italics=self.italics, reset=self.reset))
+        '{blue}[blue -{italics}italics{no_italics}-]{reset}'.format(
+            blue=self.blue,
+            italics=self.italics,
+            reset=self.reset,
+            no_italics=self.no_italics))
 
   def testConsoleWriterWrite(self):
     self.StartObjectPatch(log._ConsoleWriter, 'isatty').return_value = True
@@ -1466,8 +1474,11 @@ class LogAcceptsTypedTextTest(style_test_base.StyleTestBase,
     log.status.Print(blue_text, italics_text)
 
     self.AssertErrContains(
-        '{blue}blue{reset} {italics}italics{reset}'.format(
-            blue=self.blue, reset=self.reset, italics=self.italics))
+        '{blue}blue{reset} {italics}italics{no_italics}'.format(
+            blue=self.blue,
+            reset=self.reset,
+            italics=self.italics,
+            no_italics=self.no_italics))
 
 
 if __name__ == '__main__':

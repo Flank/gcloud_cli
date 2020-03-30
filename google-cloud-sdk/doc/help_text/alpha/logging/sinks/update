@@ -3,10 +3,13 @@ NAME
 
 SYNOPSIS
     gcloud alpha logging sinks update SINK_NAME [DESTINATION]
-        [--add-exclusions=[description=DESCRIPTION],
+        [--add-exclusion=[description=DESCRIPTION],
           [disabled=DISABLED],[filter=FILTER],[name=NAME]] [--clear-exclusions]
         [--description=DESCRIPTION] [--disabled] [--log-filter=LOG_FILTER]
-        [--remove-exclusions=[EXCLUSION ID,...]] [--use-partitioned-tables]
+        [--remove-exclusions=[EXCLUSION ID,...]]
+        [--update-exclusion=[description=DESCRIPTION],
+          [disabled=DISABLED],[filter=FILTER],[name=NAME]]
+        [--use-partitioned-tables]
         [--billing-account=BILLING_ACCOUNT_ID | --folder=FOLDER_ID
           | --organization=ORGANIZATION_ID | --project=PROJECT_ID]
         [--dlp-deidentify-template=DLP_DEIDENTIFY_TEMPLATE
@@ -27,7 +30,7 @@ POSITIONAL ARGUMENTS
         destination is unchanged.
 
 FLAGS
-     --add-exclusions=[description=DESCRIPTION],[disabled=DISABLED],[filter=FILTER],[name=NAME]
+     --add-exclusion=[description=DESCRIPTION],[disabled=DISABLED],[filter=FILTER],[name=NAME]
         Add an exclusion filter for a log entry that is not to be exported.
         This flag can be repeated.
 
@@ -35,7 +38,7 @@ FLAGS
         accepted:
 
          name
-            An identifier, such as "load-balancer-exclusion". Identifiers are
+            An identifier, such as load-balancer-exclusion. Identifiers are
             limited to 100 characters and can include only letters, digits,
             underscores, hyphens, and periods.
 
@@ -63,6 +66,28 @@ FLAGS
 
      --remove-exclusions=[EXCLUSION ID,...]
         Specify the name of the Logging exclusion(s) to delete.
+
+     --update-exclusion=[description=DESCRIPTION],[disabled=DISABLED],[filter=FILTER],[name=NAME]
+        Update an exclusion filter for a log entry that is not to be exported.
+        This flag can be repeated.
+
+        The name and filter attributes are required. following keys are
+        accepted:
+
+         name
+            An identifier, such as load-balancer-exclusion. Identifiers are
+            limited to 100 characters and can include only letters, digits,
+            underscores, hyphens, and periods.
+
+         description
+            A description of this exclusion.
+
+         filter
+            An advanced log filter that matches the log entries to be excluded.
+
+         disabled
+            If this exclusion should be disabled and not exclude the log
+            entries.
 
      Settings for sink exporting data to BigQuery.
 
@@ -116,8 +141,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To only update a sink filter, run:

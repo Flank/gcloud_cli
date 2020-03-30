@@ -8,7 +8,9 @@ SYNOPSIS
         [--ksk-algorithm=KSK_ALGORITHM] [--ksk-key-length=KSK_KEY_LENGTH]
         [--networks=[NETWORK,...]] [--update-labels=[KEY=VALUE,...]]
         [--zsk-algorithm=ZSK_ALGORITHM] [--zsk-key-length=ZSK_KEY_LENGTH]
-        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+        [--clear-labels | --remove-labels=[KEY,...]]
+        [--target-network=TARGET_NETWORK --target-project=TARGET_PROJECT]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Update an existing Cloud DNS managed-zone.
@@ -98,14 +100,24 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
+
+     --target-network=TARGET_NETWORK
+        Network ID of the Google Compute Engine private network to forward
+        queries to.
+
+     --target-project=TARGET_PROJECT
+        Project ID of the Google Compute Engine private network to forward
+        queries to.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To change the description of a managed-zone, run:

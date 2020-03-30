@@ -105,8 +105,39 @@ and are suitable for applications in production.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create an instance with id \f5my\-instance\-id\fR with a cluster located in
+\f5us\-east1\-c\fR, run:
+
+.RS 2m
+$ gcloud bigtable instances create my\-instance\-id \e
+    \-\-display\-name="My Instance" \-\-cluster=my\-cluster\-id \e
+    \-\-cluster\-zone=us\-east1\-c
+.RE
+
+To create a \f5DEVELOPMENT\fR instance, run:
+
+.RS 2m
+$ gcloud bigtable instances create my\-dev\-instance \e
+    \-\-display\-name="Dev Instance" \-\-instance\-type=DEVELOPMENT \e
+    \-\-cluster=my\-cluster\-id \-\-cluster\-zone=us\-east1\-c
+.RE
+
+To create an instance with \f5HDD\fR storage and \f510\fR nodes, run:
+
+.RS 2m
+$ gcloud bigtable instances create my\-hdd\-instance \e
+    \-\-display\-name="HDD Instance" \-\-cluster\-storage\-type=HDD \e
+    \-\-cluster\-num\-nodes=10 \-\-cluster=my\-cluster\-id \e
+    \-\-cluster\-zone=us\-east1\-c
+.RE
 
 
 

@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.core import exceptions as core_exceptions
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
@@ -78,6 +79,20 @@ class CreateSurfaceTestGA(base.MlGaPlatformTestBase):
   def testCreateDescription(self, module_name):
     self._ExpectModel(description='Foo')
     self.Run('{} models create myModel --description Foo'.format(module_name))
+
+  def testConflictingRegionFlag(self, module_name):
+    with self.assertRaisesRegex(
+        core_exceptions.Error,
+        'Only one of --region or --regions can be specified.'):
+      self.Run(
+          '{} models create myModel --region regionA --regions regionB'.format(
+              module_name))
+
+  # NOTE that this test only checks the request. endpoint is not tested here.
+  def testCreateRegionFlag(self, module_name):
+    self._ExpectModel(regions=['europe-west4'])
+    self.Run(
+        '{} models create myModel --region europe-west4'.format(module_name))
 
 
 @parameterized.parameters('ml-engine', 'ai-platform')

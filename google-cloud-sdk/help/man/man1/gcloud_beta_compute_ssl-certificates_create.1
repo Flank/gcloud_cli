@@ -17,10 +17,10 @@ gcloud beta compute ssl\-certificates create \- create a Google Compute Engine S
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR \fBgcloud beta compute ssl\-certificates create\fR is used to
-create SSL certificates which can be used to configure a target HTTPS proxy. An
-SSL certificate consists of a certificate and private key. The private key is
-encrypted before it is stored.
+\fB(BETA)\fR \fBgcloud beta compute ssl\-certificates create\fR creates SSL
+certificates, which you can use in a target HTTPS or target SSL proxy. An SSL
+certificate resource consists of a certificate and private key. The private key
+is encrypted before it is stored.
 
 You can create either a managed or a self\-managed SslCertificate. A managed
 SslCertificate will be provisioned and renewed for you, when you specify the
@@ -131,8 +131,21 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a certificate 'my\-cert' from a certificate placed under path
+\'foo/cert' and a private key placed under path 'foo/pk', run:
+
+.RS 2m
+$ gcloud beta compute ssl\-certificates create my\-cert \e
+  \-\-certificate=foo/cert \-\-private\-key=foo/pk
+.RE
 
 
 

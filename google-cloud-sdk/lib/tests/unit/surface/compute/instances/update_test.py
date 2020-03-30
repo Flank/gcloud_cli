@@ -55,7 +55,7 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
         instance_ref, edited_labels, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
     response = self.Run(
@@ -85,7 +85,7 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
         instance_ref, edited_labels, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
     response = self.Run(
@@ -108,7 +108,7 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
         instance_ref, update_labels, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
     response = self.Run(
@@ -232,8 +232,8 @@ class SetMinCpuPlatformTest(UpdateTestBaseClass):
     with self.Client() as client:
       self.ExpectSetMinCpuPlatform(client)
 
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),
@@ -241,6 +241,7 @@ class SetMinCpuPlatformTest(UpdateTestBaseClass):
               self._GetOperationRef('operation-X', 'central2-a'),
               self.messages.Operation.StatusValueValuesEnum.DONE,
               self._GetInstanceRef('instance-1', 'central2-a')))
+
       client.instances.Get.Expect(
           self.messages.ComputeInstancesGetRequest(
               instance='instance-1', project='fake-project', zone='central2-a'),
@@ -259,8 +260,8 @@ class SetMinCpuPlatformTest(UpdateTestBaseClass):
     with self.Client() as client:
       self.ExpectSetMinCpuPlatform(client, None)
 
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),
@@ -268,6 +269,7 @@ class SetMinCpuPlatformTest(UpdateTestBaseClass):
               self._GetOperationRef('operation-X', 'central2-a'),
               self.messages.Operation.StatusValueValuesEnum.DONE,
               self._GetInstanceRef('instance-1', 'central2-a')))
+
       client.instances.Get.Expect(
           self.messages.ComputeInstancesGetRequest(
               instance='instance-1', project='fake-project', zone='central2-a'),
@@ -324,8 +326,8 @@ class DeletionProtectionTest(UpdateTestBaseClass, parameterized.TestCase):
       self.ExpectSetDeletionProtection(client,
                                        deletion_protection=deletion_protection)
 
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),
@@ -414,8 +416,8 @@ class InstancesSetShieldedInstanceConfigGATest(UpdateTestBaseClass,
       self.ExpectShieldedInstanceConfig(
           client, shielded_instance_config=shieldedinstanceconfig)
 
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),
@@ -423,6 +425,7 @@ class InstancesSetShieldedInstanceConfigGATest(UpdateTestBaseClass,
               self._GetOperationRef('operation-X', 'central2-a'),
               self.messages.Operation.StatusValueValuesEnum.DONE,
               self._GetInstanceRef('instance-1', 'central2-a')))
+
       client.instances.Get.Expect(
           self.messages.ComputeInstancesGetRequest(
               instance='instance-1', project='fake-project', zone='central2-a'),
@@ -496,8 +499,8 @@ class InstancesSetShieldedInstanceIntegrityPolicyGATest(
           client,
           shielded_instance_integrity_policy=shieldedinstance_integrity_policy)
 
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),
@@ -505,6 +508,7 @@ class InstancesSetShieldedInstanceIntegrityPolicyGATest(
               self._GetOperationRef('operation-X', 'central2-a'),
               self.messages.Operation.StatusValueValuesEnum.DONE,
               self._GetInstanceRef('instance-1', 'central2-a')))
+
       client.instances.Get.Expect(
           self.messages.ComputeInstancesGetRequest(
               instance='instance-1', project='fake-project', zone='central2-a'),
@@ -558,8 +562,8 @@ class DisplayDeviceTest(UpdateTestBaseClass, parameterized.TestCase):
     with self.Client() as client:
       self.ExpectUpdateDisplayDevice(client, enable_display)
 
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),

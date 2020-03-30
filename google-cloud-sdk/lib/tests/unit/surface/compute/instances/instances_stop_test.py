@@ -46,6 +46,14 @@ class InstancesStopTestBase(test_base.BaseTest):
             self.api_mock.messages.ComputeZoneOperationsGetRequest(
                 **operation_ref.AsDict()))
 
+  def _GetOperationWaitRequest(self, operation_ref):
+    return (self.api_mock.adapter.apitools_client.zoneOperations, 'Wait',
+            self.api_mock.messages.ComputeZoneOperationsWaitRequest(
+                **operation_ref.AsDict()))
+
+  def _GetOperationPollingRequest(self, operation_ref):
+    return self._GetOperationWaitRequest(operation_ref)
+
   def _GetOperationMessage(self, operation_ref, status, errors=None):
     operation = self.api_mock.messages.Operation(
         name=operation_ref.Name(),
@@ -102,7 +110,7 @@ class InstancesStopTest(InstancesStopTestBase):
           (self._GetOperationMessage(op_ref, self.status_enum.PENDING)))])
 
     self.api_mock.batch_responder.ExpectBatch([
-        (self._GetOperationGetRequest(op_ref), self._GetOperationMessage(
+        (self._GetOperationPollingRequest(op_ref), self._GetOperationMessage(
             op_ref, self.status_enum.DONE)),
     ])
 
@@ -132,10 +140,10 @@ class InstancesStopTest(InstancesStopTestBase):
           (self._GetOperationMessage(op_refs[i], self.status_enum.PENDING)))
          for i in range(num_instances)])
 
-    self.api_mock.batch_responder.ExpectBatch([(self._GetOperationGetRequest(  # pylint:disable=g-complex-comprehension
-        op_refs[i]), self._GetOperationMessage(op_refs[i],
-                                               self.status_enum.DONE))
-                                               for i in range(num_instances)])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._GetOperationPollingRequest(op_refs[i]),
+         self._GetOperationMessage(op_refs[i], self.status_enum.DONE))
+        for i in range(num_instances)])
 
     self.api_mock.batch_responder.ExpectBatch([(self._GetInstancesStopRequest(
         stop_refs[i]), self._CreateInstancesStopRequest(stop_refs[i]))
@@ -162,7 +170,7 @@ class InstancesStopTest(InstancesStopTestBase):
           (self._GetOperationMessage(op_ref, self.status_enum.PENDING)))])
 
     self.api_mock.batch_responder.ExpectBatch([
-        (self._GetOperationGetRequest(op_ref), self._GetOperationMessage(
+        (self._GetOperationPollingRequest(op_ref), self._GetOperationMessage(
             op_ref, self.status_enum.DONE)),
     ])
 
@@ -262,7 +270,7 @@ class InstancesStopTestAlpha(InstancesStopTestBase):
                 op_ref, self.status_enum.PENDING)))])
 
     self.api_mock.batch_responder.ExpectBatch([
-        (self._GetOperationGetRequest(op_ref), self._GetOperationMessage(
+        (self._GetOperationPollingRequest(op_ref), self._GetOperationMessage(
             op_ref, self.status_enum.DONE)),
     ])
 
@@ -286,7 +294,7 @@ class InstancesStopTestAlpha(InstancesStopTestBase):
                 op_ref, self.status_enum.PENDING)))])
 
     self.api_mock.batch_responder.ExpectBatch([
-        (self._GetOperationGetRequest(op_ref), self._GetOperationMessage(
+        (self._GetOperationPollingRequest(op_ref), self._GetOperationMessage(
             op_ref, self.status_enum.DONE)),
     ])
 

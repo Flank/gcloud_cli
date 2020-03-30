@@ -1,0 +1,71 @@
+NAME
+    gcloud beta memcache instances apply-parameters - apply updated parameters
+        to a Memorystore Memcached instance
+
+SYNOPSIS
+    gcloud beta memcache instances apply-parameters
+        (INSTANCE : --region=REGION) (--apply-all | --node-ids=[NODE_IDS,...])
+        [--async] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Apply updated parameters to the nodes of a Memorystore Memcached
+    instance with the given name.
+
+POSITIONAL ARGUMENTS
+     Instance resource - Arguments and flags that specify the Memcached
+     instance you want to apply parameters to. The arguments in this group can
+     be used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: provide the argument [instance] on the command
+     line with a fully specified name; provide the argument [--project] on the
+     command line; set the property [core/project]. This must be specified.
+
+       INSTANCE
+          ID of the instance or fully qualified identifier for the instance.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --region=REGION
+          The name of the Memcached region of the instance.
+
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --apply-all
+          Apply the updated parameters onto all nodes.
+
+       --node-ids=[NODE_IDS,...]
+          The nodes on which to apply the updated parameters.
+
+OPTIONAL FLAGS
+     --async
+        Return immediately, without waiting for the operation in progress to
+        complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the memcache/v1beta2 API. The full documentation for this
+    API can be found at: https://cloud.google.com/memorystore/
+
+EXAMPLES
+    The following command applies updated parameters to nodes 'node-1' and
+    'node-2' of a Memcached instance with the name 'my-memcache-instance' in
+    region 'us-central1'
+
+        $ gcloud beta memcache instances apply-parameters \
+            my-memcache-instance --node-ids=node-1,node-2 \
+            --region=us-central1
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha memcache instances apply-parameters
+

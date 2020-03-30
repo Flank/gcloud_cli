@@ -53,7 +53,7 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
     self._ExpectGetRequest(address_ref, address)
     self._ExpectLabelsSetRequest(address_ref, edited_labels, b'fingerprint-42',
                                  operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(address_ref, updated_address)
 
     response = self.Run(
@@ -79,7 +79,7 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
     self._ExpectGetRequest(address_ref, address)
     self._ExpectLabelsSetRequest(address_ref, edited_labels, b'fingerprint-42',
                                  operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(address_ref, updated_address)
 
     response = self.Run(
@@ -106,7 +106,7 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
     self._ExpectGetRequest(address_ref, address)
     self._ExpectLabelsSetRequest(address_ref, edited_labels, b'fingerprint-42',
                                  operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(address_ref, updated_address)
 
     response = self.Run(
@@ -128,7 +128,7 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
     self._ExpectGetRequest(address_ref, address)
     self._ExpectLabelsSetRequest(address_ref, update_labels, b'fingerprint-42',
                                  operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(address_ref, updated_address)
 
     response = self.Run(

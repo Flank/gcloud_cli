@@ -35,7 +35,7 @@ class MlTranslateTestBase(sdk_test_base.WithFakeAuth,
 
   _VERSIONS_FOR_RELEASE_TRACKS = {
       calliope_base.ReleaseTrack.ALPHA: 'v3beta1',
-      calliope_base.ReleaseTrack.BETA: 'v3beta1',
+      calliope_base.ReleaseTrack.BETA: 'v3',
   }
 
   def SetUp(self):
@@ -54,5 +54,3 @@ class MlTranslateTestBase(sdk_test_base.WithFakeAuth,
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = apis.GetMessagesModule(TRANSLATE_API, self.version)
-
-

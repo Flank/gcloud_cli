@@ -30,10 +30,11 @@ FLAGS
      --metadata=KEY=VALUE,[KEY=VALUE,...]
         Metadata to be made available to the guest operating system running on
         the instances. Each metadata entry is a key/value pair separated by an
-        equals sign. Metadata keys must be unique and less than 128 bytes in
-        length. Values must be less than or equal to 32,768 bytes in length.
+        equals sign. Each metadata key must be unique and have a max of 128
+        bytes in length. Each value must have a max of 256 KB in length.
         Multiple arguments can be passed to this flag, e.g., --metadata
-        key-1=value-1,key-2=value-2,key-3=value-3.
+        key-1=value-1,key-2=value-2,key-3=value-3. The combined total size for
+        all metadata entries is 512 KB.
 
         In images that have Compute Engine tools installed on them, such as the
         official images (https://cloud.google.com/compute/docs/images), the
@@ -61,8 +62,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

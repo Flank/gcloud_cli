@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from apitools.base.py import exceptions as api_exceptions
 from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
@@ -48,7 +49,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         log_location=log_location,
         permissions=permissions,
         async_flag=async_flag,
-        is_import=True)
+        is_import=False)
 
   def GetNetworkStepForExport(
       self, network=None, subnet=None, include_zone=True,
@@ -124,8 +125,30 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         [image-export] output
         """, normalize_space=True)
 
-  def testServiceNotEnabled(self):
-    self._ExpectServiceUsage(build_enabled=False)
+  def testCloudbuildServiceNotEnabled(self):
+    self._ExpectServiceUsage(build_enabled=False, compute_enabled=False)
+
+    self.mocked_crm_v1.projects.Get.Expect(
+        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
+            projectId='my-project',
+        ),
+        response=self.project,
+    )
+
+    self.PrepareDaisyBucketMocksWithRegion()
+
+    with self.assertRaisesRegexp(console_io.UnattendedPromptError,
+                                 'This prompt could not be answered because '
+                                 'you are not in an interactive session.'):
+      self.Run("""
+               compute images export --image {0}
+               --destination-uri {1}
+               """.format(self.image_name, self.destination_uri))
+
+    self.AssertErrContains('cloudbuild.googleapis.com')
+
+  def testComputeServiceNotEnabled(self):
+    self._ExpectServiceUsage(compute_enabled=False)
 
     self.mocked_crm_v1.projects.Get.Expect(
         self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
@@ -144,7 +167,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
                --destination-uri {1}
                """.format(self.image_name, self.destination_uri))
 
-    self.AssertErrContains('cloudbuild.googleapis.com')
+    self.AssertErrContains('compute.googleapis.com')
 
   def testImageProject(self):
     build_step = self.GetNetworkStepForExport(include_zone=False,
@@ -267,7 +290,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
 
   def testScratchBucketCreatedInSourceRegion(self):
     build_step = self.GetNetworkStepForExport(include_zone=False)
-    self.PrepareDaisyMocks(build_step)
+    self.PrepareDaisyMocks(build_step, is_import=False)
 
     self.mocked_storage_v1.buckets.Get.Expect(
         self.storage_v1_messages.StorageBucketsGetRequest(bucket='31dd'),
@@ -301,6 +324,160 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
              """.format(self.image_name, self.destination_uri))
 
     self.AssertOutputContains("""\
+        [image-export] output
+        """, normalize_space=True)
+
+  def testAllowFailedServiceAccountPermissionModification(self):
+    actual_permissions = self.crm_v1_messages.Policy(bindings=[
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_USER),
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR),
+    ])
+    build_step = self.GetNetworkStepForExport(include_zone=False)
+    self.PrepareDaisyMocksForExport(build_step, permissions=actual_permissions)
+
+    # mock for 2 service accounts.
+    for _ in range(2):
+      self.mocked_crm_v1.projects.GetIamPolicy.Expect(
+          request=(
+              self.crm_v1_messages
+              .CloudresourcemanagerProjectsGetIamPolicyRequest(
+                  getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(
+                      options=self.crm_v1_messages.GetPolicyOptions(
+                          requestedPolicyVersion=iam_util
+                          .MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
+                  resource='my-project')),
+          response=self.permissions,
+      )
+
+      self.mocked_crm_v1.projects.SetIamPolicy.Expect(
+          self.crm_v1_messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
+              resource='my-project',
+              setIamPolicyRequest=self.crm_v1_messages.SetIamPolicyRequest(
+                  policy=self.permissions,),
+          ),
+          exception=api_exceptions.HttpForbiddenError('response', 'content',
+                                                      'url'))
+    self.Run("""
+             compute images export --image {0}
+             --destination-uri {1} --quiet
+             """.format(self.image_name, self.destination_uri))
+
+    self.AssertOutputContains(
+        """\
+        [image-export] output
+        """, normalize_space=True)
+
+  def testAllowFailedIamGetRoles(self):
+    self.PrepareDaisyBucketMocksWithRegion()
+    self._ExpectServiceUsage()
+
+    self.mocked_crm_v1.projects.Get.Expect(
+        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
+            projectId='my-project',
+        ),
+        response=self.project,
+    )
+
+    get_request = self.crm_v1_messages \
+      .CloudresourcemanagerProjectsGetIamPolicyRequest(
+          getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(
+              options=self.crm_v1_messages.GetPolicyOptions(
+                  requestedPolicyVersion=
+                  iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
+          resource='my-project')
+    actual_permissions = self.crm_v1_messages.Policy(bindings=[])
+    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
+        request=get_request,
+        response=actual_permissions,
+    )
+
+    self.mocked_iam_v1.roles.Get.Expect(
+        self.iam_v1_messages.IamRolesGetRequest(
+            name=daisy_utils.ROLE_COMPUTE_ADMIN),
+        exception=api_exceptions.HttpForbiddenError('response', 'content',
+                                                    'url'))
+    self.mocked_iam_v1.roles.Get.Expect(
+        self.iam_v1_messages.IamRolesGetRequest(
+            name=daisy_utils.ROLE_COMPUTE_STORAGE_ADMIN),
+        exception=api_exceptions.HttpForbiddenError('response', 'content',
+                                                    'url'))
+
+    # Called once for each missed service account role.
+    self._ExpectAddIamPolicyBinding(5)
+
+    self._ExpectCloudBuild(self.GetNetworkStepForExport(include_zone=False))
+
+    self.Run("""
+             compute images export --image {0}
+             --destination-uri {1} --quiet
+             """.format(self.image_name, self.destination_uri))
+
+    self.AssertOutputContains(
+        """\
+        [image-export] output
+        """, normalize_space=True)
+
+  def testEditorPermissionIsSufficientForComputeAccount(self):
+    actual_permissions = self.crm_v1_messages.Policy(bindings=[
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_COMPUTE_ADMIN),
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_USER),
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR),
+        self.crm_v1_messages.Binding(
+            members=[
+                'serviceAccount:123456-compute@developer.gserviceaccount.com'
+            ],
+            role=daisy_utils.ROLE_EDITOR),
+    ])
+    build_step = self.GetNetworkStepForExport(include_zone=False)
+    self.PrepareDaisyMocksForExport(build_step, permissions=actual_permissions)
+
+    self.Run("""
+             compute images export --image {0}
+             --destination-uri {1}
+             """.format(self.image_name, self.destination_uri))
+
+    self.AssertOutputContains(
+        """\
+        [image-export] output
+        """, normalize_space=True)
+
+  def testCustomRolePermissionIsSufficientForComputeAccount(self):
+    actual_permissions = self.crm_v1_messages.Policy(bindings=[
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_COMPUTE_ADMIN),
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_USER),
+        self.crm_v1_messages.Binding(
+            members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+            role=daisy_utils.ROLE_IAM_SERVICE_ACCOUNT_TOKEN_CREATOR),
+        self.crm_v1_messages.Binding(
+            members=[
+                'serviceAccount:123456-compute@developer.gserviceaccount.com'
+            ],
+            role='roles/custom'),
+    ])
+    build_step = self.GetNetworkStepForExport(include_zone=False)
+    self.PrepareDaisyMocksForExport(build_step, permissions=actual_permissions)
+
+    self.Run("""
+             compute images export --image {0}
+             --destination-uri {1}
+             """.format(self.image_name, self.destination_uri))
+
+    self.AssertOutputContains(
+        """\
         [image-export] output
         """, normalize_space=True)
 

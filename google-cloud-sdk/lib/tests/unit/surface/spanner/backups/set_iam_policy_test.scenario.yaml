@@ -1,0 +1,75 @@
+title: spanner backups set-iam-policy test
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: spanner backups set-iam-policy test-backup --instance=test-instance policy.json
+  - stderr: |
+      Updated IAM policy for backup [test-backup].
+  - stdout: |
+      bindings:
+      - members:
+        - user:test@gmail.com
+        role: roles/non-primitive
+      etag: etag
+      version: 1
+actions:
+- write_file:
+    path: policy.json
+    contents: |
+      {
+        "version": 1,
+        "etag": "etag",
+        "bindings": [
+          {
+            "role": "roles/non-primitive",
+            "members": [
+              "user:test@gmail.com"
+            ],
+          }
+        ]
+      }
+- execute_command:
+    command: spanner backups set-iam-policy test-backup --instance=test-instance policy.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/test-instance/backups/test-backup:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:test@gmail.com
+                  role: roles/non-primitive
+                etag: etag
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:test@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for backup [test-backup].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:test@gmail.com
+          role: roles/non-primitive
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0

@@ -15,6 +15,12 @@ gcloud alpha compute network\-endpoint\-groups update \- update a Google Compute
 
 
 
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update a Google Compute Engine network endpoint group.
+
+
+
 .SH "POSITIONAL ARGUMENTS"
 
 .RS 2m
@@ -112,9 +118,20 @@ NEG default port is set.
 \f5GCE_VM_PRIMARY_IP\fR
 
 .RS 2m
+*instance* \- Required instance name in same zone as the network
+endpoint group.
+.RE
+
+.RS 2m
+The VM instance must belong to the network / subnetwork
+associated with the network endpoint group. If the VM instance
+is deleted, then any network endpoint group that has a reference
+to it is updated.
+.RE
+
+.RS 2m
 *ip* \- Required IP address of the network endpoint to attach. The
-IP address must be the primary IP of a VM's primary network
-interface.
+IP address must be the primary IP of a VM's network interface.
 .RE
 
 .TP 2m
@@ -176,9 +193,14 @@ NEG default port is set.
 \f5GCE_VM_PRIMARY_IP\fR
 
 .RS 2m
+*instance* \- Required name of instance whose endpoint(s) to
+detach. If IP address is unset then all endpoints for the
+instance in the NEG will be detached.
+.RE
+
+.RS 2m
 *ip* \- Required IP address of the network endpoint to attach. The
-IP address must be the primary IP of a VM's primary network
-interface.
+IP address must be the primary IP of a VM's network interface.
 .RE
 
 
@@ -236,8 +258,9 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -248,8 +271,8 @@ To add two endpoints to a network endpoint group:
 .RS 2m
 $ gcloud alpha compute network\-endpoint\-groups update my\-neg \e
     \-\-zone=us\-central1\-a \e
-  \-\-add\-endpoint=instance=my\-instance1,ip=127.0.0.1,port=1234 \e
-  \-\-add\-endpoint=instance=my\-instance2
+    \-\-add\-endpoint=instance=my\-instance1,ip=127.0.0.1,port=1234 \e
+    \-\-add\-endpoint=instance=my\-instance2
 .RE
 
 To remove two endpoints from a network endpoint group:
@@ -257,8 +280,8 @@ To remove two endpoints from a network endpoint group:
 .RS 2m
 $ gcloud alpha compute network\-endpoint\-groups update my\-neg \e
     \-\-zone=us\-central1\-a \e
-  \-\-remove\-endpoint=instance=my\-instance1,ip=127.0.0.1,port=1234 \e
-  \-\-remove\-endpoint=instance=my\-instance2
+    \-\-remove\-endpoint=instance=my\-instance1,ip=127.0.0.1,port=1234 \e
+    \-\-remove\-endpoint=instance=my\-instance2
 .RE
 
 

@@ -422,6 +422,20 @@ class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
              '--num-paths 42'.format(module_name))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateExplainabilityXrai(self, module_name):
+    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
+    xrai_config = self.msgs.GoogleCloudMlV1XraiAttribution()
+    xrai_config.numIntegralSteps = 42
+    explain_config.xraiAttribution = xrai_config
+    self._ExpectCreate(explain_config=explain_config)
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--explanation-method xrai '
+             '--num-integral-steps 42'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
 
 class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
 
@@ -523,6 +537,20 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
     self.Run('{} versions create versionId --model modelId '
              '--origin gs://path/to/file '
              '--explanation-method integrated-gradients '
+             '--num-integral-steps 42'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateExplainabilityXrai(self, module_name):
+    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
+    xrai_config = self.msgs.GoogleCloudMlV1XraiAttribution()
+    xrai_config.numIntegralSteps = 42
+    explain_config.xraiAttribution = xrai_config
+    self._ExpectCreate(explain_config=explain_config)
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--explanation-method xrai '
              '--num-integral-steps 42'.format(module_name))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 

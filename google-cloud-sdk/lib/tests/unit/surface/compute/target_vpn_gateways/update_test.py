@@ -61,7 +61,7 @@ class UpdateLabelsTestBeta(
     self._ExpectGetRequest(self.target_vpn_gateway_ref, target_vpn_gateway)
     self._ExpectLabelsSetRequest(self.target_vpn_gateway_ref, edited_labels,
                                  b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(self.target_vpn_gateway_ref,
                            updated_target_vpn_gateway)
 
@@ -89,7 +89,7 @@ class UpdateLabelsTestBeta(
     self._ExpectGetRequest(self.target_vpn_gateway_ref, target_vpn_gateway)
     self._ExpectLabelsSetRequest(self.target_vpn_gateway_ref, edited_labels,
                                  b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(self.target_vpn_gateway_ref,
                            updated_target_vpn_gateway)
 
@@ -112,7 +112,7 @@ class UpdateLabelsTestBeta(
     self._ExpectGetRequest(self.target_vpn_gateway_ref, target_vpn_gateway)
     self._ExpectLabelsSetRequest(self.target_vpn_gateway_ref, update_labels,
                                  b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(self.target_vpn_gateway_ref,
                            updated_target_vpn_gateway)
 

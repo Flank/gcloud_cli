@@ -80,8 +80,21 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To simulate a maintenance event on an instance named \f5\fItest\-instance\fR\fR
+located in zone \f5\fIus\-east1\-d\fR\fR, run:
+
+.RS 2m
+$ gcloud beta compute instances simulate\-maintenance\-event \e
+    test\-instance \-\-zone=us\-east1\-d
+.RE
 
 
 

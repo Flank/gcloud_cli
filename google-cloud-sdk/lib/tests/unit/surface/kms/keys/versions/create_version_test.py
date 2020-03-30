@@ -31,6 +31,7 @@ class CryptokeysVersionsCreateTestGA(base.KmsMockTest):
   def SetUp(self):
     self.version_name = self.project_name.Version('global/my_kr/my_key/3')
 
+  def SetCreateExpectation(self):
     # pylint: disable=line-too-long
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.Create.Expect(
@@ -40,12 +41,14 @@ class CryptokeysVersionsCreateTestGA(base.KmsMockTest):
         self.messages.CryptoKeyVersion(name=self.version_name.RelativeName()))
 
   def testCreateNonPrimary(self):
+    self.SetCreateExpectation()
     self.Run('kms keys versions create '
              '--location={0} --keyring={1} --key={2}'.format(
                  self.version_name.location_id, self.version_name.key_ring_id,
                  self.version_name.crypto_key_id))
 
   def testCreatePrimary(self):
+    self.SetCreateExpectation()
     self.kms.projects_locations_keyRings_cryptoKeys.UpdatePrimaryVersion.Expect(
         self.messages.
         CloudkmsProjectsLocationsKeyRingsCryptoKeysUpdatePrimaryVersionRequest(
@@ -61,8 +64,41 @@ class CryptokeysVersionsCreateTestGA(base.KmsMockTest):
                  self.version_name.crypto_key_id))
 
   def testCreateFullName(self):
+    self.SetCreateExpectation()
     self.Run('kms keys versions create --key={0}'.format(
         self.version_name.Parent().RelativeName()))
+
+  def testCreateExternalKeyVersion(self):
+    # pylint: disable=line-too-long
+    sample_kms_address = 'https://example.kms/'
+    ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
+    ckv.Create.Expect(
+        self.messages.
+        CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsCreateRequest(
+            parent=self.version_name.Parent().RelativeName(),
+            cryptoKeyVersion=self.messages.CryptoKeyVersion(
+                externalProtectionLevelOptions=self.messages
+                .ExternalProtectionLevelOptions(
+                    externalKeyUri=sample_kms_address))),
+        self.messages.CryptoKeyVersion(
+            name=self.version_name.RelativeName(),
+            externalProtectionLevelOptions=self.messages
+            .ExternalProtectionLevelOptions(externalKeyUri=sample_kms_address)))
+
+    self.kms.projects_locations_keyRings_cryptoKeys.UpdatePrimaryVersion.Expect(
+        self.messages
+        .CloudkmsProjectsLocationsKeyRingsCryptoKeysUpdatePrimaryVersionRequest(
+            name=self.version_name.Parent().RelativeName(),
+            updateCryptoKeyPrimaryVersionRequest=(
+                self.messages.UpdateCryptoKeyPrimaryVersionRequest(
+                    cryptoKeyVersionId=self.version_name.version_id))),
+        self.messages.CryptoKey(
+            name=self.version_name.Parent().RelativeName(),))
+    self.Run(
+        'kms keys versions create '
+        '--location={0} --keyring={1} --key={2} --external-key-uri={3} --primary'
+        .format(self.version_name.location_id, self.version_name.key_ring_id,
+                self.version_name.crypto_key_id, sample_kms_address))
 
 
 class CryptokeysVersionsCreateTestBeta(CryptokeysVersionsCreateTestGA):

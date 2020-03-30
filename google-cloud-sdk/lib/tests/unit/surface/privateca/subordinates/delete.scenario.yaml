@@ -1,0 +1,125 @@
+title: privateca roots delete scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: privateca subordinates delete ca --location europe-west1
+  - prompt:
+    - message: You are about to delete Certificate Authority [ca]
+    - input: y
+  - stderr: |
+      Deleted Certificate Authority [ca].
+- execute:
+  - command: privateca subordinates delete ca --location europe-west1
+  - prompt:
+    - message: You are about to delete Certificate Authority [ca]
+    - input: y
+  - error: '1: Cannot perform subordinates command on Root CA. Please use the `privateca
+      roots` command group instead.'
+- execute:
+  - command: privateca subordinates delete ca --location europe-west1 --quiet
+  - stderr: |
+      Deleted Certificate Authority [ca].
+- execute:
+  - command: privateca subordinates delete ca --location europe-west1
+  - prompt:
+    - message: You are about to delete Certificate Authority [ca]
+    - input: n
+  - error: '1: Aborted by user.'
+actions:
+- execute_command:
+    command: privateca subordinates delete ca --location europe-west1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete Certificate Authority [ca]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+            type: SUBORDINATE
+    - api_call:
+        expect_request:
+          uri:
+            matches: ^https://privateca\.googleapis\.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca\?alt=json&requestId=[^&]+$
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+    - expect_stderr: |
+        Deleted Certificate Authority [ca].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca subordinates delete ca --location europe-west1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete Certificate Authority [ca]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+            type: SELF_SIGNED
+    - expect_exit:
+        code: 1
+        message: Cannot perform subordinates command on Root CA. Please use the `privateca
+          roots` command group instead.
+- execute_command:
+    command: privateca subordinates delete ca --location europe-west1 --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+            type: SUBORDINATE
+    - api_call:
+        expect_request:
+          uri:
+            matches: ^https://privateca\.googleapis\.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca\?alt=json&requestId=[^&]+$
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+    - expect_stderr: |
+        Deleted Certificate Authority [ca].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca subordinates delete ca --location europe-west1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete Certificate Authority [ca]
+        user_input: n
+    - expect_exit:
+        code: 1
+        message: Aborted by user.

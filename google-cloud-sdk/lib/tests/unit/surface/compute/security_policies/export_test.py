@@ -33,19 +33,19 @@ from tests.lib.surface.compute import test_resources
 
 _JSON_FILE_PATH = sdk_test_base.SdkBase.Resource(
     'tests', 'unit', 'surface', 'compute', 'security_policies', 'test_data',
-    'security-policy-exported.json')
+    'security-policy-exported-cloud-armor-config.json')
 _YAML_FILE_PATH = sdk_test_base.SdkBase.Resource(
     'tests', 'unit', 'surface', 'compute', 'security_policies', 'test_data',
-    'security-policy-exported.yaml')
+    'security-policy-exported-cloud-armor-config.yaml')
 
 
 class SecurityPoliciesExportTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.GA
-    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'v1')
+    self.resources.RegisterApiByName('compute', 'alpha')
     self.result_file_path = os.path.join(self.temp_path, 'exported')
     self.my_policy = self.resources.Create(
         'compute.securityPolicies',
@@ -54,10 +54,10 @@ class SecurityPoliciesExportTest(test_base.BaseTest):
 
   def testWriteToJsonFile(self):
     with open(self.result_file_path, 'w') as json_file:
-      security_policies_utils.WriteToFile(json_file,
-                                          test_resources.MakeSecurityPolicy(
-                                              self.messages, self.my_policy),
-                                          'json')
+      security_policies_utils.WriteToFile(
+          json_file,
+          test_resources.MakeSecurityPolicyCloudArmorConfig(
+              self.messages, self.my_policy), 'json')
 
     with open(self.result_file_path) as results:
       with open(_JSON_FILE_PATH) as expected:
@@ -65,10 +65,10 @@ class SecurityPoliciesExportTest(test_base.BaseTest):
 
   def testWriteToYamlFile(self):
     with open(self.result_file_path, 'w') as yaml_file:
-      security_policies_utils.WriteToFile(yaml_file,
-                                          test_resources.MakeSecurityPolicy(
-                                              self.messages, self.my_policy),
-                                          'yaml')
+      security_policies_utils.WriteToFile(
+          yaml_file,
+          test_resources.MakeSecurityPolicyCloudArmorConfig(
+              self.messages, self.my_policy), 'yaml')
 
     with open(self.result_file_path) as results:
       with open(_YAML_FILE_PATH) as expected:
@@ -76,10 +76,13 @@ class SecurityPoliciesExportTest(test_base.BaseTest):
 
   def _ExportToFileHelper(self, expected_file, file_format='json'):
     self.make_requests.side_effect = iter([
-        [test_resources.MakeSecurityPolicy(self.messages, self.my_policy)],
+        [
+            test_resources.MakeSecurityPolicyCloudArmorConfig(
+                self.messages, self.my_policy)
+        ],
     ])
     self.Run('compute security-policies export my-policy'
-             ' --file-name {0} --file-format {1}'.format(
+             ' --file-name "{0}" --file-format {1}'.format(
                  self.result_file_path, file_format))
 
     with open(self.result_file_path) as result:
@@ -95,10 +98,9 @@ class SecurityPoliciesExportTest(test_base.BaseTest):
   def testExportWithErrors(self):
     with self.AssertRaisesExceptionRegexp(
         files.Error,
-        r'Unable to write file \[{0}\]: .*'.format(
-            re.escape('/'))):
+        r'Unable to write file \[{0}\]: .*'.format(re.escape('/'))):
       self.Run('compute security-policies export my-policy'
-               ' --file-name {0} --file-format {1}'.format('/', 'json'))
+               ' --file-name "{0}" --file-format {1}'.format('/', 'json'))
 
 
 if __name__ == '__main__':

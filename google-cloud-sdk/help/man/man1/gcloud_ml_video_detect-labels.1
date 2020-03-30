@@ -105,8 +105,9 @@ Examples:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -114,6 +115,16 @@ help\fR for details.
 
 This command uses the \fBvideointelligence/v1\fR API. The full documentation for
 this API can be found at: https://cloud.google.com/video\-intelligence/docs/
+
+
+
+.SH "EXAMPLES"
+
+To detect labels in video file 'gs://my_bucket/input_file.mp4':
+
+.RS 2m
+$ gcloud ml video detect\-labels gs://my_bucket/input_file.mp4
+.RE
 
 
 

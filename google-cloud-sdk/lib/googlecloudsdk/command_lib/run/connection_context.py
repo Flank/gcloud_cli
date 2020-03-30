@@ -33,13 +33,18 @@ from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from googlecloudsdk.command_lib.run import flags
-
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
 
 import httplib2
 import six
 from six.moves.urllib import parse as urlparse
+
+
+_CLUSTER_API_VERSION = 'v1alpha1'
+_CLUSTER_ALPHA_API_VERSION = 'v1'
+
+_EVENTS_API_VERSION = 'v1alpha1'
 
 
 @contextlib.contextmanager
@@ -62,11 +67,17 @@ def _OverrideEndpointOverrides(override):
 class ConnectionInfo(six.with_metaclass(abc.ABCMeta)):
   """Information useful in constructing an API client."""
 
-  def __init__(self):
+  def __init__(self, version):
+    """Initialize a connection context.
+
+    Args:
+      version: str, api version to use for making requests.
+    """
     self.endpoint = None
     self.ca_certs = None
     self.region = None
     self._cm = None
+    self._version = version
 
   @property
   def api_name(self):
@@ -74,7 +85,7 @@ class ConnectionInfo(six.with_metaclass(abc.ABCMeta)):
 
   @property
   def api_version(self):
-    return global_methods.SERVERLESS_API_VERSION
+    return self._version
 
   @property
   def active(self):
@@ -148,8 +159,8 @@ def _CheckTLSSupport():
 class _GKEConnectionContext(ConnectionInfo):
   """Context manager to connect to the GKE Cloud Run add-in."""
 
-  def __init__(self, cluster_ref):
-    super(_GKEConnectionContext, self).__init__()
+  def __init__(self, cluster_ref, version):
+    super(_GKEConnectionContext, self).__init__(version)
     self.cluster_ref = cluster_ref
 
   @contextlib.contextmanager
@@ -164,7 +175,7 @@ class _GKEConnectionContext(ConnectionInfo):
 
   @property
   def operator(self):
-    return 'Cloud Run on GKE'
+    return 'Cloud Run for Anthos'
 
   def HttpClient(self):
     # Import http only when needed, as it depends on credential infrastructure
@@ -201,14 +212,15 @@ class _GKEConnectionContext(ConnectionInfo):
 class _KubeconfigConnectionContext(ConnectionInfo):
   """Context manager to connect to a cluster defined in a Kubeconfig file."""
 
-  def __init__(self, kubeconfig, context=None):
+  def __init__(self, kubeconfig, version, context=None):
     """Initialize connection context based on kubeconfig file.
 
     Args:
       kubeconfig: googlecloudsdk.api_lib.container.kubeconfig.Kubeconfig object
+      version: str, api version to use for making requests
       context: str, current context name
     """
-    super(_KubeconfigConnectionContext, self).__init__()
+    super(_KubeconfigConnectionContext, self).__init__(version)
     self.kubeconfig = kubeconfig
     self.kubeconfig.SetCurrentContext(context or kubeconfig.current_context)
     self.client_cert_data = None
@@ -231,7 +243,7 @@ class _KubeconfigConnectionContext(ConnectionInfo):
           self.endpoint = 'https://{}/'.format(self.raw_hostname)
           with _OverrideEndpointOverrides(self.endpoint):
             yield self
-      except httplib2.SSLHandshakeError as e:
+      except httplib2.HttpLib2Error as e:
         if 'CERTIFICATE_VERIFY_FAILED' in six.text_type(e):
           raise gke.NoCaCertError(
               'Missing or invalid [certificate-authority] or '
@@ -263,7 +275,7 @@ class _KubeconfigConnectionContext(ConnectionInfo):
 
   @property
   def operator(self):
-    return 'Kubernetes Cluster'
+    return 'Cloud Run for Anthos'
 
   @property
   def location_label(self):
@@ -361,9 +373,8 @@ class _RegionalConnectionContext(ConnectionInfo):
   """Context manager to connect a particular Cloud Run region."""
 
   def __init__(self, region, version):
-    super(_RegionalConnectionContext, self).__init__()
+    super(_RegionalConnectionContext, self).__init__(version)
     self.region = region
-    self._version = version
 
   @property
   def ns_label(self):
@@ -387,20 +398,42 @@ class _RegionalConnectionContext(ConnectionInfo):
       yield self
 
   @property
-  def api_version(self):
-    return self._version
-
-  @property
   def supports_one_platform(self):
     return True
 
 
-def GetConnectionContext(args, track=base.ReleaseTrack.BETA):
+def _GetApiVersion(product,
+                   release_track,
+                   is_cluster=False,
+                   version_override=None):
+  """Returns the api version to use depending on the current context."""
+  if version_override is not None:
+    return version_override
+
+  if product == flags.Product.RUN:
+    if is_cluster:
+      if release_track == base.ReleaseTrack.ALPHA:
+        return _CLUSTER_ALPHA_API_VERSION
+      return _CLUSTER_API_VERSION
+    return global_methods.SERVERLESS_API_VERSION
+  elif product == flags.Product.EVENTS:
+    return _EVENTS_API_VERSION
+  else:
+    raise ValueError('Unrecognized product: ' + six.u(product))
+
+
+def GetConnectionContext(args,
+                         product=flags.Product.RUN,
+                         release_track=base.ReleaseTrack.GA,
+                         version_override=None):
   """Gets the regional, kubeconfig, or GKE connection context.
 
   Args:
     args: Namespace, the args namespace.
-    track: ReleaseTrack, the release track.
+    product: Which product is requesting connection context.
+    release_track: Release track of the command being run.
+    version_override: If specified, the given api version will be used no matter
+      the other parameters.
 
   Raises:
     ArgumentError if region or cluster is not specified.
@@ -408,27 +441,35 @@ def GetConnectionContext(args, track=base.ReleaseTrack.BETA):
   Returns:
     A GKE or regional ConnectionInfo object.
   """
-  if flags.IsKubernetes(args):
+  if flags.GetPlatform() == flags.PLATFORM_KUBERNETES:
     kubeconfig = flags.GetKubeconfig(args)
-    return _KubeconfigConnectionContext(kubeconfig, args.context)
+    api_version = _GetApiVersion(
+        product,
+        release_track,
+        is_cluster=True,
+        version_override=version_override)
+    return _KubeconfigConnectionContext(kubeconfig, api_version, args.context)
 
-  if flags.IsGKE(args):
+  if flags.GetPlatform() == flags.PLATFORM_GKE:
     cluster_ref = args.CONCEPTS.cluster.Parse()
     if not cluster_ref:
       raise flags.ArgumentError(
           'You must specify a cluster in a given location. '
           'Either use the `--cluster` and `--cluster-location` flags '
           'or set the run/cluster and run/cluster_location properties.')
-    return _GKEConnectionContext(cluster_ref)
+    api_version = _GetApiVersion(
+        product,
+        release_track,
+        is_cluster=True,
+        version_override=version_override)
+    return _GKEConnectionContext(cluster_ref, api_version)
 
-  if flags.IsManaged(args):
+  if flags.GetPlatform() == flags.PLATFORM_MANAGED:
     region = flags.GetRegion(args, prompt=True)
     if not region:
       raise flags.ArgumentError(
           'You must specify a region. Either use the `--region` flag '
           'or set the run/region property.')
-    if track == base.ReleaseTrack.ALPHA:
-      version = 'v1'
-    else:
-      version = global_methods.SERVERLESS_API_VERSION
-    return _RegionalConnectionContext(region, version)
+    api_version = _GetApiVersion(
+        product, release_track, version_override=version_override)
+    return _RegionalConnectionContext(region, api_version)

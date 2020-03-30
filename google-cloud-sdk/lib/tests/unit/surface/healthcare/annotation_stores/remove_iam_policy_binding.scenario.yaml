@@ -29,7 +29,7 @@ actions:
     - api_call:
         expect_request:
           uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:getIamPolicy?alt=json
-          method: POST
+          method: GET
           headers: {}
           body: null
         return_response:

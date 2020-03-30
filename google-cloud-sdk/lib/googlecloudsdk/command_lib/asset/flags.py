@@ -74,19 +74,20 @@ def AddContentTypeArgs(parser, required):
   """--content-type argument for asset export and get-history."""
   if required:
     help_text = (
-        'Asset content type. Choices are `resource`, `iam-policy` and '
-        '`org-policy`. Specifying `resource` will export resource metadata, '
-        'specifying `iam-policy` will export IAM policy set on assets, '
-        'specifying `org-policy` will export Org Policy set on asset, and '
-        'specifying `access-policy` will export Access Policy set on asset.')
+        'Asset content type. Specifying `resource` will export resource '
+        'metadata, specifying `iam-policy` will export the IAM policy for each '
+        'child asset, specifying `org-policy` will export the Org Policy set on'
+        ' child assets, and specifying `access-policy` will export the Access '
+        'Policy set on child assets.')
   else:
     help_text = (
         'Asset content type. If specified, only content matching the '
         'specified type will be returned. Otherwise, no content but the '
-        'asset name will be returned. Choices are `resource`, '
-        '`iam-policy`. Specifying `resource` will export resource '
-        'metadata, and specifying `iam-policy` will export IAM policy set '
-        'on assets.')
+        'asset name will be returned. Specifying `resource` will export '
+        'resource metadata, specifying `iam-policy` will export the IAM policy '
+        'for each child asset, specifying `org-policy` will export the Org '
+        'Policy set on child assets, and specifying `access-policy` will '
+        'export the Access Policy set on child assets.')
 
   parser.add_argument(
       '--content-type',
@@ -208,6 +209,15 @@ def AddOperationArgs(parser):
       'id',
       metavar='OPERATION_NAME',
       help='Name of the operation to describe.')
+
+
+def AddListContentTypeArgs(parser):
+  help_text = (
+      'Asset content type. If not specified, no content but the asset name and'
+      ' type will be returned in the feed. To read more see '
+      'https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/overview#asset_content_type'
+  )
+  parser.add_argument('--content-type', choices=['resource'], help=help_text)
 
 
 def AddFeedIdArgs(parser, help_text):

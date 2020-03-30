@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute sole-tenancy node-templates - read and manage Google
-        Compute Engine sole-tenancy node templates
+    gcloud beta compute sole-tenancy node-templates - read and manage Compute
+        Engine sole-tenancy node templates
 
 SYNOPSIS
     gcloud beta compute sole-tenancy node-templates COMMAND
@@ -16,36 +16,36 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (BETA) Add IAM policy binding to a Google Compute Engine node template.
+        (BETA) Add IAM policy binding to a Compute Engine node template.
 
      create
-        (BETA) Creates a Google Compute Engine node template.
+        (BETA) Create a Compute Engine node template.
 
      delete
-        (BETA) Deletes a Google Compute Engine node template.
+        (BETA) Delete a Google Compute Engine node template.
 
      describe
-        (BETA) Describes a Google Compute Engine node template.
+        (BETA) Describe a Compute Engine node template.
 
      get-iam-policy
-        (BETA) Get the IAM Policy for a Google Compute Engine node template.
+        (BETA) Get the IAM Policy for a Compute Engine node template.
 
      list
         (BETA) List Google Compute Engine node templates.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding from a Google Compute Engine node
-        template.
+        (BETA) Remove IAM policy binding from a Compute Engine node template.
 
      set-iam-policy
-        (BETA) Set the IAM policy for a Google Compute Engine node template.
+        (BETA) Set the IAM policy for a Compute Engine node template.
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -70,6 +70,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
       self.refreshed = True
       if cred:
         cred.access_token = _TOKEN
+        self.StartObjectPatch(store, 'Load', return_value=cred)
 
     self.StartObjectPatch(store, 'Refresh', side_effect=FakeRefresh)
 
@@ -300,7 +301,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
 
   def testAuthorizeOnlyAllowRegionalRegistriesWithCredStore(self):
     self.WriteNewDockerConfig({_CREDENTIAL_STORE_KEY: 'helper'})
-    registry = constants.REGIONAL_REGISTRIES[0]
+    registry = constants.REGIONAL_GCR_REGISTRIES[0]
     self.get_process_mock.side_effect = self.AssertRegistryLogin(
         registry='https://' + registry)
     self.Run('docker --server {registry} '
@@ -509,7 +510,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     }
     docker.WriteDockerAuthConfig(initial_entry)
 
-    registry = constants.REGIONAL_REGISTRIES[0]
+    registry = constants.REGIONAL_GCR_REGISTRIES[0]
     self.Run('docker --server {registry} '
              '--authorize-only'.format(registry=registry))
 

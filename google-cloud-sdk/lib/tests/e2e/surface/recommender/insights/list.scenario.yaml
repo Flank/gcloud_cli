@@ -1,13 +1,18 @@
 title: List insights
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 - execute_command:
     command: recommender insights list --project=cloud-sdk-integration-testing --location=global
       --insight-type=google.compute.firewall.Insight
     events:
     - api_call:
         expect_request:
-          uri: https://recommender.googleapis.com/v1alpha2/projects/cloud-sdk-integration-testing/locations/global/insightTypes/google.compute.firewall.Insight/insights?alt=json
+          uri: https://recommender.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/insightTypes/google.compute.firewall.Insight/insights?alt=json
           method: GET
           headers: {}
           body: null

@@ -1,5 +1,5 @@
 title: Data Catalog describe entry scenario test.
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -12,12 +12,18 @@ summary:
         expireTime: '1970-01-01T00:00:00Z'
         updateTime: '2019-03-27T19:31:43.757Z'
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta1
+      ALPHA: v1beta1
 - execute_command:
     command: data-catalog entries describe entry1 --entry-group=@pubsub --location=global
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/global/entryGroups/@pubsub/entries/entry1?alt=json
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/global/entryGroups/@pubsub/entries/entry1?alt=json
           method: GET
           headers: {}
           body: null

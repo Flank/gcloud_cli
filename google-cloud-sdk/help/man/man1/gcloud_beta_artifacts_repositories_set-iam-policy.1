@@ -1,0 +1,113 @@
+
+.TH "GCLOUD_BETA_ARTIFACTS_REPOSITORIES_SET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta artifacts repositories set\-iam\-policy \- set the IAM policy for an Artifact Registry repository
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta artifacts repositories set\-iam\-policy\fR (\fIREPOSITORY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Set the IAM policy associated with an Artifact Registry repository.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The repository specified does not exist.
+.IP "\(bu" 2m
+The active account does not have permission to access the given repository's IAM
+policies.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Repository resource \- Name of the Artifact Registry repository. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [repository] on the
+command line with a fully specified name; set the property [core/project];
+provide the argument [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIREPOSITORY\fR
+ID of the repository or fully qualified identifier for the repository. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the repository. Overrides the default artifacts/location property
+value for this command invocation. To configure the default location, use the
+command: gcloud config set artifacts/location.
+
+.RE
+.sp
+.TP 2m
+\fIPOLICY_FILE\fR
+Path to a local JSON or YAML formatted file containing a valid policy.
+
+The output of the \f5get\-iam\-policy\fR command is a valid file, as is any JSON
+or YAML file conforming to the structure of a Policy
+(https://cloud.google.com/iam/reference/rest/v1/Policy).
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBartifactregistry/v1beta1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/artifacts/docs/
+
+
+
+.SH "EXAMPLES"
+
+To set the IAM policy for \f5my\-repository\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts repositories set\-iam\-policy my\-repo \e
+    policy.json
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha artifacts repositories set\-iam\-policy
+.RE
+

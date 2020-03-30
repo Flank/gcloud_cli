@@ -124,7 +124,7 @@ class Collections(enum.Enum):
   )
   GLOBALORGANIZATIONOPERATIONS = (
       'globalOrganizationOperations',
-      'locations/global/operations/{operation}',
+      'projects/locations/global/operations/{operation}',
       {},
       [u'operation'],
       True
@@ -289,7 +289,7 @@ class Collections(enum.Enum):
   )
   ORGANIZATIONSECURITYPOLICIES = (
       'organizationSecurityPolicies',
-      'locations/global/securityPolicies/{securityPolicy}',
+      'projects/locations/global/securityPolicies/{securityPolicy}',
       {},
       [u'securityPolicy'],
       True
@@ -374,6 +374,13 @@ class Collections(enum.Enum):
       [u'project', u'region', u'healthCheck'],
       True
   )
+  REGIONINPLACESNAPSHOTS = (
+      'regionInPlaceSnapshots',
+      'projects/{project}/regions/{region}/inPlaceSnapshots/{inPlaceSnapshot}',
+      {},
+      [u'project', u'region', u'inPlaceSnapshot'],
+      True
+  )
   REGIONINSTANCEGROUPMANAGERS = (
       'regionInstanceGroupManagers',
       'projects/{project}/regions/{region}/instanceGroupManagers/'
@@ -387,6 +394,14 @@ class Collections(enum.Enum):
       'projects/{project}/regions/{region}/instanceGroups/{instanceGroup}',
       {},
       [u'project', u'region', u'instanceGroup'],
+      True
+  )
+  REGIONNETWORKENDPOINTGROUPS = (
+      'regionNetworkEndpointGroups',
+      'projects/{project}/regions/{region}/networkEndpointGroups/'
+      '{networkEndpointGroup}',
+      {},
+      [u'project', u'region', u'networkEndpointGroup'],
       True
   )
   REGIONNOTIFICATIONENDPOINTS = (
@@ -512,6 +527,13 @@ class Collections(enum.Enum):
       [u'project', u'region', u'subnetwork'],
       True
   )
+  TARGETGRPCPROXIES = (
+      'targetGrpcProxies',
+      'projects/{project}/global/targetGrpcProxies/{targetGrpcProxy}',
+      {},
+      [u'project', u'targetGrpcProxy'],
+      True
+  )
   TARGETHTTPPROXIES = (
       'targetHttpProxies',
       'projects/{project}/global/targetHttpProxies/{targetHttpProxy}',
@@ -581,6 +603,13 @@ class Collections(enum.Enum):
       'projects/{project}/regions/{region}/vpnTunnels/{vpnTunnel}',
       {},
       [u'project', u'region', u'vpnTunnel'],
+      True
+  )
+  ZONEINPLACESNAPSHOTS = (
+      'zoneInPlaceSnapshots',
+      'projects/{project}/zones/{zone}/inPlaceSnapshots/{inPlaceSnapshot}',
+      {},
+      [u'project', u'zone', u'inPlaceSnapshot'],
       True
   )
   ZONEOPERATIONS = (

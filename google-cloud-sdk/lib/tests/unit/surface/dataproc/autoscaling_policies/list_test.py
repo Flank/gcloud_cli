@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import unit_base
 
@@ -31,58 +32,32 @@ class AutoscalingPoliciesListUnitTest(unit_base.DataprocUnitTestBase):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
 
-  def testListAutoscalingPolicies(self):
+  def _testListAutoscalingPolicies(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+
     policy_1 = self.messages.AutoscalingPolicy(
         id='policy-1',
-        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1'
-    )
+        name='projects/fake-project/regions/{0}/autoscalingPolicies/policy-1'
+        .format(region))
     policy_2 = self.messages.AutoscalingPolicy(
         id='policy-2',
-        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-2'
-    )
+        name='projects/fake-project/regions/{0}/autoscalingPolicies/policy-2'
+        .format(region))
     policy_3 = self.messages.AutoscalingPolicy(
         id='policy-3',
-        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-3'
-    )
+        name='projects/fake-project/regions/{0}/autoscalingPolicies/policy-3'
+        .format(region))
     mocked_response = self.messages.ListAutoscalingPoliciesResponse(
         policies=[policy_1, policy_2, policy_3])
     self.mock_client.projects_regions_autoscalingPolicies.List.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesListRequest(
             pageSize=100,
-            parent='projects/fake-project/regions/antarctica-north42'),
-        response=mocked_response)
-
-    self.RunDataproc('autoscaling-policies list', output_format='')
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-ID
-policy-1
-policy-2
-policy-3
-"""))
-
-  def testListAutoscalingPolicies_regionFlag(self):
-    policy_1 = self.messages.AutoscalingPolicy(
-        id='policy-1',
-        name='projects/fake-project/regions/cool-region/autoscalingPolicies/policy-1'
-    )
-    policy_2 = self.messages.AutoscalingPolicy(
-        id='policy-2',
-        name='projects/fake-project/regions/cool-region/autoscalingPolicies/policy-2'
-    )
-    policy_3 = self.messages.AutoscalingPolicy(
-        id='policy-3',
-        name='projects/fake-project/regions/cool-region/autoscalingPolicies/policy-3'
-    )
-    mocked_response = self.messages.ListAutoscalingPoliciesResponse(
-        policies=[policy_1, policy_2, policy_3])
-    self.mock_client.projects_regions_autoscalingPolicies.List.Expect(
-        self.messages.DataprocProjectsRegionsAutoscalingPoliciesListRequest(
-            pageSize=100, parent='projects/fake-project/regions/cool-region'),
+            parent='projects/fake-project/regions/{0}'.format(region)),
         response=mocked_response)
 
     self.RunDataproc(
-        'autoscaling-policies list --region cool-region', output_format='')
+        'autoscaling-policies list {0}'.format(region_flag), output_format='')
     self.AssertOutputEquals(
         textwrap.dedent("""\
 ID
@@ -90,6 +65,24 @@ policy-1
 policy-2
 policy-3
 """))
+
+  def testListAutoscalingPolicies(self):
+    self._testListAutoscalingPolicies()
+
+  def testListAutoscalingPolicies_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('cool-region')
+    self._testListAutoscalingPolicies(region='cool-region')
+
+  def testListAutoscalingPolicies_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testListAutoscalingPolicies(
+        region='cool-region', region_flag='--region=cool-region')
+
+  def testListAutoscalingPolicies_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'The required property \[region\] is not currently set'
+    with self.assertRaisesRegex(properties.RequiredPropertyError, regex):
+      self.RunDataproc('autoscaling-policies list', set_region=False)
 
   def testListAutoscalingPolicies_pagination(self):
     policy_1 = self.messages.AutoscalingPolicy(

@@ -17,7 +17,7 @@ gcloud alpha logging buckets list \- lists the defined buckets
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Lists the defined buckets.
+\fB(ALPHA)\fR Lists the buckets for a project.
 
 
 
@@ -111,8 +111,19 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list the buckets in a project, run:
+
+.RS 2m
+$ gcloud alpha logging buckets list
+.RE
 
 
 
@@ -121,5 +132,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta logging buckets list
+.RE
 

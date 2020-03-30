@@ -45,11 +45,9 @@ class CompleterTest(base.SqlMockTestBeta, completer_test_base.CompleterBase):
                     name='mock-db-1',
                     charset='utf-8',
                     collation='some-collation',
-                    selfLink=
-                    'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db-1'.
-                    format(self.Project()),
-                    etag=
-                    '\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
+                    selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db-1'
+                    .format(self.Project()),
+                    etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
                     kind='sql#database'),
                 self.messages.Database(
                     # pylint:disable=line-too-long
@@ -58,11 +56,9 @@ class CompleterTest(base.SqlMockTestBeta, completer_test_base.CompleterBase):
                     name='mock-db-2',
                     charset='utf-8',
                     collation='some-collation',
-                    selfLink=
-                    'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db-2'.
-                    format(self.Project()),
-                    etag=
-                    '\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahe\"',
+                    selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db-2'
+                    .format(self.Project()),
+                    etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahe\"',
                     kind='sql#database'),
             ]),
     )

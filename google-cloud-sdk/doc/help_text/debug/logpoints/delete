@@ -1,5 +1,6 @@
 NAME
-    gcloud debug logpoints delete - delete debug logpoints
+    gcloud debug logpoints delete - delete debug logpoints for a Cloud Debugger
+        debug target (debuggee)
 
 SYNOPSIS
     gcloud debug logpoints delete [ID ...] [--all-users] [--include-inactive]
@@ -7,9 +8,10 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    This command deletes logpoints from a Cloud Debugger debug target. It will
-    ask for confirmation before deleting any logpoints. To suppress
-    confirmation, use the global --quiet option.
+    gcloud debug logpoints delete is used to delete logpoints from a Cloud
+    Debugger debug target (debuggee). It will ask for confirmation before
+    deleting any logpoints. To suppress confirmation, use the global --quiet
+    option.
 
 POSITIONAL ARGUMENTS
      [ID ...]
@@ -49,8 +51,27 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To delete all active debug logpoints created by the current user of the
+    debug target (debuggee), without being prompted for confirmation, run:
+
+        $ gcloud debug logpoints delete --target=<debuggee_id> --quiet
+
+    To delete all active and inactive debug logpoints created by all users of
+    the debug target (debuggee), run:
+
+        $ gcloud debug logpoints delete --target=<debuggee_id> \
+            --include-inactive --all-users
+
+    To delete the debug logpoints with IDs 'ID1' and 'ID2' (where ID1 and ID2
+    were each created by different users) of the debug target (debuggee), run:
+
+        $ gcloud debug logpoints delete ID1 ID2 --target=<debuggee_id> \
+            --all-users
 
 NOTES
     This variant is also available:

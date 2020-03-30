@@ -8,12 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances add-tags is used to add tags to Google
-    Compute Engine virtual machine instances. For example, running:
-
-        $ gcloud beta compute instances add-tags example-instance \
-            --tags tag-1,tag-2
-
-    will add tags tag-1 and tag-2 to 'example-instance'.
+    Compute Engine virtual machine instances.
 
     Tags can be used to identify the instances when adding network firewall
     rules. Tags can also be used to get firewall rules that already exist to be
@@ -69,8 +64,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To add tags tag-1 and tag-2 to an instance named test-instance, run:
+
+        $ gcloud beta compute instances add-tags test-instance \
+            --tags=tag-1,tag-2
 
 NOTES
     This command is currently in BETA and may change without notice. These

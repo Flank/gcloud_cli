@@ -57,6 +57,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
   # Otherwise the function will be deployed from the CWD, which may result in
   # huge zip files being created (plus potential test timeouts and out of space
   # on /tmp).
+  # TODO(b/150148464) Change naming convention of these tests
 
   def _GetFakeMakeZipFromDir(self, expected_src_dir=None):
     if expected_src_dir is None:
@@ -134,18 +135,18 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         original_function)
     if expect_get_upload_url:
       self._ExpectGenerateUploadUrl()
+    operation_name = self.GetOperationName()
     self.mock_client.projects_locations_functions.Patch.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsPatchRequest(
             cloudFunction=updated_function,
             name=function_name,
             updateMask=update_mask
         ),
-        self._GenerateActiveOperation('operations/operation')
+        self._GenerateActiveOperation(operation_name)
     )
     self.mock_client.operations.Get.Expect(
-        self.messages.CloudfunctionsOperationsGetRequest(
-            name='operations/operation'),
-        self._GenerateSuccessfulOperation('operations/operation'))
+        self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
+        self._GenerateSuccessfulOperation(operation_name))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=updated_function.name),
@@ -352,15 +353,15 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         self.Project(), region, _DEFAULT_FUNCTION_NAME, trigger,
         source_upload_url='foo')
     create_request = self.GetFunctionsCreateRequest(function, location_path)
-    operation = self.messages.Operation(name='operations/operation')
+    operation_name = self.GetOperationName()
+    operation = self._GenerateActiveOperation(operation_name)
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
     self.MockRemoveIamPolicy('my-test', region=region)
     self.mock_client.operations.Get.Expect(
-        self.messages.CloudfunctionsOperationsGetRequest(
-            name='operations/operation'),
-        self._GenerateSuccessfulOperation('operations/operation'))
+        self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
+        self._GenerateSuccessfulOperation(operation_name))
 
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
@@ -378,6 +379,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           '--quiet --runtime=nodejs6'.format(region))
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testCreateWithPubSubAndRetrying(self):
     self.MockUnpackedSourcesDirSize()
@@ -400,15 +403,15 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         self.Project(), _DEFAULT_LOCATION, _DEFAULT_FUNCTION_NAME, trigger,
         source_upload_url='foo')
     create_request = self.GetFunctionsCreateRequest(function, location_path)
-    operation = self.messages.Operation(name='operations/operation')
+    operation_name = self.GetOperationName()
+    operation = self._GenerateActiveOperation(operation_name)
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
     self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
-        self.messages.CloudfunctionsOperationsGetRequest(
-            name='operations/operation'),
-        self._GenerateSuccessfulOperation('operations/operation'))
+        self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
+        self._GenerateSuccessfulOperation(operation_name))
 
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
@@ -428,6 +431,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           '--runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testCreateWithPubSubAndLabels(self):
     self.MockUnpackedSourcesDirSize()
@@ -452,15 +457,15 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         self.Project(), _DEFAULT_LOCATION, _DEFAULT_FUNCTION_NAME, trigger,
         None, labels=labels, source_upload_url='foo')
     create_request = self.GetFunctionsCreateRequest(function, location_path)
-    operation = self.messages.Operation(name='operations/operation')
+    operation_name = self.GetOperationName()
+    operation = self._GenerateActiveOperation(operation_name)
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
     self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
-        self.messages.CloudfunctionsOperationsGetRequest(
-            name='operations/operation'),
-        self._GenerateSuccessfulOperation('operations/operation'))
+        self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
+        self._GenerateSuccessfulOperation(operation_name))
 
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
@@ -480,6 +485,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           '--runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testDeployFromLocalDirWithSourceFlag(self):
     # Mock out making archive containing the function to deploy.
@@ -511,15 +518,15 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         self.Project(), _DEFAULT_LOCATION, _DEFAULT_FUNCTION_NAME, trigger,
         source_upload_url='foo')
     create_request = self.GetFunctionsCreateRequest(function, location_path)
-    operation = self.messages.Operation(name='operations/operation')
+    operation_name = self.GetOperationName()
+    operation = self._GenerateActiveOperation(operation_name)
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
     self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
-        self.messages.CloudfunctionsOperationsGetRequest(
-            name='operations/operation'),
-        self._GenerateSuccessfulOperation('operations/operation'))
+        self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
+        self._GenerateSuccessfulOperation(operation_name))
 
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
@@ -536,6 +543,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           '--source my/functions/directory --quiet --runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testDeployFromLocalSource_failIfPathDoesNotExist(self):
     self.ExpectGetFunction()
@@ -559,15 +568,15 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         self.Project(), _DEFAULT_LOCATION, _DEFAULT_FUNCTION_NAME, trigger,
         'gs://my-bucket/function.zip')
     create_request = self.GetFunctionsCreateRequest(function, location_path)
-    operation = self.messages.Operation(name='operations/operation')
+    operation_name = self.GetOperationName()
+    operation = self._GenerateActiveOperation(operation_name)
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
     self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
-        self.messages.CloudfunctionsOperationsGetRequest(
-            name='operations/operation'),
-        self._GenerateSuccessfulOperation('operations/operation'))
+        self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
+        self._GenerateSuccessfulOperation(operation_name))
 
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
@@ -580,6 +589,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         '--source gs://my-bucket/function.zip --quiet --runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testDeployFromRepoWithSourceFlag(self):
     self.MockUnpackedSourcesDirSize()
@@ -595,15 +606,15 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
                                'projects/my-project/repos/my-repo/'
                                'fixed-aliases/rc0.0.9'))
     create_request = self.GetFunctionsCreateRequest(function, location_path)
-    operation = self.messages.Operation(name='operations/operation')
+    operation_name = self.GetOperationName()
+    operation = self._GenerateActiveOperation(operation_name)
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
     self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
-        self.messages.CloudfunctionsOperationsGetRequest(
-            name='operations/operation'),
-        self._GenerateSuccessfulOperation('operations/operation'))
+        self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
+        self._GenerateSuccessfulOperation(operation_name))
 
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
@@ -619,6 +630,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         '--quiet --runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testHttpTriggerAndRetrying(self):
     self.MockUnpackedSourcesDirSize()
@@ -651,6 +664,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         update_mask='eventTrigger,httpsTrigger',
     )
     self.Run('functions deploy my-test --trigger-topic new-topic')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testUpdate_withMemoryLimitGb(self):
     self.MockUnpackedSourcesDirSize()
@@ -670,6 +685,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         update_mask='availableMemoryMb',
     )
     self.Run('functions deploy my-test --memory 1GB')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testUpdate_withMemoryLimitMb(self):
     self.MockUnpackedSourcesDirSize()
@@ -689,6 +706,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         update_mask='availableMemoryMb',
     )
     self.Run('functions deploy my-test --memory 128MB')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testUpdate_withMemoryLimitDefaultUnit(self):
     self.MockUnpackedSourcesDirSize()
@@ -708,7 +727,10 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         update_mask='availableMemoryMb',
     )
     self.Run('functions deploy my-test --memory 512')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
+  # TODO(b/149922916) unit tests are missing assertions
   def testUpdate_withTimeout(self):
     self.MockUnpackedSourcesDirSize()
     function_name = self.GetFunctionRelativePath(
@@ -727,6 +749,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         update_mask='timeout',
     )
     self.Run('functions deploy my-test --timeout 512')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testUpdate_withRetry(self):
     self.MockUnpackedSourcesDirSize()
@@ -747,6 +771,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         update_mask='eventTrigger.failurePolicy',
     )
     self.Run('functions deploy my-test --retry')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testUpdate_withNoRetry(self):
     self.MockUnpackedSourcesDirSize()
@@ -767,6 +793,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
 
     )
     self.Run('functions deploy my-test --no-retry')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testUpdate_withLabels(self):
     self.MockUnpackedSourcesDirSize()
@@ -798,6 +826,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     )
     self.Run('functions deploy my-test '
              '--update-labels foo=baz --remove-labels boo,moo')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testUpdate_withClearLabels(self):
     self.MockUnpackedSourcesDirSize()
@@ -851,6 +881,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
       self.StartObjectPatch(
           file_utils, 'TemporaryDirectory', return_value=mock_zip)
       self.Run('functions deploy my-test --source .')
+      self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+          project=self.Project(), build_id=self.GetBuildId()))
 
   def testUpdate_withLocalSourceExplicit(self):
     self.MockUnpackedSourcesDirSize()
@@ -944,21 +976,23 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
             'moveable-aliases/master'),
     )
     create_request = self.GetFunctionsCreateRequest(function, location_path)
-    operation = self.messages.Operation(name='operations/operation')
+    operation_name = self.GetOperationName()
+    operation = self._GenerateActiveOperation(operation_name)
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request,
         operation)
     self.MockRemoveIamPolicy('my-test')
     self.mock_client.operations.Get.Expect(
-        self.messages.CloudfunctionsOperationsGetRequest(
-            name='operations/operation'),
-        self._GenerateSuccessfulOperation('operations/operation'))
+        self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
+        self._GenerateSuccessfulOperation(operation_name))
     self.ExpectGetFunction(response=function)
 
     self.Run(
         'functions deploy my-test '
         '--source  https://source.developers.google.com/projects/p/repos/r '
         '--trigger-http --runtime=nodejs6')
+    self.AssertErrContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
 
   def testUpdate_ImplicitKeepHttpTrigger(self):
     self.MockUnpackedSourcesDirSize()
@@ -1074,6 +1108,92 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
             'functions deploy my-test --source {0} --trigger-topic topic '
             '--stage-bucket buck --runtime=nodejs6'
             .format(t))
+
+
+class FunctionsDeployOutputTest(FunctionsDeployTestBase):
+
+  def testNoStackdriverLogPrintedIfNoBuildId(self):
+    self.MockUnpackedSourcesDirSize()
+    self.ExpectGetFunction()
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
+
+    location_path = self.GetLocationRelativePath(
+        self.Project(), _DEFAULT_LOCATION)
+    trigger = self.GetPubSubTrigger(self.Project(), 'topic')
+    function = self.GetFunction(
+        self.Project(), _DEFAULT_LOCATION, _DEFAULT_FUNCTION_NAME, trigger,
+        source_repository_url=('https://source.developers.google.com/'
+                               'projects/my-project/repos/my-repo/'
+                               'fixed-aliases/rc0.0.9'))
+    create_request = self.GetFunctionsCreateRequest(function, location_path)
+    operation_name = self.GetOperationName()
+    operation = self._GenerateActiveOperation(operation_name)
+
+    success_operation = self.messages.Operation()
+    success_operation.name = operation_name
+    success_operation.done = True
+    success_operation.metadata = self.messages.Operation.MetadataValue()
+
+    self.mock_client.projects_locations_functions.Create.Expect(
+        create_request, operation)
+    self.MockRemoveIamPolicy('my-test')
+    self.mock_client.operations.Get.Expect(
+        self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
+        success_operation)
+
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=self.GetFunctionRelativePath(
+                self.Project(), _DEFAULT_LOCATION, _DEFAULT_FUNCTION_NAME)),
+        function)
+    self.Run('functions deploy my-test --trigger-topic topic '
+             '--source '
+             'https://source.developers.google.com/projects/my-project/'
+             'repos/my-repo/fixed-aliases/rc0.0.9 --quiet --runtime=nodejs6')
+    self.AssertErrNotContains(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+        project=self.Project(), build_id=self.GetBuildId()))
+
+  def testStackdriverLogPrintedOnlyOnceDuringMultiplePolls(self):
+    self.MockUnpackedSourcesDirSize()
+    self.ExpectGetFunction()
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
+
+    location_path = self.GetLocationRelativePath(
+        self.Project(), _DEFAULT_LOCATION)
+    trigger = self.GetPubSubTrigger(self.Project(), 'topic')
+    function = self.GetFunction(
+        self.Project(), _DEFAULT_LOCATION, _DEFAULT_FUNCTION_NAME, trigger,
+        source_repository_url=('https://source.developers.google.com/'
+                               'projects/my-project/repos/my-repo/'
+                               'fixed-aliases/rc0.0.9'))
+    create_request = self.GetFunctionsCreateRequest(function, location_path)
+    operation_name = self.GetOperationName()
+    operation = self._GenerateActiveOperation(operation_name)
+
+    self.mock_client.projects_locations_functions.Create.Expect(
+        create_request, operation)
+    self.MockRemoveIamPolicy('my-test')
+    self.mock_client.operations.Get.Expect(
+        self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
+        self._GenerateActiveOperation(operation_name))
+    self.mock_client.operations.Get.Expect(
+        self.messages.CloudfunctionsOperationsGetRequest(name=operation_name),
+        self._GenerateSuccessfulOperation(operation_name))
+
+    self.mock_client.projects_locations_functions.Get.Expect(
+        self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
+            name=self.GetFunctionRelativePath(
+                self.Project(), _DEFAULT_LOCATION, _DEFAULT_FUNCTION_NAME)),
+        function)
+    self.Run('functions deploy my-test --trigger-topic topic '
+             '--source '
+             'https://source.developers.google.com/projects/my-project/'
+             'repos/my-repo/fixed-aliases/rc0.0.9 --quiet --runtime=nodejs6')
+
+    stderr = self.GetErr()
+    self.assertEqual(1,
+                     stderr.count(base.STACKDRIVER_LOG_STDERR_TEMPLATE.format(
+                         project=self.Project(), build_id=self.GetBuildId())))
 
 if __name__ == '__main__':
   test_case.main()

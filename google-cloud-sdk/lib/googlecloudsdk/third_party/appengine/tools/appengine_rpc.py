@@ -26,7 +26,7 @@ import sys
 import time
 import urllib
 
-
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.third_party.appengine._internal import six_subset
 
 # pylint:disable=g-import-not-at-top
@@ -297,14 +297,14 @@ class AbstractRpcServer(object):
 
     req = self._CreateRequest(
         url=("https://%s/accounts/ClientLogin" %
-             os.getenv("APPENGINE_AUTH_SERVER", "www.google.com")),
+             encoding.GetEncodedValue(os.environ, "APPENGINE_AUTH_SERVER", "www.google.com")),
         data=urlencode_fn(data))
     try:
       response = self.opener.open(req)
       response_body = response.read()
       response_dict = dict(x.split("=")
                            for x in response_body.split("\n") if x)
-      if os.getenv("APPENGINE_RPC_USE_SID", "0") == "1":
+      if encoding.GetEncodedValue(os.environ, "APPENGINE_RPC_USE_SID", "0") == "1":
         self.extra_headers["Cookie"] = (
             'SID=%s; Path=/;' % response_dict["SID"])
       return response_dict["Auth"]
@@ -362,7 +362,7 @@ class AbstractRpcServer(object):
       credentials = self.auth_function()
       try:
         auth_token = self._GetAuthToken(credentials[0], credentials[1])
-        if os.getenv("APPENGINE_RPC_USE_SID", "0") == "1":
+        if encoding.GetEncodedValue(os.environ, "APPENGINE_RPC_USE_SID", "0") == "1":
           return
       except ClientLoginError as e:
         # TODO(user): some of these cases probably only pertain to the
@@ -410,7 +410,8 @@ class AbstractRpcServer(object):
     """
     if email:
       user_id_digest = hashlib.md5(email.lower()).digest()
-      user_id = "1" + "".join(["%02d" % ord(x) for x in user_id_digest])[:20]
+      user_id = "1" + "".join(
+          ["%02d" % x for x in six_subset.iterbytes(user_id_digest)])[:20]
     else:
       user_id = ""
     return "%s:%s:%s" % (email, bool(admin), user_id)
@@ -493,8 +494,8 @@ class AbstractRpcServer(object):
               self._Authenticate()
             elif re.match(
                 r"https://www\.google\.com/a/[a-z0-9\.\-]+/ServiceLogin", loc):
-              self.account_type = os.getenv("APPENGINE_RPC_HOSTED_LOGIN_TYPE",
-                                            "HOSTED")
+              self.account_type = encoding.GetEncodedValue(
+                  os.environ, "APPENGINE_RPC_HOSTED_LOGIN_TYPE", "HOSTED")
               self._Authenticate()
             elif loc.startswith("http://%s/_ah/login" % (self.host,)):
               self._DevAppServerAuthenticate()

@@ -20,8 +20,8 @@ gcloud alpha compute os\-config guest\-policies list \- list guest policies in a
 .RS 2m
 .TP 2m
 
-The scope of the guest policies which defaults to project if unspecified. At
-most one of these may be specified:
+The scope of the guest policies. If a scope is not specified, the current
+project is used as the default. At most one of these may be specified:
 
 .RS 2m
 .TP 2m
@@ -34,17 +34,15 @@ The organization of the guest policies to list.
 
 .TP 2m
 \fB\-\-project\fR=\fIPROJECT_ID\fR
-The project of the guest policies to list.
+The project name to use. If a project name is not specified, then the current
+project is used. The current project can be listed using gcloud config list
+\-\-format='text(core.project)' and can be set using gcloud config set project
+PROJECTID.
 
-The Google Cloud Platform project name to use for this invocation. If omitted,
-then the current project is assumed; the current project can be listed using
-\f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
-\f5gcloud config set project PROJECTID\fR.
-
-\f5\-\-project\fR and its fallback \f5core/project\fR property play two roles in
-the invocation. It specifies the project of the resource to operate on. It also
-specifies the project for API enablement check, quota, and billing. To specify a
-different project for quota and billing, use \f5\-\-billing\-project\fR or
+\f5\-\-project\fR and its fallback \f5core/project\fR property play two roles.
+It specifies the project of the resource to operate on, and also specifies the
+project for API enablement check, quota, and billing. To specify a different
+project for quota and billing, use \f5\-\-billing\-project\fR or
 \f5billing/quota_project\fR property.
 
 
@@ -97,8 +95,9 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -110,7 +109,7 @@ To list guest policies in the current project, run:
 $ gcloud alpha compute os\-config guest\-policies list
 .RE
 
-To list guest policies in the organization '12345', run:
+To list guest policies in the organization \f512345\fR, run:
 
 .RS 2m
 $ gcloud alpha compute os\-config guest\-policies list \e
@@ -124,5 +123,9 @@ $ gcloud alpha compute os\-config guest\-policies list \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute os\-config guest\-policies list
+.RE
 

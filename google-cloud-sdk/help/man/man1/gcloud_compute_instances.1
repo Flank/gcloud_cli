@@ -26,8 +26,9 @@ Read and manipulate Google Compute Engine virtual machine instances.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -101,6 +102,10 @@ Describe a virtual machine instance.
 .TP 2m
 \fBdetach\-disk\fR
 Detach disks from Compute Engine virtual machine instances.
+
+.TP 2m
+\fBexport\fR
+Export a Compute Engine virtual machine instance's configuration to a file.
 
 .TP 2m
 \fBget\-guest\-attributes\fR
@@ -200,6 +205,10 @@ Update a Google Compute Engine virtual machine access configuration.
 \fBupdate\-container\fR
 Updates Google Compute engine virtual machine instances running container
 images.
+
+.TP 2m
+\fBupdate\-from\-file\fR
+Update a Compute Engine virtual machine instance using a configuration file.
 
 
 .RE

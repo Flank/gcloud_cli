@@ -9,8 +9,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -35,10 +36,6 @@ EXAMPLES
 
         $ gcloud alpha filestore snapshots create my-snapshot
 
-    To create a local snapshot with the name 'my-snapshot', run:
-
-        $ gcloud alpha filestore snapshots create my-snapshot --local
-
     To delete a snapshot with the name 'my-snapshot', run:
 
         $ gcloud alpha filestore snapshots delete my-snapshot
@@ -58,9 +55,8 @@ EXAMPLES
             --update-labels=env=prod
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

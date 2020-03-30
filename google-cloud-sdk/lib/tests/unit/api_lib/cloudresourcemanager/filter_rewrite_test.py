@@ -129,6 +129,10 @@ class CloudResourceManagerListFilterRewriteTest(subtests.Base):
        'parent.id:1234 AND (parent.type:folder AND lifecycleState:ACTIVE)'),
       'parent.id:1234 parent.type:folder lifecycleState:ACTIVE')
 
+    T((None, '( projectNumber=123 OR projectNumber=456 )'),
+      'projectNumber=(123,456)')
+    T((None, '( projectNumber=123 OR projectNumber=456 )'),
+      'PROJECT_NUMBER=(123,456)')
 
 if __name__ == '__main__':
   test_case.main()

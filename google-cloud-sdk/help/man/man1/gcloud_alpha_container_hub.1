@@ -5,19 +5,26 @@
 
 .SH "NAME"
 .HP
-gcloud alpha container hub \- registers a cluster with Google Cloud Platform
+gcloud alpha container hub \- centrally manage features and services on all your Kubernetes clusters with Hub
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container hub\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container hub\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Manage clusters registered with Google Cloud Platform.
+\fB(ALPHA)\fR The command group to register GKE or other Kubernetes clusters
+running in a variety of environments, including Google cloud, on premises in
+customer datacenters, or other third party clouds with Hub. Hub provides a
+centralized control\-plane to managed features and services on all registered
+clusters.
+
+A registered cluster is always associated with a Membership, a resource within
+Hub.
 
 
 
@@ -26,38 +33,42 @@ gcloud alpha container hub \- registers a cluster with Google Cloud Platform
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBfeatures\fR
+\fB(ALPHA)\fR Manage features on all Hub memberships(registered clusters).
+
+.TP 2m
+\fBmemberships\fR
+\fB(ALPHA)\fR Manage memberships of all your GKE and other Kubernetes cluster
+with HUB.
+
+
+.RE
+.sp
 
 .SH "EXAMPLES"
 
-Register a cluster referenced from the default kubeconfig file, installing the
-Connect agent:
+Manage memberships of all your GKE and other Kubernetes clusters with Hub:
 
 .RS 2m
-$ gcloud alpha container hub register\-cluster my\-cluster           \e
-    \-\-context=my\-cluster\-context             \e
-  \-\-service\-account\-key\-file=/tmp/keyfile.json
+$ gcloud alpha container hub memberships \-\-help
 .RE
 
-Upgrade the Connect agent in a cluster:
+Manage features on all memberships:
 
 .RS 2m
-$ gcloud alpha container hub register\-cluster my\-cluster           \e
-    \-\-context=my\-cluster\-context             \e
-  \-\-service\-account\-key\-file=/tmp/keyfile.json
-.RE
-
-Register a cluster and output a manifest that can be used to install the Connect
-agent:
-
-.RS 2m
-$ gcloud alpha container hub register\-cluster my\-cluster           \e
-    \-\-context=my\-cluster\-context             \e
-  \-\-manifest\-output\-file=/tmp/manifest.yaml             \e
-  \-\-service\-account\-key\-file=/tmp/keyfile.json
+$ gcloud alpha container hub features \-\-help
 .RE
 
 
@@ -67,9 +78,10 @@ $ gcloud alpha container hub register\-cluster my\-cluster           \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud container hub
 $ gcloud beta container hub
 .RE
 

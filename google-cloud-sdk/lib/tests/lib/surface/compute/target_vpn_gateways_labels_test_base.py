@@ -152,6 +152,22 @@ class TargetVpnGatewaysLabelsTestBase(sdk_test_base.WithFakeAuth,
             region=operation_ref.region,
             project=self.Project()), operation)
 
+  def _ExpectOperationWaitRequest(self, operation_ref, operation):
+    """Verifies a Wait request on an operation.
+
+    Args:
+      operation_ref: Reference to the operation.
+      operation: The Operation message expected to be returned.
+    """
+    self.region_operations.Wait.Expect(
+        self.messages.ComputeRegionOperationsWaitRequest(
+            operation=operation_ref.operation,
+            region=operation_ref.region,
+            project=self.Project()), operation)
+
+  def _ExpectOperationPollingRequest(self, operation_ref, operation):
+    self._ExpectOperationWaitRequest(operation_ref, operation)
+
   def _ExpectLabelsSetRequest(self,
                               target_vpn_gateway_ref,
                               labels,

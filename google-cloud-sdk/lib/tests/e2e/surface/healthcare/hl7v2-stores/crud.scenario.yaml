@@ -3,6 +3,10 @@ release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
+  - command: pubsub topics create $$test-pubsub-topic$$
+  - stderr: |
+      Created topic [projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$].
+- execute:
   - command: healthcare datasets create --location us-central1 $$test-dataset$$
   - stderr: |
       Create request issued for: [$$test-dataset$$]
@@ -27,6 +31,15 @@ summary:
       ID                                            LOCATION     TOPIC
       $$test-hl7v2-store$$  us-central1
 - execute:
+  - command: healthcare hl7v2-stores update $$test-hl7v2-store$$ --pubsub-topic projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
+      --dataset $$test-dataset$$ --location us-central1
+  - stderr: |
+      Updated hl7v2Store [$$test-hl7v2-store$$].
+  - stdout: |
+      name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/hl7V2Stores/$$test-hl7v2-store$$
+      notificationConfig:
+        pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
+- execute:
   - command: healthcare hl7v2-stores delete $$test-hl7v2-store$$ --dataset $$test-dataset$$
       --location us-central1
   - prompt:
@@ -41,6 +54,10 @@ summary:
     - input: y
   - stderr: |
       Deleted dataset [$$test-dataset$$].
+- execute:
+  - command: pubsub topics delete $$test-pubsub-topic$$
+  - stderr: |
+      Deleted topic [projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$].
 actions:
 - define_reference:
     reference: api-version
@@ -53,6 +70,17 @@ actions:
 - generate_resource_id:
     reference: test-hl7v2-store
     prefix: gcloud-test-hl7v2-store
+- generate_resource_id:
+    reference: test-pubsub-topic
+    prefix: gcloud-test-pubsub-topic
+- execute_command:
+    command: pubsub topics create $$test-pubsub-topic$$
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created topic [projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$].
+    - expect_exit:
+        code: 0
 - execute_command:
     command: healthcare datasets create --location us-central1 $$test-dataset$$
     events:
@@ -70,7 +98,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190827-205159-iokf/operations/10652971136339410945
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191111-174231-etak/operations/17430341705936142337
     - expect_stderr: |
         Create request issued for: [$$test-dataset$$]
     - expect_progress_tracker:
@@ -162,6 +190,37 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
+    command: healthcare hl7v2-stores update $$test-hl7v2-store$$ --pubsub-topic projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
+      --dataset $$test-dataset$$ --location us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/hl7V2Stores/$$test-hl7v2-store$$?alt=json&updateMask=notificationConfig.pubsubTopic
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              notificationConfig:
+                pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '328'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/hl7V2Stores/$$test-hl7v2-store$$
+            notificationConfig:
+              pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
+    - expect_stderr: |
+        Updated hl7v2Store [$$test-hl7v2-store$$].
+    - expect_stdout: |
+        name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/hl7V2Stores/$$test-hl7v2-store$$
+        notificationConfig:
+          pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
+    - expect_exit:
+        code: 0
+- execute_command:
     command: healthcare hl7v2-stores delete $$test-hl7v2-store$$ --dataset $$test-dataset$$
       --location us-central1
     cleanup_for: test-hl7v2-store
@@ -197,5 +256,14 @@ actions:
         user_input: y
     - expect_stderr: |
         Deleted dataset [$$test-dataset$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: pubsub topics delete $$test-pubsub-topic$$
+    cleanup_for: test-pubsub-topic
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted topic [projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$].
     - expect_exit:
         code: 0

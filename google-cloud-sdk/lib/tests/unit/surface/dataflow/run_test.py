@@ -122,6 +122,30 @@ class RunUnitTest(base.DataflowMockingTestBase,
         '--disable-public-ips')
     self.assertEqual(JOB_1_ID, result.id)
 
+  def testRunWithWorkerRegion(self):
+    self.MockRunJob(
+        job=self.SampleJob(
+            JOB_1_ID, environment=self.fake_environment),
+        gcs_location='gs://foo',
+        worker_region='us-foo1',
+        job_name='myjob')
+    result = self.Run(
+        'dataflow jobs run myjob --gcs-location=gs://foo '
+        '--worker-region=us-foo1')
+    self.assertEqual(JOB_1_ID, result.id)
+
+  def testRunWithWorkerZone(self):
+    self.MockRunJob(
+        job=self.SampleJob(
+            JOB_1_ID, environment=self.fake_environment),
+        gcs_location='gs://foo',
+        worker_zone='us-foo1-a',
+        job_name='myjob')
+    result = self.Run(
+        'dataflow jobs run myjob --gcs-location=gs://foo '
+        '--worker-zone=us-foo1-a')
+    self.assertEqual(JOB_1_ID, result.id)
+
   def testRunBetaNoParameters(self):
     self.MockRunJob(
         job=self.SampleJob(

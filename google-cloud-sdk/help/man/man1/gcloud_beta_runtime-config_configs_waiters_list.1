@@ -78,8 +78,9 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -89,7 +90,7 @@ To list all waiters within the configuration named "my\-config", run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs waiters list \e
-    \-\-config\-name my\-config
+    \-\-config\-name=my\-config
 .RE
 
 The \-\-filter parameter can be used to filter results based on content. For
@@ -97,7 +98,7 @@ example, to list all waiters with names that begin with 'foo', run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs waiters list \e
-    \-\-config\-name my\-config \-\-filter 'name=foo*'
+    \-\-config\-name=my\-config \-\-filter='name=foo*'
 .RE
 
 

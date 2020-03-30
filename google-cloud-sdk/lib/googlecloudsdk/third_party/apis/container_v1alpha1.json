@@ -17,6 +17,7 @@
   "documentationLink": "https://cloud.google.com/container-engine/",
   "protocol": "rest",
   "rootUrl": "https://container.googleapis.com/",
+  "mtlsRootUrl": "https://container.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://container.googleapis.com/",
   "batchPath": "batch",
@@ -157,11 +158,11 @@
           "$ref": "MasterAuth"
         },
         "loggingService": {
-          "description": "The logging service the cluster should use to write logs.\nCurrently available options:\n\n* `logging.googleapis.com` - the Google Cloud Logging service.\n* `none` - no logs will be exported from the cluster.\n* if left as an empty string,`logging.googleapis.com` will be used.",
+          "description": "The logging service the cluster should use to write logs.\nCurrently available options:\n\n* `logging.googleapis.com\/kubernetes` - The Cloud Logging\nservice with a Kubernetes-native resource model\n* `logging.googleapis.com` - The legacy Cloud Logging service (no longer\n  available as of GKE 1.15).\n* `none` - no logs will be exported from the cluster.\n\nIf left as an empty string,`logging.googleapis.com\/kubernetes` will be\nused for GKE 1.14+ or `logging.googleapis.com` for earlier versions.",
           "type": "string"
         },
         "monitoringService": {
-          "description": "The monitoring service the cluster should use to write metrics.\nCurrently available options:\n\n* `monitoring.googleapis.com` - the Google Cloud Monitoring service.\n* `none` - no metrics will be exported from the cluster.\n* if left as an empty string, `monitoring.googleapis.com` will be used.",
+          "description": "The monitoring service the cluster should use to write metrics.\nCurrently available options:\n\n* \"monitoring.googleapis.com\/kubernetes\" - The Cloud Monitoring\nservice with a Kubernetes-native resource model\n* `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no\n  longer available as of GKE 1.15).\n* `none` - No metrics will be exported from the cluster.\n\nIf left as an empty string,`monitoring.googleapis.com\/kubernetes` will be\nused for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.",
           "type": "string"
         },
         "network": {
@@ -257,10 +258,6 @@
           "description": "The default constraint on the maximum number of pods that can be run\nsimultaneously on a node in the node pool of this cluster. Only honored\nif cluster created with IP Alias support.",
           "$ref": "MaxPodsConstraint"
         },
-        "managedPodIdentityConfig": {
-          "description": "Configuration for the use of GCP IAM Service Accounts in applications in\nthis cluster.\n\nDeprecated, use WorkloadIdentityConfig instead.",
-          "$ref": "ManagedPodIdentityConfig"
-        },
         "resourceUsageExportConfig": {
           "description": "Configuration for exporting resource usages. Resource usage export is\ndisabled when this config unspecified.",
           "$ref": "ResourceUsageExportConfig"
@@ -318,6 +315,14 @@
         "costManagementConfig": {
           "description": "Configuration for the fine-grained cost management feature.",
           "$ref": "CostManagementConfig"
+        },
+        "clusterTelemetry": {
+          "description": "Telemetry integration for the cluster.",
+          "$ref": "ClusterTelemetry"
+        },
+        "tpuConfig": {
+          "description": "Configuration for Cloud TPU support;",
+          "$ref": "TpuConfig"
         },
         "selfLink": {
           "description": "[Output only] Server-defined URL for the resource.",
@@ -403,7 +408,7 @@
           "type": "string"
         },
         "enableTpu": {
-          "description": "Enable the ability to use Cloud TPUs in this cluster.",
+          "description": "Enable the ability to use Cloud TPUs in this cluster.\nThis field is deprecated, use tpu_config.enabled instead.",
           "type": "boolean"
         },
         "tpuIpv4CidrBlock": {
@@ -449,11 +454,11 @@
           }
         },
         "serviceAccount": {
-          "description": "The Google Cloud Platform Service Account to be used by the node VMs. If\nno Service Account is specified, the \"default\" service account is used.",
+          "description": "The Google Cloud Platform Service Account to be used by the node VMs.\nSpecify the email address of the Service Account; otherwise, if no Service\nAccount is specified, the \"default\" service account is used.",
           "type": "string"
         },
         "metadata": {
-          "description": "The metadata key\/value pairs assigned to instances in the cluster.\n\nKeys must conform to the regexp [a-zA-Z0-9-_]+ and be less than 128 bytes\nin length. These are reflected as part of a URL in the metadata server.\nAdditionally, to avoid ambiguity, keys must not conflict with any other\nmetadata keys for the project or be one of the reserved keys:\n \"cluster-location\"\n \"cluster-name\"\n \"cluster-uid\"\n \"configure-sh\"\n \"containerd-configure-sh\"\n \"enable-os-login\"\n \"gci-update-strategy\"\n \"gci-ensure-gke-docker\"\n \"instance-template\"\n \"kube-env\"\n \"startup-script\"\n \"user-data\"\n \"disable-address-manager\"\n \"windows-startup-script-ps1\"\n \"common-psm1\"\n \"k8s-node-setup-psm1\"\n \"install-ssh-psm1\"\n \"user-profile-psm1\"\n \"serial-port-logging-enable\"\nValues are free-form strings, and only have meaning as interpreted by\nthe image running in the instance. The only restriction placed on them is\nthat each value's size must be less than or equal to 32 KB.\n\nThe total size of all keys and values must be less than 512 KB.",
+          "description": "The metadata key\/value pairs assigned to instances in the cluster.\n\nKeys must conform to the regexp [a-zA-Z0-9-_]+ and be less than 128 bytes\nin length. These are reflected as part of a URL in the metadata server.\nAdditionally, to avoid ambiguity, keys must not conflict with any other\nmetadata keys for the project or be one of the reserved keys:\n \"cluster-location\"\n \"cluster-name\"\n \"cluster-uid\"\n \"configure-sh\"\n \"containerd-configure-sh\"\n \"enable-os-login\"\n \"gci-ensure-gke-docker\"\n \"gci-metrics-enabled\"\n \"gci-update-strategy\"\n \"instance-template\"\n \"kube-env\"\n \"startup-script\"\n \"user-data\"\n \"disable-address-manager\"\n \"windows-startup-script-ps1\"\n \"common-psm1\"\n \"k8s-node-setup-psm1\"\n \"install-ssh-psm1\"\n \"user-profile-psm1\"\n \"serial-port-logging-enable\"\nValues are free-form strings, and only have meaning as interpreted by\nthe image running in the instance. The only restriction placed on them is\nthat each value's size must be less than or equal to 32 KB.\n\nThe total size of all keys and values must be less than 512 KB.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -608,6 +613,20 @@
             "EXPOSE",
             "GKE_METADATA_SERVER"
           ]
+        },
+        "mode": {
+          "description": "Mode is the configuration for how to expose metadata to workloads running\non the node pool.",
+          "enumDescriptions": [
+            "Not set.",
+            "Expose all Compute Engine metadata to pods.",
+            "Run the GKE Metadata Server on this node. The GKE Metadata Server exposes\na metadata API to workloads that is compatible with the V1 Compute\nMetadata APIs exposed by the Compute Engine and App Engine Metadata\nServers. This feature can only be enabled if Workload Identity is enabled\nat the cluster level."
+          ],
+          "type": "string",
+          "enum": [
+            "MODE_UNSPECIFIED",
+            "GCE_METADATA",
+            "GKE_METADATA"
+          ]
         }
       }
     },
@@ -717,7 +736,7 @@
           ]
         },
         "key": {
-          "description": "Corresponds to the label key of reservation resource.",
+          "description": "Corresponds to the label key of a reservation resource. To target a\nSPECIFIC_RESERVATION by name, specify \"googleapis.com\/reservation-name\" as\nthe key and specify the name of your reservation as its value.",
           "type": "string"
         },
         "values": {
@@ -857,7 +876,7 @@
           "$ref": "ConfigConnectorConfig"
         },
         "gcePersistentDiskCsiDriverConfig": {
-          "description": "Configuration for the GCE PD CSI driver. This option can only be enabled\nat cluster creation time.",
+          "description": "Configuration for the GCP Compute Persistent Disk CSI driver.",
           "$ref": "GcePersistentDiskCsiDriverConfig"
         },
         "kalmConfig": {
@@ -887,7 +906,7 @@
       "type": "object",
       "properties": {
         "disabled": {
-          "description": "Whether the Horizontal Pod Autoscaling feature is enabled in the cluster.\nWhen enabled, it ensures that a Heapster pod is running in the cluster,\nwhich is also used by the Cloud Monitoring service.",
+          "description": "Whether the Horizontal Pod Autoscaling feature is enabled in the cluster.\nWhen enabled, it ensures that metrics are collected into Stackdriver\nMonitoring.",
           "type": "boolean"
         }
       }
@@ -980,11 +999,11 @@
     },
     "GcePersistentDiskCsiDriverConfig": {
       "id": "GcePersistentDiskCsiDriverConfig",
-      "description": "Configuration for the GCE PD CSI driver. This option can only be enabled\nat cluster creation time.",
+      "description": "Configuration for the Compute Engine PD CSI driver. This option can only be\nenabled at cluster creation time.",
       "type": "object",
       "properties": {
         "enabled": {
-          "description": "Whether the GCE PD CSI driver is enabled for this cluster.",
+          "description": "Whether the Compute Engine PD CSI driver is enabled for this cluster.",
           "type": "boolean"
         }
       }
@@ -1191,7 +1210,7 @@
           "description": "Machine-friendly representation of the condition",
           "enumDescriptions": [
             "UNKNOWN indicates a generic condition.",
-            "GCE_STOCKOUT indicates a Google Compute Engine stockout.",
+            "GCE_STOCKOUT indicates that Google Compute Engine resources are\ntemporarily unavailable.",
             "GKE_SERVICE_ACCOUNT_DELETED indicates that the user deleted their robot\nservice account.",
             "Google Compute Engine quota was exceeded.",
             "Cluster state was manually changed by an SRE due to a system logic error.",
@@ -1270,7 +1289,7 @@
       "type": "object",
       "properties": {
         "useIpAliases": {
-          "description": "Whether alias IPs will be used for pod IPs in the cluster.",
+          "description": "Whether alias IPs will be used for pod IPs in the cluster.\nThis is used in conjunction with use_routes. It cannot be true if\nuse_routes is true. If both use_ip_aliases and use_routes are false,\nthen the server picks the default IP allocation mode",
           "type": "boolean"
         },
         "createSubnetwork": {
@@ -1318,11 +1337,11 @@
           "type": "boolean"
         },
         "tpuIpv4CidrBlock": {
-          "description": "The IP address range of the Cloud TPUs in this cluster. If unspecified, a\nrange will be automatically chosen with the default size.\n\nThis field is only applicable when `use_ip_aliases` is true, and it must\nnot be specified when the `tpu_use_service_networking` is `true`.\n\nUnspecified to have a range chosen with the default size `\/20`.\n\nSet to \/netmask (e.g. `\/14`) to have a range chosen with a specific\nnetmask.\n\nSet to a\n[CIDR](http:\/\/en.wikipedia.org\/wiki\/Classless_Inter-Domain_Routing)\nnotation (e.g. `10.96.0.0\/14`) from the RFC-1918 private networks (e.g.\n`10.0.0.0\/8`, `172.16.0.0\/12`, `192.168.0.0\/16`) to pick a specific range\nto use.",
+          "description": "The IP address range of the Cloud TPUs in this cluster. If unspecified, a\nrange will be automatically chosen with the default size.\n\nThis field is only applicable when `use_ip_aliases` is true, and it must\nnot be specified when the `tpu_use_service_networking` is `true`.\n\nUnspecified to have a range chosen with the default size `\/20`.\n\nSet to \/netmask (e.g. `\/14`) to have a range chosen with a specific\nnetmask.\n\nSet to a\n[CIDR](http:\/\/en.wikipedia.org\/wiki\/Classless_Inter-Domain_Routing)\nnotation (e.g. `10.96.0.0\/14`) from the RFC-1918 private networks (e.g.\n`10.0.0.0\/8`, `172.16.0.0\/12`, `192.168.0.0\/16`) to pick a specific range\nto use.\nThis field is deprecated, use cluster.tpu_config.ipv4_cidr_block instead.",
           "type": "string"
         },
         "tpuUseServiceNetworking": {
-          "description": "Enable Cloud TPU's Service Networking mode. In this mode, the CIDR blocks\nused by the Cloud TPUs will be allocated and managed by Service Networking,\ninstead of GKE.\n\nThis field must be `false` when `tpu_ipv4_cidr_block` is specified.",
+          "description": "Enable Cloud TPU's Service Networking mode. In this mode, the CIDR blocks\nused by the Cloud TPUs will be allocated and managed by Service Networking,\ninstead of GKE.\n\nThis field must be `false` when `tpu_ipv4_cidr_block` is specified.\nThis field is deprecated, use cluster.tpu_config.use_service_networking\ninstead.",
           "type": "boolean"
         }
       }
@@ -1553,6 +1572,10 @@
         "management": {
           "description": "Specifies the node management options for NAP created node-pools.",
           "$ref": "NodeManagement"
+        },
+        "minCpuPlatform": {
+          "description": "Minimum CPU platform to be used for NAP created node pools.\nThe instance may be scheduled on the specified or newer CPU platform.\nApplicable values are the friendly names of CPU platforms, such as\n<code>minCpuPlatform: &quot;Intel Haswell&quot;<\/code> or\n<code>minCpuPlatform: &quot;Intel Sandy Bridge&quot;<\/code>. For more\ninformation, read [how to specify min CPU\nplatform](https:\/\/cloud.google.com\/compute\/docs\/instances\/specify-min-cpu-platform)\nTo unset the min cpu platform field pass \"automatic\" as field value.",
+          "type": "string"
         }
       }
     },
@@ -1586,23 +1609,26 @@
           "type": "boolean"
         },
         "disableDefaultSnat": {
-          "description": "Whether the cluster disables default in-node sNAT rules. In-node sNAT rules\nwill be disabled when this flag is true. When set to false, default IP\nmasquerade rules will be applied to the nodes to prevent sNAT on cluster\ninternal traffic.",
-          "type": "boolean"
-        }
-      }
-    },
-    "ManagedPodIdentityConfig": {
-      "id": "ManagedPodIdentityConfig",
-      "description": "Configuration for the use of GCP IAM Service Accounts in applications in\nthis cluster.\n\nDeprecated, use WorkloadIdentityConfig instead.",
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "description": "[Output only] Deprecated. This field has no effect. To enable Managed Pod\nIdentity, specify a federating service account.",
+          "description": "Whether the cluster disables default in-node sNAT rules. In-node sNAT rules\nwill be disabled when this flag is true. When set to false, default IP\nmasquerade rules will be applied to the nodes to prevent sNAT on cluster\ninternal traffic.\nDeprecated. Use default_snat_status instead",
           "type": "boolean"
         },
-        "federatingServiceAccount": {
-          "description": "Email of the federating GCP SA that has permission to act on behalf of\ncustomer SAs through Managed Pod Identity.",
-          "type": "string"
+        "enableL4ilbSubsetting": {
+          "description": "Whether L4ILB Subsetting is enabled for this cluster.",
+          "type": "boolean"
+        },
+        "datapathProvider": {
+          "description": "The desired datapath provider for this cluster. By default, uses the\nIPTables-based kube-proxy implementation.",
+          "enumDescriptions": [
+            "Default value.",
+            "Use the IPTables implementation based on kube-proxy.",
+            "Use the eBPF based data plane with additional visibility features."
+          ],
+          "type": "string",
+          "enum": [
+            "DATAPATH_PROVIDER_UNSPECIFIED",
+            "LEGACY_DATAPATH",
+            "ADVANCED_DATAPATH"
+          ]
         }
       }
     },
@@ -1702,13 +1728,24 @@
           "description": "Output only. The external IP address of this cluster's endpoint.",
           "type": "string"
         },
-        "enablePeeringRouteSharing": {
-          "description": "Whether to enable route sharing over the network peering.",
-          "type": "boolean"
-        },
         "peeringName": {
           "description": "Output only. The peering name in the customer VPC used by this cluster.",
           "type": "string"
+        },
+        "masterGlobalAccessConfig": {
+          "description": "Controls master global access settings.",
+          "$ref": "PrivateClusterMasterGlobalAccessConfig"
+        }
+      }
+    },
+    "PrivateClusterMasterGlobalAccessConfig": {
+      "id": "PrivateClusterMasterGlobalAccessConfig",
+      "description": "Configuration for controlling master global access settings.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whenever master is accessible globally or not.",
+          "type": "boolean"
         }
       }
     },
@@ -1722,7 +1759,7 @@
           "enumDescriptions": [
             "Should never be set",
             "Secrets in etcd are encrypted.",
-            "Secrets in etcd are stored in plain text (at etcd level) - this is\nunrelated to Google Compute Engine level full disk encryption."
+            "Secrets in etcd are stored in plain text (at etcd level) - this is\nunrelated to Compute Engine level full disk encryption."
           ],
           "type": "string",
           "enum": [
@@ -1811,6 +1848,10 @@
         "identityNamespace": {
           "description": "IAM Identity Namespace to attach all k8s Service Accounts to.",
           "type": "string"
+        },
+        "workloadPool": {
+          "description": "The workload pool to attach all Kubernetes service accounts to.",
+          "type": "string"
         }
       }
     },
@@ -1822,6 +1863,48 @@
         "enabled": {
           "description": "Whether the feature is enabled or not.",
           "type": "boolean"
+        }
+      }
+    },
+    "ClusterTelemetry": {
+      "id": "ClusterTelemetry",
+      "description": "Telemetry integration for the cluster.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "Type of the integration.",
+          "enumDescriptions": [
+            "Not set.",
+            "Monitoring integration is disabled.",
+            "Monitoring integration is enabled.",
+            "Only system components are monitored and logged."
+          ],
+          "type": "string",
+          "enum": [
+            "UNSPECIFIED",
+            "DISABLED",
+            "ENABLED",
+            "SYSTEM_ONLY"
+          ]
+        }
+      }
+    },
+    "TpuConfig": {
+      "id": "TpuConfig",
+      "description": "Configuration for Cloud TPU.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether Cloud TPU integration is enabled or not.",
+          "type": "boolean"
+        },
+        "useServiceNetworking": {
+          "description": "Whether to use service networking for Cloud TPU or not.",
+          "type": "boolean"
+        },
+        "ipv4CidrBlock": {
+          "description": "IPv4 CIDR block reserved for Cloud TPU in the VPC.",
+          "type": "string"
         }
       }
     },
@@ -1928,7 +2011,7 @@
           "type": "string"
         },
         "statusMessage": {
-          "description": "If an error has occurred, a textual description of the error.\nDeprecated, use the field conditions instead.",
+          "description": "Output only. If an error has occurred, a textual description of the error.",
           "type": "string"
         },
         "selfLink": {
@@ -1952,7 +2035,7 @@
           "type": "string"
         },
         "progress": {
-          "description": "[Output only] Progress information for an operation.",
+          "description": "Output only. [Output only] Progress information for an operation.",
           "$ref": "OperationProgress"
         },
         "clusterConditions": {
@@ -2020,7 +2103,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Metric name, required.\ne.g., \"nodes total\", \"percent done\"",
+          "description": "Required. Metric name, e.g., \"nodes total\", \"percent done\".",
           "type": "string"
         },
         "intValue": {
@@ -2080,7 +2163,7 @@
           "type": "string"
         },
         "desiredMonitoringService": {
-          "description": "The monitoring service the cluster should use to write metrics.\nCurrently available options:\n\n* \"monitoring.googleapis.com\/kubernetes\" - the Google Cloud Monitoring\nservice with Kubernetes-native resource model\n* \"monitoring.googleapis.com\" - the Google Cloud Monitoring service\n* \"none\" - no metrics will be exported from the cluster",
+          "description": "The monitoring service the cluster should use to write metrics.\nCurrently available options:\n\n* \"monitoring.googleapis.com\/kubernetes\" - The Cloud Monitoring\nservice with a Kubernetes-native resource model\n* `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no\n  longer available as of GKE 1.15).\n* `none` - No metrics will be exported from the cluster.\n\nIf left as an empty string,`monitoring.googleapis.com\/kubernetes` will be\nused for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.",
           "type": "string"
         },
         "desiredAddonsConfig": {
@@ -2128,7 +2211,7 @@
           "format": "int32"
         },
         "desiredLoggingService": {
-          "description": "The logging service the cluster should use to write metrics.\nCurrently available options:\n\n* \"logging.googleapis.com\/kubernetes\" - the Google Cloud Logging\nservice with Kubernetes-native resource model\n* \"logging.googleapis.com\" - the Google Cloud Logging service\n* \"none\" - no logs will be exported from the cluster",
+          "description": "The logging service the cluster should use to write logs.\nCurrently available options:\n\n* `logging.googleapis.com\/kubernetes` - The Cloud Logging\nservice with a Kubernetes-native resource model\n* `logging.googleapis.com` - The legacy Cloud Logging service (no longer\n  available as of GKE 1.15).\n* `none` - no logs will be exported from the cluster.\n\nIf left as an empty string,`logging.googleapis.com\/kubernetes` will be\nused for GKE 1.14+ or `logging.googleapis.com` for earlier versions.",
           "type": "string"
         },
         "securityProfile": {
@@ -2163,9 +2246,25 @@
           "description": "The desired status of whether to disable default sNAT for this cluster.",
           "$ref": "DefaultSnatStatus"
         },
+        "desiredClusterTelemetry": {
+          "description": "The desired telemetry integration for the cluster.",
+          "$ref": "ClusterTelemetry"
+        },
         "desiredReleaseChannel": {
           "description": "The desired release channel configuration.",
           "$ref": "ReleaseChannel"
+        },
+        "privateClusterConfig": {
+          "description": "The desired private cluster configuration.",
+          "$ref": "PrivateClusterConfig"
+        },
+        "desiredTpuConfig": {
+          "description": "The desired Cloud TPU configuration.",
+          "$ref": "TpuConfig"
+        },
+        "desiredL4ilbSubsettingConfig": {
+          "description": "The desired L4 Internal Load Balancer Subsetting configuration.",
+          "$ref": "ILBSubsettingConfig"
         },
         "desiredMasterVersion": {
           "description": "The Kubernetes version to change the master to.\n\nUsers may specify either explicit versions offered by\nKubernetes Engine or version aliases, which have the following behavior:\n\n- \"latest\": picks the highest valid Kubernetes version\n- \"1.X\": picks the highest valid patch+gke.N patch in the 1.X version\n- \"1.X.Y\": picks the highest valid gke.N patch in the 1.X.Y version\n- \"1.X.Y-gke.N\": picks an explicit Kubernetes version\n- \"-\": picks the default Kubernetes version",
@@ -2241,6 +2340,17 @@
         }
       }
     },
+    "ILBSubsettingConfig": {
+      "id": "ILBSubsettingConfig",
+      "description": "ILBSubsettingConfig contains the desired config of L4 Internal LoadBalancer\nsubsetting on this cluster.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Enables l4 ILB subsetting for this cluster",
+          "type": "boolean"
+        }
+      }
+    },
     "UpdateNodePoolRequest": {
       "id": "UpdateNodePoolRequest",
       "description": "SetNodePoolVersionRequest updates the version of a node pool.",
@@ -2294,7 +2404,7 @@
           "type": "string"
         },
         "workloadMetadataConfig": {
-          "description": "The desired image type for the node pool.",
+          "description": "The desired workload metadata config for the node pool.",
           "$ref": "WorkloadMetadataConfig"
         },
         "upgradeSettings": {
@@ -2352,7 +2462,7 @@
           "type": "string"
         },
         "loggingService": {
-          "description": "The logging service the cluster should use to write metrics.\nCurrently available options:\n\n* \"logging.googleapis.com\" - the Google Cloud Logging service\n* \"none\" - no metrics will be exported from the cluster",
+          "description": "The logging service the cluster should use to write logs.\nCurrently available options:\n\n* `logging.googleapis.com\/kubernetes` - The Cloud Logging\nservice with a Kubernetes-native resource model\n* `logging.googleapis.com` - The legacy Cloud Logging service (no longer\n  available as of GKE 1.15).\n* `none` - no logs will be exported from the cluster.\n\nIf left as an empty string,`logging.googleapis.com\/kubernetes` will be\nused for GKE 1.14+ or `logging.googleapis.com` for earlier versions.",
           "type": "string"
         },
         "name": {
@@ -2379,7 +2489,7 @@
           "type": "string"
         },
         "monitoringService": {
-          "description": "The monitoring service the cluster should use to write metrics.\nCurrently available options:\n\n* \"monitoring.googleapis.com\" - the Google Cloud Monitoring service\n* \"none\" - no metrics will be exported from the cluster",
+          "description": "The monitoring service the cluster should use to write metrics.\nCurrently available options:\n\n* \"monitoring.googleapis.com\/kubernetes\" - The Cloud Monitoring\nservice with a Kubernetes-native resource model\n* `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no\n  longer available as of GKE 1.15).\n* `none` - No metrics will be exported from the cluster.\n\nIf left as an empty string,`monitoring.googleapis.com\/kubernetes` will be\nused for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.",
           "type": "string"
         },
         "name": {
@@ -3192,6 +3302,53 @@
         }
       }
     },
+    "ListLocationsResponse": {
+      "id": "ListLocationsResponse",
+      "description": "ListLocationsResponse returns the list of all GKE locations and their\nrecommendation state.",
+      "type": "object",
+      "properties": {
+        "locations": {
+          "description": "A full list of GKE locations.",
+          "type": "array",
+          "items": {
+            "$ref": "Location"
+          }
+        },
+        "nextPageToken": {
+          "description": "Only return ListLocationsResponse that occur after the page_token. This\nvalue should be populated from the ListLocationsResponse.next_page_token if\nthat response token was set (which happens when listing more Locations than\nfit in a single ListLocationsResponse). This is currently not used and will\nbe honored once we use pagination.",
+          "type": "string"
+        }
+      }
+    },
+    "Location": {
+      "id": "Location",
+      "description": "Location returns the location name, and if the location is recommended\nfor GKE cluster scheduling.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "Contains the type of location this Location is for. Regional or Zonal.",
+          "enumDescriptions": [
+            "LOCATION_TYPE_UNSPECIFIED means the location type was not determined.",
+            "A GKE Location where Zonal clusters can be created.",
+            "A GKE Location where Regional clusters can be created."
+          ],
+          "type": "string",
+          "enum": [
+            "LOCATION_TYPE_UNSPECIFIED",
+            "ZONE",
+            "REGION"
+          ]
+        },
+        "name": {
+          "description": "Contains the name of the resource requested.\nSpecified in the format 'projects\/*\/locations\/*'.",
+          "type": "string"
+        },
+        "recommended": {
+          "description": "Recommended is a bool combining the drain state of the location (ie- has\nthe region been drained manually?), and the stockout status of any zone\naccording to Zone Advisor. This will be internal only for use by pantheon.",
+          "type": "boolean"
+        }
+      }
+    },
     "ListUsableSubnetworksResponse": {
       "id": "ListUsableSubnetworksResponse",
       "description": "ListUsableSubnetworksResponse is the response of\nListUsableSubnetworksRequest.",
@@ -3313,6 +3470,31 @@
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
               "description": "Returns configuration info about the Google Kubernetes Engine service."
+            },
+            "list": {
+              "id": "container.projects.locations.list",
+              "path": "v1alpha1/{+parent}/locations",
+              "flatPath": "v1alpha1/projects/{projectsId}/locations",
+              "httpMethod": "GET",
+              "parameters": {
+                "parent": {
+                  "description": "Contains the name of the resource requested.\nSpecified in the format 'projects\/*'.",
+                  "location": "path",
+                  "required": true,
+                  "pattern": "^projects\/[^\/]+$",
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "response": {
+                "$ref": "ListLocationsResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Fetches locations that offer Google Kubernetes Engine."
             }
           }
           ,
@@ -3560,7 +3742,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Sets the locations for a specific cluster."
+                  "description": "Sets the locations for a specific cluster.\nDeprecated. Use\n[projects.locations.clusters.update](\/kubernetes-engine\/docs\/reference\/rest\/v1alpha1\/projects.locations.clusters.update)\ninstead."
                 },
                 "updateMaster": {
                   "id": "container.projects.locations.clusters.updateMaster",
@@ -4649,7 +4831,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Sets the locations for a specific cluster."
+                  "description": "Sets the locations for a specific cluster.\nDeprecated. Use\n[projects.locations.clusters.update](\/kubernetes-engine\/docs\/reference\/rest\/v1alpha1\/projects.locations.clusters.update)\ninstead."
                 },
                 "master": {
                   "id": "container.projects.zones.clusters.master",

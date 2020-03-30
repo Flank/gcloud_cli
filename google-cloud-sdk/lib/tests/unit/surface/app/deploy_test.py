@@ -41,6 +41,7 @@ from googlecloudsdk.api_lib.app import version_util
 from googlecloudsdk.api_lib.cloudbuild import build
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.cloudbuild import logs as cloudbuild_logs
+from googlecloudsdk.api_lib.datastore import index_api
 from googlecloudsdk.api_lib.services import enable_api
 from googlecloudsdk.api_lib.services import exceptions as sm_exceptions
 from googlecloudsdk.api_lib.storage import storage_api
@@ -195,6 +196,8 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
     self.pool_mock.map.side_effect = map
     self.StartPatch('multiprocessing.Pool').return_value = self.pool_mock
     self.temp_path = os.path.realpath(self.temp_path)
+    self.mock_index_api_create_indexes = self.StartObjectPatch(
+        index_api, 'CreateMissingIndexes')
 
   def ExpectServiceDeployed(self, service, version, set_default=1,
                             set_default_success=True,
@@ -311,9 +314,8 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
     self.AssertRequested('https://appengine.google.com/api/queue/update',
                          {'app_id': project},
                          requested=queue)
-    self.AssertRequested('https://appengine.google.com/api/datastore/index/add',
-                         {'app_id': project},
-                         requested=index)
+    if index:
+      self.mock_index_api_create_indexes.assert_called_once()
 
   def AssertPostDeployHints(self, default_service=False, single_service=None,
                             multiple_services=False, cron=False,
@@ -370,6 +372,13 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
     _AssertHintDisplayedOrNotDisplayed(stop_version, STOP_VERSION_HINT.format(
         project=self.Project(), version=stop_version, service=stop_service))
 
+  def _RuntimeBuilderExperimentEnabled(self, enabled=True):
+    experiment_config = mock.MagicMock()
+    self.StartObjectPatch(experiment_config, 'GetExperimentPercentWithDefault',
+                          return_value=100 if enabled else 0)
+    self.StartObjectPatch(runtime_builders.Experiments, 'LoadFromURI',
+                          return_value=experiment_config)
+
 
 class DeployWithApiTests(DeployWithApiTestsBase):
   """Tests the deploy command."""
@@ -381,6 +390,8 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     fake_image = app_build.BuildArtifact.MakeImageArtifact(
         'appengine.gcr.io/gcloud/1.default')
     self.build_and_push_mock.return_value = fake_image
+    properties.VALUES.app.trigger_build_server_side.Set(None)
+    self._RuntimeBuilderExperimentEnabled()
 
   def testNoCodeBucketRepairsApp(self):
     """Test deploy with no default bucket."""
@@ -509,6 +520,66 @@ class DeployWithApiTests(DeployWithApiTestsBase):
                    r'conversion error.$')
     with self.assertRaisesRegex(exceptions.ConfigError, error_regex):
       self.Run('app deploy --version=1 ' + self.FullPath('app.yaml'))
+
+  def testStaging_MavenNoAppYaml(self):
+    """Tests that a deployment of Java11 Maven project functions correctly."""
+
+    # Load a Maven pom.xml project structure without app.yaml.
+    app_dir = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                            'maven_no_appyaml')
+    with file_utils.TemporaryDirectory() as staging_area:
+      # Create a stager with an empty staging directory.
+      stager = staging.GetBetaStager(staging_area)
+      # Call the staging phase:
+      staging_dir = stager.Stage(
+          os.path.join(app_dir, 'pom.xml'), app_dir, 'java-maven-project',
+          env.STANDARD)
+
+      # Staging directory should now contain a pom.xml and a generated
+      # app.yaml with a single line: runtime: java11.
+      staged_pom_file = os.path.join(staging_dir, 'pom.xml')
+      self.AssertFileExists(staged_pom_file)
+      staged_yaml_file = os.path.join(staging_dir, 'app.yaml')
+      self.AssertFileExistsWithContents('runtime: java11\n', staged_yaml_file)
+
+  def testStaging_MavenWithAppYaml(self):
+    """Tests that a deployment of Java11 Maven project functions correctly."""
+
+    # Load a Maven pom.xml project structure with app.yaml.
+    app_dir = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                            'maven_with_appyaml')
+    with file_utils.TemporaryDirectory() as staging_area:
+      # Create a stager with an empty staging directory.
+      stager = staging.GetBetaStager(staging_area)
+      # Call the staging phase:
+      staging_dir = stager.Stage(app_dir, app_dir, 'java-maven-project',
+                                 env.STANDARD)
+
+      # Staging directory should now contain a pom.xml and the
+      # app.yaml from src/main/appengine directory in its root.
+      staged_pom_file = os.path.join(staging_dir, 'pom.xml')
+      self.AssertFileExists(staged_pom_file)
+      staged_yaml_file = os.path.join(staging_dir, 'app.yaml')
+      self.AssertFileExistsWithContents(
+          'runtime: java11\nenv_variables:\n  SPANNER_INSTANCE: xxx\n',
+          staged_yaml_file)
+      # Verify that the built target/ area is not staged.
+      staged_target_directory = os.path.join(staging_dir, 'target')
+      if os.path.isdir(staged_target_directory):
+        self.fail(
+            'No expected directory [{0}] .'.format(staged_target_directory))
+
+  def testStaging_CannotDeployMavenForJava8(self):
+    """Tests deploying a Maven project does not work for GAE Java8."""
+
+    # Load a Maven pom.xml project structure which is a Java8 GAE application.
+    app_dir = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                            'maven_gae_java8')
+    with file_utils.TemporaryDirectory() as staging_area:
+      # Create a stager with an empty staging directory.
+      stager = staging.GetBetaStager(staging_area)
+      with self.assertRaises(staging.MavenPomNotSupported):
+        stager.Stage(app_dir, app_dir, 'java-maven-project', env.STANDARD)
 
   def testStaging_Java11JarWithManifestClassPath(self):
     """Tests that a deployment of Java11 jar with dep jars functions correctly.
@@ -697,6 +768,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
       - The staging command itself.
       - That the correct files are uploaded.
     """
+    properties.VALUES.app.trigger_build_server_side.Set(False)
     self.StartPropertyPatch(config.Paths, 'sdk_root', return_value='sdk_root')
     command = staging._BundledCommand('stage.sh', 'stage.cmd')
     staging_area = '/staging-area'
@@ -1109,10 +1181,11 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     self.Run(('app deploy --bucket=gs://default-bucket/ --version=1 '
               '{m}').format(m=service_path))
 
-  def testGeneratesDeploymentManifestForNoFilesEnv2(self):
+  def testGeneratesDeploymentManifestForNoFilesFlex(self):
     """Test that files are not in manifest with env: 2."""
+    properties.VALUES.app.trigger_build_server_side.Set(False)
     self.StartObjectPatch(deploy_command_util, 'PossiblyEnableFlex')
-    service_path = self.WriteEnv2Runtime('app.yaml', 'python-compat')
+    service_path = self.WriteFlexRuntime('app.yaml', 'python-compat')
     config_dir = os.path.dirname(service_path)
     # Write three files within the same directory as the configuration file.
     # These files would be included without env: 2, but should be left out with
@@ -1130,8 +1203,9 @@ class DeployWithApiTests(DeployWithApiTestsBase):
 
     self.ExpectServiceDeployed('default', '1',
                                deployment=expected_deployment,
+                               handlers=self.DefaultHandlers(with_static=True),
                                version_call_args={
-                                   'env': '2',
+                                   'env': 'flex',
                                    'runtime': 'vm'},
                                beta_settings=self.VmBetaSettings(
                                    vm_runtime='python-compat'))
@@ -1421,14 +1495,17 @@ class DeployWithFlexBase(DeployWithApiTestsBase, build_base.BuildBase):
                            'runtime': 'vm'},
         handlers=handlers)
 
-  def _ExpectServiceDeployedWithBuildOptions(self, runtime='python-compat',
+  def _ExpectServiceDeployedWithBuildOptions(self,
+                                             runtime='python-compat',
                                              warning=None,
                                              build_id=None,
-                                             timeout=None):
-    expected_deployment = self.GetDeploymentMessage(filenames=['app.yaml'])
+                                             timeout=None,
+                                             directory=None,
+                                             filenames=None):
+    expected_deployment = self.GetDeploymentMessage(
+        filenames=filenames or ['app.yaml'], directory=directory)
     expected_deployment.cloudBuildOptions = self.messages.CloudBuildOptions(
-        appYamlPath='app.yaml',
-        cloudBuildTimeout=timeout)
+        appYamlPath='app.yaml', cloudBuildTimeout=timeout)
     create_version_metadata = None
     if build_id:
       create_version_metadata = self.messages.CreateVersionMetadataV1Beta(
@@ -1447,8 +1524,10 @@ class DeployWithFlexBase(DeployWithApiTestsBase, build_base.BuildBase):
         '1',
         deployment=expected_deployment,
         beta_settings=beta_settings,
-        version_call_args={'env': 'flex',
-                           'runtime': 'vm'},
+        version_call_args={
+            'env': 'flex',
+            'runtime': 'vm'
+        },
         operation_metadata=operation_metadata,
         handlers=handlers)
 
@@ -1458,6 +1537,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
   def SetUp(self):
     self.service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
                                       runtime='python-compat')
+    self._RuntimeBuilderExperimentEnabled()
 
   def _ServiceManagementExpectListServicesRequest(self,
                                                   enabled=False,
@@ -1496,6 +1576,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
 
   def testSkipFilesWithFlex(self):
     """Test that skip files is respected in cloud build."""
+    properties.VALUES.app.trigger_build_server_side.Set(False)
     self._ExpectServiceDeployed()
     self._ServiceManagementExpectListServicesRequest(enabled=True)
     service_path = self.WriteApp(
@@ -1528,7 +1609,6 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
 
   def testDefaultSkipFilesWithFlex(self):
     """Test that the default skip files for flexible deployments is correct."""
-    self._ExpectServiceDeployed()
     self._ServiceManagementExpectListServicesRequest(enabled=True)
     service_path = self.WriteApp(
         'app.yaml',
@@ -1552,17 +1632,15 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
     os.mkdir(os.path.join(config_dir, 'not_ignored'))
     self.WriteFile('goodfile', 'empty',
                    directory=os.path.join(config_dir, 'not_ignored'))
-    create_tar_mock = self.StartObjectPatch(cloud_build, '_CreateTar')
+    self._ExpectServiceDeployedWithBuildOptions(
+        directory=config_dir,
+        filenames=[
+            'app.yaml', self.HANDLER_FILE, self.UTIL_FILE, '.hiddenfile',
+            os.path.join('not_ignored', 'goodfile')
+        ])
 
     self.Run(('app deploy --bucket=gs://default-bucket/ --version=1 '
               '{m}').format(m=service_path))
-
-    create_tar_mock.assert_called_once_with(
-        config_dir,
-        mock.ANY,
-        set(['app.yaml', self.HANDLER_FILE, self.UTIL_FILE,
-             '.hiddenfile', os.path.join('not_ignored', 'goodfile')]),
-        mock.ANY)
 
   def testDeploy_GaRespectsRuntimeBuildersConfig(self):
     """Tests that non-beta deployments still respect the config flag.
@@ -1572,6 +1650,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
     respected.
     """
     properties.VALUES.app.use_runtime_builders.Set(True)
+    properties.VALUES.app.trigger_build_server_side.Set(False)
     self._ExpectServiceDeployed('python-compat')
     self._ServiceManagementExpectListServicesRequest(enabled=True)
     service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
@@ -1589,6 +1668,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
     """Tests that non-beta deployments don't use beta whitelisted builders.
     """
     self._ExpectServiceDeployed('test-beta')
+    properties.VALUES.app.trigger_build_server_side.Set(False)
     self._ServiceManagementExpectListServicesRequest(enabled=True)
     service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
                                  runtime='test-beta')
@@ -1601,28 +1681,47 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
   def testDeploy_GaUsesWhitelistedRuntimeBuilders(self):
     """Tests that non-beta deployments use GA whitelisted runtime builders.
     """
-    self._ExpectServiceDeployed('test-ga')
     self._ServiceManagementExpectListServicesRequest(enabled=True)
     service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
                                  runtime='test-ga')
+    self._ExpectServiceDeployedWithBuildOptions(
+        'test-ga',
+        directory=os.path.dirname(service_path))
 
     self.Run('app deploy --bucket=gs://default-bucket/ --version=1 ' +
              service_path)
-
-    self.load_cloud_build_mock.assert_called_once_with(
-        {'_OUTPUT_IMAGE': 'us.gcr.io/{}/appengine/default.1:latest'.format(
-            self.Project()),
-         '_GAE_APPLICATION_YAML_PATH': 'app.yaml'})
 
   def testDeploy_EnablesFlexSuccessfully(self):
     """Test that deploy command attempts to enable Flexible API."""
     self._ServiceManagementExpectListServicesRequest(enabled=False)
     self._ServiceManagementExpectEnableServicesRequest()
-    self._ExpectServiceDeployed()
+    self._ExpectServiceDeployedWithBuildOptions()
+
     self.Run('app deploy {} --version=1 '.format(self.service_path))
 
   def testDeploy_FlexEnabled(self):
     """Test that deploy command attempts to enable Flexible API."""
+    self._ServiceManagementExpectListServicesRequest(enabled=True)
+    self._ExpectServiceDeployedWithBuildOptions()
+    self.Run('app deploy {} --version=1 '.format(self.service_path))
+
+  def testDeploy_FlexEnabled_runtimeBuilderOptout(self):
+    """Test that deploy command attempts to enable Flexible API."""
+    properties.VALUES.app.use_runtime_builders.Set(False)
+    self._ServiceManagementExpectListServicesRequest(enabled=True)
+    self._ExpectServiceDeployed()
+    self.Run('app deploy {} --version=1 '.format(self.service_path))
+
+  def testDeploy_FlexEnabled_serverSideBuildOptout(self):
+    """Test that deploy command attempts to enable Flexible API."""
+    properties.VALUES.app.trigger_build_server_side.Set(False)
+    self._ServiceManagementExpectListServicesRequest(enabled=True)
+    self._ExpectServiceDeployed()
+    self.Run('app deploy {} --version=1 '.format(self.service_path))
+
+  def testDeploy_FlexEnabled_experimentNotEnabled(self):
+    """Test that deploy command attempts to enable Flexible API."""
+    self._RuntimeBuilderExperimentEnabled(False)
     self._ServiceManagementExpectListServicesRequest(enabled=True)
     self._ExpectServiceDeployed()
     self.Run('app deploy {} --version=1 '.format(self.service_path))
@@ -1632,8 +1731,10 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
     self._ServiceManagementExpectListServicesRequest(
         error=http_error.MakeDetailedHttpError(
             code=403, message='Message.'))
-    self._ExpectServiceDeployed()
+    self._ExpectServiceDeployedWithBuildOptions()
+
     self.Run('app deploy {} --version=1'.format(self.service_path))
+
     self.AssertErrContains(
         'Unable to verify that the Appengine Flexible API is enabled for '
         'project [fake-project].')
@@ -1644,6 +1745,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
         error=http_error.MakeDetailedHttpError(code=400, message='Message.'))
     # Deploy should fail before any other requests to AppEngine.
     self.ExpectGetApplicationRequest(self.Project())
+
     with self.assertRaises(api_lib_exceptions.HttpException):
       self.Run('app deploy {} --version=1'.format(self.service_path))
 
@@ -1676,6 +1778,7 @@ class DeployWithApiTestsCWD(DeployWithApiTestsBase, sdk_test_base.WithTempCWD):
 
   def testDeploy_NoYaml(self):
     """Test deploying with a single python file in a directory."""
+    self._RuntimeBuilderExperimentEnabled()
     self.Touch(self.cwd_path, 'start.py')
     properties.VALUES.core.user_output_enabled.Set(True)
     with self.assertRaises(app_exceptions.UnknownSourceError):

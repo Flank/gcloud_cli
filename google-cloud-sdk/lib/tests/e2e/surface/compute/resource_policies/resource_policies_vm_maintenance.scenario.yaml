@@ -1,5 +1,5 @@
 filters:
-  skip:
+  skipAlways:
     reason: Failing - "internal error"
     bug: b/135525225
 title: test resource policy

@@ -128,8 +128,20 @@ A non\-boot disk.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete an instance called 'instance\-1' in the zone 'us\-central\-2\-a', run:
+
+.RS 2m
+$ gcloud beta compute instances delete instance\-1 \e
+    \-\-zone=us\-central2\-a
+.RE
 
 
 

@@ -1,0 +1,119 @@
+NAME
+    gcloud alpha labelmanager keys remove-iam-policy-binding - removes a policy
+        binding from the IAM policy of a LabelKey
+
+SYNOPSIS
+    gcloud alpha labelmanager keys remove-iam-policy-binding
+        (LABEL_KEY_ID : --label-parent=LABEL_PARENT) --member=MEMBER
+        --role=ROLE
+        [--all | --condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Removes an IAM policy binding for a LabelKey resource given the
+    binding and an identifier for the LabelKey. The identifier can be the
+    LabelKey's display name and parent or the LabelKey's ID in the form:
+    labelKeys/{numeric_id}.
+
+POSITIONAL ARGUMENTS
+     LabelKey. This must be specified.
+
+       LABEL_KEY_ID
+          Display name or numeric id for the LabelKey. The display name must be
+          1-63 characters, beginning and ending with an alphanumeric character
+          ([a-z0-9A-Z]) with dashes (-), underscores (), dots (.), and
+          alphanumerics between. The numeric id should be of the form
+          labelKeys/{numeric_id}. This positional must be specified if any of
+          the other arguments in this group are specified.
+
+       --label-parent=LABEL_PARENT
+          Parent of the LabelKey. This must be the form organizations/{org_id}.
+          This field is required if LABEL_KEY_ID is a display name instead of a
+          numeric id.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to remove the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:test123@example.domain.com, or
+        domain:example.domain.com.
+
+        Can also be one of the following special values:
+        * allUsers - Special identifier that represents anyone who is on the
+          internet, with or without a Google account.
+        * allAuthenticatedUsers - Special identifier that represents anyone
+          who is authenticated with a Google account or a service account.
+
+     --role=ROLE
+        The role to remove the member from.
+
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --all
+          Remove all bindings with this role and member, irrespective of any
+          conditions.
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be removed. When condition is explicitly
+          specified as None (e.g. --condition=None), it matches a binding
+          without a condition. Otherwise, only the binding with a condition
+          which exactly matches the specified condition (including the optional
+          description) will be removed.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To remove an IAM policy binding for the role of 'roles/editor' for the user
+    'test-user@gmail.com' on the LabelKey 'labelKeys/123', run:
+
+        $ gcloud alpha labelmanager keys remove-iam-policy-binding \
+            labelKeys/123 --member='user:test-user@gmail.com' \
+            --role='roles/editor'
+
+    To remove an IAM policy binding for a LabelKey with the name 'env' under
+    'organization/456' for the role of 'roles/labelmanager.labelUser' for the
+    user 'test-user@gmail.com', run:
+
+        $ gcloud alpha labelmanager keys remove-iam-policy-binding env \
+            --label-parent='organizations/456' \
+            --member='user:test-user@gmail.com' \
+            --role='roles/labelmanager.labelUser'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

@@ -180,16 +180,11 @@ class ConditionPoller(waiter.OperationPoller):
     self._dependencies = {k: set() for k in tracker}
     if dependencies is not None:
       for k in dependencies:
-        error_msg = 'Condition {} is not in the dependency tracker.'
-        if k not in tracker:
-          raise ValueError(error_msg.format(k))
-        for c in dependencies[k]:
-          if c not in tracker:
-            raise ValueError(error_msg.format(c))
-        # Add dependencies, only if they're still not complete
+        # Add dependencies, only if they're still not complete. If a stage isn't
+        # in the tracker. consider it "already complete".
         self._dependencies[k] = {
-            c for c in dependencies[k] if not tracker.IsComplete(c)
-        }
+            c for c in dependencies[k]
+            if c in tracker and not tracker.IsComplete(c)}
     self._resource_getter = resource_getter
     self._tracker = tracker
     self._resource_fail_type = exceptions.Error
@@ -271,8 +266,7 @@ class ConditionPoller(waiter.OperationPoller):
       conditions_message: str, The message from the conditions object we're
         displaying..
     """
-
-    if self._tracker.IsComplete(condition):
+    if condition not in self._tracker or self._tracker.IsComplete(condition):
       return
 
     if self._IsBlocked(condition):
@@ -303,7 +297,7 @@ class ConditionPoller(waiter.OperationPoller):
     Returns:
       bool: True if stage was completed, False if no action taken
     """
-    if self._tracker.IsComplete(condition):
+    if condition not in self._tracker or self._tracker.IsComplete(condition):
       return False
     # A blocked condition is likely to remain True (indicating the previous
     # operation concerning it was successful) until the blocking condition(s)
@@ -326,6 +320,8 @@ class ConditionPoller(waiter.OperationPoller):
     # The set of stages that aren't marked started and don't have unsatisfied
     # dependencies are newly unblocked.
     for c in self._dependencies:
+      if c not in self._tracker:
+        continue
       if self._tracker.IsWaiting(c) and not self._IsBlocked(c):
         self._tracker.StartStage(c)
     # TODO(b/120679874): Should not have to manually call Tick()
@@ -342,7 +338,7 @@ class ConditionPoller(waiter.OperationPoller):
       DeploymentFailedError: If the 'Ready' condition failed.
     """
     # Don't fail an already failed stage.
-    if self._tracker.IsComplete(condition):
+    if condition not in self._tracker or self._tracker.IsComplete(condition):
       return
 
     self._tracker.FailStage(
@@ -518,7 +514,7 @@ class ServerlessOperations(object):
       region: str, The region of the control plane if operating against
         hosted Cloud Run, else None.
       op_client: The API client for interacting with One Platform APIs. Or
-        None if interacting with Cloud Run on GKE.
+        None if interacting with Cloud Run for Anthos.
     """
     self._client = client
     self._registry = resources.REGISTRY.Clone()
@@ -808,9 +804,17 @@ class ServerlessOperations(object):
       base_revision_nonce = template.labels.get(revision.NONCE_LABEL, None)
       if base_revision_nonce:
         try:
-          namespace_ref = self._registry.Parse(
-              metadata.namespace,
-              collection='run.namespaces')
+          # TODO(b/150322097): Remove this when the api has been split.
+          # This try/except block is needed because the v1alpha1 and v1 run apis
+          # have different collection names for the namespaces.
+          try:
+            namespace_ref = self._registry.Parse(
+                metadata.namespace,
+                collection='run.namespaces')
+          except resources.InvalidCollectionException:
+            namespace_ref = self._registry.Parse(
+                metadata.namespace,
+                collection='run.api.v1.namespaces')
           poller = NonceBasedRevisionPoller(self, namespace_ref)
           base_revision = poller.GetResult(waiter.PollUntilDone(
               poller, base_revision_nonce,
@@ -854,18 +858,8 @@ class ServerlessOperations(object):
       The Service object we created or modified.
     """
     messages = self.messages_module
-    config_changes = [_SetClientNameAndVersion()] + config_changes
     try:
       if serv:
-        if not with_code:
-          # Avoid changing the running code by making the new revision by digest
-          self._EnsureImageDigest(serv, config_changes)
-
-        # Revision names must be unique across the namespace.
-        # To prevent the revision name being unchanged from the last revision,
-        # we reset the value so the default naming scheme will be used instead.
-        serv.template.name = None
-
         # PUT the changed Service
         for config_change in config_changes:
           serv = config_change.Adjust(serv)
@@ -961,8 +955,16 @@ class ServerlessOperations(object):
       getter = functools.partial(self.GetService, service_ref)
       self.WaitForCondition(ServiceConditionPoller(getter, tracker, serv=serv))
 
+  def _AddRevisionForcingChange(self, serv, config_changes):
+    """Get a new revision forcing config change for the given service."""
+    curr_generation = serv.generation if serv is not None else 0
+    revision_suffix = '{}-{}'.format(
+        str(curr_generation + 1).zfill(5), name_generator.GenerateName())
+    config_changes.insert(0, _NewRevisionForcingChange(revision_suffix))
+
   def ReleaseService(self, service_ref, config_changes, tracker=None,
-                     asyn=False, allow_unauthenticated=None, for_replace=False):
+                     asyn=False, allow_unauthenticated=None, for_replace=False,
+                     prefetch=False):
     """Change the given service in prod using the given config_changes.
 
     Ensures a new revision is always created, even if the spec of the revision
@@ -979,22 +981,29 @@ class ServerlessOperations(object):
         unauthenticated access from a service.
       for_replace: bool, If the change is for a replacing the service from a
         YAML specification.
+      prefetch: the service, pre-fetched for ReleaseService. `False` indicates
+        the caller did not perform a prefetch; `None` indicates a nonexistant
+        service.
     """
     if tracker is None:
       tracker = progress_tracker.NoOpStagedProgressTracker(
           stages.ServiceStages(allow_unauthenticated is not None),
           interruptable=True, aborted_message='aborted')
-    serv = self.GetService(service_ref)
-    curr_generation = serv.generation if serv else 0
-    revision_suffix = '{}-{}'.format(
-        str(curr_generation + 1).zfill(5), name_generator.GenerateName())
+    if prefetch is None:
+      serv = None
+    else:
+      serv = prefetch or self.GetService(service_ref)
     if for_replace:
       with_image = True
     else:
       with_image = any(
           isinstance(c, config_changes_mod.ImageChange) for c in config_changes)
-      config_changes = ([_NewRevisionForcingChange(revision_suffix)] +
-                        config_changes)
+      self._AddRevisionForcingChange(serv, config_changes)
+      if serv and not with_image:
+        # Avoid changing the running code by making the new revision by digest
+        self._EnsureImageDigest(serv, config_changes)
+    config_changes = [_SetClientNameAndVersion()] + config_changes
+
     self._UpdateOrCreateService(
         service_ref, config_changes, with_image, serv)
 
@@ -1083,12 +1092,16 @@ class ServerlessOperations(object):
     return [domain_mapping.DomainMapping(item, messages)
             for item in response.items]
 
-  def CreateDomainMapping(self, domain_mapping_ref, service_name):
+  def CreateDomainMapping(self,
+                          domain_mapping_ref,
+                          service_name,
+                          force_override=False):
     """Create a domain mapping.
 
     Args:
       domain_mapping_ref: Resource, domainmapping resource.
       service_name: str, the service to which to map domain.
+      force_override: bool, override an existing mapping of this domain.
 
     Returns:
       A domain_mapping.DomainMapping object.
@@ -1099,6 +1112,7 @@ class ServerlessOperations(object):
         self._client, domain_mapping_ref.namespacesId)
     new_mapping.name = domain_mapping_ref.domainmappingsId
     new_mapping.route_name = service_name
+    new_mapping.force_override = force_override
 
     request = messages.RunNamespacesDomainmappingsCreateRequest(
         domainMapping=new_mapping.Message(),

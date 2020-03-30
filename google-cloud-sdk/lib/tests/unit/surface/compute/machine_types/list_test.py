@@ -23,7 +23,6 @@ import textwrap
 from googlecloudsdk.api_lib.compute import lister
 from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.core.resource import resource_projector
-from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -134,7 +133,7 @@ class MachineTypesListTest(test_base.BaseTest,
     self.ExpectListerInvoke(
         scope_set=self.MakeZoneSet(['my-zone']),
         filter_expr='name eq ".*(asdf).*"',
-        max_results=123,
+        max_results=None,
         result=[],
         with_implementation=lister.ZonalLister(
             self.api_mock.adapter,

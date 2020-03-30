@@ -38,7 +38,7 @@ class DomainsListCommandTest(sdk_test_base.WithFakeAuth,
   APPENGINE_API_VERSION = 'v1'
 
   RUN_API = 'run'
-  RUN_API_VERSION = 'v1alpha1'
+  RUN_API_VERSION = 'v1'
 
   exp_messages = core_apis.GetMessagesModule(APPENGINE_API,
                                              APPENGINE_API_VERSION)

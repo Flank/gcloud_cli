@@ -1,5 +1,5 @@
 title: List recommendations
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -11,8 +11,9 @@ actions:
 - define_reference:
     reference: api-version
     track_values:
-      ALPHA: v1alpha1
+      ALPHA: v1alpha2
       BETA: v1beta1
+      GA: v1
 - execute_command:
     command: recommender recommendations list --project=my-project --location=my-location --recommender=my-recommender
     events:

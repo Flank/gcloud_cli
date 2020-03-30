@@ -38,6 +38,7 @@ class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   def SetUp(self):
+
     def _GetParameters(args, unused_event_type):
       parameters = {}
       parameters.update(args.parameters)
@@ -46,9 +47,7 @@ class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
       return parameters
 
     self.validate_params = self.StartObjectPatch(
-        flags,
-        'GetAndValidateParameters',
-        side_effect=_GetParameters)
+        flags, 'GetAndValidateParameters', side_effect=_GetParameters)
     self.operations.GetTrigger.return_value = None
     self.operations.GetSource.return_value = None
 
@@ -60,20 +59,17 @@ class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
     self.source_crd.spec.group = 'events.api.group'
     self.source_crd.spec.names = (
         self.crd_messages.CustomResourceDefinitionNames(
-            kind='PubSub', plural='pubsubs'))
+            kind='CloudPubSubSource', plural='cloudpubsubsources'))
     self.event_type = custom_resource_definition.EventType(
-        self.source_crd,
-        type='google.source.my.type',
-        description='desc')
+        self.source_crd, type='google.source.my.type', description='desc')
     self.source_crd.event_types = [self.event_type]
     self.operations.ListSourceCustomResourceDefinitions.return_value = [
         self.source_crd
     ]
 
-  def _MakeSource(self, source_crd):
+  def _MakeSource(self, source_crd, namespace='default'):
     """Creates a source object of the type specified by source_crd."""
-    self.source = source.Source.New(self.mock_serverless_client,
-                                    'default',
+    self.source = source.Source.New(self.mock_serverless_client, namespace,
                                     source_crd.source_kind,
                                     source_crd.source_api_category)
     self.source.name = 'source-for-my-trigger'
@@ -82,111 +78,144 @@ class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
     """Creates a trigger object with the given source dependency and event type."""
     self.trigger = trigger.Trigger.New(self.mock_serverless_client, 'default')
     self.trigger.name = 'my-trigger'
-    self.trigger.dependency = source_obj
-    # TODO(b/141617597): Set to str(random.random()) without prepended string
-    self.trigger.filter_attributes[trigger.SOURCE_TRIGGER_LINK_FIELD] = (
-        'link{}'.format(random.random()))
-    self.trigger.filter_attributes[trigger.EVENT_TYPE_FIELD] = event_type.type
+    if source_obj is not None:
+      self.trigger.dependency = source_obj
+      # TODO(b/141617597): Set to str(random.random()) without prepended string
+      self.trigger.filter_attributes[trigger.SOURCE_TRIGGER_LINK_FIELD] = (
+          'link{}'.format(random.random()))
+    self.trigger.filter_attributes[trigger.EVENT_TYPE_FIELD] = event_type
 
-  def testTriggersFailNonGKE(self):
-    """Triggers are not yet supported on managed Cloud Run."""
-    with self.assertRaises(exceptions.UnsupportedArgumentError):
-      self.Run('events triggers create my-trigger --region=us-central1 '
-               '--target-service=my-service --type=com.google.event.type')
-    self.AssertErrContains(
-        'Events are only available with Cloud Run for Anthos.')
+  def testCreateManaged(self):
+    """Tests successful create with default output format."""
+    self._MakeEventType()
+    self._MakeSource(self.source_crd, namespace='fake-project')
+    self._MakeTrigger(self.source, self.event_type.type)
+    self.operations.CreateTrigger.return_value = self.trigger
+    self.Run('events triggers create my-trigger --region=us-central1 '
+             '--target-service=my-service --type=google.source.my.type')
 
-  def testTriggersCreate(self):
+    trigger_ref = self._TriggerRef('my-trigger', 'fake-project')
+    self.validate_params.assert_called_once_with(mock.ANY, self.event_type)
+    self.source.name = 'source-for-my-trigger'
+    self.operations.CreateTrigger.assert_called_once_with(
+        trigger_ref, self.source, self.event_type.type, 'my-service', 'default')
+    self.operations.CreateSource.assert_called_once_with(
+        self.source, self.event_type.crd, self.trigger,
+        self._NamespaceRef(project='fake-project'), 'default', {})
+    self.operations.PollSource.assert_called_once_with(self.source,
+                                                       self.event_type,
+                                                       mock.ANY)
+    self.operations.PollTrigger.assert_called_once_with(trigger_ref, mock.ANY)
+    self.AssertErrContains('Initializing trigger...')
+    self.AssertErrContains('"status": "SUCCESS"')
+
+  def testCreateGke(self):
     """Tests successful create with default output format."""
     self._MakeEventType()
     self._MakeSource(self.source_crd)
-    self._MakeTrigger(self.source, self.event_type)
+    self._MakeTrigger(self.source, self.event_type.type)
     self.operations.CreateTrigger.return_value = self.trigger
     self.Run('events triggers create my-trigger --platform=gke '
              '--cluster=cluster-1 --cluster-location=us-central1-a '
              '--target-service=my-service --type=google.source.my.type')
 
+    trigger_ref = self._TriggerRef('my-trigger', 'default')
     self.validate_params.assert_called_once_with(mock.ANY, self.event_type)
     self.source.name = 'source-for-my-trigger'
-    self.operations.CreateTriggerAndSource.assert_called_once_with(
-        None,
-        self._TriggerRef('my-trigger', 'default'),
-        self._NamespaceRef(project='default'),
-        self.source,
-        self.event_type,
-        {},
-        'default',
-        'my-service',
-        mock.ANY,
-    )
+    self.operations.CreateTrigger.assert_called_once_with(
+        trigger_ref, self.source, self.event_type.type, 'my-service', 'default')
+    self.operations.CreateSource.assert_called_once_with(
+        self.source, self.event_type.crd, self.trigger,
+        self._NamespaceRef(project='default'), 'default', {})
+    self.operations.PollSource.assert_called_once_with(self.source,
+                                                       self.event_type,
+                                                       mock.ANY)
+    self.operations.PollTrigger.assert_called_once_with(trigger_ref, mock.ANY)
     self.AssertErrContains('Initializing trigger...')
     self.AssertErrContains('"status": "SUCCESS"')
 
-  def testTriggersCreateWithParameters(self):
+  def testCreateWithParameters(self):
     """Tests successful create with default output format."""
     self._MakeEventType()
     self._MakeSource(self.source_crd)
-    self._MakeTrigger(self.source, self.event_type)
+    self._MakeTrigger(self.source, self.event_type.type)
+    self.operations.CreateTrigger.return_value = self.trigger
     self.Run('events triggers create my-trigger --platform=gke '
              '--cluster=cluster-1 --cluster-location=us-central1-a '
              '--target-service=my-service --type=google.source.my.type '
              '--parameters="someParam=value,otherParam=other value" '
              '--secrets=someSecret=name:key ')
 
+    trigger_ref = self._TriggerRef('my-trigger', 'default')
     self.validate_params.assert_called_once_with(mock.ANY, self.event_type)
     self.source.name = 'source-for-my-trigger'
-    self.operations.CreateTriggerAndSource.assert_called_once_with(
-        None,
-        self._TriggerRef('my-trigger', 'default'),
-        self._NamespaceRef(project='default'),
-        self.source,
-        self.event_type,
-        {
+    self.operations.CreateTrigger.assert_called_once_with(
+        trigger_ref, self.source, self.event_type.type, 'my-service', 'default')
+    self.operations.CreateSource.assert_called_once_with(
+        self.source, self.event_type.crd, self.trigger,
+        self._NamespaceRef(project='default'), 'default', {
             'someParam': 'value',
             'otherParam': 'other value',
             'someSecret': {
                 'name': 'name',
                 'key': 'key'
             }
-        },
-        'default',
-        'my-service',
-        mock.ANY,
-    )
+        })
+    self.operations.PollSource.assert_called_once_with(self.source,
+                                                       self.event_type,
+                                                       mock.ANY)
+    self.operations.PollTrigger.assert_called_once_with(trigger_ref, mock.ANY)
     self.AssertErrContains('Initializing trigger...')
     self.AssertErrContains('"status": "SUCCESS"')
 
-  def testTriggersCreateExistingTrigger(self):
+  def testCreateWithCustomEventType(self):
+    """Tests successful create with default output format."""
+    event_type = 'custom.event.type'
+    self._MakeTrigger(None, event_type)
+    self.operations.CreateTrigger.return_value = self.trigger
+    self.Run('events triggers create my-trigger --platform=gke '
+             '--cluster=cluster-1 --cluster-location=us-central1-a '
+             '--target-service=my-service --type={} '
+             '--custom-type'.format(event_type))
+
+    trigger_ref = self._TriggerRef('my-trigger', 'default')
+    self.operations.CreateTrigger.assert_called_once_with(
+        trigger_ref, None, event_type, 'my-service', 'default')
+    self.operations.CreateSource.assert_not_called()
+    self.operations.PollSource.assert_not_called()
+    self.operations.PollTrigger.assert_called_once_with(trigger_ref, mock.ANY)
+    self.AssertErrContains('Initializing trigger...')
+    self.AssertErrContains('"status": "SUCCESS"')
+
+  def testCreateExistingTrigger(self):
     """Tests successful create with default output format."""
     self._MakeEventType()
     self._MakeSource(self.source_crd)
-    self._MakeTrigger(self.source, self.event_type)
+    self._MakeTrigger(self.source, self.event_type.type)
     self.operations.GetTrigger.return_value = self.trigger
     self.Run('events triggers create my-trigger --platform=gke '
              '--cluster=cluster-1 --cluster-location=us-central1-a '
              '--target-service=my-service --type=google.source.my.type')
 
+    trigger_ref = self._TriggerRef('my-trigger', 'default')
     self.validate_params.assert_called_once_with(mock.ANY, self.event_type)
     self.source.name = 'source-for-my-trigger'
-    self.operations.CreateTriggerAndSource.assert_called_once_with(
-        self.trigger,
-        self._TriggerRef('my-trigger', 'default'),
-        self._NamespaceRef(project='default'),
-        self.source,
-        self.event_type,
-        {},
-        'default',
-        'my-service',
-        mock.ANY,
-    )
+    self.operations.CreateTrigger.assert_not_called()
+    self.operations.CreateSource.assert_called_once_with(
+        self.source, self.event_type.crd, self.trigger,
+        self._NamespaceRef(project='default'), 'default', {})
+    self.operations.PollSource.assert_called_once_with(self.source,
+                                                       self.event_type,
+                                                       mock.ANY)
+    self.operations.PollTrigger.assert_called_once_with(trigger_ref, mock.ANY)
     self.AssertErrContains('Initializing trigger...')
     self.AssertErrContains('"status": "SUCCESS"')
 
-  def testTriggersCreateExistingTriggerFailsValidation(self):
+  def testCreateExistingTriggerFailsValidation(self):
     """Tests successful create with default output format."""
     self._MakeEventType()
     self._MakeSource(self.source_crd)
-    self._MakeTrigger(self.source, self.event_type)
+    self._MakeTrigger(self.source, self.event_type.type)
     self.operations.GetTrigger.return_value = self.trigger
     self.StartObjectPatch(util, 'ValidateTrigger', side_effect=AssertionError)
     with self.assertRaises(exceptions.TriggerCreationError):
@@ -195,11 +224,24 @@ class TriggersCreateTestAlpha(base.ServerlessSurfaceBase):
                '--target-service=my-service --type=google.source.my.type')
     self.AssertErrContains('Trigger [my-trigger] already exists')
 
-  def testTriggersCreateFailsIfExistingTriggerAndSource(self):
+  def testCreateExistingTriggerFailsWithCustomEventType(self):
+    """Tests successful create with default output format."""
+    self._MakeEventType()
+    self._MakeSource(self.source_crd)
+    self._MakeTrigger(self.source, self.event_type.type)
+    self.operations.GetTrigger.return_value = self.trigger
+    with self.assertRaises(exceptions.TriggerCreationError):
+      self.Run('events triggers create my-trigger --platform=gke '
+               '--cluster=cluster-1 --cluster-location=us-central1-a '
+               '--target-service=my-service --type=custom.event.type '
+               '--custom-type')
+    self.AssertErrContains('Trigger [my-trigger] already exists')
+
+  def testCreateFailsIfExistingTriggerAndSource(self):
     """Tests failed create if both trigger and source already exist."""
     self._MakeEventType()
     self._MakeSource(self.source_crd)
-    self._MakeTrigger(self.source, self.event_type)
+    self._MakeTrigger(self.source, self.event_type.type)
     self.operations.GetTrigger.return_value = self.trigger
     self.operations.GetSource.return_value = self.source
 

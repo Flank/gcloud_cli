@@ -299,6 +299,105 @@ class ManifestTest(sdk_test_base.WithFakeAuth):
       m.GetBuilderReference('foo')
 
 
+class ExperimentsTest(sdk_test_base.WithFakeAuth):
+  EXPERIMENTS_FILE = """\
+  schema_version: 1
+  experiments:
+    test_experiment_1: 123
+    test_experiment_2: 456
+  """
+
+  EXPERIMENTS_FILE_NO_SCHEMA_VERSION = """\
+  experiments:
+    test_experiment_1: 123
+    test_experiment_2: 456
+  """
+
+  EXPERIMENTS_UNSUPPORTED_SCHEMA_VERSION = """\
+  schema_version: 10000
+  experiments:
+    test_experiment_1: 123
+    test_experiment_2: 456
+  """
+
+  EXPERIMENTS_INVALID_SYNTAX = """\
+  schema_version: 10000
+    experiments:
+      test_experiment_1: 123
+      test_experiment_2: 456
+  """
+
+  def testLoadManifest(self):
+    self.Touch(
+        self.temp_path,
+        'experiments.yaml',
+        contents=ExperimentsTest.EXPERIMENTS_FILE)
+    self.StartObjectPatch(
+        storage_api.StorageClient, 'ReadObject', side_effect=
+        lambda x: io.BytesIO(ExperimentsTest.EXPERIMENTS_FILE.encode('utf-8')))
+    for builder_root in [_URLFromFile(self.temp_path), 'gs://mybucket']:
+      m = runtime_builders.Experiments.LoadFromURI(builder_root)
+      self.assertEqual(m._data, yaml.load(ExperimentsTest.EXPERIMENTS_FILE))
+      self.assertEqual(
+          set(m.Experiments().keys()),
+          {'test_experiment_1', 'test_experiment_2'})
+      self.assertEqual(m.Experiments()['test_experiment_1'], 123)
+      self.assertEqual(m.Experiments()['test_experiment_2'], 456)
+
+  def testGetExperimentPercentWithDefault(self):
+    self.Touch(
+        self.temp_path,
+        'experiments.yaml',
+        contents=ExperimentsTest.EXPERIMENTS_FILE)
+    builder_root = _URLFromFile(self.temp_path)
+    m = runtime_builders.Experiments.LoadFromURI(builder_root)
+    self.assertEqual(
+        m.GetExperimentPercentWithDefault('test_experiment_1', 777), 123)
+    self.assertEqual(
+        m.GetExperimentPercentWithDefault('test_experiment_foo', 777), 777)
+
+  def testGetExperimentPercentWithDefault_FileNotFound(self):
+    with self.assertRaisesRegex(
+        runtime_builders.ExperimentsError,
+        'Unable to read the runtimes experiment config'):
+      runtime_builders.Experiments.LoadFromURI('file://not/existent/file')
+
+  def testGetExperimentPercentWithDefault_missing_schema_version(self):
+    self.Touch(
+        self.temp_path,
+        'experiments.yaml',
+        contents=ExperimentsTest.EXPERIMENTS_FILE_NO_SCHEMA_VERSION)
+    builder_root = _URLFromFile(self.temp_path)
+    with self.assertRaisesRegex(
+        runtime_builders.ExperimentsError,
+        'Unable to parse the runtimes experiment config due to '
+        'missing schema_version field'):
+      runtime_builders.Experiments.LoadFromURI(builder_root)
+
+  def testGetExperimentPercentWithDefault_UnsupportedSchemaVersion(self):
+    self.Touch(
+        self.temp_path,
+        'experiments.yaml',
+        contents=ExperimentsTest.EXPERIMENTS_UNSUPPORTED_SCHEMA_VERSION)
+    builder_root = _URLFromFile(self.temp_path)
+    with self.assertRaisesRegex(
+        runtime_builders.ExperimentsError,
+        r'Unable to parse the runtimes experiments config. Your client '
+        r'supports schema version \[1\] but requires \[10000\]'):
+      runtime_builders.Experiments.LoadFromURI(builder_root)
+
+  def testGetExperimentPercentWithDefault_InvalidSyntax(self):
+    self.Touch(
+        self.temp_path,
+        'experiments.yaml',
+        contents=ExperimentsTest.EXPERIMENTS_INVALID_SYNTAX)
+    builder_root = _URLFromFile(self.temp_path)
+    with self.assertRaisesRegex(
+        runtime_builders.ExperimentsError,
+        'Unable to read the runtimes experiment config'):
+      runtime_builders.Experiments.LoadFromURI(builder_root)
+
+
 class ResolverTest(sdk_test_base.SdkBase):
   _BUILDER_FILES = {
       'runtimes.yaml': """\

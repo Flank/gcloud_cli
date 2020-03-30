@@ -132,6 +132,9 @@ DESCRIPTION
             True if key does not match the RE (regular expression) pattern
             value.
 
+    For more about regular expression syntax, see:
+    https://docs.python.org/3/library/re.html#re-syntax
+
 EXAMPLES
     List all Google Compute Engine instance resources:
 
@@ -141,8 +144,8 @@ EXAMPLES
 
         $ gcloud compute instances list --filter="machineType:f1-micro"
 
-    List Compute Engine instance resources with zone prefix us and not
-    MachineType f1-micro:
+    List Compute Engine instance resources using a regular expression for zone
+    prefix us and not MachineType f1-micro:
 
         $ gcloud compute instances list \
             --filter="zone ~ ^us AND -machineType:f1-micro"
@@ -213,9 +216,9 @@ EXAMPLES
       xyz*     abcpdqxyz    False    False
       xyz      abcpdqxyz    False    True
       *        abcpdqxyz    True     True
-      *        <None>       False    False
-      *        <''>         False    False
-      *        <otherwise>  True     True
+      *        (None)       False    False
+      *        ('')         False    False
+      *        (otherwise)  True     True
       abc*     abc.pdq.xyz  True     True
       abc      abc.pdq.xyz  True     True
       abc.pdq  abc.pdq.xyz  True     True

@@ -30,14 +30,13 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions as c_exceptions
 from googlecloudsdk.command_lib.builds import staging_bucket_util
 from googlecloudsdk.command_lib.builds.deploy import build_util
-from googlecloudsdk.command_lib.projects import util as projects_util
+from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 
 import six
 
-_CLEAN_PREVIEW_SCHEDULER_LOCATION = 'us-east4'
 _CLEAN_PREVIEW_SCHEDULE_HOUR = 12
 _CLEAN_PREVIEW_SCHEDULE = '0 {} * * *'.format(_CLEAN_PREVIEW_SCHEDULE_HOUR)
 _REPO_TYPE_CODES = {
@@ -69,9 +68,8 @@ class SourceRepoNotConnectedException(c_exceptions.InvalidArgumentException):
 class ConfigureGKEDeploy(base.Command):
   """Configure automated build and deployment to a target Google Kubernetes Engine cluster.
 
-  Configure automated build and deployment of a repository that can be triggered
-  via a git branch or tag push. The image that will be built and deployed will
-  have the format 'gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA'.
+  Configure automated build and deployment from a repository. This can be
+  triggered by a Git branch or tag push.
   """
 
   @staticmethod
@@ -91,17 +89,21 @@ class ConfigureGKEDeploy(base.Command):
         selected:
 
         `github` - A GitHub (Cloud Build GitHub App) repository connected to
-        Cloud Build triggers.
+        Cloud Build triggers. The deployed image will have the format
+        'gcr.io/[PROJECT_ID]/github.com/[REPO_OWNER]/[REPO_NAME]:$COMMIT_SHA'.
 
         `bitbucket_mirrored` - A Bitbucket repository connected to Cloud Source
-        Repositories.
+        Repositories. The deployed image will have the format
+        'gcr.io/[PROJECT_ID]/bitbucket.org/[REPO_OWNER]/[REPO_NAME]:$COMMIT_SHA'.
 
         `github_mirrored` - A GitHub repository connected to Cloud Source
-        Repositories.
+        Repositories. The deployed image will have the format
+        'gcr.io/[PROJECT_ID]/github.com/[REPO_OWNER]/[REPO_NAME]:$COMMIT_SHA'.
 
         `--repo-owner` must not be provided if the following is selected:
 
-        `csr` - A repository on Cloud Source Repositories.
+        `csr` - A repository on Cloud Source Repositories. The deployed image
+        will have the format 'gcr.io/[PROJECT_ID]/[REPO_NAME]:$COMMIT_SHA'.
 
         Connect repositories at
         https://console.cloud.google.com/cloud-build/triggers/connect.
@@ -212,7 +214,7 @@ class ConfigureGKEDeploy(base.Command):
         exist, Cloud Build creates it.
 
         If this field is not set, the configs are written to
-        'gs://[PROJECT_ID]_cloudbuild/deploy/config'.
+        ```gs://[PROJECT_ID]_cloudbuild/deploy/config```.
         """)
     parser.add_argument(
         '--app-name',
@@ -284,16 +286,23 @@ class ConfigureGKEDeploy(base.Command):
             '--preview-expiry',
             'Preview expiry must be > 0.')
 
-    # Determine github or csr
+    # Determine image based on repo type
+    image = None
+
+    # Determine github app or csr
     github_repo_name = None
     github_repo_owner = None
     csr_repo_name = None
+
+    project = properties.VALUES.core.project.Get(required=True)
 
     if args.repo_type == 'github':
       if not args.repo_owner:
         raise c_exceptions.RequiredArgumentException(
             '--repo-owner',
             'Repo owner is required for --repo-type=github.')
+      image = 'gcr.io/{}/github.com/{}/{}:$COMMIT_SHA'.format(
+          project, args.repo_owner, args.repo_name)
       github_repo_name = args.repo_name
       github_repo_owner = args.repo_owner
       # We do not have to verify that this repo exists because the request to
@@ -305,6 +314,7 @@ class ConfigureGKEDeploy(base.Command):
         raise c_exceptions.InvalidArgumentException(
             '--repo-owner',
             'Repo owner must not be provided for --repo-type=csr.')
+      image = 'gcr.io/{}/{}:$COMMIT_SHA'.format(project, args.repo_name)
       csr_repo_name = args.repo_name
       self._VerifyCSRRepoExists(csr_repo_name)
 
@@ -313,6 +323,8 @@ class ConfigureGKEDeploy(base.Command):
         raise c_exceptions.RequiredArgumentException(
             '--repo-owner',
             'Repo owner is required for --repo-type=bitbucket_mirrored.')
+      image = 'gcr.io/{}/bitbucket.org/{}/{}:$COMMIT_SHA'.format(
+          project, args.repo_owner, args.repo_name)
       csr_repo_name = 'bitbucket_{}_{}'.format(args.repo_owner, args.repo_name)
       self._VerifyBitbucketCSRRepoExists(
           csr_repo_name, args.repo_owner, args.repo_name)
@@ -322,6 +334,8 @@ class ConfigureGKEDeploy(base.Command):
         raise c_exceptions.RequiredArgumentException(
             '--repo-owner',
             'Repo owner is required for --repo-type=github_mirrored.')
+      image = 'gcr.io/{}/github.com/{}/{}:$COMMIT_SHA'.format(
+          project, args.repo_owner, args.repo_name)
       csr_repo_name = 'github_{}_{}'.format(args.repo_owner, args.repo_name)
       self._VerifyGitHubCSRRepoExists(
           csr_repo_name, args.repo_owner, args.repo_name)
@@ -370,28 +384,16 @@ class ConfigureGKEDeploy(base.Command):
     else:
       gcs_config_staging_path = gcs_config_staging_dir_bucket
 
-    project = properties.VALUES.core.project.Get(required=True)
-    project_number = projects_util.GetProjectNumber(project)
-    cloudbuild_service_account = '{}@cloudbuild.gserviceaccount.com'.format(
-        project_number)
-    log.status.Print(
-        'Add the roles/container.developer role to your Cloud Build '
-        'service agent account, if you have not already done so. This allows '
-        'the account to deploy to your cluster:\n\n'
-        'gcloud projects add-iam-policy-binding {project} '
-        '--member=serviceAccount:{service_account_email} '
-        '--role=roles/container.developer --project={project}\n'.format(
-            project=project,
-            service_account_email=cloudbuild_service_account
-        ))
-
     if args.pull_request_preview:
+      log.status.Print('Setting up previewing {} on pull requests.\n'.format(
+          github_repo_name))
       self._ConfigurePRPreview(
           repo_owner=github_repo_owner,
           repo_name=github_repo_name,
           pull_request_pattern=args.pull_request_pattern,
           preview_expiry=args.preview_expiry,
           comment_control=args.comment_control,
+          image=image,
           dockerfile_path=args.dockerfile,
           app_name=app_name,
           config_path=args.config,
@@ -400,6 +402,8 @@ class ConfigureGKEDeploy(base.Command):
           cluster=args.cluster,
           location=args.location)
     else:
+      log.status.Print('Setting up automated deployments for {}.\n'.format(
+          args.repo_name))
       self._ConfigureGitPushBuildTrigger(
           repo_type=args.repo_type,
           csr_repo_name=csr_repo_name,
@@ -407,6 +411,7 @@ class ConfigureGKEDeploy(base.Command):
           github_repo_name=github_repo_name,
           branch_pattern=args.branch_pattern,
           tag_pattern=args.tag_pattern,
+          image=image,
           dockerfile_path=args.dockerfile,
           app_name=app_name,
           config_path=args.config,
@@ -498,7 +503,7 @@ class ConfigureGKEDeploy(base.Command):
     messages = apis.GetMessagesModule('container', 'v1')
     project = properties.VALUES.core.project.Get(required=True)
     try:
-      client.projects_locations_clusters.Get(
+      cluster_res = client.projects_locations_clusters.Get(
           messages.ContainerProjectsLocationsClustersGetRequest(
               name='projects/{project}/locations/{location}/clusters/{cluster}'
               .format(
@@ -516,6 +521,10 @@ class ConfigureGKEDeploy(base.Command):
               location=location,
               project=project
           ))
+    if cluster_res.status != messages.Cluster.StatusValueValuesEnum.RUNNING:
+      raise core_exceptions.Error(
+          'Cluster was found but status is not RUNNING. Status is {}.'
+          .format(cluster_res.status))
 
   def _GetTriggerIfExists(self, client, messages, project, trigger_name):
     """Returns a BuildTrigger if one with the given name exists in a project.
@@ -625,8 +634,9 @@ class ConfigureGKEDeploy(base.Command):
 
   def _ConfigureGitPushBuildTrigger(
       self, repo_type, csr_repo_name, github_repo_owner, github_repo_name,
-      branch_pattern, tag_pattern, dockerfile_path, app_name, config_path,
-      namespace, expose_port, gcs_config_staging_path, cluster, location):
+      branch_pattern, tag_pattern, image, dockerfile_path, app_name,
+      config_path, namespace, expose_port, gcs_config_staging_path, cluster,
+      location):
 
     # Generate deterministic trigger name
     if csr_repo_name:
@@ -642,11 +652,9 @@ class ConfigureGKEDeploy(base.Command):
         tag_pattern=tag_pattern))
 
     if branch_pattern:
-      description = 'Build and deploy on push to branch pattern "{}"'.format(
-          branch_pattern)
+      description = 'Build and deploy on push to "{}"'.format(branch_pattern)
     elif tag_pattern:
-      description = 'Build and deploy on push to tag pattern "{}"'.format(
-          tag_pattern)
+      description = 'Build and deploy on "{}" tag'.format(tag_pattern)
 
     build_trigger = build_util.CreateGitPushBuildTrigger(
         cloudbuild_util.GetMessagesModule(),
@@ -658,6 +666,7 @@ class ConfigureGKEDeploy(base.Command):
         github_repo_name=github_repo_name,
         branch_pattern=branch_pattern,
         tag_pattern=tag_pattern,
+        image=image,
         dockerfile_path=dockerfile_path,
         app_name=app_name,
         config_path=config_path,
@@ -678,7 +687,7 @@ class ConfigureGKEDeploy(base.Command):
     log.status.Print(
         '\nSuccessfully created the Cloud Build trigger to build and deploy '
         'your application.\n\n'
-        'Visit https://console.cloud.google.com/cloud-build/triggers/{trigger_id}?project={project} '
+        'Visit https://console.cloud.google.com/cloud-build/triggers/edit/{trigger_id}?project={project} '
         'to view the trigger.\n\n'
         'You can visit https://console.cloud.google.com/cloud-build/triggers?project={project} '
         'to view all Cloud Build triggers.'.format(
@@ -687,8 +696,8 @@ class ConfigureGKEDeploy(base.Command):
 
   def _ConfigurePRPreview(
       self, repo_owner, repo_name, pull_request_pattern, preview_expiry,
-      comment_control, dockerfile_path, app_name, config_path, expose_port,
-      gcs_config_staging_path, cluster, location):
+      comment_control, image, dockerfile_path, app_name, config_path,
+      expose_port, gcs_config_staging_path, cluster, location):
     """Configures previewing the application for each pull request.
 
     PR previewing is only supported for GitHub repos.
@@ -709,6 +718,8 @@ class ConfigureGKEDeploy(base.Command):
         is expired.
       comment_control: Whether or not a user must comment /gcbrun to trigger
         the deployment build.
+      image: The image that will be built and deployed. The image can include a
+        tag or digest.
       dockerfile_path: Path to the source repository's Dockerfile, relative to
         the source repository's root directory.
       app_name: Application name, which is set as a label to deployed objects.
@@ -720,12 +731,19 @@ class ConfigureGKEDeploy(base.Command):
       cluster: Name of target cluster to deploy to.
       location: Zone/region of target cluster to deploy to.
     """
+    # Attempt to get scheduler location before creating any resources so we can
+    # fail early if we fail to get the location due to the user's App Engine
+    # app not existing, since the scheduler job must be in the same region:
+    # https://cloud.google.com/scheduler/docs/
+    scheduler_location = self._GetSchedulerJobLocation()
+
     pr_preview_trigger = self._ConfigurePRPreviewBuildTrigger(
         repo_owner=repo_owner,
         repo_name=repo_name,
         pull_request_pattern=pull_request_pattern,
         preview_expiry=preview_expiry,
         comment_control=comment_control,
+        image=image,
         dockerfile_path=dockerfile_path,
         app_name=app_name,
         config_path=config_path,
@@ -748,7 +766,8 @@ class ConfigureGKEDeploy(base.Command):
         repo_owner=repo_owner,
         repo_name=repo_name,
         pull_request_pattern=pull_request_pattern,
-        clean_preview_trigger_id=clean_preview_trigger.id)
+        clean_preview_trigger_id=clean_preview_trigger.id,
+        scheduler_location=scheduler_location)
 
     # We add scheduler job location and name as tags to the clean preview
     # trigger to track it as created by us.
@@ -760,10 +779,10 @@ class ConfigureGKEDeploy(base.Command):
     log.status.Print(
         '\nSuccessfully created resources for previewing pull requests of your '
         'application.\n\n'
-        'Visit https://console.cloud.google.com/cloud-build/triggers/{pr_preview_trigger_id}?project={project} '
+        'Visit https://console.cloud.google.com/cloud-build/triggers/edit/{pr_preview_trigger_id}?project={project} '
         'to view the Cloud Build trigger that deploys your application on pull '
         'request open/update.\n\n'
-        'Visit https://console.cloud.google.com/cloud-build/triggers/{clean_preview_trigger_id}?project={project} '
+        'Visit https://console.cloud.google.com/cloud-build/triggers/edit/{clean_preview_trigger_id}?project={project} '
         'to view the Cloud Build trigger that cleans up expired preview '
         'deployments.\n\n'
         'Visit https://console.cloud.google.com/cloudscheduler/jobs/edit/{location}/{job}?project={project} '
@@ -776,7 +795,7 @@ class ConfigureGKEDeploy(base.Command):
             pr_preview_trigger_id=pr_preview_trigger.id,
             clean_preview_trigger_id=clean_preview_trigger.id,
             project=properties.VALUES.core.project.Get(required=True),
-            location=_CLEAN_PREVIEW_SCHEDULER_LOCATION,
+            location=job_location,
             job=job_id
         )
     )
@@ -824,9 +843,9 @@ class ConfigureGKEDeploy(base.Command):
       full_repo_name: Deterministicly generated repo name, including owner
         available.
       branch_pattern: Branch pattern to match. Only one of branch_pattern or
-        tag_pattern should be provided.
+        tag_pattern should be provided. They can also both be omitted.
       tag_pattern: Tag pattern to match. Only one of branch_pattern or
-        tag_pattern should be provided.
+        tag_pattern should be provided. They can also both be omitted.
 
     Returns:
       Deterministicly generated resource name.
@@ -834,25 +853,27 @@ class ConfigureGKEDeploy(base.Command):
 
     repo_type_code = _REPO_TYPE_CODES[repo_type]
     if branch_pattern:
-      return  '{}{}b-{}-{}'.format(
+      return '{}{}b-{}-{}'.format(
           function_code, repo_type_code, full_repo_name, branch_pattern)
     elif tag_pattern:
-      return  '{}{}t-{}-{}'.format(
+      return '{}{}t-{}-{}'.format(
           function_code, repo_type_code, full_repo_name, tag_pattern)
+    else:
+      return '{}{}b-{}'.format(
+          function_code, repo_type_code, full_repo_name)
 
   def _ConfigurePRPreviewBuildTrigger(
       self, repo_owner, repo_name, pull_request_pattern, preview_expiry,
-      comment_control, dockerfile_path, app_name, config_path, expose_port,
-      gcs_config_staging_path, cluster, location):
+      comment_control, image, dockerfile_path, app_name, config_path,
+      expose_port, gcs_config_staging_path, cluster, location):
 
     # Generate deterministic trigger name
     name = self._FixBuildTriggerName(self._GenerateResourceName(
         function_code='pp',  # Pr Preview
         repo_type='github',  # Only supports github for now.
-        full_repo_name=repo_owner + '-' + repo_name,
-        branch_pattern=pull_request_pattern))
+        full_repo_name=repo_owner + '-' + repo_name))
     description = \
-      'Build and deploy on PR create/update against branch pattern "{}"'.format(
+      'Build and deploy on PR create/update against "{}"'.format(
           pull_request_pattern)
 
     build_trigger = build_util.CreatePRPreviewBuildTrigger(
@@ -865,6 +886,7 @@ class ConfigureGKEDeploy(base.Command):
         pr_pattern=pull_request_pattern,
         preview_expiry_days=preview_expiry,
         comment_control=comment_control,
+        image=image,
         dockerfile_path=dockerfile_path,
         app_name=app_name,
         config_path=config_path,
@@ -888,11 +910,10 @@ class ConfigureGKEDeploy(base.Command):
     name = self._FixBuildTriggerName(self._GenerateResourceName(
         function_code='cp',  # Clean Preview
         repo_type='github',  # Only supports github for now.
-        full_repo_name=repo_owner + '-' + repo_name,
-        branch_pattern=pull_request_pattern))
-    description = ('Clean expired preview deployments for pull requests '
-                   'against branch pattern "{}"').format(
-                       pull_request_pattern)
+        full_repo_name=repo_owner + '-' + repo_name))
+    description = \
+        'Clean expired preview deployments for PRs against "{}"'.format(
+            pull_request_pattern)
 
     build_trigger = build_util.CreateCleanPreviewBuildTrigger(
         messages=cloudbuild_util.GetMessagesModule(),
@@ -910,28 +931,50 @@ class ConfigureGKEDeploy(base.Command):
                      'deployments of your application.')
     return self._UpsertBuildTrigger(build_trigger, False)
 
+  def _GetSchedulerJobLocation(self):
+    messages = apis.GetMessagesModule('cloudscheduler', 'v1')
+    client = apis.GetClientInstance('cloudscheduler', 'v1')
+    project = properties.VALUES.core.project.Get(required=True)
+
+    try:
+      locations_res = client.projects_locations.List(
+          messages.CloudschedulerProjectsLocationsListRequest(
+              name='projects/' + project))
+    except HttpNotFoundError:
+      raise core_exceptions.Error(
+          'You must create an App Engine application in your project to use '
+          'Cloud Scheduler. Visit '
+          'https://console.developers.google.com/appengine?project={} to '
+          'add an App Engine application.'.format(project))
+
+    return locations_res.locations[0].labels.additionalProperties[0].value
+
   def _ConfigureCleanPreviewSchedulerJob(
       self, repo_owner, repo_name, pull_request_pattern,
-      clean_preview_trigger_id):
+      clean_preview_trigger_id, scheduler_location):
+
+    log.status.Print('Upserting Cloud Scheduler to run Cloud Build trigger to '
+                     'clean expired preview deployments of your application.')
+
+    messages = apis.GetMessagesModule('cloudscheduler', 'v1')
+    client = apis.GetClientInstance('cloudscheduler', 'v1')
+    project = properties.VALUES.core.project.Get(required=True)
+    service_account_email = project + '@appspot.gserviceaccount.com'
 
     # Generate deterministic scheduler job name (id)
     job_id = self._FixSchedulerName(self._GenerateResourceName(
         function_code='cp',  # Clean Preview
         repo_type='github',  # Only supports github for now.
-        full_repo_name=repo_owner + '-' + repo_name,
-        branch_pattern=pull_request_pattern))
+        full_repo_name=repo_owner + '-' + repo_name))
 
-    project = properties.VALUES.core.project.Get(required=True)
     name = 'projects/{}/locations/{}/jobs/{}'.format(
-        project, _CLEAN_PREVIEW_SCHEDULER_LOCATION, job_id)
+        project, scheduler_location, job_id)
 
-    # AppEngine service account has Editor permission by default.
-    messages = apis.GetMessagesModule('cloudscheduler', 'v1')
-    service_account_email = project + '@appspot.gserviceaccount.com'
     job = messages.Job(
         name=name,
         description='Every day, run trigger to clean expired preview '
-                    'deployments of {}/{}'.format(repo_owner, repo_name),
+                    'deployments for PRs against "{}" in {}/{}'.format(
+                        pull_request_pattern, repo_owner, repo_name),
         schedule=_CLEAN_PREVIEW_SCHEDULE,
         timeZone='UTC',
         httpTarget=messages.HttpTarget(
@@ -939,19 +982,16 @@ class ConfigureGKEDeploy(base.Command):
             .format(project, clean_preview_trigger_id),
             httpMethod=messages.HttpTarget.HttpMethodValueValuesEnum.POST,
             body=bytes(
-                '{{"projectId":"{}","repoName":"{}","branchName":"{}"}}'
-                .format(project, repo_name, pull_request_pattern)
+                # We don't actually use the branchName value but it has to be
+                # set to an existing branch, so set it to master.
+                '{{"projectId":"{}","repoName":"{}","branchName":"master"}}'
+                .format(project, repo_name)
                 .encode('utf-8')),
             oauthToken=messages.OAuthToken(
                 serviceAccountEmail=service_account_email
             )
         )
     )
-
-    client = apis.GetClientInstance('cloudscheduler', 'v1')
-
-    log.status.Print('Upserting Cloud Scheduler to run Cloud Build trigger to '
-                     'clean expired preview deployments of your application.')
 
     existing = None
     try:
@@ -969,7 +1009,7 @@ class ConfigureGKEDeploy(base.Command):
       upserted_job = client.projects_locations_jobs.Create(
           messages.CloudschedulerProjectsLocationsJobsCreateRequest(
               parent='projects/{}/locations/{}'.format(
-                  project, _CLEAN_PREVIEW_SCHEDULER_LOCATION),
+                  project, scheduler_location),
               job=job))
       log.debug('created CloudScheduler job: ' + six.text_type(upserted_job))
 
@@ -980,7 +1020,7 @@ class ConfigureGKEDeploy(base.Command):
         api_version='v1',
         params={
             'projectsId': project,
-            'locationsId': _CLEAN_PREVIEW_SCHEDULER_LOCATION,
+            'locationsId': scheduler_location,
             'jobsId': job_id,
         })
 

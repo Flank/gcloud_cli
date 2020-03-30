@@ -4,15 +4,14 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute os-config guest-policies create POLICY_ID --file=FILE
-        [--description=DESCRIPTION]
         [--folder=FOLDER_ID | --organization=ORGANIZATION_ID
           | --project=PROJECT_ID] [GCLOUD_WIDE_FLAG ...]
 
 POSITIONAL ARGUMENTS
      POLICY_ID
-        ID of the guest policy to create.
+        Name of the guest policy to create.
 
-        This ID must contain only lowercase letters, numbers, and hyphens,
+        This name must contain only lowercase letters, numbers, and hyphens,
         start with a letter, end with a number or a letter, be between 1-63
         characters, and unique within the project, folder, or organization.
 
@@ -21,14 +20,8 @@ REQUIRED FLAGS
         The JSON or YAML file with the guest policy to create.
 
 OPTIONAL FLAGS
-     --description=DESCRIPTION
-        Description of the guest policy to create. Length of the description is
-        limited to 1024 characters.
-
-        If specified, it will override any description provided in the file.
-
-     The scope of the guest policy which defaults to project if unspecified. At
-     most one of these may be specified:
+     The scope of the guest policy. If a scope is not specified, the current
+     project is used as the default. At most one of these may be specified:
 
        --folder=FOLDER_ID
           The folder of the guest policy to create.
@@ -37,33 +30,32 @@ OPTIONAL FLAGS
           The organization of the guest policy to create.
 
        --project=PROJECT_ID
-          The project of the guest policy to create.
+          The project name to use. If a project name is not specified, then the
+          current project is used. The current project can be listed using
+          gcloud config list --format='text(core.project)' and can be set using
+          gcloud config set project PROJECTID.
 
-          The Google Cloud Platform project name to use for this invocation. If
-          omitted, then the current project is assumed; the current project can
-          be listed using gcloud config list --format='text(core.project)' and
-          can be set using gcloud config set project PROJECTID.
-
-          --project and its fallback core/project property play two roles in
-          the invocation. It specifies the project of the resource to operate
-          on. It also specifies the project for API enablement check, quota,
-          and billing. To specify a different project for quota and billing,
-          use --billing-project or billing/quota_project property.
+          --project and its fallback core/project property play two roles. It
+          specifies the project of the resource to operate on, and also
+          specifies the project for API enablement check, quota, and billing.
+          To specify a different project for quota and billing, use
+          --billing-project or billing/quota_project property.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To create a guest policy 'policy1' in the current project, run:
+    To create a guest policy policy1 in the current project, run:
 
         $ gcloud alpha compute os-config guest-policies create policy1 \
         --file=path_to_config_file
 
-    To create a guest policy 'policy1' in the organization '12345', run:
+    To create a guest policy policy1 in the organization 12345, run:
 
         $ gcloud alpha compute os-config guest-policies create policy1 \
         --file=path_to_config_file \
@@ -73,5 +65,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute os-config guest-policies create
 

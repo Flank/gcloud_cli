@@ -16,6 +16,7 @@
   "documentationLink": "https://developers.google.com/cloud-test-lab/",
   "protocol": "rest",
   "rootUrl": "https://testing.googleapis.com/",
+  "mtlsRootUrl": "https://testing.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://testing.googleapis.com/",
   "batchPath": "batch",
@@ -404,6 +405,10 @@
           "items": {
             "$ref": "EnvironmentVariable"
           }
+        },
+        "systrace": {
+          "description": "Systrace configuration for the run.\nIf set a systrace will be taken, starting on test start and lasting for the\nconfigured duration. The systrace file thus obtained is put in the results\nbucket together with the other artifacts from the run.",
+          "$ref": "SystraceSetup"
         }
       }
     },
@@ -511,6 +516,17 @@
         }
       }
     },
+    "SystraceSetup": {
+      "id": "SystraceSetup",
+      "type": "object",
+      "properties": {
+        "durationSeconds": {
+          "description": "Systrace duration in seconds.\nShould be between 1 and 30 seconds. 0 disables systrace.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "IosTestSetup": {
       "id": "IosTestSetup",
       "description": "A description of how to set up an iOS device prior to running the test.",
@@ -610,7 +626,7 @@
       "type": "object",
       "properties": {
         "numShards": {
-          "description": "Required. Total number of shards. The number must be > 1, and <= 50.",
+          "description": "Required. Total number of shards. The number must be >= 1 and <= 50.",
           "type": "integer",
           "format": "int32"
         }
@@ -622,7 +638,7 @@
       "type": "object",
       "properties": {
         "testTargetsForShard": {
-          "description": "Required. Group of packages, classes, and\/or test methods to be run for\neach shard. The number of shard_test_targets must be > 1, and <= 50.",
+          "description": "Required. Group of packages, classes, and\/or test methods to be run for\neach shard. The number of shard_test_targets must be >= 1 and <= 50.",
           "type": "array",
           "items": {
             "$ref": "TestTargetsForShard"
@@ -1463,6 +1479,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "thumbnailUrl": {
+          "description": "URL of a thumbnail image of the device.",
+          "type": "string"
         }
       }
     },
@@ -1647,7 +1667,7 @@
     },
     "IosModel": {
       "id": "IosModel",
-      "description": "A description of an iOS device tests may be run on.\nNext tag: 11",
+      "description": "A description of an iOS device tests may be run on.\nNext tag: 12",
       "type": "object",
       "properties": {
         "id": {

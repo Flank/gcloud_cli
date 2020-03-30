@@ -60,7 +60,7 @@ class SslPoliciesImportTestAlpha(ssl_policies_test_base.SslPoliciesTestBase):
         operation_ref, resource_ref=ssl_policy_ref)
     self.ExpectGetRequest(ssl_policy_ref, self._existing_ssl_policy)
     self.ExpectPatchRequest(ssl_policy_ref, ssl_policy, response=operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(ssl_policy_ref, ssl_policy)
 
     self.WriteInput('y\n')
@@ -80,7 +80,7 @@ class SslPoliciesImportTestAlpha(ssl_policies_test_base.SslPoliciesTestBase):
     self.ExpectGetRequest(
         ssl_policy_ref, exception=http_error.MakeHttpError(code=404))
     self.ExpectInsertRequest(ssl_policy_ref, ssl_policy, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(ssl_policy_ref, ssl_policy)
 
     self.RunImport(self._new_resource_name)

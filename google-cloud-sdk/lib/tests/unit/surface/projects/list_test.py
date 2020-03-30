@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.cloudresourcemanager import filter_rewrite
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.projects import base
@@ -62,6 +63,36 @@ class ProjectsListTest(base.ProjectsUnitTestBase):
     results_generator = self.RunProjectsBeta('list')
     results = [x for x in results_generator]
     self.assertEqual(test_projects, results)
+
+  def testListClientLimit(self):
+    test_project = util.GetTestActiveProject()
+    self.StartObjectPatch(
+        filter_rewrite.ListRewriter,
+        'Rewrite',
+        return_value=('args.filter', ''))
+
+    # Expect server-side default limit of 500, as limit is applied client-side
+    self.mock_client.projects.List.Expect(
+        self.messages.CloudresourcemanagerProjectsListRequest(
+            pageSize=500,
+            filter='lifecycleState:ACTIVE'),
+        self.messages.ListProjectsResponse(projects=[test_project]))
+    self.RunProjects('list', '--limit=1')
+
+  def testListServerLimit(self):
+    test_project = util.GetTestActiveProject()
+    self.StartObjectPatch(
+        filter_rewrite.ListRewriter,
+        'Rewrite',
+        return_value=(None, ''))
+
+    # Expect server-side limit to be set to 1, per the provided flag
+    self.mock_client.projects.List.Expect(
+        self.messages.CloudresourcemanagerProjectsListRequest(
+            pageSize=1,
+            filter='lifecycleState:ACTIVE'),
+        self.messages.ListProjectsResponse(projects=[test_project]))
+    self.RunProjects('list', '--limit=1')
 
 
 if __name__ == '__main__':

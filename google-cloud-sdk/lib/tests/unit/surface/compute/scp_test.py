@@ -881,6 +881,66 @@ class ScpOsloginTest(test_base.BaseSSHTest):
         mock_matchers.TypeMatcher(ssh.SCPCommand),
         self.env, force_connect=True)
 
+  @mock.patch(
+      'googlecloudsdk.api_lib.oslogin.client._GetClient')
+  def testOverrideUsername(self, oslogin_mock):
+    properties.VALUES.core.account.Set('user@google.com')
+    self.remote = ssh.Remote.FromArg('user_google_com@23.251.133.75')
+    self.remote_file = ssh.FileReference('~/remote-file', remote=self.remote)
+    self.local_dir = ssh.FileReference('~/local-dir')
+    oslogin_mock.return_value = test_resources.MakeOsloginClient('v1beta')
+
+    self.make_requests.side_effect = iter([
+        [self.instance_with_oslogin_enabled],
+        [self.project_resource],
+    ])
+
+    self.Run("""\
+        compute scp
+          someotheruser@instance-1:~/remote-file
+          ~/local-dir --zone zone-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.compute.projects,
+          'Get',
+          self.messages.ComputeProjectsGetRequest(
+              project='my-project'))],
+    )
+
+    # Require SSH keys
+    self.ensure_keys.assert_called_once_with(
+        self.keys, None, allow_passphrase=True)
+
+    # No polling
+    self.poller_poll.assert_not_called()
+
+    # SCP Command
+    self.scp_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SCPCommand),
+        [self.remote_file],
+        self.local_dir,
+        identity_file=self.private_key_file,
+        extra_flags=[],
+        port=None,
+        recursive=False,
+        compress=False,
+        options=dict(self.options, HostKeyAlias='compute.44444'),
+        iap_tunnel_args=None)
+
+    self.scp_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SCPCommand),
+        self.env, force_connect=True)
+
+    self.AssertErrContains('Using OS Login user [user_google_com] instead '
+                           'of requested user [someotheruser]')
+
 
 class SCPPrivateIpTest(test_base.BaseSSHTest, parameterized.TestCase):
 

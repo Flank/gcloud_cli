@@ -1,0 +1,79 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_SECURITY\-POLICIES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute security\-policies update \- update a Google Compute Engine security policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute security\-policies update\fR \fINAME\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-ml\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute security\-policies update\fR is used to
+update security policies.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the security policy to update.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional, textual description for the security policy.
+
+.TP 2m
+\fB\-\-enable\-ml\fR
+Whether to enable Cloud Armor Adaptive Protection
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update the description run this:
+
+.RS 2m
+$ gcloud alpha compute security\-policies update SECURITY_POLICY \e
+    \-\-description='new description'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

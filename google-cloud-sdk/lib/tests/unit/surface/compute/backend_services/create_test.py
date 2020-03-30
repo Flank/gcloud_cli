@@ -259,13 +259,23 @@ class HttpBackendServiceCreateTest(BackendServiceCreateTestBase):
     )
 
   def testWithoutHealthChecks(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        'At least one health check required.'):
-      self.Run("""
-          compute backend-services create my-backend-service
-          --global
-          """)
-    self.CheckRequests()
+    messages = self.messages
+    self.Run("""
+        compute backend-services create my-backend-service
+        --global
+        """)
+
+    self.CheckRequests([(
+        self.compute.backendServices, 'Insert',
+        messages.ComputeBackendServicesInsertRequest(
+            backendService=messages.BackendService(
+                backends=[],
+                healthChecks=[],
+                name='my-backend-service',
+                portName='http',
+                protocol=(messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                timeoutSec=30),
+            project='my-project'))],)
 
   def testSimpleHttpsCase(self):
     messages = self.messages
@@ -473,6 +483,12 @@ class HttpBackendServiceCreateTest(BackendServiceCreateTestBase):
                 timeoutSec=30),
             project='my-project'))],)
 
+  def testWrongProtocol(self):
+    with self.AssertRaisesExceptionRegexp(
+        ValueError,
+        'HBHBH is not a supported option\. See the help text of --protocol for supported options.'): # pylint:disable=line-too-long
+      self.Run("""
+      compute backend-services create test --global --protocol HBHBH""")
 
 class BetaBackendServiceCreateTest(BackendServiceCreateTestBase):
 
@@ -533,6 +549,10 @@ class BetaBackendServiceCreateTest(BackendServiceCreateTestBase):
 
 
 class WithSessionAffinityApiTest(BackendServiceCreateTestBase):
+
+  # Modify the session affinity map.
+  def _ModifySessionAffinityMap(self, session_affinity_map, messages):
+    pass
 
   # Tests that default settings are applied to affinity and cookie TTL
   # if not specified
@@ -666,7 +686,7 @@ class WithSessionAffinityApiTest(BackendServiceCreateTestBase):
   # Test ilb setting all supported session affinitys.
   def _TestSetILBSessionAffinity(self,
                                  session_affiniy,
-                                 specify_global_health_check=False):
+                                 specify_global_health_check=True):
     messages = self.messages
     session_affinity_map = {
         'none':
@@ -674,12 +694,14 @@ class WithSessionAffinityApiTest(BackendServiceCreateTestBase):
         'client_ip':
             messages.BackendService.SessionAffinityValueValuesEnum.CLIENT_IP,
         'client_ip_proto':
-            messages.BackendService.SessionAffinityValueValuesEnum.
-            CLIENT_IP_PROTO,
+            messages.BackendService.SessionAffinityValueValuesEnum
+            .CLIENT_IP_PROTO,
         'client_ip_port_proto':
-            messages.BackendService.SessionAffinityValueValuesEnum.
-            CLIENT_IP_PORT_PROTO
+            messages.BackendService.SessionAffinityValueValuesEnum
+            .CLIENT_IP_PORT_PROTO
     }
+    self._ModifySessionAffinityMap(session_affinity_map, messages)
+
     self.Run("""compute backend-services create my-backend-service
         --health-checks=my-health-check-1
         --protocol=TCP
@@ -718,19 +740,19 @@ class WithSessionAffinityApiBetaTest(WithSessionAffinityApiTest):
   def SetUp(self):
     self._SetUp(calliope_base.ReleaseTrack.BETA)
 
-  def testSetIlbSessionAffinity_ClientIpProto(self):
-    self._TestSetILBSessionAffinity(
-        'client_ip_proto', specify_global_health_check=True)
-
-  def testSetIlbSessionAffinity_ClientIpPortProto(self):
-    self._TestSetILBSessionAffinity(
-        'client_ip_port_proto', specify_global_health_check=True)
-
 
 class WithSessionAffinityApiAlphaTest(WithSessionAffinityApiBetaTest):
 
   def SetUp(self):
     self._SetUp(calliope_base.ReleaseTrack.ALPHA)
+
+  def _ModifySessionAffinityMap(self, session_affinity_map, messages):
+    session_affinity_map['client_ip_no_destination'] = (
+        messages.BackendService.SessionAffinityValueValuesEnum
+        .CLIENT_IP_NO_DESTINATION)
+
+  def testSetIlbSessionAffinity_ClientIpPortProto(self):
+    self._TestSetILBSessionAffinity('client_ip_no_destination')
 
 
 class WithConnectionDrainingTimeoutApiTest(BackendServiceCreateTestBase):
@@ -1174,32 +1196,35 @@ class WithHealthcheckApiTest(BackendServiceCreateTestBase):
                 --load-balancing-scheme=internal
                 --region=alaska
                 --health-checks=my-health-check-1
+                --network default
                 --protocol TCP
                 --connection-draining-timeout=120""")
 
-    self.CheckRequests([(
-        self.compute.regionBackendServices, 'Insert',
-        messages.ComputeRegionBackendServicesInsertRequest(
-            backendService=messages.BackendService(
-                backends=[],
-                healthChecks=[
-                    (self.compute_uri + '/projects/'
-                     'my-project/global/healthChecks/my-health-check-1'),
-                ],
-                name='backend-service-25',
-                description='cheesecake',
-                loadBalancingScheme=(
-                    messages.BackendService.LoadBalancingSchemeValueValuesEnum
-                    .INTERNAL),
-                protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
-                connectionDraining=messages.ConnectionDraining(
-                    drainingTimeoutSec=120),
-                timeoutSec=30,
-            ),
-            project='my-project',
-            region='alaska',
-        )
-    )],)
+    self.CheckRequests([
+        (self.compute.regionBackendServices, 'Insert',
+         messages.ComputeRegionBackendServicesInsertRequest(
+             backendService=messages.BackendService(
+                 backends=[],
+                 healthChecks=[
+                     (self.compute_uri + '/projects/'
+                      'my-project/global/healthChecks/my-health-check-1'),
+                 ],
+                 name='backend-service-25',
+                 description='cheesecake',
+                 loadBalancingScheme=(
+                     messages.BackendService.LoadBalancingSchemeValueValuesEnum
+                     .INTERNAL),
+                 protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
+                 network=self.compute_uri +
+                 '/projects/my-project/global/networks/default',
+                 connectionDraining=messages.ConnectionDraining(
+                     drainingTimeoutSec=120),
+                 timeoutSec=30,
+             ),
+             project='my-project',
+             region='alaska',
+         ))
+    ],)
 
   def testInternalProtocolDefault(self):
     messages = self.messages
@@ -1938,6 +1963,147 @@ class WithCdnSignedUrlApiTest(BackendServiceCreateTestBase):
                 includeProtocol=True,
                 includeQueryString=True,
                 queryStringWhitelist=['foo', 'bar', 'baz'])))
+
+
+class WithFailoverPolicyApiTest(BackendServiceCreateTestBase):
+
+  def SetUp(self):
+    self._create_service_cmd_line = (
+        """compute backend-services create my-backend-service
+           --health-checks my-health-check-1
+           --global-health-checks
+           --description "My backend service"
+           --region us-central1""")
+
+  def CheckResults(self, expected_message=None):
+    messages = self.messages
+
+    self.CheckRequests([
+        (self.compute.regionBackendServices, 'Insert',
+         messages.ComputeRegionBackendServicesInsertRequest(
+             backendService=messages.BackendService(
+                 backends=[],
+                 description='My backend service',
+                 failoverPolicy=expected_message,
+                 healthChecks=[
+                     (self.compute_uri + '/projects/'
+                      'my-project/global/healthChecks/my-health-check-1'),
+                 ],
+                 loadBalancingScheme=(
+                     messages.BackendService.LoadBalancingSchemeValueValuesEnum
+                     .INTERNAL),
+                 name='my-backend-service',
+                 protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
+                 timeoutSec=30),
+             project='my-project',
+             region='us-central1'))
+    ],)
+
+  def testEnableFailoverOptions(self):
+    self.Run(self._create_service_cmd_line + ' --load-balancing-scheme internal'
+             ' --no-connection-drain-on-failover'
+             ' --drop-traffic-if-unhealthy'
+             ' --failover-ratio 0.5')
+    self.CheckResults(
+        self.messages.BackendServiceFailoverPolicy(
+            disableConnectionDrainOnFailover=True,
+            dropTrafficIfUnhealthy=True,
+            failoverRatio=0.5))
+
+  def testDisableFailoverOptions(self):
+    self.Run(self._create_service_cmd_line + ' --load-balancing-scheme internal'
+             ' --connection-drain-on-failover'
+             ' --no-drop-traffic-if-unhealthy'
+             ' --failover-ratio 0.5')
+    self.CheckResults(
+        self.messages.BackendServiceFailoverPolicy(
+            disableConnectionDrainOnFailover=False,
+            dropTrafficIfUnhealthy=False,
+            failoverRatio=0.5))
+
+  def testCannotSpecifyFailoverPolicyForGlobalBackendService(self):
+    self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        '^Invalid value for \\[--global\\]: cannot specify failover policies'
+        ' for global backend services.', self.Run,
+        'compute backend-services create backend-service-1'
+        ' --http-health-checks my-health-check-1'
+        ' --description "My backend service"'
+        ' --global'
+        ' --connection-drain-on-failover')
+
+  def testInvalidLoadBalancingSchemeWithInternalFailoverOptions(self):
+    self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        '^Invalid value for \\[--load-balancing-scheme\\]: can only specify '
+        '--connection-drain-on-failover or --drop-traffic-if-unhealthy'
+        ' if the load balancing scheme is INTERNAL.', self.Run,
+        self._create_service_cmd_line + ' --protocol TCP' +
+        ' --drop-traffic-if-unhealthy')
+
+  def testInvalidProtocolWithConnectionDrainOnFailover(self):
+    self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        '^Invalid value for \\[--protocol\\]: can only specify '
+        '--connection-drain-on-failover if the protocol is TCP.', self.Run,
+        self._create_service_cmd_line + ' --load-balancing-scheme INTERNAL' +
+        ' --protocol SSL' + ' --connection-drain-on-failover')
+
+
+class WithLogConfigApiTest(BackendServiceCreateTestBase):
+
+  def SetUp(self):
+    self._create_service_cmd_line = (
+        """compute backend-services create my-backend-service
+           --health-checks my-health-check-1
+           --global-health-checks
+           --description "My backend service"
+           --global""")
+
+  def CheckResults(self, expected_message=None):
+    messages = self.messages
+
+    self.CheckRequests([(
+        self.compute.backendServices, 'Insert',
+        messages.ComputeBackendServicesInsertRequest(
+            backendService=messages.BackendService(
+                backends=[],
+                description='My backend service',
+                logConfig=expected_message,
+                healthChecks=[
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-1'),
+                ],
+                name='my-backend-service',
+                portName='http',
+                protocol=(messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                timeoutSec=30),
+            project='my-project'))],)
+
+  def testEnableLogging(self):
+    self.Run(self._create_service_cmd_line + ' --load-balancing-scheme external'
+             ' --protocol HTTP'
+             ' --enable-logging'
+             ' --logging-sample-rate 0.7')
+    self.CheckResults(
+        self.messages.BackendServiceLogConfig(enable=True, sampleRate=0.7))
+
+  def testDisableLogging(self):
+    self.Run(self._create_service_cmd_line + ' --load-balancing-scheme external'
+             ' --protocol HTTP'
+             ' --no-enable-logging'
+             ' --logging-sample-rate 0.0')
+    self.CheckResults(
+        self.messages.BackendServiceLogConfig(enable=False, sampleRate=0.0))
+
+  def testInvalidProtocolWithLogConfig(self):
+    self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        '^Invalid value for \\[--protocol\\]: can only specify --enable-logging'
+        ' or --logging-sample-rate if the protocol is HTTP/HTTPS/HTTP2.',
+        self.Run,
+        self._create_service_cmd_line + ' --load-balancing-scheme external' +
+        ' --protocol TCP' + ' --enable-logging')
 
 
 if __name__ == '__main__':

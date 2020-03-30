@@ -5,21 +5,20 @@ NAME
 SYNOPSIS
     gcloud alpha run services update [[SERVICE] --namespace=NAMESPACE]
         [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
-        [--concurrency=CONCURRENCY] [--max-instances=MAX_INSTANCES]
-        [--memory=MEMORY] [--platform=PLATFORM] [--port=PORT]
-        [--timeout=TIMEOUT]
+        [--concurrency=CONCURRENCY] [--cpu=CPU] [--max-instances=MAX_INSTANCES]
+        [--memory=MEMORY] [--min-instances=MIN_INSTANCES] [--platform=PLATFORM]
+        [--port=PORT] [--service-account=SERVICE_ACCOUNT] [--timeout=TIMEOUT]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
           | --update-labels=[KEY=VALUE,...]]
         [--clear-vpc-connector --revision-suffix=REVISION_SUFFIX
-          --service-account=SERVICE_ACCOUNT --vpc-connector=VPC_CONNECTOR
+          --vpc-connector=VPC_CONNECTOR
           --add-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
           | --clear-cloudsql-instances
           | --remove-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
           | --set-cloudsql-instances=[CLOUDSQL-INSTANCES,...]]
-        [--connectivity=CONNECTIVITY --cpu=CPU
-          --min-instances=MIN_INSTANCES --[no-]use-http2 --clear-config-maps
+        [--connectivity=CONNECTIVITY --[no-]use-http2 --clear-config-maps
           | --set-config-maps=[KEY=VALUE,...] | --remove-config-maps=[KEY,...]
           --update-config-maps=[KEY=VALUE,...] --clear-secrets
           | --set-secrets=[KEY=VALUE,...]
@@ -65,12 +64,19 @@ FLAGS
         requests are allowed. To unset this field, provide the special value
         default.
 
+     --cpu=CPU
+        Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
+
      --max-instances=MAX_INSTANCES
-        The maximum number of container instances of the Service to run or
-        'default' to remove any maximum.
+        The maximum number of container instances of the Service to run. Use
+        'default' to unset the limit and use the platform default.
 
      --memory=MEMORY
         Set a memory limit. Ex: 1Gi, 512Mi.
+
+     --min-instances=MIN_INSTANCES
+        The minimum number of container instances of the Service to run or
+        'default' to remove any minimum.
 
      --platform=PLATFORM
         Target platform for running commands. Alternatively, set the property
@@ -94,6 +100,16 @@ FLAGS
         Container port to receive requests at. Also sets the $PORT environment
         variable. Must be a number between 1 and 65535, inclusive. To unset
         this field, pass the special value "default".
+
+     --service-account=SERVICE_ACCOUNT
+        The service account associated with the revision of the service. The
+        service account represents the identity of the running revision, and
+        determines what permissions the revision has. For the managed platform,
+        this is the email address of an IAM service account. For the
+        Kubernetes-based platforms (gke, kubernetes), this is the name of a
+        Kubernetes service account in the same namespace as the service. If not
+        provided, the revision will use the default service account of the
+        project, or default Kubernetes namespace service account respectively.
 
      --timeout=TIMEOUT
         Set the maximum request execution time (timeout). It is specified as a
@@ -136,7 +152,8 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
 
      At most one of these may be specified:
 
@@ -160,13 +177,6 @@ FLAGS
           with the service name automatically. For example, specifying
           [--revision-suffix=v1] for a service named 'helloworld', would lead
           to a revision named 'helloworld-v1'.
-
-       --service-account=SERVICE_ACCOUNT
-          Email address of the IAM service account associated with the revision
-          of the service. The service account represents the identity of the
-          running revision, and determines what permissions the revision has.
-          If not provided, the revision will use the project's default service
-          account.
 
        --vpc-connector=VPC_CONNECTOR
           Set a VPC connector for this Service.
@@ -203,13 +213,6 @@ FLAGS
               Visible from outside the cluster.
            internal
               Visible only within the cluster.
-
-       --cpu=CPU
-          Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
-
-       --min-instances=MIN_INSTANCES
-          The minimum number of container instances of the Service to run or
-          'default' to remove any minimum.
 
        --[no-]use-http2
           Whether to use HTTP/2 for connections to the service. Use --use-http2
@@ -321,8 +324,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To update one or more env vars:

@@ -61,8 +61,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To import data from the BAK file my-bucket/my-export.bak into the database
@@ -82,8 +83,9 @@ EXAMPLES
             --pvk-path=gs://my-bucket/my-key.key --prompt-for-pvk-password
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud sql import bak
         $ gcloud alpha sql import bak
 

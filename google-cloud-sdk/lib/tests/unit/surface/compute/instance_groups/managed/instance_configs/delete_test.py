@@ -30,13 +30,15 @@ from tests.lib import test_case
 from mock import patch
 
 
-class InstanceGroupManagerInstanceConfigsDeleteTestBase(
+class _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase(
     sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
-  API_VERSION = 'alpha'
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self.client = mock.Client(
         core_apis.GetClientClass('compute', self.API_VERSION))
     self.resources = resources.REGISTRY.Clone()
@@ -44,12 +46,13 @@ class InstanceGroupManagerInstanceConfigsDeleteTestBase(
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE
-    self.project_uri = (
-        'https://compute.googleapis.com/compute/alpha/projects/fake-project')
+    self.project_uri = ('https://compute.googleapis.com/compute/{api_version}'
+                        '/projects/fake-project'.format(
+                            api_version=self.API_VERSION))
 
 
-class InstanceGroupManagerInstanceConfigsDeleteTest(
-    InstanceGroupManagerInstanceConfigsDeleteTestBase):
+class InstanceGroupManagerInstanceConfigsDeleteBetaTest(
+    _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase):
 
   def _ExpectDeletePerInstanceConfigs(self):
     request = (
@@ -87,6 +90,26 @@ class InstanceGroupManagerInstanceConfigsDeleteTest(
         response=response,
     )
 
+  def _ExpectWaitOperation(self, name):
+    request = self.messages.ComputeZoneOperationsWaitRequest(
+        operation=name,
+        project='fake-project',
+        zone='us-central2-a',
+    )
+    response = self.messages.Operation(
+        status=self.messages.Operation.StatusValueValuesEnum.DONE,
+        selfLink=self.project_uri + '/zones/us-central2-a/operations/' + name,
+        targetLink=(self.project_uri +
+                    '/zones/us-central2-a/instanceGroupManagers/group-1'),
+    )
+    self.client.zoneOperations.Wait.Expect(
+        request,
+        response=response,
+    )
+
+  def _ExpectPollingOperation(self, name):
+    self._ExpectWaitOperation(name)
+
   def _ExpectGetInstanceGroupManager(self):
     request = self.messages.ComputeInstanceGroupManagersGetRequest(
         instanceGroupManager='group-1',
@@ -110,10 +133,11 @@ class InstanceGroupManagerInstanceConfigsDeleteTest(
             self.project_uri + '/zones/us-central2-a/instances/foo',
             self.project_uri + '/zones/us-central2-a/instances/bas',
         ],
-          minimalAction=self.messages.InstanceGroupManagersApplyUpdatesRequest.
-          MinimalActionValueValuesEnum.NONE,
-          maximalAction=self.messages.InstanceGroupManagersApplyUpdatesRequest.
-          MaximalActionValueValuesEnum.RESTART),
+          minimalAction=self.messages.InstanceGroupManagersApplyUpdatesRequest
+          .MinimalActionValueValuesEnum.NONE,
+          mostDisruptiveAllowedAction=self.messages
+          .InstanceGroupManagersApplyUpdatesRequest
+          .MostDisruptiveAllowedActionValueValuesEnum.RESTART),
         project='fake-project',
         zone='us-central2-a',
     )
@@ -126,7 +150,10 @@ class InstanceGroupManagerInstanceConfigsDeleteTest(
 
   def testSimpleCase(self):
     self._ExpectDeletePerInstanceConfigs()
-    self._ExpectGetOperation('delete')
+    self._ExpectPollingOperation('delete')
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyNow()
+    self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -135,7 +162,7 @@ class InstanceGroupManagerInstanceConfigsDeleteTest(
           --instances foo,bas
         """)
 
-  def testNoInstanceProvided(self):
+  def testDeleteWithNoInstanceProvided(self):
     with self.AssertRaisesArgumentErrorMatches(
         r'argument --instances: Must be specified.'):
       self.Run("""
@@ -143,19 +170,16 @@ class InstanceGroupManagerInstanceConfigsDeleteTest(
             --zone us-central2-a
           """)
 
-  def testWithApplyNow(self):
+  def testDeleteWithoutInstanceUpdate(self):
     self._ExpectDeletePerInstanceConfigs()
-    self._ExpectGetOperation('delete')
-    self._ExpectGetInstanceGroupManager()
-    self._ExpectApplyNow()
-    self._ExpectGetOperation('apply')
+    self._ExpectPollingOperation('delete')
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
         compute instance-groups managed instance-configs delete group-1
           --zone us-central2-a
           --instances foo,bas
-          --force-instance-update
+          --no-update-instance
         """)
 
   @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
@@ -170,8 +194,8 @@ class InstanceGroupManagerInstanceConfigsDeleteTest(
           """)
 
 
-class RegionInstanceGroupManagerInstanceConfigsDeleteTest(
-    InstanceGroupManagerInstanceConfigsDeleteTestBase):
+class RegionInstanceGroupManagerInstanceConfigsDeleteBetaTest(
+    _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase):
 
   def _ExpectDeletePerInstanceConfigs(self):
     request = (
@@ -206,6 +230,26 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteTest(
         request,
         response=response,
     )
+
+  def _ExpectWaitOperation(self, name):
+    request = self.messages.ComputeRegionOperationsWaitRequest(
+        operation=name,
+        project='fake-project',
+        region='us-central2',
+    )
+    response = self.messages.Operation(
+        status=self.messages.Operation.StatusValueValuesEnum.DONE,
+        selfLink=self.project_uri + '/regions/us-central2/operations/' + name,
+        targetLink=(self.project_uri +
+                    '/regions/us-central2/instanceGroupManagers/group-1'),
+    )
+    self.client.regionOperations.Wait.Expect(
+        request,
+        response=response,
+    )
+
+  def _ExpectPollingOperation(self, name):
+    self._ExpectWaitOperation(name)
 
   def _ExpectListManagedInstances(self):
     request = (self.messages.
@@ -251,8 +295,8 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteTest(
 
   def _ExpectApplyNow(self):
     request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersApplyUpdatesToInstancesRequest)(
+        self.messages
+        .ComputeRegionInstanceGroupManagersApplyUpdatesToInstancesRequest)(
             instanceGroupManager='group-1',
             regionInstanceGroupManagersApplyUpdatesRequest=(
                 self.messages.RegionInstanceGroupManagersApplyUpdatesRequest)(
@@ -260,12 +304,12 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteTest(
                         self.project_uri + '/zones/us-central2-a/instances/foo',
                         self.project_uri + '/zones/us-central2-a/instances/bas',
                     ],
-                    minimalAction=self.messages.
-                    RegionInstanceGroupManagersApplyUpdatesRequest.
-                    MinimalActionValueValuesEnum.NONE,
-                    maximalAction=self.messages.
-                    RegionInstanceGroupManagersApplyUpdatesRequest.
-                    MaximalActionValueValuesEnum.RESTART),
+                    minimalAction=self.messages
+                    .RegionInstanceGroupManagersApplyUpdatesRequest
+                    .MinimalActionValueValuesEnum.NONE,
+                    mostDisruptiveAllowedAction=self.messages
+                    .RegionInstanceGroupManagersApplyUpdatesRequest
+                    .MostDisruptiveAllowedActionValueValuesEnum.RESTART),
             project='fake-project',
             region='us-central2',
         )
@@ -279,7 +323,10 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteTest(
   def testSimpleCase(self):
     self._ExpectListManagedInstances()
     self._ExpectDeletePerInstanceConfigs()
-    self._ExpectGetOperation('delete')
+    self._ExpectPollingOperation('delete')
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyNow()
+    self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -288,7 +335,7 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteTest(
           --instances foo,bas
         """)
 
-  def testNoInstanceProvided(self):
+  def testDeleteWithNoInstanceProvided(self):
     with self.AssertRaisesArgumentErrorMatches(
         r'argument --instances: Must be specified.'):
       self.Run("""
@@ -296,21 +343,39 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteTest(
             --region us-central2
           """)
 
-  def testWithApplyNow(self):
+  def testDeleteWithoutInstanceUpdate(self):
     self._ExpectListManagedInstances()
     self._ExpectDeletePerInstanceConfigs()
-    self._ExpectGetOperation('delete')
-    self._ExpectGetInstanceGroupManager()
-    self._ExpectApplyNow()
-    self._ExpectGetOperation('apply')
+    self._ExpectPollingOperation('delete')
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
         compute instance-groups managed instance-configs delete group-1
           --region us-central2
           --instances foo,bas
-          --force-instance-update
+          --no-update-instance
         """)
+
+
+class _InstanceGroupManagerInstanceConfigsDeleteAlphaTestBase(
+    _InstanceGroupManagerInstanceConfigsDeleteBetaTestBase):
+
+  API_VERSION = 'alpha'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class InstanceGroupManagerInstanceConfigsDeleteAlphaTest(
+    _InstanceGroupManagerInstanceConfigsDeleteAlphaTestBase,
+    InstanceGroupManagerInstanceConfigsDeleteBetaTest):
+  pass
+
+
+class RegionInstanceGroupManagerInstanceConfigsDeleteAlphaTest(
+    _InstanceGroupManagerInstanceConfigsDeleteAlphaTestBase,
+    RegionInstanceGroupManagerInstanceConfigsDeleteBetaTest):
+  pass
 
 
 if __name__ == '__main__':

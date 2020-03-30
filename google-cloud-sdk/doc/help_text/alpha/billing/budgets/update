@@ -1,0 +1,123 @@
+NAME
+    gcloud alpha billing budgets update - update a budget
+
+SYNOPSIS
+    gcloud alpha billing budgets update
+        (BUDGET : --billing-account=BILLING_ACCOUNT)
+        [--all-updates-rule-pubsub-topic=ALL_UPDATES_RULE_PUBSUB_TOPIC]
+        [--credit-types-treatment=CREDIT_TYPES_TREATMENT]
+        [--display-name=DISPLAY_NAME] [--filter-projects=[FILTER_PROJECTS,...]]
+        [--filter-services=[FILTER_SERVICES,...]]
+        [--budget-amount=BUDGET_AMOUNT | --last-period-amount]
+        [--threshold-rules-from-file=THRESHOLD_RULES_FROM_FILE
+          | --add-threshold-rule=ADD_THRESHOLD_RULE --clear-threshold-rules]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Update a budget.
+
+POSITIONAL ARGUMENTS
+     Budget resource - Billing budget to update. The arguments in this group
+     can be used to specify the attributes of this resource. This must be
+     specified.
+
+       BUDGET
+          ID of the budget or fully qualified identifier for the budget. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --billing-account=BILLING_ACCOUNT
+          The billing account.
+
+FLAGS
+     --all-updates-rule-pubsub-topic=ALL_UPDATES_RULE_PUBSUB_TOPIC
+        The name of the Cloud Pub/Sub topic where budget related messages will
+        be published, in the form projects/{project_id}/topics/{topic_id}.
+
+     --credit-types-treatment=CREDIT_TYPES_TREATMENT
+        Whether to include all the credit types when calculating the actual
+        spend against the budget. If this is not specified, then no credit
+        types are used in the calculation. CREDIT_TYPES_TREATMENT must be one
+        of: credit-types-treatment-unspecified, exclude-all-credits,
+        include-all-credits.
+
+     --display-name=DISPLAY_NAME
+        User data for display name in UI. Must be less than or equal to 60
+        characters.
+
+     --filter-projects=[FILTER_PROJECTS,...]
+        A set of projects in the form projects/{project_id}, specifying that
+        usage from only this set of projects should be included in the budget.
+        If omitted, all projects will be included.
+
+     --filter-services=[FILTER_SERVICES,...]
+        A set of services of the form services/{service_id}, specifying that
+        usage from only this set of services should be included in the budget.
+        If omitted, the report will include usage for all services. The service
+        names are available through the Catalog API:
+        https://cloud.google.com/billing/v1/how-tos/catalog-api.
+
+     At most one of these may be specified:
+
+       --budget-amount=BUDGET_AMOUNT
+          Specify the amount of the budget. If a currency type is included, it
+          must be the currency associated with the billing account.
+
+       --last-period-amount
+          Use the amount of last period's budget.
+
+     At most one of these may be specified:
+
+       --threshold-rules-from-file=THRESHOLD_RULES_FROM_FILE
+          Import a file with the updated threshold rules. The threshold rules
+          in the file will replace the rules in the budget. This can be used to
+          add or remove specific threshold rules.
+
+       --add-threshold-rule=ADD_THRESHOLD_RULE
+          Rule that triggers alerts (notifications of thresholds being crossed)
+          when spend exceeds the specified percentages of the budget. This flag
+          can be repeated to provide multiple thresholds above which an alert
+          is sent.
+
+       percent
+          Integer between 0 and 100 above which an alert is sent.
+
+       basis
+          type of basis used to determine if spend has passed the threshold.
+          Must be one of: 'current-spend' or 'forecasted-spend'. Behavior
+          defaults to 'current-spend' if not set.
+
+       --clear-threshold-rules
+          Removes all threshold rules from the budget.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the billingbudgets/v1beta1 API. The full documentation
+    for this API can be found at:
+    https://cloud.google.com/billing/docs/how-to/budget-api-overview
+
+EXAMPLES
+    To update the amount in the budget called 'abc' in account '123' to
+    '987.65', run:
+
+        $ gcloud alpha billing budgets update \
+            billingAccounts/123/budgets/abc --budget-amount=987.65
+
+    Alternatively, you can run:
+
+        $ gcloud alpha billing budgets update abc --billing-account=123 \
+            --budget-amount=987.65
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

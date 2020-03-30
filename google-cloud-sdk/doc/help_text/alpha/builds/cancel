@@ -15,8 +15,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To cancel a build 123-456-789:
+
+        $ gcloud alpha builds cancel '123-456-789'
+
+    You may also cancel multiple builds at the same time:
+
+        $ gcloud alpha builds cancel '123-456-789', '987-654-321'
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

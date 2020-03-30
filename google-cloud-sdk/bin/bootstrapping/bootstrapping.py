@@ -86,6 +86,11 @@ def ExecutePythonTool(tool_dir, exec_name, *args):
     if gsutil_py:
       py_path = gsutil_py
 
+  if exec_name == 'bq.py':
+    bq_py = encoding.GetEncodedValue(os.environ, 'CLOUDSDK_BQ_PYTHON')
+    if bq_py:
+      py_path = bq_py
+
   _ExecuteTool(
       execution_utils.ArgsForPythonTool(
           _FullPath(tool_dir, exec_name), *args, python=py_path))

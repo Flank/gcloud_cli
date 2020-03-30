@@ -9,6 +9,7 @@ class ServicenetworkingV1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://servicenetworking.googleapis.com/'
+  MTLS_BASE_URL = u'https://servicenetworking.mtls.googleapis.com/'
 
   _PACKAGE = u'servicenetworking'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform', u'https://www.googleapis.com/auth/service.management']
@@ -327,6 +328,60 @@ type `Subnetwork` if the operation successfully completes.
         supports_download=False,
     )
 
+    def DisableVpcServiceControls(self, request, global_params=None):
+      r"""Disables VPC service controls for a connection.
+
+      Args:
+        request: (ServicenetworkingServicesDisableVpcServiceControlsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('DisableVpcServiceControls')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    DisableVpcServiceControls.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/services/{servicesId}:disableVpcServiceControls',
+        http_method=u'PATCH',
+        method_id=u'servicenetworking.services.disableVpcServiceControls',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'v1/{+parent}:disableVpcServiceControls',
+        request_field=u'disableVpcServiceControlsRequest',
+        request_type_name=u'ServicenetworkingServicesDisableVpcServiceControlsRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def EnableVpcServiceControls(self, request, global_params=None):
+      r"""Enables VPC service controls for a connection.
+
+      Args:
+        request: (ServicenetworkingServicesEnableVpcServiceControlsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('EnableVpcServiceControls')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    EnableVpcServiceControls.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/services/{servicesId}:enableVpcServiceControls',
+        http_method=u'PATCH',
+        method_id=u'servicenetworking.services.enableVpcServiceControls',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'v1/{+parent}:enableVpcServiceControls',
+        request_field=u'enableVpcServiceControlsRequest',
+        request_type_name=u'ServicenetworkingServicesEnableVpcServiceControlsRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
     def SearchRange(self, request, global_params=None):
       r"""Service producers can use this method to find a currently unused range.
 within consumer allocated ranges.   This returned range is not reserved,
@@ -358,5 +413,35 @@ Operation<response: Range>
         request_field=u'searchRangeRequest',
         request_type_name=u'ServicenetworkingServicesSearchRangeRequest',
         response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Validate(self, request, global_params=None):
+      r"""Service producers use this method to validate if the consumer provided.
+network, project and the requested range is valid. This allows them to use
+a fail-fast mechanism for consumer requests, and not have to wait for
+AddSubnetwork operation completion to determine if user request is invalid.
+
+      Args:
+        request: (ServicenetworkingServicesValidateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ValidateConsumerConfigResponse) The response message.
+      """
+      config = self.GetMethodConfig('Validate')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Validate.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/services/{servicesId}:validate',
+        http_method=u'POST',
+        method_id=u'servicenetworking.services.validate',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'v1/{+parent}:validate',
+        request_field=u'validateConsumerConfigRequest',
+        request_type_name=u'ServicenetworkingServicesValidateRequest',
+        response_type_name=u'ValidateConsumerConfigResponse',
         supports_download=False,
     )

@@ -115,8 +115,9 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -124,6 +125,18 @@ help\fR for details.
 
 This command uses the \fBcloudiot/v1\fR API. The full documentation for this API
 can be found at: https://cloud.google.com/iot
+
+
+
+.SH "EXAMPLES"
+
+To list all devices in the device registry 'my\-registry' and region
+\'us\-central1', run:
+
+.RS 2m
+$ gcloud beta iot devices list \-\-region=us\-central1 \e
+    \-\-registry=my\-registry
+.RE
 
 
 

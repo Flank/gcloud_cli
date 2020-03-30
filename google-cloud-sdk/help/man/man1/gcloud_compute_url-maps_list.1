@@ -11,7 +11,7 @@ gcloud compute url\-maps list \- list Google Compute Engine URL maps
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute url\-maps list\fR [\fINAME\fR\ ...] [\fB\-\-regexp\fR=\fIREGEXP\fR,\ \fB\-r\fR\ \fIREGEXP\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute url\-maps list\fR [\fINAME\fR\ ...] [\fB\-\-regexp\fR=\fIREGEXP\fR,\ \fB\-r\fR\ \fIREGEXP\fR] [\fB\-\-global\fR\ |\ \fB\-\-regions\fR=[\fIREGION\fR,...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -19,6 +19,10 @@ gcloud compute url\-maps list \- list Google Compute Engine URL maps
 
 \fBgcloud compute url\-maps list\fR displays all Google Compute Engine URL maps
 in a project.
+
+By default, global URL maps and URL maps from all regions are listed. The
+results can be narrowed down by providing the \f5\fI\-\-global\fR\fR or
+\f5\fI\-\-regions\fR\fR flag.
 
 
 
@@ -48,7 +52,26 @@ that do not match the entire regular expression will be filtered out.
 Flag \f5\-\-regexp\fR is deprecated. Use \f5\-\-filter="name~'REGEXP'"\fR
 instead.
 
+.TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If provided, only global resources are shown.
+
+.TP 2m
+\fB\-\-regions\fR=[\fIREGION\fR,...]
+(DEPRECATED) If provided, only regional resources are shown. If arguments are
+provided, only resources from the given regions are shown.
+
+Flag \f5\-\-regions\fR is deprecated. Use \f5\-\-filter="region:( REGION ...
+)"\fR instead. For example \f5\-\-filter="region:( europe\-west1 europe\-west2
+)"\fR.
+
+
+.RE
 .RE
 .sp
 
@@ -97,8 +120,9 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -114,6 +138,20 @@ To list the URIs of all URL maps in a project, run:
 
 .RS 2m
 $ gcloud compute url\-maps list \-\-uri
+.RE
+
+To list all global URL maps in a project, run:
+
+.RS 2m
+$ gcloud compute url\-maps list \-\-global
+.RE
+
+To list all URL maps in the \f5\fIus\-central1\fR\fR and
+\f5\fIeurope\-west1\fR\fR regions, given they are regional resources, run:
+
+.RS 2m
+$ gcloud compute url\-maps list \e
+    \-\-filter="region:( europe\-west1 us\-central1 )"
 .RE
 
 

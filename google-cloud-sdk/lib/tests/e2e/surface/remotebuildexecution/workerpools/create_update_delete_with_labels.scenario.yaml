@@ -23,16 +23,10 @@ summary:
   - stderr: |
       Updated workerpool [$$test-workerpool$$].
   - stdout: |
-      name: projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$
-      state: RUNNING
       workerConfig:
-        diskSizeGb: '200'
-        diskType: pd-standard
         labels:
           a: '1'
           c: '3'
-        machineType: n1-standard-2
-        networkAccess: public
 - execute:
   - label: |
       Delete worker pool (generally --async shouldn't be used in tests, but the delete for worker
@@ -117,7 +111,7 @@ actions:
         code: 0
 - execute_command:
     command: |
-      remote-build-execution worker-pools update $$test-workerpool$$ --instance=default_instance --update-labels=c=3 --remove-labels=b
+      remote-build-execution worker-pools update $$test-workerpool$$ --instance=default_instance --update-labels=c=3 --remove-labels=b --format 'yaml(workerConfig.labels)'
     events:
     - api_call:
         poll_operation: true
@@ -173,16 +167,10 @@ actions:
     - expect_stderr: |
         Updated workerpool [$$test-workerpool$$].
     - expect_stdout: |
-        name: projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$
-        state: RUNNING
         workerConfig:
-          diskSizeGb: '200'
-          diskType: pd-standard
           labels:
             a: '1'
             c: '3'
-          machineType: n1-standard-2
-          networkAccess: public
     - expect_exit:
         code: 0
 - execute_command:

@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute forwarding-rules update - update a Google Compute
-        Engine forwarding rule
+    gcloud beta compute forwarding-rules update - update a Compute Engine
+        forwarding rule
 
 SYNOPSIS
     gcloud beta compute forwarding-rules update NAME [--allow-global-access]
@@ -10,23 +10,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute forwarding-rules update updates labels and
-    global access for a Google Compute Engine forwarding rule. For example:
-
-        $ gcloud beta compute forwarding-rules update example-fr \
-            --region us-central1 \
-          --update-labels=k0=value1,k1=value2 --remove-labels=k3
-
-    will add/update labels k0 and k1 and remove labels with key k3.
-
-    Labels can be used to identify the forwarding rule and to filter them as in
-
-        $ gcloud beta compute forwarding-rules list \
-            --filter='labels.k1:value2'
-
-    To list existing labels
-
-        $ gcloud beta compute forwarding-rules describe example-fr \
-            --format='default(labels)'
+    global access for a Compute Engine forwarding rule.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -65,7 +49,8 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
 
      At most one of these may be specified:
 
@@ -96,12 +81,36 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To update the forwarding rule to allow global access, run:
+
+        $ gcloud beta compute forwarding-rules update example-fr \
+            --allow-global-access --region=us-central1
+
+    To add/update labels k0 and k1 and remove labels with key k3, run:
+
+        $ gcloud beta compute forwarding-rules update example-fr \
+            --region=us-central1           \
+            --update-labels=k0=value1,k1=value2 --remove-labels=k3
+
+    Labels can be used to identify the forwarding rule and to filter them as in
+
+        $ gcloud beta compute forwarding-rules list \
+            --filter='labels.k1:value2'
+
+    To list existing labels, run:
+
+        $ gcloud beta compute forwarding-rules describe example-fr \
+            --format='default(labels)'
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute forwarding-rules update
         $ gcloud alpha compute forwarding-rules update
 

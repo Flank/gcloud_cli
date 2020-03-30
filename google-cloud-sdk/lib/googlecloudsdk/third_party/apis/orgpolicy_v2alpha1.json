@@ -3,20 +3,21 @@
   "discoveryVersion": "v1",
   "id": "orgpolicy:v2alpha1",
   "name": "orgpolicy",
-  "canonicalName": "Orgpolicy",
+  "canonicalName": "OrgPolicy API",
   "version": "v2alpha1",
   "revision": "0",
-  "title": "orgpolicy API",
-  "description": "",
+  "title": "Organization Policy API",
+  "description": "The Org Policy API allows users to configure governance ruleson their GCP resources across the Cloud Resource Hierarchy.",
   "ownerDomain": "google.com",
   "ownerName": "Google",
   "icons": {
     "x16": "http://www.google.com/images/icons/product/search-16.gif",
     "x32": "http://www.google.com/images/icons/product/search-32.gif"
    },
-  "documentationLink": "",
+  "documentationLink": "https://cloud.google.com/resource-manager/docs/organization-policy/understanding-constraints",
   "protocol": "rest",
   "rootUrl": "https://orgpolicy.googleapis.com/",
+  "mtlsRootUrl": "https://orgpolicy.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://orgpolicy.googleapis.com/",
   "batchPath": "batch",
@@ -173,6 +174,10 @@
       "description": "A `Constraint` that allows or disallows a list of string values, which are\nconfigured by an Organization's policy administrator with a `Policy`.",
       "type": "object",
       "properties": {
+        "supportsIn": {
+          "description": "Indicates whether values grouped into categories can be used in\n`Policy.allowed_values` and `Policy.denied_values`. For example,\n`\"in:Python\"` would match any value in the 'Python' group.",
+          "type": "boolean"
+        },
         "supportsUnder": {
           "description": "Indicates whether subtrees of Cloud Resource Manager resource hierarchy\ncan be used in `Policy.allowed_values` and `Policy.denied_values`. For\nexample, `\"under:folders\/123\"` would match any resource under the\n'folders\/123' folder.",
           "type": "boolean"
@@ -206,8 +211,13 @@
     },
     "GoogleCloudOrgpolicyV2alpha1Policy": {
       "id": "GoogleCloudOrgpolicyV2alpha1Policy",
+      "description": "Defines a Cloud Organization `Policy` which is used to specify `Constraints`\nfor configurations of Cloud Platform resources.",
       "type": "object",
       "properties": {
+        "name": {
+          "description": "Immutable. The resource name of the Policy. Must be one of the following\nforms, where constraint_name is the name of the constraint which this\nPolicy configures:\n* `projects\/{project_number}\/policies\/{constraint_name}`\n* `folders\/{folder_id}\/policies\/{constraint_name}`\n* `organizations\/{organization_id}\/policies\/{constraint_name}`\n\nFor example, \"projects\/123\/policies\/compute.disableSerialPortAccess\".\n\nNote: `projects\/{project_id}\/policies\/{constraint_name}` is also an\nacceptable name for API requests, but responses will return the name using\nthe equivalent project number.",
+          "type": "string"
+        },
         "spec": {
           "$ref": "GoogleCloudOrgpolicyV2alpha1PolicySpec"
         },
@@ -219,18 +229,15 @@
     },
     "GoogleCloudOrgpolicyV2alpha1PolicySpec": {
       "id": "GoogleCloudOrgpolicyV2alpha1PolicySpec",
-      "description": "Defines a Cloud Organization `Policy` which is used to specify `Constraints`\nfor configurations of Cloud Platform resources.",
+      "description": "Defines a Cloud Organization `PolicySpec` which is used to specify\n`Constraints` for configurations of Cloud Platform resources.",
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
         "etag": {
-          "description": "This field is ignored if used in a `CreatePolicy` request.\n\nWhen the `Policy` is returned from either a `GetPolicy` or a\n`ListPolicies` request, this `etag` indicates the version of the\ncurrent `Policy` to use when executing a read-modify-write loop.\n\nWhen the `Policy` is returned from a `GetEffectivePolicy` request, the\n`etag` will be unset.\n\nWhen the `Policy` is used in a `UpdatePolicy` method, use the `etag` value\nthat was returned from a `GetPolicy` request as part of a\nread-modify-write loop for concurrency control. If `UpdatePolicyRequest`'s\n`force_unconditional_write` field is set to true, this field must not be\nset. Otherwise, the `etag` is required for `UpdatePolicy`.",
+          "description": "An opaque tag indicating the current version of the `Policy`, used for\nconcurrency control.\n\nThis field is ignored if used in a `CreatePolicy` request.\n\nWhen the `Policy` is returned from either a `GetPolicy` or a\n`ListPolicies` request, this `etag` indicates the version of the\ncurrent `Policy` to use when executing a read-modify-write loop.\n\nWhen the `Policy` is returned from a `GetEffectivePolicy` request, the\n`etag` will be unset.\n\nWhen the `Policy` is used in a `UpdatePolicy` method, use the `etag` value\nthat was returned from a `GetPolicy` request as part of a\nread-modify-write loop for concurrency control. If `UpdatePolicyRequest`'s\n`force_unconditional_write` field is set to true, this field must not be\nset. Otherwise, the `etag` is required for `UpdatePolicy`.",
           "type": "string"
         },
         "updateTime": {
-          "description": "Output only. The time stamp the `Policy` was previously updated. This\nrepresents the last time a call to `CreatePolicy` or `UpdatePolicy` was\nmade for that `Policy`.",
+          "description": "Output only. The time stamp this was previously updated. This\nrepresents the last time a call to `CreatePolicy` or `UpdatePolicy` was\nmade for that `Policy`.",
           "type": "string",
           "format": "google-datetime"
         },
@@ -273,7 +280,7 @@
           "type": "boolean"
         },
         "condition": {
-          "description": "An optional condition which determines whether this rule is used\nin the evaluation of the policy. When set, the `expression` field in\nthe `Expr` must have the form \"resource.matchLabels(key_id, value_id)\",\nwhere key_id and value_id are the numeric identifiers for Label Keys\nand Values. These identifiers are available from the Label Manager\nService.",
+          "description": "Optional. A condition which determines whether this rule is used\nin the evaluation of the policy. When set, the `expression` field in\nthe `Expr' must include from 1 to 10 subexpressions, joined by the \"||\"\nor \"&&\" operators. Each subexpression must be of the form\n\"resource.matchLabels(key_name, value_name)\",\nwhere key_name and value_name are the resource names for Label Keys\nand Values. These names are available from the Label Manager Service. An\nexample expression is:\n\"resource.matchLabels('labelKeys\/123, 'labelValues\/456')\".",
           "$ref": "GoogleTypeExpr"
         }
       }
@@ -301,23 +308,23 @@
     },
     "GoogleTypeExpr": {
       "id": "GoogleTypeExpr",
-      "description": "Represents an expression text. Example:\n\n    title: \"User account presence\"\n    description: \"Determines whether the request has a user account\"\n    expression: \"size(request.user) > 0\"",
+      "description": "Represents a textual expression in the Common Expression Language (CEL)\nsyntax. CEL is a C-like expression language. The syntax and semantics of CEL\nare documented at https:\/\/github.com\/google\/cel-spec.\n\nExample (Comparison):\n\n    title: \"Summary size limit\"\n    description: \"Determines if a summary is less than 100 chars\"\n    expression: \"document.summary.size() < 100\"\n\nExample (Equality):\n\n    title: \"Requestor is owner\"\n    description: \"Determines if requestor is the document owner\"\n    expression: \"document.owner == request.auth.claims.email\"\n\nExample (Logic):\n\n    title: \"Public documents\"\n    description: \"Determine whether the document should be publicly visible\"\n    expression: \"document.type != 'private' && document.type != 'internal'\"\n\nExample (Data Manipulation):\n\n    title: \"Notification string\"\n    description: \"Create a notification string with a timestamp.\"\n    expression: \"'New message received at ' + string(document.create_time)\"\n\nThe exact variables and functions that may be referenced within an expression\nare determined by the service that evaluates it. See the service\ndocumentation for additional information.",
       "type": "object",
       "properties": {
         "expression": {
-          "description": "Textual representation of an expression in\nCommon Expression Language syntax.\n\nThe application context of the containing message determines which\nwell-known feature set of CEL is supported.",
+          "description": "Textual representation of an expression in Common Expression Language\nsyntax.",
           "type": "string"
         },
         "title": {
-          "description": "An optional title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
+          "description": "Optional. Title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
           "type": "string"
         },
         "description": {
-          "description": "An optional description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
+          "description": "Optional. Description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
           "type": "string"
         },
         "location": {
-          "description": "An optional string indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
+          "description": "Optional. String indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
           "type": "string"
         }
       }
@@ -512,6 +519,7 @@
           "httpMethod": "PATCH",
           "parameters": {
             "name": {
+              "description": "Immutable. The resource name of the Policy. Must be one of the following\nforms, where constraint_name is the name of the constraint which this\nPolicy configures:\n* `projects\/{project_number}\/policies\/{constraint_name}`\n* `folders\/{folder_id}\/policies\/{constraint_name}`\n* `organizations\/{organization_id}\/policies\/{constraint_name}`\n\nFor example, \"projects\/123\/policies\/compute.disableSerialPortAccess\".\n\nNote: `projects\/{project_id}\/policies\/{constraint_name}` is also an\nacceptable name for API requests, but responses will return the name using\nthe equivalent project number.",
               "location": "path",
               "required": true,
               "pattern": "^[^\/]+\/[^\/]+\/policies\/[^\/]+$",
@@ -567,4 +575,3 @@
   },
   "basePath": ""
 }
-

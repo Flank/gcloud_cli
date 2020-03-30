@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute sole\-tenancy node\-groups delete \- deletes a Google Compute Engine node group
+gcloud beta compute sole\-tenancy node\-groups delete \- delete a Compute Engine node group
 
 
 
@@ -17,7 +17,7 @@ gcloud beta compute sole\-tenancy node\-groups delete \- deletes a Google Comput
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Deletes a Google Compute Engine node group.
+\fB(BETA)\fR Delete a Compute Engine node group.
 
 
 
@@ -72,8 +72,19 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a node group, run:
+
+.RS 2m
+$ gcloud beta compute sole\-tenancy node\-groups delete my\-node\-group
+.RE
 
 
 

@@ -37,6 +37,18 @@ class RouterTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       setattr(self, api_version + '_messages',
               core_apis.GetMessagesModule('compute', api_version))
 
+  def _GetOperation(self):
+    operation_name = 'operation-X'
+    return self.messages.Operation(
+        name=('https://compute.googleapis.com/compute/{0}/projects/'
+              'fake-project/regions/us-central1/operations/{1}'.format(
+                  self.api_version, operation_name)),
+        status=self.messages.Operation.StatusValueValuesEnum.PENDING,
+        selfLink=('https://compute.googleapis.com/compute/{0}/projects'
+                  '/fake-project/regions/us-central1/operations/{1}'.format(
+                      self.api_version, operation_name)),
+    )
+
   def SelectApi(self, track, api_version):
     self.track = track
     self.messages = getattr(self, api_version + '_messages')
@@ -50,10 +62,7 @@ class RouterTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         self.messages.ComputeRoutersInsertRequest(
             project=self.Project(),
             region='us-central1',
-            router=expected_message),
-        self.messages.Operation(
-            name='operation-X',
-            status=self.messages.Operation.StatusValueValuesEnum.PENDING))
+            router=expected_message), self._GetOperation())
 
   def ExpectGet(self, expected_message):
     """Expect a Routers 'Get' request."""
@@ -69,10 +78,7 @@ class RouterTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             project=self.Project(),
             region='us-central1',
             router='my-router',
-            routerResource=expected_message),
-        self.messages.Operation(
-            name='operation-X',
-            status=self.messages.Operation.StatusValueValuesEnum.PENDING))
+            routerResource=expected_message), self._GetOperation())
 
   def ExpectOperationsGet(self):
     """Expect a Router Operations 'Get' request for polling."""
@@ -84,3 +90,17 @@ class RouterTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         self.messages.Operation(
             name='operation-X',
             status=self.messages.Operation.StatusValueValuesEnum.DONE))
+
+  def ExpectOperationsWait(self):
+    """Expect a Router Operations 'Wait' request for polling."""
+    self.mock_client.regionOperations.Wait.Expect(
+        self.messages.ComputeRegionOperationsWaitRequest(
+            project=self.Project(),
+            region='us-central1',
+            operation='operation-X'),
+        self.messages.Operation(
+            name='operation-X',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
+
+  def ExpectOperationsPolling(self):
+    self.ExpectOperationsWait()

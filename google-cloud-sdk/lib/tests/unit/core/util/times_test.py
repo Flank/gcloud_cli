@@ -214,7 +214,6 @@ class TimeZoneWIthNonAsciiNameTest(test_case.WithOutputCapture):
     # Python 2 falls back to +-HH:MM; Python 3 returns ÜñîçòÐé
     self.assertRegexpMatches(actual, r'ÜñîçòÐé|\+01:00')
 
-  @test_case.Filters.SkipOnMacAndPy3('failing', 'b/139006909')
   def testFormatTzNameUtf8Unaware(self):
     encoding = 'utf-8'
     self.SetEncoding(encoding)
@@ -226,7 +225,6 @@ class TimeZoneWIthNonAsciiNameTest(test_case.WithOutputCapture):
     # Python 2 falls back to +-HH:MM; Python 3 returns ÜñîçòÐé
     self.assertRegexpMatches(actual, r'Ṳᾔḯ¢◎ⅾℯ|\+01:00')
 
-  @test_case.Filters.SkipOnMacAndPy3('failing', 'b/139006909')
   def testFormatTzNameUtf8(self):
     encoding = 'utf-8'
     self.SetEncoding(encoding)

@@ -187,6 +187,27 @@ class AddTest(test_base.OsloginBaseTest):
 
     self.assertEqual(response.loginProfile, self.profiles['profile_with_keys'])
 
+  def testImpersonateServiceAccount(self, track):
+    self._RunSetUp(track)
+    self.mock_oslogin_client.users.ImportSshPublicKey.Expect(
+        request=self.messages.OsloginUsersImportSshPublicKeyRequest(
+            parent='users/service_account_user@google.com',
+            projectId='fake-project',
+            sshPublicKey=self.messages.SshPublicKey(
+                expirationTimeUsec=None,
+                fingerprint=None,
+                key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ',
+            )),
+        response=self.messages.ImportSshPublicKeyResponse(
+            loginProfile=self.profiles['profile_with_keys']))
+
+    response = self.Run("""
+        compute os-login ssh-keys add --key 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ'
+            --impersonate-service-account service_account_user@google.com
+        """)
+
+    self.assertEqual(response.loginProfile, self.profiles['profile_with_keys'])
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -11,7 +11,7 @@ gcloud alpha dns managed\-zones update \- update an existing Cloud DNS managed\-
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha dns managed\-zones update\fR \fIZONE\fR [\fB\-\-async\fR] [\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR] [\fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]] [\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR] [\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR] [\fB\-\-networks\fR=[\fINETWORK\fR,...]] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR] [\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-target\-network\fR=\fITARGET_NETWORK\fR\ \fB\-\-target\-project\fR=\fITARGET_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha dns managed\-zones update\fR \fIZONE\fR [\fB\-\-async\fR] [\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR] [\fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]] [\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR] [\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR] [\fB\-\-managed\-reverse\-lookup\fR] [\fB\-\-networks\fR=[\fINETWORK\fR,...]] [\fB\-\-private\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR] [\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-target\-network\fR=\fITARGET_NETWORK\fR\ \fB\-\-target\-project\fR=\fITARGET_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -95,9 +95,20 @@ Requires DNSSEC enabled. \fIKSK_ALGORITHM\fR must be one of:
 Length of the key\-signing key in bits. Requires DNSSEC enabled.
 
 .TP 2m
+\fB\-\-managed\-reverse\-lookup\fR
+Whether this zone is a managed reverse lookup zone, required for Cloud DNS to
+correctly resolve Non\-RFC1918 PTR records.
+
+.TP 2m
 \fB\-\-networks\fR=[\fINETWORK\fR,...]
 List of networks that the zone should be visible in if the zone visibility is
 [private].
+
+.TP 2m
+\fB\-\-private\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]
+List of IPv4 addresses of target name servers that the zone will forward queries
+to. Ignored for \f5public\fR visibility. All addresses specified for this
+parameter will be reached through the VPC.
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -146,6 +157,8 @@ $ gcloud alpha dns managed\-zones update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 .RE
 .sp
@@ -166,8 +179,9 @@ Project ID of the Google Compute Engine private network to forward queries to.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

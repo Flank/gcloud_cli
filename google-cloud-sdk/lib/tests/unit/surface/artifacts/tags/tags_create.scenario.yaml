@@ -1,0 +1,48 @@
+title: artifacts tags create
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: artifacts tags create my-tag --version=1.0.0-pre --package=my-pkg --repository=my-repo
+      --location=us-east1
+  - stderr: |
+      Created tag [my-tag].
+actions:
+- execute_command:
+    command: artifacts tags create my-tag --version=1.0.0-pre --package=my-pkg --repository=my-repo
+      --location=us-east1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/fake-project/locations/us-east1
+              locationId: us-east1
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/repositories/my-repo/packages/my-pkg/tags?alt=json&tagId=my-tag
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/us-east1/repositories/my-repo/packages/my-pkg/tags/my-tag
+              version: projects/fake-project/locations/us-east1/repositories/my-repo/packages/my-pkg/versions/1.0.0-pre
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/repositories/my-repo/packages/my-pkg/tags/my-tag",
+              "version": "projects/fake-project/locations/us-east1/repositories/my-repo/packages/my-pkg/versions/1.0.0-pre"
+            }
+    - expect_stderr: |
+        Created tag [my-tag].
+    - expect_exit:
+        code: 0

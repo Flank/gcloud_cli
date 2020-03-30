@@ -4,6 +4,18 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: compute/zone us-central1-c
 - execute:
+  - label: Base Case
+  - command: |
+      compute tpus create mytpu --version '1.6'
+  - stderr: |
+      Create request issued for: [mytpu]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created tpu [mytpu].
+- execute:
   - label: With Cust Params
   - command: |
       compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
@@ -57,6 +69,19 @@ summary:
   - stderr: |
       Created tpu [mytpu].
 - execute:
+  - label: With Service Networking and range
+  - command: |
+      compute tpus create mytpu --use-service-networking --version 1.6
+      --network projects/other-fake-project/global/networks/my-tf-network --range 10.240.0.0
+  - stderr: |
+      Create request issued for: [mytpu]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created tpu [mytpu].
+- execute:
   - label: Service Networking and project not peered
   - command: |
       compute tpus create mytpu --use-service-networking --version 1.6
@@ -70,24 +95,6 @@ summary:
       --network projects/badfake-project/global/networks/my-tf-network
   - error: '1: Error determining VPC peering status for network [projects/badfake-project/global/networks/my-tf-network]:
       [fake-project]'
-- execute:
-  - label: Service Networking and Range Mutually Exclusive
-  - command: |
-      compute tpus create mytpu --use-service-networking --range 10.240.0.0/29 --version 1.6
-      --network projects/other-fake-project/global/networks/my-tf-network
-  - stderr: |
-      ERROR: (gcloud.alpha.compute.tpus.create) argument --range: Exactly one of (--range | --use-service-networking) must be specified.
-      Usage: gcloud alpha compute tpus create (TPU : --zone=ZONE) --network=NETWORK --version=VERSION (--range=RANGE | --use-service-networking) [optional flags]
-        optional flags may be  --accelerator-type | --async | --description | --help |
-                               --model-base-path | --model-config-file |
-                               --model-name | --platform-config-file | --preemptible |
-                               --range | --reserved | --use-service-networking |
-                               --zone
-
-      For detailed information on this command and its flags, run:
-        gcloud alpha compute tpus create --help
-  - error: '1: argument --range: Exactly one of (--range | --use-service-networking)
-      must be specified.'
 - execute:
   - label: With Reservation
   - command: |
@@ -143,12 +150,12 @@ summary:
       --model-base-path basePath --model-name exampleModelName
   - stderr: |
       ERROR: (gcloud.alpha.compute.tpus.create) argument --model-base-path --model-name: At most one of --model-base-path --model-name | --model-config-file --platform-config-file may be specified.
-      Usage: gcloud alpha compute tpus create (TPU : --zone=ZONE) --network=NETWORK --version=VERSION (--range=RANGE | --use-service-networking) [optional flags]
+      Usage: gcloud alpha compute tpus create (TPU : --zone=ZONE) --version=VERSION [optional flags]
         optional flags may be  --accelerator-type | --async | --description | --help |
                                --model-base-path | --model-config-file |
-                               --model-name | --platform-config-file | --preemptible |
-                               --range | --reserved | --use-service-networking |
-                               --zone
+                               --model-name | --network | --platform-config-file |
+                               --preemptible | --range | --reserved |
+                               --use-service-networking | --zone
 
       For detailed information on this command and its flags, run:
         gcloud alpha compute tpus create --help
@@ -157,6 +164,56 @@ summary:
 actions:
 - set_property:
     compute/zone: us-central1-c
+- execute_command:
+    label: Base Case
+    command: |
+      compute tpus create mytpu --version '1.6'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1-c/nodes?alt=json&nodeId=mytpu
+          method: POST
+          headers: {}
+          body:
+            json:
+              network: default
+              tensorflowVersion: '1.6'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              network: default
+              tensorflowVersion: '1.6'
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_stderr: |
+        Create request issued for: [mytpu]
+    - api_call:
+        poll_operation: false
+        repeatable: true
+        expect_request:
+          uri: https://tpu.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1-c/operations/create?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              network: default
+              tensorflowVersion: '1.6'
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Created tpu [mytpu].
+    - expect_exit:
+        code: 0
 - execute_command:
     label: With Cust Params
     command: |
@@ -514,6 +571,106 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
+    label: With Service Networking and range
+    command: |
+      compute tpus create mytpu --use-service-networking --version 1.6
+      --network projects/other-fake-project/global/networks/my-tf-network --range 10.240.0.0
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/other-fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            createTime: '2018-01-01T00:00:00Z'
+            lifecycleState: ACTIVE
+            name: other-fake-project
+            parent:
+              id: '999999999999'
+              type: organization
+            projectId: fake-project
+            projectNumber: '999999999999'
+    - api_call:
+        expect_request:
+          uri: https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fmy-tf-network
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            connections:
+            - network: projects/999999999999/global/networks/my-tf-network
+              peering: servicenetworking-googleapis-com
+              reservedPeeringRanges:
+              - google1
+              - google2
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1-c/nodes?alt=json&nodeId=mytpu
+          method: POST
+          headers: {}
+          body:
+            json:
+              acceleratorType: v2-8
+              network: projects/other-fake-project/global/networks/my-tf-network
+              cidrBlock: 10.240.0.0
+              schedulingConfig:
+                preemptible: false
+              tensorflowVersion: '1.6'
+              useServiceNetworking: true
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              tensorflowVersion: '1.6'
+              acceleratorType: v2-8
+              network: projects/other-fake-project/global/networks/my-tf-network
+              cidrBlock: 10.240.0.0
+              useServiceNetworking: true
+              schedulingConfig:
+                preemptible: false
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+
+    - expect_stderr: |
+        Create request issued for: [mytpu]
+    - api_call:
+        poll_operation: false
+        expect_request:
+          uri: https://tpu.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1-c/operations/create?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              tensorflowVersion: '1.6'
+              acceleratorType: v2-8
+              network: projects/other-fake-project/global/networks/my-tf-network
+              cidrBlock: 10.240.0.0
+              useServiceNetworking: true
+              schedulingConfig:
+                preemptible: false
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Created tpu [mytpu].
+    - expect_exit:
+        code: 0
+- execute_command:
     label: Service Networking and project not peered
     command: |
       compute tpus create mytpu --use-service-networking --version 1.6
@@ -584,27 +741,6 @@ actions:
         code: 1
         message: 'Error determining VPC peering status for network [projects/badfake-project/global/networks/my-tf-network]:
           [fake-project]'
-- execute_command:
-    label: Service Networking and Range Mutually Exclusive
-    command: |
-      compute tpus create mytpu --use-service-networking --range 10.240.0.0/29 --version 1.6
-      --network projects/other-fake-project/global/networks/my-tf-network
-    events:
-    - expect_stderr: |
-        ERROR: (gcloud.alpha.compute.tpus.create) argument --range: Exactly one of (--range | --use-service-networking) must be specified.
-        Usage: gcloud alpha compute tpus create (TPU : --zone=ZONE) --network=NETWORK --version=VERSION (--range=RANGE | --use-service-networking) [optional flags]
-          optional flags may be  --accelerator-type | --async | --description | --help |
-                                 --model-base-path | --model-config-file |
-                                 --model-name | --platform-config-file | --preemptible |
-                                 --range | --reserved | --use-service-networking |
-                                 --zone
-
-        For detailed information on this command and its flags, run:
-          gcloud alpha compute tpus create --help
-    - expect_exit:
-        code: 1
-        message: 'argument --range: Exactly one of (--range | --use-service-networking)
-          must be specified.'
 - execute_command:
     label: With Reservation
     command: |
@@ -838,12 +974,12 @@ actions:
     events:
     - expect_stderr: |
         ERROR: (gcloud.alpha.compute.tpus.create) argument --model-base-path --model-name: At most one of --model-base-path --model-name | --model-config-file --platform-config-file may be specified.
-        Usage: gcloud alpha compute tpus create (TPU : --zone=ZONE) --network=NETWORK --version=VERSION (--range=RANGE | --use-service-networking) [optional flags]
+        Usage: gcloud alpha compute tpus create (TPU : --zone=ZONE) --version=VERSION [optional flags]
           optional flags may be  --accelerator-type | --async | --description | --help |
                                  --model-base-path | --model-config-file |
-                                 --model-name | --platform-config-file | --preemptible |
-                                 --range | --reserved | --use-service-networking |
-                                 --zone
+                                 --model-name | --network | --platform-config-file |
+                                 --preemptible | --range | --reserved |
+                                 --use-service-networking | --zone
 
         For detailed information on this command and its flags, run:
           gcloud alpha compute tpus create --help

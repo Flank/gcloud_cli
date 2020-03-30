@@ -9,6 +9,7 @@ class ClouderrorreportingV1beta1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://clouderrorreporting.googleapis.com/'
+  MTLS_BASE_URL = u'https://clouderrorreporting.mtls.googleapis.com/'
 
   _PACKAGE = u'clouderrorreporting'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
@@ -86,7 +87,7 @@ for authentication. To use an API key, append it to the URL as the value of
 a `key` parameter. For example:
 
 `POST
-https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`
+https://clouderrorreporting.googleapis.com/v1beta1/{projectName}/events:report?key=123ABC456`
 
       Args:
         request: (ClouderrorreportingProjectsEventsReportRequest) input message

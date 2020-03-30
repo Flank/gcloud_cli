@@ -228,6 +228,21 @@ class UtilsTest(test_base.OrgPolicyUnitTestBase, parameterized.TestCase):
 
     self.assertEqual(new_policy, updated_policy)
 
+  def testGetLabelKeyAndLabelValueDisplayNameFromCondition_InvalidCondition_ThrowsError(
+      self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidInputError,
+        ('Label condition must be of the form: resource.matchLabels('
+         '"label_key_input", "label_value_input").')):
+      utils.GetLabelKeyAndLabelValueInputFromCondition('invalid')
+
+  def testGetLabelKeyAndLabelValueDisplayNameFromCondition_ValidCondition_ReturnsDisplayName(
+      self):
+    display_names = utils.GetLabelKeyAndLabelValueInputFromCondition(
+        self.CONDITION_EXPRESSION_ALIAS)
+
+    self.assertEqual(display_names[0], 'env')
+    self.assertEqual(display_names[1], 'dev')
 
 if __name__ == '__main__':
   test_case.main()

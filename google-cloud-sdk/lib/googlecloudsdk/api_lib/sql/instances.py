@@ -26,6 +26,7 @@ from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.sql import api_util
 from googlecloudsdk.api_lib.sql import constants
 from googlecloudsdk.api_lib.sql import exceptions as sql_exceptions
+from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import config
 from googlecloudsdk.core import execution_utils
@@ -34,12 +35,44 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files as file_utils
+import six
 
+
+messages = apis.GetMessagesModule('sql', 'v1beta4')
 
 _BASE_CLOUD_SQL_PROXY_ERROR = 'Failed to start the Cloud SQL Proxy'
 
 _POSTGRES_DATABASE_VERSION_PREFIX = 'POSTGRES'
 _SQLSERVER_DATABASE_VERSION_PREFIX = 'SQLSERVER'
+
+
+class DatabaseInstancePresentation(object):
+  """Represents a DatabaseInstance message that is modified for user visibility."""
+
+  def __init__(self, orig):
+    for field in orig.all_fields():
+      if field.name == 'state':
+        if orig.settings and orig.settings.activationPolicy == messages.Settings.ActivationPolicyValueValuesEnum.NEVER:
+          self.state = 'STOPPED'
+        else:
+          self.state = orig.state
+      else:
+        value = getattr(orig, field.name)
+        if value is not None and not (isinstance(value, list) and not value):
+          if field.name in ['currentDiskSize', 'maxDiskSize']:
+            setattr(self, field.name, six.text_type(value))
+          else:
+            setattr(self, field.name, value)
+
+  def __eq__(self, other):
+    """Overrides the default implementation by checking attribute dicts."""
+    if isinstance(other, DatabaseInstancePresentation):
+      return self.__dict__ == other.__dict__
+    return False
+
+  def __ne__(self, other):
+    """Overrides the default implementation (only needed for Python 2)."""
+    return not self.__eq__(other)
 
 
 def GetRegionFromZone(gce_zone):
@@ -151,23 +184,17 @@ def StartCloudSqlProxy(instance, port, seconds_to_timeout=10):
   return _WaitForProxyToStart(proxy_process, port, seconds_to_timeout)
 
 
-def IsInstanceV1(instance):
+def IsInstanceV1(sql_messages, instance):
   """Returns a boolean indicating if the database instance is first gen."""
-  return (instance.backendType == 'FIRST_GEN' or
+  return (instance.backendType ==
+          sql_messages.DatabaseInstance.BackendTypeValueValuesEnum.FIRST_GEN or
           (instance.settings and instance.settings.tier and
            instance.settings.tier.startswith('D')))
 
 
-def IsInstanceV2(instance):
+def IsInstanceV2(sql_messages, instance):
   """Returns a boolean indicating if the database instance is second gen."""
-  return instance.backendType == 'SECOND_GEN'
-
-
-def GetInstanceState(instance):
-  """Return the default state string unless the instance is stopped."""
-  if instance.settings and instance.settings.activationPolicy == 'NEVER':
-    return 'STOPPED'
-  return instance.state
+  return instance.backendType == sql_messages.DatabaseInstance.BackendTypeValueValuesEnum.SECOND_GEN
 
 
 # TODO(b/73648377): Factor out static methods into module-level functions.
@@ -187,7 +214,7 @@ class _BaseInstances(object):
       batch_size: int, The number of items to retrieve per request.
 
     Returns:
-      List of yielded sql_messages.DatabaseInstance instances.
+      List of yielded DatabaseInstancePresentation instances.
     """
 
     client = api_util.SqlClient(api_util.API_VERSION_DEFAULT)
@@ -207,9 +234,7 @@ class _BaseInstances(object):
 
     def YieldInstancesWithAModifiedState():
       for result in yielded:
-        # TODO(b/63139112): Investigate impact of instances without settings.
-        result.state = GetInstanceState(result)
-        yield result
+        yield DatabaseInstancePresentation(result)
 
     return YieldInstancesWithAModifiedState()
 
@@ -225,25 +250,12 @@ class _BaseInstances(object):
   @staticmethod
   def IsPostgresDatabaseVersion(database_version):
     """Returns a boolean indicating if the database version is Postgres."""
-    return _POSTGRES_DATABASE_VERSION_PREFIX in database_version
+    return _POSTGRES_DATABASE_VERSION_PREFIX in database_version.name
 
   @staticmethod
   def IsSqlServerDatabaseVersion(database_version):
     """Returns a boolean indicating if the database version is SQL Server."""
-    return _SQLSERVER_DATABASE_VERSION_PREFIX in database_version
-
-
-class InstancesV1Beta3(_BaseInstances):
-  """Common utility functions for sql instances V1Beta3."""
-
-  @staticmethod
-  def SetProjectAndInstanceFromRef(instance_resource, instance_ref):
-    instance_resource.project = instance_ref.project
-    instance_resource.instance = instance_ref.instance
-
-  @staticmethod
-  def AddBackupConfigToSettings(settings, backup_config):
-    settings.backupConfiguration = [backup_config]
+    return _SQLSERVER_DATABASE_VERSION_PREFIX in database_version.name
 
 
 class InstancesV1Beta4(_BaseInstances):

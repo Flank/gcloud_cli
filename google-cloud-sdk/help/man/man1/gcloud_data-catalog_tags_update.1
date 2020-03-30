@@ -1,0 +1,149 @@
+
+.TH "GCLOUD_DATA\-CATALOG_TAGS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud data\-catalog tags update \- update a Cloud Data Catalog entry tag
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud data\-catalog tags update\fR (\fITAG\fR\ :\ \fB\-\-entry\fR=\fIENTRY\fR\ \fB\-\-entry\-group\fR=\fIENTRY_GROUP\fR\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-tag\-file\fR=\fITAG_FILE\fR (\fB\-\-tag\-template\fR=\fITAG_TEMPLATE\fR\ :\ \fB\-\-tag\-template\-location\fR=\fITAG_TEMPLATE_LOCATION\fR\ \fB\-\-tag\-template\-project\fR=\fITAG_TEMPLATE_PROJECT\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Update a Cloud Data Catalog entry tag. This will overwrite the current values of
+the tag.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Tag resource \- Entry tag to update. The arguments in this group can be used to
+specify the attributes of this resource. The arguments in this group can be used
+to specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [tag] on the command line with a fully specified
+name; set the property [core/project]; provide the argument [\-\-project] on the
+command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fITAG\fR
+ID of the tag or fully qualified identifier for the tag. This positional must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-entry\fR=\fIENTRY\fR
+Entry of the tag.
+
+.TP 2m
+\fB\-\-entry\-group\fR=\fIENTRY_GROUP\fR
+Entry group of the tag.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the tag.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-tag\-file\fR=\fITAG_FILE\fR
+Path to a JSON or YAML file containing the tag.
+
+The file should contain a JSON/YAML object with a key and value for each field
+that should be set. See $ gcloud topic datetimes for information on how to
+specify timestamp fields
+
+For example:
+
+.RS 2m
+{
+  "dbl_field": 123,
+  "str_field": "String",
+  "bool_field": true,
+  "ts_field": "1970\-01\-01T00:00:00.000Z",
+  "enum_field": "ENUM_A",
+}
+.RE
+
+.TP 2m
+
+Tag template resource \- Tag template. \f5\-\-tag\-template\-location\fR
+defaults to the tag's location. \f5\-\-tag\-template\-project\fR defaults to the
+tag's project. The arguments in this group can be used to specify the attributes
+of this resource. This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fB\-\-tag\-template\fR=\fITAG_TEMPLATE\fR
+ID of the tag template or fully qualified identifier for the tag template. This
+flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-tag\-template\-location\fR=\fITAG_TEMPLATE_LOCATION\fR
+Location of the tag template.
+
+.TP 2m
+\fB\-\-tag\-template\-project\fR=\fITAG_TEMPLATE_PROJECT\fR
+Project of the tag template.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdatacatalog/v1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/data\-catalog/docs/
+
+
+
+.SH "EXAMPLES"
+
+Update a Cloud Data Catalog entry tag:
+
+.RS 2m
+$ gcloud data\-catalog tags update TAG \-\-tag\-template=TAG_TEMPLATE \e
+    \-\-tag\-file=TAG_FILE
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha data\-catalog tags update
+$ gcloud beta data\-catalog tags update
+.RE
+

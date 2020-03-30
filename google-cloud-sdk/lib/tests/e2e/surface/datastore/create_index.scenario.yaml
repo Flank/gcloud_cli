@@ -1,0 +1,73 @@
+title: Create Datastore indexes
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: datastore indexes create index.yaml
+  - stderr: |+
+      Configurations to update:
+
+      descriptor:      [index.yaml]
+      type:            [datastore indexes]
+      target project:  [cloud-sdk-integration-testing]
+
+
+  - prompt:
+    - input: y
+  - progress_tracker:
+    - message: .
+    - status: SUCCESS
+actions:
+- write_file:
+    path: index.yaml
+    contents: |
+      indexes:
+      - kind: Cat
+        ancestor: no
+        properties:
+        - name: name
+        - name: age
+          direction: desc
+
+- execute_command:
+    command: datastore indexes create index.yaml
+    events:
+    - expect_stderr: |+
+        Configurations to update:
+
+        descriptor:      [index.yaml]
+        type:            [datastore indexes]
+        target project:  [cloud-sdk-integration-testing]
+
+
+    - expect_prompt_continue:
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://datastore.googleapis.com/v1/projects/cloud-sdk-integration-testing/indexes?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '384'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            indexes:
+            - projectId: cloud-sdk-integration-testing
+              indexId: CICAgICA8ogK
+              kind: Cat
+              ancestor: NONE
+              properties:
+              - name: name
+                direction: ASCENDING
+              - name: age
+                direction: DESCENDING
+              state: READY
+    - expect_progress_tracker:
+        status: SUCCESS
+        message: .
+    - expect_exit:
+        code: 0

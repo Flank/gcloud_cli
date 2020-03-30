@@ -21,14 +21,14 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class OrgSecurityPolicies(base.Group):
   """Manage Google Compute Organization Engine security policies.
 
   Manage Google Compute Organization Engine security policies. Organization
   security policies are used to control incoming/outgoing traffic.
   """
-  pass
+  category = base.COMPUTE_CATEGORY
 
 
 OrgSecurityPolicies.detailed_help = {

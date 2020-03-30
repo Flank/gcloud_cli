@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud beta compute health-checks create http2 NAME
         [--check-interval=CHECK_INTERVAL; default="5s"]
-        [--description=DESCRIPTION]
+        [--description=DESCRIPTION] [--enable-logging]
         [--healthy-threshold=HEALTHY_THRESHOLD; default=2] [--host=HOST]
         [--proxy-header=PROXY_HEADER; default="NONE"]
         [--request-path=REQUEST_PATH; default="/"] [--response=RESPONSE]
@@ -36,6 +36,12 @@ FLAGS
 
      --description=DESCRIPTION
         An optional string description for the HTTP2 health check.
+
+     --enable-logging
+        Enable logging of health check probe results to Stackdriver. Logging is
+        disabled by default.
+
+            Use --no-enable-logging to disable logging.
 
      --healthy-threshold=HEALTHY_THRESHOLD; default=2
         The number of consecutive successful health checks before an unhealthy
@@ -125,8 +131,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create a HTTP2 health check with default options, run:

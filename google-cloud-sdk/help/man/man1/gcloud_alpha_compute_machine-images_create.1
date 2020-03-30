@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute machine\-images create \- create Google Compute Engine machine images
+gcloud alpha compute machine\-images create \- create a Compute Engine machine image
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha compute machine\-images create \- create Google Compute Engine mach
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Create Google Compute Engine machine images.
+\fB(ALPHA)\fR Create a Compute Engine machine image.
 
 
 
@@ -58,7 +58,7 @@ more details.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
-Specifies a textual description of the machine image.
+Specifies a text description of the machine image.
 
 .TP 2m
 \fB\-\-guest\-flush\fR
@@ -163,8 +163,21 @@ The Cloud project for the key.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a machine image, run:
+
+.RS 2m
+$ gcloud alpha compute machine\-images create my\-machine\-image \e
+    \-\-source\-instance=example\-source \e
+    \-\-source\-instance\-zone=us\-central1\-a
+.RE
 
 
 
@@ -173,5 +186,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute machine\-images create
+.RE
 

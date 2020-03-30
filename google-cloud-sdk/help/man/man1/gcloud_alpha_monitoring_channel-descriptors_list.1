@@ -17,9 +17,26 @@ gcloud alpha monitoring channel\-descriptors list \- list notification channel d
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR List notification channel descriptors.
+\fB(ALPHA)\fR List notification channel descriptors representing the various
+NotificationChannel types.
 
 
+.SH "EXAMPLES"
+The following command prints all of the \f5NotificationChannelDescriptor`s:
+
+.RS 2m
+$ gcloud alpha monitoring channel\-descriptors list
+.RE
+
+The following command prints all supported notification channel types:
+
+.RS 2m
+$ gcloud alpha monitoring channel\-descriptors list \e
+    \-\-format='value(type)'
+.RE
+
+
+\fR
 
 .SH "LIST COMMAND FLAGS"
 
@@ -66,8 +83,9 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -83,5 +101,9 @@ API can be found at: https://cloud.google.com/monitoring/api/
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta monitoring channel\-descriptors list
+.RE
 

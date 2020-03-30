@@ -1,5 +1,5 @@
 title: Data Catalog lookup entry scenario test.
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -23,13 +23,19 @@ summary:
         expireTime: '1970-01-01T00:00:00Z'
         updateTime: '2019-03-20T01:23:27.462Z'
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta1
+      ALPHA: v1beta1
 - execute_command:
     label: Lookup by SQL name
     command: data-catalog entries lookup pubsub.topic.project1.topic1
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/entries:lookup?alt=json&sqlResource=pubsub.topic.project1.topic1
+          uri: https://datacatalog.googleapis.com/$$api-version$$/entries:lookup?alt=json&sqlResource=pubsub.topic.project1.topic1
           method: GET
           headers: {}
           body: null
@@ -61,7 +67,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/entries:lookup?alt=json&linkedResource=%2F%2Fpubsub.googleapis.com%2Fprojects%2Ffake-project%2Ftopics%2Ftopic1
+          uri: https://datacatalog.googleapis.com/$$api-version$$/entries:lookup?alt=json&linkedResource=%2F%2Fpubsub.googleapis.com%2Fprojects%2Ffake-project%2Ftopics%2Ftopic1
           method: GET
           headers: {}
           body: null

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute os\-config patch\-jobs cancel \- cancel the given active OS patch job
+gcloud alpha compute os\-config patch\-jobs cancel \- cancel a specific OS patch job which must currently be active
 
 
 
@@ -41,14 +41,15 @@ ID of the patch_job or fully qualified identifier for the patch_job.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To cancel the patch job 'job1', run:
+To cancel the patch job \f5job1\fR, run:
 
 .RS 2m
 $ gcloud alpha compute os\-config patch\-jobs cancel job1
@@ -61,5 +62,10 @@ $ gcloud alpha compute os\-config patch\-jobs cancel job1
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud compute os\-config patch\-jobs cancel
+$ gcloud beta compute os\-config patch\-jobs cancel
+.RE
 

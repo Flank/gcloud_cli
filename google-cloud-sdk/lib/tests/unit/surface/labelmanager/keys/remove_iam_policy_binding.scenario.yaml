@@ -1,0 +1,185 @@
+title: LabelManager - LabelKeys - RemoveIamPolicyBinding scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: labelmanager keys remove-iam-policy-binding labelKeys/123 --member=user:test@gmail.com
+      --role=roles/labelmanager.labelUser
+  - stderr: |
+      Updated IAM policy for LabelKey [labelKeys/123].
+  - stdout: |
+      bindings:
+      - members:
+        - user:owner@gmail.com
+        role: roles/labelmanager.labelViewer
+      etag: BwWUlZ6XEfY=
+      version: 1
+- execute:
+  - command: labelmanager keys remove-iam-policy-binding env --label-parent='organizations/456'
+      --member=user:test@gmail.com --role=roles/labelmanager.labelUser
+  - stderr: |
+      Updated IAM policy for LabelKey [labelKeys/123].
+  - stdout: |
+      bindings:
+      - members:
+        - user:owner@gmail.com
+        role: roles/labelmanager.labelViewer
+      etag: BwWUlZ6XEfY=
+      version: 1
+actions:
+- execute_command:
+    command: labelmanager keys remove-iam-policy-binding labelKeys/123 --member=user:test@gmail.com
+      --role=roles/labelmanager.labelUser
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys/123:getIamPolicy?alt=json
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 3,
+              "etag": "BwWUlZ6XEfY=",
+              "bindings": [
+                {
+                  "role": "roles/labelmanager.labelViewer",
+                  "members": [
+                    "user:owner@gmail.com"
+                  ]
+                },
+                {
+                  "role": "roles/labelmanager.labelUser",
+                  "members": [
+                    "user:test@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys/123:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:owner@gmail.com
+                  role: roles/labelmanager.labelViewer
+                version: 3
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "BwWUlZ6XEfY=",
+              "bindings": [
+                {
+                  "role": "roles/labelmanager.labelViewer",
+                  "members": [
+                    "user:owner@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for LabelKey [labelKeys/123].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:owner@gmail.com
+          role: roles/labelmanager.labelViewer
+        etag: BwWUlZ6XEfY=
+        version: 1
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: labelmanager keys remove-iam-policy-binding env --label-parent='organizations/456'
+      --member=user:test@gmail.com --role=roles/labelmanager.labelUser
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F456
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body:
+            keys:
+            - displayName: env
+              name: labelKeys/123
+            - displayName: location
+              name: labelKeys/456
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys/123:getIamPolicy?alt=json
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 3,
+              "etag": "BwWUlZ6XEfY=",
+              "bindings": [
+                {
+                  "role": "roles/labelmanager.labelViewer",
+                  "members": [
+                    "user:owner@gmail.com"
+                  ]
+                },
+                {
+                  "role": "roles/labelmanager.labelUser",
+                  "members": [
+                    "user:test@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys/123:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:owner@gmail.com
+                  role: roles/labelmanager.labelViewer
+                version: 3
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "BwWUlZ6XEfY=",
+              "bindings": [
+                {
+                  "role": "roles/labelmanager.labelViewer",
+                  "members": [
+                    "user:owner@gmail.com"
+                  ]
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for LabelKey [labelKeys/123].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:owner@gmail.com
+          role: roles/labelmanager.labelViewer
+        etag: BwWUlZ6XEfY=
+        version: 1
+    - expect_exit:
+        code: 0

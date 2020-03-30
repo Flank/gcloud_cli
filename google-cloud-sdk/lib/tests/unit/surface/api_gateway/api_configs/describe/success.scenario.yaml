@@ -1,0 +1,39 @@
+title: Cloud API Gateway API Config Describe with Success
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway api-configs describe rev1 --api apiName
+  - stdout: |
+      displayName: Config Number 1
+      name: projects/fake-project/locations/global/apis/apiName/configs/rev1
+      serviceRollout:
+        rolloutId: someRolloutId
+actions:
+- execute_command:
+    command: |
+      api-gateway api-configs describe rev1 --api apiName
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/apiName/configs/rev1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/global/apis/apiName/configs/rev1
+            displayName: Config Number 1
+            serviceRollout:
+              rolloutId: someRolloutId
+
+    - expect_stdout: |
+        displayName: Config Number 1
+        name: projects/fake-project/locations/global/apis/apiName/configs/rev1
+        serviceRollout:
+          rolloutId: someRolloutId
+    - expect_exit:
+        code: 0

@@ -141,7 +141,8 @@ FLAGS
 
              --remove-user-labels=[KEY,...]
                 List of label keys to remove. If a label does not exist it is
-                silently ignored.
+                silently ignored. If --update-user-labels is also specified
+                then --remove-user-labels is applied first.
 
      At most one of these may be specified:
 
@@ -155,8 +156,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

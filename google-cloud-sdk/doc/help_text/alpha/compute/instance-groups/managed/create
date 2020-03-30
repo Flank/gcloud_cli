@@ -8,7 +8,8 @@ SYNOPSIS
         [--description=DESCRIPTION] [--initial-delay=INITIAL_DELAY]
         [--instance-redistribution-type=TYPE]
         [--stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME]]
-        [--target-pool=[TARGET_POOL,...]] [--zones=ZONE,[ZONE,...]]
+        [--target-distribution-shape=SHAPE] [--target-pool=[TARGET_POOL,...]]
+        [--zones=ZONE,[ZONE,...]]
         [--health-check=HEALTH_CHECK | --http-health-check=HTTP_HEALTH_CHECK
           | --https-health-check=HTTPS_HEALTH_CHECK]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -53,32 +54,30 @@ OPTIONAL FLAGS
         information on duration formats.
 
      --instance-redistribution-type=TYPE
-        Specify type of instance redistribution policy. Instance redistribution
-        type gives possibility to enable or disable automatic instance
-        redistribution between zones to its target distribution. Target
-        distribution is a state of regional managed instance group where all
-        instances are spread out equally between all target zones.
+        Specifies the type of the instance redistribution policy. An instance
+        redistribution type lets you enable or disable automatic instance
+        redistribution across zones to meet the target distribution. The target
+        distribution is a state of a regional managed instance group where all
+        instances are spread out evenly across all target zones.
 
-        Instance redistribution type may be specified for non-autoscaled
-        regional managed instance group only. By default it is set to
+        An instance redistribution type can be specified only for a
+        non-autoscaled regional managed instance group. By default it is set to
         PROACTIVE.
 
         The following types are available:
 
-        * NONE - managed instance group will not take any action to bring
-          instances to its target distribution.
+        * NONE - The managed instance group does not redistribute instances
+          across zones.
 
-        * PROACTIVE - managed instance group will actively converge all
-          instances between zones to its target distribution.
+        * PROACTIVE - The managed instance group proactively redistributes
+          instances to meet its target distribution.
 
     TYPE must be one of: NONE, PROACTIVE.
 
      --stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME]
-        Disks considered stateful by the instance group. Usually, the managed
-        instance group deletes disks when deleting instances; however, in the
-        case of stateful disks, these disks are detached from the deleted
-        instance and attached to new instances the managed instance group
-        creates.
+        Disks considered stateful by the instance group. Managed instance
+        groups preserve and reattach stateful disks on VM autohealing, update,
+        and recreate events.
 
         Use this argument multiple times to attach more disks.
 
@@ -87,11 +86,28 @@ OPTIONAL FLAGS
 
          auto-delete
             (Optional) Specifies the auto deletion policy of the stateful disk.
-            Supported values are 'never' (never delete this disk) and
-            'on-permanent-instance-deletion' (delete the stateful disk when the
+            Supported values are never (never delete this disk) and
+            on-permanent-instance-deletion (delete the stateful disk when the
             given instance is permanently deleted from the instance group; for
-            example when the group is resized down). If omitted, 'never' is
-            used as the default.
+            example when the group is resized down). If omitted, never is used
+            as the default.
+
+     --target-distribution-shape=SHAPE
+        Specify distribution policy target shape.
+
+        Target shape may be specified for regional managed instance group only.
+        By default it is set to EVEN.
+
+        The following target shapes are available:
+
+        * EVEN - managed instance group will create and delete instances in a
+          manner preserving or converging to even distribution.
+
+        * ANY - managed instance group will create instances based on present
+          capacity constraints and will not attempt to converge to even
+          distribution.
+
+    SHAPE must be one of: EVEN, ANY.
 
      --target-pool=[TARGET_POOL,...]
         Specifies any target pools you want the instances of this managed
@@ -155,8 +171,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

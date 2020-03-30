@@ -46,8 +46,23 @@ class LocalTrainTestBase(object):
         os.getcwd(),
         2,
         2,
+        0,
         27182,
         user_args=['--job-dir', 'gs://foo/bar'])
+
+  def testLocalTrainDistributedWithEvaluator(self, module_name):
+    self.Run('{} local train --module-name test_package.test_task '
+             '--package-path test_package/ --distributed '
+             '--evaluator-count 1'.format(module_name))
+
+    self.run_mock.assert_called_once_with(
+        'test_package.test_task',
+        os.getcwd(),
+        2,
+        2,
+        1,
+        27182,
+        user_args=[])
 
   def testLocalTrainExitNonZero(self, module_name):
     self.run_mock.return_value = 1
@@ -61,6 +76,7 @@ class LocalTrainTestBase(object):
         os.getcwd(),
         2,
         2,
+        0,
         27182,
         user_args=[])
 

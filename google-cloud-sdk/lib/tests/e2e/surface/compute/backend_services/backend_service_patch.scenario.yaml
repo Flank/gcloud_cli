@@ -7,7 +7,6 @@ summary:
 - execute:
   - command: compute health-checks create tcp $$tcp-hc$$ --format none
   - stderr: |
-      WARNING: The health-checks create tcp command will soon require either a --global or --region flag.
       Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$\].
 - execute:
   - command: compute backend-services create $$tcp-bs$$ --protocol TCP --health-checks
@@ -75,12 +74,6 @@ actions:
       BETA: --global-health-checks
 
 
-- define_reference:
-    reference: warning-msg
-    track_values:
-      GA: "WARNING: The health-checks create tcp command will soon require either a --global or --region flag.\n"
-      BETA: .?
-      ALPHA: .?
 - generate_resource_id:
     reference: tcp-hc
     prefix: compute-backend-tcp-hc
@@ -90,7 +83,7 @@ actions:
     events:
     - expect_stderr:
         matches: |
-          $$warning-msg$$Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$\].
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$\].
     - expect_exit:
         code: 0
 

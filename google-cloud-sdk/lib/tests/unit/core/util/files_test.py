@@ -241,9 +241,8 @@ class TemporaryDirectoryTest(test_case.Base):
         close_mock.side_effect = RuntimeError('Close Error')
         raise RuntimeError('Some Error')
     except RuntimeError:
-      self.assertRegexpMatches(
-          traceback.format_exc(),
-          '(?ms)RuntimeError: Some Error.+'
+      self.assertRegex(
+          traceback.format_exc(), '(?ms)RuntimeError: Some Error.+'
           'RuntimeError: Close Error')
     else:
       self.fail('RuntimeError not raised')
@@ -1162,7 +1161,8 @@ class WriteFileContentsTest(test_case.Base):
     path = os.path.join(self.dir.path, 'nonexistent-dir', self.RandomFileName())
     contents = 'abc123'
     with self.assertRaises(file_utils.Error):
-      file_utils.WriteFileContents(path, contents, overwrite=False)
+      file_utils.WriteFileContents(
+          path, contents, create_path=False, overwrite=False)
 
   def testOverwrite(self):
     path = self.Touch(self.dir.path, contents='abc123')
@@ -1187,6 +1187,20 @@ class WriteFileContentsTest(test_case.Base):
     with io.open(path, 'rb') as f:
       actual_contents = f.read()
     self.assertEqual(contents, actual_contents)
+
+  def testFileWriteCreatePath(self):
+    contents = 'abc123'
+    path = os.path.join(self.dir.path, self.RandomFileName(),
+                        self.RandomFileName())
+    file_utils.WriteFileContents(path, contents)
+    self.AssertFileEquals(contents, path)
+
+  def testFileWriteBinaryCreatePath(self):
+    contents = b'\xc3\x9c\xc3\xb1\xc3\xae\xc3\xa7\xc3\xb2\xc3\x90\xc3\xa9\n'
+    path = os.path.join(self.dir.path, self.RandomFileName(),
+                        self.RandomFileName())
+    file_utils.WriteBinaryFileContents(path, contents)
+    self.assertEqual(file_utils.ReadBinaryFileContents(path), contents)
 
 
 class WriteFileOrStdoutContentsTest(test_case.Base,

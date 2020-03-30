@@ -21,8 +21,9 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA,
+                    base.ReleaseTrack.GA)
 class Osconfig(base.Group):
-  """Manage OS Config tasks for Compute Engine VMs."""
+  """Manage OS Config tasks for Compute Engine VM instances."""
   category = base.TOOLS_CATEGORY
   base.EnableUserProjectQuota()

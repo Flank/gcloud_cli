@@ -4,7 +4,8 @@ NAME
 SYNOPSIS
     gcloud alpha org-policies describe CONSTRAINT
         (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
-          | --project=PROJECT_ID) [--effective] [GCLOUD_WIDE_FLAG ...]
+          | --project=PROJECT_ID) [--effective] [--show-label-name]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Describes an organization policy.
@@ -33,16 +34,20 @@ OPTIONAL FLAGS
      --effective
         Describe the effective policy.
 
+     --show-label-name
+        Return label based conditions with the display name instead of ID.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To describe the policy associated with the constraint gcp.resourceLocations
-    and the project foo-project, run:
+    To describe the policy associated with the constraint
+    'gcp.resourceLocations' and the Project 'foo-project', run:
 
         $ gcloud alpha org-policies describe gcp.resourceLocations \
             --project=foo-project

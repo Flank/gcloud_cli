@@ -18,6 +18,34 @@ from apitools.base.py import extra_types
 package = 'datafusion'
 
 
+class Accelerator(_messages.Message):
+  r"""Identifies Data Fusion accelerators for an instance.
+
+  Enums:
+    AcceleratorTypeValueValuesEnum: The type of an accelator for a CDF
+      instance.
+
+  Fields:
+    acceleratorType: The type of an accelator for a CDF instance.
+  """
+
+  class AcceleratorTypeValueValuesEnum(_messages.Enum):
+    r"""The type of an accelator for a CDF instance.
+
+    Values:
+      ACCELERATOR_TYPE_UNSPECIFIED: Default value, if unspecified.
+      CDC: Change Data Capture accelerator for CDF.
+      HEALTHCARE: Cloud Healthcare accelerator for CDF. This accelerator is to
+        enable Cloud Healthcare specific CDF plugins developed by Healthcare
+        team.
+    """
+    ACCELERATOR_TYPE_UNSPECIFIED = 0
+    CDC = 1
+    HEALTHCARE = 2
+
+  acceleratorType = _messages.EnumField('AcceleratorTypeValueValuesEnum', 1)
+
+
 class AuditConfig(_messages.Message):
   r"""Specifies the audit configuration for a service. The configuration
   determines which permission types are logged, and what identities, if any,
@@ -42,15 +70,13 @@ class AuditConfig(_messages.Message):
 
   Fields:
     auditLogConfigs: The configuration for logging of each type of permission.
-    exemptedMembers: A string attribute.
     service: Specifies a service that will be enabled for audit logging. For
       example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
       `allServices` is a special value that covers all services.
   """
 
   auditLogConfigs = _messages.MessageField('AuditLogConfig', 1, repeated=True)
-  exemptedMembers = _messages.StringField(2, repeated=True)
-  service = _messages.StringField(3)
+  service = _messages.StringField(2)
 
 
 class AuditLogConfig(_messages.Message):
@@ -67,7 +93,6 @@ class AuditLogConfig(_messages.Message):
   Fields:
     exemptedMembers: Specifies the identities that do not cause logging for
       this type of permission. Follows the same format of Binding.members.
-    ignoreChildExemptions: A boolean attribute.
     logType: The log type that this config enables.
   """
 
@@ -86,38 +111,7 @@ class AuditLogConfig(_messages.Message):
     DATA_READ = 3
 
   exemptedMembers = _messages.StringField(1, repeated=True)
-  ignoreChildExemptions = _messages.BooleanField(2)
-  logType = _messages.EnumField('LogTypeValueValuesEnum', 3)
-
-
-class AuthorizationLoggingOptions(_messages.Message):
-  r"""Authorization-related information used by Cloud Audit Logging.
-
-  Enums:
-    PermissionTypeValueValuesEnum: The type of the permission that was
-      checked.
-
-  Fields:
-    permissionType: The type of the permission that was checked.
-  """
-
-  class PermissionTypeValueValuesEnum(_messages.Enum):
-    r"""The type of the permission that was checked.
-
-    Values:
-      PERMISSION_TYPE_UNSPECIFIED: Default. Should not be used.
-      ADMIN_READ: A read of admin (meta) data.
-      ADMIN_WRITE: A write of admin (meta) data.
-      DATA_READ: A read of standard data.
-      DATA_WRITE: A write of standard data.
-    """
-    PERMISSION_TYPE_UNSPECIFIED = 0
-    ADMIN_READ = 1
-    ADMIN_WRITE = 2
-    DATA_READ = 3
-    DATA_WRITE = 4
-
-  permissionType = _messages.EnumField('PermissionTypeValueValuesEnum', 1)
+  logType = _messages.EnumField('LogTypeValueValuesEnum', 2)
 
 
 class Binding(_messages.Message):
@@ -141,7 +135,7 @@ class Binding(_messages.Message):
       that represents a Google group.    For example, `admins@example.com`.  *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
-      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
       recovered, this value reverts to `user:{emailid}` and the recovered user
       retains the role in the binding.  *
       `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
@@ -169,225 +163,6 @@ class Binding(_messages.Message):
 
 class CancelOperationRequest(_messages.Message):
   r"""The request message for Operations.CancelOperation."""
-
-
-class CloudAuditOptions(_messages.Message):
-  r"""Write a Cloud Audit log
-
-  Enums:
-    LogNameValueValuesEnum: The log_name to populate in the Cloud Audit
-      Record.
-
-  Fields:
-    authorizationLoggingOptions: Information used by the Cloud Audit Logging
-      pipeline.
-    logName: The log_name to populate in the Cloud Audit Record.
-  """
-
-  class LogNameValueValuesEnum(_messages.Enum):
-    r"""The log_name to populate in the Cloud Audit Record.
-
-    Values:
-      UNSPECIFIED_LOG_NAME: Default. Should not be used.
-      ADMIN_ACTIVITY: Corresponds to "cloudaudit.googleapis.com/activity"
-      DATA_ACCESS: Corresponds to "cloudaudit.googleapis.com/data_access"
-    """
-    UNSPECIFIED_LOG_NAME = 0
-    ADMIN_ACTIVITY = 1
-    DATA_ACCESS = 2
-
-  authorizationLoggingOptions = _messages.MessageField('AuthorizationLoggingOptions', 1)
-  logName = _messages.EnumField('LogNameValueValuesEnum', 2)
-
-
-class Condition(_messages.Message):
-  r"""A condition to be met.
-
-  Enums:
-    IamValueValuesEnum: Trusted attributes supplied by the IAM system.
-    OpValueValuesEnum: An operator to apply the subject with.
-    SysValueValuesEnum: Trusted attributes supplied by any service that owns
-      resources and uses the IAM system for access control.
-
-  Fields:
-    iam: Trusted attributes supplied by the IAM system.
-    op: An operator to apply the subject with.
-    svc: Trusted attributes discharged by the service.
-    sys: Trusted attributes supplied by any service that owns resources and
-      uses the IAM system for access control.
-    values: The objects of the condition.
-  """
-
-  class IamValueValuesEnum(_messages.Enum):
-    r"""Trusted attributes supplied by the IAM system.
-
-    Values:
-      NO_ATTR: Default non-attribute.
-      AUTHORITY: Either principal or (if present) authority selector.
-      ATTRIBUTION: The principal (even if an authority selector is present),
-        which must only be used for attribution, not authorization.
-      SECURITY_REALM: Any of the security realms in the IAMContext (go
-        /security-realms). When used with IN, the condition indicates "any of
-        the request's realms match one of the given values; with NOT_IN, "none
-        of the realms match any of the given values". Note that a value can
-        be:  - 'self' (i.e., allow connections from clients that are in the
-        same  security realm)  - a realm (e.g., 'campus-abc')  - a realm group
-        (e.g., 'realms-for-borg-cell-xx', see: go/realm-groups) A match is
-        determined by a realm group membership check performed by a
-        RealmAclRep object (go/realm-acl-howto). It is not permitted to grant
-        access based on the *absence* of a realm, so realm conditions can only
-        be used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
-      APPROVER: An approver (distinct from the requester) that has authorized
-        this request. When used with IN, the condition indicates that one of
-        the approvers associated with the request matches the specified
-        principal, or is a member of the specified group. Approvers can only
-        grant additional access, and are thus only used in a strictly positive
-        context (e.g. ALLOW/IN or DENY/NOT_IN).
-      JUSTIFICATION_TYPE: What types of justifications have been supplied with
-        this request. String values should match enum names from
-        security.credentials.JustificationType, e.g. "MANUAL_STRING". It is
-        not permitted to grant access based on the *absence* of a
-        justification, so justification conditions can only be used in a
-        "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).  Multiple
-        justifications, e.g., a Buganizer ID and a manually-entered reason,
-        are normal and supported.
-      CREDENTIALS_TYPE: What type of credentials have been supplied with this
-        request. String values should match enum names from
-        security_loas_l2.CredentialsType - currently, only
-        CREDS_TYPE_EMERGENCY is supported. It is not permitted to grant access
-        based on the *absence* of a credentials type, so the conditions can
-        only be used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
-    """
-    NO_ATTR = 0
-    AUTHORITY = 1
-    ATTRIBUTION = 2
-    SECURITY_REALM = 3
-    APPROVER = 4
-    JUSTIFICATION_TYPE = 5
-    CREDENTIALS_TYPE = 6
-
-  class OpValueValuesEnum(_messages.Enum):
-    r"""An operator to apply the subject with.
-
-    Values:
-      NO_OP: Default no-op.
-      EQUALS: DEPRECATED. Use IN instead.
-      NOT_EQUALS: DEPRECATED. Use NOT_IN instead.
-      IN: The condition is true if the subject (or any element of it if it is
-        a set) matches any of the supplied values.
-      NOT_IN: The condition is true if the subject (or every element of it if
-        it is a set) matches none of the supplied values.
-      DISCHARGED: Subject is discharged
-    """
-    NO_OP = 0
-    EQUALS = 1
-    NOT_EQUALS = 2
-    IN = 3
-    NOT_IN = 4
-    DISCHARGED = 5
-
-  class SysValueValuesEnum(_messages.Enum):
-    r"""Trusted attributes supplied by any service that owns resources and
-    uses the IAM system for access control.
-
-    Values:
-      NO_ATTR: Default non-attribute type
-      REGION: Region of the resource
-      SERVICE: Service name
-      NAME: Resource name
-      IP: IP address of the caller
-    """
-    NO_ATTR = 0
-    REGION = 1
-    SERVICE = 2
-    NAME = 3
-    IP = 4
-
-  iam = _messages.EnumField('IamValueValuesEnum', 1)
-  op = _messages.EnumField('OpValueValuesEnum', 2)
-  svc = _messages.StringField(3)
-  sys = _messages.EnumField('SysValueValuesEnum', 4)
-  values = _messages.StringField(5, repeated=True)
-
-
-class CounterOptions(_messages.Message):
-  r"""Increment a streamz counter with the specified metric and field names.
-  Metric names should start with a '/', generally be lowercase-only, and end
-  in "_count". Field names should not contain an initial slash. The actual
-  exported metric names will have "/iam/policy" prepended.  Field names
-  correspond to IAM request parameters and field values are their respective
-  values.  Supported field names:    - "authority", which is "[token]" if
-  IAMContext.token is present,      otherwise the value of
-  IAMContext.authority_selector if present, and      otherwise a
-  representation of IAMContext.principal; or    - "iam_principal", a
-  representation of IAMContext.principal even if a      token or authority
-  selector is present; or    - "" (empty string), resulting in a counter with
-  no fields.  Examples:   counter { metric: "/debug_access_count"  field:
-  "iam_principal" }   ==> increment counter /iam/policy/debug_access_count
-  {iam_principal=[value of IAMContext.principal]}
-
-  Fields:
-    customFields: Custom fields.
-    field: The field value to attribute.
-    metric: The metric to update.
-  """
-
-  customFields = _messages.MessageField('CustomField', 1, repeated=True)
-  field = _messages.StringField(2)
-  metric = _messages.StringField(3)
-
-
-class CustomField(_messages.Message):
-  r"""Custom fields. These can be used to create a counter with arbitrary
-  field/value pairs. See: go/rpcsp-custom-fields.
-
-  Fields:
-    name: Name is the field name.
-    value: Value is the field value. It is important that in contrast to the
-      CounterOptions.field, the value here is a constant that is not derived
-      from the IAMContext.
-  """
-
-  name = _messages.StringField(1)
-  value = _messages.StringField(2)
-
-
-class DataAccessOptions(_messages.Message):
-  r"""Write a Data Access (Gin) log
-
-  Enums:
-    LogModeValueValuesEnum: Whether Gin logging should happen in a fail-closed
-      manner at the caller. This is relevant only in the LocalIAM
-      implementation, for now.
-
-  Fields:
-    logMode: Whether Gin logging should happen in a fail-closed manner at the
-      caller. This is relevant only in the LocalIAM implementation, for now.
-  """
-
-  class LogModeValueValuesEnum(_messages.Enum):
-    r"""Whether Gin logging should happen in a fail-closed manner at the
-    caller. This is relevant only in the LocalIAM implementation, for now.
-
-    Values:
-      LOG_MODE_UNSPECIFIED: Client is not required to write a partial Gin log
-        immediately after the authorization check. If client chooses to write
-        one and it fails, client may either fail open (allow the operation to
-        continue) or fail closed (handle as a DENY outcome).
-      LOG_FAIL_CLOSED: The application's operation in the context of which
-        this authorization check is being made may only be performed if it is
-        successfully logged to Gin. For instance, the authorization library
-        may satisfy this obligation by emitting a partial log entry at
-        authorization check time and only returning ALLOW to the application
-        if it succeeds.  If a matching Rule has this directive, but the client
-        has not indicated that it will honor such requirements, then the IAM
-        check will result in authorization failure by setting
-        CheckPolicyResponse.success=false.
-    """
-    LOG_MODE_UNSPECIFIED = 0
-    LOG_FAIL_CLOSED = 1
-
-  logMode = _messages.EnumField('LogModeValueValuesEnum', 1)
 
 
 class DatafusionProjectsLocationsGetRequest(_messages.Message):
@@ -637,21 +412,33 @@ class Empty(_messages.Message):
 
 
 class Expr(_messages.Message):
-  r"""Represents an expression text. Example:      title: "User account
-  presence"     description: "Determines whether the request has a user
-  account"     expression: "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit"     description: "Determines if a summary is
+  less than 100 chars"     expression: "document.summary.size() < 100"
+  Example (Equality):      title: "Requestor is owner"     description:
+  "Determines if requestor is the document owner"     expression:
+  "document.owner == request.auth.claims.email"  Example (Logic):      title:
+  "Public documents"     description: "Determine whether the document should
+  be publicly visible"     expression: "document.type != 'private' &&
+  document.type != 'internal'"  Example (Data Manipulation):      title:
+  "Notification string"     description: "Create a notification string with a
+  timestamp."     expression: "'New message received at ' +
+  string(document.create_time)"  The exact variables and functions that may be
+  referenced within an expression are determined by the service that evaluates
+  it. See the service documentation for additional information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
@@ -661,7 +448,7 @@ class Expr(_messages.Message):
 
 
 class Instance(_messages.Message):
-  r"""Represents a Data Fusion instance.
+  r"""Represents a Data Fusion instance. Next available ID: 23
 
   Enums:
     StateValueValuesEnum: Output only. The current state of this Data Fusion
@@ -670,23 +457,26 @@ class Instance(_messages.Message):
 
   Messages:
     LabelsValue: The resource labels for instance to use to annotate any
-      related underlying resources such as GCE VMs. The character '=' is not
-      allowed to be used within the labels.
+      related underlying resources such as Compute Engine VMs. The character
+      '=' is not allowed to be used within the labels.
     OptionsValue: Map of additional options used to configure the behavior of
       Data Fusion instance.
 
   Fields:
+    accelerators: List of accelerators enabled for this CDF instance.
     apiEndpoint: Output only. Endpoint on which the REST APIs is accessible.
     availableVersion: Available versions that the instance can be upgraded to
       using UpdateInstanceRequest.
     createTime: Output only. The time the instance was created.
-    description: An optional description of this instance.
+    description: Optional. An optional description of this instance.
     displayName: Display name for an instance.
     enableStackdriverLogging: Option to enable Stackdriver Logging.
     enableStackdriverMonitoring: Option to enable Stackdriver Monitoring.
+    gcsBucket: Output only. Cloud Storage bucket generated by Data Fusion in
+      the customer project.
     labels: The resource labels for instance to use to annotate any related
-      underlying resources such as GCE VMs. The character '=' is not allowed
-      to be used within the labels.
+      underlying resources such as Compute Engine VMs. The character '=' is
+      not allowed to be used within the labels.
     name: Output only. The name of this instance is in the form of
       projects/{project}/locations/{location}/instances/{instance}.
     networkConfig: Network configuration options. These are required when a
@@ -705,7 +495,7 @@ class Instance(_messages.Message):
       of this Data Fusion instance if available.
     type: Required. Instance type.
     updateTime: Output only. The time the instance was last updated.
-    version: Current version of the Data Fusion. Only specifiable in Update.
+    version: Current version of Data Fusion.
     zone: Name of the zone in which the Data Fusion instance will be created.
   """
 
@@ -745,18 +535,23 @@ class Instance(_messages.Message):
         certain limitations, such as fewer number of concurrent pipelines, no
         support for streaming pipelines, etc.
       ENTERPRISE: Enterprise Data Fusion instance. In Enterprise type, the
-        user will have more features available, such as support for streaming
+        user will have all features available, such as support for streaming
         pipelines, higher number of concurrent pipelines, etc.
+      DEVELOPER: Developer Data Fusion instance. In Developer type, the user
+        will have all features available but with restrictive capabilities.
+        This is to help enterprises design and develop their data ingestion
+        and integration pipelines at low cost.
     """
     TYPE_UNSPECIFIED = 0
     BASIC = 1
     ENTERPRISE = 2
+    DEVELOPER = 3
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
     r"""The resource labels for instance to use to annotate any related
-    underlying resources such as GCE VMs. The character '=' is not allowed to
-    be used within the labels.
+    underlying resources such as Compute Engine VMs. The character '=' is not
+    allowed to be used within the labels.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -803,26 +598,28 @@ class Instance(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  apiEndpoint = _messages.StringField(1)
-  availableVersion = _messages.MessageField('Version', 2, repeated=True)
-  createTime = _messages.StringField(3)
-  description = _messages.StringField(4)
-  displayName = _messages.StringField(5)
-  enableStackdriverLogging = _messages.BooleanField(6)
-  enableStackdriverMonitoring = _messages.BooleanField(7)
-  labels = _messages.MessageField('LabelsValue', 8)
-  name = _messages.StringField(9)
-  networkConfig = _messages.MessageField('NetworkConfig', 10)
-  options = _messages.MessageField('OptionsValue', 11)
-  privateInstance = _messages.BooleanField(12)
-  serviceAccount = _messages.StringField(13)
-  serviceEndpoint = _messages.StringField(14)
-  state = _messages.EnumField('StateValueValuesEnum', 15)
-  stateMessage = _messages.StringField(16)
-  type = _messages.EnumField('TypeValueValuesEnum', 17)
-  updateTime = _messages.StringField(18)
-  version = _messages.StringField(19)
-  zone = _messages.StringField(20)
+  accelerators = _messages.MessageField('Accelerator', 1, repeated=True)
+  apiEndpoint = _messages.StringField(2)
+  availableVersion = _messages.MessageField('Version', 3, repeated=True)
+  createTime = _messages.StringField(4)
+  description = _messages.StringField(5)
+  displayName = _messages.StringField(6)
+  enableStackdriverLogging = _messages.BooleanField(7)
+  enableStackdriverMonitoring = _messages.BooleanField(8)
+  gcsBucket = _messages.StringField(9)
+  labels = _messages.MessageField('LabelsValue', 10)
+  name = _messages.StringField(11)
+  networkConfig = _messages.MessageField('NetworkConfig', 12)
+  options = _messages.MessageField('OptionsValue', 13)
+  privateInstance = _messages.BooleanField(14)
+  serviceAccount = _messages.StringField(15)
+  serviceEndpoint = _messages.StringField(16)
+  state = _messages.EnumField('StateValueValuesEnum', 17)
+  stateMessage = _messages.StringField(18)
+  type = _messages.EnumField('TypeValueValuesEnum', 19)
+  updateTime = _messages.StringField(20)
+  version = _messages.StringField(21)
+  zone = _messages.StringField(22)
 
 
 class ListInstancesResponse(_messages.Message):
@@ -944,20 +741,6 @@ class Location(_messages.Message):
   locationId = _messages.StringField(3)
   metadata = _messages.MessageField('MetadataValue', 4)
   name = _messages.StringField(5)
-
-
-class LogConfig(_messages.Message):
-  r"""Specifies what kind of log the caller must write
-
-  Fields:
-    cloudAudit: Cloud audit options.
-    counter: Counter options.
-    dataAccess: Data access options.
-  """
-
-  cloudAudit = _messages.MessageField('CloudAuditOptions', 1)
-  counter = _messages.MessageField('CounterOptions', 2)
-  dataAccess = _messages.MessageField('DataAccessOptions', 3)
 
 
 class NetworkConfig(_messages.Message):
@@ -1117,15 +900,16 @@ class OperationMetadata(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.   A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**      {       "bindings": [         {
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.   A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**      {       "bindings": [         {
   "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-project-
@@ -1134,23 +918,24 @@ class Policy(_messages.Message):
   ["user:eve@example.com"],           "condition": {             "title":
   "expirable access",             "description": "Does not grant access after
   Sep 2020",             "expression": "request.time <
-  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
-  **YAML Example**      bindings:     - members:       - user:mike@example.com
-  - group:admins@example.com       - domain:google.com       - serviceAccount
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
+  "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
+  bindings:     - members:       - user:mike@example.com       -
+  group:admins@example.com       - domain:google.com       - serviceAccount
   :my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
   grant access after Sep 2020         expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  timestamp('2020-10-01T00:00:00.000Z')     - etag: BwWWja0YfJA=     -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
     auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1158,93 +943,34 @@ class Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
-    iamOwned: A boolean attribute.
-    rules: If more than one rule is specified, the rules are applied in the
-      following manner: - All matching LOG rules are always applied. - If any
-      DENY/DENY_WITH_LOG rule matches, permission is denied.   Logging will be
-      applied if one or more matching rule requires logging. - Otherwise, if
-      any ALLOW/ALLOW_WITH_LOG rule matches, permission is   granted.
-      Logging will be applied if one or more matching rule requires logging. -
-      Otherwise, if no rule applies, permission is denied.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy   that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
   auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
   bindings = _messages.MessageField('Binding', 2, repeated=True)
   etag = _messages.BytesField(3)
-  iamOwned = _messages.BooleanField(4)
-  rules = _messages.MessageField('Rule', 5, repeated=True)
-  version = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
 
 
 class RestartInstanceRequest(_messages.Message):
   r"""Request message for restarting a Data Fusion instance."""
-
-
-class Rule(_messages.Message):
-  r"""A rule to be applied in a Policy.
-
-  Enums:
-    ActionValueValuesEnum: Required
-
-  Fields:
-    action: Required
-    conditions: Additional restrictions that must be met. All conditions must
-      pass for the rule to match.
-    description: Human-readable description of the rule.
-    in_: If one or more 'in' clauses are specified, the rule matches if the
-      PRINCIPAL/AUTHORITY_SELECTOR is in at least one of these entries.
-    logConfig: The config returned to callers of tech.iam.IAM.CheckPolicy for
-      any entries that match the LOG action.
-    notIn: If one or more 'not_in' clauses are specified, the rule matches if
-      the PRINCIPAL/AUTHORITY_SELECTOR is in none of the entries. The format
-      for in and not_in entries can be found at in the Local IAM documentation
-      (see go/local-iam#features).
-    permissions: A permission is a string of form '<service>.<resource
-      type>.<verb>' (e.g., 'storage.buckets.list'). A value of '*' matches all
-      permissions, and a verb part of '*' (e.g., 'storage.buckets.*') matches
-      all verbs.
-  """
-
-  class ActionValueValuesEnum(_messages.Enum):
-    r"""Required
-
-    Values:
-      NO_ACTION: Default no action.
-      ALLOW: Matching 'Entries' grant access.
-      ALLOW_WITH_LOG: Matching 'Entries' grant access and the caller promises
-        to log the request per the returned log_configs.
-      DENY: Matching 'Entries' deny access.
-      DENY_WITH_LOG: Matching 'Entries' deny access and the caller promises to
-        log the request per the returned log_configs.
-      LOG: Matching 'Entries' tell IAM.Check callers to generate logs.
-    """
-    NO_ACTION = 0
-    ALLOW = 1
-    ALLOW_WITH_LOG = 2
-    DENY = 3
-    DENY_WITH_LOG = 4
-    LOG = 5
-
-  action = _messages.EnumField('ActionValueValuesEnum', 1)
-  conditions = _messages.MessageField('Condition', 2, repeated=True)
-  description = _messages.StringField(3)
-  in_ = _messages.StringField(4, repeated=True)
-  logConfig = _messages.MessageField('LogConfig', 5, repeated=True)
-  notIn = _messages.StringField(6, repeated=True)
-  permissions = _messages.StringField(7, repeated=True)
 
 
 class SetIamPolicyRequest(_messages.Message):
@@ -1421,8 +1147,6 @@ class Version(_messages.Message):
   versionNumber = _messages.StringField(1)
 
 
-encoding.AddCustomJsonFieldMapping(
-    Rule, 'in_', 'in')
 encoding.AddCustomJsonFieldMapping(
     StandardQueryParameters, 'f__xgafv', '$.xgafv')
 encoding.AddCustomJsonEnumMapping(

@@ -24,6 +24,8 @@ from apitools.base.py import extra_types
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.api_lib.dataproc import storage_helpers
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import unit_base
@@ -49,18 +51,21 @@ class ClustersDiagnoseUnitTest(unit_base.DataprocUnitTestBase):
     self.mock_stream_open = mock.PropertyMock(return_value=True)
     type(self.mock_stream).open = self.mock_stream_open
 
-  def ExpectDiagnoseCluster(self, response=None, exception=None):
+  def ExpectDiagnoseCluster(self, response=None, exception=None, region=None):
     if not (response or exception):
       response = self.MakeOperation()
+    if region is None:
+      region = self.REGION
+
     self.mock_client.projects_regions_clusters.Diagnose.Expect(
         self.messages.DataprocProjectsRegionsClustersDiagnoseRequest(
             clusterName=self.CLUSTER_NAME,
-            region=self.REGION,
+            region=region,
             projectId=self.Project()),
         response=response,
         exception=exception)
 
-  def ExpectDiagnoseCalls(self, response=None):
+  def ExpectDiagnoseCalls(self, response=None, region=None):
     response = self.messages.Operation.ResponseValue()
     response.additionalProperties = [
         self.messages.Operation.ResponseValue.AdditionalProperty(
@@ -69,7 +74,7 @@ class ClustersDiagnoseUnitTest(unit_base.DataprocUnitTestBase):
             key='outputUri',
             value=extra_types.JsonValue(string_value='gs://example/output')),
     ]
-    self.ExpectDiagnoseCluster()
+    self.ExpectDiagnoseCluster(region=region)
     self.ExpectGetOperation()
     self.ExpectGetOperation(
         operation=self.MakeCompletedOperation(response=response))
@@ -123,6 +128,30 @@ class ClustersDiagnoseUnitTest(unit_base.DataprocUnitTestBase):
       self.RunDataproc((
           'clusters diagnose {0}'
       ).format(self.CLUSTER_NAME))
+
+  def testDiagnoseClusterWithRegionProperty(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self.ExpectDiagnoseCalls(region='us-central1')
+    self.mock_stream_open.side_effect = [True, True, False]
+    result = self.RunDataproc('clusters diagnose ' + self.CLUSTER_NAME)
+    self.assertEqual('gs://example/output', result)
+    self.AssertErrNotContains('output did not finish streaming')
+
+  def testDiagnoseClusterWithRegionFlag(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self.ExpectDiagnoseCalls(region='us-east1')
+    self.mock_stream_open.side_effect = [True, True, False]
+    result = self.RunDataproc('clusters diagnose {} --region us-east1'.format(
+        self.CLUSTER_NAME))
+    self.assertEqual('gs://example/output', result)
+    self.AssertErrNotContains('output did not finish streaming')
+
+  def testDiagnoseClusterWithoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc(
+          'clusters diagnose ' + self.CLUSTER_NAME, set_region=False)
 
 
 class ClustersDiagnoseUnitTestBeta(ClustersDiagnoseUnitTest,

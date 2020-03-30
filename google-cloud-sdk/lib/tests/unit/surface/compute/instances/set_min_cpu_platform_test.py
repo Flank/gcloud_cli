@@ -96,8 +96,8 @@ class SetMinCpuPlatformTest(sdk_test_base.WithFakeAuth,
     with self.Client() as client:
       self.ExpectSetMinCpuPlatform(client)
 
-      client.zoneOperations.Get.Expect(
-          self.messages.ComputeZoneOperationsGetRequest(
+      client.zoneOperations.Wait.Expect(
+          self.messages.ComputeZoneOperationsWaitRequest(
               operation='operation-X',
               zone='central2-a',
               project=self.Project()),

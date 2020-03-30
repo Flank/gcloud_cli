@@ -19,7 +19,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk import calliope
-
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import unit_base
@@ -29,16 +30,36 @@ class WorkflowTemplateDescribeUnitTest(unit_base.DataprocUnitTestBase,
                                        compute_base.BaseComputeUnitTest):
   """Tests for workflow template describe."""
 
-  def testDescribeWorkflowTemplates(self):
+  def _testDescribeWorkflowTemplates(self, region=None, region_flag=''):
     """Tests the describe command."""
-    workflow_template = self.MakeWorkflowTemplate()
+    if region is None:
+      region = self.REGION
+    workflow_template = self.MakeWorkflowTemplate(region=region)
     self.ExpectGetWorkflowTemplate(
         name=workflow_template.name,
         version=workflow_template.version,
         response=workflow_template)
-    result = self.RunDataproc(
-        'workflow-templates describe {0}'.format(self.WORKFLOW_TEMPLATE))
+    result = self.RunDataproc('workflow-templates describe {0} {1}'.format(
+        self.WORKFLOW_TEMPLATE, region_flag))
     self.AssertMessagesEqual(workflow_template, result)
+
+  def testDescribeWorkflowTemplates(self):
+    self._testDescribeWorkflowTemplates()
+
+  def testDescribeWorkflowTemplates_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testDescribeWorkflowTemplates(region='global')
+
+  def testDescribeWorkflowTemplates_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testDescribeWorkflowTemplates(
+        region='us-central1', region_flag='--region=us-central1')
+
+  def testDescribeWorkflowTemplates_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('workflow-templates describe foo', set_region=False)
 
   def testCreateWorkflowTemplatesWithVersion(self):
     workflow_template = self.MakeWorkflowTemplate(version=2)

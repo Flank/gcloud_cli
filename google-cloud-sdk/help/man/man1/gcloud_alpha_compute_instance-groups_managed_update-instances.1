@@ -28,8 +28,8 @@ can be sure that all the changes were applied.
 to specify the least and the most disruptive actions that can be performed while
 updating the instances. This way you can reduce the risk of rolling out too many
 changes at once. Possible actions are: \f5none\fR, \f5refresh\fR, \f5restart\fR
-and \f5replace\fR. The order of disruption to the instance is: \f5none\fR <
-\f5refresh\fR < \f5restart\fR < \f5replace\fR.
+and \f5replace\fR. The level of disruption to the instance is ordered as:
+\f5none\fR < \f5refresh\fR < \f5restart\fR < \f5replace\fR.
 
 
 
@@ -147,16 +147,17 @@ invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
 To update instances \f5instance\-1\fR, \f5instance\-2\fR in \f5my\-group\fR,
-with \f5minimal\-action\fR none and \f5most\-disruptive\-allowed\-action\fR
-equal to \f5restart\fR, run:
+with \f5minimal\-action=none\fR and
+\f5most\-disruptive\-allowed\-action=restart\fR, run:
 
 .RS 2m
 $ gcloud alpha compute instance\-groups managed update\-instances \e
@@ -172,9 +173,10 @@ $ gcloud alpha compute instance\-groups managed update\-instances \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud compute instance\-groups managed update\-instances
 $ gcloud beta compute instance\-groups managed update\-instances
 .RE
 

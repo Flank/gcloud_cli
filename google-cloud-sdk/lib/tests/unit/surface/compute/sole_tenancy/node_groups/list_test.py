@@ -36,10 +36,9 @@ class NodeGroupsListTest(test_base.BaseTest):
     self.list_json.side_effect = iter([test_resources.NODE_GROUPS])
     self.Run('compute sole-tenancy node-groups list')
     self.list_json.assert_called_once_with(
-        requests=[(self.compute.nodeGroups,
-                   'AggregatedList',
+        requests=[(self.compute.nodeGroups, 'AggregatedList',
                    self.messages.ComputeNodeGroupsAggregatedListRequest(
-                       project='my-project'))],
+                       project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])

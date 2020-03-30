@@ -1,0 +1,156 @@
+title: End to end tests for Service Directory services resolve command.
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      service-directory namespaces create $$my-namespace$$ --location us-east1
+  - stderr: |
+      Created namespace [$$my-namespace$$].
+- execute:
+  - command: |
+      service-directory services create $$my-service$$ --location us-east1 --namespace $$my-namespace$$ --metadata a=b
+  - stderr: |
+      Created service [$$my-service$$].
+- execute:
+  - command: |
+      service-directory endpoints create $$my-endpoint1$$ --location us-east1 --namespace $$my-namespace$$ --service $$my-service$$
+  - stderr: |
+      Created endpoint [$$my-endpoint1$$].
+- execute:
+  - command: |
+      service-directory services resolve $$my-service$$ --location us-east1 --namespace $$my-namespace$$
+  - stdout: |
+      service:
+        endpoints:
+        - name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$/endpoints/$$my-endpoint1$$
+        metadata:
+          a: b
+        name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$
+- execute:
+  - command: |
+      service-directory endpoints delete $$my-endpoint1$$ --location us-east1 --namespace $$my-namespace$$ --service $$my-service$$
+  - stderr: |
+      Deleted endpoint [$$my-endpoint1$$].
+- execute:
+  - command: |
+      service-directory services delete $$my-service$$ --location us-east1 --namespace $$my-namespace$$
+  - stderr: |
+      Deleted service [$$my-service$$].
+- execute:
+  - command: |
+      service-directory namespaces delete $$my-namespace$$ --location us-east1
+  - stderr: |
+      Deleted namespace [$$my-namespace$$].
+actions:
+- define_reference:
+    reference: api-version
+    value: v1beta1
+
+- generate_resource_id:
+    reference: my-namespace
+    prefix: servicedirectory-namespace
+
+- generate_resource_id:
+    reference: my-service
+    prefix: servicedirectory-service
+
+- generate_resource_id:
+    reference: my-endpoint1
+    prefix: servicedirectory-endpoint
+
+- execute_command:
+    command: |
+      service-directory namespaces create $$my-namespace$$ --location us-east1
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created namespace [$$my-namespace$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      service-directory services create $$my-service$$ --location us-east1 --namespace $$my-namespace$$ --metadata a=b
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created service [$$my-service$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      service-directory endpoints create $$my-endpoint1$$ --location us-east1 --namespace $$my-namespace$$ --service $$my-service$$
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created endpoint [$$my-endpoint1$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      service-directory services resolve $$my-service$$ --location us-east1 --namespace $$my-namespace$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$:resolve?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '538'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            service:
+              name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$
+              metadata:
+                a: b
+              endpoints:
+              - name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$/endpoints/$$my-endpoint1$$
+    - expect_stdout: |
+        service:
+          endpoints:
+          - name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$/endpoints/$$my-endpoint1$$
+          metadata:
+            a: b
+          name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      service-directory endpoints delete $$my-endpoint1$$ --location us-east1 --namespace $$my-namespace$$ --service $$my-service$$
+    cleanup_for: my-endpoint1
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted endpoint [$$my-endpoint1$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      service-directory services delete $$my-service$$ --location us-east1 --namespace $$my-namespace$$
+    cleanup_for: my-service
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted service [$$my-service$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      service-directory namespaces delete $$my-namespace$$ --location us-east1
+    cleanup_for: my-namespace
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted namespace [$$my-namespace$$].
+    - expect_exit:
+        code: 0

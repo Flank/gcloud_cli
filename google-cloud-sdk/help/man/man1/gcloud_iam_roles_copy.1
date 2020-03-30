@@ -58,25 +58,28 @@ The project of the source role if it is an custom role.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To create a copy of an existing role into an organization with ORGANIZATION_ID.
+To create a copy of an existing role \f5\fIspanner.databaseAdmin\fR\fR into an
+organization with \f5\fI1234567\fR\fR, run:
 
 .RS 2m
-$gcloud iam roles copy \-\-source "roles/viewer" \-\-destination CustomViewer
- \-\-dest\-organization ORGANIZATION_ID
+$ gcloud iam roles copy \-\-source="roles/spanner.databaseAdmin" \e
+    \-\-destination=CustomViewer \-\-dest\-organization=1234567
 .RE
 
-To create a copy of an existing role into a project with PROJECT_ID.
+To create a copy of an existing role \f5\fIspanner.databaseAdmin\fR\fR into a
+project with \f5\fIPROJECT_ID\fR\fR, run:
 
 .RS 2m
-$gcloud iam roles copy \-\-source "roles/spanner.databaseAdmin"
- \-\-destination CustomSpannerDbAdmin \-\-dest\-project PROJECT_ID
+$ gcloud iam roles copy \-\-source="roles/spanner.databaseAdmin" \e
+    \-\-destination=CustomSpannerDbAdmin \-\-dest\-project=PROJECT_ID
 .RE
 
 To modify the newly created role see the roles update command.

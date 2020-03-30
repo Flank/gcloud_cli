@@ -18,21 +18,23 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import collections
-
+import re
 from apitools.base.protorpclite import messages as proto_messages
 from apitools.base.py import encoding as apitools_encoding
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import yaml
+from googlecloudsdk.core.resource import resource_property
 from googlecloudsdk.core.util import files
 
 import six
 
 _API_NAME = 'cloudbuild'
 _API_VERSION = 'v1'
-_ALPHA_API_VERSION = 'v1alpha1'
+_ALPHA_API_VERSION = 'v1alpha2'
+
+WORKERPOOL_NAME_MATCHER = r'projects/.*/workerPools/.*'
+WORKERPOOL_NAME_SELECTOR = r'projects/.*/workerPools/(.*)'
 
 
 def GetMessagesModule():
@@ -166,6 +168,37 @@ def SnakeToCamel(msg, skip=None):
     return [SnakeToCamel(elem, skip) for elem in msg]
   else:
     return msg
+
+
+def MessageToFieldPaths(msg):
+  """Produce field paths from a message object.
+
+  The result is used to create a FieldMask proto message that contains all field
+  paths presented in the object.
+  https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/field_mask.proto
+
+  Args:
+    msg: An user defined message object that extends the messages.Message class.
+    https://github.com/google/apitools/blob/master/apitools/base/protorpclite/messages.py
+
+  Returns:
+    The list of field paths.
+  """
+  fields = []
+  for field in msg.all_fields():
+    v = msg.get_assigned_value(field.name)
+    if field.repeated and not v:
+      # Repeated field is initialized as an empty list.
+      continue
+    if v is not None:
+      name = resource_property.ConvertToSnakeCase(field.name)
+      if hasattr(v, 'all_fields'):
+        # message has sub-messages, constructing subpaths.
+        for f in MessageToFieldPaths(v):
+          fields.append('{}.{}'.format(name, f))
+      else:
+        fields.append(name)
+  return fields
 
 
 def _UnpackCheckUnused(obj, msg_type):
@@ -385,13 +418,22 @@ def LoadMessagesFromPath(path,
                                   skip_camel_case, path)
 
 
-def GenerateRegionChoiceToEnum():
-  # Return a map of region choice strings (for arguments) to region enum values.
-  msg = GetMessagesModuleAlpha()
-  enums = msg.WorkerPool.RegionsValueListEntryValuesEnum
-  d = {
-      arg_utils.EnumNameToChoice(region_val.name): region_val
-      for region_val in enums
-      if region_val != enums.REGION_UNSPECIFIED
-  }
-  return collections.OrderedDict(sorted(d.items(), key=lambda t: t[0]))
+def WorkerPoolShortName(resource_name):
+  """Turn a worker pool's full resource name into its short name (the ID).
+
+  For example, this turns "projects/abc/workerPools/def" into "def".
+
+  Args:
+    resource_name: A Worker pool's full resource name.
+
+  Raises:
+    ValueError: If the full resource name was not well-formatted.
+
+  Returns:
+    The worker pool's short name.
+  """
+  match = re.search(WORKERPOOL_NAME_SELECTOR, resource_name)
+  if match:
+    return match.group(1)
+  raise ValueError('The worker pool resource name must match "%s"' %
+                   (WORKERPOOL_NAME_MATCHER,))

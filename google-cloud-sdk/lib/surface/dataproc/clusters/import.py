@@ -28,7 +28,8 @@ from googlecloudsdk.core import yaml_validator
 from googlecloudsdk.core.console import console_io
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Import(base.UpdateCommand):
   """Import a cluster.
 
@@ -36,12 +37,24 @@ class Import(base.UpdateCommand):
   this name already exists, an error will be thrown.
   """
 
+  detailed_help = {
+      'EXAMPLES': """
+To import a cluster from a YAML file, run:
+
+  $ {command} my_cluster --region=us-central1 --source=cluster.yaml
+
+To import a cluster from standard output, run:
+
+  $ {command} my_cluster --region=us-central1
+"""
+  }
+
   @classmethod
   def GetApiVersion(cls):
     """Returns the API version based on the release track."""
-    if cls.ReleaseTrack() == base.ReleaseTrack.BETA:
-      return 'v1beta2'
-    return 'v1'
+    if cls.ReleaseTrack() == base.ReleaseTrack.GA:
+      return 'v1'
+    return 'v1beta2'
 
   @classmethod
   def GetSchemaPath(cls, for_help=False):

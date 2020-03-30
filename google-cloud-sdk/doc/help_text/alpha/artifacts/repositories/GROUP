@@ -1,0 +1,83 @@
+NAME
+    gcloud alpha artifacts repositories - manage Artifact Registry repositories
+
+SYNOPSIS
+    gcloud alpha artifacts repositories COMMAND [GCLOUD_WIDE_FLAG ...]
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add an IAM policy binding to the IAM policy of an Artifact
+        Registry repository.
+
+     create
+        (ALPHA) Create an Artifact Registry repository.
+
+     delete
+        (ALPHA) Delete an Artifact Registry repository.
+
+     get-iam-policy
+        (ALPHA) Get IAM policy for an Artifact Registry repository.
+
+     list
+        (ALPHA) List repositories in the specified project.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove an IAM policy binding from the IAM policy of an Artifact
+        Registry repository.
+
+     set-iam-policy
+        (ALPHA) Set the IAM policy for an Artifact Registry repository.
+
+EXAMPLES
+    To create a repository with the name my-repo, run:
+
+        $ gcloud alpha artifacts repositories create my-repo
+
+    To delete a repository with the name my-repo, run:
+
+        $ gcloud alpha artifacts repositories delete my-repo
+
+    To list all Artifact Registry repositories, run:
+
+        $ gcloud alpha artifacts repositories list
+
+    To set an IAM policy for repository my-repo, run:
+
+        $ gcloud alpha artifacts repositories set-iam-policy my-repo \
+            policy.json
+
+    To get an IAM policy for repository my-repo, run:
+
+        $ gcloud alpha artifacts repositories get-iam-policy my-repo
+
+    To add an IAM policy binding for the role of 'roles/editor' for the user
+    'test-user@gmail.com' on repository my-repo, run:
+
+        $ gcloud alpha artifacts repositories add-iam-policy-binding my-repo
+        --member='user:test-user@gmail.com' --role='roles/editor'
+
+    To remove an IAM policy binding for the role of 'roles/editor' for the user
+    'test-user@gmail.com' on repository my-repo, run:
+
+        $ gcloud alpha artifacts repositories remove-iam-policy-binding \
+            my-repo
+        --member='user:test-user@gmail.com' --role='roles/editor'
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta artifacts repositories
+

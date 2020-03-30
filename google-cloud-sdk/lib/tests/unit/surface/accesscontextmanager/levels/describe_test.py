@@ -29,6 +29,7 @@ from six import text_type
 class LevelsDescribeTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -43,13 +44,13 @@ class LevelsDescribeTestGA(accesscontextmanager.Base):
         request_type(name=level_name, accessLevelFormat=level_format), level)
 
   def testDescribe_MissingRequired(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run('access-context-manager levels describe --policy 123')
 
   def testDescribe(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     level = self._MakeBasicLevel(
         'my_level', title='My Level', combining_function='AND')
     self._ExpectGet(level, '123')
@@ -60,7 +61,7 @@ class LevelsDescribeTestGA(accesscontextmanager.Base):
     self.assertEqual(result, level)
 
   def testDescribe_PolicyFromProperty(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     level = self._MakeBasicLevel(
         'my_level', title='My Level', combining_function='AND')
     policy = '456'
@@ -72,7 +73,7 @@ class LevelsDescribeTestGA(accesscontextmanager.Base):
     self.assertEqual(result, level)
 
   def testDescribe_InvalidPolicyArg(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.assertRaises(properties.InvalidValueError) as ex:
       # Common error is to specify --policy arg as 'accessPolicies/<num>'
       self.Run('access-context-manager levels describe my_level'
@@ -83,13 +84,41 @@ class LevelsDescribeTestGA(accesscontextmanager.Base):
 class LevelsDescribeTestBeta(LevelsDescribeTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def testDescribeCustom(self):
+    self.SetUpForAPI(self.api_version)
+    level = self._MakeCustomLevel(
+        'my_level',
+        title='My Level',
+        expression="inIpRange(origin.ip, ['127.0.0.1/24']")
+    self._ExpectGet(level, '123')
+
+    result = self.Run(
+        'access-context-manager levels describe my_level --policy 123')
+
+    self.assertEqual(result, level)
 
 
 class LevelsDescribeTestAlpha(LevelsDescribeTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testDescribeCustom(self):
+    self.SetUpForAPI(self.api_version)
+    level = self._MakeCustomLevel(
+        'my_level',
+        title='My Level',
+        expression="inIpRange(origin.ip, ['127.0.0.1/24']")
+    self._ExpectGet(level, '123')
+
+    result = self.Run(
+        'access-context-manager levels describe my_level --policy 123')
+
+    self.assertEqual(result, level)
 
 
 if __name__ == '__main__':

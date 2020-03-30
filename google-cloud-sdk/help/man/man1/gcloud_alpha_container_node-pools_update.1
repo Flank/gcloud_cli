@@ -62,26 +62,34 @@ Type of metadata server available to pods running in the node pool.
 .RS 2m
 .TP 2m
 \fBEXPOSED\fR
+[DEPRECATED] Pods running in this node pool have access to the node's underlying
+Compute Engine Metadata Server.
+.TP 2m
+\fBGCE_METADATA\fR
 Pods running in this node pool have access to the node's underlying Compute
 Engine Metadata Server.
 .TP 2m
-\fBGKE_METADATA_SERVER\fR
+\fBGKE_METADATA\fR
 Run the Kubernetes Engine Metadata Server on this node. The Kubernetes Engine
 Metadata Server exposes a metadata API to workloads that is compatible with the
 V1 Compute Metadata APIs exposed by the Compute Engine and App Engine Metadata
 Servers. This feature can only be enabled if Workload Identity is enabled at the
 cluster level.
 .TP 2m
+\fBGKE_METADATA_SERVER\fR
+[DEPRECATED] Run the Kubernetes Engine Metadata Server on this node. The
+Kubernetes Engine Metadata Server exposes a metadata API to workloads that is
+compatible with the V1 Compute Metadata APIs exposed by the Compute Engine and
+App Engine Metadata Servers. This feature can only be enabled if Workload
+Identity is enabled at the cluster level.
+.TP 2m
 \fBSECURE\fR
-Prevents pods not in hostNetwork from accessing certain VM metadata,
+[DPRECATED] Prevents pods not in hostNetwork from accessing certain VM metadata,
 specifically kube\-env, which contains Kubelet credentials, and the instance
 identity token. This is a temporary security solution available while the
 bootstrapping process for cluster nodes is being redesigned with significant
 security improvements. This feature is scheduled to be deprecated in the future
 and later removed.
-.TP 2m
-\fBUNSPECIFIED\fR
-Chooses the default.
 .RE
 .sp
 
@@ -231,8 +239,9 @@ Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -243,7 +252,7 @@ run:
 
 .RS 2m
 $ gcloud alpha container node\-pools update node\-pool\-1 \e
-    \-\-cluster=example\-cluster \-\-enable\-autoupgrade
+    \-\-cluster=sample\-cluster \-\-enable\-autoupgrade
 .RE
 
 

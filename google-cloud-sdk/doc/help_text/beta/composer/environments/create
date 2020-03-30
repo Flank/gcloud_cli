@@ -13,11 +13,13 @@ SYNOPSIS
         [--airflow-version=AIRFLOW_VERSION | --image-version=IMAGE_VERSION]
         [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR
           --cluster-secondary-range-name=CLUSTER_SECONDARY_RANGE_NAME
-          --enable-ip-alias --enable-private-endpoint
-          --enable-private-environment --master-ipv4-cidr=MASTER_IPV4_CIDR
-          --services-ipv4-cidr=SERVICES_IPV4_CIDR
+          --enable-ip-alias --services-ipv4-cidr=SERVICES_IPV4_CIDR
           --services-secondary-range-name=SERVICES_SECONDARY_RANGE_NAME]
-        [--network=NETWORK : --subnetwork=SUBNETWORK] [GCLOUD_WIDE_FLAG ...]
+        [--enable-private-endpoint
+          --enable-private-environment --master-ipv4-cidr=MASTER_IPV4_CIDR]
+        [--network=NETWORK : --subnetwork=SUBNETWORK]
+        [--web-server-allow-ip=[description=DESCRIPTION],[ip_range=IP_RANGE]
+          | --web-server-deny-all] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) If run asynchronously with --async, exits after printing an
@@ -136,7 +138,7 @@ FLAGS
               version will be selected. The version numbers that are used will
               be stored.
 
-     Private Clusters and IP Alias (VPC-native)
+     IP Alias (VPC-native)
 
        --cluster-ipv4-cidr=CLUSTER_IPV4_CIDR
           IP address range for the pods in this cluster in CIDR notation (e.g.
@@ -156,6 +158,26 @@ FLAGS
           (https://cloud.google.com/compute/docs/alias-ip/) for Pod IPs. This
           will require at least two secondary ranges in the subnetwork, one for
           the pod IPs and another to reserve space for the services range.
+
+       --services-ipv4-cidr=SERVICES_IPV4_CIDR
+          IP range for the services IPs.
+
+          Can be specified as a netmask size (e.g. '/20') or as in CIDR notion
+          (e.g. '10.100.0.0/20'). If given as a netmask size, the IP range will
+          be chosen automatically from the available space in the network.
+
+          If unspecified, the services CIDR range will be chosen with a default
+          mask size.
+
+          Cannot be specified unless '--enable-ip-alias' is also specified.
+
+       --services-secondary-range-name=SERVICES_SECONDARY_RANGE_NAME
+          Secondary range to be used for services (e.g. ClusterIPs). NAME must
+          be the name of an existing secondary range in the cluster subnetwork.
+
+          Cannot be specified unless '--enable-ip-alias' is also specified.
+
+     Private Clusters
 
        --enable-private-endpoint
           Environment cluster is managed using the private IP address of the
@@ -183,24 +205,6 @@ FLAGS
           Cannot be specified unless '--enable-private-environnment' is also
           specified.
 
-       --services-ipv4-cidr=SERVICES_IPV4_CIDR
-          IP range for the services IPs.
-
-          Can be specified as a netmask size (e.g. '/20') or as in CIDR notion
-          (e.g. '10.100.0.0/20'). If given as a netmask size, the IP range will
-          be chosen automatically from the available space in the network.
-
-          If unspecified, the services CIDR range will be chosen with a default
-          mask size.
-
-          Cannot be specified unless '--enable-ip-alias' is also specified.
-
-       --services-secondary-range-name=SERVICES_SECONDARY_RANGE_NAME
-          Secondary range to be used for services (e.g. ClusterIPs). NAME must
-          be the name of an existing secondary range in the cluster subnetwork.
-
-          Cannot be specified unless '--enable-ip-alias' is also specified.
-
      Virtual Private Cloud networking
 
        --network=NETWORK
@@ -214,12 +218,41 @@ FLAGS
           (https://cloud.google.com/compute/docs/subnetworks) to which the
           environment will be connected.
 
+     At most one of these may be specified:
+
+       --web-server-allow-ip=[description=DESCRIPTION],[ip_range=IP_RANGE]
+          Specifies a list of IPv4 or IPv6 ranges that will be allowed to
+          access the Airflow web server. By default, all IPs are allowed to
+          access the web server.
+
+       ip_range
+          IPv4 or IPv6 range of addresses allowed to access the Airflow web
+          server.
+
+       description
+          An optional description of the IP range.
+       --web-server-deny-all
+          Denies all incoming traffic to the Airflow web server.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create an environment called env-1 with all the default values, run:
+
+        $ gcloud beta composer environments create env-1
+
+    To create a new environment named env-1 with the Google Compute Engine
+    machine-type n1-standard-8, and the Google Compute Engine network
+    my-network, run:
+
+        $ gcloud beta composer environments create env-1 \
+            --machine-type=n1-standard-8 --network=my-network
 
 NOTES
     This command is currently in BETA and may change without notice. These

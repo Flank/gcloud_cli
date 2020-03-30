@@ -11,8 +11,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -25,6 +26,12 @@ COMMANDS
 
      connect
         (ALPHA) Connect to a service via VPC peering for a project network.
+
+     disable-vpc-service-controls
+        (ALPHA) Disable VPC Service Controls for a connection.
+
+     enable-vpc-service-controls
+        (ALPHA) Enable VPC Service Controls for a connection.
 
      list
         (ALPHA) List connections to a service via VPC peering for a project

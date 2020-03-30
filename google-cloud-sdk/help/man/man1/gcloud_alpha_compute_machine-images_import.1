@@ -1,0 +1,277 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_MACHINE\-IMAGES_IMPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute machine\-images import \- create a Compute Engine machine image from virtual appliance in OVA/OVF format
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute machine\-images import\fR \fIIMAGE\fR \fB\-\-source\-uri\fR=\fISOURCE_URI\fR [\fB\-\-async\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-no\-guest\-environment\fR] [\fB\-\-guest\-flush\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-os\fR=\fIOS\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-storage\-location\fR=\fILOCATION\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute machine\-images import\fR creates Compute
+Engine machine image from virtual appliance in OVA/OVF format.
+
+Importing OVF involves:
+.RS 2m
+.IP "\(bu" 2m
+Unpacking OVF package (if in OVA format) to Cloud Storage.
+.IP "\(bu" 2m
+Import disks from OVF to Google Compute Engine.
+.IP "\(bu" 2m
+Translate the boot disk to make it bootable in Google Compute Engine.
+.IP "\(bu" 2m
+Create a machine image using OVF metadata and imported disks.
+.RE
+.sp
+
+Virtual instances, images, machine images, and disks in Compute engine and files
+stored on Cloud Storage incur charges. See
+https://cloud.google.com/compute/docs/images/importing\-virtual\-disks#resource_cleanup.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMAGE\fR
+Name of the machineImage to import.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\-uri\fR=\fISOURCE_URI\fR
+Cloud Storage path to one of: OVF descriptor OVA file Directory with OVF package
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-can\-ip\-forward\fR
+If provided, allows the VMs created from the imported machine image to send and
+receive packets with non\-matching destination or source IP addresses.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Specifies a text description of the machine image.
+
+.TP 2m
+\fB\-\-guest\-environment\fR
+The guest environment will be installed on the machine image. Enabled by
+default, use \fB\-\-no\-guest\-environment\fR to disable.
+
+.TP 2m
+\fB\-\-guest\-flush\fR
+Create an application\-consistent machine image by informing the OS to prepare
+for the snapshot process. Currently only supported on Windows instances using
+the Volume Shadow Copy Service (VSS).
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
+Specifies the machine type used for the instances. To get a list of available
+machine types, run 'gcloud compute machine\-types list'. If unspecified, the
+default type is n1\-standard\-1.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+Specifies the network for the VMs that are created from the imported machine
+image. If \f5\-\-subnet\fR is also specified, then the subnet must be a
+subnetwork of network specified by \f5\-\-network\fR. If neither is specified,
+the \f5default\fR network is used.
+
+.TP 2m
+\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR
+Specifies the network tier that will be used to configure the machine image.
+\f5\fINETWORK_TIER\fR\fR must be one of: \f5PREMIUM\fR, \f5STANDARD\fR. The
+default value is \f5PREMIUM\fR.
+
+.TP 2m
+\fB\-\-os\fR=\fIOS\fR
+Specifies the OS of the machine image being imported. \fIOS\fR must be one of:
+\fBcentos\-6\fR, \fBcentos\-7\fR, \fBcentos\-8\fR, \fBdebian\-8\fR,
+\fBdebian\-9\fR, \fBopensuse\-15\fR, \fBrhel\-6\fR, \fBrhel\-6\-byol\fR,
+\fBrhel\-7\fR, \fBrhel\-7\-byol\fR, \fBrhel\-8\fR, \fBrhel\-8\-byol\fR,
+\fBsles\-12\-byol\fR, \fBsles\-15\-byol\fR, \fBubuntu\-1404\fR,
+\fBubuntu\-1604\fR, \fBubuntu\-1804\fR, \fBwindows\-10\-x64\-byol\fR,
+\fBwindows\-10\-x86\-byol\fR, \fBwindows\-2008r2\fR,
+\fBwindows\-2008r2\-byol\fR, \fBwindows\-2012\fR, \fBwindows\-2012\-byol\fR,
+\fBwindows\-2012r2\fR, \fBwindows\-2012r2\-byol\fR, \fBwindows\-2016\fR,
+\fBwindows\-2016\-byol\fR, \fBwindows\-2019\fR, \fBwindows\-2019\-byol\fR,
+\fBwindows\-7\-x64\-byol\fR, \fBwindows\-7\-x86\-byol\fR,
+\fBwindows\-8\-x64\-byol\fR, \fBwindows\-8\-x86\-byol\fR.
+
+.TP 2m
+\fB\-\-restart\-on\-failure\fR
+The VMs created from the imported machine image are restarted if they are
+terminated by Compute Engine. This does not affect terminations performed by the
+user. Enabled by default, use \fB\-\-no\-restart\-on\-failure\fR to disable.
+
+.TP 2m
+\fB\-\-storage\-location\fR=\fILOCATION\fR
+Google Cloud Storage location, either regional or multi\-regional, where machine
+image's content is to be stored. If absent, a nearby regional or multi\-regional
+location is chosen automatically.
+
+.TP 2m
+\fB\-\-subnet\fR=\fISUBNET\fR
+Specifies the subnet for the VMs created from the imported machine image. If
+\f5\-\-network\fR is also specified, the subnet must be a subnetwork of the
+network specified by \f5\-\-network\fR.
+
+.TP 2m
+\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]
+Specifies a list of tags to apply to the VMs created from the imported machine
+image. These tags allow network firewall rules and routes to be applied to
+specified VMs. See \fBgcloud compute firewall\-rules create\fR(1) for more
+details.
+
+To read more about configuring network tags, read this guide:
+https://cloud.google.com/vpc/docs/add\-remove\-network\-tags
+
+To list VMs with their respective status and tags, run:
+
+.RS 2m
+$ gcloud compute instances list \e
+    \-\-format='table(name,status,tags.list())'
+.RE
+
+To list VMs tagged with a specific tag, \f5tag1\fR, run:
+
+.RS 2m
+$ gcloud compute instances list \-\-filter='tags:tag1'
+.RE
+
+.TP 2m
+\fB\-\-timeout\fR=\fITIMEOUT\fR; default="2h"
+Maximum time an import can last before it fails as "TIMEOUT". For example,
+specifying \f52h\fR fails the process after 2 hours. See $ gcloud topic
+datetimes for information about duration formats.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the machine image to import. The zone in which to perform the import of
+the machine image. If not specified and the \f5\fIcompute/zone\fR\fR property
+isn't set, you may be prompted to select a zone.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+.TP 2m
+
+Custom machine type extensions.
+
+.RS 2m
+.TP 2m
+\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR
+A whole number value indicating how many cores are desired in the custom machine
+type. This flag must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
+\fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR
+A whole number value indicating how much memory is desired in the custom machine
+type. A size unit should be provided (eg. 3072MB or 9GB) \- if no units are
+specified, GB is assumed. This flag must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-custom\-extensions\fR
+Use the extended custom machine type.
+
+.TP 2m
+\fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR
+Specifies VM type. n1 \- VMs with CPU platforms Skylake and older, n2 \- VMs
+with CPU platform Cascade Lake. n2 offers flexible sizing from 2 to 80 vCPUs,
+and 1 to 640GBs of memory. It also features a number of performance enhancements
+including exposing a more accurate NUMA topology to the guest OS. The default is
+\f5n1\fR.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To import an OVF package from Cloud Storage into a machine image named
+\f5my\-machine\-image\fR, run:
+
+.RS 2m
+$ gcloud alpha compute machine\-images import my\-machine\-image \e
+    \-\-source\-uri=gs://my\-bucket/my\-dir
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute machine\-images import
+.RE
+

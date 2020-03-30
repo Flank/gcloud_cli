@@ -29,7 +29,7 @@ from tests.lib.surface.sql import base
 class _BaseUsersSetPasswordTest(object):
 
   def testSetPassword(self):
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Update.Expect(
         msgs.SqlUsersUpdateRequest(
             project=self.Project(),
@@ -46,7 +46,8 @@ class _BaseUsersSetPasswordTest(object):
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
-        msgs.Operation(name='op_name', status='DONE'))
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql users set-password --instance my_instance my_username '
              '--host my_host --password my_password')
     self.AssertErrContains('Updating Cloud SQL user')
@@ -60,7 +61,7 @@ class _BaseUsersSetPasswordTest(object):
                'my_username my_host --password my_password')
 
   def testSetPasswordWithNoHostArgument(self):
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Update.Expect(
         msgs.SqlUsersUpdateRequest(
             project=self.Project(),
@@ -77,13 +78,14 @@ class _BaseUsersSetPasswordTest(object):
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
-        msgs.Operation(name='op_name', status='DONE'))
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql users set-password --instance my_instance my_username '
              '--password my_password')
     self.AssertErrContains('Updating Cloud SQL user')
 
   def testSetPasswordWithHostFlag(self):
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Update.Expect(
         msgs.SqlUsersUpdateRequest(
             project=self.Project(),
@@ -100,13 +102,14 @@ class _BaseUsersSetPasswordTest(object):
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
-        msgs.Operation(name='op_name', status='DONE'))
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql users set-password --instance my_instance my_username '
              '--password my_password --host my_host')
     self.AssertErrContains('Updating Cloud SQL user')
 
   def testSetPasswordAsync(self):
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Update.Expect(
         msgs.SqlUsersUpdateRequest(
             project=self.Project(),
@@ -134,7 +137,7 @@ class _BaseUsersSetPasswordTest(object):
 
   def testSetPasswordPrompt(self):
     self.StartObjectPatch(getpass, 'getpass', return_value='my_password')
-    msgs = apis.GetMessagesModule('sqladmin', 'v1beta4')
+    msgs = apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.users.Update.Expect(
         msgs.SqlUsersUpdateRequest(
             project=self.Project(),
@@ -151,7 +154,8 @@ class _BaseUsersSetPasswordTest(object):
     self.mocked_client.operations.Get.Expect(
         msgs.SqlOperationsGetRequest(
             operation='op_name', project=self.Project()),
-        msgs.Operation(name='op_name', status='DONE'))
+        msgs.Operation(
+            name='op_name', status=msgs.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql users set-password --instance my_instance my_username '
              '--host my_host --prompt-for-password')
     self.AssertErrContains('Updating Cloud SQL user')

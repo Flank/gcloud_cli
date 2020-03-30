@@ -39,8 +39,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To list all NATs in router r1 in region us-central1, run:
+
+        $ gcloud alpha compute routers nats list --router=r1 \
+          --region=us-central1.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

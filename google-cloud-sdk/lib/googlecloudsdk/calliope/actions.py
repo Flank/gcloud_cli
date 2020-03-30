@@ -92,6 +92,7 @@ def FunctionExitAction(func):
   """
 
   class Action(argparse.Action):
+    """The action created for FunctionExitAction."""
 
     def __init__(self, **kwargs):
       kwargs['nargs'] = 0
@@ -406,6 +407,7 @@ def RenderDocumentAction(command, default_style=None):
   """
 
   class Action(argparse.Action):
+    """The action created for RenderDocumentAction."""
 
     def __init__(self, **kwargs):
       if default_style:
@@ -481,8 +483,7 @@ def GetCommandMetaData(command):
   for arg in command.GetAllAvailableFlags():
     for arg_name in arg.option_strings:
       command_metadata.flags.append(arg_name)
-      if (isinstance(arg, argparse._StoreTrueAction) or
-          isinstance(arg, argparse._StoreFalseAction)):
+      if isinstance(arg, argparse._StoreConstAction):
         command_metadata.bool_flags.append(arg_name)
   command_metadata.is_group = command.is_group
   return command_metadata
@@ -577,6 +578,7 @@ def _PreActionHook(action, func, additional_help=None):
 
 def DeprecationAction(flag_name,
                       show_message=lambda _: True,
+                      show_add_help=lambda _: True,
                       warn='Flag {flag_name} is deprecated.',
                       error='Flag {flag_name} has been removed.',
                       removed=False,
@@ -592,6 +594,7 @@ def DeprecationAction(flag_name,
         as input, validates it against some criteria and returns a boolean.
         If true deprecation message is shown at runtime. Deprecation message
         will always be appended to flag help.
+    show_add_help: boolean, whether to show additional help in help text.
     warn: string, warning message, 'flag_name' template will be replaced with
         value of flag_name parameter
     error: string, error message, 'flag_name' template will be replaced with
@@ -618,4 +621,7 @@ def DeprecationAction(flag_name,
       else:
         log.warning(add_help.message)
 
-  return _PreActionHook(action, DeprecationFunc, add_help)
+  if show_add_help:
+    return _PreActionHook(action, DeprecationFunc, add_help)
+
+  return _PreActionHook(action, DeprecationFunc, None)

@@ -32,8 +32,9 @@ and detailed documentation can be found here: https://cloud.google.com/iap/docs/
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -42,6 +43,14 @@ help\fR for details.
 \f5\fIGROUP\fR\fR is one of the following:
 
 .RS 2m
+.TP 2m
+\fBoauth\-brands\fR
+\fB(ALPHA)\fR Manage IAP OAuth brands.
+
+.TP 2m
+\fBoauth\-clients\fR
+\fB(ALPHA)\fR Manage IAP OAuth clients.
+
 .TP 2m
 \fBweb\fR
 \fB(ALPHA)\fR Manage IAP web policies.
@@ -55,9 +64,10 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud iap
 $ gcloud beta iap
 .RE
 

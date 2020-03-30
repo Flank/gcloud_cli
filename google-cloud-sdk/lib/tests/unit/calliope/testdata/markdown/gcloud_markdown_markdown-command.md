@@ -45,7 +45,7 @@ Flags and positionals passed to the underlying ssh implementation.
         The '--' argument must be specified between gcloud specific args on
         the left and IMPLEMENTATION-ARGS on the right. Example:
 +
-          $ link:gcloud/markdown/markdown-command[gcloud markdown markdown-command] example-instance \
+          $ gcloud markdown markdown-command example-instance \
       --zone us-central1-a -- -vvv -L 80:%INSTANCE%:80
 +
 +
@@ -191,6 +191,7 @@ flag interacts with other flags that are applied in this order: *--flatten*,
 ## GCLOUD WIDE FLAGS
 
 These flags are available to all commands: --configuration, --flags-file, --flatten, --format, --help, --log-http, --top-group-flag, --user-output-enabled, --verbosity.
+
 Run *$ link:gcloud[gcloud] help* for details.
 
 
@@ -205,7 +206,7 @@ Run *$ link:gcloud[gcloud] help* for details.
 
 To foo the command run:
 
-  $ link:gcloud/markdown/markdown-command[gcloud markdown markdown-command] list --foo
+  $ gcloud markdown markdown-command list --foo
 
 To bar the parent command run:
 

@@ -113,7 +113,7 @@ class ProxiedAuthTests(sdk_test_base.SdkBase):
   # has passed.
   def testStore(self):
     creds = c_store.Load()
-    self.assertEqual(type(creds), devshell.DevshellCredentials)
+    self.assertIsInstance(creds, devshell.DevshellCredentials)
     self.assertEqual(creds.access_token, 'sometoken')
     self.assertGreater(creds.token_expiry, datetime.datetime.utcnow())
     self.assertLess(
@@ -122,6 +122,18 @@ class ProxiedAuthTests(sdk_test_base.SdkBase):
 
     accounts = c_store.AvailableAccounts()
     self.assertIn('joe@example.com', accounts)
+
+  def testDevShellCredentialsGoogleAuthConversion(self):
+    creds = c_store.Load()
+    self.assertIsInstance(creds, devshell.DevshellCredentials)
+
+    google_auth_creds = devshell.DevShellCredentialsGoogleAuth.from_devshell_credentials(creds)  # pylint: disable=line-too-long
+    self.assertIsInstance(google_auth_creds,
+                          devshell.DevShellCredentialsGoogleAuth)
+    self.assertEqual(google_auth_creds.token, creds.access_token)
+    self.assertEqual(google_auth_creds.id_tokenb64, creds.id_tokenb64)
+    self.assertEqual(google_auth_creds.id_token, creds.id_tokenb64)
+    self.assertEqual(google_auth_creds.expiry, creds.token_expiry)
 
   def testNoSerialize(self):
     creds = c_store.Load()

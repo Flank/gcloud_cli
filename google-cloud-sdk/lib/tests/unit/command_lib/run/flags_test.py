@@ -20,12 +20,16 @@ from __future__ import unicode_literals
 
 import argparse
 import os
+
 from googlecloudsdk.api_lib.container import kubeconfig
 from googlecloudsdk.api_lib.run import k8s_object
 from googlecloudsdk.api_lib.run import service
 from googlecloudsdk.api_lib.run import traffic
 from googlecloudsdk.api_lib.services import enable_api
+from googlecloudsdk.api_lib.services import exceptions as services_exceptions
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import parser_extensions
+from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import exceptions
 from googlecloudsdk.command_lib.run import flags
 from googlecloudsdk.command_lib.run import name_generator
@@ -36,6 +40,7 @@ from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 from tests.lib.surface.run import base
 
 import mock
@@ -89,14 +94,33 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
 
   def SetUp(self):
     self.args = parser_extensions.Namespace(
-        update_env_vars=None, set_env_vars=None, remove_env_vars=None,
-        clear_env_vars=None, concurrency=None, add_cloudsql_instances=None,
-        remove_cloudsql_instances=None, clear_cloudsql_instances=None,
-        set_cloudsql_instances=None, cpu=None, clear_labels=None,
-        update_labels=None, remove_labels=None, update_secrets=None,
-        set_secrets=None, remove_secrets=None, clear_secrets=None,
-        update_config_maps=None, set_config_maps=None, remove_config_maps=None,
-        clear_config_maps=None)
+        update_env_vars=None,
+        set_env_vars=None,
+        remove_env_vars=None,
+        clear_env_vars=None,
+        concurrency=None,
+        add_cloudsql_instances=None,
+        remove_cloudsql_instances=None,
+        clear_cloudsql_instances=None,
+        set_cloudsql_instances=None,
+        cpu=None,
+        clear_labels=None,
+        update_labels=None,
+        remove_labels=None,
+        update_secrets=None,
+        set_secrets=None,
+        remove_secrets=None,
+        clear_secrets=None,
+        update_config_maps=None,
+        set_config_maps=None,
+        remove_config_maps=None,
+        clear_config_maps=None,
+        update_tags=None,
+        set_tags=None,
+        remove_tags=None,
+        clear_tags=None,
+        to_latest=None,
+        to_revisions=None)
     self.service = service.Service.New(
         self.mock_serverless_client, self.namespace.namespacesId)
     self.service.name = 'myservice'
@@ -199,7 +223,33 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     self._GetAndApplyChanges()
     api_mock.assert_any_call(flags._CLOUD_SQL_API_SERVICE_TOKEN)
     api_mock.assert_any_call(flags._CLOUD_SQL_ADMIN_API_SERVICE_TOKEN)
-    self.assertTrue(2, api_mock.call_count)
+    self.assertEqual(2, api_mock.call_count)
+
+  @parameterized.parameters([
+      services_exceptions.GetServicePermissionDeniedException('Boom!'),
+      http_error.MakeHttpError()
+  ])
+  def testCloudSqlApiEnablementFailsOpen(self, exception):
+    properties.VALUES.core.should_prompt_to_enable_api.Set(True)
+    self.StartObjectPatch(flags, '_HasCloudSQLChanges', return_value=True)
+    api_mock = self.StartObjectPatch(flags, 'PromptToEnableApi')
+    api_mock.side_effect = exception
+    self._GetAndApplyChanges()
+    api_mock.assert_called_once_with(flags._CLOUD_SQL_API_SERVICE_TOKEN)
+
+  @parameterized.parameters([
+      services_exceptions.GetServicePermissionDeniedException('Boom!'),
+      http_error.MakeHttpError()
+  ])
+  def testCloudSqlAdminApiEnablementFailsOpen(self, exception):
+    properties.VALUES.core.should_prompt_to_enable_api.Set(True)
+    self.StartObjectPatch(flags, '_HasCloudSQLChanges', return_value=True)
+    api_mock = self.StartObjectPatch(flags, 'PromptToEnableApi')
+    api_mock.side_effect = [None, exception]
+    self._GetAndApplyChanges()
+    api_mock.assert_any_call(flags._CLOUD_SQL_API_SERVICE_TOKEN)
+    api_mock.assert_any_call(flags._CLOUD_SQL_ADMIN_API_SERVICE_TOKEN)
+    self.assertEqual(2, api_mock.call_count)
 
   @parameterized.parameters(['suffix', 'revision-1'])
   def testRevisionSuffix(self, suffix):
@@ -260,30 +310,93 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     self.assertEqual(got, {u'autoscaling.knative.dev/maxScale': '3'})
 
   def testTrafficToLatest(self):
-    self.service.traffic['r1'] = traffic.NewTrafficTarget(
-        self.serverless_messages, 'r1', 100)
+    self.service.spec_traffic['r1'] = [traffic.NewTrafficTarget(
+        self.serverless_messages, 'r1', 100)]
     self.args.to_latest = True
     self.args.to_revisions = None
     self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
     self._GetAndApplyChanges()
     expect = {
-        traffic.LATEST_REVISION_KEY: traffic.NewTrafficTarget(
-            self.serverless_messages, traffic.LATEST_REVISION_KEY, 100)}
-    self.assertEqual(self.service.traffic, expect)
+        traffic.LATEST_REVISION_KEY: [traffic.NewTrafficTarget(
+            self.serverless_messages, traffic.LATEST_REVISION_KEY, 100)]}
+    self.assertEqual(self.service.spec_traffic, expect)
 
   def testTrafficToRevision(self):
-    self.service.traffic[
-        traffic.LATEST_REVISION_KEY] = traffic.NewTrafficTarget(
-            self.serverless_messages, traffic.LATEST_REVISION_KEY, 100)
+    self.service.spec_traffic[
+        traffic.LATEST_REVISION_KEY] = [traffic.NewTrafficTarget(
+            self.serverless_messages, traffic.LATEST_REVISION_KEY, 100)]
     self.args.to_latest = False
     self.args.to_revisions = {'r1': 60}
     self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
     self._GetAndApplyChanges()
     expect = {
-        traffic.LATEST_REVISION_KEY: traffic.NewTrafficTarget(
-            self.serverless_messages, traffic.LATEST_REVISION_KEY, 40),
-        'r1': traffic.NewTrafficTarget(self.serverless_messages, 'r1', 60)}
-    self.assertEqual(self.service.traffic, expect)
+        traffic.LATEST_REVISION_KEY: [traffic.NewTrafficTarget(
+            self.serverless_messages, traffic.LATEST_REVISION_KEY, 40)],
+        'r1': [traffic.NewTrafficTarget(self.serverless_messages, 'r1', 60)]}
+    self.assertEqual(self.service.spec_traffic, expect)
+
+  def testTrafficTagsSet(self):
+    self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
+    change_mock = self.StartObjectPatch(
+        config_changes, 'TrafficChanges', autoSpec=True)
+    self.args.set_tags = {'latest': 'LATEST', 'prod': 'r1'}
+    self._GetAndApplyChanges()
+    change_mock.assert_called_once_with({}, {
+        'latest': 'LATEST',
+        'prod': 'r1'
+    }, None, True)
+
+  def testTrafficTagsUpdate(self):
+    self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
+    change_mock = self.StartObjectPatch(
+        config_changes, 'TrafficChanges', autoSpec=True)
+    self.args.update_tags = {'latest': 'LATEST', 'prod': 'r1'}
+    self._GetAndApplyChanges()
+    change_mock.assert_called_once_with({}, {
+        'latest': 'LATEST',
+        'prod': 'r1'
+    }, None, None)
+
+  def testTrafficTagsRemove(self):
+    self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
+    change_mock = self.StartObjectPatch(
+        config_changes, 'TrafficChanges', autoSpec=True)
+    self.args.remove_tags = ['prod']
+    self._GetAndApplyChanges()
+    change_mock.assert_called_once_with({}, None, ['prod'], None)
+
+  def testTrafficTagsClear(self):
+    self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
+    change_mock = self.StartObjectPatch(
+        config_changes, 'TrafficChanges', autoSpec=True)
+    self.args.clear_tags = True
+    self._GetAndApplyChanges()
+    change_mock.assert_called_once_with({}, None, None, True)
+
+  def testTrafficSetTagsAndToRevision(self):
+    self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
+    change_mock = self.StartObjectPatch(
+        config_changes, 'TrafficChanges', autoSpec=True)
+    self.args.set_tags = {'latest': 'LATEST', 'prod': 'r1'}
+    self.args.to_latest = False
+    self.args.to_revisions = {'r1': 60}
+    self._GetAndApplyChanges()
+    change_mock.assert_called_once_with({'r1': 60}, {
+        'latest': 'LATEST',
+        'prod': 'r1'
+    }, None, True)
+
+  def testTrafficUpdateTagsAndToLatest(self):
+    self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
+    change_mock = self.StartObjectPatch(
+        config_changes, 'TrafficChanges', autoSpec=True)
+    self.args.update_tags = {'latest': 'LATEST', 'prod': 'r1'}
+    self.args.to_latest = True
+    self._GetAndApplyChanges()
+    change_mock.assert_called_once_with({'LATEST': 100}, {
+        'latest': 'LATEST',
+        'prod': 'r1'
+    }, None, None)
 
   def testPromptToEnableApi(self):
     properties.VALUES.core.should_prompt_to_enable_api.Set(True)
@@ -408,21 +521,25 @@ class GetPlatformTest(base.ServerlessBase):
   def testGetFromFlag(self):
     properties.VALUES.run.platform.Set('gke')
     self.parser.parse_args(['--platform', 'managed'], self.args)
-    self.assertEqual('managed', flags.GetPlatform(self.args))
+    self.assertEqual('managed', flags.GetAndValidatePlatform(
+        self.args, calliope_base.ReleaseTrack.GA, flags.Product.RUN))
 
   def testGetFromProperty(self):
     properties.VALUES.run.platform.Set('gke')
-    self.assertEqual('gke', flags.GetPlatform(self.args))
+    self.assertEqual('gke', flags.GetAndValidatePlatform(
+        self.args, calliope_base.ReleaseTrack.GA, flags.Product.RUN))
 
   def testInvalidProperty(self):
     properties.VALUES.run.platform.Set('invalid')
     with self.assertRaises(flags.ArgumentError):
-      flags.GetPlatform(self.args)
+      flags.GetAndValidatePlatform(self.args, calliope_base.ReleaseTrack.GA,
+                                   flags.Product.RUN)
 
   def testGetFromPrompt(self):
     self.WriteInput('2\n')
     expected_platform = 'gke'
-    actual_platform = flags.GetPlatform(self.args)
+    actual_platform = flags.GetAndValidatePlatform(
+        self.args, calliope_base.ReleaseTrack.GA, flags.Product.RUN)
     self.AssertErrContains(
         'run `gcloud config set run/platform {}`'.format(expected_platform))
     self.assertEqual(expected_platform, actual_platform)
@@ -430,106 +547,230 @@ class GetPlatformTest(base.ServerlessBase):
   def testCantGetFromPrompt(self):
     self.is_interactive.return_value = False
     with self.assertRaises(flags.ArgumentError):
-      flags.GetPlatform(self.args)
+      flags.GetAndValidatePlatform(self.args, calliope_base.ReleaseTrack.GA,
+                                   flags.Product.RUN)
 
 
 class ValidationsTest(test_case.TestCase):
 
+  def SetUp(self):
+    self.StartObjectPatch(
+        parser_extensions.Namespace, 'IsSpecified', return_value=True)
+
   def testVerifyGKEFlagsAllowUnauthenticated(self):
+    args = parser_extensions.Namespace(allow_unauthenticated=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.allow_unauthenticated = True
-      flags.VerifyGKEFlags(args)
+      flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
+                           flags.Product.RUN)
 
   def testVerifyGKEFlagsServiceAccount(self):
+    args = parser_extensions.Namespace(service_account=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.service_account = 'test@iam.gserviceaccount.com'
-      flags.VerifyGKEFlags(args)
+      flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
+                           flags.Product.RUN)
+
+  def testVerifyGKEFlagsServiceAccountAlpha(self):
+    args = parser_extensions.Namespace(service_account=None)
+    args.service_account = 'test'
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.ALPHA,
+                         flags.Product.RUN)
 
   def testVerifyGKEFlagsRegion(self):
+    args = parser_extensions.Namespace(region=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.region = 'us-central1'
-      flags.VerifyGKEFlags(args)
+      flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
+                           flags.Product.RUN)
 
   def testVerifyGKEFlagsKubeconfig(self):
+    args = parser_extensions.Namespace(kubeconfig=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.kubeconfig = '~/.kube/config'
-      flags.VerifyGKEFlags(args)
+      flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
+                           flags.Product.RUN)
+
+  def testVerifyGKEFlagsNoTrafficAlpha(self):
+    args = parser_extensions.Namespace(no_traffic=None)
+    args.no_traffic = True
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.ALPHA,
+                         flags.Product.RUN)
+
+  def testVerifyGKEFlagsNoTrafficBeta(self):
+    args = parser_extensions.Namespace(no_traffic=None)
+    args.no_traffic = True
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.BETA,
+                         flags.Product.RUN)
+
+  def testVerifyGKEFlagsNoTrafficGA(self):
+    args = parser_extensions.Namespace(no_traffic=None)
+    args.no_traffic = True
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA, flags.Product.RUN)
+
+  def testVerifyGKEFlagsClearSecretsAlpha(self):
+    args = parser_extensions.Namespace(clear_secrets=None)
+    args.clear_secrets = True
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.ALPHA,
+                         flags.Product.RUN)
+
+  def testVerifyGKEFlagsClearSecretsBeta(self):
+    args = parser_extensions.Namespace(clear_secrets=None)
+    args.clear_secrets = True
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.BETA,
+                         flags.Product.RUN)
+
+  def testVerifyGKEFlagsClearSecretsGA(self):
+    args = parser_extensions.Namespace(clear_secrets=None)
+    args.clear_secrets = True
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA, flags.Product.RUN)
+
+  def testVerifyGKEFlagsMinInstanceGA(self):
+    args = parser_extensions.Namespace(min_instances=None)
+    args.min_instances = 3
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
+                         flags.Product.RUN)
+
+  def testVerifyGKEFlagsMinInstanceBeta(self):
+    args = parser_extensions.Namespace(min_instances=None)
+    args.min_instances = 3
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.BETA,
+                         flags.Product.RUN)
+
+  def testVerifyGKEFlagsMinInstanceAlpha(self):
+    args = parser_extensions.Namespace(min_instances=None)
+    args.min_instances = 3
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.ALPHA,
+                         flags.Product.RUN)
 
   def testVerifyGKEFlagsContext(self):
+    args = parser_extensions.Namespace(context=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.context = 'some-context'
-      flags.VerifyGKEFlags(args)
+      flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
+                           flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsConnectivity(self):
+    args = parser_extensions.Namespace(connectivity=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.connectivity = True
-      flags.VerifyOnePlatformFlags(args)
+      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
+                                   flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsCpu(self):
-    with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
-      args.cpu = 2
-      flags.VerifyOnePlatformFlags(args)
+    args = parser_extensions.Namespace(cpu=None)
+    args.cpu = 2
+    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
+                                 flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsCluster(self):
+    args = parser_extensions.Namespace(cluster=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.cluster = 'cluster-1'
-      flags.VerifyOnePlatformFlags(args)
+      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
+                                   flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsLocation(self):
+    args = parser_extensions.Namespace(cluster_location=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.cluster_location = 'us-central1-a'
-      flags.VerifyOnePlatformFlags(args)
+      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
+                                   flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsKubeconfig(self):
+    args = parser_extensions.Namespace(kubeconfig=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.kubeconfig = '~/.kube/config'
-      flags.VerifyOnePlatformFlags(args)
+      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
+                                   flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsContext(self):
+    args = parser_extensions.Namespace(context=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.context = 'some-context'
-      flags.VerifyOnePlatformFlags(args)
+      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
+                                   flags.Product.RUN)
 
-  def testVerifyKuberetesFlagsAllowUnauthenticated(self):
+  def testVerifyOnePlatformFlagsMinInstanceGA(self):
+    args = parser_extensions.Namespace(min_instances=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
+      args.min_instances = 3
+      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
+                                   flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsMinInstanceBeta(self):
+    args = parser_extensions.Namespace(min_instances=None)
+    with self.assertRaises(exceptions.ConfigurationError):
+      args.min_instances = 3
+      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.BETA,
+                                   flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsMinInstanceAlpha(self):
+    args = parser_extensions.Namespace(min_instances=None)
+    args.min_instances = 3
+    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.ALPHA,
+                                 flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsNoTrafficGA(self):
+    args = parser_extensions.Namespace(no_traffic=None)
+    with self.assertRaises(exceptions.ConfigurationError):
+      args.no_traffic = True
+      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
+                                   flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsNoTrafficBeta(self):
+    args = parser_extensions.Namespace(no_traffic=None)
+    with self.assertRaises(exceptions.ConfigurationError):
+      args.no_traffic = True
+      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.BETA,
+                                   flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsNoTrafficAlpha(self):
+    args = parser_extensions.Namespace(no_traffic=None)
+    args.no_traffic = True
+    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.ALPHA,
+                                 flags.Product.RUN)
+
+  def testVerifyKubernetesFlagsAllowUnauthenticated(self):
+    args = parser_extensions.Namespace(allow_unauthenticated=None)
+    with self.assertRaises(exceptions.ConfigurationError):
       args.allow_unauthenticated = True
-      flags.VerifyKubernetesFlags(args)
+      flags.VerifyKubernetesFlags(args, calliope_base.ReleaseTrack.GA,
+                                  flags.Product.RUN)
 
-  def testVerifyKuberetesFlagsServiceAccount(self):
+  def testVerifyKubernetesFlagsServiceAccount(self):
+    args = parser_extensions.Namespace(service_account=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.service_account = 'test@iam.gserviceaccount.com'
-      flags.VerifyKubernetesFlags(args)
+      flags.VerifyKubernetesFlags(args, calliope_base.ReleaseTrack.GA,
+                                  flags.Product.RUN)
 
-  def testVerifyKuberetesFlagsRegion(self):
+  def testVerifyKubernetesFlagsServiceAccountAlpha(self):
+    args = parser_extensions.Namespace(service_account=None)
+    args.service_account = 'test'
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.ALPHA,
+                         flags.Product.RUN)
+
+  def testVerifyKubernetesFlagsRegion(self):
+    args = parser_extensions.Namespace(region=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.region = 'us-central1'
-      flags.VerifyKubernetesFlags(args)
+      flags.VerifyKubernetesFlags(args, calliope_base.ReleaseTrack.GA,
+                                  flags.Product.RUN)
 
-  def testVerifyKuberetesFlagsCluster(self):
+  def testVerifyKubernetesFlagsCluster(self):
+    args = parser_extensions.Namespace(cluster=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.cluster = 'cluster-1'
-      flags.VerifyKubernetesFlags(args)
+      flags.VerifyKubernetesFlags(args, calliope_base.ReleaseTrack.GA,
+                                  flags.Product.RUN)
 
-  def testVerifyKuberetesFlagsLocation(self):
+  def testVerifyKubernetesFlagsLocation(self):
+    args = parser_extensions.Namespace(cluster_location=None)
     with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
       args.cluster_location = 'us-central1-a'
-      flags.VerifyKubernetesFlags(args)
+      flags.VerifyKubernetesFlags(args, calliope_base.ReleaseTrack.GA,
+                                  flags.Product.RUN)
 
 
 class GetKubeconfigTest(test_case.TestCase):

@@ -18,7 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import json
+
+from apitools.base.py import exceptions as apitools_exceptions
+from apitools.base.py import http_wrapper
 from googlecloudsdk.api_lib.dataflow import apis
+from googlecloudsdk.api_lib.util import exceptions
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.dataflow import base
@@ -137,12 +142,80 @@ class ApisUnitTest(base.DataflowMockingTestBase,
 
     self.mocked_client.projects_locations_templates.Create.Expect(
         wrapped_request, apis.GetMessagesModule().Job())
+    template_args = apis.TemplateArguments(job_name=name, gcs_location=gcs_path,
+                                           project_id=self.Project(),
+                                           staging_location=staging_path)
+    apis.Templates.Create(template_args)
 
-    apis.Templates.Create(
+  def testLaunchDynamicTemplate(self):
+    name = 'myjob'
+    gcs_path = 'gs://dynamic_template_path'
+    staging_path = 'gs://my_staging_path'
+    parameters = apis.Templates.LAUNCH_TEMPLATE_PARAMETERS(
+        jobName=name,
+        environment=apis.GetMessagesModule().RuntimeEnvironment(
+            tempLocation=staging_path),
+        update=False)
+
+    wrapper_req = (
+        apis.GetMessagesModule().DataflowProjectsLocationsTemplatesLaunchRequest
+    )
+    wrapped_request = wrapper_req(
+        dynamicTemplate_gcsPath=gcs_path,
+        dynamicTemplate_stagingLocation=staging_path,
+        launchTemplateParameters=parameters,
+        projectId=self.Project(),
+        location=base.DEFAULT_REGION,
+        validateOnly=False)
+
+    self.mocked_client.projects_locations_templates.Launch.Expect(
+        wrapped_request,
+        apis.GetMessagesModule().LaunchTemplateResponse())
+    template_args = apis.TemplateArguments(
         job_name=name,
-        project_id=self.Project(),
         gcs_location=gcs_path,
+        project_id=self.Project(),
         staging_location=staging_path)
+    apis.Templates.LaunchDynamicTemplate(template_args)
+
+  def testLaunchDynamicTemplate_httpError(self):
+    name = 'myjob'
+    gcs_path = 'gs://dynamic_template_path'
+    staging_path = 'gs://my_staging_path'
+    parameters = apis.Templates.LAUNCH_TEMPLATE_PARAMETERS(
+        jobName=name,
+        environment=apis.GetMessagesModule().RuntimeEnvironment(
+            tempLocation=staging_path),
+        update=False)
+
+    wrapper_req = (
+        apis.GetMessagesModule().DataflowProjectsLocationsTemplatesLaunchRequest
+    )
+    wrapped_request = wrapper_req(
+        dynamicTemplate_gcsPath=gcs_path,
+        dynamicTemplate_stagingLocation=staging_path,
+        launchTemplateParameters=parameters,
+        projectId=self.Project(),
+        location=base.DEFAULT_REGION,
+        validateOnly=False)
+
+    self.mocked_client.projects_locations_templates.Launch.Expect(
+        wrapped_request,
+        exception=apitools_exceptions.HttpError.FromResponse(
+            http_wrapper.Response(
+                info={'status': 400},
+                content='{"error": '
+                '{"message": "The workflow could not be created."}}',
+                request_url='https://dataflow.googleapis.com/v1b3/request-url'))
+    )
+    template_args = apis.TemplateArguments(
+        job_name=name,
+        gcs_location=gcs_path,
+        project_id=self.Project(),
+        staging_location=staging_path)
+    with self.AssertRaisesExceptionMatches(
+        exceptions.HttpException, 'The workflow could not be created.'):
+      apis.Templates.LaunchDynamicTemplate(template_args)
 
   def testPrivateIPTemplatesCreate(self):
     name = 'job name'
@@ -169,13 +242,119 @@ class ApisUnitTest(base.DataflowMockingTestBase,
     self.mocked_client.projects_locations_templates.Create.Expect(
         wrapped_request,
         apis.GetMessagesModule().Job())
+    template_args = apis.TemplateArguments(job_name=name, gcs_location=gcs_path,
+                                           project_id=self.Project(),
+                                           staging_location=staging_path,
+                                           disable_public_ips=True)
+    apis.Templates.Create(template_args)
 
-    apis.Templates.Create(
-        job_name=name,
-        project_id=self.Project(),
-        gcs_location=gcs_path,
-        staging_location=staging_path,
-        disable_public_ips=True)
+  def testFlexTemplatesCreateJob(self):
+    name = 'job name'
+    gcs_path = 'gs://my_gcs_path'
+    template_args = apis.TemplateArguments(job_name=name, gcs_location=gcs_path,
+                                           project_id=self.Project())
+    launch_params = apis.Templates.FLEX_TEMPLATE_PARAMETER(
+        jobName=template_args.job_name,
+        containerSpecGcsPath=template_args.gcs_location,
+        parameters=None)
+    request = apis.Templates.LAUNCH_FLEX_TEMPLATE_REQUEST(
+        launchParameter=launch_params)
+
+    wrapper_req = (
+        apis.GetMessagesModule()
+        .DataflowProjectsLocationsFlexTemplatesLaunchRequest)
+    wrapped_request = wrapper_req(
+        projectId=self.Project(),
+        location=base.DEFAULT_REGION,
+        launchFlexTemplateRequest=request)
+
+    self.mocked_client.projects_locations_flexTemplates.Launch.Expect(
+        wrapped_request,
+        apis.GetMessagesModule().LaunchFlexTemplateResponse())
+
+    apis.Templates.CreateJobFromFlexTemplate(template_args)
+
+  def testBuildAndStoreFlexTemplateFileMalformedMetadata(self):
+    metadata = {
+        'parameters': [{
+            'name': 'input',
+            'label': 'input',
+            'helpText': 'help text for input param'
+        }]
+    }
+    with self.AssertRaisesExceptionRegexp(
+        ValueError,
+        'Invalid template metadata. Name field is empty.*'):
+      apis.Templates.BuildAndStoreFlexTemplateFile(
+          'gs://foo/template-file', 'gcr://foo-image', json.dumps(metadata),
+          'JAVA', True)
+
+  def testBuildAndStoreFlexTemplateFileMalformedParameterName(self):
+    metadata = {
+        'name': 'name',
+        'parameters': [{
+            'label': 'input',
+            'helpText': 'help text for input param'
+        }]
+    }
+    with self.AssertRaisesExceptionRegexp(
+        ValueError,
+        'Invalid template metadata. Parameter name field is empty.*'):
+      apis.Templates.BuildAndStoreFlexTemplateFile(
+          'gs://foo/template-file', 'gcr://foo-image', json.dumps(metadata),
+          'JAVA', True)
+
+  def testBuildAndStoreFlexTemplateFileMalformedParameterLabel(self):
+    metadata = {
+        'name': 'name',
+        'parameters': [{
+            'name': 'name',
+            'helpText': 'help text for input param'
+        }]
+    }
+    with self.AssertRaisesExceptionRegexp(
+        ValueError,
+        'Invalid template metadata. Parameter label field is empty.*'):
+      apis.Templates.BuildAndStoreFlexTemplateFile(
+          'gs://foo/template-file', 'gcr://foo-image', json.dumps(metadata),
+          'JAVA', True)
+
+  def testBuildAndStoreFlexTemplateFileMalformedParameterHelpText(self):
+    metadata = {
+        'name': 'name',
+        'parameters': [{
+            'label': 'input',
+            'name': 'name'
+        }]
+    }
+    with self.AssertRaisesExceptionRegexp(
+        ValueError,
+        'Invalid template metadata. Parameter helpText field is empty.*'):
+      apis.Templates.BuildAndStoreFlexTemplateFile(
+          'gs://foo/template-file', 'gcr://foo-image', json.dumps(metadata),
+          'JAVA', True)
+
+  def testBuildAndStoreFlexTemplateFilePrinOnly(self):
+    expected_result = {
+        'image': 'gcr://foo-image',
+        'sdkInfo': {
+            'language': 'JAVA'
+        },
+        'metadata': {
+            'name': 'name',
+            'parameters': [{
+                'name': 'input',
+                'label': 'input',
+                'helpText': 'help text for input param'
+            }]
+        }
+    }
+    metadata_file = self.Resource('tests/unit/surface/dataflow/test_data',
+                                  'flex_template_metadata.json')
+    with open(metadata_file, 'r') as f:
+      result = apis.Templates.BuildAndStoreFlexTemplateFile(
+          'gs://foo/template-file', 'gcr://foo-image', f.read(), 'JAVA', True)
+      self.assertEqual(json.loads(result), expected_result)
 
 
 if __name__ == '__main__':

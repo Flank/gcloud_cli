@@ -1,0 +1,43 @@
+title: iap oauth-clients create test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      iap oauth-clients create projects/1234567890/brands/1234567890 --display_name=TestName
+  - stderr: |
+      Created [1234567890-some-client].
+  - stdout: |
+      displayName: TestName
+      name: projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-some-client
+      secret: client-secret
+actions:
+- execute_command:
+    command: |
+      iap oauth-clients create projects/1234567890/brands/1234567890 --display_name=TestName
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iap.googleapis.com/v1/projects/1234567890/brands/1234567890/identityAwareProxyClients?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              displayName: TestName
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-some-client",
+              "secret": "client-secret",
+              "displayName": "TestName"
+            }
+    - expect_stderr: |
+        Created [1234567890-some-client].
+    - expect_stdout: |
+        displayName: TestName
+        name: projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-some-client
+        secret: client-secret
+    - expect_exit:
+        code: 0

@@ -72,7 +72,7 @@ actions:
               "name": "projects/cloudsdktest/locations/us-central1/datasets/my-dataset/operations/10009462774859563009",
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.cloud.healthcare.v1alpha2.dataset.Dataset",
+                "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.dataset.Dataset",
                 "name": "projects/cloudsdktest/locations/us-central1/datasets/my-dataset"
               }
             }
@@ -91,14 +91,14 @@ actions:
             {
               "name": "projects/cloudsdktest/locations/us-central1/datasets/my-dataset/operations/10009462774859563009",
               "metadata": {
-                "@type": "type.googleapis.com/google.cloud.healthcare.v1alpha2.OperationMetadata",
-                "apiMethodName": "google.cloud.healthcare.v1alpha2.dataset.DatasetService.CreateDataset",
+                "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.OperationMetadata",
+                "apiMethodName": "google.cloud.healthcare.$$api-version$$.dataset.DatasetService.CreateDataset",
                 "createTime": "2019-02-08T15:55:24.862766Z",
                 "endTime": "2019-02-08T15:55:24.897585Z"
               },
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.cloud.healthcare.v1alpha2.dataset.Dataset",
+                "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.dataset.Dataset",
                 "name": "projects/cloudsdktest/locations/us-central1/datasets/my-dataset"
               }
             }

@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha compute forwarding-rules set-target NAME
         (--backend-service=BACKEND_SERVICE
+          | --target-grpc-proxy=TARGET_GRPC_PROXY
           | --target-http-proxy=TARGET_HTTP_PROXY
           | --target-https-proxy=TARGET_HTTPS_PROXY
           | --target-instance=TARGET_INSTANCE | --target-pool=TARGET_POOL
@@ -27,7 +28,8 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) gcloud alpha compute forwarding-rules set-target is used to set a
     new target for a forwarding        rule.         A forwarding rule directs traffic that matches a destination IP address
-    to a forwarding target (load balancer, VPN gateway or VM instance).
+    (and possibly a TCP or UDP port) to a forwarding target (load balancer, VPN
+    gateway or VM instance).
 
     Forwarding rules can be either global or regional, specified with the
     --global or --region=REGION flags. For more information about the scope of
@@ -49,7 +51,7 @@ DESCRIPTION
     internal self-managed forwarding rule.
 
     Different types of load balancers work at different layers of the OSI
-    networking model (http://en.wikipedia.org/wiki/Network_layer). Layer 3
+    networking model (http://en.wikipedia.org/wiki/Network_layer). Layer 3/4
     targets include target pools, target SSL proxies, target TCP proxies, and
     backend services. Layer 7 targets include target HTTP proxies and target
     HTTPS proxies. For more information, refer to
@@ -57,8 +59,9 @@ DESCRIPTION
 
         When creating a forwarding rule, exactly one of  `_--target-instance_`,
         `_--target-pool_`, `_--target-http-proxy_`, `_--target-https-proxy_`,
-        `_--target-ssl-proxy_`, `_--target-tcp-proxy_` or
-        `_--target-vpn-gateway_` must be specified.
+        `_--target-grpc-proxy_`, `_--target-ssl-proxy_`,
+        `_--target-tcp-proxy_` or `_--target-vpn-gateway_`
+        must be specified.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -69,6 +72,9 @@ REQUIRED FLAGS
 
        --backend-service=BACKEND_SERVICE
           Target backend service that receives the traffic.
+
+       --target-grpc-proxy=TARGET_GRPC_PROXY
+          Target gRPC proxy that receives the traffic.
 
        --target-http-proxy=TARGET_HTTP_PROXY
           Target HTTP proxy that receives the traffic. Acceptable values for
@@ -137,7 +143,7 @@ OPTIONAL FLAGS
             --target-https-proxy.
          INTERNAL_SELF_MANAGED
             Traffic director load balancing or forwarding, used with
-            --target-http-proxy, --target-https-proxy.
+            --target-http-proxy, --target-https-proxy, --target-grpc-proxy.
 
      --network=NETWORK
         (Only for --load-balancing-scheme=INTERNAL or
@@ -262,8 +268,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -1,0 +1,107 @@
+title: iap oauth-clients list test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      iap oauth-clients list projects/1234567890/brands/1234567890
+  - stdout: |
+      ---
+      displayName: client_1
+      name: projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc1.apps.googleusercontent.com
+      secret: secret_1
+      ---
+      displayName: client_2
+      name: projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc2.apps.googleusercontent.com
+      secret: secret_2
+- execute:
+  - command: |
+      iap oauth-clients list --project other-project 1234567890
+  - stdout: |
+      ---
+      displayName: client_1
+      name: projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc1.apps.googleusercontent.com
+      secret: secret_1
+      ---
+      displayName: client_2
+      name: projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc2.apps.googleusercontent.com
+      secret: secret_2
+actions:
+- execute_command:
+    command: |
+      iap oauth-clients list projects/1234567890/brands/1234567890
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iap.googleapis.com/v1/projects/1234567890/brands/1234567890/identityAwareProxyClients?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "identityAwareProxyClients": [
+                {
+                  "name": "projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc1.apps.googleusercontent.com",
+                  "secret": "secret_1",
+                  "displayName": "client_1"
+                },
+                {
+                  "name": "projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc2.apps.googleusercontent.com",
+                  "secret": "secret_2",
+                  "displayName": "client_2"
+                }
+              ]
+            }
+    - expect_stdout: |
+        ---
+        displayName: client_1
+        name: projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc1.apps.googleusercontent.com
+        secret: secret_1
+        ---
+        displayName: client_2
+        name: projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc2.apps.googleusercontent.com
+        secret: secret_2
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      iap oauth-clients list --project other-project 1234567890
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iap.googleapis.com/v1/projects/other-project/brands/1234567890/identityAwareProxyClients?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "identityAwareProxyClients": [
+                {
+                  "name": "projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc1.apps.googleusercontent.com",
+                  "secret": "secret_1",
+                  "displayName": "client_1"
+                },
+                {
+                  "name": "projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc2.apps.googleusercontent.com",
+                  "secret": "secret_2",
+                  "displayName": "client_2"
+                }
+              ]
+            }
+    - expect_stdout: |
+        ---
+        displayName: client_1
+        name: projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc1.apps.googleusercontent.com
+        secret: secret_1
+        ---
+        displayName: client_2
+        name: projects/1234567890/brands/1234567890/identityAwareProxyClients/1234567890-abc2.apps.googleusercontent.com
+        secret: secret_2
+    - expect_exit:
+        code: 0

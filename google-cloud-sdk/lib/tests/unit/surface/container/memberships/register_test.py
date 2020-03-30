@@ -22,9 +22,14 @@ from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
+from googlecloudsdk.command_lib.container.hub import agent_util
+from googlecloudsdk.command_lib.container.hub import api_util
+from googlecloudsdk.command_lib.container.hub import exclusivity_util
+from googlecloudsdk.command_lib.container.hub import kube_util
 from googlecloudsdk.command_lib.container.hub import util
 from googlecloudsdk.command_lib.projects import util as p_util
 from googlecloudsdk.core import exceptions
+from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -33,7 +38,6 @@ from tests.lib import test_case
 TEST_CONTAINER_IMAGE = 'gcr.io/test/test'
 
 
-# LINT.IfChange
 def TestDataFile(*args):
   """Returns an SdkBase.Resource for a file from the test data directory.
 
@@ -91,10 +95,10 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
     self.kubeconfig = TestDataFile('kubeconfig')
     self.serviceaccount_file = TestDataFile('service_account.json')
     self.docker_credential_file = TestDataFile('docker_credential.json')
-    self.mock_kubernetes_client = self.MockOutKubernetesClient()
-    self.mock_api_adatper = self.MockOutApiAdapter()
+    self.mock_old_kubernetes_client = self.MockOutOldKubernetesClient()
+    self.mock_api_adapter = self.MockOutApiAdapter()
     self.mock_gke_cluster_self_link = self.StartPatch(
-        'googlecloudsdk.command_lib.container.hub.util.GKEClusterSelfLink')
+        'googlecloudsdk.command_lib.container.hub.api_util.GKEClusterSelfLink')
 
   def RunCommand(self, params):
     """Runs the 'register' command with the provided params.
@@ -111,34 +115,32 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
     prefix = ['container', 'memberships', 'register']
     return self.Run(prefix + params)
 
-  def MockOutKubernetesClient(self):
+  def MockOutOldKubernetesClient(self):
     return self.StartPatch(
-        'googlecloudsdk.command_lib.container.hub.util.KubernetesClient')()
+        'googlecloudsdk.command_lib.container.hub.kube_util.OldKubernetesClient'
+    )()
 
   def MockOutApiAdapter(self):
     return self.StartPatch(
-        'googlecloudsdk.api_lib.container.hub.api_adapter.V1Beta1Adapter')()
+        'googlecloudsdk.api_lib.container.hub.gkehub_api_adapter.APIAdapter')()
 
   def testWithoutArgs(self):
     with self.AssertRaisesArgumentErrorMatches('CLUSTER_NAME'):
       self.RunCommand([])
-
-  def testMissingContextFlag(self):
-    with self.AssertRaisesArgumentErrorMatches('context'):
-      self.RunCommand(['my-cluster', '--service-account-key-file=/key.json'])
 
   def testMissingServiceAccountKeyFileFlag(self):
     with self.AssertRaisesArgumentErrorMatches('service-account-key-file'):
       self.RunCommand(['my-cluster', '--context=test-context'])
 
   def testInvalidServiceAccountKeyFile(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
-    self.StartObjectPatch(util, 'ProjectForClusterUUID', return_value=None)
+    self.StartObjectPatch(api_util, 'ProjectForClusterUUID', return_value=None)
 
     with self.AssertRaisesExceptionMatches(Exception,
                                            'service-account-key-file'):
@@ -151,13 +153,14 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
       ])
 
   def testInvalidDockerServiceAccountKeyFile(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
-    self.StartObjectPatch(util, 'ProjectForClusterUUID', return_value=None)
+    self.StartObjectPatch(api_util, 'ProjectForClusterUUID', return_value=None)
 
     with self.AssertRaisesExceptionMatches(Exception, 'docker-credential-file'):
       self.RunCommand([
@@ -178,12 +181,13 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
 
   def testGKEClusterSelfLinkRaises(self):
     self.mock_gke_cluster_self_link.side_effect = Exception('self link')
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
-    self.StartObjectPatch(util, 'ProjectForClusterUUID', return_value=None)
+    self.StartObjectPatch(api_util, 'ProjectForClusterUUID', return_value=None)
 
     with self.AssertRaisesExceptionMatches(Exception, 'self link'):
       self.RunCommand([
@@ -193,13 +197,15 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
       ])
 
   def testListMembershipsNotFound(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
-    mock_list_memberships = self.StartObjectPatch(util, 'ProjectForClusterUUID')
+    mock_list_memberships = self.StartObjectPatch(api_util,
+                                                  'ProjectForClusterUUID')
     mock_list_memberships.side_effect = apitools_exceptions.HttpNotFoundError(
         None, None, None)
 
@@ -211,15 +217,16 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
       ])
 
   def testCreateMembershipConfictNotAlreadyExists(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
 
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
-    self.StartObjectPatch(util, 'ProjectForClusterUUID', return_value=None)
-    mock_create_membership = self.StartObjectPatch(util, 'CreateMembership')
+    self.StartObjectPatch(api_util, 'ProjectForClusterUUID', return_value=None)
+    mock_create_membership = self.StartObjectPatch(api_util, 'CreateMembership')
     response = {'reason': 'CONFLICT'}
     mock_create_membership.side_effect = apitools_exceptions.HttpConflictError(
         response, None, None)
@@ -233,19 +240,20 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
       ])
 
   def testCreateMembershipAlreadyExistsWithDifferentName(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
 
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
-    self.StartObjectPatch(util, 'ProjectForClusterUUID', return_value=None)
-    mock_create_membership = self.StartObjectPatch(util, 'CreateMembership')
+    self.StartObjectPatch(api_util, 'ProjectForClusterUUID', return_value=None)
+    mock_create_membership = self.StartObjectPatch(api_util, 'CreateMembership')
     response = {'reason': 'ALREADY_EXISTS'}
     mock_create_membership.side_effect = apitools_exceptions.HttpConflictError(
         response, None, None)
-    mock_get_membership = self.StartObjectPatch(util, 'GetMembership')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
     messages = core_apis.GetMessagesModule('gkehub', 'v1beta1')
     mock_get_membership.return_value = messages.Membership(
         description='my-other-cluster')
@@ -258,19 +266,20 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
       ])
 
   def testCreateMembershipAlreadyExistsWithSameName(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
 
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
-    self.StartObjectPatch(util, 'ProjectForClusterUUID', return_value=None)
-    mock_create_membership = self.StartObjectPatch(util, 'CreateMembership')
+    self.StartObjectPatch(api_util, 'ProjectForClusterUUID', return_value=None)
+    mock_create_membership = self.StartObjectPatch(api_util, 'CreateMembership')
     response = {'reason': 'ALREADY_EXISTS'}
     mock_create_membership.side_effect = apitools_exceptions.HttpConflictError(
         response, None, None)
-    mock_get_membership = self.StartObjectPatch(util, 'GetMembership')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
     messages = core_apis.GetMessagesModule('gkehub', 'v1beta1')
     mock_get_membership.return_value = messages.Membership(
         description='my-cluster')
@@ -285,15 +294,16 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
       ])
 
   def testCreateMembershipWithClusterLink(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
     self.mock_gke_cluster_self_link.return_value = '//container.googleapis.com/projects/project/locations/location/clusters/cluster'
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
-    self.StartObjectPatch(util, 'ProjectForClusterUUID', return_value=None)
-    mock_create_membership = self.StartObjectPatch(util, 'CreateMembership')
+    self.StartObjectPatch(api_util, 'ProjectForClusterUUID', return_value=None)
+    mock_create_membership = self.StartObjectPatch(api_util, 'CreateMembership')
     mock_create_membership.side_effect = apitools_exceptions.HttpNotFoundError(
         None, None, None)
 
@@ -310,24 +320,25 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
 
     mock_create_membership.assert_called_once_with(
         'fake-project', 'fake-uid', 'my-cluster',
-        '//container.googleapis.com/projects/project/locations/location/clusters/cluster'
-    )
+        '//container.googleapis.com/projects/project/locations/location/clusters/cluster',
+        'fake-uid', calliope_base.ReleaseTrack.BETA)
 
   def testFailedAgentDeployment(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
-    self.mock_kubernetes_client.NamespaceExists.return_value = False
-    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = []
-    self.mock_kubernetes_client.Apply.return_value = 'Error applying manifest'
-    self.mock_api_adatper.GenerateConnectAgentManifest.return_value = [
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_old_kubernetes_client.NamespaceExists.return_value = False
+    self.mock_old_kubernetes_client.NamespacesWithLabelSelector.return_value = []
+    self.mock_old_kubernetes_client.Apply.return_value = ('Error applying '
+                                                          'manifest')
+    self.mock_api_adapter.GenerateConnectAgentManifest.return_value = [
         {'manifest': 'some content'},
     ]
 
     self.StartObjectPatch(
         util, 'UserAccessibleProjectIDSet', return_value={'fake-project'})
-    mock_create_membership = self.StartObjectPatch(util, 'CreateMembership')
-    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+    mock_create_membership = self.StartObjectPatch(api_util, 'CreateMembership')
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
     mock_delete_membership_resource = self.StartObjectPatch(
-        util, 'DeleteMembershipResources')
+        exclusivity_util, 'DeleteMembershipResources')
     messages = core_apis.GetMessagesModule('gkehub', 'v1beta1')
     mock_create_membership.return_value = messages.Membership(
         name='projects/fake-project/locations/global/memberships/fake-uid',
@@ -347,24 +358,25 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
       mock_delete_membership_resource.assert_called_once()
 
   def successfulMockSetup(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
-    self.mock_kubernetes_client.NamespaceExists.return_value = False
-    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = []
-    self.mock_kubernetes_client.GetResourceField.side_effect = _GetResourceFieldSideEffect
-    self.mock_kubernetes_client.Apply.return_value = None
-    self.mock_kubernetes_client.Logs.return_value = ('Fake log', None)
-    self.mock_kubernetes_client.Delete.return_value = None
-    self.mock_api_adatper.GenerateConnectAgentManifest.return_value = [
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_old_kubernetes_client.NamespaceExists.return_value = False
+    self.mock_old_kubernetes_client.NamespacesWithLabelSelector.return_value = []
+    self.mock_old_kubernetes_client.GetResourceField.side_effect = _GetResourceFieldSideEffect
+    self.mock_old_kubernetes_client.Apply.return_value = ('some output', None)
+    self.mock_old_kubernetes_client.Logs.return_value = ('Fake log', None)
+    self.mock_old_kubernetes_client.Delete.return_value = None
+    self.mock_api_adapter.GenerateConnectAgentManifest.return_value = [
         {'manifest': 'some content'},
     ]
 
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
-    self.StartObjectPatch(util, 'ProjectForClusterUUID', return_value=None)
-    mock_create_membership = self.StartObjectPatch(util, 'CreateMembership')
+    self.StartObjectPatch(api_util, 'ProjectForClusterUUID', return_value=None)
+    mock_create_membership = self.StartObjectPatch(api_util, 'CreateMembership')
     messages = core_apis.GetMessagesModule('gkehub', 'v1beta1')
     mock_create_membership.return_value = messages.Membership(
         name='projects/fake-project/locations/global/memberships/fake-uid',
@@ -375,10 +387,10 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
   def testSuccessfulAgentDeployment(self):
     self.successfulMockSetup()
     apply_membership_resources = self.StartObjectPatch(
-        util, 'ApplyMembershipResources')
-    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+        exclusivity_util, 'ApplyMembershipResources')
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
     mock_delete_membership_resource = self.StartObjectPatch(
-        util, 'DeleteMembershipResources')
+        exclusivity_util, 'DeleteMembershipResources')
 
     self.RunCommand([
         'my-cluster',
@@ -396,10 +408,10 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
   def testSuccessfulAgentDeploymentWithProxy(self):
     self.successfulMockSetup()
     apply_membership_resources = self.StartObjectPatch(
-        util, 'ApplyMembershipResources')
-    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+        exclusivity_util, 'ApplyMembershipResources')
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
     mock_delete_membership_resource = self.StartObjectPatch(
-        util, 'DeleteMembershipResources')
+        exclusivity_util, 'DeleteMembershipResources')
 
     self.RunCommand([
         'my-cluster',
@@ -418,10 +430,10 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
   def testSuccessfulAgentDeploymentWithEncodedProxy(self):
     self.successfulMockSetup()
     apply_membership_resources = self.StartObjectPatch(
-        util, 'ApplyMembershipResources')
-    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+        exclusivity_util, 'ApplyMembershipResources')
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
     mock_delete_membership_resource = self.StartObjectPatch(
-        util, 'DeleteMembershipResources')
+        exclusivity_util, 'DeleteMembershipResources')
 
     self.RunCommand([
         'my-cluster',
@@ -440,12 +452,12 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
   def testSuccessfulAgentDeploymentWithPrivateRegistry(self):
     self.successfulMockSetup()
     apply_membership_resources = self.StartObjectPatch(
-        util, 'ApplyMembershipResources')
-    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+        exclusivity_util, 'ApplyMembershipResources')
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
     mock_delete_membership_resource = self.StartObjectPatch(
-        util, 'DeleteMembershipResources')
+        exclusivity_util, 'DeleteMembershipResources')
     # TODO(b/139814516): remove this.
-    self.StartObjectPatch(util, 'DeployConnectAgentAlpha', return_value=None)
+    self.StartObjectPatch(agent_util, 'DeployConnectAgent', return_value=None)
     self.RunCommand([
         'my-cluster',
         '--context=test-context',
@@ -461,41 +473,42 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
     mock_delete_membership_resource.assert_not_called()
 
   def testSuccessfulAgentUpgradeWithProjectNumberNamespace(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
-    self.mock_kubernetes_client.GetResourceField.side_effect = _GetResourceFieldSideEffect
-    self.mock_kubernetes_client.Apply.return_value = None
-    self.mock_kubernetes_client.Logs.return_value = ('Fake log', None)
-    self.mock_kubernetes_client.Delete.return_value = None
-    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_old_kubernetes_client.GetResourceField.side_effect = _GetResourceFieldSideEffect
+    self.mock_old_kubernetes_client.Apply.return_value = ('some output', None)
+    self.mock_old_kubernetes_client.Logs.return_value = ('Fake log', None)
+    self.mock_old_kubernetes_client.Delete.return_value = None
+    self.mock_old_kubernetes_client.NamespacesWithLabelSelector.return_value = [
         'gke-connect'
     ]
-    self.mock_api_adatper.GenerateConnectAgentManifest.return_value = [
+    self.mock_api_adapter.GenerateConnectAgentManifest.return_value = [
         {'manifest': 'some content'},
     ]
 
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
     self.StartObjectPatch(
-        util, 'ProjectForClusterUUID', return_value='fake-project')
-    mock_create_membership = self.StartObjectPatch(util, 'CreateMembership')
+        api_util, 'ProjectForClusterUUID', return_value='fake-project')
+    mock_create_membership = self.StartObjectPatch(api_util, 'CreateMembership')
     response = {'reason': 'ALREADY_EXISTS'}
     mock_create_membership.side_effect = apitools_exceptions.HttpConflictError(
         response, None, None)
-    mock_get_membership = self.StartObjectPatch(util, 'GetMembership')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
     messages = core_apis.GetMessagesModule('gkehub', 'v1beta1')
     mock_get_membership.return_value = messages.Membership(
         description='my-cluster')
     apply_membership_resources = self.StartObjectPatch(
-        util, 'ApplyMembershipResources')
-    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+        exclusivity_util, 'ApplyMembershipResources')
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
     mock_delete_membership_resource = self.StartObjectPatch(
-        util, 'DeleteMembershipResources')
+        exclusivity_util, 'DeleteMembershipResources')
 
     self.StartObjectPatch(p_util, 'GetProjectNumber')
-    self.StartObjectPatch(util, '_DeleteNamespaceForReinstall')
+    self.StartObjectPatch(kube_util, 'DeleteNamespace')
 
     # The prompt is for membership deletion.
     self.WriteInput('Y')
@@ -516,48 +529,51 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
     apply_membership_resources.assert_called_once()
 
     # The Connect namespace should be searched for by its label.
-    self.mock_kubernetes_client.NamespacesWithLabelSelector.assert_called_once_with(
+    self.mock_old_kubernetes_client.NamespacesWithLabelSelector.assert_called_once_with(
         'hub.gke.io/project=fake-project')
 
-    manifest_yaml_call_arg = self.mock_kubernetes_client.Apply.call_args[0]
+    manifest_yaml_call_arg = self.mock_old_kubernetes_client.Apply.call_args[0]
     self.assertTrue(manifest_yaml_call_arg)
     self.assertNotIn('namespace: gke-connect-12321', manifest_yaml_call_arg[0])
     self.assertIn('namespace: gke-connect\n', manifest_yaml_call_arg[0])
 
   def testSuccessfulAgentUpgradeWithNonProjectNumberNamespace(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
-    self.mock_kubernetes_client.GetResourceField.side_effect = _GetResourceFieldSideEffect
-    self.mock_kubernetes_client.Apply.return_value = None
-    self.mock_kubernetes_client.Logs.return_value = ('Fake log', None)
-    self.mock_kubernetes_client.Delete.return_value = None
-    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_old_kubernetes_client.GetResourceField.side_effect = _GetResourceFieldSideEffect
+    self.mock_old_kubernetes_client.Apply.return_value = ('some output', None)
+    self.mock_old_kubernetes_client.Logs.return_value = ('Fake log', None)
+    self.mock_old_kubernetes_client.Delete.return_value = None
+    self.mock_old_kubernetes_client.NamespacesWithLabelSelector.return_value = [
         'gke-connect'
     ]
-    self.mock_api_adatper.GenerateConnectAgentManifest.return_value = [
+    self.mock_api_adapter.GenerateConnectAgentManifest.return_value = [
         {'manifest': 'some content'},
     ]
 
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
     self.StartObjectPatch(
-        util, 'ProjectForClusterUUID', return_value='fake-project')
-    self.StartObjectPatch(util, '_DeleteNamespaceForReinstall')
-    mock_create_membership = self.StartObjectPatch(util, 'CreateMembership')
+        api_util, 'ProjectForClusterUUID', return_value='fake-project')
+    self.StartObjectPatch(kube_util, 'DeleteNamespace')
+    mock_create_membership = self.StartObjectPatch(api_util, 'CreateMembership')
     response = {'reason': 'ALREADY_EXISTS'}
     mock_create_membership.side_effect = apitools_exceptions.HttpConflictError(
         response, None, None)
-    mock_get_membership = self.StartObjectPatch(util, 'GetMembership')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
     messages = core_apis.GetMessagesModule('gkehub', 'v1beta1')
     mock_get_membership.return_value = messages.Membership(
         description='my-cluster')
     apply_membership_resources = self.StartObjectPatch(
-        util, 'ApplyMembershipResources')
-    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+        exclusivity_util, 'ApplyMembershipResources')
+    log.status.Print('800')
+    log.status.Print(apply_membership_resources)
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
     mock_delete_membership_resource = self.StartObjectPatch(
-        util, 'DeleteMembershipResources')
+        exclusivity_util, 'DeleteMembershipResources')
 
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
 
@@ -575,7 +591,7 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
     mock_delete_membership_resource.assert_not_called()
 
     # The Connect namespace should be searched for by its label.
-    self.mock_kubernetes_client.NamespacesWithLabelSelector.assert_called_once_with(
+    self.mock_old_kubernetes_client.NamespacesWithLabelSelector.assert_called_once_with(
         'hub.gke.io/project=fake-project')
 
     # This was a successful registration; make sure we created the Membership
@@ -584,44 +600,47 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
 
     # If the connect namespace does not have a project number, that should be
     # reflected in the generated manifest.
-    manifest_yaml_call_arg = self.mock_kubernetes_client.Apply.call_args[0]
+    log.status.Print('600')
+    log.status.Print(type(self.mock_old_kubernetes_client.Apply.call_args))
+    manifest_yaml_call_arg = self.mock_old_kubernetes_client.Apply.call_args[0]
     self.assertTrue(manifest_yaml_call_arg)
     self.assertIn('namespace: gke-connect\n', manifest_yaml_call_arg[0])
     self.assertNotIn('namespace: gke-connect-12321\n',
                      manifest_yaml_call_arg[0])
 
   def testSuccessfulAgentUpgradeWithMultipleConnectNamespaces(self):
-    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
-    self.mock_kubernetes_client.GetResourceField.side_effect = _GetResourceFieldSideEffect
-    self.mock_kubernetes_client.Apply.return_value = None
-    self.mock_kubernetes_client.Logs.return_value = ('Fake log', None)
-    self.mock_kubernetes_client.Delete.return_value = None
-    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
+    self.mock_old_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_old_kubernetes_client.GetResourceField.side_effect = _GetResourceFieldSideEffect
+    self.mock_old_kubernetes_client.Apply.return_value = ('some output', None)
+    self.mock_old_kubernetes_client.Logs.return_value = ('Fake log', None)
+    self.mock_old_kubernetes_client.Delete.return_value = None
+    self.mock_old_kubernetes_client.NamespacesWithLabelSelector.return_value = [
         'gke-connect',
         'gke-connect-2',
     ]
-    self.mock_api_adatper.GenerateConnectAgentManifest.return_value = [
+    self.mock_api_adapter.GenerateConnectAgentManifest.return_value = [
         {'manifest': 'some content'},
     ]
 
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
         return_value={'fake-project', 'other-project'})
     self.StartObjectPatch(
-        util, 'ProjectForClusterUUID', return_value='fake-project')
-    mock_create_membership = self.StartObjectPatch(util, 'CreateMembership')
+        api_util, 'ProjectForClusterUUID', return_value='fake-project')
+    mock_create_membership = self.StartObjectPatch(api_util, 'CreateMembership')
     response = {'reason': 'ALREADY_EXISTS'}
     mock_create_membership.side_effect = apitools_exceptions.HttpConflictError(
         response, None, None)
-    mock_get_membership = self.StartObjectPatch(util, 'GetMembership')
+    mock_get_membership = self.StartObjectPatch(api_util, 'GetMembership')
     messages = core_apis.GetMessagesModule('gkehub', 'v1beta1')
     mock_get_membership.return_value = messages.Membership(
         description='my-cluster')
-    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
     mock_delete_membership_resource = self.StartObjectPatch(
-        util, 'DeleteMembershipResources')
+        exclusivity_util, 'DeleteMembershipResources')
 
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
 
@@ -640,16 +659,16 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
 
       # If the membership already exists, then the existence of the namespace
       # should not be verified.
-      self.mock_kubernetes_client.NamespaceExists.assert_not_called()
+      self.mock_old_kubernetes_client.NamespaceExists.assert_not_called()
 
       # The Connect namespace should be searched for by its label.
-      self.mock_kubernetes_client.NamespacesWithLabelSelector.assert_called_once_with(
+      self.mock_old_kubernetes_client.NamespacesWithLabelSelector.assert_called_once_with(
           'hub.gke.io/project=fake-project')
 
   def testCreateDifferentMembershipOwnerID(self):
-    self.mock_kubernetes_client = self.MockOutKubernetesClient()
+    self.mock_old_kubernetes_client = self.MockOutOldKubernetesClient()
     self.StartObjectPatch(
-        util, 'GetMembershipCROwnerID', return_value='fake-project')
+        exclusivity_util, 'GetMembershipCROwnerID', return_value='fake-project')
     self.StartObjectPatch(
         util,
         'UserAccessibleProjectIDSet',
@@ -664,13 +683,14 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
       ])
 
   def testCreateExistingMembershipOtherProject(self):
-    self.StartObjectPatch(util, 'GetClusterUUID', return_value='fake-uid')
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(kube_util, 'GetClusterUUID', return_value='fake-uid')
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util, 'UserAccessibleProjectIDSet', return_value={'my-project'})
     self.StartObjectPatch(
-        util, 'ProjectForClusterUUID', return_value='other-project')
-    mock_create_membership = self.StartObjectPatch(util, 'CreateMembership')
+        api_util, 'ProjectForClusterUUID', return_value='other-project')
+    mock_create_membership = self.StartObjectPatch(api_util, 'CreateMembership')
 
     with self.AssertRaisesExceptionMatches(exceptions.Error,
                                            'already registered'):
@@ -685,19 +705,20 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
 
       # If the membership already exists, then the existence of the namespace
       # should not be verified.
-      self.mock_kubernetes_client.NamespaceExists.assert_not_called()
+      self.mock_old_kubernetes_client.NamespaceExists.assert_not_called()
 
       # The Connect namespace should be searched for by its label.
-      self.mock_kubernetes_client.NamespacesWithLabelSelector.assert_called_once_with(
+      self.mock_old_kubernetes_client.NamespacesWithLabelSelector.assert_called_once_with(
           'hub.gke.io/project=fake-project')
 
   def testCreateWithUnauthorizedProject(self):
-    self.StartObjectPatch(util, 'GetClusterUUID', return_value='fake-uid')
-    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(kube_util, 'GetClusterUUID', return_value='fake-uid')
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
     self.StartObjectPatch(
         util, 'UserAccessibleProjectIDSet', return_value={'other-project'})
-    self.StartObjectPatch(util, 'ProjectForClusterUUID', return_value=None)
-    mock_create_membership = self.StartObjectPatch(util, 'CreateMembership')
+    self.StartObjectPatch(api_util, 'ProjectForClusterUUID', return_value=None)
+    mock_create_membership = self.StartObjectPatch(api_util, 'CreateMembership')
 
     with self.AssertRaisesExceptionMatches(exceptions.Error, 'not authorized'):
       self.WriteInput('Y')
@@ -711,10 +732,10 @@ class RegisterTestBeta(cli_test_base.CliTestBase,
 
       # If the membership already exists, then the existence of the namespace
       # should not be verified.
-      self.mock_kubernetes_client.NamespaceExists.assert_not_called()
+      self.mock_old_kubernetes_client.NamespaceExists.assert_not_called()
 
       # The Connect namespace should be searched for by its label.
-      self.mock_kubernetes_client.NamespacesWithLabelSelector.assert_called_once_with(
+      self.mock_old_kubernetes_client.NamespacesWithLabelSelector.assert_called_once_with(
           'hub.gke.io/project=fake-project')
 
 
@@ -726,4 +747,3 @@ class RegisterTestAlpha(RegisterTestBeta):
 
 if __name__ == '__main__':
   test_case.main()
-# LINT.ThenChange(../hub/register_cluster_test.py)

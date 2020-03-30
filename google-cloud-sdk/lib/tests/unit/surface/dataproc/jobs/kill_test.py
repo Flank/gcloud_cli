@@ -23,6 +23,8 @@ import copy
 
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
@@ -32,7 +34,10 @@ from tests.lib.surface.dataproc import jobs_unit_base
 class JobsKillUnitTest(jobs_unit_base.JobsUnitTestBase):
   """Tests for dataproc jobs kill."""
 
-  def ExpectCancelJob(self, job=None, response=None, exception=None):
+  def ExpectCancelJob(
+      self, job=None, response=None, exception=None, region=None):
+    if region is None:
+      region = self.REGION
     if not job:
       job = self.MakeRunningJob()
     if not (response or exception):
@@ -41,37 +46,59 @@ class JobsKillUnitTest(jobs_unit_base.JobsUnitTestBase):
     self.mock_client.projects_regions_jobs.Cancel.Expect(
         self.messages.DataprocProjectsRegionsJobsCancelRequest(
             jobId=job.reference.jobId,
-            region=self.REGION,
+            region=region,
             projectId=self.Project(),
             cancelJobRequest=self.messages.CancelJobRequest()),
         response=response,
         exception=exception)
     return response
 
-  def ExpectKillCalls(self, job=None, final_state=None):
+  def ExpectKillCalls(self, job=None, final_state=None, region=None):
+    if region is None:
+      region = self.REGION
     if not final_state:
       final_state = self.STATE_ENUM.CANCELLED
-    job = self.ExpectCancelJob(job)
-    self.ExpectGetJob(job)
+    job = self.ExpectCancelJob(job, region=region)
+    self.ExpectGetJob(job, region=region)
     job = copy.deepcopy(job)
     job.status.state = self.STATE_ENUM.CANCEL_STARTED
-    self.ExpectGetJob(job)
-    self.ExpectGetJob(job)
+    self.ExpectGetJob(job, region=region)
+    self.ExpectGetJob(job, region=region)
     job = copy.deepcopy(job)
     job.status.state = final_state
-    self.ExpectGetJob(job)
+    self.ExpectGetJob(job, region=region)
     return job
 
-  def testKillJob(self):
-    expected = self.ExpectKillCalls()
+  def _testKillJob(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+    expected = self.ExpectKillCalls(region=region)
     self.WriteInput('y\n')
-    result = self.RunDataproc('jobs kill ' + self.JOB_ID)
+    result = self.RunDataproc('jobs kill {0} {1}'.format(
+        self.JOB_ID, region_flag))
     self.AssertErrContains(
         "The job 'dbf5f287-f332-470b-80b2-c94b49358c45' will be killed.")
     self.AssertErrContains('PROMPT_CONTINUE')
     self.AssertMessagesEqual(expected, result)
     self.AssertErrContains('Job cancellation initiated')
     self.AssertErrContains('Waiting for job cancellation')
+
+  def testKillJob(self):
+    self._testKillJob()
+
+  def testKillJob_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self._testKillJob(region='us-central1')
+
+  def testKillJob_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('other-default-region')
+    self._testKillJob(region='us-central1', region_flag='--region=us-central1')
+
+  def testKillJob_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('jobs kill foo-job', set_region=False)
 
   def testKillJobFailure(self):
     self.ExpectKillCalls(final_state=self.STATE_ENUM.ERROR)

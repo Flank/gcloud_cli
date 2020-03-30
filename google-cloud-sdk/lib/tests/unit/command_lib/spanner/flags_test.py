@@ -217,7 +217,6 @@ class CompletionTest(base.SpannerTestBase, completer_test_base.CompleterBase):
     self.RunCompleter(
         flags.DatabaseSessionCompleter,
         expected_command=[
-            'beta',
             'spanner',
             'databases',
             'sessions',

@@ -11,7 +11,7 @@ gcloud beta container clusters create \- create a cluster for running containers
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container clusters create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-addons\fR=[\fIADDON\fR,...]] [\fB\-\-allow\-route\-overlap\fR] [\fB\-\-async\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR] [\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-database\-encryption\-key\fR=\fIDATABASE_ENCRYPTION_KEY\fR] [\fB\-\-default\-max\-pods\-per\-node\fR=\fIDEFAULT_MAX_PODS_PER_NODE\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-no\-enable\-autoupgrade\fR] [\fB\-\-enable\-binauthz\fR] [\fB\-\-enable\-cloud\-logging\fR] [\fB\-\-enable\-cloud\-monitoring\fR] [\fB\-\-enable\-cloud\-run\-alpha\fR] [\fB\-\-enable\-intra\-node\-visibility\fR] [\fB\-\-enable\-ip\-alias\fR] [\fB\-\-enable\-kubernetes\-alpha\fR] [\fB\-\-enable\-legacy\-authorization\fR] [\fB\-\-enable\-network\-policy\fR] [\fB\-\-enable\-pod\-security\-policy\fR] [\fB\-\-enable\-shielded\-nodes\fR] [\fB\-\-enable\-stackdriver\-kubernetes\fR] [\fB\-\-enable\-vertical\-pod\-autoscaling\fR] [\fB\-\-identity\-namespace\fR=\fIIDENTITY_NAMESPACE\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-issue\-client\-certificate\fR] [\fB\-\-istio\-config\fR=[\fIauth\fR=\fIMTLS_PERMISSIVE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR;\ default=1] [\fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-security\-group\fR=\fISECURITY_GROUP\fR] [\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [[\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ [\fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ :\ \fB\-\-autoprovisioning\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ \fB\-\-autoprovisioning\-scopes\fR=[\fISCOPE\fR,...]\ \fB\-\-autoprovisioning\-service\-account\fR=\fIAUTOPROVISIONING_SERVICE_ACCOUNT\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-enable\-master\-authorized\-networks\fR\ \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR] [\fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-nodes\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR\ \fB\-\-private\-cluster\fR] [\fB\-\-enable\-tpu\fR\ \fB\-\-tpu\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-maintenance\-window\fR=\fISTART_TIME\fR\ |\ \fB\-\-maintenance\-window\-end\fR=\fITIME_STAMP\fR\ \fB\-\-maintenance\-window\-recurrence\fR=\fIRRULE\fR\ \fB\-\-maintenance\-window\-start\fR=\fITIME_STAMP\fR] [\fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-release\-channel\fR=\fICHANNEL\fR\ |\ \fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR\ \fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container clusters create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-addons\fR=[\fIADDON\fR,...]] [\fB\-\-allow\-route\-overlap\fR] [\fB\-\-async\fR] [\fB\-\-autoscaling\-profile\fR=\fIAUTOSCALING_PROFILE\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR] [\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-database\-encryption\-key\fR=\fIDATABASE_ENCRYPTION_KEY\fR] [\fB\-\-default\-max\-pods\-per\-node\fR=\fIDEFAULT_MAX_PODS_PER_NODE\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-no\-enable\-autoupgrade\fR] [\fB\-\-enable\-binauthz\fR] [\fB\-\-enable\-cloud\-logging\fR] [\fB\-\-enable\-cloud\-monitoring\fR] [\fB\-\-enable\-cloud\-run\-alpha\fR] [\fB\-\-enable\-intra\-node\-visibility\fR] [\fB\-\-enable\-ip\-alias\fR] [\fB\-\-enable\-kubernetes\-alpha\fR] [\fB\-\-enable\-legacy\-authorization\fR] [\fB\-\-enable\-logging\-monitoring\-system\-only\fR] [\fB\-\-enable\-network\-policy\fR] [\fB\-\-enable\-pod\-security\-policy\fR] [\fB\-\-enable\-shielded\-nodes\fR] [\fB\-\-enable\-stackdriver\-kubernetes\fR] [\fB\-\-enable\-vertical\-pod\-autoscaling\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-issue\-client\-certificate\fR] [\fB\-\-istio\-config\fR=[\fIauth\fR=\fIMTLS_PERMISSIVE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR;\ default=1] [\fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-security\-group\fR=\fISECURITY_GROUP\fR] [\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-workload\-pool\fR=\fIWORKLOAD_POOL\fR] [\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [[\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ [\fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ :\ \fB\-\-autoprovisioning\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ \fB\-\-autoprovisioning\-scopes\fR=[\fISCOPE\fR,...]\ \fB\-\-autoprovisioning\-service\-account\fR=\fIAUTOPROVISIONING_SERVICE_ACCOUNT\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-enable\-master\-authorized\-networks\fR\ \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR] [\fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-nodes\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR\ \fB\-\-private\-cluster\fR] [\fB\-\-enable\-tpu\fR\ \fB\-\-enable\-tpu\-service\-networking\fR\ |\ \fB\-\-tpu\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-maintenance\-window\fR=\fISTART_TIME\fR\ |\ \fB\-\-maintenance\-window\-end\fR=\fITIME_STAMP\fR\ \fB\-\-maintenance\-window\-recurrence\fR=\fIRRULE\fR\ \fB\-\-maintenance\-window\-start\fR=\fITIME_STAMP\fR] [\fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-release\-channel\fR=\fICHANNEL\fR\ |\ \fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR\ \fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -64,7 +64,8 @@ are additional Kubernetes cluster components. Addons specified by this flag will
 be enabled. The others will be disabled. Default addons: HttpLoadBalancing,
 HorizontalPodAutoscaling. \fIADDON\fR must be one of: \fBHttpLoadBalancing\fR,
 \fBHorizontalPodAutoscaling\fR, \fBKubernetesDashboard\fR, \fBNetworkPolicy\fR,
-\fBCloudRun\fR, \fBIstio\fR, \fBApplicationManager\fR.
+\fBCloudRun\fR, \fBIstio\fR, \fBApplicationManager\fR, \fBNodeLocalDNS\fR,
+\fBGcePersistentDiskCsiDriver\fR.
 
 .TP 2m
 \fB\-\-allow\-route\-overlap\fR
@@ -82,6 +83,19 @@ Must be used in conjunction with '\-\-enable\-ip\-alias' or
 .TP 2m
 \fB\-\-async\fR
 Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-autoscaling\-profile\fR=\fIAUTOSCALING_PROFILE\fR
+Set autoscaling behaviour, choices are 'optimize\-utilization' and 'balanced'.
+Default is 'balanced'.
+
+.TP 2m
+\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR
+The Customer Managed Encryption Key used to encrypt the boot disk attached to
+each node in the node pool. This should be of the form
+projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
+For more information about protecting resources with Cloud KMS Keys please see:
+https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption
 
 .TP 2m
 \fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR
@@ -152,7 +166,7 @@ the application layer. The key provided should be the resource ID in the format
 of
 \f5projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME]\fR.
 For more information, see
-<https://cloud.google.com/kubernetes\-engine/docs/how\-to/encrypting\-secrets>.
+https://cloud.google.com/kubernetes\-engine/docs/how\-to/encrypting\-secrets.
 
 .TP 2m
 \fB\-\-default\-max\-pods\-per\-node\fR=\fIDEFAULT_MAX_PODS_PER_NODE\fR
@@ -277,6 +291,10 @@ instead, create or update your cluster with the option
 \f5\-\-no\-enable\-legacy\-authorization\fR.
 
 .TP 2m
+\fB\-\-enable\-logging\-monitoring\-system\-only\fR
+Enable Stackdriver Kubernetes system\-only monitoring and logging.
+
+.TP 2m
 \fB\-\-enable\-network\-policy\fR
 Enable network policy enforcement for this cluster. If you are enabling network
 policy on an existing cluster the network policy addon must first be enabled on
@@ -293,7 +311,8 @@ https://cloud.google.com/kubernetes\-engine/docs/how\-to/pod\-security\-policies
 .TP 2m
 \fB\-\-enable\-shielded\-nodes\fR
 Enable Shielded Nodes for this cluster. Enabling Shielded Nodes will enable a
-more secure Node credential bootstrapping implementation.
+more secure Node credential bootstrapping implementation. Starting with version
+1.18, clusters will have shielded GKE nodes by default.
 
 .TP 2m
 \fB\-\-enable\-stackdriver\-kubernetes\fR
@@ -302,22 +321,6 @@ Enable Stackdriver Kubernetes monitoring and logging.
 .TP 2m
 \fB\-\-enable\-vertical\-pod\-autoscaling\fR
 Enable vertical pod autoscaling for a cluster.
-
-.TP 2m
-\fB\-\-identity\-namespace\fR=\fIIDENTITY_NAMESPACE\fR
-Enable Workload Identity on the cluster.
-
-When enabled, Kubernetes service accounts will be able to act as Cloud IAM
-Service Accounts, through the provided identity namespace.
-
-Currently, the only accepted identity namespace is the identity namespace of the
-Cloud project containing the cluster, \f5PROJECT_NAME.svc.id.goog\fR.
-
-For more information on Workload Identity, see
-
-.RS 2m
-https://cloud.google.com/kubernetes\-engine/docs/how\-to/workload\-identity
-.RE
 
 .TP 2m
 \fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR
@@ -653,29 +656,53 @@ Type of metadata server available to pods running in the node pool.
 .RS 2m
 .TP 2m
 \fBEXPOSED\fR
+[DEPRECATED] Pods running in this node pool have access to the node's underlying
+Compute Engine Metadata Server.
+.TP 2m
+\fBGCE_METADATA\fR
 Pods running in this node pool have access to the node's underlying Compute
 Engine Metadata Server.
 .TP 2m
-\fBGKE_METADATA_SERVER\fR
+\fBGKE_METADATA\fR
 Run the Kubernetes Engine Metadata Server on this node. The Kubernetes Engine
 Metadata Server exposes a metadata API to workloads that is compatible with the
 V1 Compute Metadata APIs exposed by the Compute Engine and App Engine Metadata
 Servers. This feature can only be enabled if Workload Identity is enabled at the
 cluster level.
 .TP 2m
+\fBGKE_METADATA_SERVER\fR
+[DEPRECATED] Run the Kubernetes Engine Metadata Server on this node. The
+Kubernetes Engine Metadata Server exposes a metadata API to workloads that is
+compatible with the V1 Compute Metadata APIs exposed by the Compute Engine and
+App Engine Metadata Servers. This feature can only be enabled if Workload
+Identity is enabled at the cluster level.
+.TP 2m
 \fBSECURE\fR
-Prevents pods not in hostNetwork from accessing certain VM metadata,
+[DPRECATED] Prevents pods not in hostNetwork from accessing certain VM metadata,
 specifically kube\-env, which contains Kubelet credentials, and the instance
 identity token. This is a temporary security solution available while the
 bootstrapping process for cluster nodes is being redesigned with significant
 security improvements. This feature is scheduled to be deprecated in the future
 and later removed.
-.TP 2m
-\fBUNSPECIFIED\fR
-Chooses the default.
 .RE
 .sp
 
+
+.TP 2m
+\fB\-\-workload\-pool\fR=\fIWORKLOAD_POOL\fR
+Enable Workload Identity on the cluster.
+
+When enabled, Kubernetes service accounts will be able to act as Cloud IAM
+Service Accounts, through the provided workload pool.
+
+Currently, the only accepted workload pool is the workload pool of the Cloud
+project containing the cluster, \f5PROJECT_NAME.svc.id.goog\fR.
+
+For more information on Workload Identity, see
+
+.RS 2m
+https://cloud.google.com/kubernetes\-engine/docs/how\-to/workload\-identity
+.RE
 
 .TP 2m
 
@@ -750,7 +777,8 @@ At most one of these may be specified:
 \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR
 Path of the JSON/YAML file which contains information about the cluster's node
 autoprovisioning configuration. Currently it contains a list of resource limits,
-identity defaults for autoprovisioning and node locations for autoprovisioning.
+identity defaults for autoprovisioning, node upgrade settings, node management
+settings, minimum cpu platform, and node locations for autoprovisioning.
 
 Resource limits are specified in the field 'resourceLimits'. Each resource
 limits definition contains three fields: resourceType, maximum and minimum.
@@ -761,12 +789,30 @@ the maximum allowed amount with the unit of the resource. Minimum is the minimum
 allowed amount with the unit of the resource.
 
 Identity default contains at most one of the below fields: serviceAccount: The
-Google Cloud Platform Service Account to be used by node VMs in autoprovisioined
-node pools. If not specified, the project default service account is used.
-scopes: A list of scopes be used by node instances in autoprovisioined node
+Google Cloud Platform Service Account to be used by node VMs in autoprovisioned
+node pools. If not specified, the project's default service account is used.
+scopes: A list of scopes to be used by node instances in autoprovisioned node
 pools. Multiple scopes can be specified, separated by commas. For information on
 defaults, look at:
 https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#\-\-scopes
+
+Note: Node Upgrade settings are implemented only in Beta and Alpha. Node Upgrade
+settings are specified under the field 'upgradeSettings', which has the
+following fields: maxSurgeUpgrade: Number of extra (surge) nodes to be created
+on each upgrade of an autoprovisioned node pool. maxUnavailableUpgrade: Number
+of nodes that can be unavailable at the same time on each upgrade of an
+autoprovisioned node pool.
+
+Note: Node Management settings are implemented only in Beta and Alpha. Node
+Management settings are specified under the field 'nodeManagement', which has
+the following fields: enableAutoUpgrade: A boolean field that indicates if node
+autoupgrade is enabled for autoprovisioned node pools. enableAutoRepair: A
+boolean field that indicates if node autorepair is enabled for autoprovisioned
+node pools.
+
+minCpuPlatform: If specified, new autoprovisioned nodes will be scheduled on
+host with specified CPU architecture or a newer one. Note: Min CPU platform can
+only be specified in Beta and Alpha.
 
 Autoprovisioning locations is a set of zones where new node pools can be created
 by Autoprovisioning. Autoprovisioning locations are specified in the field
@@ -817,7 +863,7 @@ Flags to specify identity for autoprovisioned nodes:
 .RS 2m
 .TP 2m
 \fB\-\-autoprovisioning\-scopes\fR=[\fISCOPE\fR,...]
-The scopes be used by node instances in autoprovisioined node pools. Multiple
+The scopes be used by node instances in autoprovisioned node pools. Multiple
 scopes can be specified, separated by commas. For information on defaults, look
 at:
 https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#\-\-scopes
@@ -825,7 +871,7 @@ https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#\-\-scop
 .TP 2m
 \fB\-\-autoprovisioning\-service\-account\fR=\fIAUTOPROVISIONING_SERVICE_ACCOUNT\fR
 The Google Cloud Platform Service Account to be used by node VMs in
-autoprovisioined node pools. If not specified, the project default service
+autoprovisioned node pools. If not specified, the project default service
 account is used.
 
 .RE
@@ -1021,6 +1067,19 @@ Enable Cloud TPUs for this cluster.
 Can not be specified unless \f5\-\-enable\-ip\-alias\fR is also specified.
 
 .TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-tpu\-service\-networking\fR
+Enable Cloud TPU's Service Networking mode. In this mode, the CIDR blocks used
+by the Cloud TPUs will be allocated and managed by Service Networking, instead
+of Kubernetes Engine.
+
+This cannot be specified if \f5tpu\-ipv4\-cidr\fR is specified.
+
+.TP 2m
 \fB\-\-tpu\-ipv4\-cidr\fR=\fICIDR\fR
 Set the IP range for the Cloud TPUs.
 
@@ -1033,6 +1092,7 @@ If unspecified, the TPU CIDR range will use automatic default '/20'.
 Can not be specified unless '\-\-enable\-tpu' and '\-\-enable\-ip\-alias' are
 also specified.
 
+.RE
 .RE
 .sp
 .TP 2m
@@ -1175,10 +1235,10 @@ be specified:
 \fB\-\-release\-channel\fR=\fICHANNEL\fR
 Release channel a cluster is subscribed to.
 
-When a cluster is subscribed to a release channel, Google maintains both the
-master version and the node version. Node auto\-upgrade defaults to true and
-cannot be disabled. Updates to version related fields (e.g.
-\-\-cluster\-version) return an error.
+When a cluster is subscribed to a release channel, GKE maintains both the master
+version and the node version. Node auto\-upgrade defaults to true and cannot be
+disabled. Updates to version related fields (e.g. \-\-cluster\-version) return
+an error.
 
 \fICHANNEL\fR must be one of:
 
@@ -1237,6 +1297,24 @@ $ gcloud container get\-server\-config
 .RE
 
 .RE
+.RE
+.sp
+.TP 2m
+
+Specifies the reservation for the default initial node pool.
+
+.RS 2m
+.TP 2m
+\fB\-\-reservation\fR=\fIRESERVATION\fR
+The name of the reservation, required when
+\f5\-\-reservation\-affinity=specific\fR.
+
+.TP 2m
+\fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR
+The type of the reservation for the default initial node pool.
+\fIRESERVATION_AFFINITY\fR must be one of: \fBany\fR, \fBnone\fR,
+\fBspecific\fR.
+
 .RE
 .sp
 .TP 2m
@@ -1337,8 +1415,19 @@ used.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a cluster with the default configuration, run:
+
+.RS 2m
+$ gcloud beta container clusters create sample\-cluster
+.RE
 
 
 

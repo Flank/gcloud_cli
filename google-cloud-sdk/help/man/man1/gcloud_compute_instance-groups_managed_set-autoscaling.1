@@ -11,7 +11,7 @@ gcloud compute instance\-groups managed set\-autoscaling \- set autoscaling para
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instance\-groups managed set\-autoscaling\fR \fINAME\fR \fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instance\-groups managed set\-autoscaling\fR \fINAME\fR \fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -87,6 +87,31 @@ Notes about Autoscaler.
 Minimum number of replicas Autoscaler will set.
 
 .TP 2m
+\fB\-\-mode\fR=\fIMODE\fR
+Set the mode of an autoscaler for a managed instance group.
+
+You can turn off or restrict MIG autoscaler activities without affecting your
+autoscaler configuration. The autoscaler configuration persists while the
+activities are turned off or restricted, and the activities resume when the
+autoscaler is turned on again or when the restrictions are lifted.
+
+\fIMODE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBoff\fR
+To turn off autoscaling, while keeping the new configuration.
+.TP 2m
+\fBon\fR
+To permit autoscaling to scale up and down (default for new autoscalers).
+.TP 2m
+\fBonly\-up\fR
+To permit autoscaling to scale only up and not down.
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-scale\-based\-on\-cpu\fR
 Autoscaler will be based on CPU utilization.
 
@@ -146,8 +171,9 @@ invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

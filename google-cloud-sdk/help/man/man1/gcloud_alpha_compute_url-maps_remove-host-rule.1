@@ -100,8 +100,9 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -112,7 +113,7 @@ named \f5MY\-URL\-MAP\fR, you can use this command:
 
 .RS 2m
 $ gcloud alpha compute url\-maps remove\-host\-rule MY\-URL\-MAP \e
-    \-\-host example.com \-\-global
+    \-\-host=example.com
 .RE
 
 

@@ -89,6 +89,12 @@ def Create(versions_client, operations_client, version_id,
       raise InvalidArgumentCombinationError(
           'If --origin is provided as a local path, --staging-bucket must be '
           'given as well.')
+  if explanation_method is not None:
+    log.status.Print(
+        'Explanations reflect patterns in your model, but don\'t necessarily '
+        'reveal fundamental relationships about your data population. See '
+        'https://cloud.google.com/ml-engine/docs/ai-explanations/limitations '
+        'for more information.')
 
   model_ref = models_util.ParseModel(model)
   version = versions_client.BuildVersion(version_id,
@@ -160,3 +166,14 @@ def Update(versions_client, operations_client, version_ref, args):
 def SetDefault(versions_client, version, model=None):
   version_ref = ParseVersion(model, version)
   return versions_client.SetDefault(version_ref)
+
+
+def ValidateFrameworkAndMachineTypeGa(framework, machine_type):
+  frameworks_enum = (
+      versions_api.GetMessagesModule().GoogleCloudMlV1Version
+      .FrameworkValueValuesEnum)
+  if (framework != frameworks_enum.TENSORFLOW and
+      not machine_type.startswith('ml')):
+    raise InvalidArgumentCombinationError(
+        'Machine type {0} is currently only supported with tensorflow.'.format(
+            machine_type))

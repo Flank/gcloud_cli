@@ -105,8 +105,36 @@ Allow transactional writes with a Single Cluster Routing policy.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update an app profile to use a multi\-cluster routing policy, run:
+
+.RS 2m
+$ gcloud beta bigtable app\-profiles update my\-app\-profile\-id \e
+    \-\-instance=my\-instance\-id \-\-route\-any
+.RE
+
+To update an app profile to use a single\-cluster routing policy that routes all
+requests to \f5my\-cluster\-id\fR and allows transactional writes, run:
+
+.RS 2m
+$ gcloud beta bigtable app\-profiles update my\-app\-profile\-id \e
+    \-\-instance=my\-instance\-id \-\-route\-to=my\-cluster\-id \e
+    \-\-transactional\-writes
+.RE
+
+To update the description for an app profile, run:
+
+.RS 2m
+$ gcloud beta bigtable app\-profiles update my\-app\-profile\-id \e
+    \-\-instance=my\-instance\-id \-\-description="New description"
+.RE
 
 
 

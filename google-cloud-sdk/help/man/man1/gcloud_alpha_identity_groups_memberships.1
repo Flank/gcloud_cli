@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha identity groups memberships \- manage Cloud Identity Groups
+gcloud alpha identity groups memberships \- manage Cloud Identity Groups Memberships
 
 
 
@@ -26,8 +26,9 @@ gcloud alpha identity groups memberships \- manage Cloud Identity Groups
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -37,12 +38,24 @@ help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBadd\fR
+\fB(ALPHA)\fR Create a new membership in an existing group.
+
+.TP 2m
+\fBdelete\fR
+\fB(ALPHA)\fR Delete a membership from an existing group.
+
+.TP 2m
 \fBdescribe\fR
 \fB(ALPHA)\fR Describe a membership in a group.
 
 .TP 2m
 \fBlist\fR
 \fB(ALPHA)\fR List memberships in an existing group.
+
+.TP 2m
+\fBmodify\-membership\-roles\fR
+\fB(ALPHA)\fR Add/remove/modify membership roles of a membership in a group.
 
 
 .RE
@@ -53,5 +66,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta identity groups memberships
+.RE
 

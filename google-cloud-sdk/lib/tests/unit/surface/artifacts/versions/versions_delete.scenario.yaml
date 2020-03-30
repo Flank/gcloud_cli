@@ -1,0 +1,151 @@
+title: artifacts versions delete
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: artifacts versions delete 1.0.0-alpha --package=my-pkg --repository=my-repo
+      --location=us
+  - prompt:
+    - message: You are about to delete version [1.0.0-alpha]
+    - input: y
+  - stderr: |
+      Delete request issued for: [1.0.0-alpha]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted version [1.0.0-alpha].
+- execute:
+  - command: artifacts versions delete 1.0.0 --package=my-pkg --repository=my-repo
+      --location=us --delete-tags
+  - prompt:
+    - message: You are about to delete version [1.0.0]
+    - input: y
+  - stderr: |
+      Delete request issued for: [1.0.0]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted version [1.0.0].
+actions:
+- execute_command:
+    command: artifacts versions delete 1.0.0-alpha --package=my-pkg --repository=my-repo
+      --location=us
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete version [1.0.0-alpha]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/fake-project/locations/us
+              locationId: us
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo/packages/my-pkg/versions/1.0.0-alpha?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": false,
+              "name": "projects/my-project/locations/us/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
+              "response": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+    - expect_stderr: |
+        Delete request issued for: [1.0.0-alpha]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted version [1.0.0-alpha].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts versions delete 1.0.0 --package=my-pkg --repository=my-repo
+      --location=us --delete-tags
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete version [1.0.0]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/fake-project/locations/us
+              locationId: us
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo/packages/my-pkg/tags?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            nextPageToken: asdf
+            tags:
+            - name: projects/fake-project/locations/us/repositories/my-repo/packages/my-pkg/tags/my-tag
+              version: projects/fake-project/locations/us/repositories/my-repo/packages/my-pkg/versions/1.0.0
+            - name: projects/fake-project/locations/us/repositories/my-repo/packages/my-pkg/tags/my-other-tag
+              version: projects/fake-project/locations/us/repositories/my-repo/packages/my-pkg/versions/2.0.0
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo/packages/my-pkg/tags/my-tag?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories/my-repo/packages/my-pkg/versions/1.0.0?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": false,
+              "name": "projects/my-project/locations/us/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
+              "response": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+    - expect_stderr: |
+        Delete request issued for: [1.0.0]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted version [1.0.0].
+    - expect_exit:
+        code: 0

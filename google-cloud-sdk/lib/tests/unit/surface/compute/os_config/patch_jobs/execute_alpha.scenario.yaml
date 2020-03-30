@@ -1,0 +1,187 @@
+# TODO(b/145214199): Remove this scenario when removing `--instance-filter` flag
+title: patch-jobs execute.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute os-config patch-jobs execute
+  - stderr: .*Exactly one of.*--instance-filter.*--instance-filter-all.* .*--instance-filter-group-labels.*--instance-filter-name-prefixes.*--instance-filter-names
+      .*--instance-filter-zones.*must be specified.*$
+  - error: '1: Exactly one of (--instance-filter | --instance-filter-all | --instance-filter-group-labels
+      --instance-filter-name-prefixes --instance-filter-names --instance-filter-zones)
+      must be specified.'
+- execute:
+  - command: compute os-config patch-jobs execute --instance-filter="" --instance-filter-zones="us-east1-b"
+  - stderr: .*Exactly one of.*--instance-filter.*--instance-filter-all.* .*--instance-filter-group-labels.*--instance-filter-name-prefixes.*--instance-filter-names
+      .*--instance-filter-zones.*must be specified.*$
+  - error: '1: argument --instance-filter: Exactly one of (--instance-filter | --instance-filter-all
+      | --instance-filter-group-labels --instance-filter-name-prefixes --instance-filter-names
+      --instance-filter-zones) must be specified.'
+- execute:
+  - command: compute os-config patch-jobs execute --instance-filter=""
+  - stderr: |
+      WARNING:           --instance-filter is deprecated; use individual filter flags instead. See
+                the command help text for more details.
+  - staged_progress_tracker:
+    - message: Executing patch job [68cb687a-de54-40dc-bdc3-c74ebc23346c]
+    - status: SUCCESS
+  - stderr: Execution for patch job.*has completed with status \[SUCCEEDED\].*$
+  - stdout: |
+      createTime: '2019-01-01T12:00:00Z'
+      instanceFilter:
+        all: true
+      name: projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+      patchConfig: {}
+      state: SUCCEEDED
+      updateTime: '2019-12-09T23:05:36.421Z'
+- execute:
+  - command: compute os-config patch-jobs execute --instance-filter="" --async
+  - stderr: |
+      WARNING:           --instance-filter is deprecated; use individual filter flags instead. See
+                the command help text for more details.
+  - stderr: Execution in progress for patch job.*$
+  - stdout: |
+      createTime: '2019-01-01T12:00:00Z'
+      instanceFilter:
+        all: true
+      name: projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+      patchConfig: {}
+      state: STARTED
+      updateTime: '2019-12-09T23:05:36.421Z'
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+- define_reference:
+    reference: zone
+    value: us-central1-f
+- execute_command:
+    command: compute os-config patch-jobs execute
+    events:
+    - expect_stderr:
+        matches: .*Exactly one of.*--instance-filter.*--instance-filter-all.* .*--instance-filter-group-labels.*--instance-filter-name-prefixes.*--instance-filter-names
+          .*--instance-filter-zones.*must be specified.*
+    - expect_exit:
+        code: 1
+        message: Exactly one of (--instance-filter | --instance-filter-all | --instance-filter-group-labels
+          --instance-filter-name-prefixes --instance-filter-names --instance-filter-zones)
+          must be specified.
+- execute_command:
+    command: compute os-config patch-jobs execute --instance-filter="" --instance-filter-zones="us-east1-b"
+    events:
+    - expect_stderr:
+        matches: .*Exactly one of.*--instance-filter.*--instance-filter-all.* .*--instance-filter-group-labels.*--instance-filter-name-prefixes.*--instance-filter-names
+          .*--instance-filter-zones.*must be specified.*
+    - expect_exit:
+        code: 1
+        message: 'argument --instance-filter: Exactly one of (--instance-filter |
+          --instance-filter-all | --instance-filter-group-labels --instance-filter-name-prefixes
+          --instance-filter-names --instance-filter-zones) must be specified.'
+- execute_command:
+    command: compute os-config patch-jobs execute --instance-filter=""
+    events:
+    - expect_stderr: |
+        WARNING:           --instance-filter is deprecated; use individual filter flags instead. See
+                  the command help text for more details.
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs:execute?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              instanceFilter:
+                all: true
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "createTime": "2019-01-01T12:00:00Z",
+              "instanceFilter": {
+                "all": true
+              },
+              "name": "projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c",
+              "patchConfig": {},
+              "state": "STARTED",
+              "updateTime": "2019-12-09T23:05:36.421Z"
+            }
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "createTime": "2019-01-01T12:00:00Z",
+              "instanceFilter": {
+                "all": true
+              },
+              "name": "projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c",
+              "patchConfig": {},
+              "state": "SUCCEEDED",
+              "updateTime": "2019-12-09T23:05:36.421Z"
+            }
+        repeatable: true
+    - expect_staged_progress_tracker:
+        message: Executing patch job [68cb687a-de54-40dc-bdc3-c74ebc23346c]
+        status: SUCCESS
+    - expect_stderr:
+        matches: Execution for patch job.*has completed with status \[SUCCEEDED\].*
+    - expect_stdout: |
+        createTime: '2019-01-01T12:00:00Z'
+        instanceFilter:
+          all: true
+        name: projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+        patchConfig: {}
+        state: SUCCEEDED
+        updateTime: '2019-12-09T23:05:36.421Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute os-config patch-jobs execute --instance-filter="" --async
+    events:
+    - expect_stderr: |
+        WARNING:           --instance-filter is deprecated; use individual filter flags instead. See
+                  the command help text for more details.
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchJobs:execute?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              instanceFilter:
+                all: true
+              patchConfig: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "createTime": "2019-01-01T12:00:00Z",
+              "instanceFilter": {
+                "all": true
+              },
+              "name": "projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c",
+              "patchConfig": {},
+              "state": "STARTED",
+              "updateTime": "2019-12-09T23:05:36.421Z"
+            }
+    - expect_stderr:
+        matches: Execution in progress for patch job.*
+    - expect_stdout: |
+        createTime: '2019-01-01T12:00:00Z'
+        instanceFilter:
+          all: true
+        name: projects/fake-project/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+        patchConfig: {}
+        state: STARTED
+        updateTime: '2019-12-09T23:05:36.421Z'
+    - expect_exit:
+        code: 0

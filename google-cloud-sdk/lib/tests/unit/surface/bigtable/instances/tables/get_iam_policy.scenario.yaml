@@ -1,5 +1,5 @@
 title: bigtable instances tables get-iam-policy scenario test
-release_tracks: [BETA, ALPHA]
+release_tracks: [GA, BETA, ALPHA]
 
 actions:
 - execute_command:

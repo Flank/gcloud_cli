@@ -20,33 +20,6 @@ gcloud ml speech recognize\-long\-running \- get transcripts of longer audio fro
 Get a transcript of audio up to 80 minutes in length. If the audio is under 60
 seconds, you may also use \f5gcloud ml speech recognize\fR to analyze it.
 
-To block the command from completing until analysis is finished, run:
-
-.RS 2m
-$ gcloud ml speech recognize\-long\-running AUDIO_FILE \e
-    \-\-language\-code LANGUAGE_CODE \-\-sample\-rate SAMPLE_RATE
-.RE
-
-You can also receive an operation as the result of the command by running:
-
-.RS 2m
-$ gcloud ml speech recognize\-long\-running AUDIO_FILE \e
-    \-\-language\-code LANGUAGE_CODE \-\-sample\-rate SAMPLE_RATE \-\-async
-.RE
-
-This will return information about an operation. To get information about the
-operation, run:
-
-.RS 2m
-$ gcloud ml speech operations describe OPERATION_ID
-.RE
-
-To poll the operation until it's complete, run:
-
-.RS 2m
-$ gcloud ml speech operations wait OPERATION_ID
-.RE
-
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -131,8 +104,9 @@ audio source (instead of re\-sampling).
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -141,6 +115,37 @@ help\fR for details.
 This command uses the \fBspeech/v1\fR API. The full documentation for this API
 can be found at:
 https://cloud.google.com/speech\-to\-text/docs/quickstart\-protocol
+
+
+
+.SH "EXAMPLES"
+
+To block the command from completing until analysis is finished, run:
+
+.RS 2m
+$ gcloud ml speech recognize\-long\-running AUDIO_FILE \e
+    \-\-language\-code=LANGUAGE_CODE \-\-sample\-rate=SAMPLE_RATE
+.RE
+
+You can also receive an operation as the result of the command by running:
+
+.RS 2m
+$ gcloud ml speech recognize\-long\-running AUDIO_FILE \e
+    \-\-language\-code=LANGUAGE_CODE \-\-sample\-rate=SAMPLE_RATE \-\-async
+.RE
+
+This will return information about an operation. To get information about the
+operation, run:
+
+.RS 2m
+$ gcloud ml speech operations describe OPERATION_ID
+.RE
+
+To poll the operation until it's complete, run:
+
+.RS 2m
+$ gcloud ml speech operations wait OPERATION_ID
+.RE
 
 
 

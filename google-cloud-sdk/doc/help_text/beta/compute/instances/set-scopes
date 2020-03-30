@@ -114,8 +114,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To set a service account with pubsub and trace scopes, run:
+
+        $ gcloud beta compute instances set-scopes example-instance \
+            --scopes=pubsub,trace --zone=us-central1-b \
+            --service-account=example-account
 
 NOTES
     This command is currently in BETA and may change without notice. This

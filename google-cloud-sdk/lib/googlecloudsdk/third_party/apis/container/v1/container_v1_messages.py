@@ -92,14 +92,19 @@ class AutoprovisioningNodePoolDefaults(_messages.Message):
   created by NAP.
 
   Fields:
+    management: Specifies the node management options for NAP created node-
+      pools.
     oauthScopes: Scopes that are used by NAP when creating node pools. If
       oauth_scopes are specified, service_account should be empty.
     serviceAccount: The Google Cloud Platform Service Account to be used by
       the node VMs. If service_account is specified, scopes should be empty.
+    upgradeSettings: Specifies the upgrade settings for NAP created node pools
   """
 
-  oauthScopes = _messages.StringField(1, repeated=True)
-  serviceAccount = _messages.StringField(2)
+  management = _messages.MessageField('NodeManagement', 1)
+  oauthScopes = _messages.StringField(2, repeated=True)
+  serviceAccount = _messages.StringField(3)
+  upgradeSettings = _messages.MessageField('UpgradeSettings', 4)
 
 
 class BigQueryDestination(_messages.Message):
@@ -130,13 +135,12 @@ class CancelOperationRequest(_messages.Message):
   Fields:
     name: The name (project, location, operation id) of the operation to
       cancel. Specified in the format 'projects/*/locations/*/operations/*'.
-    operationId: Required. Deprecated. The server-assigned `name` of the
-      operation. This field has been deprecated and replaced by the name
-      field.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    operationId: Deprecated. The server-assigned `name` of the operation. This
+      field has been deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the operation resides.
       This field has been deprecated and replaced by the name field.
   """
@@ -264,11 +268,13 @@ class Cluster(_messages.Message):
       [zones](/compute/docs/zones#available) in which the cluster's nodes
       should be located.
     loggingService: The logging service the cluster should use to write logs.
-      Currently available options:  * "logging.googleapis.com/kubernetes" -
-      the Google Cloud Logging service with Kubernetes-native resource model *
-      `logging.googleapis.com` - the Google Cloud Logging service. * `none` -
-      no logs will be exported from the cluster. * if left as an empty
-      string,`logging.googleapis.com` will be used.
+      Currently available options:  * `logging.googleapis.com/kubernetes` -
+      The Cloud Logging service with a Kubernetes-native resource model *
+      `logging.googleapis.com` - The legacy Cloud Logging service (no longer
+      available as of GKE 1.15). * `none` - no logs will be exported from the
+      cluster.  If left as an empty string,`logging.googleapis.com/kubernetes`
+      will be used for GKE 1.14+ or `logging.googleapis.com` for earlier
+      versions.
     maintenancePolicy: Configure the maintenance policy for this cluster.
     masterAuth: The authentication information for accessing the master
       endpoint. If unspecified, the defaults are used: For clusters before
@@ -278,10 +284,13 @@ class Cluster(_messages.Message):
     masterAuthorizedNetworksConfig: The configuration options for master
       authorized networks feature.
     monitoringService: The monitoring service the cluster should use to write
-      metrics. Currently available options:  * `monitoring.googleapis.com` -
-      the Google Cloud Monitoring service. * `none` - no metrics will be
-      exported from the cluster. * if left as an empty string,
-      `monitoring.googleapis.com` will be used.
+      metrics. Currently available options:  *
+      "monitoring.googleapis.com/kubernetes" - The Cloud Monitoring service
+      with a Kubernetes-native resource model * `monitoring.googleapis.com` -
+      The legacy Cloud Monitoring service (no   longer available as of GKE
+      1.15). * `none` - No metrics will be exported from the cluster.  If left
+      as an empty string,`monitoring.googleapis.com/kubernetes` will be used
+      for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
     name: The name of this cluster. The name must be unique within this
       project and location (e.g. zone or region), and can be up to 40
       characters with the following restrictions:  * Lowercase letters,
@@ -317,6 +326,7 @@ class Cluster(_messages.Message):
       services in this cluster, in [CIDR](http://en.wikipedia.org/wiki
       /Classless_Inter-Domain_Routing) notation (e.g. `1.2.3.4/29`). Service
       addresses are typically put in the last `/16` from the container CIDR.
+    shieldedNodes: Shielded Nodes configuration.
     status: [Output only] The current status of this cluster.
     statusMessage: [Output only] Additional information about the current
       status of this cluster, if available.
@@ -328,6 +338,8 @@ class Cluster(_messages.Message):
       Domain_Routing) notation (e.g. `1.2.3.4/29`).
     verticalPodAutoscaling: Cluster-level Vertical Pod Autoscaling
       configuration.
+    workloadIdentityConfig: Configuration for the use of Kubernetes Service
+      Accounts in GCP IAM policies.
     zone: [Output only] The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field is deprecated, use location instead.
@@ -428,12 +440,14 @@ class Cluster(_messages.Message):
   resourceUsageExportConfig = _messages.MessageField('ResourceUsageExportConfig', 40)
   selfLink = _messages.StringField(41)
   servicesIpv4Cidr = _messages.StringField(42)
-  status = _messages.EnumField('StatusValueValuesEnum', 43)
-  statusMessage = _messages.StringField(44)
-  subnetwork = _messages.StringField(45)
-  tpuIpv4CidrBlock = _messages.StringField(46)
-  verticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 47)
-  zone = _messages.StringField(48)
+  shieldedNodes = _messages.MessageField('ShieldedNodes', 43)
+  status = _messages.EnumField('StatusValueValuesEnum', 44)
+  statusMessage = _messages.StringField(45)
+  subnetwork = _messages.StringField(46)
+  tpuIpv4CidrBlock = _messages.StringField(47)
+  verticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 48)
+  workloadIdentityConfig = _messages.MessageField('WorkloadIdentityConfig', 49)
+  zone = _messages.StringField(50)
 
 
 class ClusterAutoscaling(_messages.Message):
@@ -489,10 +503,12 @@ class ClusterUpdate(_messages.Message):
       include the cluster's primary zone.
     desiredLoggingService: The logging service the cluster should use to write
       logs. Currently available options:  *
-      "logging.googleapis.com/kubernetes" - the Google Cloud Logging service
-      with Kubernetes-native resource model * "logging.googleapis.com" - the
-      Google Cloud Logging service * "none" - no logs will be exported from
-      the cluster
+      `logging.googleapis.com/kubernetes` - The Cloud Logging service with a
+      Kubernetes-native resource model * `logging.googleapis.com` - The legacy
+      Cloud Logging service (no longer   available as of GKE 1.15). * `none` -
+      no logs will be exported from the cluster.  If left as an empty
+      string,`logging.googleapis.com/kubernetes` will be used for GKE 1.14+ or
+      `logging.googleapis.com` for earlier versions.
     desiredMasterAuthorizedNetworksConfig: The desired configuration options
       for master authorized networks feature.
     desiredMasterVersion: The Kubernetes version to change the master to.
@@ -504,10 +520,12 @@ class ClusterUpdate(_messages.Message):
       explicit Kubernetes version - "-": picks the default Kubernetes version
     desiredMonitoringService: The monitoring service the cluster should use to
       write metrics. Currently available options:  *
-      "monitoring.googleapis.com/kubernetes" - the Google Cloud Monitoring
-      service with Kubernetes-native resource model *
-      "monitoring.googleapis.com" - the Google Cloud Monitoring service *
-      "none" - no metrics will be exported from the cluster
+      "monitoring.googleapis.com/kubernetes" - The Cloud Monitoring service
+      with a Kubernetes-native resource model * `monitoring.googleapis.com` -
+      The legacy Cloud Monitoring service (no   longer available as of GKE
+      1.15). * `none` - No metrics will be exported from the cluster.  If left
+      as an empty string,`monitoring.googleapis.com/kubernetes` will be used
+      for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
     desiredNodePoolAutoscaling: Autoscaler configuration for the node pool
       specified in desired_node_pool_id. If there is only one pool in the
       cluster and desired_node_pool_id is not provided then the change applies
@@ -526,8 +544,10 @@ class ClusterUpdate(_messages.Message):
       picks the Kubernetes master version
     desiredResourceUsageExportConfig: The desired configuration for exporting
       resource usage.
+    desiredShieldedNodes: Configuration for Shielded Nodes.
     desiredVerticalPodAutoscaling: Cluster-level Vertical Pod Autoscaling
       configuration.
+    desiredWorkloadIdentityConfig: Configuration for Workload Identity.
   """
 
   desiredAddonsConfig = _messages.MessageField('AddonsConfig', 1)
@@ -547,7 +567,9 @@ class ClusterUpdate(_messages.Message):
   desiredNodePoolId = _messages.StringField(15)
   desiredNodeVersion = _messages.StringField(16)
   desiredResourceUsageExportConfig = _messages.MessageField('ResourceUsageExportConfig', 17)
-  desiredVerticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 18)
+  desiredShieldedNodes = _messages.MessageField('ShieldedNodes', 18)
+  desiredVerticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 19)
+  desiredWorkloadIdentityConfig = _messages.MessageField('WorkloadIdentityConfig', 20)
 
 
 class CompleteIPRotationRequest(_messages.Message):
@@ -555,16 +577,16 @@ class CompleteIPRotationRequest(_messages.Message):
   mode.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster. This field has
-      been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster. This field has been
+      deprecated and replaced by the name field.
     name: The name (project, location, cluster id) of the cluster to complete
       IP rotation. Specified in the format
       'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project
       number](https://developers.google.com/console/help/new/#projectnumber).
       This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -616,14 +638,14 @@ class ContainerProjectsLocationsClustersDeleteRequest(_messages.Message):
   r"""A ContainerProjectsLocationsClustersDeleteRequest object.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to delete. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to delete. This field has
+      been deprecated and replaced by the name field.
     name: The name (project, location, cluster) of the cluster to delete.
       Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -649,14 +671,14 @@ class ContainerProjectsLocationsClustersGetRequest(_messages.Message):
   r"""A ContainerProjectsLocationsClustersGetRequest object.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to retrieve. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to retrieve. This field has
+      been deprecated and replaced by the name field.
     name: The name (project, location, cluster) of the cluster to retrieve.
       Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -674,10 +696,10 @@ class ContainerProjectsLocationsClustersListRequest(_messages.Message):
     parent: The parent (project and location) where the clusters will be
       listed. Specified in the format 'projects/*/locations/*'. Location "-"
       matches all zones and all regions.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the parent field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the parent field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides, or
       "-" for all zones. This field has been deprecated and replaced by the
       parent field.
@@ -692,18 +714,18 @@ class ContainerProjectsLocationsClustersNodePoolsDeleteRequest(_messages.Message
   r"""A ContainerProjectsLocationsClustersNodePoolsDeleteRequest object.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster. This field has
-      been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster. This field has been
+      deprecated and replaced by the name field.
     name: The name (project, location, cluster, node pool id) of the node pool
       to delete. Specified in the format
       'projects/*/locations/*/clusters/*/nodePools/*'.
-    nodePoolId: Required. Deprecated. The name of the node pool to delete.
-      This field has been deprecated and replaced by the name field.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project
+    nodePoolId: Deprecated. The name of the node pool to delete. This field
+      has been deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project
       number](https://developers.google.com/console/help/new/#projectnumber).
       This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -719,18 +741,18 @@ class ContainerProjectsLocationsClustersNodePoolsGetRequest(_messages.Message):
   r"""A ContainerProjectsLocationsClustersNodePoolsGetRequest object.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster. This field has
-      been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster. This field has been
+      deprecated and replaced by the name field.
     name: The name (project, location, cluster, node pool id) of the node pool
       to get. Specified in the format
       'projects/*/locations/*/clusters/*/nodePools/*'.
-    nodePoolId: Required. Deprecated. The name of the node pool. This field
-      has been deprecated and replaced by the name field.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project
+    nodePoolId: Deprecated. The name of the node pool. This field has been
+      deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project
       number](https://developers.google.com/console/help/new/#projectnumber).
       This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -746,16 +768,16 @@ class ContainerProjectsLocationsClustersNodePoolsListRequest(_messages.Message):
   r"""A ContainerProjectsLocationsClustersNodePoolsListRequest object.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster. This field has
-      been deprecated and replaced by the parent field.
+    clusterId: Deprecated. The name of the cluster. This field has been
+      deprecated and replaced by the parent field.
     parent: The parent (project, location, cluster id) where the node pools
       will be listed. Specified in the format
       'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project
       number](https://developers.google.com/console/help/new/#projectnumber).
       This field has been deprecated and replaced by the parent field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the parent field.
   """
@@ -786,10 +808,10 @@ class ContainerProjectsLocationsGetServerConfigRequest(_messages.Message):
   Fields:
     name: The name (project and location) of the server config to get,
       specified in the format 'projects/*/locations/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) to return operations for. This
       field has been deprecated and replaced by the name field.
   """
@@ -805,13 +827,12 @@ class ContainerProjectsLocationsOperationsGetRequest(_messages.Message):
   Fields:
     name: The name (project, location, operation id) of the operation to get.
       Specified in the format 'projects/*/locations/*/operations/*'.
-    operationId: Required. Deprecated. The server-assigned `name` of the
-      operation. This field has been deprecated and replaced by the name
-      field.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    operationId: Deprecated. The server-assigned `name` of the operation. This
+      field has been deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -829,10 +850,10 @@ class ContainerProjectsLocationsOperationsListRequest(_messages.Message):
     parent: The parent (project and location) where the operations will be
       listed. Specified in the format 'projects/*/locations/*'. Location "-"
       matches all zones and all regions.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the parent field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the parent field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) to return operations for, or `-`
       for all zones. This field has been deprecated and replaced by the parent
       field.
@@ -847,14 +868,14 @@ class ContainerProjectsZonesClustersDeleteRequest(_messages.Message):
   r"""A ContainerProjectsZonesClustersDeleteRequest object.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to delete. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to delete. This field has
+      been deprecated and replaced by the name field.
     name: The name (project, location, cluster) of the cluster to delete.
       Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -869,14 +890,14 @@ class ContainerProjectsZonesClustersGetRequest(_messages.Message):
   r"""A ContainerProjectsZonesClustersGetRequest object.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to retrieve. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to retrieve. This field has
+      been deprecated and replaced by the name field.
     name: The name (project, location, cluster) of the cluster to retrieve.
       Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -894,10 +915,10 @@ class ContainerProjectsZonesClustersListRequest(_messages.Message):
     parent: The parent (project and location) where the clusters will be
       listed. Specified in the format 'projects/*/locations/*'. Location "-"
       matches all zones and all regions.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the parent field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the parent field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides, or
       "-" for all zones. This field has been deprecated and replaced by the
       parent field.
@@ -912,18 +933,18 @@ class ContainerProjectsZonesClustersNodePoolsDeleteRequest(_messages.Message):
   r"""A ContainerProjectsZonesClustersNodePoolsDeleteRequest object.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster. This field has
-      been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster. This field has been
+      deprecated and replaced by the name field.
     name: The name (project, location, cluster, node pool id) of the node pool
       to delete. Specified in the format
       'projects/*/locations/*/clusters/*/nodePools/*'.
-    nodePoolId: Required. Deprecated. The name of the node pool to delete.
-      This field has been deprecated and replaced by the name field.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project
+    nodePoolId: Deprecated. The name of the node pool to delete. This field
+      has been deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project
       number](https://developers.google.com/console/help/new/#projectnumber).
       This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -939,18 +960,18 @@ class ContainerProjectsZonesClustersNodePoolsGetRequest(_messages.Message):
   r"""A ContainerProjectsZonesClustersNodePoolsGetRequest object.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster. This field has
-      been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster. This field has been
+      deprecated and replaced by the name field.
     name: The name (project, location, cluster, node pool id) of the node pool
       to get. Specified in the format
       'projects/*/locations/*/clusters/*/nodePools/*'.
-    nodePoolId: Required. Deprecated. The name of the node pool. This field
-      has been deprecated and replaced by the name field.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project
+    nodePoolId: Deprecated. The name of the node pool. This field has been
+      deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project
       number](https://developers.google.com/console/help/new/#projectnumber).
       This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -966,16 +987,16 @@ class ContainerProjectsZonesClustersNodePoolsListRequest(_messages.Message):
   r"""A ContainerProjectsZonesClustersNodePoolsListRequest object.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster. This field has
-      been deprecated and replaced by the parent field.
+    clusterId: Deprecated. The name of the cluster. This field has been
+      deprecated and replaced by the parent field.
     parent: The parent (project, location, cluster id) where the node pools
       will be listed. Specified in the format
       'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project
       number](https://developers.google.com/console/help/new/#projectnumber).
       This field has been deprecated and replaced by the parent field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the parent field.
   """
@@ -992,10 +1013,10 @@ class ContainerProjectsZonesGetServerconfigRequest(_messages.Message):
   Fields:
     name: The name (project and location) of the server config to get,
       specified in the format 'projects/*/locations/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) to return operations for. This
       field has been deprecated and replaced by the name field.
   """
@@ -1011,13 +1032,12 @@ class ContainerProjectsZonesOperationsGetRequest(_messages.Message):
   Fields:
     name: The name (project, location, operation id) of the operation to get.
       Specified in the format 'projects/*/locations/*/operations/*'.
-    operationId: Required. Deprecated. The server-assigned `name` of the
-      operation. This field has been deprecated and replaced by the name
-      field.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    operationId: Deprecated. The server-assigned `name` of the operation. This
+      field has been deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -1035,10 +1055,10 @@ class ContainerProjectsZonesOperationsListRequest(_messages.Message):
     parent: The parent (project and location) where the operations will be
       listed. Specified in the format 'projects/*/locations/*'. Location "-"
       matches all zones and all regions.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the parent field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the parent field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) to return operations for, or `-`
       for all zones. This field has been deprecated and replaced by the parent
       field.
@@ -1057,10 +1077,10 @@ class CreateClusterRequest(_messages.Message):
       engine/reference/rest/v1/projects.zones.clusters)
     parent: The parent (project and location) where the cluster will be
       created. Specified in the format 'projects/*/locations/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the parent field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the parent field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the parent field.
   """
@@ -1075,17 +1095,17 @@ class CreateNodePoolRequest(_messages.Message):
   r"""CreateNodePoolRequest creates a node pool for a cluster.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster. This field has
-      been deprecated and replaced by the parent field.
+    clusterId: Deprecated. The name of the cluster. This field has been
+      deprecated and replaced by the parent field.
     nodePool: Required. The node pool to create.
     parent: The parent (project, location, cluster id) where the node pool
       will be created. Specified in the format
       'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project
       number](https://developers.google.com/console/help/new/#projectnumber).
       This field has been deprecated and replaced by the parent field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the parent field.
   """
@@ -1148,7 +1168,7 @@ class DatabaseEncryption(_messages.Message):
       UNKNOWN: Should never be set
       ENCRYPTED: Secrets in etcd are encrypted.
       DECRYPTED: Secrets in etcd are stored in plain text (at etcd level) -
-        this is unrelated to GCE level full disk encryption.
+        this is unrelated to Compute Engine level full disk encryption.
     """
     UNKNOWN = 0
     ENCRYPTED = 1
@@ -1217,8 +1237,8 @@ class HorizontalPodAutoscaling(_messages.Message):
 
   Fields:
     disabled: Whether the Horizontal Pod Autoscaling feature is enabled in the
-      cluster. When enabled, it ensures that a Heapster pod is running in the
-      cluster, which is also used by the Cloud Monitoring service.
+      cluster. When enabled, it ensures that metrics are collected into
+      Stackdriver Monitoring.
   """
 
   disabled = _messages.BooleanField(1)
@@ -1570,6 +1590,23 @@ class MaxPodsConstraint(_messages.Message):
   maxPodsPerNode = _messages.IntegerField(1)
 
 
+class Metric(_messages.Message):
+  r"""Progress metric is (string, int|float|string) pair.
+
+  Fields:
+    doubleValue: For metrics with floating point value.
+    intValue: For metrics with integer value.
+    name: Required. Metric name, e.g., "nodes total", "percent done".
+    stringValue: For metrics with custom values (ratios, visual progress,
+      etc.).
+  """
+
+  doubleValue = _messages.FloatField(1)
+  intValue = _messages.IntegerField(2)
+  name = _messages.StringField(3)
+  stringValue = _messages.StringField(4)
+
+
 class NetworkConfig(_messages.Message):
   r"""NetworkConfig reports the relative names of network & subnetwork.
 
@@ -1648,14 +1685,15 @@ class NodeConfig(_messages.Message):
       conflict with any other metadata keys for the project or be one of the
       reserved keys:  "cluster-location"  "cluster-name"  "cluster-uid"
       "configure-sh"  "containerd-configure-sh"  "enable-os-login"  "gci-
-      update-strategy"  "gci-ensure-gke-docker"  "instance-template"  "kube-
-      env"  "startup-script"  "user-data"  "disable-address-manager"
-      "windows-startup-script-ps1"  "common-psm1"  "k8s-node-setup-psm1"
-      "install-ssh-psm1"  "user-profile-psm1"  "serial-port-logging-enable"
-      Values are free-form strings, and only have meaning as interpreted by
-      the image running in the instance. The only restriction placed on them
-      is that each value's size must be less than or equal to 32 KB.  The
-      total size of all keys and values must be less than 512 KB.
+      ensure-gke-docker"  "gci-metrics-enabled"  "gci-update-strategy"
+      "instance-template"  "kube-env"  "startup-script"  "user-data"
+      "disable-address-manager"  "windows-startup-script-ps1"  "common-psm1"
+      "k8s-node-setup-psm1"  "install-ssh-psm1"  "user-profile-psm1"  "serial-
+      port-logging-enable"  Values are free-form strings, and only have
+      meaning as interpreted by the image running in the instance. The only
+      restriction placed on them is that each value's size must be less than
+      or equal to 32 KB.  The total size of all keys and values must be less
+      than 512 KB.
 
   Fields:
     accelerators: A list of hardware accelerators to be attached to each node.
@@ -1691,14 +1729,15 @@ class NodeConfig(_messages.Message):
       conflict with any other metadata keys for the project or be one of the
       reserved keys:  "cluster-location"  "cluster-name"  "cluster-uid"
       "configure-sh"  "containerd-configure-sh"  "enable-os-login"  "gci-
-      update-strategy"  "gci-ensure-gke-docker"  "instance-template"  "kube-
-      env"  "startup-script"  "user-data"  "disable-address-manager"
-      "windows-startup-script-ps1"  "common-psm1"  "k8s-node-setup-psm1"
-      "install-ssh-psm1"  "user-profile-psm1"  "serial-port-logging-enable"
-      Values are free-form strings, and only have meaning as interpreted by
-      the image running in the instance. The only restriction placed on them
-      is that each value's size must be less than or equal to 32 KB.  The
-      total size of all keys and values must be less than 512 KB.
+      ensure-gke-docker"  "gci-metrics-enabled"  "gci-update-strategy"
+      "instance-template"  "kube-env"  "startup-script"  "user-data"
+      "disable-address-manager"  "windows-startup-script-ps1"  "common-psm1"
+      "k8s-node-setup-psm1"  "install-ssh-psm1"  "user-profile-psm1"  "serial-
+      port-logging-enable"  Values are free-form strings, and only have
+      meaning as interpreted by the image running in the instance. The only
+      restriction placed on them is that each value's size must be less than
+      or equal to 32 KB.  The total size of all keys and values must be less
+      than 512 KB.
     minCpuPlatform: Minimum CPU platform to be used by this instance. The
       instance may be scheduled on the specified or newer CPU platform.
       Applicable values are the friendly names of CPU platforms, such as
@@ -1723,8 +1762,14 @@ class NodeConfig(_messages.Message):
     preemptible: Whether the nodes are created as preemptible VM instances.
       See: https://cloud.google.com/compute/docs/instances/preemptible for
       more information about preemptible VM instances.
+    reservationAffinity: The optional reservation affinity. Setting this field
+      will apply the specified [Zonal Compute
+      Reservation](/compute/docs/instances/reserving-zonal-resources) to this
+      node pool.
+    sandboxConfig: Sandbox configuration for this node.
     serviceAccount: The Google Cloud Platform Service Account to be used by
-      the node VMs. If no Service Account is specified, the "default" service
+      the node VMs. Specify the email address of the Service Account;
+      otherwise, if no Service Account is specified, the "default" service
       account is used.
     shieldedInstanceConfig: Shielded Instance options.
     tags: The list of instance tags applied to all nodes. Tags are used to
@@ -1734,6 +1779,7 @@ class NodeConfig(_messages.Message):
     taints: List of kubernetes taints to be applied to each node.  For more
       information, including usage and the valid values, see:
       https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+    workloadMetadataConfig: The workload metadata configuration for this node.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -1774,14 +1820,15 @@ class NodeConfig(_messages.Message):
     Additionally, to avoid ambiguity, keys must not conflict with any other
     metadata keys for the project or be one of the reserved keys:  "cluster-
     location"  "cluster-name"  "cluster-uid"  "configure-sh"  "containerd-
-    configure-sh"  "enable-os-login"  "gci-update-strategy"  "gci-ensure-gke-
-    docker"  "instance-template"  "kube-env"  "startup-script"  "user-data"
-    "disable-address-manager"  "windows-startup-script-ps1"  "common-psm1"
-    "k8s-node-setup-psm1"  "install-ssh-psm1"  "user-profile-psm1"  "serial-
-    port-logging-enable"  Values are free-form strings, and only have meaning
-    as interpreted by the image running in the instance. The only restriction
-    placed on them is that each value's size must be less than or equal to 32
-    KB.  The total size of all keys and values must be less than 512 KB.
+    configure-sh"  "enable-os-login"  "gci-ensure-gke-docker"  "gci-metrics-
+    enabled"  "gci-update-strategy"  "instance-template"  "kube-env"
+    "startup-script"  "user-data"  "disable-address-manager"  "windows-
+    startup-script-ps1"  "common-psm1"  "k8s-node-setup-psm1"  "install-ssh-
+    psm1"  "user-profile-psm1"  "serial-port-logging-enable"  Values are free-
+    form strings, and only have meaning as interpreted by the image running in
+    the instance. The only restriction placed on them is that each value's
+    size must be less than or equal to 32 KB.  The total size of all keys and
+    values must be less than 512 KB.
 
     Messages:
       AdditionalProperty: An additional property for a MetadataValue object.
@@ -1815,10 +1862,13 @@ class NodeConfig(_messages.Message):
   nodeImageConfig = _messages.MessageField('CustomImageConfig', 10)
   oauthScopes = _messages.StringField(11, repeated=True)
   preemptible = _messages.BooleanField(12)
-  serviceAccount = _messages.StringField(13)
-  shieldedInstanceConfig = _messages.MessageField('ShieldedInstanceConfig', 14)
-  tags = _messages.StringField(15, repeated=True)
-  taints = _messages.MessageField('NodeTaint', 16, repeated=True)
+  reservationAffinity = _messages.MessageField('ReservationAffinity', 13)
+  sandboxConfig = _messages.MessageField('SandboxConfig', 14)
+  serviceAccount = _messages.StringField(15)
+  shieldedInstanceConfig = _messages.MessageField('ShieldedInstanceConfig', 16)
+  tags = _messages.StringField(17, repeated=True)
+  taints = _messages.MessageField('NodeTaint', 18, repeated=True)
+  workloadMetadataConfig = _messages.MessageField('WorkloadMetadataConfig', 19)
 
 
 class NodeManagement(_messages.Message):
@@ -1865,6 +1915,9 @@ class NodePool(_messages.Message):
     instanceGroupUrls: [Output only] The resource URLs of the [managed
       instance groups](/compute/docs/instance-groups/creating-groups-of-
       managed-instances) associated with this node pool.
+    locations: The list of Google Compute Engine
+      [zones](/compute/docs/zones#available) in which the NodePool's nodes
+      should be located.
     management: NodeManagement configuration for this NodePool.
     maxPodsConstraint: The constraint on the maximum number of pods that can
       be run simultaneously on a node in the node pool.
@@ -1875,6 +1928,8 @@ class NodePool(_messages.Message):
     status: [Output only] The status of the nodes in this pool instance.
     statusMessage: [Output only] Additional information about the current
       status of this node pool instance, if available.
+    upgradeSettings: Upgrade settings control disruption and speed of the
+      upgrade.
     version: The version of the Kubernetes of this node.
   """
 
@@ -1911,14 +1966,16 @@ class NodePool(_messages.Message):
   config = _messages.MessageField('NodeConfig', 3)
   initialNodeCount = _messages.IntegerField(4, variant=_messages.Variant.INT32)
   instanceGroupUrls = _messages.StringField(5, repeated=True)
-  management = _messages.MessageField('NodeManagement', 6)
-  maxPodsConstraint = _messages.MessageField('MaxPodsConstraint', 7)
-  name = _messages.StringField(8)
-  podIpv4CidrSize = _messages.IntegerField(9, variant=_messages.Variant.INT32)
-  selfLink = _messages.StringField(10)
-  status = _messages.EnumField('StatusValueValuesEnum', 11)
-  statusMessage = _messages.StringField(12)
-  version = _messages.StringField(13)
+  locations = _messages.StringField(6, repeated=True)
+  management = _messages.MessageField('NodeManagement', 7)
+  maxPodsConstraint = _messages.MessageField('MaxPodsConstraint', 8)
+  name = _messages.StringField(9)
+  podIpv4CidrSize = _messages.IntegerField(10, variant=_messages.Variant.INT32)
+  selfLink = _messages.StringField(11)
+  status = _messages.EnumField('StatusValueValuesEnum', 12)
+  statusMessage = _messages.StringField(13)
+  upgradeSettings = _messages.MessageField('UpgradeSettings', 14)
+  version = _messages.StringField(15)
 
 
 class NodePoolAutoscaling(_messages.Message):
@@ -1994,12 +2051,14 @@ class Operation(_messages.Message):
     name: The server-assigned ID for the operation.
     nodepoolConditions: Which conditions caused the current node pool state.
     operationType: The operation type.
+    progress: Output only. [Output only] Progress information for an
+      operation.
     selfLink: Server-defined URL for the resource.
     startTime: [Output only] The time the operation started, in
       [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
     status: The current status of the operation.
-    statusMessage: If an error has occurred, a textual description of the
-      error.
+    statusMessage: Output only. If an error has occurred, a textual
+      description of the error.
     targetLink: Server-defined URL for the target of the operation.
     zone: The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the operation is taking
@@ -2069,12 +2128,53 @@ class Operation(_messages.Message):
   name = _messages.StringField(5)
   nodepoolConditions = _messages.MessageField('StatusCondition', 6, repeated=True)
   operationType = _messages.EnumField('OperationTypeValueValuesEnum', 7)
-  selfLink = _messages.StringField(8)
-  startTime = _messages.StringField(9)
-  status = _messages.EnumField('StatusValueValuesEnum', 10)
-  statusMessage = _messages.StringField(11)
-  targetLink = _messages.StringField(12)
-  zone = _messages.StringField(13)
+  progress = _messages.MessageField('OperationProgress', 8)
+  selfLink = _messages.StringField(9)
+  startTime = _messages.StringField(10)
+  status = _messages.EnumField('StatusValueValuesEnum', 11)
+  statusMessage = _messages.StringField(12)
+  targetLink = _messages.StringField(13)
+  zone = _messages.StringField(14)
+
+
+class OperationProgress(_messages.Message):
+  r"""Information about operation (or operation stage) progress.
+
+  Enums:
+    StatusValueValuesEnum: Status of an operation stage. Unset for single-
+      stage operations.
+
+  Fields:
+    metrics: Progress metric bundle, for example:   metrics: [{name: "nodes
+      done",     int_value: 15},             {name: "nodes total",
+      int_value: 32}] or   metrics: [{name: "progress",       double_value:
+      0.56},             {name: "progress scale", double_value: 1.0}]
+    name: A non-parameterized string describing an operation stage. Unset for
+      single-stage operations.
+    stages: Substages of an operation or a stage.
+    status: Status of an operation stage. Unset for single-stage operations.
+  """
+
+  class StatusValueValuesEnum(_messages.Enum):
+    r"""Status of an operation stage. Unset for single-stage operations.
+
+    Values:
+      STATUS_UNSPECIFIED: Not set.
+      PENDING: The operation has been created.
+      RUNNING: The operation is currently running.
+      DONE: The operation is done, either cancelled or completed.
+      ABORTING: The operation is aborting.
+    """
+    STATUS_UNSPECIFIED = 0
+    PENDING = 1
+    RUNNING = 2
+    DONE = 3
+    ABORTING = 4
+
+  metrics = _messages.MessageField('Metric', 1, repeated=True)
+  name = _messages.StringField(2)
+  stages = _messages.MessageField('OperationProgress', 3, repeated=True)
+  status = _messages.EnumField('StatusValueValuesEnum', 4)
 
 
 class PrivateClusterConfig(_messages.Message):
@@ -2091,6 +2191,8 @@ class PrivateClusterConfig(_messages.Message):
       addresses to the master or set of masters, as well as the ILB VIP. This
       range must not overlap with any other ranges in use within the cluster's
       network.
+    peeringName: Output only. The peering name in the customer VPC used by
+      this cluster.
     privateEndpoint: Output only. The internal IP address of this cluster's
       master endpoint.
     publicEndpoint: Output only. The external IP address of this cluster's
@@ -2100,8 +2202,9 @@ class PrivateClusterConfig(_messages.Message):
   enablePrivateEndpoint = _messages.BooleanField(1)
   enablePrivateNodes = _messages.BooleanField(2)
   masterIpv4CidrBlock = _messages.StringField(3)
-  privateEndpoint = _messages.StringField(4)
-  publicEndpoint = _messages.StringField(5)
+  peeringName = _messages.StringField(4)
+  privateEndpoint = _messages.StringField(5)
+  publicEndpoint = _messages.StringField(6)
 
 
 class RecurringTimeWindow(_messages.Message):
@@ -2131,6 +2234,44 @@ class RecurringTimeWindow(_messages.Message):
 
   recurrence = _messages.StringField(1)
   window = _messages.MessageField('TimeWindow', 2)
+
+
+class ReservationAffinity(_messages.Message):
+  r"""[ReservationAffinity](/compute/docs/instances/reserving-zonal-resources)
+  is the configuration of desired reservation which instances could take
+  capacity from.
+
+  Enums:
+    ConsumeReservationTypeValueValuesEnum: Corresponds to the type of
+      reservation consumption.
+
+  Fields:
+    consumeReservationType: Corresponds to the type of reservation
+      consumption.
+    key: Corresponds to the label key of a reservation resource. To target a
+      SPECIFIC_RESERVATION by name, specify "googleapis.com/reservation-name"
+      as the key and specify the name of your reservation as its value.
+    values: Corresponds to the label value(s) of reservation resource(s).
+  """
+
+  class ConsumeReservationTypeValueValuesEnum(_messages.Enum):
+    r"""Corresponds to the type of reservation consumption.
+
+    Values:
+      UNSPECIFIED: Default value. This should not be used.
+      NO_RESERVATION: Do not consume from any reserved capacity.
+      ANY_RESERVATION: Consume any reservation available.
+      SPECIFIC_RESERVATION: Must consume from a specific reservation. Must
+        specify key value fields for specifying the reservations.
+    """
+    UNSPECIFIED = 0
+    NO_RESERVATION = 1
+    ANY_RESERVATION = 2
+    SPECIFIC_RESERVATION = 3
+
+  consumeReservationType = _messages.EnumField('ConsumeReservationTypeValueValuesEnum', 1)
+  key = _messages.StringField(2)
+  values = _messages.StringField(3, repeated=True)
 
 
 class ResourceLimit(_messages.Message):
@@ -2172,17 +2313,17 @@ class RollbackNodePoolUpgradeRequest(_messages.Message):
   successfully completed.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to rollback. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to rollback. This field has
+      been deprecated and replaced by the name field.
     name: The name (project, location, cluster, node pool id) of the node poll
       to rollback upgrade. Specified in the format
       'projects/*/locations/*/clusters/*/nodePools/*'.
-    nodePoolId: Required. Deprecated. The name of the node pool to rollback.
-      This field has been deprecated and replaced by the name field.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    nodePoolId: Deprecated. The name of the node pool to rollback. This field
+      has been deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2192,6 +2333,30 @@ class RollbackNodePoolUpgradeRequest(_messages.Message):
   nodePoolId = _messages.StringField(3)
   projectId = _messages.StringField(4)
   zone = _messages.StringField(5)
+
+
+class SandboxConfig(_messages.Message):
+  r"""SandboxConfig contains configurations of the sandbox to use for the
+  node.
+
+  Enums:
+    TypeValueValuesEnum: Type of the sandbox to use for the node.
+
+  Fields:
+    type: Type of the sandbox to use for the node.
+  """
+
+  class TypeValueValuesEnum(_messages.Enum):
+    r"""Type of the sandbox to use for the node.
+
+    Values:
+      UNSPECIFIED: Default value. This should not be used.
+      GVISOR: Run sandbox using gvisor.
+    """
+    UNSPECIFIED = 0
+    GVISOR = 1
+
+  type = _messages.EnumField('TypeValueValuesEnum', 1)
 
 
 class ServerConfig(_messages.Message):
@@ -2219,14 +2384,14 @@ class SetAddonsConfigRequest(_messages.Message):
   Fields:
     addonsConfig: Required. The desired configurations for the various addons
       available to run in the cluster.
-    clusterId: Required. Deprecated. The name of the cluster to upgrade. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to upgrade. This field has
+      been deprecated and replaced by the name field.
     name: The name (project, location, cluster) of the cluster to set addons.
       Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2247,8 +2412,8 @@ class SetLabelsRequest(_messages.Message):
     ResourceLabelsValue: Required. The labels to set for that cluster.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster. This field has
-      been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster. This field has been
+      deprecated and replaced by the name field.
     labelFingerprint: Required. The fingerprint of the previous set of labels
       for this resource, used to detect conflicts. The fingerprint is
       initially generated by Kubernetes Engine and changes after every request
@@ -2258,12 +2423,12 @@ class SetLabelsRequest(_messages.Message):
       fingerprint.
     name: The name (project, location, cluster id) of the cluster to set
       labels. Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project
       number](https://developers.google.com/console/help/new/#projectnumber).
       This field has been deprecated and replaced by the name field.
     resourceLabels: Required. The labels to set for that cluster.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2306,17 +2471,17 @@ class SetLegacyAbacRequest(_messages.Message):
   mechanism for a cluster.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to update. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to update. This field has
+      been deprecated and replaced by the name field.
     enabled: Required. Whether ABAC authorization will be enabled in the
       cluster.
     name: The name (project, location, cluster id) of the cluster to set
       legacy abac. Specified in the format
       'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2332,8 +2497,8 @@ class SetLocationsRequest(_messages.Message):
   r"""SetLocationsRequest sets the locations of the cluster.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to upgrade. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to upgrade. This field has
+      been deprecated and replaced by the name field.
     locations: Required. The desired list of Google Compute Engine
       [zones](/compute/docs/zones#available) in which the cluster's nodes
       should be located. Changing the locations a cluster is in will result in
@@ -2342,10 +2507,10 @@ class SetLocationsRequest(_messages.Message):
       include the cluster's primary zone.
     name: The name (project, location, cluster) of the cluster to set
       locations. Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2361,18 +2526,22 @@ class SetLoggingServiceRequest(_messages.Message):
   r"""SetLoggingServiceRequest sets the logging service of a cluster.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to upgrade. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to upgrade. This field has
+      been deprecated and replaced by the name field.
     loggingService: Required. The logging service the cluster should use to
-      write metrics. Currently available options:  * "logging.googleapis.com"
-      - the Google Cloud Logging service * "none" - no metrics will be
-      exported from the cluster
+      write logs. Currently available options:  *
+      `logging.googleapis.com/kubernetes` - The Cloud Logging service with a
+      Kubernetes-native resource model * `logging.googleapis.com` - The legacy
+      Cloud Logging service (no longer   available as of GKE 1.15). * `none` -
+      no logs will be exported from the cluster.  If left as an empty
+      string,`logging.googleapis.com/kubernetes` will be used for GKE 1.14+ or
+      `logging.googleapis.com` for earlier versions.
     name: The name (project, location, cluster) of the cluster to set logging.
       Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2416,15 +2585,15 @@ class SetMasterAuthRequest(_messages.Message):
 
   Fields:
     action: Required. The exact form of action to be taken on the master auth.
-    clusterId: Required. Deprecated. The name of the cluster to upgrade. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to upgrade. This field has
+      been deprecated and replaced by the name field.
     name: The name (project, location, cluster) of the cluster to set auth.
       Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
     update: Required. A description of the update.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2458,20 +2627,22 @@ class SetMonitoringServiceRequest(_messages.Message):
   r"""SetMonitoringServiceRequest sets the monitoring service of a cluster.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to upgrade. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to upgrade. This field has
+      been deprecated and replaced by the name field.
     monitoringService: Required. The monitoring service the cluster should use
       to write metrics. Currently available options:  *
-      "monitoring.googleapis.com/kubernetes" - the Google Cloud Monitoring
-      service with Kubernetes-native resource model *
-      "monitoring.googleapis.com" - the Google Cloud Monitoring service *
-      "none" - no metrics will be exported from the cluster
+      "monitoring.googleapis.com/kubernetes" - The Cloud Monitoring service
+      with a Kubernetes-native resource model * `monitoring.googleapis.com` -
+      The legacy Cloud Monitoring service (no   longer available as of GKE
+      1.15). * `none` - No metrics will be exported from the cluster.  If left
+      as an empty string,`monitoring.googleapis.com/kubernetes` will be used
+      for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
     name: The name (project, location, cluster) of the cluster to set
       monitoring. Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2487,18 +2658,18 @@ class SetNetworkPolicyRequest(_messages.Message):
   r"""SetNetworkPolicyRequest enables/disables network policy for a cluster.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster. This field has
-      been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster. This field has been
+      deprecated and replaced by the name field.
     name: The name (project, location, cluster id) of the cluster to set
       networking policy. Specified in the format
       'projects/*/locations/*/clusters/*'.
     networkPolicy: Required. Configuration options for the NetworkPolicy
       feature.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project
       number](https://developers.google.com/console/help/new/#projectnumber).
       This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2516,17 +2687,17 @@ class SetNodePoolAutoscalingRequest(_messages.Message):
 
   Fields:
     autoscaling: Required. Autoscaling configuration for the node pool.
-    clusterId: Required. Deprecated. The name of the cluster to upgrade. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to upgrade. This field has
+      been deprecated and replaced by the name field.
     name: The name (project, location, cluster, node pool) of the node pool to
       set autoscaler settings. Specified in the format
       'projects/*/locations/*/clusters/*/nodePools/*'.
-    nodePoolId: Required. Deprecated. The name of the node pool to upgrade.
-      This field has been deprecated and replaced by the name field.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    nodePoolId: Deprecated. The name of the node pool to upgrade. This field
+      has been deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2544,18 +2715,18 @@ class SetNodePoolManagementRequest(_messages.Message):
   node pool.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to update. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to update. This field has
+      been deprecated and replaced by the name field.
     management: Required. NodeManagement configuration for the node pool.
     name: The name (project, location, cluster, node pool id) of the node pool
       to set management properties. Specified in the format
       'projects/*/locations/*/clusters/*/nodePools/*'.
-    nodePoolId: Required. Deprecated. The name of the node pool to update.
-      This field has been deprecated and replaced by the name field.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    nodePoolId: Deprecated. The name of the node pool to update. This field
+      has been deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2572,18 +2743,18 @@ class SetNodePoolSizeRequest(_messages.Message):
   r"""SetNodePoolSizeRequest sets the size a node pool.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to update. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to update. This field has
+      been deprecated and replaced by the name field.
     name: The name (project, location, cluster, node pool id) of the node pool
       to set size. Specified in the format
       'projects/*/locations/*/clusters/*/nodePools/*'.
     nodeCount: Required. The desired node count for the pool.
-    nodePoolId: Required. Deprecated. The name of the node pool to update.
-      This field has been deprecated and replaced by the name field.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    nodePoolId: Deprecated. The name of the node pool to update. This field
+      has been deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2613,6 +2784,17 @@ class ShieldedInstanceConfig(_messages.Message):
 
   enableIntegrityMonitoring = _messages.BooleanField(1)
   enableSecureBoot = _messages.BooleanField(2)
+
+
+class ShieldedNodes(_messages.Message):
+  r"""Configuration of Shielded Nodes feature.
+
+  Fields:
+    enabled: Whether Shielded Nodes features are enabled on all nodes in this
+      cluster.
+  """
+
+  enabled = _messages.BooleanField(1)
 
 
 class StandardQueryParameters(_messages.Message):
@@ -2683,16 +2865,16 @@ class StartIPRotationRequest(_messages.Message):
   performs a node upgrade on each node pool to point to the new IP.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster. This field has
-      been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster. This field has been
+      deprecated and replaced by the name field.
     name: The name (project, location, cluster id) of the cluster to start IP
       rotation. Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project
       number](https://developers.google.com/console/help/new/#projectnumber).
       This field has been deprecated and replaced by the name field.
     rotateCredentials: Whether to rotate credentials during IP rotation.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2721,7 +2903,8 @@ class StatusCondition(_messages.Message):
 
     Values:
       UNKNOWN: UNKNOWN indicates a generic condition.
-      GCE_STOCKOUT: GCE_STOCKOUT indicates a Google Compute Engine stockout.
+      GCE_STOCKOUT: GCE_STOCKOUT indicates that Google Compute Engine
+        resources are temporarily unavailable.
       GKE_SERVICE_ACCOUNT_DELETED: GKE_SERVICE_ACCOUNT_DELETED indicates that
         the user deleted their robot service account.
       GCE_QUOTA_EXCEEDED: Google Compute Engine quota was exceeded.
@@ -2758,15 +2941,15 @@ class UpdateClusterRequest(_messages.Message):
   r"""UpdateClusterRequest updates the settings of a cluster.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to upgrade. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to upgrade. This field has
+      been deprecated and replaced by the name field.
     name: The name (project, location, cluster) of the cluster to update.
       Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
     update: Required. A description of the update.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2782,8 +2965,8 @@ class UpdateMasterRequest(_messages.Message):
   r"""UpdateMasterRequest updates the master of the cluster.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to upgrade. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to upgrade. This field has
+      been deprecated and replaced by the name field.
     masterVersion: Required. The Kubernetes version to change the master to.
       Users may specify either explicit versions offered by Kubernetes Engine
       or version aliases, which have the following behavior:  - "latest":
@@ -2793,10 +2976,10 @@ class UpdateMasterRequest(_messages.Message):
       explicit Kubernetes version - "-": picks the default Kubernetes version
     name: The name (project, location, cluster) of the cluster to update.
       Specified in the format 'projects/*/locations/*/clusters/*'.
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2812,18 +2995,23 @@ class UpdateNodePoolRequest(_messages.Message):
   r"""UpdateNodePoolRequests update a node pool's image and/or version.
 
   Fields:
-    clusterId: Required. Deprecated. The name of the cluster to upgrade. This
-      field has been deprecated and replaced by the name field.
+    clusterId: Deprecated. The name of the cluster to upgrade. This field has
+      been deprecated and replaced by the name field.
     image: The desired name of the image name to use for this node. This is
       used to create clusters using a custom image.
     imageProject: The project containing the desired image to use for this
       node pool. This is used to create clusters using a custom image.
     imageType: Required. The desired image type for the node pool.
+    locations: The desired list of Google Compute Engine
+      [zones](/compute/docs/zones#available) in which the node pool's nodes
+      should be located. Changing the locations for a node pool will result in
+      nodes being either created or removed from the node pool, depending on
+      whether locations are being added or removed.
     name: The name (project, location, cluster, node pool) of the node pool to
       update. Specified in the format
       'projects/*/locations/*/clusters/*/nodePools/*'.
-    nodePoolId: Required. Deprecated. The name of the node pool to upgrade.
-      This field has been deprecated and replaced by the name field.
+    nodePoolId: Deprecated. The name of the node pool to upgrade. This field
+      has been deprecated and replaced by the name field.
     nodeVersion: Required. The Kubernetes version to change the nodes to
       (typically an upgrade).  Users may specify either explicit versions
       offered by Kubernetes Engine or version aliases, which have the
@@ -2832,10 +3020,14 @@ class UpdateNodePoolRequest(_messages.Message):
       version - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y
       version - "1.X.Y-gke.N": picks an explicit Kubernetes version - "-":
       picks the Kubernetes master version
-    projectId: Required. Deprecated. The Google Developers Console [project ID
-      or project number](https://support.google.com/cloud/answer/6158840).
-      This field has been deprecated and replaced by the name field.
-    zone: Required. Deprecated. The name of the Google Compute Engine
+    projectId: Deprecated. The Google Developers Console [project ID or
+      project number](https://support.google.com/cloud/answer/6158840). This
+      field has been deprecated and replaced by the name field.
+    upgradeSettings: Upgrade settings control disruption and speed of the
+      upgrade.
+    workloadMetadataConfig: The desired workload metadata config for the node
+      pool.
+    zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
       field has been deprecated and replaced by the name field.
   """
@@ -2844,11 +3036,43 @@ class UpdateNodePoolRequest(_messages.Message):
   image = _messages.StringField(2)
   imageProject = _messages.StringField(3)
   imageType = _messages.StringField(4)
-  name = _messages.StringField(5)
-  nodePoolId = _messages.StringField(6)
-  nodeVersion = _messages.StringField(7)
-  projectId = _messages.StringField(8)
-  zone = _messages.StringField(9)
+  locations = _messages.StringField(5, repeated=True)
+  name = _messages.StringField(6)
+  nodePoolId = _messages.StringField(7)
+  nodeVersion = _messages.StringField(8)
+  projectId = _messages.StringField(9)
+  upgradeSettings = _messages.MessageField('UpgradeSettings', 10)
+  workloadMetadataConfig = _messages.MessageField('WorkloadMetadataConfig', 11)
+  zone = _messages.StringField(12)
+
+
+class UpgradeSettings(_messages.Message):
+  r"""These upgrade settings control the level of parallelism and the level of
+  disruption caused by an upgrade.  maxUnavailable controls the number of
+  nodes that can be simultaneously unavailable.  maxSurge controls the number
+  of additional nodes that can be added to the node pool temporarily for the
+  time of the upgrade to increase the number of available nodes.
+  (maxUnavailable + maxSurge) determines the level of parallelism (how many
+  nodes are being upgraded at the same time).  Note: upgrades inevitably
+  introduce some disruption since workloads need to be moved from old nodes to
+  new, upgraded ones. Even if maxUnavailable=0, this holds true. (Disruption
+  stays within the limits of PodDisruptionBudget, if it is configured.)
+  Consider a hypothetical node pool with 5 nodes having maxSurge=2,
+  maxUnavailable=1. This means the upgrade process upgrades 3 nodes
+  simultaneously. It creates 2 additional (upgraded) nodes, then it brings
+  down 3 old (not yet upgraded) nodes at the same time. This ensures that
+  there are always at least 4 nodes available.
+
+  Fields:
+    maxSurge: The maximum number of nodes that can be created beyond the
+      current size of the node pool during the upgrade process.
+    maxUnavailable: The maximum number of nodes that can be simultaneously
+      unavailable during the upgrade process. A node is considered available
+      if its status is Ready.
+  """
+
+  maxSurge = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  maxUnavailable = _messages.IntegerField(2, variant=_messages.Variant.INT32)
 
 
 class UsableSubnetwork(_messages.Message):
@@ -2930,6 +3154,51 @@ class VerticalPodAutoscaling(_messages.Message):
   """
 
   enabled = _messages.BooleanField(1)
+
+
+class WorkloadIdentityConfig(_messages.Message):
+  r"""Configuration for the use of Kubernetes Service Accounts in GCP IAM
+  policies.
+
+  Fields:
+    workloadPool: The workload pool to attach all Kubernetes service accounts
+      to.
+  """
+
+  workloadPool = _messages.StringField(1)
+
+
+class WorkloadMetadataConfig(_messages.Message):
+  r"""WorkloadMetadataConfig defines the metadata configuration to expose to
+  workloads on the node pool.
+
+  Enums:
+    ModeValueValuesEnum: Mode is the configuration for how to expose metadata
+      to workloads running on the node pool.
+
+  Fields:
+    mode: Mode is the configuration for how to expose metadata to workloads
+      running on the node pool.
+  """
+
+  class ModeValueValuesEnum(_messages.Enum):
+    r"""Mode is the configuration for how to expose metadata to workloads
+    running on the node pool.
+
+    Values:
+      MODE_UNSPECIFIED: Not set.
+      GCE_METADATA: Expose all Compute Engine metadata to pods.
+      GKE_METADATA: Run the GKE Metadata Server on this node. The GKE Metadata
+        Server exposes a metadata API to workloads that is compatible with the
+        V1 Compute Metadata APIs exposed by the Compute Engine and App Engine
+        Metadata Servers. This feature can only be enabled if Workload
+        Identity is enabled at the cluster level.
+    """
+    MODE_UNSPECIFIED = 0
+    GCE_METADATA = 1
+    GKE_METADATA = 2
+
+  mode = _messages.EnumField('ModeValueValuesEnum', 1)
 
 
 encoding.AddCustomJsonFieldMapping(

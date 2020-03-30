@@ -735,6 +735,29 @@ class TrainTestBase(object):
              '    --master-image-uri gcr.io/project/containerimage'
              '    -- --model-dir=gs://my-bucket '.format(module_name))
 
+  def testTrain_CustomContainerUseChief(self, module_name):
+    scale_tier_enum = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum
+    training_input = self.short_msgs.TrainingInput(
+        scaleTier=scale_tier_enum.CUSTOM,
+        region='us-central1',
+        args=['--model-dir=gs://my-bucket'],
+        masterConfig=self.short_msgs.ReplicaConfig(
+            imageUri='gcr.io/project/containerimage'),
+        masterType='complex_model_m',
+        useChiefInTfConfig=True)
+    self.client.projects_jobs.Create.Expect(
+        self._MakeCreateRequest(
+            self.short_msgs.Job(jobId='my_job', trainingInput=training_input),
+            parent='projects/{}'.format(self.Project())),
+        self.short_msgs.Job(jobId='my_job'))
+    self.Run('{} jobs submit training my_job '
+             '    --scale-tier CUSTOM  '
+             '    --region us-central1 '
+             '    --master-machine-type complex_model_m'
+             '    --master-image-uri gcr.io/project/containerimage'
+             '    --use-chief-in-tf-config true'
+             '    -- --model-dir=gs://my-bucket '.format(module_name))
+
   def testTrain_CustomContainerErrors(self, module_name):
     # Image URI Validation
     with self.AssertRaisesExceptionMatches(flags.ArgumentError,

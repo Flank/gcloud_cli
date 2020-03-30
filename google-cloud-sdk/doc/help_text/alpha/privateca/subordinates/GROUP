@@ -1,0 +1,64 @@
+NAME
+    gcloud alpha privateca subordinates - manage subordinate certificate
+        authorities
+
+SYNOPSIS
+    gcloud alpha privateca subordinates COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage subordinate certificate authorities.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     activate
+        (ALPHA) Activate a subordinate certificate authority in a pending
+        state.
+
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding for a subordinate Certificate Authority.
+
+     create
+        (ALPHA) Create a new subordinate certificate authority.
+
+     delete
+        (ALPHA) Permanently delete a subordinate certificate authority.
+
+     describe
+        (ALPHA) Get metadata for a subordinate Certificate Authority.
+
+     get-csr
+        (ALPHA) Get the CSR for a subordinate certificate authority that has
+        not yet been activated.
+
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a subordinate Certificate Authority.
+
+     list
+        (ALPHA) List the subordinate certificate authorities within a location.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove IAM policy binding for a subordinate Certificate
+        Authority.
+
+     set-iam-policy
+        (ALPHA) Set the IAM policy for a subordinate Certificate Authority.
+
+     update
+        (ALPHA) Update an existing subordinate certificate authority.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

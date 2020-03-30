@@ -1,0 +1,187 @@
+
+.TH "GCLOUD_ALPHA_RECAPTCHA_KEYS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha recaptcha keys create \- create a Key
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha recaptcha keys create\fR \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR ([\fB\-\-android\fR\ :\ \fB\-\-package\-names\fR=[\fIPACKAGE_NAMES\fR,...]]\ |\ [\fB\-\-ios\fR\ :\ \fB\-\-bundle\-ids\fR=[\fIBUNDLE_IDS\fR,...]]\ |\ [\fB\-\-web\fR\ (\fB\-\-allow\-all\-domains\fR\ |\ \fB\-\-domains\fR=[\fIDOMAINS\fR,...])\ :\ \fB\-\-allow\-amp\-traffic\fR\ \fB\-\-integration\-type\fR=\fIINTEGRATION_TYPE\fR\ \fB\-\-security\-preference\fR=\fISECURITY_PREFERENCE\fR]) [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a reCAPTCHA Key.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+A human\-readable name for the key. Typically a site or app name.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+
+Options for the creation of a site key for Android.
+
+
+.RS 2m
+.TP 2m
+\fB\-\-android\fR
+Creates a Key configured for Android devices. This flag must be specified if any
+of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-package\-names\fR=[\fIPACKAGE_NAMES\fR,...]
+Android package names of apps allowed to use the key.
+
+Examples of valid package names: 'com.companyname.appname'
+
+.RE
+.sp
+.TP 2m
+
+Options for the creation of a site key for iOS.
+
+
+.RS 2m
+.TP 2m
+\fB\-\-ios\fR
+Creates a Key configured for iOS devices. This flag must be specified if any of
+the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-bundle\-ids\fR=[\fIBUNDLE_IDS\fR,...]
+iOS bundle ids of apps allowed to use the key.
+
+Examples of valid bundle ids: 'com.companyname.productname.appname'
+
+.RE
+.sp
+.TP 2m
+
+Options for the creation of a site key for web.
+
+
+.RS 2m
+.TP 2m
+\fB\-\-web\fR
+Creates a Key configured for websites. This flag must be specified if any of the
+other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-allow\-amp\-traffic\fR
+Whether this key can be used on AMP (Accelerated Mobile Pages) websites.
+
+.TP 2m
+\fB\-\-integration\-type\fR=\fIINTEGRATION_TYPE\fR
+Configures how reCAPTCHA will operate on your site. This only applies to 'web'
+platform. \fIINTEGRATION_TYPE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBcheckbox\fR
+Renders the classic "I'm not a robot" checkbox, and a captcha challenge for low
+scoring events
+
+.TP 2m
+\fBinvisible\fR
+Does not display the "I'm not a robot" checkbox, but may show CAPTCHA challenges
+after risk analysis
+
+.TP 2m
+\fBscore\fR
+Shows no CAPTCHA challenge on the page
+
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-security\-preference\fR=\fISECURITY_PREFERENCE\fR
+Represents the possible challenge frequency and difficulty configurations for a
+web key. usability: show fewer and easier challenges. balance: show balanced (in
+amount and difficulty) challenges. security: show more and harder challenges.
+
+\fISECURITY_PREFERENCE\fR must be one of: \fBbalance\fR,
+\fBchallenge\-security\-preference\-unspecified\fR, \fBsecurity\fR,
+\fBusability\fR.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-allow\-all\-domains\fR
+If set, domain name enforcemente will NOT be enabled on this key.
+
+.TP 2m
+\fB\-\-domains\fR=[\fIDOMAINS\fR,...]
+Domains or subdomains of websites allowed to use the key. All subdomains of an
+allowed domain are automatically allowed. A valid domain requires a host and
+must not include any path, port, query or fragment.
+
+Examples of valid domains: 'example.com' 'subdomain.example.com'
+
+
+.RE
+.RE
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBrecaptchaenterprise/v1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/recaptcha\-enterprise/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

@@ -1,0 +1,253 @@
+title: surface unit test for beta asset analyze-iam-policy
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
+      --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
+      --expand-groups --expand-roles --no-expand-resources --output-group-edges --no-output-resource-edges
+      --execution-timeout "60s"
+  - stdout: |
+      analysisResults:
+      - accessControlLists:
+        - accesses:
+          - role: roles/cloudasset.r1
+          resources:
+          - fullResourceName: //cloudresourcemanager.googleapis.com/o1
+        attachedResourceFullName: //cloudresourcemanager.googleapis.com/o1
+        iamBinding:
+          members:
+          - serviceAccount:service-001@gcp-sa-cloudasset.iam.gserviceaccount.com
+          role: roles/cloudasset.r1
+        identityList:
+          identities:
+          - name: serviceAccount:service-001@gcp-sa-cloudasset.iam.gserviceaccount.com
+- execute:
+  - command: asset analyze-iam-policy --folder "f1" --identity "user:user1@foo.com"
+      --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
+      --no-expand-groups --no-expand-roles --expand-resources --no-output-group-edges
+      --output-resource-edges --execution-timeout "60s" --show-response
+  - stdout: |
+      analysisResults:
+      - accessControlLists:
+        - accesses:
+          - role: roles/cloudasset.r1
+          resources:
+          - fullResourceName: //cloudresourcemanager.googleapis.com/o1
+        attachedResourceFullName: //cloudresourcemanager.googleapis.com/o1
+        iamBinding:
+          members:
+          - user:user1@foo.com
+          role: roles/cloudasset.r1
+        identityList:
+          identities:
+          - name: user:user1@foo.com
+actions:
+- execute_command:
+    command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
+      --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
+      --expand-groups --expand-roles --no-expand-resources --output-group-edges --no-output-resource-edges
+      --execution-timeout "60s"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1p4beta1/organizations/o1:analyzeIamPolicy?analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1&options.executionTimeout=60&options.expandGroups=True&options.expandResources=False&options.expandRoles=True&options.outputGroupEdges=True&options.outputResourceEdges=False
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "mainAnalysis": {
+                "analysisQuery": {
+                  "parent": "organizations/o1",
+                  "resourceSelector": {
+                    "fullResourceName": "//o1/f/p/r1"
+                  },
+                  "accessSelector": {
+                    "roles": "roles/cloudasset.r1",
+                    "roles": "roles/cloudasset.r2",
+                    "permissions": "a.b.get",
+                    "permissions": "c.d.create"
+                  }
+                },
+                "analysisResults": [
+                  {
+                    "attachedResourceFullName": "//cloudresourcemanager.googleapis.com/o1",
+                    "iamBinding": {
+                      "role": "roles/cloudasset.r1",
+                      "members": [
+                        "serviceAccount:service-001@gcp-sa-cloudasset.iam.gserviceaccount.com"
+                      ]
+                    },
+                    "accessControlLists": [
+                      {
+                        "resources": [
+                          {
+                            "fullResourceName": "//cloudresourcemanager.googleapis.com/o1"
+                          },
+                          {
+                            "fullResourceName": "//cloudresourcemanager.googleapis.com/f1"
+                          }
+                        ],
+                        "accesses": [
+                          {
+                            "role": "roles/cloudasset.r1",
+                            "permissions": "a.b.get"
+                          }
+                        ]
+                      },
+                      {
+                        "resources": [
+                          {
+                            "fullResourceName": "//cloudresourcemanager.googleapis.com/o2"
+                          },
+                          {
+                            "fullResourceName": "//cloudresourcemanager.googleapis.com/f2"
+                          },
+                          {
+                            "fullResourceName": "//cloudresourcemanager.googleapis.com/p2"
+                          }
+                        ],
+                        "accesses": [
+                          {
+                            "role": "roles/cloudasset.r1",
+                            "permissions": "c.d.create"
+                          }
+                        ]
+                      }
+                    ],
+                    "identityList": {
+                      "identities": [
+                        {
+                          "name": "serviceAccount:service-001@gcp-sa-cloudasset.iam.gserviceaccount.com"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+    - expect_stdout: |
+        ---
+        accesses:
+        - permissions: a.b.get
+          role: roles/cloudasset.r1
+        identities:
+        - name: serviceAccount:service-001@gcp-sa-cloudasset.iam.gserviceaccount.com
+        resources:
+        - fullResourceName: //cloudresourcemanager.googleapis.com/o1
+        - fullResourceName: //cloudresourcemanager.googleapis.com/f1
+        ---
+        accesses:
+        - permissions: c.d.create
+          role: roles/cloudasset.r1
+        identities:
+        - name: serviceAccount:service-001@gcp-sa-cloudasset.iam.gserviceaccount.com
+        resources:
+        - fullResourceName: //cloudresourcemanager.googleapis.com/o2
+        - fullResourceName: //cloudresourcemanager.googleapis.com/f2
+        - fullResourceName: //cloudresourcemanager.googleapis.com/p2
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: asset analyze-iam-policy --folder "f1" --identity "user:user1@foo.com"
+      --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
+      --no-expand-groups --no-expand-roles --expand-resources --no-output-group-edges
+      --output-resource-edges --execution-timeout "60s" --show-response
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1p4beta1/folders/f1:analyzeIamPolicy?analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.identitySelector.identity=user%3Auser1%40foo.com&options.executionTimeout=60&options.expandGroups=False&options.expandResources=True&options.expandRoles=False&options.outputGroupEdges=False&options.outputResourceEdges=True
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "mainAnalysis": {
+                "analysisQuery": {
+                  "parent": "folders/f1",
+                  "identitySelector": {
+                    "identity": "user:user1@foo.com"
+                  },
+                  "accessSelector": {
+                    "roles": "roles/cloudasset.r1",
+                    "roles": "roles/cloudasset.r2",
+                    "permissions": "a.b.get",
+                    "permissions": "c.d.create"
+                  }
+                },
+                "analysisResults": [
+                  {
+                    "attachedResourceFullName": "//cloudresourcemanager.googleapis.com/o1",
+                    "iamBinding": {
+                      "role": "roles/cloudasset.r1",
+                      "members": [
+                        "user:user1@foo.com"
+                      ]
+                    },
+                    "accessControlLists": [
+                      {
+                        "resources": [
+                          {
+                            "fullResourceName": "//cloudresourcemanager.googleapis.com/o1"
+                          }
+                        ],
+                        "accesses": [
+                          {
+                            "role": "roles/cloudasset.r1"
+                          }
+                        ]
+                      }
+                    ],
+                    "identityList": {
+                      "identities": [
+                        {
+                          "name": "user:user1@foo.com"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+    - expect_stdout: |
+        ---
+        accesses:
+        - role: roles/cloudasset.r1
+        identities:
+        - name: user:user1@foo.com
+        resources:
+        - fullResourceName: //cloudresourcemanager.googleapis.com/o1
+        ---
+        mainAnalysis:
+          analysisQuery:
+            accessSelector:
+              permissions:
+              - c.d.create
+              roles:
+              - roles/cloudasset.r2
+            identitySelector:
+              identity: user:user1@foo.com
+            parent: folders/f1
+          analysisResults:
+          - accessControlLists:
+            - accesses:
+              - role: roles/cloudasset.r1
+              resources:
+              - fullResourceName: //cloudresourcemanager.googleapis.com/o1
+            attachedResourceFullName: //cloudresourcemanager.googleapis.com/o1
+            iamBinding:
+              members:
+              - user:user1@foo.com
+              role: roles/cloudasset.r1
+            identityList:
+              identities:
+              - name: user:user1@foo.com
+    - expect_exit:
+        code: 0

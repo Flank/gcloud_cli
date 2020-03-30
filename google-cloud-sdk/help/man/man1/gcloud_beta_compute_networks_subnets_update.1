@@ -11,7 +11,7 @@ gcloud beta compute networks subnets update \- updates properties of an existing
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute networks subnets update\fR \fINAME\fR [\fB\-\-drain\-timeout\fR=\fIDRAIN_TIMEOUT\fR;\ default="0s"] [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-role\fR=\fIROLE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute networks subnets update\fR \fINAME\fR [\fB\-\-drain\-timeout\fR=\fIDRAIN_TIMEOUT\fR;\ default="0s"] [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-role\fR=\fIROLE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -135,6 +135,12 @@ without a public ip address. Use \fB\-\-enable\-private\-ip\-google\-access\fR
 to enable and \fB\-\-no\-enable\-private\-ip\-google\-access\fR to disable.
 
 .TP 2m
+\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR
+The private IPv6 google access type for the VMs in this subnet.
+\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR must be one of: \fBdisable\fR,
+\fBenable\-bidirectional\-access\fR, \fBenable\-outbound\-vm\-access\fR.
+
+.TP 2m
 \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]
 Removes secondary ranges from the subnetwork.
 
@@ -170,8 +176,9 @@ The ACTIVE subnet that is currently used.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

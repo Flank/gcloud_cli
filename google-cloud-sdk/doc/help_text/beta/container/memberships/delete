@@ -6,7 +6,10 @@ SYNOPSIS
         [--async] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Delete a membership from Google Kubernetes Hub.
+    (BETA) (DEPRECATED) This command group is deprecated. Please use gcloud
+    container hub memberships command group instead.
+
+    Delete a membership from Google Kubernetes Hub.
 
 POSITIONAL ARGUMENTS
      Membership resource - membership resource representing a cluster in Google
@@ -34,8 +37,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the gkehub/v1beta1 API. The full documentation for this

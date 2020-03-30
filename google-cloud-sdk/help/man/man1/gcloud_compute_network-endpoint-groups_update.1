@@ -11,7 +11,13 @@ gcloud compute network\-endpoint\-groups update \- update a Google Compute Engin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute network\-endpoint\-groups update\fR \fINAME\fR (\fB\-\-add\-endpoint\fR=[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]\ |\ \fB\-\-remove\-endpoint\fR=[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]) [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute network\-endpoint\-groups update\fR \fINAME\fR (\fB\-\-add\-endpoint\fR=[\fIfqdn\fR=\fIFQDN\fR],[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]\ |\ \fB\-\-remove\-endpoint\fR=[\fIfqdn\fR=\fIFQDN\fR],[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]) [\fB\-\-global\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Update a Google Compute Engine network endpoint group.
 
 
 
@@ -36,75 +42,128 @@ Exactly one of these must be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-add\-endpoint\fR=[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]
-The network endpoint to add to the network endpoint group. Allowed keys are:
+\fB\-\-add\-endpoint\fR=[\fIfqdn\fR=\fIFQDN\fR],[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]
+The network endpoint to add to the network endpoint group. Keys used depend on
+the endpoint type of the NEG.
+
+\f5GCE_VM_IP_PORT\fR
 
 .RS 2m
-.IP "\(bu" 2m
-instance \- Name of instance in same zone as network endpoint group.
+*instance* \- Name of instance in same zone as the network endpoint
+group.
+.RE
 
 .RS 2m
-The VM instance must belong to the network / subnetwork associated
-with the network endpoint group. If the VM instance is deleted, then
-any network endpoint group that has a reference to it is updated.
-The delete causes all network endpoints on the VM to be removed
-from the network endpoint group.
+The VM instance must belong to the network / subnetwork
+associated with the network endpoint group. If the VM instance
+is deleted, then any network endpoint group that has a reference
+to it is updated.
 .RE
-
-.IP "\(bu" 2m
-ip \- Optional IP address of the network endpoint.
 
 .RS 2m
-Optional IP address of the network endpoint. If the IP address is
-not specified then, we use the primary IP address for the VM
-instance in the network that the NEG belongs to.
+*ip* \- Optional IP address of the network endpoint. the IP address
+must belong to a VM in compute engine (either the primary IP or
+as part of an aliased IP range). If the IP address is not
+specified, then the primary IP address for the VM instance in
+the network that the network endpoint group belongs to will be
+used.
 .RE
-
-.IP "\(bu" 2m
-port \- Optional port for the network endpoint.
 
 .RS 2m
-Optional port for the network endpoint. If not specified and the
-networkEndpointType is `GCE_VM_IP_PORT`, the defaultPort for the
-network endpoint group will be used.
+*port* \- Required endpoint port unless NEG default port is set.
 .RE
-.RE
-.RE
-.RE
-.sp
+
+\f5INTERNET_IP_PORT\fR
 
 .RS 2m
+*ip* \- Required IP address of the endpoint to attach. Must be
+publicly routable.
+.RE
+
+.RS 2m
+*port* \- Optional port of the endpoint to attach. If unspecified
+then NEG default port is set. If no default port is set, the
+well known port for the backend protocol will be used instead
+(80 for http, 443 for https).
+.RE
+
+\f5INTERNET_FQDN_PORT\fR
+
+.RS 2m
+*fqdn* \- Required fully qualified domain name to use to look up an
+external endpoint. Must be resolvable to a public IP address via
+public DNS.
+.RE
+
+.RS 2m
+*port* \- Optional port of the endpoint to attach. If unspecified
+then NEG default port is set. If no default port is set, the
+well known port for the backend protocol will be used instead
+(80 for http, 443 for https or http2).
+.RE
+
 .TP 2m
-\fB\-\-remove\-endpoint\fR=[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]
-The network endpoint to detach from the network endpoint group. Allowed keys
-are:
+\fB\-\-remove\-endpoint\fR=[\fIfqdn\fR=\fIFQDN\fR],[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]
+The network endpoint to detach from the network endpoint group. Keys used depend
+on the endpoint type of the NEG.
+
+\f5GCE_VM_IP_PORT\fR
 
 .RS 2m
-.IP "\(bu" 2m
-instance \- Name of instance in same zone as network endpoint group.
-
-.RS 2m
-.IP "\(bu" 2m
-ip \- Optional IP address of the network endpoint.
-
-.RS 2m
-If the IP address is not specified then all network endpoints that
-belong to the instance are removed from the NEG.
+*instance* \- Required name of instance whose endpoint(s) to
+detach. If IP address is unset then all endpoints for the
+instance in the NEG will be detached.
 .RE
 
-.IP "\(bu" 2m
-port \- Optional port for the network endpoint. Required if the network endpoint
-type is \f5GCE_VM_IP_PORT\fR.
+.RS 2m
+*ip* \- Optional IP address of the network endpoint to detach.
+If specified port must be provided as well.
 .RE
+
+.RS 2m
+*port* \- Optional port of the network endpoint to detach.
+.RE
+
+\f5INTERNET_IP_PORT\fR
+
+.RS 2m
+*ip* \- Required IP address of the network endpoint to detach.
+.RE
+
+.RS 2m
+*port* \- Optional port of the network endpoint to detach if the
+endpoint has a port specified.
+.RE
+
+\f5INTERNET_FQDN_PORT\fR
+
+.RS 2m
+*fqdn* \- Required fully qualified domain name of the endpoint to
+detach.
+.RE
+
+.RS 2m
+*port* \- Optional port of the network endpoint to detach if the
+endpoint has a port specified.
+.RE
+
+
 .RE
 .RE
 .sp
-
-
 
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the network endpoint group is global.
+
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 Zone of the network endpoint group to operate on. If not specified and the
@@ -135,6 +194,7 @@ Alternatively, the zone can be stored in the environment variable
 
 
 .RE
+.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
@@ -142,8 +202,9 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -154,8 +215,8 @@ To add two endpoints to a network endpoint group:
 .RS 2m
 $ gcloud compute network\-endpoint\-groups update my\-neg \e
     \-\-zone=us\-central1\-a \e
-  \-\-add\-endpoint=instance=my\-instance1,ip=127.0.0.1,port=1234 \e
-  \-\-add\-endpoint=instance=my\-instance2
+    \-\-add\-endpoint=instance=my\-instance1,ip=127.0.0.1,port=1234 \e
+    \-\-add\-endpoint=instance=my\-instance2
 .RE
 
 To remove two endpoints from a network endpoint group:
@@ -163,8 +224,8 @@ To remove two endpoints from a network endpoint group:
 .RS 2m
 $ gcloud compute network\-endpoint\-groups update my\-neg \e
     \-\-zone=us\-central1\-a \e
-  \-\-remove\-endpoint=instance=my\-instance1,ip=127.0.0.1,port=1234 \e
-  \-\-remove\-endpoint=instance=my\-instance2
+    \-\-remove\-endpoint=instance=my\-instance1,ip=127.0.0.1,port=1234 \e
+    \-\-remove\-endpoint=instance=my\-instance2
 .RE
 
 

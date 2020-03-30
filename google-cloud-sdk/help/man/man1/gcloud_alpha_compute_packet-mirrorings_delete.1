@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute packet\-mirrorings delete \- delete a Google Compute Engine packet mirroring
+gcloud alpha compute packet\-mirrorings delete \- delete a Google Compute Engine packet mirroring policy
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha compute packet\-mirrorings delete \- delete a Google Compute Engine
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Delete a Google Compute Engine Packet Mirroring
+\fB(ALPHA)\fR Delete a Google Compute Engine Packet Mirroring policy.
 
 
 
@@ -49,14 +49,15 @@ Region of the packet mirrorings to delete. Overrides the default
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-Delete the Packet Mirroring resource pm\-1 in region us\-central1.
+Delete the Packet Mirroring policy pm\-1 in region us\-central1.
 
 .RS 2m
 $ gcloud alpha compute packet\-mirrorings delete pm\-1
@@ -70,9 +71,10 @@ $ gcloud alpha compute packet\-mirrorings delete pm\-1
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud compute packet\-mirrorings delete
 $ gcloud beta compute packet\-mirrorings delete
 .RE
 

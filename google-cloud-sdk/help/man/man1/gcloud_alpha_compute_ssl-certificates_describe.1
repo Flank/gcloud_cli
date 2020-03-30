@@ -18,7 +18,8 @@ gcloud alpha compute ssl\-certificates describe \- describe a Google Compute Eng
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute ssl\-certificates describe\fR displays all
-data associated with Google Compute Engine SSL certificate in a project.
+data (except private keys) associated with Google Compute Engine SSL certificate
+in a project.
 
 
 
@@ -43,7 +44,7 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-global\fR
-If set, the SSL certificate is global.
+(Default) If set, the SSL certificate is global.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
@@ -82,8 +83,19 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To display a description of a certificate 'my\-cert', run:
+
+.RS 2m
+$ gcloud alpha compute ssl\-certificates describe my\-cert
+.RE
 
 
 

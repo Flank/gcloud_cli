@@ -35,7 +35,7 @@ class ProjectBucketsGetTest(base.LoggingTestBase):
             name='projects/my-project/locations/global/buckets/my-bucket'),
         test_bucket)
     self.RunLogging('buckets describe my-bucket --location global',
-                    calliope_base.ReleaseTrack.ALPHA)
+                    calliope_base.ReleaseTrack.BETA)
     self.AssertOutputContains(test_bucket.name)
 
   def testGetFolder(self):
@@ -46,7 +46,7 @@ class ProjectBucketsGetTest(base.LoggingTestBase):
             name='folders/123/locations/global/buckets/my-bucket'),
         test_bucket)
     self.RunLogging('buckets describe my-bucket --location global --folder 123',
-                    calliope_base.ReleaseTrack.ALPHA)
+                    calliope_base.ReleaseTrack.BETA)
     self.AssertOutputContains(test_bucket.name)
 
   def testGetNoPerms(self):
@@ -56,17 +56,17 @@ class ProjectBucketsGetTest(base.LoggingTestBase):
         exception=http_error.MakeHttpError(403))
     self.RunWithoutPerms(
         'buckets describe my-bucket --location global',
-        calliope_base.ReleaseTrack.ALPHA)
+        calliope_base.ReleaseTrack.BETA)
 
   def testGetNoProject(self):
     self.RunWithoutProject(
         'buckets describe my-bucket --location global',
-        calliope_base.ReleaseTrack.ALPHA)
+        calliope_base.ReleaseTrack.BETA)
 
   def testGetNoAuth(self):
     self.RunWithoutAuth(
         'buckets describe my-bucket --location global',
-        calliope_base.ReleaseTrack.ALPHA)
+        calliope_base.ReleaseTrack.BETA)
 
 
 if __name__ == '__main__':

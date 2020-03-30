@@ -41,8 +41,9 @@ The email address of the member whose membership is being described.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -55,11 +56,12 @@ for this API can be found at: https://cloud.google.com/identity/
 
 .SH "EXAMPLES"
 
-To describe a membership in a group.
+To describe a membership in a group:
 
-$ gcloud alpha identity groups memberships describe \e.RS 2m
-\-\-group\-email eng\-discuss@foo.com \-\-member\-email user@foo.com
-
+.RS 2m
+$ gcloud alpha identity groups memberships describe \e
+    \-\-group\-email="eng\-discuss@foo.com" \e
+    \-\-member\-email="user@foo.com"
 .RE
 
 
@@ -69,5 +71,9 @@ $ gcloud alpha identity groups memberships describe \e.RS 2m
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta identity groups memberships describe
+.RE
 

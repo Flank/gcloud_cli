@@ -29,6 +29,7 @@ from six import text_type
 class PerimetersUpdateTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -62,13 +63,13 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
     self._ExpectGet(policy, perimeter_after)
 
   def testUpdate_MissingRequired(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run('access-context-manager perimeters update --policy 123')
 
   def testUpdate_NoUpdates(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     # No patch message sent, because nothing is changed.
 
     self.Run('access-context-manager perimeters update MY_PERIMETER '
@@ -77,7 +78,7 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
         'The update specified results in an identical resource.')
 
   def testUpdate_NonRepeatingFields(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -103,7 +104,7 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
     self.assertEqual(result, perimeter)
 
   def testUpdate_ClearRepeatingFields(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -127,7 +128,7 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
     self.assertEqual(result, perimeter)
 
   def testUpdate_SetRepeatingFields(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -157,7 +158,7 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
     self.assertEqual(result, perimeter)
 
   def testUpdate_AddRemoveRepeatingFields(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter_before = self._MakePerimeter(
         'MY_PERIMETER',
         title='My Perimeter Title',
@@ -190,7 +191,7 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
     self.assertEqual(result, perimeter_after)
 
   def testUpdate_PolicyFromProperty(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
     perimeter = self._MakePerimeter(
@@ -230,16 +231,18 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
 class PerimetersUpdateTestBeta(PerimetersUpdateTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class PerimetersUpdateTestAlpha(PerimetersUpdateTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testUpdate_AddServiceFilterFields(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
 
     perimeter_before = self._MakePerimeter(
         'MY_PERIMETER',
@@ -257,11 +260,10 @@ class PerimetersUpdateTestAlpha(PerimetersUpdateTestGA):
     )
     perimeter_update = self.messages.ServicePerimeter(
         status=self.messages.ServicePerimeterConfig(
-            vpcServiceRestriction=perimeter_after.status.vpcServiceRestriction))
+            vpcAccessibleServices=perimeter_after.status.vpcAccessibleServices))
     self._ExpectGet('123', perimeter_before)
-    self._ExpectPatch(
-        perimeter_update, perimeter_after,
-        'status.vpcServiceRestriction.allowedServices', '123')
+    self._ExpectPatch(perimeter_update, perimeter_after,
+                      'status.vpcAccessibleServices.allowedServices', '123')
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
@@ -271,7 +273,7 @@ class PerimetersUpdateTestAlpha(PerimetersUpdateTestGA):
     self.assertEqual(result, perimeter_after)
 
   def testUpdate_EnableServiceFilters(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
 
     perimeter_before = self._MakePerimeter(
         'MY_PERIMETER',
@@ -285,20 +287,19 @@ class PerimetersUpdateTestAlpha(PerimetersUpdateTestGA):
         description='foo bar',
         restricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
         type_='PERIMETER_TYPE_BRIDGE',
-        enable_vpc_service_restriction=True,
+        enable_vpc_accessible_services=True,
     )
     perimeter_update = self.messages.ServicePerimeter(
         status=self.messages.ServicePerimeterConfig(
-            vpcServiceRestriction=perimeter_after.status.vpcServiceRestriction))
+            vpcAccessibleServices=perimeter_after.status.vpcAccessibleServices))
 
     self._ExpectGet('123', perimeter_before)
-    self._ExpectPatch(
-        perimeter_update, perimeter_after,
-        'status.vpcServiceRestriction.enableRestriction', '123')
+    self._ExpectPatch(perimeter_update, perimeter_after,
+                      'status.vpcAccessibleServices.enableRestriction', '123')
 
     result = self.Run('access-context-manager perimeters update MY_PERIMETER '
                       '   --policy 123 '
-                      '   --enable-vpc-service-restriction ')
+                      '   --enable-vpc-accessible-services ')
 
     self.assertEqual(result, perimeter_after)
 

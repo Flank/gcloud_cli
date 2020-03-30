@@ -11,7 +11,7 @@ gcloud alpha compute org\-security\-policies associations create \- create a new
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute org\-security\-policies associations create\fR \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR (\fB\-\-folder\fR=\fIFOLDER\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION\fR) [\fB\-\-name\fR=\fINAME\fR] [\fB\-\-replace\-association\-on\-target\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute org\-security\-policies associations create\fR \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR [\fB\-\-folder\fR=\fIFOLDER\fR] [\fB\-\-name\fR=\fINAME\fR] [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fB\-\-replace\-association\-on\-target\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -31,21 +31,7 @@ resources.
 \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR
 Security policy ID of the association.
 
-.TP 2m
 
-Exactly one of these must be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-folder\fR=\fIFOLDER\fR
-ID of the folder with which the association is created.
-
-.TP 2m
-\fB\-\-organization\fR=\fIORGANIZATION\fR
-ID of the organization with which the association is created.
-
-
-.RE
 .RE
 .sp
 
@@ -53,9 +39,18 @@ ID of the organization with which the association is created.
 
 .RS 2m
 .TP 2m
+\fB\-\-folder\fR=\fIFOLDER\fR
+ID of the folder with which the association is created.
+
+.TP 2m
 \fB\-\-name\fR=\fINAME\fR
 Name to identify this association. If unspecified, the name will be set to
 "organization\-{ORGANIZATION_ID}" or "folder\-{FOLDER_ID}".
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+ID of the organization in which the security policy is to be associated. Must be
+set if SECURITY_POLICY is display name.
 
 .TP 2m
 \fB\-\-replace\-association\-on\-target\fR
@@ -73,8 +68,21 @@ the new association is created.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To associate an organization security policy under folder with ID ``123456789"
+to folder ``987654321", run:
+
+.RS 2m
+$ gcloud alpha compute org\-security\-policies associations create \e
+    create \-\-security\-policy=123456789 \-\-folder=987654321
+.RE
 
 
 
@@ -83,5 +91,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute org\-security\-policies associations create
+.RE
 

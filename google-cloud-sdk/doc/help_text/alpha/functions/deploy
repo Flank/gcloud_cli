@@ -9,6 +9,7 @@ SYNOPSIS
         [--runtime=RUNTIME] [--service-account=SERVICE_ACCOUNT]
         [--source=SOURCE] [--stage-bucket=STAGE_BUCKET] [--timeout=TIMEOUT]
         [--update-labels=[KEY=VALUE,...]]
+        [--build-worker-pool=BUILD_WORKER_POOL | --clear-build-worker-pool]
         [--clear-env-vars | --env-vars-file=FILE_PATH
           | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
@@ -190,6 +191,18 @@ FLAGS
 
      At most one of these may be specified:
 
+       --build-worker-pool=BUILD_WORKER_POOL
+          Name of the Cloud Build Custom Worker Pool that should be used to
+          build the function. The format of this field is
+          projects/${PROJECT}/workerPools/${WORKERPOOL} where ${PROJECT} is the
+          project id where the worker pool is defined and ${WORKERPOOL} is the
+          short name of the worker pool.
+
+       --clear-build-worker-pool
+          Clears the Cloud Build Custom Worker Pool field.
+
+     At most one of these may be specified:
+
        --clear-env-vars
           Remove all environment variables.
 
@@ -228,8 +241,10 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.Label keys starting with deployment are reserved for
-          use by deployment tools and cannot be specified manually.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.Label keys starting with deployment
+          are reserved for use by deployment tools and cannot be specified
+          manually.
 
      At most one of these may be specified:
 
@@ -290,8 +305,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

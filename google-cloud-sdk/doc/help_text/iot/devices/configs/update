@@ -56,8 +56,24 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To update the latest configuration of a device in region 'us-central1',
+    run:
+
+        $ gcloud iot devices configs update --region=us-central1 \
+            --registry=my-registry --device=my-device \
+            --config-data="job_timeout:300"
+
+    To update the latest configuration of a device in region 'us-central1' only
+    if the latest configuration version is 11, run:
+
+        $ gcloud iot devices configs update --region=us-central1 \
+            --registry=my-registry --device=my-device \
+            --config-file=/path/to/config.base64 --version-to-update=11
 
 NOTES
     These variants are also available:

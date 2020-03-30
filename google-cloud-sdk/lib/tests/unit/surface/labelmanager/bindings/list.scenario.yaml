@@ -1,0 +1,283 @@
+title: LabelManager - LabelBindings - List test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: labelmanager bindings list test --label-key="env" --label-parent="organizations/1"
+  - stdout: |
+      bindings:
+      - label_value: labelValues/1000
+        name: labelBindings/somename1
+        resource: //cloudresourcemanager.googleapis.com/projects/10
+      - label_value: labelValues/1000
+        name: labelBindings/somename2
+        resource: //cloudresourcemanager.googleapis.com/projects/11
+- execute:
+  - command: labelmanager bindings list test --label-key="labelKeys/100"
+  - stdout: |
+      bindings:
+      - label_value: labelValues/1000
+        name: labelBindings/somename1
+        resource: //cloudresourcemanager.googleapis.com/projects/10
+      - label_value: labelValues/1000
+        name: labelBindings/somename2
+        resource: //cloudresourcemanager.googleapis.com/projects/11
+- execute:
+  - command: labelmanager bindings list labelValues/1000
+  - stdout: |
+      {}
+- execute:
+  - command: labelmanager bindings list --resource="//cloudresourcemanager.googleapis.com/projects/10"
+  - stdout: |
+      bindings:
+      - label_value: labelValues/1000
+        name: labelBindings/somename1
+        resource: //cloudresourcemanager.googleapis.com/projects/10
+      - label_value: labelValues/1001
+        name: labelBindings/somename2
+        resource: //cloudresourcemanager.googleapis.com/projects/10
+      - label_value: labelValues/1002
+        name: labelBindings/somename3
+        resource: //cloudresourcemanager.googleapis.com/projects/10
+- execute:
+  - command: labelmanager bindings list labelValues/1000 --resource="//cloudresourcemanager.googleapis.com/projects/10"
+  - stderr: |
+      ERROR: (gcloud.alpha.labelmanager.bindings.list) argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly one of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource) must be specified.
+      Usage: gcloud alpha labelmanager bindings list ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource=RESOURCE) [optional flags]
+        optional flags may be  --filter | --help | --label-key | --label-parent |
+                               --limit | --page-size | --resource | --sort-by
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha labelmanager bindings list --help
+  - error: '1: argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly one
+      of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource)
+      must be specified.'
+- execute:
+  - command: labelmanager bindings list test --label-key="labelKeys/100" --resource="//cloudresourcemanager.googleapis.com/projects/10"
+  - stderr: |
+      ERROR: (gcloud.alpha.labelmanager.bindings.list) argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly one of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource) must be specified.
+      Usage: gcloud alpha labelmanager bindings list ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource=RESOURCE) [optional flags]
+        optional flags may be  --filter | --help | --label-key | --label-parent |
+                               --limit | --page-size | --resource | --sort-by
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha labelmanager bindings list --help
+  - error: '1: argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly one
+      of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource)
+      must be specified.'
+- execute:
+  - command: labelmanager bindings list test --label-key="env" --label-parent="organizations/1"
+      --resource="//cloudresourcemanager.googleapis.com/projects/10"
+  - stderr: |
+      ERROR: (gcloud.alpha.labelmanager.bindings.list) argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly one of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource) must be specified.
+      Usage: gcloud alpha labelmanager bindings list ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource=RESOURCE) [optional flags]
+        optional flags may be  --filter | --help | --label-key | --label-parent |
+                               --limit | --page-size | --resource | --sort-by
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha labelmanager bindings list --help
+  - error: '1: argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly one
+      of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource)
+      must be specified.'
+actions:
+- execute_command:
+    command: labelmanager bindings list test --label-key="env" --label-parent="organizations/1"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F1
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body:
+            keys:
+            - displayName: env
+              name: labelKeys/100
+            - displayName: location
+              name: labelKeys/101
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F100
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body:
+            values:
+            - displayName: test
+              name: labelValues/1000
+            - displayName: prod
+              name: labelValues/1001
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelBindings?alt=json&filter=labelValue%3AlabelValues%2F1000
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body:
+            bindings:
+            - label_value: labelValues/1000
+              name: labelBindings/somename1
+              resource: //cloudresourcemanager.googleapis.com/projects/10
+            - label_value: labelValues/1000
+              name: labelBindings/somename2
+              resource: //cloudresourcemanager.googleapis.com/projects/11
+    - expect_stdout: |
+        bindings:
+        - label_value: labelValues/1000
+          name: labelBindings/somename1
+          resource: //cloudresourcemanager.googleapis.com/projects/10
+        - label_value: labelValues/1000
+          name: labelBindings/somename2
+          resource: //cloudresourcemanager.googleapis.com/projects/11
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: labelmanager bindings list test --label-key="labelKeys/100"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F100
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body:
+            values:
+            - displayName: test
+              name: labelValues/1000
+            - displayName: prod
+              name: labelKeys/1001
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelBindings?alt=json&filter=labelValue%3AlabelValues%2F1000
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body:
+            bindings:
+            - label_value: labelValues/1000
+              name: labelBindings/somename1
+              resource: //cloudresourcemanager.googleapis.com/projects/10
+            - label_value: labelValues/1000
+              name: labelBindings/somename2
+              resource: //cloudresourcemanager.googleapis.com/projects/11
+    - expect_stdout: |
+        bindings:
+        - label_value: labelValues/1000
+          name: labelBindings/somename1
+          resource: //cloudresourcemanager.googleapis.com/projects/10
+        - label_value: labelValues/1000
+          name: labelBindings/somename2
+          resource: //cloudresourcemanager.googleapis.com/projects/11
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: labelmanager bindings list labelValues/1000
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelBindings?alt=json&filter=labelValue%3AlabelValues%2F1000
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body:
+            bindings: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: labelmanager bindings list --resource="//cloudresourcemanager.googleapis.com/projects/10"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelBindings?alt=json&filter=resource%3A%2F%2Fcloudresourcemanager.googleapis.com%2Fprojects%2F10
+          method: GET
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body:
+            bindings:
+            - label_value: labelValues/1000
+              name: labelBindings/somename1
+              resource: //cloudresourcemanager.googleapis.com/projects/10
+            - label_value: labelValues/1001
+              name: labelBindings/somename2
+              resource: //cloudresourcemanager.googleapis.com/projects/10
+            - label_value: labelValues/1002
+              name: labelBindings/somename3
+              resource: //cloudresourcemanager.googleapis.com/projects/10
+    - expect_stdout: |
+        bindings:
+        - label_value: labelValues/1000
+          name: labelBindings/somename1
+          resource: //cloudresourcemanager.googleapis.com/projects/10
+        - label_value: labelValues/1001
+          name: labelBindings/somename2
+          resource: //cloudresourcemanager.googleapis.com/projects/10
+        - label_value: labelValues/1002
+          name: labelBindings/somename3
+          resource: //cloudresourcemanager.googleapis.com/projects/10
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: labelmanager bindings list labelValues/1000 --resource="//cloudresourcemanager.googleapis.com/projects/10"
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.labelmanager.bindings.list) argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly one of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource) must be specified.
+        Usage: gcloud alpha labelmanager bindings list ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource=RESOURCE) [optional flags]
+          optional flags may be  --filter | --help | --label-key | --label-parent |
+                                 --limit | --page-size | --resource | --sort-by
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha labelmanager bindings list --help
+    - expect_exit:
+        code: 1
+        message: 'argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly
+          one of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT]
+          --resource) must be specified.'
+- execute_command:
+    command: labelmanager bindings list test --label-key="labelKeys/100" --resource="//cloudresourcemanager.googleapis.com/projects/10"
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.labelmanager.bindings.list) argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly one of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource) must be specified.
+        Usage: gcloud alpha labelmanager bindings list ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource=RESOURCE) [optional flags]
+          optional flags may be  --filter | --help | --label-key | --label-parent |
+                                 --limit | --page-size | --resource | --sort-by
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha labelmanager bindings list --help
+    - expect_exit:
+        code: 1
+        message: 'argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly
+          one of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT]
+          --resource) must be specified.'
+- execute_command:
+    command: labelmanager bindings list test --label-key="env" --label-parent="organizations/1"
+      --resource="//cloudresourcemanager.googleapis.com/projects/10"
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.labelmanager.bindings.list) argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly one of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource) must be specified.
+        Usage: gcloud alpha labelmanager bindings list ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT] --resource=RESOURCE) [optional flags]
+          optional flags may be  --filter | --help | --label-key | --label-parent |
+                                 --limit | --page-size | --resource | --sort-by
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha labelmanager bindings list --help
+    - expect_exit:
+        code: 1
+        message: 'argument [LABEL_VALUE_ID : --label-key --label-parent]: Exactly
+          one of ([LABEL_VALUE_ID : --label-key=LABEL_KEY --label-parent=LABEL_PARENT]
+          --resource) must be specified.'

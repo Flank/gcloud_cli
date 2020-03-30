@@ -11,6 +11,9 @@ DESCRIPTION
     for a Cloud Billing account given an account ID and a JSON or YAML file
     that describes the IAM policy.
 
+    Note: Setting the IAM policy for a Cloud Billing account replaces existing
+    IAM bindings for that account.
+
 POSITIONAL ARGUMENTS
      Account resource - The Cloud Billing account for which to display the IAM
      policy. This represents a Cloud resource. This must be specified.
@@ -29,8 +32,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the cloudbilling/v1 API. The full documentation for this

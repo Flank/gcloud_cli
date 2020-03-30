@@ -64,6 +64,26 @@ class ClustersIntegrationTest(e2e_base.DataprocIntegrationTestBase):
     pass
 
 
+class ClustersIntegrationTestGA(ClustersIntegrationTest,
+                                base.DataprocTestBaseGA):
+  """Integration test for all cluster commands.
+
+  See DataprocIntegrationTestBase for requirements of tests that create
+  clusters.
+  """
+
+  def testGA(self):
+    self.assertEqual(self.messages,
+                     core_apis.GetMessagesModule('dataproc', 'v1'))
+    self.assertEqual(self.track, calliope_base.ReleaseTrack.GA)
+
+  def DoTestGetSetIAMPolicy(self):
+    self.GetSetIAMPolicy('clusters', self.cluster_name)
+
+  def testClustersList(self):
+    self.RunDataproc('clusters list --page-size=10 --limit=20')
+
+
 class ClustersIntegrationTestBeta(ClustersIntegrationTest,
                                   base.DataprocTestBaseBeta):
   """Integration test for all cluster commands.
@@ -79,20 +99,6 @@ class ClustersIntegrationTestBeta(ClustersIntegrationTest,
 
   def DoTestGetSetIAMPolicy(self):
     self.GetSetIAMPolicy('clusters', self.cluster_name)
-
-  def testImportCluster(self):
-    cluster_yaml = """
-    config:
-      gceClusterConfig:
-        zoneUri: {zone}
-      softwareConfig:
-        properties:
-          dataproc:fake.property: "fake-value"
-    """.format(zone=self.zone)
-    self.WriteInput(cluster_yaml)
-
-    result = self.RunDataproc('clusters import {0}'.format(self.cluster_name))
-    self.assertEqual(self.cluster_name, result.clusterName)
 
   def testClustersList(self):
     self.RunDataproc('clusters list --page-size=10 --limit=20')

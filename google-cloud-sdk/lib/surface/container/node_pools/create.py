@@ -45,14 +45,14 @@ DETAILED_HELP = {
         To create a new node pool "node-pool-1" with the default options in the
         cluster "sample-cluster", run:
 
-          $ {command} node-pool-1 --cluster=example-cluster
+          $ {command} node-pool-1 --cluster=sample-cluster
 
         The new node pool will show up in the cluster after all the nodes have
         been provisioned.
 
         To create a node pool with 5 nodes, run:
 
-          $ {command} node-pool-1 --cluster=example-cluster --num-nodes=5
+          $ {command} node-pool-1 --cluster=sample-cluster --num-nodes=5
         """,
 }
 
@@ -113,6 +113,7 @@ def ParseCreateNodePoolOptionsBase(args):
   """Parses the flags provided with the node pool creation command."""
   enable_autorepair = cmd_util.GetAutoRepair(args)
   flags.WarnForNodeModification(args, enable_autorepair)
+  flags.ValidateSurgeUpgradeSettings(args)
   metadata = metadata_utils.ConstructMetadataDict(args.metadata,
                                                   args.metadata_from_file)
   return api_adapter.CreateNodePoolOptions(
@@ -142,8 +143,14 @@ def ParseCreateNodePoolOptionsBase(args):
       metadata=metadata,
       max_pods_per_node=args.max_pods_per_node,
       enable_autoprovisioning=args.enable_autoprovisioning,
+      workload_metadata_from_node=args.workload_metadata_from_node,
       shielded_secure_boot=args.shielded_secure_boot,
-      shielded_integrity_monitoring=args.shielded_integrity_monitoring)
+      shielded_integrity_monitoring=args.shielded_integrity_monitoring,
+      reservation_affinity=args.reservation_affinity,
+      reservation=args.reservation,
+      sandbox=args.sandbox,
+      max_surge_upgrade=args.max_surge_upgrade,
+      max_unavailable_upgrade=args.max_unavailable_upgrade)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -158,14 +165,23 @@ class Create(base.CreateCommand):
     flags.AddPreemptibleFlag(parser, for_node_pool=True)
     flags.AddEnableAutoRepairFlag(parser, for_node_pool=True, for_create=True)
     flags.AddMinCpuPlatformFlag(parser, for_node_pool=True)
+    flags.AddWorkloadMetadataFromNodeFlag(parser)
     flags.AddNodeTaintsFlag(parser, for_node_pool=True)
     flags.AddNodePoolNodeIdentityFlags(parser)
     flags.AddNodePoolAutoprovisioningFlag(parser, hidden=False)
     flags.AddMaxPodsPerNodeFlag(parser, for_node_pool=True)
     flags.AddEnableAutoUpgradeFlag(parser, for_node_pool=True, default=True)
+    flags.AddReservationAffinityFlags(parser, for_node_pool=True)
+    flags.AddSandboxFlag(parser)
+    flags.AddNodePoolLocationsFlag(parser, for_create=True)
+    flags.AddSurgeUpgradeFlag(parser, for_node_pool=True)
+    flags.AddMaxUnavailableUpgradeFlag(
+        parser, for_node_pool=True, is_create=True)
 
   def ParseCreateNodePoolOptions(self, args):
-    return ParseCreateNodePoolOptionsBase(args)
+    ops = ParseCreateNodePoolOptionsBase(args)
+    ops.node_locations = args.node_locations
+    return ops
 
   def Run(self, args):
     """This is what gets called when the user runs this command.
@@ -228,10 +244,11 @@ class CreateBeta(Create):
     _Args(parser)
     flags.AddClusterAutoscalingFlags(parser)
     flags.AddLocalSSDFlag(parser)
+    flags.AddBootDiskKmsKeyFlag(parser)
     flags.AddPreemptibleFlag(parser, for_node_pool=True)
     flags.AddEnableAutoRepairFlag(parser, for_node_pool=True, for_create=True)
     flags.AddMinCpuPlatformFlag(parser, for_node_pool=True)
-    flags.AddWorkloadMetadataFromNodeFlag(parser)
+    flags.AddWorkloadMetadataFromNodeFlag(parser, use_mode=False)
     flags.AddNodeTaintsFlag(parser, for_node_pool=True)
     flags.AddNodePoolNodeIdentityFlags(parser)
     flags.AddNodePoolAutoprovisioningFlag(parser, hidden=False)
@@ -240,18 +257,18 @@ class CreateBeta(Create):
     flags.AddSandboxFlag(parser)
     flags.AddNodePoolLocationsFlag(parser, for_create=True)
     flags.AddSurgeUpgradeFlag(parser, for_node_pool=True, default=1)
-    flags.AddMaxUnavailableUpgradeFlag(parser, for_node_pool=True,
-                                       is_create=True)
+    flags.AddMaxUnavailableUpgradeFlag(
+        parser, for_node_pool=True, is_create=True)
+    flags.AddReservationAffinityFlags(parser, for_node_pool=True)
 
   def ParseCreateNodePoolOptions(self, args):
     ops = ParseCreateNodePoolOptionsBase(args)
     flags.WarnForNodeVersionAutoUpgrade(args)
     flags.ValidateSurgeUpgradeSettings(args)
     ops.workload_metadata_from_node = args.workload_metadata_from_node
+    ops.boot_disk_kms_key = args.boot_disk_kms_key
     ops.sandbox = args.sandbox
     ops.node_locations = args.node_locations
-    ops.max_surge_upgrade = args.max_surge_upgrade
-    ops.max_unavailable_upgrade = args.max_unavailable_upgrade
     return ops
 
 
@@ -265,11 +282,10 @@ class CreateAlpha(Create):
     flags.ValidateSurgeUpgradeSettings(args)
     ops.workload_metadata_from_node = args.workload_metadata_from_node
     ops.local_ssd_volume_configs = args.local_ssd_volumes
+    ops.boot_disk_kms_key = args.boot_disk_kms_key
     ops.sandbox = args.sandbox
     ops.node_group = args.node_group
     ops.linux_sysctls = args.linux_sysctls
-    ops.max_surge_upgrade = args.max_surge_upgrade
-    ops.max_unavailable_upgrade = args.max_unavailable_upgrade
     ops.node_locations = args.node_locations
     ops.node_config = args.node_config
     return ops
@@ -280,10 +296,11 @@ class CreateAlpha(Create):
     flags.AddClusterAutoscalingFlags(parser)
     flags.AddNodePoolAutoprovisioningFlag(parser, hidden=False)
     flags.AddLocalSSDAndLocalSSDVolumeConfigsFlag(parser, for_node_pool=True)
+    flags.AddBootDiskKmsKeyFlag(parser)
     flags.AddPreemptibleFlag(parser, for_node_pool=True)
     flags.AddEnableAutoRepairFlag(parser, for_node_pool=True, for_create=True)
     flags.AddMinCpuPlatformFlag(parser, for_node_pool=True)
-    flags.AddWorkloadMetadataFromNodeFlag(parser)
+    flags.AddWorkloadMetadataFromNodeFlag(parser, use_mode=False)
     flags.AddNodeTaintsFlag(parser, for_node_pool=True)
     flags.AddNodePoolNodeIdentityFlags(parser)
     flags.AddMaxPodsPerNodeFlag(parser, for_node_pool=True)
@@ -292,10 +309,11 @@ class CreateAlpha(Create):
     flags.AddEnableAutoUpgradeFlag(parser, for_node_pool=True, default=True)
     flags.AddLinuxSysctlFlags(parser, for_node_pool=True)
     flags.AddSurgeUpgradeFlag(parser, for_node_pool=True, default=1)
-    flags.AddMaxUnavailableUpgradeFlag(parser, for_node_pool=True,
-                                       is_create=True)
+    flags.AddMaxUnavailableUpgradeFlag(
+        parser, for_node_pool=True, is_create=True)
     flags.AddNodePoolLocationsFlag(parser, for_create=True)
     flags.AddNodeConfigFlag(parser)
+    flags.AddReservationAffinityFlags(parser, for_node_pool=True)
 
 
 Create.detailed_help = DETAILED_HELP

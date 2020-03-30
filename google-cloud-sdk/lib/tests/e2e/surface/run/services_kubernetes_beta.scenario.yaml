@@ -7,7 +7,7 @@ summary:
   - command: run deploy --kubeconfig robot-kubeconfig.yaml --image "gcr.io/knative-samples/helloworld-nodejs"
       $$service-name$$
   - stderr: |
-      Deploying container to Kubernetes Cluster service [$$service-name$$] in namespace [default] of context [gke_cloud-sdk-integration-testing_us-central1-a_do-not-delete-gke-knative-test-cluster] referenced by config file [robot-kubeconfig.yaml]
+      Deploying container to Cloud Run for Anthos service [$$service-name$$] in namespace [default] of context [gke_cloud-sdk-integration-testing_us-central1-a_do-not-delete-knative-test-oldest] referenced by config file [robot-kubeconfig.yaml]
   - staged_progress_tracker:
     - message: Deploying new service...
     - status: SUCCESS
@@ -60,32 +60,7 @@ actions:
               kind: services
             code: 404
     - expect_stderr: |
-        Deploying container to Kubernetes Cluster service [$$service-name$$] in namespace [default] of context [gke_cloud-sdk-integration-testing_us-central1-a_do-not-delete-gke-knative-test-cluster] referenced by config file [robot-kubeconfig.yaml]
-    - api_call:
-        expect_request:
-          uri:
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
-            content-length: '292'
-            content-type: application/json
-            status: '404'
-          body:
-            kind: Status
-            apiVersion: v1
-            metadata: {}
-            status: Failure
-            message: services.serving.knative.dev "$$service-name$$" not found
-            reason: NotFound
-            details:
-              name: $$service-name$$
-              group: serving.knative.dev
-              kind: services
-            code: 404
+        Deploying container to Cloud Run for Anthos service [$$service-name$$] in namespace [default] of context [gke_cloud-sdk-integration-testing_us-central1-a_do-not-delete-knative-test-oldest] referenced by config file [robot-kubeconfig.yaml]
     - api_call:
         expect_request:
           uri:
@@ -100,7 +75,6 @@ actions:
                 annotations:
                   client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
                   run.googleapis.com/client-name: gcloud
-                initializers: {}
                 labels: {}
                 name: $$service-name$$
                 namespace: default
@@ -135,8 +109,6 @@ actions:
                   annotations:
                     run.googleapis.com/client-name: gcloud
                   creationTimestamp: '2019-07-23T18:13:29Z'
-                  initializers:
-                    pending: null
                   labels:
                     client.knative.dev/nonce: dmwqrjmbba
                 spec:
@@ -183,8 +155,6 @@ actions:
                   annotations:
                     run.googleapis.com/client-name: gcloud
                   creationTimestamp: '2019-07-23T18:13:29Z'
-                  initializers:
-                    pending: null
                   labels:
                     client.knative.dev/nonce: dmwqrjmbba
                 spec:
@@ -260,8 +230,6 @@ actions:
                   annotations:
                     run.googleapis.com/client-name: gcloud
                   creationTimestamp: '2019-07-23T18:13:29Z'
-                  initializers:
-                    pending: null
                   labels:
                     client.knative.dev/nonce: dmwqrjmbba
                 spec:

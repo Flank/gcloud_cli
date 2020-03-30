@@ -143,6 +143,16 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
                       zone='us-central2-a')))
     return res
 
+  def CreateOperationWaitRequests(self, ids):
+    res = []
+    for i in ids:
+      res.append((self.compute.zoneOperations, 'Wait',
+                  self.messages.ComputeZoneOperationsWaitRequest(
+                      operation='operation-' + str(i),
+                      project='my-project',
+                      zone='us-central2-a')))
+    return res
+
   def CreateInstances(self, ids):
     res = []
     for i in ids:
@@ -253,7 +263,7 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     mock_progress_tracker = mock.MagicMock()
     self.RegisterCalls(
         Call(
-            requests=self.CreateOperationGetRequests([0]),
+            requests=self.CreateOperationWaitRequests([0]),
             responses=self.CreateOperations([DONE_V1])),
         Call(
             requests=self.CreateInstancesGetRequests([0]),
@@ -272,11 +282,11 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
   def testWithManyPendingInsertOperations(self):
     self.RegisterCalls(
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=self.CreateOperations(
                 [PENDING_V1, PENDING_V1, PENDING_V1])),
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=self.CreateOperations([DONE_V1, DONE_V1, DONE_V1])),
         Call(
             requests=self.CreateInstancesGetRequests([0, 1, 2]),
@@ -294,11 +304,11 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
   def testWithManyPendingDeleteOperations(self):
     self.RegisterCalls(
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=self.CreateOperations(
                 [PENDING_V1, PENDING_V1, PENDING_V1], operation_type='delete')),
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=self.CreateOperations([DONE_V1, DONE_V1, DONE_V1],
                                             operation_type='delete')),
     )
@@ -314,35 +324,35 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
   def testWithManyPendingInsertOperationsAndInterleavingDones(self):
     self.RegisterCalls(
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=self.CreateOperations(
                 [PENDING_V1, PENDING_V1, PENDING_V1])),
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=self.CreateOperations(
                 [PENDING_V1, PENDING_V1, PENDING_V1])),
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=self.CreateOperations([PENDING_V1, DONE_V1, PENDING_V1])),
         Call(
             requests=(self.CreateInstancesGetRequests([1]) +
-                      self.CreateOperationGetRequests([0, 2])),
+                      self.CreateOperationWaitRequests([0, 2])),
             responses=(
                 self.CreateOperations([PENDING_V1, DONE_V1], ids=[0, 2]) +
                 self.CreateInstances([1]))),
         Call(
             requests=(self.CreateInstancesGetRequests([2]) +
-                      self.CreateOperationGetRequests([0])),
+                      self.CreateOperationWaitRequests([0])),
             responses=(self.CreateOperations([PENDING_V1]) +
                        self.CreateInstances([2]))),
         Call(
-            requests=self.CreateOperationGetRequests([0]),
+            requests=self.CreateOperationWaitRequests([0]),
             responses=self.CreateOperations([PENDING_V1])),
         Call(
-            requests=self.CreateOperationGetRequests([0]),
+            requests=self.CreateOperationWaitRequests([0]),
             responses=self.CreateOperations([PENDING_V1])),
         Call(
-            requests=self.CreateOperationGetRequests([0]),
+            requests=self.CreateOperationWaitRequests([0]),
             responses=self.CreateOperations([DONE_V1])),
         Call(
             requests=self.CreateInstancesGetRequests([0]),
@@ -369,7 +379,7 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     for _ in range(12):
       calls.append(
           Call(
-              requests=self.CreateOperationGetRequests([0, 1, 2]),
+              requests=self.CreateOperationWaitRequests([0, 1, 2]),
               responses=self.CreateOperations(
                   [PENDING_V1, PENDING_V1, PENDING_V1])))
 
@@ -404,7 +414,7 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     for _ in range(12):
       calls.append(
           Call(
-              requests=self.CreateOperationGetRequests([0, 1, 2]),
+              requests=self.CreateOperationWaitRequests([0, 1, 2]),
               responses=self.CreateOperations(
                   [PENDING_V1, PENDING_V1, PENDING_V1],
                   operation_type='recreateInstancesInstanceGroupManager')))
@@ -426,11 +436,11 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
               message='resource instance-' + str(i) + ' already exists')])
     self.RegisterCalls(
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=self.CreateOperations(
                 [PENDING_V1, PENDING_V1, PENDING_V1])),
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=error_ops),
     )
     self.assertEqual(
@@ -454,11 +464,11 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
 
     self.RegisterCalls(
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=self.CreateOperations(
                 [PENDING_V1, PENDING_V1, PENDING_V1])),
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=error_ops),
     )
     self.assertEqual(
@@ -482,11 +492,11 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
 
     self.RegisterCalls(
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=self.CreateOperations(
                 [PENDING_V1, PENDING_V1, PENDING_V1])),
         Call(
-            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            requests=self.CreateOperationWaitRequests([0, 1, 2]),
             responses=warning_ops),
         Call(
             requests=self.CreateInstancesGetRequests([0, 1, 2]),
@@ -522,8 +532,8 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
 
     self.RegisterCalls(
         Call(
-            requests=[(self.compute.regionOperations, 'Get',
-                       self.messages.ComputeRegionOperationsGetRequest(
+            requests=[(self.compute.regionOperations, 'Wait',
+                       self.messages.ComputeRegionOperationsWaitRequest(
                            operation='operation-0',
                            project='my-project',
                            region='us-central2'))],
@@ -565,13 +575,13 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
 
     self.RegisterCalls(
         Call(
-            requests=[(self.compute.regionOperations, 'Get',
-                       self.messages.ComputeRegionOperationsGetRequest(
+            requests=[(self.compute.regionOperations, 'Wait',
+                       self.messages.ComputeRegionOperationsWaitRequest(
                            operation='operation-0',
                            project='my-project',
                            region='us-central2')),
-                      (self.compute.zoneOperations, 'Get',
-                       self.messages.ComputeZoneOperationsGetRequest(
+                      (self.compute.zoneOperations, 'Wait',
+                       self.messages.ComputeZoneOperationsWaitRequest(
                            operation='operation-0',
                            project='my-project',
                            zone='us-central2-a'))],
@@ -864,11 +874,11 @@ class OperationDataTestOperationGet(sdk_test_base.SdkBase):
 
     time_patcher = self.StartPatch(
         'googlecloudsdk.command_lib.util.time_util.CurrentTimeSec',
-        auto_spec=True)
+        autospec=True)
     time_patcher.side_effect = iter(range(0, 1000, 5))
 
     self.sleep_patcher = self.StartPatch(
-        'googlecloudsdk.command_lib.util.time_util.Sleep', auto_spec=True)
+        'googlecloudsdk.command_lib.util.time_util.Sleep', autospec=True)
 
     self.messages = apis.GetMessagesModule('compute', 'alpha')
     self.compute = apis.GetClientInstance('compute', 'alpha', no_http=True)

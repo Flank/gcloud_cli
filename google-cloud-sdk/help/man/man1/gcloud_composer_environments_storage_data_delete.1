@@ -67,8 +67,21 @@ Compute Engine region in which to create the environment.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete the data from the path \f5\fIpath/to/data\fR\fR, for the environment
+named \f5\fIenvironmnet\-1\fR\fR in the location \f5\fIus\-east1\fR\fR, run:
+
+.RS 2m
+$ gcloud composer environments storage data delete path/to/data \e
+    \-\-environment=environment\-1 \-\-location=us\-east1
+.RE
 
 
 

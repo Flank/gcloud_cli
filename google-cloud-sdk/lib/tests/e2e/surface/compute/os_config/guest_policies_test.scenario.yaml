@@ -1,5 +1,5 @@
 title: guest-policies create, describe, list, update, lookup, delete.
-release_tracks: [ALPHA]
+release_tracks: [BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -53,7 +53,13 @@ actions:
 - define_reference:
     reference: api-version
     track_values:
+      BETA: v1beta
       ALPHA: v1alpha2
+- define_reference:
+    reference: lookup-request-name
+    track_values:
+      BETA: lookupEffectiveGuestPolicy
+      ALPHA: lookupGuestPolicies
 - define_reference:
     reference: zone
     value: us-central1-f
@@ -289,7 +295,7 @@ actions:
                 not found.
     - api_call:
         expect_request:
-          uri: https://osconfig.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$zone$$/instances/$$instance-id$$:lookupGuestPolicies?alt=json
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$zone$$/instances/$$instance-id$$:$$lookup-request-name$$?alt=json
           method: POST
           headers: {}
           body: null

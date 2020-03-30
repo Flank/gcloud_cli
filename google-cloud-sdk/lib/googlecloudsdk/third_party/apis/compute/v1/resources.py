@@ -108,6 +108,13 @@ class Collections(enum.Enum):
       [u'project', u'forwardingRule'],
       True
   )
+  GLOBALNETWORKENDPOINTGROUPS = (
+      'globalNetworkEndpointGroups',
+      'projects/{project}/global/networkEndpointGroups/{networkEndpointGroup}',
+      {},
+      [u'project', u'networkEndpointGroup'],
+      True
+  )
   GLOBALOPERATIONS = (
       'globalOperations',
       'projects/{project}/global/operations/{operation}',
@@ -256,6 +263,13 @@ class Collections(enum.Enum):
       'projects/{project}/zones/{zone}/nodeTypes/{nodeType}',
       {},
       [u'project', u'zone', u'nodeType'],
+      True
+  )
+  PACKETMIRRORINGS = (
+      'packetMirrorings',
+      'projects/{project}/regions/{region}/packetMirrorings/{packetMirroring}',
+      {},
+      [u'project', u'region', u'packetMirroring'],
       True
   )
   PROJECTS = (

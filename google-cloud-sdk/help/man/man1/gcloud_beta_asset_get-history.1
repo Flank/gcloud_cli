@@ -32,13 +32,12 @@ format.
 
 .TP 2m
 \fB\-\-content\-type\fR=\fICONTENT_TYPE\fR
-Asset content type. Choices are \f5resource\fR, \f5iam\-policy\fR and
-\f5org\-policy\fR. Specifying \f5resource\fR will export resource metadata,
-specifying \f5iam\-policy\fR will export IAM policy set on assets, specifying
-\f5org\-policy\fR will export Org Policy set on asset, and specifying
-\f5access\-policy\fR will export Access Policy set on asset. \fICONTENT_TYPE\fR
-must be one of: \fBresource\fR, \fBiam\-policy\fR, \fBorg\-policy\fR,
-\fBaccess\-policy\fR.
+Asset content type. Specifying \f5resource\fR will export resource metadata,
+specifying \f5iam\-policy\fR will export the IAM policy for each child asset,
+specifying \f5org\-policy\fR will export the Org Policy set on child assets, and
+specifying \f5access\-policy\fR will export the Access Policy set on child
+assets. \fICONTENT_TYPE\fR must be one of: \fBresource\fR, \fBiam\-policy\fR,
+\fBorg\-policy\fR, \fBaccess\-policy\fR.
 
 .TP 2m
 \fB\-\-start\-time\fR=\fISTART_TIME\fR
@@ -93,8 +92,9 @@ time formats.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

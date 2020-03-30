@@ -33,13 +33,6 @@ class ManagedZonesUpdateTest(base.DnsMockMultiTrackTest):
   def SetUp(self):
     self.SetUpForTrack(self.track, self.api_version)
 
-
-class BetaManagedZonesUpdateTest(ManagedZonesUpdateTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'v1beta2'
-
   def testUpdateWithDnsPeering_IncompleteTargetProject(self):
     # set target-project, no target-network.
     with self.assertRaisesRegex(
@@ -53,6 +46,13 @@ class BetaManagedZonesUpdateTest(ManagedZonesUpdateTest):
         cli_test_base.MockArgumentError,
         'argument --target-project: Must be specified.'):
       self.Run('dns managed-zones update --target-network tn zone')
+
+
+class BetaManagedZonesUpdateTest(ManagedZonesUpdateTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta2'
 
 
 if __name__ == '__main__':

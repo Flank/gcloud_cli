@@ -1,0 +1,208 @@
+title: Cloud API Gateway Gateway Create Success Tests
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway gateways create test-name --location us-central1 --api-config projects/my-project/locations/global/apis/api-name/configs/rev1
+  - progress_tracker:
+    - message: Waiting for API Gateway [test-name] to be created with [projects/my-project/locations/global/apis/api-name/configs/rev1]
+        config
+    - status: SUCCESS
+- execute:
+  - command: |
+      api-gateway gateways create test-name --location us-central1 --api-config projects/my-project/locations/global/apis/api-name/configs/rev1 --async
+  - stderr: |+
+      Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+      gcloud api-gateway operations wait projects/fake-project/locations/us-central1/operations/123456789
+
+- execute:
+  - command: |
+      api-gateway gateways create test-name --location us-central1 --api-config rev1 --api api-name --async
+  - stderr: |+
+      Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+      gcloud api-gateway operations wait projects/fake-project/locations/us-central1/operations/123456789
+
+- execute:
+  - command: |
+      api-gateway gateways create test-name --location us-central1 --display-name="Display Name" --api-config projects/my-project/locations/global/apis/api-name/configs/rev1 --async
+  - stderr: |+
+      Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+      gcloud api-gateway operations wait projects/fake-project/locations/us-central1/operations/123456789
+
+- execute:
+  - command: |
+      api-gateway gateways create test-name --location us-central1 --labels="a_label=a_value" --api-config projects/my-project/locations/global/apis/api-name/configs/rev1 --async
+  - stderr: |+
+      Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+      gcloud api-gateway operations wait projects/fake-project/locations/us-central1/operations/123456789
+
+actions:
+- execute_command:
+    command: |
+      api-gateway gateways create test-name --location us-central1 --api-config projects/my-project/locations/global/apis/api-name/configs/rev1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways?alt=json&gatewayId=test-name
+          method: POST
+          headers: {}
+          body:
+            json:
+              apiConfig: projects/my-project/locations/global/apis/api-name/configs/rev1
+              name: projects/fake-project/locations/us-central1/gateways/test-name
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: false
+            name: projects/fake-project/locations/us-central1/operations/123456789
+            error: null
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/operations/123456789?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/operations/123456789
+            done: true
+            response:
+              '@type': type.googleapis.com/google.cloud.apigateway.v1alpha1.Gateway
+              name: projects/fake-project/locations/us-central1/gateways/test-name
+    - expect_progress_tracker:
+        message: Waiting for API Gateway [test-name] to be created with [projects/my-project/locations/global/apis/api-name/configs/rev1]
+          config
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways/test-name?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/operations/123456789
+            done: false
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      api-gateway gateways create test-name --location us-central1 --api-config projects/my-project/locations/global/apis/api-name/configs/rev1 --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways?alt=json&gatewayId=test-name
+          method: POST
+          headers: {}
+          body:
+            json:
+              apiConfig: projects/my-project/locations/global/apis/api-name/configs/rev1
+              name: projects/fake-project/locations/us-central1/gateways/test-name
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: false
+            name: projects/fake-project/locations/us-central1/operations/123456789
+            error: null
+    - expect_stderr: |+
+        Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+        gcloud api-gateway operations wait projects/fake-project/locations/us-central1/operations/123456789
+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      api-gateway gateways create test-name --location us-central1 --api-config rev1 --api api-name --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways?alt=json&gatewayId=test-name
+          method: POST
+          headers: {}
+          body:
+            json:
+              apiConfig: projects/fake-project/locations/global/apis/api-name/configs/rev1
+              name: projects/fake-project/locations/us-central1/gateways/test-name
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: false
+            name: projects/fake-project/locations/us-central1/operations/123456789
+            error: null
+    - expect_stderr: |+
+        Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+        gcloud api-gateway operations wait projects/fake-project/locations/us-central1/operations/123456789
+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      api-gateway gateways create test-name --location us-central1 --display-name="Display Name" --api-config projects/my-project/locations/global/apis/api-name/configs/rev1 --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways?alt=json&gatewayId=test-name
+          method: POST
+          headers: {}
+          body:
+            json:
+              apiConfig: projects/my-project/locations/global/apis/api-name/configs/rev1
+              name: projects/fake-project/locations/us-central1/gateways/test-name
+              displayName: Display Name
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: false
+            name: projects/fake-project/locations/us-central1/operations/123456789
+            error: null
+    - expect_stderr: |+
+        Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+        gcloud api-gateway operations wait projects/fake-project/locations/us-central1/operations/123456789
+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      api-gateway gateways create test-name --location us-central1 --labels="a_label=a_value" --api-config projects/my-project/locations/global/apis/api-name/configs/rev1 --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways?alt=json&gatewayId=test-name
+          method: POST
+          headers: {}
+          body:
+            json:
+              apiConfig: projects/my-project/locations/global/apis/api-name/configs/rev1
+              name: projects/fake-project/locations/us-central1/gateways/test-name
+              labels:
+                a_label: a_value
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: false
+            name: projects/fake-project/locations/us-central1/operations/123456789
+            error: null
+    - expect_stderr: |+
+        Asynchronous operation is in progress. Use the following command to wait for its completion:
+
+        gcloud api-gateway operations wait projects/fake-project/locations/us-central1/operations/123456789
+
+    - expect_exit:
+        code: 0

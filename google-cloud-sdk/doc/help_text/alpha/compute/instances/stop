@@ -6,10 +6,11 @@ SYNOPSIS
         [--async] [--discard-local-ssd] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute instances stop is used stop a Google Compute
-    Engine virtual machine. Stopping a VM performs a clean shutdown, much like
-    invoking the shutdown functionality of a workstation or laptop. Stopping a
-    VM with a local SSD is not supported and will result in an API error.
+    (ALPHA) gcloud alpha compute instances stop is used to stop a Google
+    Compute Engine virtual machine. Stopping a VM performs a clean shutdown,
+    much like invoking the shutdown functionality of a workstation or laptop.
+    Stopping a VM with a local SSD is not supported and will result in an API
+    error. Stopping a VM which is already stopped will return without errors.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAMES [INSTANCE_NAMES ...]
@@ -52,8 +53,14 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To stop an instance named test-instance, run:
+
+        $ gcloud alpha compute instances stop test-instance
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

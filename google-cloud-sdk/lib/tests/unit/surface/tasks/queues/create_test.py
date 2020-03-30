@@ -158,7 +158,9 @@ class CreateAppEngineQueueTest(test_base.CloudTasksTestBase):
                                               maxDoublings=4, minBackoff='1s',
                                               maxBackoff='10s'),
         rateLimits=self.messages.RateLimits(
-            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10),
+        stackdriverLoggingConfig=self.messages.StackdriverLoggingConfig(
+            samplingRatio=0.1))
     self.queues_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
             parent=self.location_ref.RelativeName(), queue=expected_queue),
@@ -170,7 +172,8 @@ class CreateAppEngineQueueTest(test_base.CloudTasksTestBase):
                             '--max-backoff=10s '
                             '--max-dispatches-per-second=100 '
                             '--max-concurrent-dispatches=10 '
-                            '--routing-override=service:abc')
+                            '--routing-override=service:abc '
+                            '--log-sampling-ratio=0.1')
 
     self.assertEqual(actual_queue, expected_queue)
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)

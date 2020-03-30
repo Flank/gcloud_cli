@@ -3,20 +3,21 @@
   "discoveryVersion": "v1",
   "id": "billingbudgets:v1alpha1",
   "name": "billingbudgets",
-  "canonicalName": "Billingbudgets",
+  "canonicalName": "CloudBillingBudget",
   "version": "v1alpha1",
   "revision": "0",
   "title": "Cloud Billing Budget API",
-  "description": "",
+  "description": "The Cloud Billing Budget API stores Cloud Billing budgets, which define a budget plan and the rules to execute as spend is tracked against that plan.",
   "ownerDomain": "google.com",
   "ownerName": "Google",
   "icons": {
     "x16": "http://www.google.com/images/icons/product/search-16.gif",
     "x32": "http://www.google.com/images/icons/product/search-32.gif"
    },
-  "documentationLink": "https://docs.google.com/document/d/13BHH4JD6AclB5a2tRgVo7yB2oKyH8SeZh0M4biDWGOY/edit",
+  "documentationLink": "https://cloud.google.com/billing/docs/how-to/budget-api-overview",
   "protocol": "rest",
   "rootUrl": "https://billingbudgets.googleapis.com/",
+  "mtlsRootUrl": "https://billingbudgets.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://billingbudgets.googleapis.com/",
   "batchPath": "batch",
@@ -142,7 +143,7 @@
           "$ref": "GoogleCloudBillingBudgetsV1alpha1BudgetAmount"
         },
         "thresholdRules": {
-          "description": "Required. Rules that trigger alerts (notifications of thresholds\nbeing crossed) when spend exceeds the specified percentages of the budget.",
+          "description": "Optional. Rules that trigger alerts (notifications of thresholds\nbeing crossed) when spend exceeds the specified percentages of the budget.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudBillingBudgetsV1alpha1ThresholdRule"
@@ -164,7 +165,7 @@
       "type": "object",
       "properties": {
         "projects": {
-          "description": "Optional. A set of projects of the form `projects\/{project_id}`,\nspecifying that usage from only this set of projects should be\nincluded in the budget. If omitted, the report will include all usage for\nthe billing account, regardless of which project the usage occurred on.\nOnly zero or one project can be specified currently.",
+          "description": "Optional. A set of projects of the form `projects\/{project}`,\nspecifying that usage from only this set of projects should be\nincluded in the budget. If omitted, the report will include all usage for\nthe billing account, regardless of which project the usage occurred on.\nOnly zero or one project can be specified currently.",
           "type": "array",
           "items": {
             "type": "string"
@@ -238,7 +239,7 @@
     },
     "GoogleCloudBillingBudgetsV1alpha1ThresholdRule": {
       "id": "GoogleCloudBillingBudgetsV1alpha1ThresholdRule",
-      "description": "ThresholdRule contains a definition of a threshold which triggers\nan alert (a notification of a threshold being crossed) to be sent when\nspend goes above the specified amount.\nAlerts are automatically e-mailed to the billing users who have\naccess to the billing account. The thresholds here have no effect on\nnotifications sent to anything configured under `Budget.all_updates_rule`.",
+      "description": "ThresholdRule contains a definition of a threshold which triggers\nan alert (a notification of a threshold being crossed) to be sent when\nspend goes above the specified amount.\nAlerts are automatically e-mailed to users with the Billing Account\nAdministrator role or the Billing Account User role.\nThe thresholds here have no effect on notifications sent to anything\nconfigured under `Budget.all_updates_rule`.",
       "type": "object",
       "properties": {
         "thresholdPercent": {
@@ -350,7 +351,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Creates a new budget. See\n<a href=\"https:\/\/cloud.google.com\/billing\/quotas\">Quotas and limits<\/a>\nfor more information."
+              "description": "Creates a new budget. See\n<a href=\"https:\/\/cloud.google.com\/billing\/quotas\">Quotas and limits<\/a>\nfor more information on the limits of the number of budgets you can create."
             },
             "patch": {
               "id": "billingbudgets.billingAccounts.budgets.patch",
@@ -378,7 +379,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Updates a budget and returns the updated budget."
+              "description": "Updates a budget and returns the updated budget.\n\nWARNING: There are some fields exposed on the Google Cloud Console that\naren't available on this API. Budget fields that are not exposed in\nthis API will not be changed by this method."
             },
             "get": {
               "id": "billingbudgets.billingAccounts.budgets.get",
@@ -403,7 +404,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Returns a budget."
+              "description": "Returns a budget.\n\nWARNING: There are some fields exposed on the Google Cloud Console that\naren't available on this API. When reading from the API, you will not\nsee these fields in the return value, though they may have been set\nin the Cloud Console."
             },
             "list": {
               "id": "billingbudgets.billingAccounts.budgets.list",
@@ -439,7 +440,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Returns a list of budgets for a billing account."
+              "description": "Returns a list of budgets for a billing account.\n\nWARNING: There are some fields exposed on the Google Cloud Console that\naren't available on this API. When reading from the API, you will not\nsee these fields in the return value, though they may have been set\nin the Cloud Console."
             },
             "delete": {
               "id": "billingbudgets.billingAccounts.budgets.delete",

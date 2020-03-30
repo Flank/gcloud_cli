@@ -161,8 +161,29 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To attach a disk named 'my\-disk' as a boot disk to an instance named
+\'my\-instance', run:
+
+.RS 2m
+$ gcloud compute instances attach\-disk my\-instance \-\-disk=my\-disk \e
+    \-\-boot
+.RE
+
+To attach a device named 'my\-device' for read\-only access to an instance named
+\'my\-instance', run:
+
+.RS 2m
+$ gcloud compute instances attach\-disk my\-instance \e
+    \-\-device\-name=my\-device \-\-mode=ro
+.RE
 
 
 

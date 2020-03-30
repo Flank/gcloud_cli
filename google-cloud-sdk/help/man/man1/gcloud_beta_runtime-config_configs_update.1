@@ -49,8 +49,9 @@ The new description of the configuration.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -60,13 +61,13 @@ To update a runtime\-config resource's description, run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs update \e
-    \-\-description "My new description" my\-config
+    \-\-description="My new description" my\-config
 .RE
 
 To remove a runtime\-config resource's description, run:
 
 .RS 2m
-$ gcloud beta runtime\-config configs update \-\-description "" \e
+$ gcloud beta runtime\-config configs update \-\-description="" \e
     my\-config
 .RE
 

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud datastore \- manage your Cloud Datastore indexes
+gcloud datastore \- manage your Cloud Datastore resources
 
 
 
@@ -17,9 +17,6 @@ gcloud datastore \- manage your Cloud Datastore indexes
 
 .SH "DESCRIPTION"
 
-The gcloud datastore command group lets you create and delete Google Cloud
-Datastore indexes.
-
 Cloud Datastore is a highly\-scalable NoSQL database for your applications.
 Cloud Datastore automatically handles sharding and replication, providing you
 with a highly available and durable database that scales automatically to handle
@@ -29,6 +26,14 @@ More information on Cloud Datastore can be found here:
 https://cloud.google.com/datastore and detailed documentation can be found here:
 https://cloud.google.com/datastore/docs
 
+export \-\- Export data to Google Cloud Storage
+
+import \-\- Import data from Google Cloud Storage
+
+indexes \-\- Manage your Cloud Firestore indexes.
+
+operations \-\- Manage Long Running Operations for Cloud Firestore.
+
 
 
 .SH "GCLOUD WIDE FLAGS"
@@ -36,8 +41,9 @@ https://cloud.google.com/datastore/docs
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -48,7 +54,7 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBindexes\fR
-Manage Cloud Datastore indexes.
+Manage your Cloud Datastore indexes.
 
 .TP 2m
 \fBoperations\fR
@@ -74,22 +80,6 @@ Import Cloud Datastore entities from Google Cloud Storage.
 
 .RE
 .sp
-
-.SH "EXAMPLES"
-
-To create new indexes from a file, run:
-
-.RS 2m
-$ gcloud datastore indexes create index.yaml
-.RE
-
-To clean up unused indexes from a file, run:
-
-.RS 2m
-$ gcloud datastore indexes cleanup index.yaml
-.RE
-
-
 
 .SH "NOTES"
 

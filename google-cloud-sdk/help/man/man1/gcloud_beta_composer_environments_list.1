@@ -17,7 +17,7 @@ gcloud beta composer environments list \- list the Cloud Composer environments u
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR List environments that not have been successfully deleted. Prints a
+\fB(BETA)\fR List environments that have not been successfully deleted. Prints a
 table with the following columns:
 .RS 2m
 .IP "\(bu" 2m
@@ -101,8 +101,21 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list the Cloud Composer environments under the project 'project\-1' and in
+location 'us\-central1', run:
+
+.RS 2m
+$ gcloud beta composer environments list \-\-project=project\-1 \e
+    \-\-locations=us\-central1
+.RE
 
 
 

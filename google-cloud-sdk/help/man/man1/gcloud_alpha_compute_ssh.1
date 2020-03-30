@@ -49,7 +49,8 @@ generated key will have an empty passphrase).
 Specifies the instance to SSH into.
 
 \f5\fIUSER\fR\fR specifies the username with which to SSH. If omitted, the user
-login name is used.
+login name is used. If using OS Login, USER will be replaced by the OS Login
+user.
 
 \f5\fIINSTANCE\fR\fR specifies the name of the virtual machine instance to SSH
 into.
@@ -217,8 +218,9 @@ formats.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

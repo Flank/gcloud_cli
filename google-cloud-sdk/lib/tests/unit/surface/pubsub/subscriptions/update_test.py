@@ -31,7 +31,7 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.pubsub import base
 
 
-class SubscriptionsUpdateTest(base.CloudPubsubTestBase):
+class SubscriptionsUpdateTest(base.CloudPubsubTestBase, parameterized.TestCase):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
@@ -314,48 +314,6 @@ class SubscriptionsUpdateTest(base.CloudPubsubTestBase):
     self.AssertErrEquals('Updated subscription [{0}].\n'.format(
         sub_ref.RelativeName()))
 
-
-class SubscriptionsUpdateTestBeta(SubscriptionsUpdateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-
-class SubscriptionsUpdateTestAlpha(SubscriptionsUpdateTestBeta,
-                                   parameterized.TestCase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testUpdateAll(self):
-    sub_ref = util.ParseSubscription('sub', self.Project())
-    new_sub = self.msgs.Subscription(
-        name=sub_ref.RelativeName(),
-        ackDeadlineSeconds=100,
-        pushConfig=self.msgs.PushConfig(
-            pushEndpoint='https://my.appspot.com/push'),
-        retainAckedMessages=True,
-        messageRetentionDuration='259200s',
-        deadLetterPolicy=self.msgs.DeadLetterPolicy(
-            deadLetterTopic=util.ParseTopic('topic2',
-                                            self.Project()).RelativeName(),
-            maxDeliveryAttempts=5))
-
-    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
-        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
-            subscription=new_sub,
-            updateMask=('ackDeadlineSeconds,pushConfig,retainAckedMessages,'
-                        'messageRetentionDuration,deadLetterPolicy')),
-        name=sub_ref.RelativeName())
-    self.svc.Expect(
-        request=update_req, response=self.msgs.Subscription())  # Ignore
-    self.Run('pubsub subscriptions update sub --ack-deadline 100'
-             ' --push-endpoint https://my.appspot.com/push'
-             ' --retain-acked-messages --message-retention-duration 3d'
-             ' --dead-letter-topic topic2 --max-delivery-attempts 5')
-    self.AssertErrEquals('Updated subscription [{0}].\n'.format(
-        sub_ref.RelativeName()))
-
   @parameterized.parameters(
       (' --dead-letter-topic topic2 --max-delivery-attempts 5', 'topic2', 5),
       (' --dead-letter-topic topic2 --max-delivery-attempts 100', 'topic2',
@@ -446,6 +404,109 @@ class SubscriptionsUpdateTestAlpha(SubscriptionsUpdateTestBeta,
                                           exception_message):
     with self.AssertRaisesExceptionMatches(exception, exception_message):
       self.Run('pubsub subscriptions update sub' + dead_letter_flags)
+
+
+class SubscriptionsUpdateTestBeta(SubscriptionsUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class SubscriptionsUpdateTestAlpha(SubscriptionsUpdateTestBeta):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testUpdateAll(self):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    new_sub = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        ackDeadlineSeconds=100,
+        pushConfig=self.msgs.PushConfig(
+            pushEndpoint='https://my.appspot.com/push'),
+        retainAckedMessages=True,
+        messageRetentionDuration='259200s',
+        deadLetterPolicy=self.msgs.DeadLetterPolicy(
+            deadLetterTopic=util.ParseTopic('topic2',
+                                            self.Project()).RelativeName(),
+            maxDeliveryAttempts=5))
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub,
+            updateMask=('ackDeadlineSeconds,pushConfig,retainAckedMessages,'
+                        'messageRetentionDuration,deadLetterPolicy')),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(
+        request=update_req, response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub --ack-deadline 100'
+             ' --push-endpoint https://my.appspot.com/push'
+             ' --retain-acked-messages --message-retention-duration 3d'
+             ' --dead-letter-topic topic2 --max-delivery-attempts 5')
+    self.AssertErrEquals('Updated subscription [{0}].\n'.format(
+        sub_ref.RelativeName()))
+
+  @parameterized.parameters(
+      (' --min-retry-delay 20s --max-retry-delay 50s', '20s', '50s'),
+      (' --min-retry-delay 20s', '20s', None),
+      (' --max-retry-delay 50s', None, '50s'))
+  def testUpdateRetryPolicy(self, retry_policy_flags, min_retry_delay,
+                            max_retry_delay):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    retry_policy = self.msgs.RetryPolicy(
+        minimumBackoff=min_retry_delay, maximumBackoff=max_retry_delay)
+    new_sub = self.msgs.Subscription(
+        name=sub_ref.RelativeName(), retryPolicy=retry_policy)
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub, updateMask=('retryPolicy')),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(
+        request=update_req, response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub' + retry_policy_flags)
+    self.AssertErrEquals('Updated subscription [{0}].\n'.format(
+        sub_ref.RelativeName()))
+
+  def testUpdateRemoveRetryPolicy(self):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    new_sub = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        ackDeadlineSeconds=100,
+        pushConfig=self.msgs.PushConfig(
+            pushEndpoint='https://my.appspot.com/push'),
+        retainAckedMessages=True,
+        messageRetentionDuration='259200s',
+        retryPolicy=None)
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub,
+            updateMask=('ackDeadlineSeconds,pushConfig,retainAckedMessages,'
+                        'messageRetentionDuration,retryPolicy')),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(
+        request=update_req, response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub --ack-deadline 100'
+             ' --push-endpoint https://my.appspot.com/push'
+             ' --retain-acked-messages --message-retention-duration 3d'
+             ' --clear-retry-policy')
+    self.AssertErrEquals('Updated subscription [{0}].\n'.format(
+        sub_ref.RelativeName()))
+
+  @parameterized.parameters(
+      (' --min-retry-delay 0s --max-retry-delay 700s',
+       cli_test_base.MockArgumentError,
+       'argument --max-retry-delay: value must be less than or equal '
+       'to 600s; received: 700s'),
+      (' --min-retry-delay 800s --max-retry-delay 500s',
+       cli_test_base.MockArgumentError,
+       'argument --min-retry-delay: value must be less than or equal '
+       'to 600s; received: 800s'))
+  def testUpdateRetryPolicyException(self, retry_policy_flags, exception,
+                                     exception_message):
+    with self.AssertRaisesExceptionMatches(exception, exception_message):
+      self.Run('pubsub subscriptions update sub' + retry_policy_flags)
 
 
 if __name__ == '__main__':

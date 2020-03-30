@@ -26,7 +26,6 @@ import time
 from apitools.base.py import encoding
 from apitools.base.py import extra_types
 from apitools.base.py.testing import mock as apitools_mock
-
 from googlecloudsdk.api_lib.app.api import appengine_api_client_base as api_client
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
@@ -85,11 +84,16 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     return self.messages.AppengineAppsGetRequest(
         name='apps/{0}'.format(app))
 
-  def GetApplicationResponse(self, app, gcr_domain=None,
-                             code_bucket=None, hostname=None,
-                             location_id=None, serving_status='SERVING',
+  def GetApplicationResponse(self,
+                             app,
+                             gcr_domain=None,
+                             code_bucket=None,
+                             hostname=None,
+                             location_id=None,
+                             serving_status='SERVING',
                              split_health_checks=None,
-                             track=calliope_base.ReleaseTrack.GA):
+                             track=calliope_base.ReleaseTrack.GA,
+                             database_type=None):
     """Helper function to create response for GetApplication API call."""
     if code_bucket is None:
       code_bucket = '{0}-staging.appspot.com'.format(app)
@@ -104,8 +108,10 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         gcrDomain=gcr_domain,
         defaultHostname=hostname,
         locationId=location_id,
-        servingStatus=serving_status
-    )
+        servingStatus=serving_status)
+
+    if database_type:
+      application.databaseType = database_type
 
     if track == calliope_base.ReleaseTrack.BETA:
       if split_health_checks is None:
@@ -116,11 +122,17 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
 
     return application
 
-  def ExpectGetApplicationRequest(self, app, gcr_domain=None, code_bucket=None,
-                                  exception=None, hostname=None,
-                                  location_id=None, serving_status='SERVING',
+  def ExpectGetApplicationRequest(self,
+                                  app,
+                                  gcr_domain=None,
+                                  code_bucket=None,
+                                  exception=None,
+                                  hostname=None,
+                                  location_id=None,
+                                  serving_status='SERVING',
                                   split_health_checks=None,
-                                  track=calliope_base.ReleaseTrack.GA):
+                                  track=calliope_base.ReleaseTrack.GA,
+                                  database_type=None):
     """Adds expected get-application call and response to mock client."""
     if exception:
       self.mock_client.apps.Get.Expect(
@@ -129,10 +141,41 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       self.mock_client.apps.Get.Expect(
           self.GetApplicationCall(app),
           response=self.GetApplicationResponse(
-              app, gcr_domain=(gcr_domain or 'us.gcr.io'),
-              code_bucket=code_bucket, hostname=hostname,
-              location_id=location_id, serving_status=serving_status,
-              split_health_checks=split_health_checks, track=track))
+              app,
+              gcr_domain=(gcr_domain or 'us.gcr.io'),
+              code_bucket=code_bucket,
+              hostname=hostname,
+              location_id=location_id,
+              serving_status=serving_status,
+              split_health_checks=split_health_checks,
+              track=track,
+              database_type=database_type))
+
+  def ExpectAppengineAppsPatchRequest(self,
+                                      project,
+                                      exception=None,
+                                      update_mask=None,
+                                      database_type=None):
+
+    application_update = self.messages.Application()
+    application_update.databaseType = database_type
+
+    patch_call = self.messages.AppengineAppsPatchRequest(
+        name='apps/{0}'.format(project),
+        updateMask=update_mask,
+        application=application_update)
+    if not exception:
+      op_name = 'apps/{0}'.format(project)
+      final_response = self.messages.Operation(
+          name=op_name,
+          done=True,
+          response=encoding.JsonToMessage(self.messages.Operation.ResponseValue,
+                                          encoding.MessageToJson(patch_call)))
+    else:
+      final_response = None
+
+    self.mock_client.apps.Patch.Expect(
+        patch_call, response=final_response, exception=exception)
 
   def GetServiceResponse(self, app, service, split_list):
     """Creates dummy responses for the Services.Get call.

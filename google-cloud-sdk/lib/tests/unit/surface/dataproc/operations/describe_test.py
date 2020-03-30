@@ -20,6 +20,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import unit_base
@@ -27,11 +29,32 @@ from tests.lib.surface.dataproc import unit_base
 
 class OperationsDescribeUnitTest(unit_base.DataprocUnitTestBase):
 
-  def testDescribeOperation(self):
-    expected = self.MakeCompletedOperation()
-    self.ExpectGetOperation(expected)
-    result = self.RunDataproc('operations describe ' + self.OperationName())
+  def _testDescribeOperation(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+    expected = self.MakeCompletedOperation(region=region)
+    self.ExpectGetOperation(expected, region=region)
+    result = self.RunDataproc('operations describe {0} {1}'.format(
+        self.OperationName(region=region), region_flag))
     self.AssertMessagesEqual(expected, result)
+
+  def testDescribeOperation(self):
+    self._testDescribeOperation()
+
+  def testDescribeOperation_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self._testDescribeOperation(region='us-central1')
+
+  def testDescribeOperation_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self._testDescribeOperation(
+        region='us-east4', region_flag='--region=us-east4')
+
+  def testDescribeOperation_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('operations describe foo', set_region=False)
 
   def testDescribeOperationNotFound(self):
     self.ExpectGetOperation(exception=self.MakeHttpError(404))

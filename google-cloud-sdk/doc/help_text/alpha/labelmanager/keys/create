@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha labelmanager keys create - creates a label key resource under
+    gcloud alpha labelmanager keys create - creates a LabelKey resource under
         the specified label parent
 
 SYNOPSIS
@@ -28,21 +28,24 @@ FLAGS
         complete.
 
      --description=DESCRIPTION
-        Optional user-assigned description of the label. Must not exceed 256
-        characters.
+        Optional user-assigned description of the LabelKey or LabelValue. Must
+        not exceed 256 characters.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To create a label key with the name env under an organization run:
+    To create a LabelKey with the name env under 'organizations/123' with
+    description 'description', run:
 
         $ gcloud alpha labelmanager keys create env \
-          --label_parent='organizations/123' --description='description'
+        --label_parent='organizations/123'
+        --description='description'
 
 NOTES
     This command is an internal implementation detail and may change or

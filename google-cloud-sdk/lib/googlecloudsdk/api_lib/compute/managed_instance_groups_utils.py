@@ -25,6 +25,7 @@ import sys
 from apitools.base.py import list_pager
 
 from googlecloudsdk.api_lib.compute import exceptions
+from googlecloudsdk.api_lib.compute import instance_utils
 from googlecloudsdk.api_lib.compute import lister
 from googlecloudsdk.api_lib.compute import path_simplifier
 from googlecloudsdk.api_lib.compute import request_helper
@@ -33,6 +34,7 @@ from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.compute.managed_instance_groups import auto_healing_utils
+from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
@@ -97,9 +99,12 @@ def ArgsSupportQueueScaling(args):
   return 'queue_scaling_acceptable_backlog_per_instance' in args
 
 
-def AddAutoscalerArgs(
-    parser, queue_scaling_enabled=False, autoscaling_file_enabled=False,
-    stackdriver_metrics_flags=False, mode_enabled=False, scale_down=False):
+def AddAutoscalerArgs(parser,
+                      queue_scaling_enabled=False,
+                      autoscaling_file_enabled=False,
+                      stackdriver_metrics_flags=False,
+                      scale_in=False,
+                      predictive=False):
   """Adds commandline arguments to parser."""
   parser.add_argument(
       '--cool-down-period',
@@ -254,11 +259,13 @@ Mutually exclusive with `--update-stackdriver-metric`.
               '`-stackdriver-metric-utilization-target-type`, and '
               '`--custom-metric-utilization`.'))
 
-  if mode_enabled:
-    GetModeFlag().AddToParser(parser)
+  GetModeFlag().AddToParser(parser)
 
-  if scale_down:
-    AddScaleDownControlFlag(parser)
+  if scale_in:
+    AddScaleInControlFlag(parser)
+
+  if predictive:
+    AddPredictiveAutoscaling(parser)
 
 
 def GetModeFlag():
@@ -267,55 +274,80 @@ def GetModeFlag():
   return base.ChoiceArgument(
       '--mode',
       {
-          'on': ('to permit autoscaling to scale up and down (default for '
+          'on': ('To permit autoscaling to scale up and down (default for '
                  'new autoscalers).'),
-          'only-up': 'to permit autoscaling to scale only up and not down.',
-          'off': ('to turn off autoscaling, while keeping the new '
+          'only-up': 'To permit autoscaling to scale only up and not down.',
+          'off': ('To turn off autoscaling, while keeping the new '
                   'configuration.')
       },
       help_str="""\
           Set the mode of an autoscaler for a managed instance group.
 
-          You can turn off or restrict MIG autoscaler activities (scaling up,
-          scaling down) without changing autoscaler configuration and then
-          having to restore it later. Autoscaler configuration persists while
-          the activities are turned off or restricted, and the activities pick
-          it up when they are turned on again or when the restrictions are
-          lifted.
+          You can turn off or restrict MIG autoscaler activities without
+          affecting your autoscaler configuration. The autoscaler configuration
+          persists while the activities are turned off or restricted, and the
+          activities resume when the autoscaler is turned on again or when the
+          restrictions are lifted.
       """)
 
 
-def AddScaleDownControlFlag(parser):
-  parser.add_argument(
-      '--scale-down-control',
+def AddScaleInControlFlag(parser, include_clear=False):
+  """Adds scale-in-control flags to the given parser."""
+  arg_group = parser
+  # Convert to arg group if --clear-scale-in-control flag is included.
+  if include_clear:
+    arg_group = parser.add_group(mutex=True)
+    arg_group.add_argument(
+        '--clear-scale-in-control',
+        action='store_true',
+        help="""\
+          If specified, the scale-in-control field will be cleared. Using this
+          flag will remove any configuration set by `--scale-in-control` flag.
+        """)
+  arg_group.add_argument(
+      '--scale-in-control',
       type=arg_parsers.ArgDict(
           spec={
-              'max-scaled-down-replicas': str,
-              'max-scaled-down-replicas-percent': str,
+              'max-scaled-in-replicas': str,
+              'max-scaled-in-replicas-percent': str,
               'time-window': int,
-          },
-      ),
+          },),
       help="""\
-        Configuration that allows slower scale down so that even if Autoscaler
-        recommends an abrupt scale down of a managed instance group, it will be
+        Configuration that allows slower scale in so that even if Autoscaler
+        recommends an abrupt scale in of a managed instance group, it will be
         throttled as specified by the parameters.
 
-        *max-scaled-down-replicas*::: Maximum allowed number of VMs that can be
+        *max-scaled-in-replicas*::: Maximum allowed number of VMs that can be
         deducted from the peak recommendation during the window. Possibly all
-        these VMs can be deleted at once so user service needs to be prepared
+        these VMs can be deleted at once so the application needs to be prepared
         to lose that many VMs in one step. Mutually exclusive with
-        'max-scaled-down-replicas-percent'.
+        'max-scaled-in-replicas-percent'.
 
-        *max-scaled-down-replicas-percent*::: Maximum allowed percent of VMs
+        *max-scaled-in-replicas-percent*::: Maximum allowed percent of VMs
         that can be deducted from the peak recommendation during the window.
-        Possibly all these VMs can be deleted at once so user service needs
+        Possibly all these VMs can be deleted at once so the application needs
         to be prepared to lose that many VMs in one step. Mutually exclusive
-        with  'max-scaled-down-replicas'.
+        with  'max-scaled-in-replicas'.
 
         *time-window*::: How long back autoscaling should look when computing
-        recommendations to include directives regarding slower scale down.
+        recommendations to include directives regarding slower scale in.
         Measured in seconds.
-        """
+        """)
+
+
+def AddPredictiveAutoscaling(parser):
+  parser.add_argument(
+      '--cpu-utilization-predictive-method',
+      choices={
+          'none':
+              ('(Default) No predictions are made based on the scaling metric '
+               'when calculating the number of VM instances.'),
+          'standard':
+              ('Standard predictive autoscaling  predicts the future values of '
+               'the scaling metric and then scales a MIG to ensure that new VM '
+               'instances are ready in time to cover the predicted peak.')
+      },
+      help='Indicates which method of prediction is used for CPU utilization metric, if any.'
   )
 
 
@@ -755,13 +787,21 @@ def AddAutoscalersToMigs(migs_iterator,
     yield mig
 
 
-def _BuildCpuUtilization(args, messages):
-  if args.target_cpu_utilization:
-    return messages.AutoscalingPolicyCpuUtilization(
-        utilizationTarget=args.target_cpu_utilization,
-    )
-  if args.scale_based_on_cpu:
-    return messages.AutoscalingPolicyCpuUtilization()
+def _BuildCpuUtilization(args, messages, predictive=False):
+  """Builds the CPU Utilization message given relevant arguments."""
+  flags_to_check = ['target_cpu_utilization', 'scale_based_on_cpu']
+  if predictive:
+    flags_to_check.append('cpu_utilization_predictive_method')
+
+  if instance_utils.IsAnySpecified(args, *flags_to_check):
+    cpu_message = messages.AutoscalingPolicyCpuUtilization()
+    if args.target_cpu_utilization:
+      cpu_message.utilizationTarget = args.target_cpu_utilization
+    if predictive and args.cpu_utilization_predictive_method:
+      cpu_predictive_enum = messages.AutoscalingPolicyCpuUtilization.PredictiveMethodValueValuesEnum
+      cpu_message.predictiveMethod = arg_utils.ChoiceToEnum(
+          args.cpu_utilization_predictive_method, cpu_predictive_enum)
+    return cpu_message
   return None
 
 
@@ -919,8 +959,8 @@ def BuildScaleDown(args, messages):
   Returns:
     AutoscalingPolicyScaleDownControl message object.
 
-  if args.IsSpecified('scale_down_control'):
-    replicas_arg = args.scale_down_control.get('max-scaled-down-replicas')
+  if args.IsSpecified('scale_in_control'):
+    replicas_arg = args.scale_in_control.get('max-scaled-in-replicas')
 
     if replicas_arg.endswith('%'):
       max_replicas = messages.FixedOrPercent(
@@ -930,18 +970,18 @@ def BuildScaleDown(args, messages):
 
     return messages.AutoscalingPolicyScaleDownControl(
         maxScaledDownReplicas=max_replicas,
-        timeWindowSec=args.scale_down_control.get('time-window'))
+        timeWindowSec=args.scale_in_control.get('time-window'))
   Raises:
-    InvalidArgumentError:  if both max-scaled-down-replicas and
-      max-scaled-down-replicas-percent are specified.
+    InvalidArgumentError:  if both max-scaled-in-replicas and
+      max-scaled-in-replicas-percent are specified.
   """
-  if args.IsSpecified('scale_down_control'):
-    replicas_arg = args.scale_down_control.get('max-scaled-down-replicas')
-    replicas_arg_percent = args.scale_down_control.get(
-        'max-scaled-down-replicas-percent')
+  if args.IsSpecified('scale_in_control'):
+    replicas_arg = args.scale_in_control.get('max-scaled-in-replicas')
+    replicas_arg_percent = args.scale_in_control.get(
+        'max-scaled-in-replicas-percent')
     if replicas_arg and replicas_arg_percent:
       raise InvalidArgumentError(
-          'max-scaled-down-replicas and max-scaled-down-replicas-percent'
+          'max-scaled-in-replicas and max-scaled-in-replicas-percent'
           'are mutually exclusive, you can\'t specify both')
     elif replicas_arg_percent:
       max_replicas = messages.FixedOrPercent(percent=int(replicas_arg_percent))
@@ -950,27 +990,27 @@ def BuildScaleDown(args, messages):
 
     return messages.AutoscalingPolicyScaleDownControl(
         maxScaledDownReplicas=max_replicas,
-        timeWindowSec=args.scale_down_control.get('time-window'))
+        timeWindowSec=args.scale_in_control.get('time-window'))
 
 
-def _BuildAutoscalerPolicy(args, messages, original, mode_enabled=False,
-                           scale_down=False):
+def _BuildAutoscalerPolicy(args, messages, original, scale_in=False,
+                           predictive=False):
   """Builds AutoscalingPolicy from args.
 
   Args:
     args: command line arguments.
     messages: module containing message classes.
     original: original autoscaler message.
-    mode_enabled: bool, whether to include the 'autoscalingPolicy.mode' field in
-      the message.
-    scale_down: bool, whether to include the
-    'autoscalingPolicy.scaleDownControl' field in the message
+    scale_in: bool, whether to include the
+      'autoscalingPolicy.scaleDownControl' field in the message.
+    predictive: bool, whether to inclue the
+      `autoscalingPolicy.cpuUtilization.predictiveMethod' field in the message.
   Returns:
     AutoscalingPolicy message object.
   """
   policy_dict = {
       'coolDownPeriodSec': args.cool_down_period,
-      'cpuUtilization': _BuildCpuUtilization(args, messages),
+      'cpuUtilization': _BuildCpuUtilization(args, messages, predictive),
       'customMetricUtilizations': _BuildCustomMetricUtilizations(
           args, messages, original),
       'loadBalancingUtilization': _BuildLoadBalancingUtilization(
@@ -979,9 +1019,8 @@ def _BuildAutoscalerPolicy(args, messages, original, mode_enabled=False,
       'maxNumReplicas': args.max_num_replicas,
       'minNumReplicas': args.min_num_replicas,
   }
-  if mode_enabled:
-    policy_dict['mode'] = _BuildMode(args, messages, original)
-  if scale_down:
+  policy_dict['mode'] = _BuildMode(args, messages, original)
+  if scale_in:
     policy_dict['scaleDownControl'] = BuildScaleDown(args, messages)
 
   return messages.AutoscalingPolicy(
@@ -1014,13 +1053,21 @@ def AdjustAutoscalerNameForCreation(autoscaler_resource, igm_ref):
   autoscaler_resource.name = new_name
 
 
-def BuildAutoscaler(args, messages, igm_ref, name, original,
-                    mode_enabled=False, scale_down=False):
+def BuildAutoscaler(args,
+                    messages,
+                    igm_ref,
+                    name,
+                    original,
+                    scale_in=False,
+                    predictive=False):
   """Builds autoscaler message protocol buffer."""
   autoscaler = messages.Autoscaler(
-      autoscalingPolicy=_BuildAutoscalerPolicy(args, messages, original,
-                                               mode_enabled=mode_enabled,
-                                               scale_down=scale_down),
+      autoscalingPolicy=_BuildAutoscalerPolicy(
+          args,
+          messages,
+          original,
+          scale_in=scale_in,
+          predictive=predictive),
       description=args.description,
       name=name,
       target=igm_ref.SelfLink(),
@@ -1383,3 +1430,21 @@ def ValidateIgmReadyForStatefulness(igm_resource, client):
         'Stateful regional IGMs cannot use proactive instance redistribution. '
         'Try `gcloud alpha compute instance-groups managed '
         'update --instance-redistribution-type=NONE')
+
+
+def ValueOrNone(message):
+  """Return message if message is a proto with one or more fields set or None.
+
+  If message is None or is the default proto, it returns None. In all other
+  cases, it returns the message.
+
+  Args:
+    message: An generated proto message object.
+
+  Returns:
+    message if message is initialized or None
+  """
+  if message is None:
+    return message
+  default_object = message.__class__()
+  return message if message != default_object else None

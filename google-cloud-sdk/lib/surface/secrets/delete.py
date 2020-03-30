@@ -22,9 +22,11 @@ from googlecloudsdk.api_lib.secrets import api as secrets_api
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.secrets import args as secrets_args
 from googlecloudsdk.command_lib.secrets import log as secrets_log
+from googlecloudsdk.command_lib.secrets import util as secrets_util
 from googlecloudsdk.core.console import console_io
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Delete(base.DeleteCommand):
   r"""Delete a secret.
 
@@ -49,26 +51,48 @@ class Delete(base.DeleteCommand):
         parser, purpose='to delete', positional=True, required=True)
 
   def Run(self, args):
-    messages = secrets_api.GetMessages()
+    messages = secrets_api.GetMessages(
+        version=secrets_util.GetVersionFromReleasePath(self.ReleaseTrack()))
     secret_ref = args.CONCEPTS.secret.Parse()
 
     # List all secret versions and parse their refs
-    versions = secrets_api.Versions().ListWithPager(
-        secret_ref=secret_ref, limit=9999)
-    version_refs = []
+    versions = secrets_api.Versions(
+        version=secrets_util.GetVersionFromReleasePath(
+            self.ReleaseTrack())).ListWithPager(
+                secret_ref=secret_ref, limit=9999)
+    active_version_count = 0
     for version in versions:
       if version.state != messages.SecretVersion.StateValueValuesEnum.DESTROYED:
-        version_ref = secrets_args.ParseVersionRef(version.name)
-        version_refs.append(version_ref)
+        active_version_count += 1
 
     msg = self.CONFIRM_DELETE_MESSAGE.format(
-        secret=secret_ref.Name(), num_versions=len(version_refs))
+        secret=secret_ref.Name(), num_versions=active_version_count)
     console_io.PromptContinue(msg, throw_if_unattended=True, cancel_on_no=True)
 
-    for version_ref in version_refs:
-      secrets_api.Versions().Destroy(version_ref)
-      secrets_log.Versions().Destroyed(version_ref)
-
-    result = secrets_api.Secrets().Delete(secret_ref)
+    result = secrets_api.Secrets(
+        version=secrets_util.GetVersionFromReleasePath(
+            self.ReleaseTrack())).Delete(secret_ref)
     secrets_log.Secrets().Deleted(secret_ref)
     return result
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class DeleteBeta(Delete):
+  r"""Delete a secret.
+
+  Delete a secret and destroy all secret versions. This action is irreversable.
+  If the given secret does not exist, this command will succeed, but the
+  operation will be a no-op.
+
+  ## EXAMPLES
+
+  Delete a secret 'my-secret':
+
+    $ {command} my-secret
+  """
+
+  @staticmethod
+  def Args(parser):
+    secrets_args.AddBetaSecret(
+        parser, purpose='to delete', positional=True, required=True)
+

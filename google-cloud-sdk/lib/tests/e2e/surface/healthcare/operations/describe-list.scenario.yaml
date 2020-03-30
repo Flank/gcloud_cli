@@ -14,17 +14,18 @@ summary:
 - execute:
   - command: healthcare operations describe --location us-central1 --dataset $$test-dataset$$
       $$operation$$
-  - stdout: |
+  - stdout: |-
       done: true
       metadata:
         '@type': type.googleapis.com/google.cloud.healthcare.$$api-version$$.OperationMetadata
         apiMethodName: google.cloud.healthcare.$$api-version$$.dataset.DatasetService.CreateDataset
-        createTime: '2019-08-22T17:02:48.523854Z'
-        endTime: '2019-08-22T17:02:48.571516Z'
+        createTime: .*
+        endTime: .*
       name: $$operation$$
       response:
         '@type': type.googleapis.com/google.cloud.healthcare.$$api-version$$.dataset.Dataset
         name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$
+      $
 - execute:
   - command: healthcare operations list --location us-central1 --dataset $$test-dataset$$
   - stdout: |-
@@ -60,11 +61,11 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '158'
+            content-length: '159'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190822-170248-in7u/operations/3077965766247579649
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200317-145241-xnqk/operations/13448198456019517441
     - expect_stderr: |
         Create request issued for: [$$test-dataset$$]
     - expect_progress_tracker:
@@ -101,32 +102,32 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '701'
+            content-length: '699'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: $$operation$$
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200317-145241-xnqk/operations/13448198456019517441
             metadata:
               '@type': type.googleapis.com/google.cloud.healthcare.$$api-version$$.OperationMetadata
               apiMethodName: google.cloud.healthcare.$$api-version$$.dataset.DatasetService.CreateDataset
-              createTime: '2019-08-22T17:02:48.523854Z'
-              endTime: '2019-08-22T17:02:48.571516Z'
+              createTime: '2020-03-17T14:52:41.396293Z'
+              endTime: '2020-03-17T14:52:41.438198Z'
             done: true
             response:
               '@type': type.googleapis.com/google.cloud.healthcare.$$api-version$$.dataset.Dataset
               name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$
     - expect_stdout:
         matches: |
-            done: true
-            metadata:
-              '@type': type.googleapis.com/google.cloud.healthcare.$$api-version$$.OperationMetadata
-              apiMethodName: google.cloud.healthcare.$$api-version$$.dataset.DatasetService.CreateDataset
-              createTime: .*
-              endTime: .*
-            name: $$operation$$
-            response:
-              '@type': type.googleapis.com/google.cloud.healthcare.$$api-version$$.dataset.Dataset
-              name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$
+          done: true
+          metadata:
+            '@type': type.googleapis.com/google.cloud.healthcare.$$api-version$$.OperationMetadata
+            apiMethodName: google.cloud.healthcare.$$api-version$$.dataset.DatasetService.CreateDataset
+            createTime: .*
+            endTime: .*
+          name: $$operation$$
+          response:
+            '@type': type.googleapis.com/google.cloud.healthcare.$$api-version$$.dataset.Dataset
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$
     - expect_exit:
         code: 0
 - execute_command:
@@ -141,16 +142,17 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '733'
+            content-length: '781'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             operations:
-            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190822-170248-in7u/operations/3077965766247579649
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200317-145241-xnqk/operations/13448198456019517441
               metadata:
                 '@type': type.googleapis.com/google.cloud.healthcare.$$api-version$$.OperationMetadata
                 apiMethodName: google.cloud.healthcare.$$api-version$$.dataset.DatasetService.CreateDataset
-                createTime: '2019-08-22T17:02:48.523854Z'
+                createTime: '2020-03-17T14:52:41.396293Z'
+                endTime: '2020-03-17T14:52:41.438198Z'
               done: true
               response:
                 '@type': type.googleapis.com/google.cloud.healthcare.$$api-version$$.dataset.Dataset

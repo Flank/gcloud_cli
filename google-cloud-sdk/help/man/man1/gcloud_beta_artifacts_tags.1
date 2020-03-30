@@ -1,0 +1,95 @@
+
+.TH "GCLOUD_BETA_ARTIFACTS_TAGS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta artifacts tags \- manage Artifact Registry tags
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta artifacts tags\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcreate\fR
+\fB(BETA)\fR Create an Artifact Registry tag.
+
+.TP 2m
+\fBdelete\fR
+\fB(BETA)\fR Delete an Artifact Registry tag.
+
+.TP 2m
+\fBlist\fR
+\fB(BETA)\fR List Artifact Registry tags.
+
+.TP 2m
+\fBupdate\fR
+\fB(BETA)\fR Update an Artifact Registry tag.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To create tag with the name \f5my\-tag\fR for version \f51.0.0\fR of package
+\f5my\-pkg\fR in the current project with \f5artifacts/repository\fR and
+\f5artifacts/location\fR properties are set, run:
+
+.RS 2m
+$ gcloud beta artifacts tags create my\-tag \-\-package=my\-pkg \e
+    \-\-version=1.0.0
+.RE
+
+To list all tags under package \f5my\-pkg\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts tags list \-\-package=my\-pkg
+.RE
+
+To update tag \f5my\-tag\fR from a different version to version \f51.0.0\fR of
+package \f5my\-pkg\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts tags update my\-tag \-\-version=1.0.0 \e
+    \-\-package=my\-pkg
+.RE
+
+To delete tag \f5my\-tag\fR of package \f5my\-pkg\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts tags delete my\-tag \-\-package=my\-pkg
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha artifacts tags
+.RE
+

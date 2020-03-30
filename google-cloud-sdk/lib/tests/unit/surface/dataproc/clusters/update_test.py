@@ -21,6 +21,8 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
@@ -31,17 +33,23 @@ import six
 class ClustersUpdateUnitTest(unit_base.DataprocUnitTestBase):
   """Tests for dataproc clusters update."""
 
-  def ExpectUpdateCluster(
-      self, cluster, field_paths, graceful_decommission_timeout=None,
-      response=None, exception=None):
+  def ExpectUpdateCluster(self,
+                          cluster,
+                          field_paths,
+                          graceful_decommission_timeout=None,
+                          response=None,
+                          exception=None,
+                          region=None):
     if not (response or exception):
-      response = self.MakeOperation()
+      response = self.MakeOperation(region=region)
+    if region is None:
+      region = self.REGION
 
     self.mock_client.projects_regions_clusters.Patch.Expect(
         self.messages.DataprocProjectsRegionsClustersPatchRequest(
             clusterName=cluster.clusterName,
             projectId=self.Project(),
-            region=self.REGION,
+            region=region,
             cluster=cluster,
             gracefulDecommissionTimeout=graceful_decommission_timeout,
             updateMask=','.join(field_paths),
@@ -49,23 +57,33 @@ class ClustersUpdateUnitTest(unit_base.DataprocUnitTestBase):
         response=response,
         exception=exception)
 
-  def ExpectUpdateCalls(self, cluster, field_paths,
-                        graceful_decommission_timeout=None, response=None,
-                        error=None):
+  def ExpectUpdateCalls(self,
+                        cluster,
+                        field_paths,
+                        graceful_decommission_timeout=None,
+                        response=None,
+                        error=None,
+                        region=None):
+    if region is None:
+      region = self.REGION
+
     # Update cluster returns operation pending
     self.ExpectUpdateCluster(
         cluster=cluster,
         field_paths=field_paths,
-        graceful_decommission_timeout=graceful_decommission_timeout)
+        graceful_decommission_timeout=graceful_decommission_timeout,
+        region=region)
     # Initial get operation returns pending
-    self.ExpectGetOperation()
+    self.ExpectGetOperation(region=region)
     # Second get operation returns done
-    self.ExpectGetOperation(operation=self.MakeCompletedOperation(error=error))
+    self.ExpectGetOperation(
+        operation=self.MakeCompletedOperation(error=error, region=region),
+        region=region)
     if not error:
       # Get the cluster to display it.
-      self.ExpectGetCluster(cluster=response)
+      self.ExpectGetCluster(cluster=response, region=region)
 
-  def testUpdateClusterPrimaryWorkers(self):
+  def _testUpdateClusterPrimaryWorkers(self, region=None, region_flag=''):
     cluster = self.messages.Cluster(
         clusterName=self.CLUSTER_NAME,
         projectId=self.Project(),
@@ -74,12 +92,30 @@ class ClustersUpdateUnitTest(unit_base.DataprocUnitTestBase):
     expected = self.MakeRunningCluster(workerConfigNumInstances=10)
     changed_fields = ['config.worker_config.num_instances']
     self.ExpectUpdateCalls(
-        cluster=cluster, field_paths=changed_fields, response=expected)
-    result = self.RunDataproc(
-        'clusters update {0} --num-workers 10'.format(self.CLUSTER_NAME))
+        cluster=cluster,
+        field_paths=changed_fields,
+        response=expected,
+        region=region)
+    result = self.RunDataproc('clusters update {0} --num-workers 10 {1}'.format(
+        self.CLUSTER_NAME, region_flag))
     self.AssertMessagesEqual(expected, result)
 
-  def testUpdateClusterSecondaryWorkers(self):
+  def testUpdateClusterPrimaryWorkersRegionProperty(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self._testUpdateClusterPrimaryWorkers(region='us-central1')
+
+  def testUpdateClusterPrimaryWorkersRegionFlag(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self._testUpdateClusterPrimaryWorkers(
+        region='us-east1', region_flag='--region=us-east1')
+
+  def testUpdateClusterWithoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('clusters update ' + self.CLUSTER_NAME, set_region=False)
+
+  def testUpdateClusterPreemptibleWorkers(self):
     cluster = self.messages.Cluster(
         clusterName=self.CLUSTER_NAME,
         projectId=self.Project(),
@@ -96,6 +132,30 @@ class ClustersUpdateUnitTest(unit_base.DataprocUnitTestBase):
         'clusters update {0} '
         '--num-preemptible-workers 5'.format(self.CLUSTER_NAME))
     self.AssertMessagesEqual(expected, result)
+
+  def testUpdateClusterSecondaryWorkers(self):
+    cluster = self.messages.Cluster(
+        clusterName=self.CLUSTER_NAME,
+        projectId=self.Project(),
+        config=self.messages.ClusterConfig(
+            secondaryWorkerConfig=self.messages.InstanceGroupConfig(
+                numInstances=5)))
+    expected = self.MakeRunningCluster(secondaryWorkerConfigNumInstances=5)
+    changed_fields = ['config.secondary_worker_config.num_instances']
+    self.ExpectUpdateCalls(
+        cluster=cluster, field_paths=changed_fields, response=expected)
+    result = self.RunDataproc('clusters update {0} '
+                              '--num-secondary-workers 5'.format(
+                                  self.CLUSTER_NAME))
+    self.AssertMessagesEqual(expected, result)
+
+  def testUpdateClusterPreemptibleAndSecondaryWorkers(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --num-preemptible-workers: '
+        'At most one of --num-secondary-workers may be specified.'):
+      self.RunDataproc('clusters update {0} '
+                       '--num-secondary-workers 5 '
+                       '--num-preemptible-workers 5'.format(self.CLUSTER_NAME))
 
   def testUpdateClearLabels(self):
     cluster = self.messages.Cluster(
@@ -147,12 +207,12 @@ class ClustersUpdateUnitTest(unit_base.DataprocUnitTestBase):
         workerConfigNumInstances=10)
     self.ExpectUpdateCalls(
         cluster=updated_cluster, field_paths=changed_fields, response=expected)
-    result = self.RunDataproc(
-        'clusters update {0} '
-        '--update-labels=customer=acme,keyonly="" '
-        '--remove-labels=accident '
-        '--num-workers 10 '
-        '--num-preemptible-workers 5'.format(self.CLUSTER_NAME))
+    result = self.RunDataproc('clusters update {0} '
+                              '--update-labels=customer=acme,keyonly="" '
+                              '--remove-labels=accident '
+                              '--num-workers 10 '
+                              '--num-secondary-workers 5'.format(
+                                  self.CLUSTER_NAME))
     self.AssertMessagesEqual(expected, result)
 
   def testUpdateClusterOperationFailure(self):
@@ -585,8 +645,7 @@ class ClustersUpdateUnitTestBeta(ClustersUpdateUnitTest,
 
   def testUpdateCluster_withExpirationTimeIncorrectDatetimeFormat(self):
     with self.AssertRaisesArgumentErrorRegexp(
-        'argument --expiration-time: Failed to parse date/time: bad month '
-        'number 22; must be 1-12; received: 2017-22T13:31:48-08:00'
+        'argument --expiration-time: Failed to parse date/time:.+'
     ):
       self.RunDataproc(
           ('clusters update {0} --expiration-time=2017-22T13:31:48-08:00'

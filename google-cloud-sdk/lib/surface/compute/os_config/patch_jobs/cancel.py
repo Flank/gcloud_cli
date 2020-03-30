@@ -21,17 +21,16 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute.os_config import utils as osconfig_api_utils
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.os_config import resource_args
-from googlecloudsdk.command_lib.compute.os_config import utils as osconfig_command_utils
-from googlecloudsdk.core import properties
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA,
+                    base.ReleaseTrack.GA)
 class Cancel(base.Command):
-  """Cancel the given active OS patch job.
+  """Cancel a specific OS patch job which must currently be active.
 
   ## EXAMPLES
 
-  To cancel the patch job 'job1', run:
+  To cancel the patch job `job1`, run:
 
         $ {command} job1
 
@@ -42,7 +41,6 @@ class Cancel(base.Command):
     resource_args.AddPatchJobResourceArg(parser, 'to cancel.')
 
   def Run(self, args):
-    project = properties.VALUES.core.project.GetOrFail()
     patch_job_ref = args.CONCEPTS.patch_job.Parse()
 
     release_track = self.ReleaseTrack()
@@ -51,7 +49,6 @@ class Cancel(base.Command):
 
     request = messages.OsconfigProjectsPatchJobsCancelRequest(
         cancelPatchJobRequest=None,
-        name=osconfig_command_utils.GetPatchJobUriPath(project,
-                                                       patch_job_ref.Name()),
+        name=patch_job_ref.RelativeName(),
     )
     return client.projects_patchJobs.Cancel(request)

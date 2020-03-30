@@ -24,7 +24,8 @@ from googlecloudsdk.calliope import base
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA,
-                    base.ReleaseTrack.BETA)
+                    base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Recommender(base.Group):
   """Manage Cloud recommendations and recommendation rules.
 
@@ -35,3 +36,4 @@ class Recommender(base.Group):
   recommendation, you must use the desired service's API, not the Recommender.
   Interact with and manage resources in Cloud Recommender.
   """
+  category = base.API_PLATFORM_AND_ECOSYSTEMS_CATEGORY

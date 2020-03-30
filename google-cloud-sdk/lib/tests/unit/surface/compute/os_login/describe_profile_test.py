@@ -62,6 +62,20 @@ class DescribeProfileTest(test_base.OsloginBaseTest):
 
     self.assertEqual(response, self.profiles['profile_without_keys'])
 
+  def testImpersonateServiceAccount(self, track):
+    self._RunSetUp(track)
+    self.mock_oslogin_client.users.GetLoginProfile.Expect(
+        request=self.messages.OsloginUsersGetLoginProfileRequest(
+            name='users/service_account_user@google.com'),
+        response=self.profiles['profile_with_keys'])
+
+    response = self.Run("""
+        compute os-login describe-profile
+            --impersonate-service-account service_account_user@google.com
+        """)
+
+    self.assertEqual(response, self.profiles['profile_with_keys'])
+
 
 if __name__ == '__main__':
   test_case.main()

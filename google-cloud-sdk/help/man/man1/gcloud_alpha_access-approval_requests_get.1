@@ -1,0 +1,65 @@
+
+.TH "GCLOUD_ALPHA_ACCESS\-APPROVAL_REQUESTS_GET" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha access\-approval requests get \- get an Access Approval request
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha access\-approval requests get\fR \fINAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Get an Access Approval Request. Raise error if the request does
+not exist.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+approval request name
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To get an approval request using its name (e.g.
+projects/my\-project\-123/approvalRequests/abc123), run:
+
+.RS 2m
+$ gcloud alpha access\-approval requests get \e
+    projects/my\-project\-123/approvalRequests/abc123
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

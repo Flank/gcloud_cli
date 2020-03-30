@@ -81,11 +81,11 @@ class MockFeaturesAPI(object):
   def _MakeFeature(self, **kwargs):
     return self.messages.Feature(**kwargs)
 
-  def ExpectDelete(self, response):
+  def ExpectDelete(self, response, force=False):
     self.mocked_client.projects_locations_global_features.Delete.Expect(
         request=(
             self.messages.GkehubProjectsLocationsGlobalFeaturesDeleteRequest(
-                name=self.resource_name)),
+                name=self.resource_name, force=force)),
         response=response)
 
   def ExpectGet(self, feature):
@@ -105,7 +105,9 @@ class MockFeaturesAPI(object):
 
   def _MakeOperation(self, name=None, done=False, error=None, response=None):
     operation = self.messages.Operation(
-        name=name or self.wait_operation_relative_name, done=done, error=error)
+        name=name or self.wait_operation_relative_name,
+        done=done, error=error,
+        metadata={})
     if done:
       operation.response = response
     return operation
@@ -136,5 +138,6 @@ class FeaturesTestBase(cli_test_base.CliTestBase,
   def RunCommand(self, params):
     prefix = ['container', 'hub', 'features', self.FEATURE_NAME]
     if isinstance(params, six.string_types):
-      return self.Run(prefix + [params])
-    return self.Run(prefix + params)
+      return self.Run(prefix + [params], track=self.track)
+    return self.Run(prefix + params, track=self.track)
+

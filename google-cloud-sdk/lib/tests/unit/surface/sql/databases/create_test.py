@@ -27,7 +27,7 @@ from tests.lib.surface.sql import base
 class _BaseDatabasesInsertTest(object):
 
   def testDatabasesInsert(self):
-    sqladmin = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
+    sqladmin = core_apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.databases.Insert.Expect(
         sqladmin.Database(
             project=self.Project(),
@@ -41,21 +41,24 @@ class _BaseDatabasesInsertTest(object):
         sqladmin.SqlOperationsGetRequest(
             operation='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
             project=self.Project()),
-        sqladmin.Operation(status='DONE'))
+        sqladmin.Operation(
+            status=sqladmin.Operation.StatusValueValuesEnum.DONE))
 
     self.Run('sql databases create mock-db --instance=mock-instance '
              '--collation=another-collation')
     self.AssertErrContains('Creating Cloud SQL database')
     self.AssertErrContains('Created database [mock-db].')
-    self.AssertOutputContains("""\
+    self.AssertOutputContains(
+        """\
 collation: another-collation
 instance: mock-instance
 name: mock-db
 project: {0}
-""".format(self.Project()), normalize_space=True)
+""".format(self.Project()),
+        normalize_space=True)
 
   def testDatabasesInsertAsync(self):
-    sqladmin = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
+    sqladmin = core_apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.databases.Insert.Expect(
         sqladmin.Database(
             project=self.Project(),
@@ -69,7 +72,8 @@ project: {0}
         sqladmin.SqlOperationsGetRequest(
             operation='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
             project=self.Project()),
-        sqladmin.Operation(status='DONE'))
+        sqladmin.Operation(
+            status=sqladmin.Operation.StatusValueValuesEnum.DONE))
 
     self.Run('sql databases create mock-db --instance=mock-instance '
              '--collation=another-collation --async')
@@ -77,20 +81,23 @@ project: {0}
     self.AssertOutputContains('status: DONE')
 
   def testDatabasesInsertFailed(self):
-    sqladmin = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
+    sqladmin = core_apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.databases.Insert.Expect(
         sqladmin.Database(
             project=self.Project(),
             instance='mock-instance',
             name='mock-db',
-            kind='sql#database'),
-        sqladmin.Operation(name='op1'))
+            kind='sql#database'), sqladmin.Operation(name='op1'))
     self.mocked_client.operations.Get.Expect(
         sqladmin.SqlOperationsGetRequest(
             operation='op1', project=self.Project()),
         sqladmin.Operation(
             error=sqladmin.OperationErrors(
-                errors=[sqladmin.OperationError(code='INTERNAL_ERROR')])))
+                kind='sql#operationErrors',
+                errors=[
+                    sqladmin.OperationError(
+                        kind='sql#operationError', code='INTERNAL_ERROR')
+                ])))
 
     with self.assertRaises(exceptions.OperationError):
       self.Run('sql databases create mock-db --instance=mock-instance')

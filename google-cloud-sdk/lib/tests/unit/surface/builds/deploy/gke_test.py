@@ -113,7 +113,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
                 self.build_msg.Operation.MetadataValue,
                 encoding.MessageToJson(op_metadata))))
 
-  def DefaultInputBuild(self, src=True):
+  def DefaultInputBuild(self, src=True, image=None):
     build = self.build_msg.Build(
         tags=build_util._DEFAULT_TAGS,
         options=self.build_msg.BuildOptions(
@@ -127,6 +127,14 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
               object=self.frozen_tgz_filepath,
               generation=123,
           ))
+    if image:
+      build.images = [image]
+    build.artifacts = self.build_msg.Artifacts(
+        objects=self.build_msg.ArtifactObjects(
+            location='gs://' + build_util._EXPANDED_CONFIGS_PATH_DYNAMIC,
+            paths=['output/expanded/*']
+        )
+    )
     return build
 
   def DefaultBuildSteps(self, image='gcr.io/test-project/test-image:tag',
@@ -167,7 +175,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     steps.append(self.build_msg.BuildStep(
         id=build_util._SAVE_CONFIGS_BUILD_STEP_ID,
         name='gcr.io/cloud-builders/gsutil',
-        entrypoint='sh',
+        entrypoint='bash',
         args=[
             '-c',
             build_util._SAVE_CONFIGS_SCRIPT
@@ -218,6 +226,18 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     return b_out
 
+  def testNoSource(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Invalid value for [--no-source]: '
+        'To omit source, use the --no-source flag.'
+    ):
+      self.Run([
+          'builds', 'deploy', 'gke', '', '--cluster=test-cluster',
+          '--location=us-central1', '--tag=gcr.io/test-project/test-image:tag',
+          '--async'
+      ])
+
   def testExistingImage(self):
     b_in = self.DefaultInputBuild(src=False)
     b_in.steps = self.DefaultBuildSteps()
@@ -229,7 +249,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     self.ExpectMessagesForDeploy(b_in, b_out, src=False)
     self.Run([
-        'builds', 'deploy', 'gke', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
         '--location=us-central1', '--namespace=test-namespace',
         '--image=gcr.io/test-project/test-image:tag', '--async'
     ])
@@ -249,7 +269,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     self.ExpectMessagesForDeploy(b_in, b_out, src=False)
     self.Run([
-        'builds', 'deploy', 'gke', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
         '--location=us-central1', '--namespace=test-namespace',
         '--image=gcr.io/test-project/test-image@sha256:asdfasdf',
         '--app-version=version', '--async'
@@ -260,29 +280,18 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
         exceptions.InvalidArgumentException,
         'Image value must be in the gcr.io/* or *.gcr.io/* namespace.'):
       self.Run([
-          'builds', 'deploy', 'gke', '--cluster=test-cluster',
+          'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
           '--location=us-central1', '--image=invalid-image', '--async'
-      ])
-
-  def testSourceNotRequired(self):
-    with self.AssertRaisesExceptionMatches(
-        exceptions.InvalidArgumentException,
-        'Source must not be provided when no Kubernetes configs and no docker '
-        'builds are required.'):
-      self.Run([
-          'builds', 'deploy', 'gke', '.', '--cluster=test-cluster',
-          '--location=us-central1',
-          '--image=gcr.io/test-project/test-image:tag', '--async'
       ])
 
   def testTagRequiresSource(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.RequiredArgumentException,
-        'required to build container image provided by --tag or --tag-default.'
+        'Missing required argument [SOURCE]: '
+        'Source is required to build container image.'
     ):
-
       self.Run([
-          'builds', 'deploy', 'gke', '--cluster=test-cluster',
+          'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
           '--location=us-central1', '--tag=gcr.io/test-project/test-image:tag',
           '--async'
       ])
@@ -292,12 +301,12 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
         exceptions.InvalidArgumentException,
         'Tag value must be in the gcr.io/* or *.gcr.io/* namespace.'):
       self.Run([
-          'builds', 'deploy', 'gke', '.', '--cluster=test-cluster',
+          'builds', 'deploy', 'gke', '--cluster=test-cluster',
           '--location=us-central1', '--tag=invalid-tag', '--async'
       ])
 
   def testNoTagWithNoCommitHash(self):
-    b_in = self.DefaultInputBuild()
+    b_in = self.DefaultInputBuild(image='gcr.io/test-project/test-image')
     b_in.steps = self.DefaultBuildSteps(
         image='gcr.io/test-project/test-image',
         version='',
@@ -322,7 +331,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     ])
 
   def testNoTagWithNotInGitRepo(self):
-    b_in = self.DefaultInputBuild()
+    b_in = self.DefaultInputBuild(image='gcr.io/test-project/test-image')
     b_in.steps = self.DefaultBuildSteps(
         image='gcr.io/test-project/test-image',
         version='',
@@ -345,10 +354,11 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     ])
 
   def testDefaultTagWithCommitHash(self):
-    b_in = self.DefaultInputBuild()
+    b_in = self.DefaultInputBuild(
+        image='gcr.io/$PROJECT_ID/source-dir:commitsha')
     b_in.steps = self.DefaultBuildSteps(
-        image='gcr.io/$PROJECT_ID/source-dir:shortsha',
-        version='shortsha',
+        image='gcr.io/$PROJECT_ID/source-dir:commitsha',
+        version='commitsha',
         build_and_push=True
     )
     b_in.substitutions = self.DefaultBuildSubstitutions(
@@ -362,16 +372,18 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     self.StartObjectPatch(
         subprocess,
         'check_output',
-        side_effect=('git status', 'no pending changes', 'shortsha'))
+        side_effect=('git status', 'no pending changes', 'commitsha'))
 
     self.ExpectMessagesForDeploy(b_in, b_out)
     self.Run([
         'builds', 'deploy', 'gke', './source-dir/', '--cluster=test-cluster',
-        '--location=us-central1', '--tag-default', '--async'
+        '--location=us-central1', '--async'
     ])
 
   def testDefaultTagWithOverrides(self):
-    b_in = self.DefaultInputBuild()
+    b_in = self.DefaultInputBuild(
+        image='gcr.io/$PROJECT_ID/name-override:version-override'
+    )
     b_in.steps = self.DefaultBuildSteps(
         image='gcr.io/$PROJECT_ID/name-override:version-override',
         version='version-override',
@@ -387,8 +399,8 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     self.ExpectMessagesForDeploy(b_in, b_out)
     self.Run([
-        'builds', 'deploy', 'gke', '.', '--cluster=test-cluster',
-        '--location=us-central1', '--tag-default', '--app-name=name-override',
+        'builds', 'deploy', 'gke', '--cluster=test-cluster',
+        '--location=us-central1', '--app-name=name-override',
         '--app-version=version-override', '--async'
     ])
 
@@ -397,13 +409,15 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
         '.', 'source.tgz', contents='pretend this is a valid tarball')
 
     with self.AssertRaisesExceptionMatches(
-        exceptions.InvalidArgumentException,
-        'No default container image name available. Provide an '
-        'app name with --app-name, or provide a valid --tag.'):
+        exceptions.OneOfArgumentsRequiredException,
+        'One of arguments [--app-name, --tag] is required: '
+        'Cannot resolve default container image. Provide an app name with '
+        '--app-name to use as the container image, or provide a full tag using '
+        '--tag.'):
 
       self.Run([
           'builds', 'deploy', 'gke', tarball_path, '--cluster=test-cluster',
-          '--location=us-central1', '--tag-default', '--async'
+          '--location=us-central1', '--async'
       ])
 
   def testDefaultTagVersionRequiresGitRepo(self):
@@ -414,13 +428,15 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     self.StartObjectPatch(subprocess, 'check_output', side_effect=OSError)
 
     with self.AssertRaisesExceptionMatches(
-        exceptions.InvalidArgumentException,
-        'No default container image tag available. Provide an app '
-        'version with --app-version, or provide a valid --tag.'):
+        exceptions.OneOfArgumentsRequiredException,
+        'One of arguments [--app-version, --tag] is required: '
+        'Cannot resolve default container tag. Provide an app version with '
+        '--app-version to use as the container tag, or provide a full tag '
+        'using --tag.'):
 
       self.Run([
           'builds', 'deploy', 'gke', './source-dir', '--cluster=test-cluster',
-          '--location=us-central1', '--tag-default', '--async'
+          '--location=us-central1', '--async'
       ])
 
   def testDefaultTagVersionRequiresCommitHash(self):
@@ -434,18 +450,21 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
         side_effect=('git status', 'No pending changes', None))
 
     with self.AssertRaisesExceptionMatches(
-        exceptions.InvalidArgumentException,
-        'No default tag available, no commit sha at HEAD of source repository '
-        'available for tag. Provide an app version with --app-version, '
-        'or provide a valid --tag.'):
+        exceptions.OneOfArgumentsRequiredException,
+        'One of arguments [--app-version, --tag] is required: '
+        'Cannot resolve default container tag using the Git commit SHA. '
+        'Provide an app version with --app-version to use as the container '
+        'tag, or provide a full tag using --tag.'):
 
       self.Run([
           'builds', 'deploy', 'gke', './source-dir', '--cluster=test-cluster',
-          '--location=us-central1', '--tag-default', '--async'
+          '--location=us-central1', '--async'
       ])
 
   def testVersionBasedOnImageTag(self):
-    b_in = self.DefaultInputBuild()
+    b_in = self.DefaultInputBuild(
+        image='gcr.io/test-project/test-image:my-tag'
+    )
     b_in.steps = self.DefaultBuildSteps(
         image='gcr.io/test-project/test-image:my-tag',
         version='my-tag',
@@ -457,16 +476,18 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     self.ExpectMessagesForDeploy(b_in, b_out)
     self.Run([
-        'builds', 'deploy', 'gke', '.', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--cluster=test-cluster',
         '--location=us-central1', '--tag=gcr.io/test-project/test-image:my-tag',
         '--async'
     ])
 
   def testVersionBasedOnCommitHash(self):
-    b_in = self.DefaultInputBuild()
+    b_in = self.DefaultInputBuild(
+        image='gcr.io/test-project/test-image@sha256:asdfasdf'
+    )
     b_in.steps = self.DefaultBuildSteps(
         image='gcr.io/test-project/test-image@sha256:asdfasdf',
-        version='shortsha',
+        version='commitsha',
         build_and_push=True
     )
     b_in.substitutions = self.DefaultBuildSubstitutions(
@@ -478,11 +499,11 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     self.StartObjectPatch(
         subprocess,
         'check_output',
-        side_effect=('git status', 'no pending changes', 'shortsha'))
+        side_effect=('git status', 'no pending changes', 'commitsha'))
 
     self.ExpectMessagesForDeploy(b_in, b_out)
     self.Run([
-        'builds', 'deploy', 'gke', '.', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--cluster=test-cluster',
         '--location=us-central1', '--namespace=test-namespace',
         '--tag=gcr.io/test-project/test-image@sha256:asdfasdf', '--async'
     ])
@@ -490,18 +511,21 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
   def testConfigRequiresSource(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.RequiredArgumentException,
-        'Missing required argument [SOURCE]: required because --config is a '
-        'relative path in the source directory.'):
+        'Missing required argument [SOURCE]: '
+        'Source is required when specifying --config because it is a relative '
+        'path in the source directory.'):
 
       self.Run([
-          'builds', 'deploy', 'gke', '--cluster=test-cluster',
+          'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
           '--location=us-central1',
           '--image=gcr.io/test-project/test-image:tag',
           '--config=test-config.yaml', '--async'
       ])
 
   def testDefaultConfig(self):
-    b_in = self.DefaultInputBuild()
+    b_in = self.DefaultInputBuild(
+        image='gcr.io/test-project/test-image:tag'
+    )
     b_in.steps = self.DefaultBuildSteps(
         build_and_push=True
     )
@@ -513,7 +537,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     self.ExpectMessagesForDeploy(b_in, b_out)
     self.Run([
-        'builds', 'deploy', 'gke', '.', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--cluster=test-cluster',
         '--location=us-central1', '--tag=gcr.io/test-project/test-image:tag',
         '--config=test-config.yaml', '--async'
     ])
@@ -523,7 +547,8 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     frozen_file = 'source/{}'.format(self.frozen_tgz_filename)
 
-    b_in = self.DefaultInputBuild(src=False)
+    b_in = self.DefaultInputBuild(src=False,
+                                  image='gcr.io/test-project/test-image:tag')
     b_in.source = self.build_msg.Source(
         storageSource=self.build_msg.StorageSource(
             bucket=bucket_name,
@@ -569,7 +594,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
                 encoding.MessageToJson(op_metadata))))
 
     self.Run([
-        'builds', 'deploy', 'gke', '.', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--cluster=test-cluster',
         '--location=us-central1', '--tag=gcr.io/test-project/test-image:tag',
         '--config=test-config.yaml', '--async',
         '--gcs-staging-dir=gs://test-bucket'
@@ -580,7 +605,8 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     frozen_file = 'my-deploy-dir/source/{}'.format(self.frozen_tgz_filename)
 
-    b_in = self.DefaultInputBuild(src=False)
+    b_in = self.DefaultInputBuild(src=False,
+                                  image='gcr.io/test-project/test-image:tag')
     b_in.source = self.build_msg.Source(
         storageSource=self.build_msg.StorageSource(
             bucket=bucket_name,
@@ -626,7 +652,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
                 encoding.MessageToJson(op_metadata))))
 
     self.Run([
-        'builds', 'deploy', 'gke', '.', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--cluster=test-cluster',
         '--location=us-central1', '--tag=gcr.io/test-project/test-image:tag',
         '--config=test-config.yaml', '--async',
         '--gcs-staging-dir=gs://test-bucket/my-deploy-dir'
@@ -650,13 +676,13 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
         'my-project_cloudbuild already exists and is owned by another project. '
         'Specify a bucket using --gcs-staging-dir.'):
       self.Run([
-          'builds', 'deploy', 'gke', '--cluster=test-cluster',
+          'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
           '--location=us-central1', '--namespace=test-namespace',
           '--image=gcr.io/test-project/test-image:tag', '--async'
       ])
 
   def testSourceFromBucket(self):
-    b_in = self.DefaultInputBuild()
+    b_in = self.DefaultInputBuild(image='gcr.io/test-project/test-image:tag')
     b_in.steps = self.DefaultBuildSteps(
         build_and_push=True
     )
@@ -706,14 +732,15 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
                 encoding.MessageToJson(op_metadata))))
 
     self.Run([
-        'builds', 'deploy', 'gke', 'gs://source-bucket/source.tgz',
+        'builds', 'deploy', 'gke',
+        'gs://source-bucket/source.tgz',
         '--cluster=test-cluster', '--location=us-central1',
         '--namespace=test-namespace',
         '--tag=gcr.io/test-project/test-image:tag', '--async'
     ])
 
   def testSourceFromFile(self):
-    b_in = self.DefaultInputBuild()
+    b_in = self.DefaultInputBuild(image='gcr.io/test-project/test-image:tag')
     b_in.steps = self.DefaultBuildSteps(
         build_and_push=True
     )
@@ -790,7 +817,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     self.ExpectMessagesForDeploy(b_in, b_out, src=False)
     self.Run([
-        'builds', 'deploy', 'gke', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
         '--location=us-central1', '--image=gcr.io/test-project/test-image:tag',
         '--expose=1234', '--async'
     ])
@@ -800,7 +827,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
         exceptions.InvalidArgumentException,
         'Invalid value for [--expose]: port number is invalid'):
       self.Run([
-          'builds', 'deploy', 'gke', '--cluster=test-cluster',
+          'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
           '--location=us-central1',
           '--image=gcr.io/test-project/test-image:tag', '--expose=-99',
           '--async'
@@ -821,7 +848,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     self.ExpectMessagesForDeploy(b_in, b_out, src=False)
     self.Run([
-        'builds', 'deploy', 'gke', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
         '--location=us-central1', '--namespace=test-namespace',
         '--image=gcr.io/test-project/test-image:tag', '--async'
     ])
@@ -841,7 +868,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     self.ExpectMessagesForDeploy(b_in, b_out, src=False)
     self.Run([
-        'builds', 'deploy', 'gke', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
         '--location=us-central1', '--namespace=test-namespace',
         '--image=gcr.io/test-project/test-image:tag', '--async',
         '--timeout=1m2s'
@@ -861,7 +888,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     self.ExpectMessagesForDeploy(b_in, b_out, src=False)
     self.Run([
-        'builds', 'deploy', 'gke', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
         '--location=us-central1', '--namespace=test-namespace',
         '--image=gcr.io/test-project/test-image:tag', '--async',
         '--timeout=1234'
@@ -925,7 +952,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
         body='')
 
     self.Run([
-        'builds', 'deploy', 'gke', '--cluster=test-cluster',
+        'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
         '--location=us-central1', '--image=gcr.io/test-project/test-image:tag'
     ])
 
@@ -996,7 +1023,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     with self.AssertRaisesExceptionRegexp(core_exceptions.Error, 'FAILURE'):
       self.Run([
-          'builds', 'deploy', 'gke', '--cluster=test-cluster',
+          'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
           '--location=us-central1', '--image=gcr.io/test-project/test-image:tag'
       ])
 
@@ -1068,7 +1095,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     with self.AssertRaisesExceptionRegexp(core_exceptions.Error, 'FAILURE'):
       self.Run([
-          'builds', 'deploy', 'gke', '--cluster=test-cluster',
+          'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
           '--location=us-central1', '--image=gcr.io/test-project/test-image:tag'
       ])
 
@@ -1142,7 +1169,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     with self.AssertRaisesExceptionRegexp(core_exceptions.Error, 'TIMEOUT'):
       self.Run([
-          'builds', 'deploy', 'gke', '--cluster=test-cluster',
+          'builds', 'deploy', 'gke', '--no-source', '--cluster=test-cluster',
           '--location=us-central1', '--image=gcr.io/test-project/test-image:tag'
       ])
 
@@ -1153,6 +1180,41 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
         Here the last line
         """,
         normalize_space=True)
+
+  def testImageWithConfigsIncludesSource(self):
+    b_in = self.DefaultInputBuild()
+    b_in.steps = self.DefaultBuildSteps(
+        build_and_push=False
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        config='test-config.yaml'
+    )
+
+    b_out = self.DefaultOutputBuild(b_in)
+
+    self.ExpectMessagesForDeploy(b_in, b_out)
+    self.Run([
+        'builds', 'deploy', 'gke', '--cluster=test-cluster',
+        '--location=us-central1', '--image=gcr.io/test-project/test-image:tag',
+        '--config=test-config.yaml', '--async'
+    ])
+
+  def testImageWithoutConfigsExcludesSource(self):
+    b_in = self.DefaultInputBuild(src=False)
+    b_in.steps = self.DefaultBuildSteps(
+        build_and_push=False
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions()
+
+    b_out = self.DefaultOutputBuild(b_in)
+
+    self.ExpectMessagesForDeploy(b_in, b_out, src=False)
+    self.Run([
+        'builds', 'deploy', 'gke', '--cluster=test-cluster',
+        '--location=us-central1', '--image=gcr.io/test-project/test-image:tag',
+        '--async'
+    ])
+
 
 if __name__ == '__main__':
   test_case.main()

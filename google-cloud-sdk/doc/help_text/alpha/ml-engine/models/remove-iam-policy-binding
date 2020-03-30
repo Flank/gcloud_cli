@@ -1,6 +1,6 @@
 NAME
     gcloud alpha ml-engine models remove-iam-policy-binding - remove IAM policy
-        binding from a ML model
+        binding for a model
 
 SYNOPSIS
     gcloud alpha ml-engine models remove-iam-policy-binding MODEL
@@ -10,15 +10,17 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) Remove an IAM policy binding from the IAM policy of a ML model. One
-    binding consists of a member, a role, and an optional condition.
+    binding consists of a member, a role, and an optional condition. See $
+    gcloud alpha ml-engine models get-iam-policy for examples of how to specify
+    a model resource.
 
 POSITIONAL ARGUMENTS
-     Model resource - The model for which to remove IAM policy binding from.
-     This represents a Cloud resource. (NOTE) Some attributes are not given
-     arguments in this group but can be set in other ways. To set the [project]
-     attribute: provide the argument [model] on the command line with a fully
-     specified name; provide the argument [--project] on the command line; set
-     the property [core/project]. This must be specified.
+     Model resource - The AI Platform model for which to remove IAM policy
+     binding from. This represents a Cloud resource. (NOTE) Some attributes are
+     not given arguments in this group but can be set in other ways. To set the
+     [project] attribute: provide the argument [model] on the command line with
+     a fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
 
        MODEL
           ID of the model or fully qualified identifier for the model.
@@ -78,29 +80,22 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
 
-API REFERENCE
-    This command uses the ml/v1 API. The full documentation for this API can be
-    found at: https://cloud.google.com/ml/
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To remove an IAM policy binding for the role of 'roles/editor' for the user
-    'test-user@gmail.com' with model 'my_model', run:
+    To remove an IAM policy binding for the role of 'roles/ml.admin' for the
+    user 'test-user@gmail.com' on model with identifier 'my_model', run:
 
         $ gcloud alpha ml-engine models remove-iam-policy-binding my_model \
-            --member='user:test-user@gmail.com' --role='roles/editor'
+            --member='user:test-user@gmail.com' --role='roles/ml.admin'
 
-    To remove an IAM policy binding which expires at the end of the year 2018
-    for the role of 'roles/ml.admin' and the user 'test-user@gmail.com' with
-    model 'my_model', run:
+    To remove an IAM policy binding for the role of 'roles/ml.admin' from all
+    authenticated users on model 'my_model', run:
 
         $ gcloud alpha ml-engine models remove-iam-policy-binding my_model \
-            --member='user:test-user@gmail.com' --role='roles/ml.admin' \
-            --condition='expression=request.time <
-         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
-        tion=Expires at midnight on 2018-12-31'
+            --member='allAuthenticatedUsers' --role='roles/ml.admin'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

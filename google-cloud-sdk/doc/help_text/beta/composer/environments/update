@@ -15,7 +15,9 @@ SYNOPSIS
           | --remove-labels=[KEY,...]
           | --update-pypi-packages-from-file=UPDATE_PYPI_PACKAGES_FROM_FILE
           | --update-pypi-package=PACKAGE[EXTRAS_LIST]VERSION_SPECIFIER
-          --clear-pypi-packages | --remove-pypi-packages=[PACKAGE,...])
+          --clear-pypi-packages | --remove-pypi-packages=[PACKAGE,...]
+          | --update-web-server-allow-ip=[description=DESCRIPTION],
+          [ip_range=IP_RANGE] | --web-server-allow-all | --web-server-deny-all)
         [--async] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -153,7 +155,8 @@ REQUIRED FLAGS
 
            --remove-labels=[KEY,...]
               List of label keys to remove. If a label does not exist it is
-              silently ignored.
+              silently ignored. If --update-labels is also specified then
+              --remove-labels is applied first.
 
        Group of arguments for modifying the PyPI package configuration. At most
        one of these may be specified:
@@ -200,6 +203,25 @@ REQUIRED FLAGS
               software cannot be uninstalled with the --remove-pypi-packages or
               --clear-pypi-packages flags.
 
+       At most one of these may be specified:
+
+         --update-web-server-allow-ip=[description=DESCRIPTION],[ip_range=IP_RANGE]
+            Specifies a list of IPv4 or IPv6 ranges that will be allowed to
+            access the Airflow web server. By default, all IPs are allowed to
+            access the web server.
+
+       ip_range
+          IPv4 or IPv6 range of addresses allowed to access the Airflow web
+          server.
+
+       description
+          An optional description of the IP range.
+           --web-server-allow-all
+              Allows all IP addresses to access the Airflow web server.
+
+           --web-server-deny-all
+              Denies all incoming traffic to the Airflow web server.
+
 OPTIONAL FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
@@ -209,8 +231,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To update the Cloud Composer environment named env-1 to have 8 Airflow
+    workers, and not have the production label, run:
+
+        $ gcloud beta composer environments update env-1 --node-count=8 \
+            --remove-labels=production
 
 NOTES
     This command is currently in BETA and may change without notice. These

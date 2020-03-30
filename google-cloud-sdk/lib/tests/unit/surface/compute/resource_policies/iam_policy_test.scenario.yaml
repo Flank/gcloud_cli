@@ -1,0 +1,169 @@
+title: bigtable instances tables set-iam-policy scenario test
+release_tracks: [GA, BETA, ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute resource-policies set-iam-policy my-policy --region=my-region
+      policy.json
+  - stderr: |
+      Updated IAM policy for resource policy [my-policy].
+  - stdout: |
+      bindings:
+      - condition:
+          description: descr
+          expression: expr
+          title: title
+        members:
+        - user:test@gmail.com
+        role: roles/non-primitive
+      etag: etag
+      version: 1
+- execute:
+  - command: compute resource-policies get-iam-policy my-policy --region=my-region
+  - stdout: |
+      bindings:
+      - condition:
+          description: descr
+          expression: expr
+          title: title
+        members:
+        - user:test@gmail.com
+        role: roles/non-primitive
+      etag: etag
+      version: 1
+actions:
+- write_file:
+    path: policy.json
+    contents: |
+      {
+        "version": 1,
+        "etag": "etag",
+        "bindings": [
+          {
+            "role": "roles/non-primitive",
+            "members": [
+              "user:test@gmail.com"
+            ],
+            "condition": {
+              "expression": "expr",
+              "title": "title",
+              "description": "descr"
+            }
+          }
+        ]
+      }
+
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+- define_reference:
+    reference: policy-version
+    track_values:
+      GA: ''
+      BETA: '&optionsRequestedPolicyVersion=3'
+      ALPHA: '&optionsRequestedPolicyVersion=3'
+
+- execute_command:
+    command: compute resource-policies set-iam-policy my-policy --region=my-region
+      policy.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/my-region/resourcePolicies/my-policy/setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - condition:
+                    description: descr
+                    expression: expr
+                    title: title
+                  members:
+                  - user:test@gmail.com
+                  role: roles/non-primitive
+                etag: etag
+                version: 3
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:test@gmail.com"
+                  ],
+                  "condition": {
+                    "expression": "expr",
+                    "title": "title",
+                    "description": "descr"
+                  }
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for resource policy [my-policy].
+    - expect_stdout: |
+        bindings:
+        - condition:
+            description: descr
+            expression: expr
+            title: title
+          members:
+          - user:test@gmail.com
+          role: roles/non-primitive
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute resource-policies get-iam-policy my-policy --region=my-region
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/my-region/resourcePolicies/my-policy/getIamPolicy?alt=json$$policy-version$$
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:test@gmail.com"
+                  ],
+                  "condition": {
+                    "expression": "expr",
+                    "title": "title",
+                    "description": "descr"
+                  }
+                }
+              ]
+            }
+    - expect_stdout: |
+        bindings:
+        - condition:
+            description: descr
+            expression: expr
+            title: title
+          members:
+          - user:test@gmail.com
+          role: roles/non-primitive
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0

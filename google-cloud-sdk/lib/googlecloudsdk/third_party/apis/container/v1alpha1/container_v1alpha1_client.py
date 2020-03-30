@@ -9,6 +9,7 @@ class ContainerV1alpha1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://container.googleapis.com/'
+  MTLS_BASE_URL = u'https://container.mtls.googleapis.com/'
 
   _PACKAGE = u'container'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
@@ -644,6 +645,9 @@ zones.
 
     def SetLocations(self, request, global_params=None):
       r"""Sets the locations for a specific cluster.
+Deprecated. Use
+[projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1alpha1/projects.locations.clusters.update)
+instead.
 
       Args:
         request: (SetLocationsRequest) input message
@@ -1040,6 +1044,33 @@ Modify basic_auth.csv and reset the K8S API server.
         request_field='',
         request_type_name=u'ContainerProjectsLocationsGetServerConfigRequest',
         response_type_name=u'ServerConfig',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Fetches locations that offer Google Kubernetes Engine.
+
+      Args:
+        request: (ContainerProjectsLocationsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListLocationsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1alpha1/projects/{projectsId}/locations',
+        http_method=u'GET',
+        method_id=u'container.projects.locations.list',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'v1alpha1/{+parent}/locations',
+        request_field='',
+        request_type_name=u'ContainerProjectsLocationsListRequest',
+        response_type_name=u'ListLocationsResponse',
         supports_download=False,
     )
 
@@ -1503,6 +1534,9 @@ zones.
 
     def Locations(self, request, global_params=None):
       r"""Sets the locations for a specific cluster.
+Deprecated. Use
+[projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1alpha1/projects.locations.clusters.update)
+instead.
 
       Args:
         request: (SetLocationsRequest) input message

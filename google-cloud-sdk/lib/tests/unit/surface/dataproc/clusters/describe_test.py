@@ -20,6 +20,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import unit_base
@@ -39,6 +41,27 @@ class ClustersDescribeUnitTest(unit_base.DataprocUnitTestBase):
     message = 'Resource not found API reason: Resource not found.'
     with self.AssertRaisesHttpExceptionMatches(message):
       self.RunDataproc('clusters describe ' + self.CLUSTER_NAME)
+
+  def testDescribeClusterRegionProperty(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    expected = self.MakeRunningCluster()
+    self.ExpectGetCluster(expected, region='us-central1')
+    result = self.RunDataproc('clusters describe ' + self.CLUSTER_NAME)
+    self.AssertMessagesEqual(expected, result)
+
+  def testDescribeClusterRegionFlag(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    expected = self.MakeRunningCluster()
+    self.ExpectGetCluster(expected, region='us-east1')
+    result = self.RunDataproc('clusters describe ' + self.CLUSTER_NAME +
+                              ' --region us-east1')
+    self.AssertMessagesEqual(expected, result)
+
+  def testDescribeClusterNoRegionFlag(self):
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc(
+          'clusters describe ' + self.CLUSTER_NAME, set_region=False)
 
 
 class ClustersDescribeUnitTestBeta(ClustersDescribeUnitTest,

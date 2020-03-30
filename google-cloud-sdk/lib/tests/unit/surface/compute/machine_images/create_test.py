@@ -23,11 +23,12 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class MachineImagesCreateTest(test_base.BaseTest):
+class MachineImagesCreateTestBeta(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
+    self.api_version = 'beta'
 
   def testDefaultOptionsWithSingleMachineImage(self):
     self.make_requests.side_effect = [[
@@ -109,10 +110,9 @@ class MachineImagesCreateTest(test_base.BaseTest):
                   name='machine-image-1',
                   storageLocations=['us-central1'],
                   sourceInstance='{compute_uri}/projects/my-project/zones/'
-                                 'us-central3-a/instances/instance-2'.format(
-                                     compute_uri=self.compute_uri)),
-              project='my-project'
-          ))],)
+                  'us-central3-a/instances/instance-2'.format(
+                      compute_uri=self.compute_uri)),
+              project='my-project'))],)
 
   def testGuestFlush(self):
 
@@ -129,10 +129,9 @@ class MachineImagesCreateTest(test_base.BaseTest):
                   name='machine-image-1',
                   guestFlush=True,
                   sourceInstance='{compute_uri}/projects/my-project/zones/'
-                                 'us-central3-a/instances/instance-2'.format(
-                                     compute_uri=self.compute_uri)),
-              project='my-project'
-          ))],)
+                  'us-central3-a/instances/instance-2'.format(
+                      compute_uri=self.compute_uri)),
+              project='my-project'))],)
 
   def testCsekKey(self):
     private_key_fname = self.WriteKeyFile(machine_image=True)
@@ -141,8 +140,8 @@ class MachineImagesCreateTest(test_base.BaseTest):
              '--csek-key-file={key} '
              '--source-instance '
              '{compute_uri}/projects/my-project/zones/us-central3-a/'
-             'instances/instance-2'.format(key=private_key_fname,
-                                           compute_uri=self.compute_uri))
+             'instances/instance-2'.format(
+                 key=private_key_fname, compute_uri=self.compute_uri))
     self.CheckRequests(
         [(self.compute.machineImages, 'Insert',
           self.messages.ComputeMachineImagesInsertRequest(
@@ -151,10 +150,9 @@ class MachineImagesCreateTest(test_base.BaseTest):
                   machineImageEncryptionKey=self.messages.CustomerEncryptionKey(
                       rawKey='aFellowOfInfiniteJestOfMostExcellentFancy01='),
                   sourceInstance='{compute_uri}/projects/my-project/zones/'
-                                 'us-central3-a/instances/instance-2'.format(
-                                     compute_uri=self.compute_uri)),
-              project='my-project'
-          ))],)
+                  'us-central3-a/instances/instance-2'.format(
+                      compute_uri=self.compute_uri)),
+              project='my-project'))],)
 
   def testKmsKey(self):
     self.Run('compute machine-images create machine-image-1 '
@@ -171,41 +169,53 @@ class MachineImagesCreateTest(test_base.BaseTest):
                   name='machine-image-1',
                   machineImageEncryptionKey=self.messages.CustomerEncryptionKey(
                       kmsKeyName='projects/key-project/locations/global/'
-                                 'keyRings/disk-ring/cryptoKeys/disk-key'),
+                      'keyRings/disk-ring/cryptoKeys/disk-key'),
                   sourceInstance='{compute_uri}/projects/my-project/zones/'
-                                 'us-central3-a/instances/instance-2'.format(
-                                     compute_uri=self.compute_uri)),
-              project='my-project'
-          ))],)
+                  'us-central3-a/instances/instance-2'.format(
+                      compute_uri=self.compute_uri)),
+              project='my-project'))],)
 
   def testCsekSourceDiskKey(self):
     private_key_fname = self.WriteKeyFile(machine_image=True)
 
     self.Run('compute machine-images create machine-image-1 '
              '--source-disk-csek-key csek-key-file={key},disk=https:'
-             '//compute.googleapis.com/compute/alpha/projects/my-project/'
+             '//compute.googleapis.com/compute/{api}/projects/my-project/'
              'zones/central2-a/disks/hamlet '
              '--source-instance '
              '{compute_uri}/projects/my-project/zones/us-central3-a/'
-             'instances/instance-2'.format(key=private_key_fname,
-                                           compute_uri=self.compute_uri))
-    self.CheckRequests(
-        [(self.compute.machineImages, 'Insert',
-          self.messages.ComputeMachineImagesInsertRequest(
-              machineImage=self.messages.MachineImage(
-                  name='machine-image-1',
-                  sourceDiskEncryptionKeys=
-                  [self.messages.SourceDiskEncryptionKey(
-                      diskEncryptionKey=self.messages.CustomerEncryptionKey(
-                          rawKey='abcdefghijklmnopqrstuvwxyz1234567890AAAAAAA='),
-                      sourceDisk='https://compute.googleapis.com/compute/'
-                                 'alpha/projects/my-project/'
-                                 'zones/central2-a/disks/hamlet')],
-                  sourceInstance='{compute_uri}/projects/my-project/zones/'
-                                 'us-central3-a/instances/instance-2'.format(
-                                     compute_uri=self.compute_uri)),
-              project='my-project'
-          ))],)
+             'instances/instance-2'.format(
+                 key=private_key_fname,
+                 api=self.api_version,
+                 compute_uri=self.compute_uri))
+    self.CheckRequests([(
+        self.compute.machineImages, 'Insert',
+        self.messages.ComputeMachineImagesInsertRequest(
+            machineImage=self.messages.MachineImage(
+                name='machine-image-1',
+                sourceDiskEncryptionKeys=[
+                    self.messages.SourceDiskEncryptionKey(
+                        diskEncryptionKey=self.messages.CustomerEncryptionKey(
+                            rawKey='abcdefghijklmnopqrstuvwxyz1234567890AAAAAAA='
+                        ),
+                        sourceDisk='https://compute.googleapis.com/compute/'
+                        '{api}/projects/my-project/'
+                        'zones/central2-a/disks/hamlet'.format(
+                            api=self.api_version))
+                ],
+                sourceInstance='{compute_uri}/projects/my-project/zones/'
+                'us-central3-a/instances/instance-2'.format(
+                    compute_uri=self.compute_uri)),
+            project='my-project'))],)
+
+
+class MachineImagesCreateTestAlpha(MachineImagesCreateTestBeta):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+    self.api_version = 'alpha'
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -34,7 +34,8 @@ class _BaseInstancesDescribeTest(object):
         ),
         self.messages.DatabaseInstance(
             currentDiskSize=52690837,
-            databaseVersion='MYSQL_5_5',
+            databaseVersion=self.messages.DatabaseInstance
+            .DatabaseVersionValueValuesEnum.MYSQL_5_5,
             etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/MQ"',
             name='testinstance',
             ipAddresses=[],
@@ -45,7 +46,8 @@ class _BaseInstancesDescribeTest(object):
             region='us-central',
             serverCaCert=None,
             settings=self.messages.Settings(
-                activationPolicy='NEVER',
+                activationPolicy=self.messages.Settings
+                .ActivationPolicyValueValuesEnum.NEVER,
                 authorizedGaeApplications=[],
                 backupConfiguration=self.messages.BackupConfiguration(
                     binaryLogEnabled=False,
@@ -60,13 +62,16 @@ class _BaseInstancesDescribeTest(object):
                 ),
                 kind='sql#settings',
                 locationPreference=None,
-                pricingPlan='PER_USE',
-                replicationType='SYNCHRONOUS',
+                pricingPlan=self.messages.Settings.PricingPlanValueValuesEnum
+                .PER_USE,
+                replicationType=self.messages.Settings
+                .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
                 settingsVersion=1,
                 tier='D0',
             ),
-            state='RUNNABLE',
-            instanceType='CLOUD_SQL_INSTANCE',
+            state=self.messages.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
+            instanceType=self.messages.DatabaseInstance
+            .InstanceTypeValueValuesEnum.CLOUD_SQL_INSTANCE,
         ))
 
     self.Run('sql instances describe testinstance')
@@ -112,7 +117,8 @@ state: STOPPED
         ),
         self.messages.DatabaseInstance(
             currentDiskSize=52690837,
-            databaseVersion='MYSQL_5_5',
+            databaseVersion=self.messages.DatabaseInstance
+            .DatabaseVersionValueValuesEnum.MYSQL_5_5,
             etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/MQ"',
             name='testinstance',
             ipAddresses=[],
@@ -123,7 +129,8 @@ state: STOPPED
             region='us-central',
             serverCaCert=None,
             settings=self.messages.Settings(
-                activationPolicy='ON_DEMAND',
+                activationPolicy=self.messages.Settings
+                .ActivationPolicyValueValuesEnum.ON_DEMAND,
                 authorizedGaeApplications=[],
                 backupConfiguration=self.messages.BackupConfiguration(
                     binaryLogEnabled=False,
@@ -139,30 +146,33 @@ state: STOPPED
                 kind='sql#settings',
                 userLabels=self.messages.Settings.UserLabelsValue(
                     additionalProperties=[
-                        self.messages.Settings.UserLabelsValue.
-                        AdditionalProperty(
+                        self.messages.Settings.UserLabelsValue
+                        .AdditionalProperty(
                             key='bar',
                             value='value',
                         ),
-                        self.messages.Settings.UserLabelsValue.
-                        AdditionalProperty(
+                        self.messages.Settings.UserLabelsValue
+                        .AdditionalProperty(
                             key='baz',
                             value='qux',
                         ),
-                        self.messages.Settings.UserLabelsValue.
-                        AdditionalProperty(
+                        self.messages.Settings.UserLabelsValue
+                        .AdditionalProperty(
                             key='foo',
                             value='bar',
                         ),
                     ],),
                 locationPreference=None,
-                pricingPlan='PER_USE',
-                replicationType='SYNCHRONOUS',
+                pricingPlan=self.messages.Settings.PricingPlanValueValuesEnum
+                .PER_USE,
+                replicationType=self.messages.Settings
+                .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
                 settingsVersion=1,
                 tier='D0',
             ),
-            state='RUNNABLE',
-            instanceType='CLOUD_SQL_INSTANCE',
+            state=self.messages.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
+            instanceType=self.messages.DatabaseInstance
+            .InstanceTypeValueValuesEnum.CLOUD_SQL_INSTANCE,
         ))
 
     self.Run('sql instances describe testinstance --format="default(labels)"')
@@ -180,11 +190,12 @@ settings:
     self.mocked_client.instances.Get.Expect(
         self.messages.SqlInstancesGetRequest(
             instance='nosuchinstance',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         exception=http_error.MakeHttpError(
             403,
             'The client is not authorized to make this request.',
-            url=('https://www.googleapis.com/sql/v1beta4/projects'
+            url=('https://sqladmin.googleapis.com/sql/v1beta4/projects'
                  '/google.com%3Acloudsdktest/instances/noinstance?alt=json')))
 
     with self.assertRaises(exceptions.ResourceNotFoundError):

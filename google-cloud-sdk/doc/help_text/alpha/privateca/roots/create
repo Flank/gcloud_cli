@@ -1,0 +1,181 @@
+NAME
+    gcloud alpha privateca roots create - create a new root certificate
+        authority
+
+SYNOPSIS
+    gcloud alpha privateca roots create CERTIFICATE_AUTHORITY
+        --subject=[SUBJECT,...]
+        (--kms-key-version=KMS_KEY_VERSION : --kms-key=KMS_KEY
+          --kms-keyring=KMS_KEYRING
+          --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT)
+        [--dns-san=[DNS_SAN,...]] [--email-san=[EMAIL_SAN,...]]
+        [--ip-san=[IP_SAN,...]] [--issuance-policy=ISSUANCE_POLICY]
+        [--labels=[KEY=VALUE,...]] [--no-publish-ca-cert] [--no-publish-crl]
+        [--uri-san=[URI_SAN,...]] [--validity=VALIDITY; default="P10Y"]
+        [[--reusable-config=REUSABLE_CONFIG
+          : --extended-key-usages=[EXTENDED_KEY_USAGES,...]
+          --key-usages=[KEY_USAGES,...] --max-chain-length=MAX_CHAIN_LENGTH]]
+        [GCLOUD_WIDE_FLAG ...]
+
+POSITIONAL ARGUMENTS
+     Certificate Authority resource - The name of the root CA to create. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [CERTIFICATE_AUTHORITY] on the command
+     line with a fully specified name; provide the argument [--project] on the
+     command line; set the property [core/project]. To set the [location]
+     attribute: provide the argument [CERTIFICATE_AUTHORITY] on the command
+     line with a fully specified name. This must be specified.
+
+       CERTIFICATE_AUTHORITY
+          ID of the Certificate Authority or fully qualified identifier for the
+          Certificate Authority.
+
+REQUIRED FLAGS
+     --subject=[SUBJECT,...]
+        X.501 name of the certificate subject. Example:--subject
+        "C=US,ST=California,L=Mountain View,O=Google LLC,CN=google.com"
+
+     Key version resource - The KMS key version backing this CA. The arguments
+     in this group can be used to specify the attributes of this resource. This
+     must be specified.
+
+       --kms-key-version=KMS_KEY_VERSION
+          ID of the key version or fully qualified identifier for the key
+          version. This flag must be specified if any of the other arguments in
+          this group are specified.
+
+       --kms-key=KMS_KEY
+          The KMS key of the key version.
+
+       --kms-keyring=KMS_KEYRING
+          The KMS keyring of the key version.
+
+       --kms-location=KMS_LOCATION
+          The Cloud location for the key version.
+
+       --kms-project=KMS_PROJECT
+          The Cloud project for the key version.
+
+OPTIONAL FLAGS
+     --dns-san=[DNS_SAN,...]
+        One or more comma-separated DNS Subject Alternative Names.
+
+     --email-san=[EMAIL_SAN,...]
+        One or more comma-separated email Subject Alternative Names.
+
+     --ip-san=[IP_SAN,...]
+        One or more comma-separated IP Subject Alternative Names.
+
+     --issuance-policy=ISSUANCE_POLICY
+        A YAML file describing this Certificate Authority's issuance policy.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     --publish-ca-cert
+        If this is enabled, the following will happen: 1) The CA certificate
+        will be written to a known location within the CA distribution point.
+        2) The AIA extension in all issued certificates will point to the CA
+        cert URL in that distribition point.
+
+        Note that the same bucket may be used for the CRLs if --publish-crl is
+        set.
+
+        Enabled by default, use --no-publish-ca-cert to disable.
+
+     --publish-crl
+        If this gets enabled, the following will happen: 1) CRLs will be
+        written to a known location within the CA distribution point. 2) The
+        CDP extension in all future issued certificates will point to the CRL
+        URL in that distribution point.
+
+        Note that the same bucket may be used for the CA cert if
+        --publish-ca-cert is set.
+
+        Enabled by default, use --no-publish-crl to disable.
+
+     --uri-san=[URI_SAN,...]
+        One or more comma-separated URI Subject Alternative Names.
+
+     --validity=VALIDITY; default="P10Y"
+        The validity of this CA, as an ISO8601 duration. Defaults to 10 years.
+
+     The X.509 configuration used for the CA certificate. At most one of these
+     may be specified:
+
+       Reusable config resource - The Reusable Config containing X.509 values
+       for this CA. This represents a Cloud resource. (NOTE) Some attributes
+       are not given arguments in this group but can be set in other ways. To
+       set the [project] attribute: provide the argument [--reusable-config] on
+       the command line with a fully specified name; project will default to
+       privateca-data. To set the [location] attribute: provide the argument
+       [--reusable-config] on the command line with a fully specified name;
+       location will default to us-west1.
+
+         --reusable-config=REUSABLE_CONFIG
+            ID of the reusable config or fully qualified identifier for the
+            reusable config.
+
+       --extended-key-usages=[EXTENDED_KEY_USAGES,...]
+          The list of extended key usages for this CA. This can only be
+          provided if --reusable-config is not provided. EXTENDED_KEY_USAGES
+          must be one of: server_auth, client_auth, code_signing,
+          email_protection, time_stamping, ocsp_signing.
+
+       --key-usages=[KEY_USAGES,...]
+          The list of key usages for this CA. This can only be provided if
+          --reusable-config is not provided. KEY_USAGES must be one of:
+          digital_signature, content_commitment, key_encipherment,
+          data_encipherment, key_agreement, cert_sign, crl_sign, encipher_only,
+          decipher_only.
+
+       --max-chain-length=MAX_CHAIN_LENGTH
+          Maximum depth of subordinate CAs allowed under this CA for a CA
+          certificate. This can only be provided if --reusable-config is not
+          provided.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a root CA that supports one layer of subordinates:
+
+        $ gcloud alpha privateca roots create prod-root \
+          --kms-key-version "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+          --subject "CN=Joonix Production Root CA" \
+          --max-chain-length 1
+
+    To create a root CA and restrict what it can issue:
+
+        $ gcloud alpha privateca roots create prod-root \
+          --kms-key-version "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+          --subject "CN=Joonix Production Root CA" \
+          --issuance-policy policy.yaml
+
+    To create a root CA that doesn't publicly publish CA certificate and CRLs:
+
+        $ gcloud alpha privateca roots create root-2 \
+          --kms-key-version "projects/joonix-pki/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1" \
+          --subject "CN=Joonix Production Root CA" \
+          --issuance-policy policy.yaml \
+          --no-publish-ca-cert \
+          --no-publish-crl
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

@@ -10,6 +10,7 @@ SYNOPSIS
         [--proxy-header=PROXY_HEADER; default="NONE"] [--request=REQUEST]
         [--response=RESPONSE] [--timeout=TIMEOUT; default="5s"]
         [--unhealthy-threshold=UNHEALTHY_THRESHOLD; default=2]
+        [--global | --region=REGION]
         [--port=PORT; default=80 --port-name=PORT_NAME --use-serving-port]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -77,6 +78,31 @@ FLAGS
         The number of consecutive health check failures before a healthy
         instance is marked as unhealthy. The default is 2.
 
+     At most one of these may be specified:
+
+       --global
+          If set, the TCP health check is global.
+
+       --region=REGION
+          Region of the TCP health check to create. If not specified, you may
+          be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
      These flags configure the port that the health check monitors. If none is
      specified, the default port of 80 is used; if both --port and --port-name
      are specified, --port takes precedence.
@@ -100,8 +126,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     These variants are also available:

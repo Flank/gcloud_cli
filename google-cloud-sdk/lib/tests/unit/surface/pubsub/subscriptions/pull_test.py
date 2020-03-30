@@ -227,9 +227,15 @@ class SubscriptionsPullGATest(base.CloudPubsubTestBase):
         self._GetMessageOutput('3c?', 654321, '000'), normalize_space=True)
 
   def testSubscriptionsPullNoDeprecatedArgs(self):
-    with self.AssertRaisesExceptionMatches(
+    err = """\
+ --max-messages flag is available in one or more alternate release tracks. Try:
+
+  gcloud alpha pubsub subscriptions pull --max-messages
+  gcloud beta pubsub subscriptions pull --max-messages
+"""
+    with self.AssertRaisesExceptionRegexp(
         cli_test_base.MockArgumentError,
-        'unrecognized arguments: --max-messages'):
+        err):
       self.Run('pubsub subscriptions pull subs1 --max-messages')
 
 

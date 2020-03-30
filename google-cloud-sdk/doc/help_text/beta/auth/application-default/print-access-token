@@ -7,13 +7,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Note: Consider using a service account and the complementary gcloud
-    auth activate-service-account to authorize access to Google Cloud Platform.
-    For details on authorizing with a service account, see
-    https://cloud.google.com/sdk/docs/authorizing#authorizing_with_a_service_account.
-
-    gcloud beta auth application-default print-access-token generates and
-    prints an access token for the current Application Default Credential
+    (BETA) gcloud beta auth application-default print-access-token generates
+    and prints an access token for the current Application Default Credential
     (ADC). The ADC can be specified either by setting the
     GOOGLE_APPLICATION_CREDENTIALS environment variable to the path of a
     service account key file (JSON) or using gcloud auth application-default
@@ -35,8 +30,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in BETA and may change without notice. This

@@ -30,6 +30,7 @@ from googlecloudsdk.core import config
 from googlecloudsdk.core import log
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.console import console_io
+from googlecloudsdk.core.util import encoding
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 import mock
@@ -117,7 +118,8 @@ class GetRuntimeDefDirTest(sdk_test_base.SdkBase):
     # Clear the environment variable set by the test housing so that we fall
     # through to config.Paths().sdk_root when getting the runtime definition
     # root.
-    self.old_runtime_root = os.environ.get('CLOUDSDK_APP_RUNTIME_ROOT')
+    self.old_runtime_root = encoding.GetEncodedValue(
+        os.environ, 'CLOUDSDK_APP_RUNTIME_ROOT')
     if self.old_runtime_root is not None:
       del os.environ['CLOUDSDK_APP_RUNTIME_ROOT']
 
@@ -348,10 +350,14 @@ class PluginTests(TestBase):
       with self.assertRaises(ext_runtime.InvalidRuntimeDefinition):
         cfg.GenerateConfigData()
 
-  def GetConfigurator(self, deploy):
+  def GetConfigurator(self, deploy, create_path=True):
     rt = ext_runtime.ExternalizedRuntime.Load(self.runtime_def_dir, self.env)
     params = ext_runtime.Params(deploy=deploy)
-    self.Touch(directory=self.temp_path, name='exists', contents='my contents')
+    self.Touch(
+        directory=self.temp_path,
+        name='exists',
+        contents='my contents',
+        create_path=create_path)
     configurator = rt.Detect(self.temp_path, params)
     return configurator
 
@@ -359,8 +365,8 @@ class PluginTests(TestBase):
     configurator = self.GetConfigurator(deploy)
     return configurator.GenerateConfigs()
 
-  def GenerateConfigDataFromTestRuntime(self, deploy):
-    configurator = self.GetConfigurator(deploy)
+  def GenerateConfigDataFromTestRuntime(self, deploy, create_path=True):
+    configurator = self.GetConfigurator(deploy, create_path=create_path)
     return configurator.GenerateConfigData()
 
   def testPluginGeneratedFiles(self):
@@ -397,7 +403,8 @@ class PluginTests(TestBase):
     def ExistsFake(filename):
       return filename.endswith('exists')
     with self.StartObjectPatch(os.path, 'exists', side_effect=ExistsFake):
-      cfg_files = self.GenerateConfigDataFromTestRuntime(deploy=False)
+      cfg_files = self.GenerateConfigDataFromTestRuntime(
+          deploy=False, create_path=False)
       self.assertEqual({f.filename for f in cfg_files},
                        {'foo', 'bar', 'info'})
       for gen_file in cfg_files:

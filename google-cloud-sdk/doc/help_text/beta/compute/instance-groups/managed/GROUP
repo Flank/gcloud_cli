@@ -13,11 +13,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
+
+     instance-configs
+        (BETA) Manage instance-specific settings of managed instance group.
 
      rolling-action
         (BETA) Manipulate rolling actions on Google Compute Engine managed
@@ -53,6 +57,10 @@ COMMANDS
 
      list
         (BETA) List Google Compute Engine managed instance groups.
+
+     list-errors
+        (BETA) List errors produced by managed instances in a managed instance
+        group.
 
      list-instances
         (BETA) List instances present in the managed instance group.
@@ -92,7 +100,7 @@ COMMANDS
         managed instance group.
 
      wait-until
-        (BETA) Wait until managed instance group reaches desired state.
+        (BETA) Wait until the managed instance group reaches the desired state.
 
      wait-until-stable
         (BETA) (DEPRECATED) Waits until state of managed instance group is

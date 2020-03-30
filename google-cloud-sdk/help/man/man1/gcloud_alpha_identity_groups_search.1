@@ -11,7 +11,7 @@ gcloud alpha identity groups search \- search groups
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha identity groups search\fR \fB\-\-label\fR=\fILABEL\fR \fB\-\-organization\fR=\fIORGANIZATION\fR [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR] [\fB\-\-view\fR=\fIVIEW\fR;\ default="basic"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha identity groups search\fR \fB\-\-labels\fR=\fILABELS\fR \fB\-\-organization\fR=\fIORGANIZATION\fR [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR] [\fB\-\-view\fR=\fIVIEW\fR;\ default="basic"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,8 +25,9 @@ gcloud alpha identity groups search \- search groups
 
 .RS 2m
 .TP 2m
-\fB\-\-label\fR=\fILABEL\fR
-Label of the group resource.
+\fB\-\-labels\fR=\fILABELS\fR
+Labels of the group resource. Example of labels "\-\-labels
+cloudidentity.googleapis.com/groups.discussion_forum"
 
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION\fR
@@ -75,8 +76,9 @@ Response includes all the fields of the groups.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -89,12 +91,13 @@ for this API can be found at: https://cloud.google.com/identity/
 
 .SH "EXAMPLES"
 
-To Search groups.
+To Search groups:
 
-$ gcloud alpha identity groups search \-\-organization 5149234212.RS 2m
-\-\-label "system/groups/discussion_forum"
-\-\-page\-size 3 \-\-page\-token "ala9glealanal908"
-
+.RS 2m
+$ gcloud alpha identity groups search \-\-organization="5149234212"  \e
+    \-\-labels="cloudidentity.googleapis.com/groups.discussion_forum"  \e
+    \-\-page\-size=3  \e
+    \-\-page\-token="ala9glealanal908"
 .RE
 
 
@@ -104,5 +107,9 @@ $ gcloud alpha identity groups search \-\-organization 5149234212.RS 2m
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta identity groups search
+.RE
 

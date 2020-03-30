@@ -11,10 +11,13 @@ SYNOPSIS
         [--directories-to-pull=[DIR_TO_PULL,...]]
         [--environment-variables=[KEY=VALUE,...]]
         [--network-profile=PROFILE_ID] [--num-flaky-test-attempts=int]
-        [--obb-files=OBB_FILE,[OBB_FILE]] [--other-files=FILE=DEVICE_DIR,[...]]
-        [--performance-metrics] [--record-video]
-        [--results-bucket=RESULTS_BUCKET] [--results-dir=RESULTS_DIR]
+        [--obb-files=OBB_FILE,[OBB_FILE]]
+        [--other-files=DEVICE_PATH=FILE_PATH,[...]] [--performance-metrics]
+        [--record-video] [--results-bucket=RESULTS_BUCKET]
+        [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME]
+        [--num-uniform-shards=int
+          | --test-targets-for-shard=TEST_TARGETS_FOR_SHARD]
         [--scenario-labels=LABEL,[LABEL,...]]
         [--scenario-numbers=int,[int,...]] [--test-package=TEST_PACKAGE]
         [--test-runner-class=TEST_RUNNER_CLASS]
@@ -116,12 +119,10 @@ FLAGS
         Google Cloud Storage using gs:// notation.
 
      --app-package=APP_PACKAGE
-        (DEPRECATED) The Java package of the application under test (default:
-        extracted from the APK manifest).
+        (REMOVED) The Java package of the application under test. By default,
+        the application package name is parsed from the APK manifest.
 
-        The --app-package flag is deprecated and should no longer be used. By
-        default, the correct application package name is parsed from the APK
-        manifest.
+        Flag --app-package has been removed.
 
      --async
         Invoke a test asynchronously without waiting for test results.
@@ -160,10 +161,6 @@ FLAGS
         to the am instrument -e KEY1 VALUE1 ... command and passed to your test
         runner (typically AndroidJUnitRunner). Examples:
 
-        Break test cases into four shards and run only the first shard:
-
-            --environment-variables numShards=4,shardIndex=0
-
         Enable code coverage and provide a directory to store the coverage
         results when using Android Test Orchestrator (--use-orchestrator):
 
@@ -201,19 +198,18 @@ FLAGS
         [main|patch].0300110.com.example.android.obb) and will be installed
         into <shared-storage>/Android/obb/<package-name>/ on the test device.
 
-     --other-files=FILE=DEVICE_DIR,[...]
-        A list of file=device-directory pairs that indicate paths of files to
-        push to the device before starting tests, and the device directory to
-        push them to.
+     --other-files=DEVICE_PATH=FILE_PATH,[...]
+        A list of device-path=file-path pairs that indicate the device paths to
+        push files to the device before starting tests, and the paths of files
+        to push.
 
-        Source file paths may be in the local filesystem or in Google Cloud
-        Storage (gs://...). Device directories must be absolute, whitelisted
-        paths (${EXTERNAL_STORAGE}, or ${ANDROID_DATA}/local/tmp).
+        Device paths must be under absolute, whitelisted paths
+        (${EXTERNAL_STORAGE}, or ${ANDROID_DATA}/local/tmp). Source file paths
+        may be in the local filesystem or in Google Cloud Storage (gs://...).
 
         Examples:
 
-            --other-files local/file1=/sdcard/dir1/
-            --other-files gs://bucket/file2=/sdcard/dir2
+            --other-files /sdcard/dir1/file1.txt=local/file.txt,/sdcard/dir2/file2.jpg=gs://bucket/file.jpg
 
         This flag only copies files to the device. To install files, like OBB
         or APK files, see --obb-files and --additional-apks.
@@ -246,6 +242,44 @@ FLAGS
         which use the same history name will have their results grouped
         together in the Firebase console in a time-ordered test history list.
 
+     Sharding options. At most one of these may be specified:
+
+       --num-uniform-shards=int
+          Specifies the number of shards into which you want to evenly
+          distribute test cases. The shards are run in parallel on separate
+          devices. For example, if your test execution contains 20 test cases
+          and you specify four shards, each shard executes five test cases.
+
+          The number of shards should be less than the total number of test
+          cases. The number of shards specified must be >= 1 and <= 50.
+
+       --test-targets-for-shard=TEST_TARGETS_FOR_SHARD
+          Specifies a group of packages, classes, and/or test cases to run in
+          each shard (a group of test cases). The shards are run in parallel on
+          separate devices. You can repeat this flag up to 50 times to specify
+          multiple shards.
+
+          Note: If you include the flags --environment-variable or
+          --test-targets when running --test-targets-for-shard, the flags are
+          applied to all the shards you create.
+
+          Examples:
+
+          You can also specify multiple packages, classes, or test cases in the
+          same shard by separating each item with a comma. For example:
+
+              --test-targets-for-shard
+              "package com.package1.for.shard1,com.package2.for.shard1"
+
+              --test-targets-for-shard
+              "class com.foo.ClassForShard2#testMethod1,com.foo.ClassForShard2#testMethod2"
+
+          To specify both package and class in the same shard, separate package
+          and class with semi-colons:
+
+              --test-targets-for-shard
+              "class com.foo.ClassForShard3;package com.package.for.shard3"
+
 ANDROID GAME-LOOP TEST FLAGS
      --scenario-labels=LABEL,[LABEL,...]
         A list of game-loop scenario labels (default: None). Each game-loop
@@ -265,11 +299,10 @@ ANDROID GAME-LOOP TEST FLAGS
 
 ANDROID INSTRUMENTATION TEST FLAGS
      --test-package=TEST_PACKAGE
-        (DEPRECATED) The Java package name of the instrumentation test
-        (default: extracted from the APK manifest).
+        (REMOVED) The Java package name of the instrumentation test. By
+        default, the test package name is parsed from the APK manifest.
 
-        The --test-package flag is deprecated and should no longer be used. By
-        default, the correct test package name is parsed from the APK manifest.
+        Flag --test-package has been removed.
 
      --test-runner-class=TEST_RUNNER_CLASS
         The fully-qualified Java class name of the instrumentation test runner
@@ -384,39 +417,40 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To invoke a robo test lasting 100 seconds against the default device
     environment, run:
 
-        $ gcloud beta firebase test android run --app APP_APK --timeout 100s
+        $ gcloud beta firebase test android run --app=APP_APK --timeout=100s
 
     When specifying devices to test against, the preferred method is to use the
     --device flag. For example, to invoke a robo test against a virtual,
     generic MDPI Nexus device in landscape orientation, run:
 
-        $ gcloud beta firebase test android run --app APP_APK \
-            --device model=NexusLowRes,orientation=landscape
+        $ gcloud beta firebase test android run --app=APP_APK \
+            --device=model=NexusLowRes,orientation=landscape
 
     To invoke an instrumentation test against a physical Nexus 6 device
     (MODEL_ID: shamu) which is running Android API level 21 in French, run:
 
-        $ gcloud beta firebase test android run --app APP_APK \
-            --test TEST_APK --device model=shamu,version=21,locale=fr
+        $ gcloud beta firebase test android run --app=APP_APK \
+            --test=TEST_APK --device=model=shamu,version=21,locale=fr
 
     To test against multiple devices, specify --device more than once:
 
-        $ gcloud beta firebase test android run --app APP_APK \
-            --test TEST_APK --device model=Nexus4,version=19 \
-            --device model=Nexus4,version=21 \
-            --device model=NexusLowRes,version=25
+        $ gcloud beta firebase test android run --app=APP_APK \
+            --test=TEST_APK --device=model=Nexus4,version=19 \
+            --device=model=Nexus4,version=21 \
+            --device=model=NexusLowRes,version=25
 
     To invoke a robo test on an Android App Bundle, pass the .aab file using
     the --app flag.
 
-        $ gcloud beta firebase test android run --app bundle.aab
+        $ gcloud beta firebase test android run --app=bundle.aab
 
     You may also use the legacy dimension flags (deprecated) to specify which
     devices to use. Firebase Test Lab will run tests against every possible
@@ -429,7 +463,7 @@ EXAMPLES
     comprehensive matrix of virtual and physical devices, OS versions, locales
     and orientations, run:
 
-        $ gcloud beta firebase test android run --app APP_APK --timeout 5m \
+        $ gcloud beta firebase test android run --app=APP_APK --timeout=5m \
             --device-ids=shamu,NexusLowRes,Nexus5,g3,zeroflte \
             --os-version-ids=19,21,22,23,24,25 --locales=en_GB,es,fr,ru,zh \
             --orientations=portrait,landscape
@@ -459,7 +493,7 @@ EXAMPLES
     For example, to run a robo test using a specific Google Cloud Storage
     location to hold the raw test results, run:
 
-        $ gcloud beta firebase test android run --app APP_APK \
+        $ gcloud beta firebase test android run --app=APP_APK \
             --results-bucket=gs://my-bucket \
             --results-dir=my/test/results/<unique-value>
 
@@ -467,8 +501,8 @@ EXAMPLES
     history of your tests will be collected and displayed in the Firebase
     console, run:
 
-        $ gcloud beta firebase test android run --app APP_APK \
-            --test TEST_APK \
+        $ gcloud beta firebase test android run --app=APP_APK \
+            --test=TEST_APK \
             --results-history-name='Excelsior App Test History'
 
     Argument Files

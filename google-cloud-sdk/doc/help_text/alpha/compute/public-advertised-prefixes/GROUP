@@ -1,0 +1,43 @@
+NAME
+    gcloud alpha compute public-advertised-prefixes - manage public advertised
+        prefix resources
+
+SYNOPSIS
+    gcloud alpha compute public-advertised-prefixes COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage public advertised prefix resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Creates a Google Compute Engine public advertised prefix.
+
+     delete
+        (ALPHA) Deletes a Google Compute Engine public advertised prefix.
+
+     describe
+        (ALPHA) Describes a Google Compute Engine public advertised prefix.
+
+     list
+        (ALPHA) List Google Compute Engine public advertised prefixes.
+
+     update
+        (ALPHA) Updates a Google Compute Engine public advertised prefix.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

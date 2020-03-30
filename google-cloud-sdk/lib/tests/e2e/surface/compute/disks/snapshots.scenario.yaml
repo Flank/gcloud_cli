@@ -165,8 +165,8 @@ actions:
             json: {}
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/$$operation$$?alt=json
-          method: GET
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/$$operation$$/wait?alt=json
+          method: POST
           headers: {}
           body: null
         return_response:

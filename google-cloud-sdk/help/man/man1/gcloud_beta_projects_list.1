@@ -72,8 +72,9 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -84,6 +85,13 @@ alphabetically by project ID:
 
 .RS 2m
 $ gcloud beta projects list \-\-sort\-by=projectId \-\-limit=5
+.RE
+
+To list projects that have been marked for deletion:
+
+.RS 2m
+$ gcloud beta projects list \e
+    \-\-filter='lifecycleState:DELETE_REQUESTED'
 .RE
 
 

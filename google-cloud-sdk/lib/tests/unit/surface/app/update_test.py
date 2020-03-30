@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
-from tests.lib import test_case
 from tests.lib.surface.app import app_update_base
 
 
@@ -54,24 +53,6 @@ class UpdateBetaTest(UpdateGaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
-
-  def testUpdateUseContainerOptimizedOsTrue(self):
-    self.ExpectPatchApplicationRequest(
-        self.Project(),
-        update_mask='featureSettings.useContainerOptimizedOs,',
-        use_container_optimized_os=True)
-
-    self.Run('app update --use-container-optimized-os')
-    self.AssertErrContains('Updating the app [{0}]'.format(self.Project()))
-
-  def testUpdateUseContainerOptimizedOsFalse(self):
-    self.ExpectPatchApplicationRequest(
-        self.Project(),
-        update_mask='featureSettings.useContainerOptimizedOs,',
-        use_container_optimized_os=False)
-
-    self.Run('app update --no-use-container-optimized-os')
-    self.AssertErrContains('Updating the app [{0}]'.format(self.Project()))
 
 
 class UpdateAlphaTest(UpdateBetaTest):

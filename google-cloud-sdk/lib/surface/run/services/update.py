@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.run import traffic
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.run import connection_context
 from googlecloudsdk.command_lib.run import exceptions
@@ -52,13 +53,12 @@ class Update(base.Command):
   def CommonArgs(parser):
     # Flags specific to managed CR
     managed_group = flags.GetManagedArgGroup(parser)
-    flags.AddServiceAccountFlag(managed_group)
     flags.AddCloudSQLFlags(managed_group)
+    flags.AddRevisionSuffixArg(managed_group)
 
     # Flags specific to connecting to a cluster
     cluster_group = flags.GetClusterArgGroup(parser)
     flags.AddEndpointVisibilityEnum(cluster_group)
-    flags.AddCpuFlag(cluster_group)
 
     # Flags not specific to any platform
     service_presentation = presentation_specs.ResourcePresentationSpec(
@@ -74,11 +74,19 @@ class Update(base.Command):
     flags.AddAsyncFlag(parser)
     flags.AddLabelsFlags(parser)
     flags.AddMaxInstancesFlag(parser)
+    flags.AddCommandFlag(parser)
+    flags.AddArgsFlag(parser)
+    flags.AddPortFlag(parser)
+    flags.AddCpuFlag(parser)
     concept_parsers.ConceptParser([service_presentation]).AddToParser(parser)
 
   @staticmethod
   def Args(parser):
     Update.CommonArgs(parser)
+
+    # Flags specific to managed CR
+    managed_group = flags.GetManagedArgGroup(parser)
+    flags.AddServiceAccountFlag(managed_group)
 
   def Run(self, args):
     """Update configuration information about the service.
@@ -96,40 +104,41 @@ class Update(base.Command):
           '`--memory`, `--concurrency`, `--timeout`, `--connectivity`?')
 
     conn_context = connection_context.GetConnectionContext(
-        args, self.ReleaseTrack())
+        args, flags.Product.RUN, self.ReleaseTrack())
     service_ref = flags.GetService(args)
 
     with serverless_operations.Connect(conn_context) as client:
-      deployment_stages = stages.ServiceStages()
+      service = client.GetService(service_ref)
+      has_latest = (service is None or
+                    traffic.LATEST_REVISION_KEY in service.spec_traffic)
+      deployment_stages = stages.ServiceStages(
+          include_iam_policy_set=False,
+          include_route=has_latest)
       with progress_tracker.StagedProgressTracker(
           'Deploying...',
           deployment_stages,
           failure_message='Deployment failed',
           suppress_output=args.async_) as tracker:
-        client.ReleaseService(
-            service_ref,
-            changes,
-            tracker,
-            asyn=args.async_)
+        client.ReleaseService(service_ref, changes, tracker, asyn=args.async_,
+                              prefetch=service)
       if args.async_:
         pretty_print.Success(
             'Deploying asynchronously.')
       else:
         service = client.GetService(service_ref)
-        active_revs = client.GetActiveRevisions(service_ref)
-
-        msg = ('Service [{{bold}}{serv}{{reset}}] revision{plural} {rev_msg} '
-               'is active and serving traffic at {{bold}}{url}{{reset}}')
-
-        rev_msg = ' '.join(
-            ['[{{bold}}{}{{reset}}]'.format(rev) for rev in active_revs])
-
+        latest_ready = service.status.latestReadyRevisionName
+        latest_percent_traffic = service.latest_percent_traffic
+        msg = ('Service [{{bold}}{serv}{{reset}}] '
+               'revision [{{bold}}{rev}{{reset}}] '
+               'has been deployed and is serving '
+               '{{bold}}{latest_percent_traffic}{{reset}} percent of traffic')
+        if latest_percent_traffic:
+          msg += (' at {{bold}}{url}{{reset}}')
         msg = msg.format(
             serv=service_ref.servicesId,
-            plural='s' if len(active_revs) > 1 else '',
-            rev_msg=rev_msg,
-            url=service.domain)
-
+            rev=latest_ready,
+            url=service.domain if 'domain' in dir(service) else service.url,
+            latest_percent_traffic=latest_percent_traffic)
         pretty_print.Success(msg)
 
 
@@ -145,7 +154,6 @@ class AlphaUpdate(Update):
     # Flags specific to managed CR
     managed_group = flags.GetManagedArgGroup(parser)
     flags.AddVpcConnectorArg(managed_group)
-    flags.AddRevisionSuffixArg(managed_group)
 
     # Flags specific to connecting to a cluster
     cluster_group = flags.GetClusterArgGroup(parser)
@@ -155,8 +163,7 @@ class AlphaUpdate(Update):
 
     # Flags not specific to any platform
     flags.AddMinInstancesFlag(parser)
-    flags.AddCommandFlag(parser)
-    flags.AddArgsFlag(parser)
-    flags.AddPortFlag(parser)
+    flags.AddServiceAccountFlagAlpha(parser)
+
 
 AlphaUpdate.__doc__ = Update.__doc__

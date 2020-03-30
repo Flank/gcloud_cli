@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 title: cloud identity groups delete test scenario
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -42,6 +42,13 @@ summary:
   - error: '1: Invalid value for [email]: There is no such a group associated with
       the specified argument:invalid-group@foo.com'
 actions:
+
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha1
+      BETA: v1beta1
+
 - execute_command:
     label: Delete a specified group.
     command: |
@@ -52,7 +59,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -65,7 +72,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -100,7 +107,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=invalid-group%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=invalid-group%40foo.com
           method: GET
           headers: {}
           body: null

@@ -110,8 +110,7 @@ class RegionalDisksListTestGA(test_base.BaseTest):
 
     self.list_json.assert_called_once_with(
         requests=[(self.compute.disks, 'AggregatedList',
-                   self.messages.ComputeDisksAggregatedListRequest(
-                       project='my-project',))],
+                   self._getListRequestMessage('my-project'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -156,12 +155,20 @@ class RegionalDisksListTestGA(test_base.BaseTest):
               disk-3 region-1 region 10 pd-standard READY
               """), normalize_space=True)
 
+  def _getListRequestMessage(self, project):
+    return self.messages.ComputeDisksAggregatedListRequest(
+        project=project, includeAllScopes=True)
+
 
 class RegionalDisksListTestBeta(RegionalDisksListTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'beta'
+
+  def _getListRequestMessage(self, project):
+    return self.messages.ComputeDisksAggregatedListRequest(
+        project=project, includeAllScopes=True)
 
 
 class RegionalDisksListTestAlpha(RegionalDisksListTestBeta):

@@ -46,7 +46,7 @@ summary:
       targetSize: 3
       zone:       https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
 - execute:
-  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+  - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
 - execute:
   - command: compute instance-groups managed list-instances $$manager$$ --zone us-central1-f
@@ -79,7 +79,7 @@ summary:
       selfLink: $$instance1$$
       status:   SUCCESS
 - execute:
-  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+  - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
 - execute:
   - command: compute instances describe $$instance1$$ --format 'text(machineType)'
@@ -92,7 +92,7 @@ summary:
       Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$\].
       $
 - execute:
-  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+  - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
 - execute:
   - command: compute instance-groups managed list-instances $$manager$$ --zone us-central1-f
@@ -109,7 +109,7 @@ summary:
       Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$\].
       $
 - execute:
-  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+  - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
 - execute:
   - command: compute instance-groups managed list-instances $$manager$$ --zone us-central1-f
@@ -546,7 +546,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+    command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
     validation_only: true
     events:
@@ -807,7 +807,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+    command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
     validation_only: true
     events:
@@ -915,7 +915,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+    command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
     validation_only: true
     events:
@@ -1027,7 +1027,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+    command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
     validation_only: true
     events:

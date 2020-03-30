@@ -1,0 +1,64 @@
+
+.TH "GCLOUD_ALPHA_CONTAINER_HUB_FEATURES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha container hub features \- manage features on all Hub memberships(registered\ clusters)
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha container hub features\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Manage features on all Hub memberships(registered clusters)
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBmulticlusteringress\fR
+\fB(ALPHA)\fR Manage MultiClusterIngress Feature.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+Manage features on all Hub memberships(registered clusters):
+
+.RS 2m
+$ gcloud alpha container hub features a\-feature \-\-help
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

@@ -1,5 +1,5 @@
 title: organizations add-iam-policy-binding scenario test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 
 actions:
 - execute_command:

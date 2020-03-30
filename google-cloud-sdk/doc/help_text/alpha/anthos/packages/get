@@ -1,0 +1,76 @@
+NAME
+    gcloud alpha anthos packages get - fetch Anthos package from a git
+        repository
+
+SYNOPSIS
+    gcloud alpha anthos packages get REPO_URI[.git]/[PKG_PATH][@GIT_REF]
+        --local-dir=LOCAL_DIR [--pattern=PATTERN] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Fetch Anthos package from a git repository.
+
+POSITIONAL ARGUMENTS
+     REPO_URI[.git]/[PKG_PATH][@GIT_REF]
+        Git repository URI containing 1 or more packages as where:
+
+        * REPO_URI - URI of a git repository containing 1 or more packages as
+          subdirectories. In most cases the .git suffix should be specified to
+          delimit the REPO_URI from the PKG_PATH, but this is not required for
+          widely recognized repo prefixes. If REPO_URI cannot be parsed then an
+          error will be printed an asking for '.git' to be specified as part of
+          the argument. e.g. https://github.com/kubernetes/examples.git
+
+        * PKG_PATH (optional) - Path to Git subdirectory containing Anthos
+          package files. Uses '/' as the path separator (regardless of OS).
+          e.g. staging/cockroachdb. Defaults to the root directory.
+
+        * GIT_REF (optional)- A git tag, branch, ref or commit for the remote
+          version of the package to fetch. Defaults to the repository master
+          branch e.g. @master
+
+REQUIRED FLAGS
+     --local-dir=LOCAL_DIR
+        The local directory to fetch the package to. e.g. ./my-cockroachdb-copy
+        * If the directory does NOT exist: create the specified directory and
+          write the package contents to it
+
+        * If the directory DOES exist: create a NEW directory under the
+          specified one, defaulting the name to the Base of REPO/PKG_PATH
+
+        * If the directory DOES exist and already contains a directory with
+          the same name of the one that would be created: fail
+
+OPTIONAL FLAGS
+     --pattern=PATTERN
+        Pattern to use for writing files. May contain the following formatting
+        verbs %n: metadata.name, %s: metadata.namespace, %k: kind (default
+        "%n%k.yaml")
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To fetch package FOO from github into local package dir my-foo:
+
+        $ gcloud alpha anthos packages get \
+          https://github.com/myaccount/foo.git --local-dir my-foo
+
+    To fetch package myaccount/foo.git/other_package from github, with tag
+    'v123' into local package dir 'my-foo':
+
+        $ gcloud alpha anthos packages get \
+          https://github.com/myaccount/foo.git/other_package@v123 \
+          --local-dir my-foo
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

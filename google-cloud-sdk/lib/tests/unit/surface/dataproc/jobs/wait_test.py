@@ -24,6 +24,8 @@ import textwrap
 
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_attr
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
@@ -33,9 +35,10 @@ from tests.lib.surface.dataproc import jobs_unit_base
 class JobsWaitUnitTest(jobs_unit_base.JobsUnitTestBase):
   """Tests for dataproc jobs wait."""
 
-  def testWaitJob(self):
-    expected = self.ExpectWaitCalls()
-    result = self.RunDataproc('jobs wait ' + self.JOB_ID)
+  def _testWaitJob(self, region=None, region_flag=''):
+    expected = self.ExpectWaitCalls(region=region)
+    result = self.RunDataproc(
+        'jobs wait {0} {1}'.format(self.JOB_ID, region_flag))
     self.AssertMessagesEqual(expected, result)
     self.AssertErrContains(textwrap.dedent("""\
         First line of job output.
@@ -44,6 +47,23 @@ class JobsWaitUnitTest(jobs_unit_base.JobsUnitTestBase):
         Last line of job output."""))
     self.AssertErrContains(
         'Job [{0}] finished successfully.'.format(self.JOB_ID))
+
+  def testWaitJob(self):
+    self._testWaitJob()
+
+  def testWaitJob_withRegionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testWaitJob(region='global')
+
+  def testWaitJob_withRegionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testWaitJob(region='us-central1', region_flag='--region=us-central1')
+
+  def testWaitJob_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('jobs wait foo', set_region=False)
 
   def testWaitCompletedJob(self):
     expected = self.MakeCompletedJob()

@@ -20,15 +20,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To delete a waiter named "my-waiter" within a configuration named
     "my-config", run:
 
         $ gcloud beta runtime-config configs waiters delete my-waiter \
-            --config-name my-config
+            --config-name=my-config
 
 NOTES
     This command is currently in BETA and may change without notice.

@@ -37,7 +37,8 @@ POSITIONAL ARGUMENTS
         Specifies the instance to SSH into.
 
         USER specifies the username with which to SSH. If omitted, the user
-        login name is used.
+        login name is used. If using OS Login, USER will be replaced by the OS
+        Login user.
 
         INSTANCE specifies the name of the virtual machine instance to SSH
         into.
@@ -163,8 +164,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To SSH into 'example-instance' in zone us-central1-a, run:

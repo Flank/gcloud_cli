@@ -18,9 +18,13 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import os
+import textwrap
 
 from googlecloudsdk.api_lib.auth import exceptions as auth_exceptions
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
+from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.credentials import creds
 from googlecloudsdk.core.credentials import devshell
 from googlecloudsdk.core.credentials import gce
 from googlecloudsdk.core.credentials import store
@@ -49,6 +53,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.StartDictPatch('os.environ', {'DISPLAY': ':1'})
 
     self.expected_scopes = (
+        'openid',
         'https://www.googleapis.com/auth/userinfo.email',
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/appengine.admin',
@@ -373,6 +378,30 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.assertEqual('junk', properties.VALUES.core.account.Get())
     self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
+  def testWarnUserLocalCredentials(self):
+    """Warn the user when re-using locally stored credentials.
+
+    Useful when the user might expect a fresh set of credentials that
+    authorize additional scopes, such as the one provided by the
+    `--enable-gdrive-access`. Test that the appropriate message is displayed.
+
+    """
+    self.mock_metadata.return_value.connected = False
+    fake_account = 'foo@google.com'
+    fake_cred = self.GetFakeCred(fake_account)
+    self.mock_load.return_value = fake_cred  # Simulating existing creds.
+
+    result = self.Login(account=fake_account)
+    self.assertEqual(fake_cred, result)
+    self.mock_load.assert_called_once_with(
+        account=fake_account, scopes=self.expected_scopes)
+    self.AssertErrContains(
+        'Re-using locally stored credentials for [{}]. '
+        'To fetch new credentials, re-run the command with the '
+        '`--force` flag.'.format(fake_account))
+    self.assertEqual(fake_account, properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
+
   def testAlertUserOfDevshellLogin(self):
     fake_cred = self.GetFakeCred('foo@google.com')
     self.mock_load.return_value = None  # No creds to start.
@@ -402,6 +431,94 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
 
     result = self.Login(account='foo@google.com')
     self.assertEqual(fake_cred, result)
+
+
+def _GetJsonUserADC():
+  return textwrap.dedent("""\
+    {
+      "client_id": "foo.apps.googleusercontent.com",
+      "client_secret": "file-secret",
+      "refresh_token": "file-token",
+      "type": "authorized_user"
+    }""")
+
+
+def _GetJsonUserExtendedADC():
+  return textwrap.dedent("""\
+      {
+        "client_id": "foo.apps.googleusercontent.com",
+        "client_secret": "file-secret",
+        "quota_project_id": "fake-project",
+        "refresh_token": "file-token",
+        "type": "authorized_user"
+      }""")
+
+
+def _GetJsonServiceADC():
+  return textwrap.dedent("""\
+      {
+        "client_email": "bar@developer.gserviceaccount.com",
+        "client_id": "bar.apps.googleusercontent.com",
+        "private_key": "-----BEGIN PRIVATE KEY-----\\nasdf\\n-----END PRIVATE KEY-----\\n",
+        "private_key_id": "key-id",
+        "type": "service_account"
+      }""")
+
+
+class TestWriteToADC(cli_test_base.CliTestBase, test_case.WithInput):
+
+  def SetUp(self):
+    properties.PersistProperty(properties.VALUES.core.account, 'junk')
+    self.StartObjectPatch(store, 'Store', autospec=True)
+
+    self.mock_load = self.StartObjectPatch(store, 'Load', autospec=True)
+    self.adc_file_path = os.path.join(self.temp_path,
+                                      'application_default_credentials.json')
+    self.StartObjectPatch(
+        config, 'ADCFilePath', return_value=self.adc_file_path)
+    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+
+    self.mock_metadata = self.StartObjectPatch(gce, 'Metadata', autospec=True)
+    self.mock_metadata.return_value.connected = False
+
+  def testLoginWithWriteToADC_UserCreds(self):
+    self.mock_load.return_value = creds.FromJson(_GetJsonUserADC())
+    self.Run('auth login foo@gmail.com --update-adc')
+    self.AssertFileEquals(_GetJsonUserADC(), self.adc_file_path)
+    self.AssertErrNotContains(
+        "'fake-project' is added to ADC as the quota project")
+
+  def testLoginWithWriteToADC_UserCredsWithQuotaProject(self):
+    self.mock_load.return_value = creds.FromJson(_GetJsonUserADC())
+    self.Run('auth login foo@gmail.com --update-adc --add-quota-project-to-adc')
+    self.AssertFileEquals(_GetJsonUserExtendedADC(), self.adc_file_path)
+    self.AssertErrContains(
+        "'fake-project' is added to ADC as the quota project")
+
+  def testLoginWithWriteToADC_UserCreds_CannotFindQuotaProject(self):
+    self.StartObjectPatch(creds, 'GetQuotaProject', return_value=None)
+    self.mock_load.return_value = creds.FromJson(_GetJsonUserADC())
+    self.Run('auth login foo@gmail.com --update-adc --add-quota-project-to-adc')
+    self.AssertFileEquals(_GetJsonUserADC(), self.adc_file_path)
+    self.AssertErrContains('Cannot find a project to insert into application '
+                           'default credentials (ADC) as a quota project')
+
+  def testLoginWithWriteToADC_ServiceCreds(self):
+    self.mock_load.return_value = creds.FromJson(_GetJsonServiceADC())
+    self.Run('auth login bar@developer.gserviceaccount.com --update-adc')
+    self.AssertFileNotExists(self.adc_file_path)
+    self.AssertErrContains('Credentials cannot be written')
+    self.AssertErrNotContains('Application default credentials (ADC) were '
+                              'updated.')
+
+  def testLoginAddQuotaProjectWithoutUpdateADC(self):
+    self.mock_load.return_value = creds.FromJson(_GetJsonUserADC())
+    with self.AssertRaisesExceptionMatches(
+        calliope_exceptions.InvalidArgumentException,
+        '--add-quota-project-to-adc cannot be specified without specifying '
+        '--update-adc'):
+      self.Run('auth login foo@gmail.com --add-quota-project-to-adc')
+
 
 if __name__ == '__main__':
   test_case.main()

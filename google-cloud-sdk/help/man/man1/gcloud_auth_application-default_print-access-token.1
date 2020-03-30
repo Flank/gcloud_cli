@@ -17,11 +17,6 @@ gcloud auth application\-default print\-access\-token \- print an access token f
 
 .SH "DESCRIPTION"
 
-Note: Consider using a service account and the complementary \f5gcloud auth
-activate\-service\-account\fR to authorize access to Google Cloud Platform. For
-details on authorizing with a service account, see
-https://cloud.google.com/sdk/docs/authorizing#authorizing_with_a_service_account.
-
 gcloud auth application\-default print\-access\-token generates and prints an
 access token for the current Application Default Credential (ADC). The ADC can
 be specified either by setting the \f5GOOGLE_APPLICATION_CREDENTIALS\fR
@@ -49,8 +44,9 @@ This command should be used sparingly and for debugging alone.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

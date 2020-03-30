@@ -1,0 +1,48 @@
+title: locations list test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: lifesciences locations list
+  - stdout: |
+      NAME
+      projects/fake-project/locations/us-central1
+      projects/fake-project/locations/europe-west2
+actions:
+- execute_command:
+    command: lifesciences locations list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://lifesciences.googleapis.com/v2beta/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+               "locations": [
+                 {
+                   "name": "projects/fake-project/locations/us-central1",
+                   "labels": {
+                     "cloud.googleapis.com/region": "us-central1"
+                   },
+                   "locationId": "us-central1"
+                 },
+                 {
+                   "name": "projects/fake-project/locations/europe-west2",
+                   "labels": {
+                     "cloud.googleapis.com/region": "europe-west2"
+                   },
+                   "locationId": "europe-west2"
+                 }
+               ]
+            }
+    - expect_stdout: |
+        NAME
+        projects/fake-project/locations/us-central1
+        projects/fake-project/locations/europe-west2
+    - expect_exit:
+        code: 0

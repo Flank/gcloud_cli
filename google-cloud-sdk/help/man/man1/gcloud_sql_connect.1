@@ -11,7 +11,7 @@ gcloud sql connect \- connects to a Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud sql connect\fR \fIINSTANCE\fR [\fB\-\-user\fR=\fIUSER\fR,\ \fB\-u\fR\ \fIUSER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud sql connect\fR \fIINSTANCE\fR [\fB\-\-database\fR=\fIDATABASE\fR,\ \fB\-d\fR\ \fIDATABASE\fR] [\fB\-\-user\fR=\fIUSER\fR,\ \fB\-u\fR\ \fIUSER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,6 +36,10 @@ Cloud SQL instance ID.
 
 .RS 2m
 .TP 2m
+\fB\-\-database\fR=\fIDATABASE\fR, \fB\-d\fR \fIDATABASE\fR
+The SQL Server database to connect to.
+
+.TP 2m
 \fB\-\-user\fR=\fIUSER\fR, \fB\-u\fR \fIUSER\fR
 Cloud SQL instance user to connect as.
 
@@ -48,8 +52,9 @@ Cloud SQL instance user to connect as.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

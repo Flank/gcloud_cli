@@ -25,7 +25,7 @@ summary:
       ID                                       LOCATION     TIMEZONE
       $$my-dataset$$  us-central1  EST
 - execute:
-  - command: healthcare datasets get-iam-policy $$my-dataset$$
+  - command: healthcare datasets get-iam-policy $$my-dataset$$ --format yaml(etag)
   - stdout: |
       etag: ACAB
 - execute:
@@ -62,7 +62,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/healthcare-dataset-20190514-153333-fv1t/operations/13127088163891707905
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/healthcare-dataset-20200317-145146-v07d/operations/17947153746274287617
         poll_operation: true
     - expect_stderr: |
         Create request issued for: [$$my-dataset$$]
@@ -131,12 +131,83 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '442'
+            content-length: '10382'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             datasets:
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/cglouch-test-dataset
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20000000-173659-awja
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190821-202445-6hru
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190821-202916-bs1j
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190821-203432-kpwz
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190821-204221-az75
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190821-204530-228q
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190821-205054-czbp
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190821-212956-jqd3
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190821-213153-utst
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190821-215401-f2jr
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190821-221430-u48p
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190822-005017-8115
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190822-011047-inud
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190822-011119-7zbh
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190822-011142-4ayx
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-220956-5h22
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-220956-v4ob
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-220958-5a6x
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-220958-aui9
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-220958-nw2w
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-221107-1vs8
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-221107-5kum
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-221107-lqrm
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-221107-vpyg
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-221107-wssx
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-221107-ynw6
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-221125-7q58
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-221130-p3r0
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-221130-wxl2
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-221130-y09k
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190903-221131-he7m
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190904-183747-ro6s
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190913-160705-wwfm
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190919-200552-7s02
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190920-143335-bnw1
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20190920-143338-xadj
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191014-200749-l0o2
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191015-201609-3cq6
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191015-203314-kedp
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191015-203348-343a
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191015-203423-ksc6
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191015-204934-e6we
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191015-205009-q3o7
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191015-205043-ndgi
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191016-040700-xf5t
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191021-112303-74rk
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191021-125326-0k8m
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191025-171241-9o74
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191028-040555-mz4p
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191029-235154-o98g
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191031-224320-rguz
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191114-004357-qmkk
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191114-010048-yyln
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191114-010437-wjlu
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191201-130504-4vjq
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191209-175732-qe4p
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191209-181646-ensh
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191210-010538-64vg
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191218-215232-u75m
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20191223-174759-avmw
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200117-010628-y3t5
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200127-210428-x2o1
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200216-010455-grhx
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200216-050546-ibm5
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200219-195736-3gkt
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200219-195739-g6bw
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200227-215818-86qv
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200228-175841-b5nk
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200228-204514-lcs3
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200302-151322-06sf
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200302-151325-rrod
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$my-dataset$$
               timeZone: EST
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/my-dataset
@@ -147,7 +218,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: healthcare datasets get-iam-policy $$my-dataset$$
+    command: healthcare datasets get-iam-policy $$my-dataset$$ --format yaml(etag)
     events:
     - api_call:
         expect_request:
@@ -158,10 +229,11 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '21'
+            content-length: '37'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
+            version: 1
             etag: ACAB
     - expect_stdout: |
         etag: ACAB

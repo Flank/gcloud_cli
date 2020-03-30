@@ -1,0 +1,259 @@
+
+.TH "GCLOUD_COMPUTE_PACKET\-MIRRORINGS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute packet\-mirrorings update \- update a Google Compute Engine packet mirroring policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute packet\-mirrorings update\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-collector\-ilb\fR=\fICOLLECTOR_ILB\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-filter\-cidr\-ranges\fR=[\fICIDR_RANGE\fR,...]\ |\ \fB\-\-clear\-filter\-cidr\-ranges\fR\ |\ \fB\-\-remove\-filter\-cidr\-ranges\fR=[\fICIDR_RANGE\fR,...]\ |\ \fB\-\-set\-filter\-cidr\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-add\-filter\-protocols\fR=[\fIPROTOCOL\fR,...]\ |\ \fB\-\-clear\-filter\-protocols\fR\ |\ \fB\-\-remove\-filter\-protocols\fR=[\fIPROTOCOL\fR,...]\ |\ \fB\-\-set\-filter\-protocols\fR=[\fIPROTOCOL\fR,...]] [\fB\-\-add\-mirrored\-instances\fR=[\fIINSTANCE\fR,...]\ |\ \fB\-\-clear\-mirrored\-instances\fR\ |\ \fB\-\-remove\-mirrored\-instances\fR=[\fIINSTANCE\fR,...]\ |\ \fB\-\-set\-mirrored\-instances\fR=[\fIINSTANCE\fR,...]] [\fB\-\-add\-mirrored\-subnets\fR=[\fISUBNET\fR,...]\ |\ \fB\-\-clear\-mirrored\-subnets\fR\ |\ \fB\-\-remove\-mirrored\-subnets\fR=[\fISUBNET\fR,...]\ |\ \fB\-\-set\-mirrored\-subnets\fR=[\fISUBNET\fR,...]] [\fB\-\-add\-mirrored\-tags\fR=[\fITAG\fR,...]\ |\ \fB\-\-clear\-mirrored\-tags\fR\ |\ \fB\-\-remove\-mirrored\-tags\fR=[\fITAG\fR,...]\ |\ \fB\-\-set\-mirrored\-tags\fR=[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Update a Google Compute Engine packet mirroring policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the packet mirroring to update.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-collector\-ilb\fR=\fICOLLECTOR_ILB\fR
+Forwarding rule configured as collector. This must be a regional forwarding rule
+(in the same region) with load balancing scheme INTERNAL and
+isMirroringCollector set to true.
+
+You can provide this as the full URL to the forwarding rule, partial URL, or
+name. For example, the following are valid values:
+.RS 2m
+.IP "\(em" 2m
+https://compute.googleapis.com/compute/v1/projects/myproject/
+regions/us\-central1/forwardingRules/fr\-1
+.IP "\(em" 2m
+projects/myproject/regions/us\-central1/forwardingRules/fr\-1
+.IP "\(em" 2m
+fr\-1
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Optional, textual description for the packet mirroring.
+
+.TP 2m
+\fB\-\-enable\fR
+Enable or disable the packet\-mirroring.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the packet mirroring to update. Overrides the default
+\fBcompute/region\fR property value for this command invocation.
+
+.TP 2m
+
+Update the filter CIDR ranges of this packet mirroring. At most one of these may
+be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-filter\-cidr\-ranges\fR=[\fICIDR_RANGE\fR,...]
+List of filter CIDR ranges to add to the packet mirroring.
+
+.TP 2m
+\fB\-\-clear\-filter\-cidr\-ranges\fR
+If specified, clear the existing filter CIDR ranges from the packet mirroring.
+
+.TP 2m
+\fB\-\-remove\-filter\-cidr\-ranges\fR=[\fICIDR_RANGE\fR,...]
+List of filter CIDR ranges to remove from the packet mirroring.
+
+.TP 2m
+\fB\-\-set\-filter\-cidr\-ranges\fR=[\fICIDR_RANGE\fR,...]
+List of filter CIDR ranges to be mirrored on the packet mirroring.
+
+.RE
+.sp
+.TP 2m
+
+Update the filter protocols of this packet mirroring. At most one of these may
+be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-filter\-protocols\fR=[\fIPROTOCOL\fR,...]
+List of filter IP protocols to add to the packet mirroring. \fIPROTOCOL\fR must
+be one of: \fBtcp\fR, \fBudp\fR, \fBicmp\fR.
+
+.TP 2m
+\fB\-\-clear\-filter\-protocols\fR
+If specified, clear the existing filter IP protocols from the packet mirroring.
+
+.TP 2m
+\fB\-\-remove\-filter\-protocols\fR=[\fIPROTOCOL\fR,...]
+List of filter IP protocols to remove from the packet mirroring. \fIPROTOCOL\fR
+must be one of: \fBtcp\fR, \fBudp\fR, \fBicmp\fR.
+
+.TP 2m
+\fB\-\-set\-filter\-protocols\fR=[\fIPROTOCOL\fR,...]
+List of filter IP protocols to be mirrored on the packet mirroring.
+\fIPROTOCOL\fR must be one of: \fBtcp\fR, \fBudp\fR, \fBicmp\fR.
+
+.RE
+.sp
+.TP 2m
+
+Update the mirrored instances of this packet mirroring. At most one of these may
+be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-mirrored\-instances\fR=[\fIINSTANCE\fR,...]
+List of instances to add to the packet mirroring.
+
+.TP 2m
+\fB\-\-clear\-mirrored\-instances\fR
+If specified, clear the existing instances from the packet mirroring.
+
+.TP 2m
+\fB\-\-remove\-mirrored\-instances\fR=[\fIINSTANCE\fR,...]
+List of instances to remove from the packet mirroring.
+
+.TP 2m
+\fB\-\-set\-mirrored\-instances\fR=[\fIINSTANCE\fR,...]
+List of instances to be mirrored on the packet mirroring.
+
+.RE
+.sp
+.TP 2m
+
+Update the mirrored subnets of this packet mirroring. At most one of these may
+be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-mirrored\-subnets\fR=[\fISUBNET\fR,...]
+List of subnets to add to the packet mirroring.
+
+.TP 2m
+\fB\-\-clear\-mirrored\-subnets\fR
+If specified, clear the existing subnets from the packet mirroring.
+
+.TP 2m
+\fB\-\-remove\-mirrored\-subnets\fR=[\fISUBNET\fR,...]
+List of subnets to remove from the packet mirroring.
+
+.TP 2m
+\fB\-\-set\-mirrored\-subnets\fR=[\fISUBNET\fR,...]
+List of subnets to be mirrored on the packet mirroring.
+
+.RE
+.sp
+.TP 2m
+
+Update the mirrored tags of this packet mirroring. To read more about
+configuring network tags, read this guide:
+https://cloud.google.com/vpc/docs/add\-remove\-network\-tags
+
+The virtual machines with the provided tags must live in zones contained in the
+same region as this packet mirroring. At most one of these may be specified:
+
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-mirrored\-tags\fR=[\fITAG\fR,...]
+List of tags to add to the packet mirroring.
+
+.TP 2m
+\fB\-\-clear\-mirrored\-tags\fR
+If specified, clear the existing tags from the packet mirroring.
+
+.TP 2m
+\fB\-\-remove\-mirrored\-tags\fR=[\fITAG\fR,...]
+List of tags to remove from the packet mirroring.
+
+.TP 2m
+\fB\-\-set\-mirrored\-tags\fR=[\fITAG\fR,...]
+List of tags to be mirrored on the packet mirroring.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+Stop mirroring by tags, add subnet\-1 as a mirrored subnet.
+
+.RS 2m
+$ gcloud compute packet\-mirrorings update my\-pm
+    \-\-region us\-central1 \-\-clear\-mirrored\-tags
+    \-\-add\-mirrored\-subnets subnet\-1
+.RE
+
+Change the load\-balancer to send mirrored traffic to.
+
+.RS 2m
+$ gcloud compute packet\-mirrorings update my\-pm
+    \-\-region us\-central1 \-\-collector\-ilb new\-forwarding\-rule
+.RE
+
+Disable a Packet Mirroring policy.
+
+.RS 2m
+$ gcloud compute packet\-mirrorings update my\-pm
+    \-\-region us\-central1 \-\-no\-enable
+.RE
+
+Re\-enable a disabled Packet Mirroring policy.
+
+.RS 2m
+$ gcloud compute packet\-mirrorings update my\-pm
+    \-\-region us\-central1 \-\-enable
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute packet\-mirrorings update
+$ gcloud beta compute packet\-mirrorings update
+.RE
+

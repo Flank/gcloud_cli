@@ -28,7 +28,6 @@ from tests.lib import test_case
 from tests.lib.surface.compute import e2e_instances_test_base
 
 
-@test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/91357877')
 class DatalabIntegrationTest(sdk_test_base.BundledBase,
                              e2e_instances_test_base.InstancesTestBase):
   """Integration tests for the datalab command.
@@ -83,15 +82,6 @@ class DatalabIntegrationTest(sdk_test_base.BundledBase,
     self.assertNotIn('WARNING', result.stderr)
     return result
 
-  def RunDatalabAsync(self, args, match_strings=None, timeout=300):
-    with self.ExecuteScriptAsync(
-        'datalab', args, timeout=timeout, match_strings=match_strings):
-      pass
-    # TODO(b/63677928): We cannot check the stderr from an async call,
-    # so we instead need to pass in some sort of --fail-on-warning
-    # flag once such a thing has been added to the datalab CLI
-    return
-
   @sdk_test_base.Filters.RunOnlyInBundle  # Requires datalab component
   def testDependencySetup(self):
     """Test the logic to setup dependencies."""
@@ -117,25 +107,8 @@ class DatalabIntegrationTest(sdk_test_base.BundledBase,
     self._TestDelete()
     return
 
-  # Never run this because the way it fails (killed after timeout) prevents it
-  # from being silenced properly.
-  @test_case.Filters.skipAlways('Failing', 'b/120486647')
-  @sdk_test_base.Filters.RunOnlyInBundle  # Requires datalab component
-  def testCreateConnectDelete(self):
-    self._TestInstanceCreation(machine_type='n1-highmem-2')
-    try:
-      self._TestConnection()
-    finally:
-      self._TestDelete()
-    return
-
   def _TestInstanceCreationOnly(self, machine_type=None):
     self._TestInstanceCreation(machine_type)
-    return
-
-  def _TestConnection(self):
-    self._TestUpdateMetadata()
-    self._TestConnect(timeout=900)
     return
 
   def _TestInstanceCreation(self, machine_type=None, create_repo=False):
@@ -162,25 +135,6 @@ class DatalabIntegrationTest(sdk_test_base.BundledBase,
              '--format=value(networkInterfaces.accessConfigs[0]) '
              '--zone {0} {1}'.format(self.zone, self.instance_name))
     self.AssertNewOutputContains('natIP')
-    return
-
-  def _TestUpdateMetadata(self):
-    # Store SSH keys in instance metadata, to minimize contention in the
-    # project metadata.
-    self.Run('compute instances add-metadata {0} --zone {1} '
-             '--metadata block-project-ssh-keys=true'.format(
-                 self.instance_name, self.zone))
-    return
-
-  def _TestConnect(self, timeout=600):
-    self.RunDatalabAsync(
-        ['connect', '--zone', self.zone,
-         '--quiet',
-         '--ssh-log-level=debug3',
-         '--no-launch-browser',
-         self.instance_name],
-        match_strings=[DatalabIntegrationTest._SUCCESS_MSG],
-        timeout=timeout)
     return
 
   def _TestDelete(self):

@@ -21,6 +21,9 @@ gcloud beta billing accounts set\-iam\-policy \- set the IAM policy for a Cloud 
 policy for a Cloud Billing account given an account ID and a JSON or YAML file
 that describes the IAM policy.
 
+Note: Setting the IAM policy for a Cloud Billing account replaces existing IAM
+bindings for that account.
+
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -55,8 +58,9 @@ or YAML file conforming to the structure of a Policy
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

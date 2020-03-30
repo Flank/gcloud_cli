@@ -9,6 +9,7 @@ class CloudbuildV1alpha1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://cloudbuild.googleapis.com/'
+  MTLS_BASE_URL = u'https://cloudbuild.mtls.googleapis.com/'
 
   _PACKAGE = u'cloudbuild'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
@@ -51,8 +52,6 @@ class CloudbuildV1alpha1(base_api.BaseApiClient):
     def Create(self, request, global_params=None):
       r"""Creates a `WorkerPool` to run the builds, and returns the new worker pool.
 
-This API is experimental.
-
       Args:
         request: (CloudbuildProjectsWorkerPoolsCreateRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -79,8 +78,6 @@ This API is experimental.
 
     def Delete(self, request, global_params=None):
       r"""Deletes a `WorkerPool` by its project ID and WorkerPool name.
-
-This API is experimental.
 
       Args:
         request: (CloudbuildProjectsWorkerPoolsDeleteRequest) input message
@@ -109,8 +106,6 @@ This API is experimental.
     def Get(self, request, global_params=None):
       r"""Returns information about a `WorkerPool`.
 
-This API is experimental.
-
       Args:
         request: (CloudbuildProjectsWorkerPoolsGetRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -138,8 +133,6 @@ This API is experimental.
     def List(self, request, global_params=None):
       r"""List project's `WorkerPool`s.
 
-This API is experimental.
-
       Args:
         request: (CloudbuildProjectsWorkerPoolsListRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -166,8 +159,6 @@ This API is experimental.
 
     def Patch(self, request, global_params=None):
       r"""Update a `WorkerPool`.
-
-This API is experimental.
 
       Args:
         request: (CloudbuildProjectsWorkerPoolsPatchRequest) input message

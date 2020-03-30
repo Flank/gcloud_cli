@@ -40,7 +40,7 @@ class AddLabelsTest(images_labels_test_base.ImagesLabelsTestBase):
     self._ExpectGetRequest(image_ref, image)
     self._ExpectLabelsSetRequest(
         image_ref, add_labels, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(image_ref, updated_image)
 
     response = self.Run(
@@ -71,7 +71,7 @@ class AddLabelsTest(images_labels_test_base.ImagesLabelsTestBase):
     self._ExpectGetRequest(image_ref, image)
     self._ExpectLabelsSetRequest(
         image_ref, edited_labels, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(image_ref, updated_image)
 
     response = self.Run(

@@ -18,8 +18,8 @@ DESCRIPTION
         $ gcloud compute instances move example-instance-1 \
            --zone us-central1-b --destination-zone us-central1-f
 
-    will move the instance called example-instance-1 with its all attached
-    persistent disks, currently running in us-central1-b, to us-central1-f.
+    will move the instance called 'example-instance-1' with its all attached
+    persistent disks, currently running in 'us-central1-b', to 'us-central1-f'.
 
     Please note that gcloud compute instances move does not yet support
     instances which have regional persistent disks attached. Please see
@@ -68,8 +68,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To move 'instance-1' from 'us-central-a' to 'europe-west1-d', run:
+
+        $ gcloud alpha compute instances move instance-1 \
+            --zone=us-central1-a --destination-zone=europe-west1-d
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

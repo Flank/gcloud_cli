@@ -42,11 +42,11 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
     }], resource_projector.MakeSerializable(list(result)))
     self.AssertOutputEquals('')
     self.AssertErrContains('Your project will be deleted')
-    self.AssertErrContains(
-        """\nYou can undo this operation for a limited period by running '
-        commands below. {0}
-         $ gcloud projects undelete {1}"""
-        .format(flags.SHUT_DOWN_PROJECTS, test_project_id))
+    self.AssertErrContains("""
+You can undo this operation for a limited period by running the command below.
+    $ gcloud projects undelete {1}
+
+{0}""".format(flags.SHUT_DOWN_PROJECTS, test_project_id))
 
   def testNotDeleteValidProject(self):
     test_project_id = util.GetTestActiveProject().projectId
@@ -55,11 +55,11 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
     self.assertEqual([], list(result))
     self.AssertOutputEquals('')
     self.AssertErrContains('Your project will be deleted')
-    self.AssertErrNotContains(
-        """\nYou can undo this operation for a limited period by running '
-        commands below. {0}
-         $ gcloud projects undelete {1}"""
-        .format(flags.SHUT_DOWN_PROJECTS, test_project_id))
+    self.AssertErrNotContains("""
+You can undo this operation for a limited period by running the command below.
+    $ gcloud projects undelete {1}
+
+{0}""".format(flags.SHUT_DOWN_PROJECTS, test_project_id))
 
   def testDeleteValidProjectWithFormat(self):
     test_project_id = util.GetTestActiveProject().projectId

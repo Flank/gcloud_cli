@@ -31,7 +31,7 @@ class HealthChecksDeleteTest(test_base.BaseTest,
                              completer_test_base.CompleterBase):
 
   def RunDelete(self, command):
-    self.Run('compute health-checks delete ' + command)
+    self.Run('compute health-checks delete %s' % command)
 
   def testWithSingleHealthCheck(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -108,7 +108,7 @@ class HealthChecksDeleteTest(test_base.BaseTest,
 
   def testDeleteCompletion(self):
     self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson',
         return_value=resource_projector.MakeSerializable(
             test_resources.HEALTH_CHECKS),
         autospec=True)
@@ -128,9 +128,6 @@ class HealthChecksDeleteBetaTest(HealthChecksDeleteTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
-  def RunDelete(self, command):
-    self.Run('compute health-checks delete --global ' + command)
-
 
 class HealthChecksDeleteAlphaTest(HealthChecksDeleteBetaTest):
 
@@ -139,14 +136,10 @@ class HealthChecksDeleteAlphaTest(HealthChecksDeleteBetaTest):
     self.SelectApi(self.track.prefix)
 
 
-class RegionHealthsCheckDeleteBetaTest(HealthChecksDeleteTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+class RegionHealthChecksDeleteTest(HealthChecksDeleteTest):
 
   def RunDelete(self, command):
-    self.Run('compute health-checks delete --region us-west-1 ' + command)
+    self.Run('compute health-checks delete --region us-west-1 %s' % command)
 
   def testWithSingleHealthCheck(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -205,7 +198,7 @@ class RegionHealthsCheckDeleteBetaTest(HealthChecksDeleteTest):
 
   def testDeleteCompletion(self):
     self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson',
         return_value=resource_projector.MakeSerializable(
             test_resources.HEALTH_CHECKS),
         autospec=True)
@@ -221,11 +214,30 @@ class RegionHealthsCheckDeleteBetaTest(HealthChecksDeleteTest):
         ])
 
 
-class RegionHealthsCheckDeleteAlphaTest(RegionHealthsCheckDeleteBetaTest):
+class RegionHealthChecksDeleteBetaTest(RegionHealthChecksDeleteTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+
+
+class RegionHealthChecksDeleteAlphaTest(RegionHealthChecksDeleteBetaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
+
+  def testDeleteCompletion(self):
+    self.StartPatch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson',
+        return_value=resource_projector.MakeSerializable(
+            test_resources.HEALTH_CHECKS_ALPHA),
+        autospec=True)
+    self.RunCompletion(
+        'compute health-checks delete h',
+        [
+            'health-check-grpc',
+        ])
 
 
 if __name__ == '__main__':

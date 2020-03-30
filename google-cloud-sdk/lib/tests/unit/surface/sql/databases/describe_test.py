@@ -27,7 +27,7 @@ class _BaseDatabasesDescribeTest(object):
   # pylint:disable=g-tzinfo-datetime
 
   def testDatabasesDescribe(self):
-    sqladmin = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
+    sqladmin = core_apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.databases.Get.Expect(
         sqladmin.SqlDatabasesGetRequest(
             project=self.Project(),
@@ -40,9 +40,8 @@ class _BaseDatabasesDescribeTest(object):
             name='mock-db',
             charset='utf8',
             collation='some-collation',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
-            format(self.Project()),
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'
+            .format(self.Project()),
             etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
             kind='sql#database'))
 
@@ -57,7 +56,7 @@ instance: mock-instance
 kind: sql#database
 name: mock-db
 project: {0}
-selfLink: https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db
+selfLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db
 """.format(self.Project()),
         normalize_space=True)
 

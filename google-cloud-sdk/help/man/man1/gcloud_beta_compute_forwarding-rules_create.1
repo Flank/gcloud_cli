@@ -19,34 +19,43 @@ gcloud beta compute forwarding\-rules create \- create a forwarding rule to dire
 
 \fB(BETA)\fR \fBgcloud beta compute forwarding\-rules create\fR is used to
 create a forwarding rule. A forwarding rule directs traffic that matches a
-destination IP address to a forwarding target (load balancer, VPN gateway or VM
-instance).
+destination IP address.RS 2m
+(and possibly a TCP or UDP port) to a forwarding target (load balancer,
+VPN gateway or VM instance).
 
+.RE
+
+.RS 2m
 Forwarding rules can be either global or regional, specified with the
-\f5\fI\-\-global\fR\fR or \f5\fI\-\-region=REGION\fR\fR flags. For more
-information about the scope of a forwarding rule, refer to
+`_\-\-global_` or `_\-\-region=REGION_` flags. For more information about
+the scope of a forwarding rule, refer to
 https://cloud.google.com/load\-balancing/docs/forwarding\-rule\-concepts.
+.RE
 
-Forwarding rules can be external, internal, internal managed, or internal
-self\-managed, specified with the
-\f5\fI\-\-load\-balancing\-scheme=[EXTERNAL|INTERNAL|INTERNAL_MANAGED|INTERNAL_SELF_MANAGED]\fR\fR
-flag. External forwarding rules are accessible from the internet, while internal
-forwarding rules are only accessible from within their VPC networks. You can
-specify a reserved static external or internal IP address with the
-\f5\fI\-\-address=ADDRESS\fR\fR flag for the forwarding rule. Otherwise, if the
-flag is unspecified, an ephemeral IP address is automatically assigned (global
-IP addresses for global forwarding rules and regional IP addresses for regional
-forwarding rules); an internal forwarding rule is automatically assigned an
-ephemeral internal IP address from the subnet specified with the
-\f5\fI\-\-subnet\fR\fR flag. You must provide an IP address for an internal
-self\-managed forwarding rule.
+.RS 2m
+Forwarding rules can be external, internal, internal managed, or
+internal self\-managed, specified with the
+`_\-\-load\-balancing\-scheme=[EXTERNAL|INTERNAL|INTERNAL_MANAGED|INTERNAL_SELF_MANAGED]_`
+flag. External forwarding rules are accessible from the internet, while
+internal forwarding rules are only accessible from within their VPC
+networks. You can specify a reserved static external or internal IP
+address with the `_\-\-address=ADDRESS_` flag for the forwarding rule.
+Otherwise, if the flag is unspecified, an ephemeral IP address is
+automatically assigned (global IP addresses for global forwarding rules
+and regional IP addresses for regional forwarding rules); an internal
+forwarding rule is automatically assigned an ephemeral internal IP
+address from the subnet specified with the `_\-\-subnet_` flag. You must
+provide an IP address for an internal self\-managed forwarding rule.
+.RE
 
-Different types of load balancers work at different layers of the OSI networking
-model (http://en.wikipedia.org/wiki/Network_layer). Layer 3 targets include
-target pools, target SSL proxies, target TCP proxies, and backend services.
-Layer 7 targets include target HTTP proxies and target HTTPS proxies. For more
-information, refer to
+.RS 2m
+Different types of load balancers work at different layers of the OSI
+networking model (http://en.wikipedia.org/wiki/Network_layer). Layer 3/4
+targets include target pools, target SSL proxies, target TCP proxies,
+and backend services. Layer 7 targets include target HTTP proxies and
+target HTTPS proxies. For more information, refer to
 https://cloud.google.com/load\-balancing/docs/forwarding\-rule\-concepts.
+.RE
 
 
 When creating a forwarding rule, exactly one of
@@ -222,11 +231,10 @@ one of: \f5PREMIUM\fR, \f5STANDARD\fR. The default value is \f5PREMIUM\fR.
 .TP 2m
 \fB\-\-service\-label\fR=\fISERVICE_LABEL\fR
 (Only for Internal Load Balancing):
-https://cloud.google.com/compute/docs/load\-balancing/internal/ The DNS label to
-use as the prefix of the fully qualified domain name for this forwarding rule.
-The full name will be internally generated and output as dnsName. If this field
-is not specified, no DNS record will be generated and no DNS name will be
-output.
+https://cloud.google.com/load\-balancing/docs/dns\-names/ The DNS label to use
+as the prefix of the fully qualified domain name for this forwarding rule. The
+full name will be internally generated and output as dnsName. If this field is
+not specified, no DNS record will be generated and no DNS name will be output.
 
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
@@ -294,7 +302,9 @@ address\-1
 .sp
 The load\-balancing\-scheme ((EXTERNAL, INTERNAL, INTERNAL_MANAGED,
 INTERNAL_MANAGED)) and the forwarding rule's target determine the type of IP
-address that you can use. For detailed information, refer to
+address that you can use. The address type must be external for
+load\-balancing\-scheme EXTERNAL, and for the other load\-balancing\-schemes the
+address must be internal. For detailed information, refer to
 https://cloud.google.com/load\-balancing/docs/forwarding\-rule\-concepts#ip_address_specifications.
 
 .RS 2m
@@ -506,8 +516,9 @@ https://cloud.google.com/load\-balancing/docs/forwarding\-rule\-concepts#port_sp
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -518,7 +529,7 @@ for IP address ADDRESS to a target http proxy PROXY, run:
 
 .RS 2m
 $ gcloud beta compute forwarding\-rules create RULE_NAME \-\-global \e
-    \-\-target\-http\-proxy PROXY \-\-ports 8080 \-\-address ADDRESS
+    \-\-target\-http\-proxy=PROXY \-\-ports=8080 \-\-address=ADDRESS
 .RE
 
 To create a regional forwarding rule for the subnet SUBNET_NAME on the default
@@ -527,9 +538,9 @@ SERVICE_NAME, run:
 
 .RS 2m
 $ gcloud beta compute forwarding\-rules create RULE_NAME \e
-    \-\-load\-balancing\-scheme INTERNAL \e
-    \-\-backend\-service SERVICE_NAME \-\-subnet SUBNET_NAME \e
-    \-\-network default \-\-region REGION \-\-ports 80\-82
+    \-\-load\-balancing\-scheme=INTERNAL \e
+    \-\-backend\-service=SERVICE_NAME \-\-subnet=SUBNET_NAME \e
+    \-\-network=default \-\-region=REGION \-\-ports=80\-82
 .RE
 
 

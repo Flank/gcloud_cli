@@ -20,6 +20,22 @@ gcloud beta access\-context\-manager policies list \- list access policies
 \fB(BETA)\fR List access policies.
 
 
+.SH "EXAMPLES"
+
+To list access policies, run the following command:
+
+.RS 2m
+$ gcloud beta access\-context\-manager policies list
+.RE
+
+This will print out a list of Access Policies in a tabular form:
+
+.RS 2m
+NAME      ORGANIZATION  TITLE      ETAG
+MY_POLICY 12345         My Policy  123abcdef
+.RE
+
+
 
 .SH "REQUIRED FLAGS"
 
@@ -80,15 +96,16 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "API REFERENCE"
 
-This command uses the \fBaccesscontextmanager/v1beta\fR API. The full
-documentation for this API can be found at:
+This command uses the \fBaccesscontextmanager/v1\fR API. The full documentation
+for this API can be found at:
 https://cloud.google.com/access\-context\-manager/docs/reference/rest/
 
 

@@ -14,15 +14,22 @@ REQUIRED FLAGS
      --query=QUERY
         The query statement.
 
-        Examples: To find all Cloud IAM policies in your organization that
-        contain amy@mycompany.com: 'policy:amy@mydomain.com'
-
-        To find all Cloud IAM policies in your organization that contain owners
-        role: 'policy : "roles/owner"'
-
-        To find all Cloud IAM policies in your organization which have
-        myuser@mycompany.com in the owners role:
-        'policy."roles/owner":myuser@mycompany.com'
+        Examples:
+        * To find all Cloud IAM policies in your organization that contain
+          amy@mycompany.com: policy:"amy@mydomain.com"
+        * To find all Cloud IAM policies in your organization that contain
+          owner role: policy:"roles/owner"
+        * To find all Cloud IAM policies in your organization which have
+          myuser@mycompany.com in the owner role: policy:("roles/owner"
+          "myuser@mycompany.com")
+        * To find all Cloud IAM policies in your organization which have
+          myuser@mycompany.com in the owner role or youruser@mycompany.com in
+          the viewer role: policy:(("roles/owner" "myuser@mycompany.com") OR
+          ("roles/viewer" "youruser@mycompany.com"))
+        * To find all Cloud IAM policies that are set on a resource:
+          resource: "projects/123"
+        * To find all Cloud IAM policies of resources that match a query.
+          resource: "proj"
 
 OPTIONAL FLAGS
      --page-size=PAGE_SIZE
@@ -41,13 +48,21 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the cloudasset/v1p1alpha1 API. The full documentation for
     this API can be found at:
     https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/quickstart-cloud-asset-inventory
+
+EXAMPLES
+    To search your accessible IAM policies that contains amy@mycompany.com,
+    run:
+
+        $ gcloud alpha asset search-iam-policies \
+          --query='policy:"amy@mydomain.com"'
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -28,10 +28,11 @@ from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-class PerimetersReplaceAllTestAlpha(accesscontextmanager.Base):
+class PerimetersReplaceAllTest(accesscontextmanager.Base):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -40,35 +41,44 @@ class PerimetersReplaceAllTestAlpha(accesscontextmanager.Base):
     policy_name = 'accessPolicies/{}'.format(policy)
     m = self.messages
     req_type = m.AccesscontextmanagerAccessPoliciesServicePerimetersReplaceAllRequest
-    replace_levels_req_type = m.ReplaceServicePerimetersRequest
+    replace_perimeters_req_type = m.ReplaceServicePerimetersRequest
     response_type = m.ReplaceServicePerimetersResponse(
         servicePerimeters=perimeters)
     response_value = encoding.DictToMessage(
         encoding.MessageToDict(response_type), m.Operation.ResponseValue)
 
     op = self.messages.Operation(
-        name='operations/my-op', response=response_value, done=True)
+        name='operations/{}/replacePerimeters/9876543210'.format(policy_name),
+        response=response_value,
+        done=True)
     self.client.accessPolicies_servicePerimeters.ReplaceAll.Expect(
         req_type(
             parent=policy_name,
-            replaceServicePerimetersRequest=replace_levels_req_type(
-                servicePerimeters=perimeters)), op)
+            replaceServicePerimetersRequest=replace_perimeters_req_type(
+                etag='12345ff', servicePerimeters=perimeters)), op)
+    self._ExpectGetOperation(
+        'operations/{}/replacePerimeters/9876543210'.format(policy_name))
+    list_req_type = m.AccesscontextmanagerAccessPoliciesServicePerimetersListRequest
+    list_response_type = m.ListServicePerimetersResponse
+    self.client.accessPolicies_servicePerimeters.List.Expect(
+        list_req_type(parent=policy_name),
+        list_response_type(servicePerimeters=perimeters))
 
   def testReplace_InvalidSourceFileArg(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(
         yaml.FileLoadError, 'Failed to load YAML from [not-found]'):
       self.Run('access-context-manager perimeters replace-all 123 '
                '--source-file not-found')
 
   def testReplace_MissingSourceFile(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must be specified'):
       self.Run('access-context-manager perimeters replace-all 123')
 
   def testReplace_MissingPolicy(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter_spec_path = self.Touch(
         self.temp_path, '', contents=self.SERVICE_PERIMETERS_SPECS)
     with self.AssertRaisesExceptionMatches(
@@ -77,7 +87,7 @@ class PerimetersReplaceAllTestAlpha(accesscontextmanager.Base):
                .format(perimeter_spec_path))
 
   def testReplace(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter_name1 = 'myPerimeter1'
     perimeter_name2 = 'myPerimeter2'
     perimeters = [
@@ -87,17 +97,17 @@ class PerimetersReplaceAllTestAlpha(accesscontextmanager.Base):
             id_=perimeter_name2, title='replacement perimeter 2')
     ]
 
-    self._ExpectReplace(perimeters, '123')
+    self._ExpectReplace(perimeters=perimeters, policy='123')
     perimeter_spec_path = self.Touch(
         self.temp_path, '', contents=self.SERVICE_PERIMETERS_SPECS)
 
     results = self.Run(
-        'access-context-manager perimeters replace-all 123 --source-file {}'
+        'access-context-manager perimeters replace-all 123 --etag=12345ff --source-file {}'
         .format(perimeter_spec_path))
-    self.assertEqual(results, perimeters)
+    self.assertEqual(results.servicePerimeters, perimeters)
 
   def testReplace_PolicyFromProperty(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     policy = '123'
     properties.VALUES.access_context_manager.policy.Set(policy)
 
@@ -115,9 +125,16 @@ class PerimetersReplaceAllTestAlpha(accesscontextmanager.Base):
         self.temp_path, '', contents=self.SERVICE_PERIMETERS_SPECS)
 
     results = self.Run(
-        'access-context-manager perimeters replace-all --source-file {}'.format(
-            perimeter_spec_path))
-    self.assertEqual(results, perimeters)
+        'access-context-manager perimeters replace-all --etag=12345ff --source-file {}'
+        .format(perimeter_spec_path))
+    self.assertEqual(results.servicePerimeters, perimeters)
+
+
+class PerimetersReplaceAllTestAlpha(PerimetersReplaceAllTest):
+
+  def PreSetUp(self):
+    self.api_version = 'v1alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

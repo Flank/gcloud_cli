@@ -31,21 +31,21 @@ FLAGS
      --mode=MODE
         Set the mode of an autoscaler for a managed instance group.
 
-        You can turn off or restrict MIG autoscaler activities (scaling up,
-        scaling down) without changing autoscaler configuration and then having
-        to restore it later. Autoscaler configuration persists while the
-        activities are turned off or restricted, and the activities pick it up
-        when they are turned on again or when the restrictions are lifted.
+        You can turn off or restrict MIG autoscaler activities without
+        affecting your autoscaler configuration. The autoscaler configuration
+        persists while the activities are turned off or restricted, and the
+        activities resume when the autoscaler is turned on again or when the
+        restrictions are lifted.
 
         MODE must be one of:
 
          off
-            to turn off autoscaling, while keeping the new configuration.
+            To turn off autoscaling, while keeping the new configuration.
          on
-            to permit autoscaling to scale up and down (default for new
+            To permit autoscaling to scale up and down (default for new
             autoscalers).
          only-up
-            to permit autoscaling to scale only up and not down.
+            To permit autoscaling to scale only up and not down.
 
      At most one of these may be specified:
 
@@ -75,8 +75,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To update an existing instance group:
@@ -85,8 +86,9 @@ EXAMPLES
           --mode=only-up
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute instance-groups managed update-autoscaling
         $ gcloud alpha compute instance-groups managed update-autoscaling
 

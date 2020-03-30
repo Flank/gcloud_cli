@@ -79,7 +79,7 @@ class DataflowIntegrationTestBase(base.DataflowTestBase,
         self.Do('jobs list --limit=10 --format=disable %s %s %s' %
                 (status_flag, uri_flag, region_flag)))
 
-  def FindOldTerminatedJob(self, region=None):
+  def GetOldTerminatedJobFromList(self, region=None):
     """Find the terminated job from `jobs list` with the latest state time.
 
     Args:

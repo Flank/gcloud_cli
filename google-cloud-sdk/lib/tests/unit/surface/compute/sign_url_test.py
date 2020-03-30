@@ -20,8 +20,6 @@ from __future__ import unicode_literals
 
 import base64
 import calendar
-import hashlib
-import hmac
 import time
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -68,9 +66,31 @@ class SignUrlTestsBase(cli_test_base.CliTestBase):
 
   def _GetExpectedSignature(self, url_to_sign):
     """Gets the expected signature for the URL to sign."""
-    signature = hmac.new(self.KEY, url_to_sign.encode('utf-8'),
-                         hashlib.sha1).digest()
-    return base64.urlsafe_b64encode(signature)
+    sigs = {
+        'https://www.example.com/foo/bar?Expires=1484519925&KeyName=key1':
+            'rHQearcX2Sy_uub95AFd4J20YrI=',
+        'https://www.example.com/foo/bar?q1=abc&Expires=1484520165&KeyName=key1':
+            'QSeX29zjUmlhimT6IsQAYsgnpzs=',
+        'https://www.example.com/foo/bar?q1=abc&Expires=1484521099&KeyName=key1':
+            '1D0EUBCANYiyweK30nSSzr-dVMQ=',
+        'https://www.example.com/foo/bar?q1=abc&Expires=1484525543&KeyName=key1':
+            '9lJ7lcDccg-Ak6BXFrwvxqPQ0KA=',
+        'https://www.example.com/foo/bar?q1=abc&Expires=1484534265&KeyName=key1':
+            'QQ3lJNmx38IAHAMoSCol-vmUkZw=',
+        'https://www.example.com/foo/bar?q1=abc&Expires=1484570265&KeyName=key1':
+            'VUIRK0p2wscOMrhGmnUz7Ou1Bgg=',
+        'https://www.example.com/foo/bar?q1=abc&Expires=1497566265&KeyName=key1':
+            'f3Ax95gEuNFRUsjovv-XBiec4m0=',
+        'https://www.example.com/foo/bar?q1=abc&q2=def&Expires=1484520345&KeyName=key1':
+            'zDVqW-RqSTROx1C8xZFNp1hPiWE=',
+        'https://www.example.com/foo/bar?q1=&Expires=2472174186&KeyName=key1':
+            'qVYvDNVVFPbwuTbQjTkl_Poozyg=',
+        'http://www.example.com/foo/bar?q1=abc&Expires=1484521099&KeyName=key1':
+            '6uPOktqSpvpNznzSYR4W6MQN-M4='
+    }
+    if url_to_sign in sigs:
+      return sigs[url_to_sign]
+    return None
 
   def _GetExpectedSignedUrl(self, input_url, has_query_params,
                             expected_expires_in_seconds):

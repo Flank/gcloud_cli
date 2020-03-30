@@ -7,9 +7,12 @@ SYNOPSIS
         --security-policy=SECURITY_POLICY [--action=ACTION]
         [--description=DESCRIPTION] [--dest-ip-ranges=[DEST_IP_RANGE,...]]
         [--dest-ports=[DEST_PORTS,...]] [--direction=DIRECTION]
-        [--enable-logging] [--new-priority=NEW_PRIORITY]
+        [--enable-logging] [--layer4-configs=[LAYER4_CONFIG,...]]
+        [--new-priority=NEW_PRIORITY] [--organization=ORGANIZATION]
         [--src-ip-ranges=[SRC_IP_RANGE,...]]
-        [--target-resources=[TARGET_RESOURCES,...]] [GCLOUD_WIDE_FLAG ...]
+        [--target-resources=[TARGET_RESOURCES,...]]
+        [--target-service-accounts=[TARGET_SERVICE_ACCOUNTS,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute org-security-policies rules update is used to
@@ -21,7 +24,7 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --security-policy=SECURITY_POLICY
-        Resource ID of the security policy into which the rule should be
+        Display name of the security policy into which the rule should be
         updated.
 
 OPTIONAL FLAGS
@@ -48,8 +51,16 @@ OPTIONAL FLAGS
         Use this flag to enable logging of connections that allowed or denied
         by this rule.
 
+     --layer4-configs=[LAYER4_CONFIG,...]
+        A list of destination protocols and ports to which the firewall rule
+        will apply.
+
      --new-priority=NEW_PRIORITY
         New priority for the rule to update. Valid in [0, 65535].
+
+     --organization=ORGANIZATION
+        Organization which the organization security policy belongs to. Must be
+        set if SECURITY_POLICY is display name.
 
      --src-ip-ranges=[SRC_IP_RANGE,...]
         Source IP ranges to match for this rule. Can only be specified if
@@ -58,16 +69,31 @@ OPTIONAL FLAGS
      --target-resources=[TARGET_RESOURCES,...]
         List of URLs of target resources to which the rule is applied.
 
+     --target-service-accounts=[TARGET_SERVICE_ACCOUNTS,...]
+        List of target service accounts for the rule.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To update a rule with priority ``10" in an organization security policy
+    with ID ``123456789" to change the action to ``allow" and description to
+    ``new-example-rule", run:
+
+        $ gcloud alpha compute org-security-policies rules update create \
+            10 --security-policy=123456789 --action=allow
+        --description=new-example-rule
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute org-security-policies rules update
 

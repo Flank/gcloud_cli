@@ -28,23 +28,7 @@ work for Windows VMs.
 
 To denote a remote file, prefix the file name with the virtual machine instance
 name (e.g., \fIexample\-instance\fR:~/\fIFILE\fR). To denote a local file, do
-not add a prefix to the file name (e.g., ~/\fIFILE\fR). For example, to copy a
-remote directory to your local host, run:
-
-.RS 2m
-$ gcloud beta compute copy\-files example\-instance:~/REMOTE\-DIR \e
-    ~/LOCAL\-DIR \-\-zone us\-central1\-a
-.RE
-
-In the above example, \f5~/REMOTE\-DIR\fR from \f5example\-instance\fR is copied
-into the ~/\fILOCAL\-DIR\fR directory.
-
-Conversely, files from your local computer can be copied to a virtual machine:
-
-.RS 2m
-$ gcloud beta compute copy\-files ~/LOCAL\-FILE\-1 ~/LOCAL\-FILE\-2 \e
-    example\-instance:~/REMOTE\-DIR \-\-zone us\-central1\-a
-.RE
+not add a prefix to the file name (e.g., ~/\fIFILE\fR).
 
 If a file contains a colon (``:''), you must specify it by either using an
 absolute path or a path that begins with ``./''.
@@ -163,8 +147,28 @@ formats.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To copy a remote directory '~/REMOTE\-DIR' on the instance of
+\'example\-instance' to '~/LOCAL\-DIR' on the local host, run:
+
+.RS 2m
+$ gcloud beta compute copy\-files example\-instance:~/REMOTE\-DIR \e
+    ~/LOCAL\-DIR \-\-zone=us\-central1\-a
+.RE
+
+To copy files from your local host to a virtual machine, run:
+
+.RS 2m
+$ gcloud beta compute copy\-files ~/LOCAL\-FILE\-1 ~/LOCAL\-FILE\-2 \e
+    example\-instance:~/REMOTE\-DIR \-\-zone=us\-central1\-a
+.RE
 
 
 

@@ -1,5 +1,5 @@
 title: kms import-jobs remove-iam-policy-binding scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 # remove binding without condition from a policy without condition

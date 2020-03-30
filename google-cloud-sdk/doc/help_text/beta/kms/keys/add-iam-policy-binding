@@ -5,11 +5,13 @@ NAME
 SYNOPSIS
     gcloud beta kms keys add-iam-policy-binding
         (KEY : --keyring=KEYRING --location=LOCATION) --member=MEMBER
-        --role=ROLE [GCLOUD_WIDE_FLAG ...]
+        --role=ROLE
+        [--condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Adds a policy binding to the IAM policy of a kms key. One binding
-    consists of a member and a role.
+    consists of a member, a role, and an optional condition.
 
 POSITIONAL ARGUMENTS
      Key resource - The key to add the IAM policy binding. The arguments in
@@ -49,12 +51,42 @@ REQUIRED FLAGS
      --role=ROLE
         Define the role of the member.
 
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be added. When condition is explicitly
+          specified as None (e.g. --condition=None), a binding without a
+          condition is added. When --condition is specified and is not a None
+          condition, --role cannot be a primitive role. Primitive roles are
+          roles/editor, roles/owner, and roles/viewer.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the cloudkms/v1 API. The full documentation for this API
@@ -68,6 +100,18 @@ EXAMPLES
         $ gcloud beta kms keys add-iam-policy-binding frodo \
             --keyring='fellowship' --location='global' \
             --member='user:test-user@gmail.com' --role='roles/editor'
+
+    To add an IAM policy binding which expires at the end of the year 2018 for
+    the role of 'roles/cloudkms.signer' and the user 'test-user@gmail.com' on a
+    the key frodo with the keyring fellowship and location global, run:
+
+        $ gcloud beta kms keys add-iam-policy-binding frodo \
+            --keyring='fellowship' --location='global' \
+            --member='user:test-user@gmail.com' \
+            --role='roles/cloudkms.signer' \
+            --condition='expression=request.time <
+         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+        tion=Expires at midnight on 2018-12-31'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

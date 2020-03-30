@@ -1,0 +1,217 @@
+title: Create, execute and delete a workflow
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: workflows deploy $$test-workflow$$ --location us-central1 --source=workflow_source.yaml
+      --format="text(name,sourceContents,state)"
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stdout: |
+      name:           projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
+      sourceContents: "- return:\n    Return: 1\n"
+      state:          ACTIVE
+- execute:
+  - command: workflows describe $$test-workflow$$ --location us-central1 --format="text(name,sourceContents,state)"
+  - stdout: |
+      name:           projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
+      sourceContents: "- return:\n    Return: 1\n"
+      state:          ACTIVE
+- execute:
+  - command: workflows execute $$test-workflow$$
+  - stderr: |-
+      Created \[[0-9a-f\-]{36}\].
+
+      To view the workflow status, you can use following command:
+      gcloud alpha workflows executions describe [0-9a-f\-]{36} --workflow $$test-workflow$$
+      $
+- execute:
+  - command: workflows delete $$test-workflow$$ --location us-central1
+  - prompt:
+    - message: |
+        You are about to delete workflow [$$test-workflow$$] in [us-central1].
+        Any associated data will be lost.
+    - input: y
+  - stderr: |
+      Delete request issued for: [$$test-workflow$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted workflow [$$test-workflow$$].
+actions:
+
+- generate_resource_id:
+    reference: test-workflow
+    prefix: workflow
+
+- write_file:
+    path: workflow_source.yaml
+    contents: |
+      - return:
+          Return: 1
+
+- execute_command:
+    command: workflows deploy $$test-workflow$$ --location us-central1 --source=workflow_source.yaml
+      --format="text(name,sourceContents,state)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://workflows.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+          body:
+            error:
+              code: 404
+              message: Resource 'projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$'
+                was not found
+              status: NOT_FOUND
+    - api_call:
+        expect_request:
+          uri: https://workflows.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/us-central1/workflows?alt=json&workflowId=$$test-workflow$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              sourceContents: |
+                - return:
+                    Return: 1
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/operation-1565614611834-58feb0ecb24cf-fd634781-990cb5ac
+            metadata:
+              '@type': type.googleapis.com/google.cloud.workflows.v1alpha1.OperationMetadata
+              createTime: '2019-08-12T12:56:51.847681050Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
+              verb: create
+              cancelRequested: false
+              apiVersion: v1alpha1
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://workflows.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
+            sourceContents: |
+              - return:
+                  Return: 1
+            state: ACTIVE
+            versionId: '1'
+            createTime: '2019-08-12T12:56:51.841192008Z'
+            updateTime: '2019-08-12T12:56:51.902102760Z'
+    - expect_stdout: |
+        name:           projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
+        sourceContents: "- return:\n    Return: 1\n"
+        state:          ACTIVE
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: workflows describe $$test-workflow$$ --location us-central1 --format="text(name,sourceContents,state)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://workflows.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
+            sourceContents: |
+              - return:
+                  Return: 1
+            state: ACTIVE
+            versionId: '1'
+            createTime: '2019-08-12T12:56:51.841192008Z'
+            updateTime: '2019-08-12T12:56:51.902102760Z'
+    - expect_stdout: |
+        name:           projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
+        sourceContents: "- return:\n    Return: 1\n"
+        state:          ACTIVE
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: workflows execute $$test-workflow$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://workflowexecutions.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$/executions?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/462803083913/locations/us-central1/workflows/$$test-workflow$$/executions/2b33703a-85fa-4d48-9076-4af38329962d
+            startTime: '2019-08-12T12:56:56.165793386Z'
+            state: ACTIVE
+            argument: 'null'
+    - expect_stderr:
+        matches: |
+          Created \[[0-9a-f\-]{36}\].
+
+          To view the workflow status, you can use following command:
+          gcloud alpha workflows executions describe [0-9a-f\-]{36} --workflow $$test-workflow$$
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: workflows delete $$test-workflow$$ --location us-central1
+    cleanup_for: test-workflow
+    events:
+    - expect_prompt_continue:
+        message: |
+          You are about to delete workflow [$$test-workflow$$] in [us-central1].
+          Any associated data will be lost.
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://workflows.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/operation-1565614617215-58feb0f1d4376-6e6c127f-3202a57c
+            metadata:
+              '@type': type.googleapis.com/google.cloud.workflows.v1alpha1.OperationMetadata
+              createTime: '2019-08-12T12:56:57.229359016Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-central1/workflows/$$test-workflow$$
+              verb: delete
+              cancelRequested: false
+              apiVersion: v1alpha1
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Delete request issued for: [$$test-workflow$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted workflow [$$test-workflow$$].
+    - expect_exit:
+        code: 0

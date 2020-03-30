@@ -1,0 +1,87 @@
+
+.TH "GCLOUD_ALPHA_SERVICE\-DIRECTORY_SERVICES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha service\-directory services delete \- delete a service
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha service\-directory services delete\fR (\fISERVICE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-namespace\fR=\fINAMESPACE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Delete a service.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Service resource \- The Service Directory service to delete. The arguments in
+this group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [service] on the command
+line with a fully specified name; set the property [core/project]. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fISERVICE\fR
+ID of the service or fully qualified identifier for the service. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The name of the region for the service.
+
+.TP 2m
+\fB\-\-namespace\fR=\fINAMESPACE\fR
+The name of the namespace for the service.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a Service Directory service, run:
+
+.RS 2m
+$ gcloud alpha service\-directory services delete my\-service \e
+    \-\-namespace=my\-namespace \-\-location=us\-east1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta service\-directory services delete
+.RE
+

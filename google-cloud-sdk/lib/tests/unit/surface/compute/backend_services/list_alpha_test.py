@@ -142,7 +142,7 @@ class BackendServicesListTest(test_base.BaseTest):
         requests=[(self.compute.backendServices,
                    'AggregatedList',
                    self.messages.ComputeBackendServicesAggregatedListRequest(
-                       project='my-project'))],
+                       project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])

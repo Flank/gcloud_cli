@@ -25,7 +25,7 @@ actions:
     value: compute.googleapis.com/compute
 - define_reference:
     reference: zone-to-use
-    value: us-central1-f
+    value: us-east1-c
 - generate_resource_id:
     reference: instance
     prefix: gcloud-compute-instance-custom

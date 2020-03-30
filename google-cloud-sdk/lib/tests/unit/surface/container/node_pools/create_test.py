@@ -22,6 +22,7 @@ import json
 
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import parameterized
@@ -51,36 +52,35 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
     return expected_pool, return_pool
 
   def _TestCreateDefaults(self, location):
-    self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, location,
-                                                self.PROJECT_ID))
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, location, self.PROJECT_ID))
     kwargs = {'zone': location}
-    pool_kwargs = {
-    }
+    pool_kwargs = {}
     self.ExpectCreateNodePool(
         self._MakeNodePool(**pool_kwargs),
         self._MakeNodePoolOperation(**kwargs),
         zone=location)
-    self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done,
-                                                        **kwargs))
+    self.ExpectGetOperation(
+        self._MakeNodePoolOperation(status=self.op_done, **kwargs))
 
     pool_kwargs = {'nodeVersion': self.VERSION}
     pool = self._MakeNodePool(**pool_kwargs)
     self.ExpectGetNodePool(pool.name, response=pool, zone=location)
 
     if location == self.REGION:
-      self.Run(self.regional_node_pools_command_base.format(location) +
-               ' create {0} --cluster={1}'.format(self.NODE_POOL_NAME,
-                                                  self.CLUSTER_NAME))
+      self.Run(
+          self.regional_node_pools_command_base.format(location) +
+          ' create {0} --cluster={1}'.format(self.NODE_POOL_NAME,
+                                             self.CLUSTER_NAME))
     else:
-      self.Run(self.node_pools_command_base.format(location) +
-               ' create {0} --cluster={1}'.format(self.NODE_POOL_NAME,
-                                                  self.CLUSTER_NAME))
+      self.Run(
+          self.node_pools_command_base.format(location) +
+          ' create {0} --cluster={1}'.format(self.NODE_POOL_NAME,
+                                             self.CLUSTER_NAME))
     self.AssertErrContains('Created')
     self.AssertOutputMatches(
         (r'NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
-         '{name} {version}\\n')
-        .format(name=pool.name,
-                version=pool.version),
+         '{name} {version}\\n').format(name=pool.name, version=pool.version),
         normalize_space=True)
 
   def testCreateDefaults(self):
@@ -90,19 +90,20 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
     self._TestCreateDefaults(self.REGION)
 
   def testCreateDefaultsJsonOutput(self):
-    self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
-                                                self.PROJECT_ID))
-    pool_kwargs = {
-    }
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {}
     self.ExpectCreateNodePool(
         self._MakeNodePool(**pool_kwargs), self._MakeNodePoolOperation())
     self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
     pool = self._MakeNodePool(nodeVersion=self.VERSION)
     self.ExpectGetNodePool(pool.name, response=pool)
 
-    self.Run(self.node_pools_command_base.format(self.ZONE) +
-             ' create {0} --cluster={1} --format json'.format(
-                 self.NODE_POOL_NAME, self.CLUSTER_NAME))
+    self.Run(
+        self.node_pools_command_base.format(self.ZONE) +
+        ' create {0} --cluster={1} --format json'.format(
+            self.NODE_POOL_NAME, self.CLUSTER_NAME))
     self.AssertErrContains('Created')
     json_pool = json.loads(self.GetOutput())
     self.assertEqual(len(json_pool), 1)
@@ -110,8 +111,9 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
     self.assertEqual(json_pool[0]['version'], str(self.VERSION))
 
   def testCreateNoDefaults(self):
-    self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
-                                                self.PROJECT_ID))
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
     pool_kwargs = {
         'name':
             'my-custom-pool',
@@ -144,7 +146,9 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         ],
         'autoscaling':
             self.msgs.NodePoolAutoscaling(
-                enabled=True, minNodeCount=1, maxNodeCount=5,
+                enabled=True,
+                minNodeCount=1,
+                maxNodeCount=5,
                 autoprovisioned=True),
         'imageType':
             'custom',
@@ -174,6 +178,9 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
             ]),
         'maxPodsConstraint':
             self.msgs.MaxPodsConstraint(maxPodsPerNode=30),
+        'sandboxConfig':
+            self.msgs.SandboxConfig(
+                type=self.msgs.SandboxConfig.TypeValueValuesEnum.GVISOR),
     }
 
     self.ExpectCreateNodePool(
@@ -182,14 +189,12 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
             targetLink=self.NODE_POOL_TARGET_LINK.format(
                 self.API_VERSION, self.PROJECT_NUM, self.ZONE,
                 self.CLUSTER_NAME, pool_kwargs['name'])))
-    self.ExpectGetOperation(self._MakeNodePoolOperation(
-        targetLink=self.NODE_POOL_TARGET_LINK.format(
-            self.API_VERSION,
-            self.PROJECT_NUM,
-            self.ZONE,
-            self.CLUSTER_NAME,
-            pool_kwargs['name']),
-        status=self.op_done))
+    self.ExpectGetOperation(
+        self._MakeNodePoolOperation(
+            targetLink=self.NODE_POOL_TARGET_LINK.format(
+                self.API_VERSION, self.PROJECT_NUM, self.ZONE,
+                self.CLUSTER_NAME, pool_kwargs['name']),
+            status=self.op_done))
 
     pool_version_kwargs = pool_kwargs.copy()
     pool = self._MakeNodePool(**pool_version_kwargs)
@@ -219,7 +224,8 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         ' --enable-autoupgrade'
         ' --enable-autorepair'
         ' --metadata key=value,key2=value2'
-        ' --max-pods-per-node=30'.format(**pool_kwargs))
+        ' --max-pods-per-node=30'
+        ' --sandbox type=gvisor'.format(**pool_kwargs))
     # pylint: disable=line-too-long
     self.AssertErrContains(
         """WARNING: Starting in 1.12, new node pools will be created with \
@@ -238,11 +244,11 @@ Created \
     # pylint: enable=line-too-long
     self.AssertOutputMatches(
         (r'NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
-         '{name} {machine_type} {disk_size} {version}\\n')
-        .format(name=pool.name,
-                machine_type=pool.config.machineType,
-                disk_size=pool.config.diskSizeGb,
-                version=pool.version),
+         '{name} {machine_type} {disk_size} {version}\\n').format(
+             name=pool.name,
+             machine_type=pool.config.machineType,
+             disk_size=pool.config.diskSizeGb,
+             version=pool.version),
         normalize_space=True)
 
   @parameterized.parameters(
@@ -250,8 +256,7 @@ Created \
       ('--image-type', 'COS', True),
       ('--image-type', 'UBUNTU', False),
   )
-  def testAutoRepairDefaults(
-      self, image_flag, image_value, expect_autorepair):
+  def testAutoRepairDefaults(self, image_flag, image_value, expect_autorepair):
     pool_kwargs = {
         'management': self._MakeDefaultNodeManagement(expect_autorepair),
         'imageType': image_value if image_value else None,
@@ -371,17 +376,11 @@ Created \
     effect_enum = self.msgs.NodeTaint.EffectValueValuesEnum
     taints = [
         self.msgs.NodeTaint(
-            key='key1',
-            value='val1',
-            effect=effect_enum.NO_SCHEDULE),
+            key='key1', value='val1', effect=effect_enum.NO_SCHEDULE),
         self.msgs.NodeTaint(
-            key='key2',
-            value='val2',
-            effect=effect_enum.PREFER_NO_SCHEDULE),
+            key='key2', value='val2', effect=effect_enum.PREFER_NO_SCHEDULE),
         self.msgs.NodeTaint(
-            key='key3',
-            value='val3',
-            effect=effect_enum.NO_EXECUTE)
+            key='key3', value='val3', effect=effect_enum.NO_EXECUTE)
     ]
     pool_kwargs = {
         'name': 'my-custom-pool',
@@ -411,67 +410,75 @@ Created \
 
   def testCreateMissingCluster(self):
     with self.assertRaises(properties.RequiredPropertyError):
-      self.Run(self.node_pools_command_base.format(self.ZONE) +
-               ' create {0}'.format(self.NODE_POOL_NAME))
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0}'.format(self.NODE_POOL_NAME))
     self.AssertErrContains(
         'The required property [cluster] is not currently set.')
 
   def testCreateMissingZone(self):
     with self.assertRaises(exceptions.MinimumArgumentException):
-      self.Run(self.COMMAND_BASE + ' node-pools create {0} --cluster={1}'
-               .format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
+      self.Run(self.COMMAND_BASE +
+               ' node-pools create {0} --cluster={1}'.format(
+                   self.NODE_POOL_NAME, self.CLUSTER_NAME))
 
   def testCreateMissingProject(self):
     properties.VALUES.core.project.Set(None)
     with self.assertRaises(properties.RequiredPropertyError):
-      self.Run(self.node_pools_command_base.format(self.ZONE) +
-               ' create {0} --cluster={1}'.format(self.NODE_POOL_NAME,
-                                                  self.CLUSTER_NAME))
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1}'.format(self.NODE_POOL_NAME,
+                                             self.CLUSTER_NAME))
     self.AssertErrContains(
         'The required property [project] is not currently set.')
 
   def testCreateHttpError(self):
-    self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
-                                                self.PROJECT_ID))
-    pool_kwargs = {
-    }
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {}
     self.ExpectCreateNodePool(
         self._MakeNodePool(**pool_kwargs), exception=self.HttpError())
 
     with self.assertRaises(exceptions.HttpException):
-      self.Run(self.node_pools_command_base.format(self.ZONE) +
-               ' create {0} --cluster={1}'.format(self.NODE_POOL_NAME,
-                                                  self.CLUSTER_NAME))
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1}'.format(self.NODE_POOL_NAME,
+                                             self.CLUSTER_NAME))
     self.AssertErrContains(
         'ResponseError: code=400, message=your request is bad '
         'and you should feel bad.')
 
   def testCreateInvalidNodeLabels(self):
     with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(self.node_pools_command_base.format(self.ZONE) +
-               ' create {0} --cluster={1} --node-labels=test=a,b'
-               .format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --node-labels=test=a,b'.format(
+              self.NODE_POOL_NAME, self.CLUSTER_NAME))
     self.AssertErrContains('argument --node-labels')
 
   def testCreateEmptyTags(self):
     with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(self.node_pools_command_base.format(self.ZONE) +
-               ' create {0} --cluster={1} --tags='
-               .format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --tags='.format(self.NODE_POOL_NAME,
+                                                     self.CLUSTER_NAME))
     self.AssertErrContains('argument --tags')
 
   def testCreateInvalidNodeTaints(self):
     with self.assertRaises(c_util.Error):
-      self.Run(self.node_pools_command_base.format(self.ZONE) +
-               ' create {0} --cluster={1} --node-taints=test=ab'
-               .format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --node-taints=test=ab'.format(
+              self.NODE_POOL_NAME, self.CLUSTER_NAME))
     self.AssertErrContains('argument --node-taints')
 
   def testCreateInvalidNodeTaintEffect(self):
     with self.assertRaises(c_util.Error):
-      self.Run(self.node_pools_command_base.format(self.ZONE) +
-               ' create {0} --cluster={1} --node-taints=test=ab:RandomEffect'
-               .format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --node-taints=test=ab:RandomEffect'.format(
+              self.NODE_POOL_NAME, self.CLUSTER_NAME))
     self.AssertErrContains('argument --node-taints')
 
   def testCreateInvalidacceleratorMissingType(self):
@@ -580,8 +587,8 @@ Created \
 
   def testAutoUpgradeDefault(self):
     pool_kwargs = {
-        'management': self.messages.NodeManagement(
-            autoRepair=True, autoUpgrade=True)
+        'management':
+            self.messages.NodeManagement(autoRepair=True, autoUpgrade=True)
     }
     expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
         pool_kwargs)
@@ -592,6 +599,168 @@ Created \
         base=self.node_pools_command_base.format(self.ZONE),
         name=self.NODE_POOL_NAME,
         clusterName=self.CLUSTER_NAME))
+
+  @parameterized.parameters(('any', ''), ('none', ''),
+                            ('specific', 'reservation-specific'))
+  def testReservationAffinity(self, affinity, reservation_name):
+    pool_kwargs = {
+        'reservationAffinity':
+            self._MakeReservationAffinity(affinity, reservation_name)
+    }
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
+        pool_kwargs)
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+
+    reservation_flags = '--reservation-affinity={}'.format(affinity)
+    if affinity == 'specific':
+      reservation_flags += ' --reservation={}'.format(reservation_name)
+    self.Run(
+        self.node_pools_command_base.format(self.ZONE) +
+        ' create {0} --cluster={1} {2}'.format(
+            self.NODE_POOL_NAME, self.CLUSTER_NAME, reservation_flags))
+
+  @parameterized.parameters('any', 'none')
+  def testNonSpecificReservationWith(self, affinity):
+    reservation_name = 'reservation_name'
+    err_msg = 'Cannot specify --reservation for --reservation-affinity={}.'.format(
+        affinity)
+    with self.AssertRaisesExceptionMatches(core_exceptions.Error, err_msg):
+      self.Run((
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --reservation-affinity={2} --reservation={3}'
+      ).format(self.NODE_POOL_NAME, self.CLUSTER_NAME, affinity,
+               reservation_name))
+
+  def testCreateWithReservationSpecificWithoutReservationName(self):
+    err_msg = 'Must specify --reservation for --reservation-affinity=specific.'
+    with self.AssertRaisesExceptionMatches(core_exceptions.Error, err_msg):
+      self.Run(
+          (self.node_pools_command_base.format(self.ZONE) +
+           ' create {0} --cluster={1} --reservation-affinity=specific').format(
+               self.NODE_POOL_NAME, self.CLUSTER_NAME))
+
+  def _testNodeLocations(self, flags, locations):
+    pool_kwargs = {'nodePoolLocations': locations}
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
+        pool_kwargs)
+    # Create node pool expects node pool and returns pending operation.
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    # Get operation returns done operation.
+    self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
+    # Get returns expected node pool, populated with other fields by server.
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+    self.Run('{base} create {name} {flags} '
+             '--cluster {clusterName}'.format(
+                 base=self.node_pools_command_base.format(self.ZONE),
+                 name=self.NODE_POOL_NAME,
+                 flags=flags,
+                 clusterName=self.CLUSTER_NAME))
+
+  def testNodeLocations(self):
+    self._testNodeLocations(
+        '--node-locations=us-central1-a,us-central1-b',
+        locations=['us-central1-a', 'us-central1-b'])
+
+  def _testWorkloadMetadata(self, flags, config):
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools({})
+    expected_pool.config.workloadMetadataConfig = config
+    # Create node pool expects node pool and returns pending operation.
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    # Get operation returns done operation.
+    self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
+    # Get returns expected cluster, populated with other fields by server.
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+    self.Run('{base} create {name} {flags} '
+             '--cluster {clusterName}'.format(
+                 base=self.node_pools_command_base.format(self.ZONE),
+                 name=self.NODE_POOL_NAME,
+                 flags=flags,
+                 clusterName=self.CLUSTER_NAME))
+
+  def testWorkloadMetadataDefault(self):
+    self._testWorkloadMetadata('', None)
+
+  def testWorkloadMetadataGCEMetadata(self):
+    self._testWorkloadMetadata(
+        '--workload-metadata-from-node=gce_metadata',
+        self.messages.WorkloadMetadataConfig(
+            mode=self.messages.WorkloadMetadataConfig.\
+                ModeValueValuesEnum.GCE_METADATA))
+
+  def testWorkloadMetadataGKEMetadata(self):
+    self._testWorkloadMetadata(
+        '--workload-metadata-from-node=gke_metadata',
+        self.messages.WorkloadMetadataConfig(
+            mode=self.messages.WorkloadMetadataConfig.\
+                ModeValueValuesEnum.GKE_METADATA))
+
+  def testWorkloadMetadataUnspecified(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run('{base} create {name} {flags} '
+               '--cluster {clusterName}'.format(
+                   base=self.node_pools_command_base.format(self.ZONE),
+                   name=self.NODE_POOL_NAME,
+                   flags='--workload-metadata-from-node=mode_unspecified',
+                   clusterName=self.CLUSTER_NAME))
+      self.AssertErrContains('Invalid choice')
+
+  def testCreateInvalidSandboxConfig(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --sandbox '
+          'type={2}'.format(self.NODE_POOL_NAME, self.CLUSTER_NAME, 'notatype'))
+    self.AssertErrContains('argument --sandbox')
+
+  def testCreateEmptySandboxConfig(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --sandbox'.format(self.NODE_POOL_NAME,
+                                                       self.CLUSTER_NAME))
+    self.AssertErrContains('argument --sandbox')
+
+  def testCreateNonemptySandboxWithNoType(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --sandbox '
+          'foo={2}'.format(self.NODE_POOL_NAME, self.CLUSTER_NAME, 'bar'))
+    self.AssertErrContains('argument --sandbox')
+
+  def testEnableSurgeUpgrade(self):
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {
+        'name':
+            'my-custom-pool',
+        'clusterId':
+            self.CLUSTER_NAME,
+        'upgradeSettings':
+            self._MakeUpgradeSettings(maxSurge=3, maxUnavailable=2),
+    }
+    self.ExpectCreateNodePool(
+        self._MakeNodePool(**pool_kwargs),
+        self._MakeNodePoolOperation(**pool_kwargs))
+    self.ExpectGetOperation(
+        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
+
+    pool_version_kwargs = pool_kwargs.copy()
+    pool_version_kwargs.update({'nodeVersion': self.VERSION})
+    pool = self._MakeNodePool(**pool_version_kwargs)
+    self.ExpectGetNodePool(pool.name, response=pool)
+    self.Run(
+        self.node_pools_command_base.format(self.ZONE) +
+        ' create {name} --cluster={clusterId}'
+        ' --max-surge-upgrade=3 --max-unavailable-upgrade=2'.format(
+            **pool_kwargs))
+    self.AssertOutputEquals(
+        ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
+         '{name} {version}\n').format(name=pool.name, version=pool.version),
+        normalize_space=True)
 
 
 class CreateTestGAOnly(CreateTestGA):
@@ -647,8 +816,8 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         'workloadMetadataConfig':
             m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig
                                      .NodeMetadataValueValuesEnum.SECURE),
-        'sandboxConfig':
-            m.SandboxConfig(sandboxType='gvisor'),
+        'bootDiskKmsKey':
+            'projects/bing/locations/baz/keyRings/bar/cryptoKeys/foo',
     }
 
     self.ExpectCreateNodePool(
@@ -667,34 +836,11 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         self.node_pools_command_base.format(self.ZONE) + ' create {name}'
         ' --cluster={clusterId}'
         ' --workload-metadata-from-node=secure'
-        ' --sandbox type=gvisor'.format(**pool_kwargs))
+        ' --boot-disk-kms-key={bootDiskKmsKey}'.format(**pool_kwargs))
     self.AssertOutputEquals(
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {version}\n').format(name=pool.name, version=pool.version),
         normalize_space=True)
-
-  def _testWorkloadMetadata(self, flags, config):
-    pool_kwargs = {
-        # Sort the scopes to assert equality of the lists
-        'workloadMetadataConfig': config,
-    }
-    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
-        pool_kwargs)
-    # Create node pool expects node pool and returns pending operation.
-    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
-    # Get operation returns done operation.
-    self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
-    # Get returns expected cluster, populated with other fields by server.
-    self.ExpectGetNodePool(return_pool.name, response=return_pool)
-    self.Run('{base} create {name} {flags} '
-             '--cluster {clusterName}'.format(
-                 base=self.node_pools_command_base.format(self.ZONE),
-                 name=self.NODE_POOL_NAME,
-                 flags=flags,
-                 clusterName=self.CLUSTER_NAME))
-
-  def testWorkloadMetadataDefault(self):
-    self._testWorkloadMetadata('', None)
 
   def testWorkloadMetadataSecure(self):
     self._testWorkloadMetadata(
@@ -710,17 +856,25 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
             nodeMetadata=self.messages.WorkloadMetadataConfig.\
                 NodeMetadataValueValuesEnum.EXPOSE))
 
-  def testWorkloadMetadataUnspecified(self):
+  def testWorkloadMetadataGKEMetadataServer(self):
     self._testWorkloadMetadata(
-        '--workload-metadata-from-node=unspecified',
+        '--workload-metadata-from-node=gke_metadata_server',
         self.messages.WorkloadMetadataConfig(
             nodeMetadata=self.messages.WorkloadMetadataConfig.\
-                NodeMetadataValueValuesEnum.UNSPECIFIED))
+                NodeMetadataValueValuesEnum.GKE_METADATA_SERVER))
+
+  def testWorkloadMetadataUnspecified(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run('{base} create {name} {flags} '
+               '--cluster {clusterName}'.format(
+                   base=self.node_pools_command_base.format(self.ZONE),
+                   name=self.NODE_POOL_NAME,
+                   flags='--workload-metadata-from-node=unspecified',
+                   clusterName=self.CLUSTER_NAME))
+      self.AssertErrContains('Invalid choice')
 
   def _testNodeLocations(self, flags, locations):
-    pool_kwargs = {
-        'nodePoolLocations': locations
-    }
+    pool_kwargs = {'nodePoolLocations': locations}
     expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
         pool_kwargs)
     # Create node pool expects node pool and returns pending operation.
@@ -743,9 +897,10 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
 
   def testWarnNodeVersionWithAutoUpgradeEnabled(self):
     pool_kwargs = {
-        'nodeVersion': self.VERSION,
-        'management': self.messages.NodeManagement(
-            autoRepair=True, autoUpgrade=True)
+        'nodeVersion':
+            self.VERSION,
+        'management':
+            self.messages.NodeManagement(autoRepair=True, autoUpgrade=True)
     }
     expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
         pool_kwargs)
@@ -759,23 +914,6 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
                  clusterName=self.CLUSTER_NAME,
                  version=self.VERSION))
     self.AssertErrContains(c_util.WARN_NODE_VERSION_WITH_AUTOUPGRADE_ENABLED)
-
-  def testCreateInvalidSandboxConfig(self):
-    with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(
-          self.node_pools_command_base.format(self.ZONE) +
-          ' create {0} --cluster={1} --sandbox '
-          'type={2}'.format(self.NODE_POOL_NAME,
-                            self.CLUSTER_NAME, 'notatype'))
-    self.AssertErrContains('argument --sandbox')
-
-  def testCreateEmptySandboxConfig(self):
-    with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(
-          self.node_pools_command_base.format(self.ZONE) +
-          ' create {0} --cluster={1} --sandbox'.format(self.NODE_POOL_NAME,
-                                                       self.CLUSTER_NAME))
-    self.AssertErrContains('argument --sandbox')
 
   @parameterized.parameters('--max-surge-upgrade=2',
                             '--max-unavailable-upgrade=1')
@@ -791,39 +929,9 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
     with self.assertRaises(exceptions.InvalidArgumentException):
       self.Run(
           self.node_pools_command_base.format(self.ZONE) +
-          ' create {name} --cluster={clusterId} {upgradeFlag}'
-          .format(**pool_kwargs))
+          ' create {name} --cluster={clusterId} {upgradeFlag}'.format(
+              **pool_kwargs))
     self.AssertErrContains(c_util.INVALIID_SURGE_UPGRADE_SETTINGS)
-
-  def testEnableSurgeUpgrade(self):
-    self.assertIsNone(
-        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
-                                  self.PROJECT_ID))
-    pool_kwargs = {
-        'name': 'my-custom-pool',
-        'clusterId': self.CLUSTER_NAME,
-        'upgradeSettings': self._MakeUpgradeSettings(maxSurge=3,
-                                                     maxUnavailable=2),
-    }
-    self.ExpectCreateNodePool(
-        self._MakeNodePool(**pool_kwargs),
-        self._MakeNodePoolOperation(**pool_kwargs))
-    self.ExpectGetOperation(
-        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
-
-    pool_version_kwargs = pool_kwargs.copy()
-    pool_version_kwargs.update({'nodeVersion': self.VERSION})
-    pool = self._MakeNodePool(**pool_version_kwargs)
-    self.ExpectGetNodePool(pool.name, response=pool)
-    self.Run(
-        self.node_pools_command_base.format(self.ZONE) +
-        ' create {name} --cluster={clusterId}'
-        ' --max-surge-upgrade=3 --max-unavailable-upgrade=2'
-        .format(**pool_kwargs))
-    self.AssertOutputEquals(
-        ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
-         '{name} {version}\n').format(name=pool.name, version=pool.version),
-        normalize_space=True)
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -849,6 +957,8 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
             m.LocalSsdVolumeConfig(
                 count=1, type='scsi', format=format_enum.BLOCK),
         ],
+        'bootDiskKmsKey':
+            'projects/bing/locations/baz/keyRings/bar/cryptoKeys/foo',
         'nodeGroup':
             'test-node-group',
     }
@@ -868,6 +978,7 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
     self.Run(
         self.node_pools_command_base.format(self.ZONE) + ' create {name}'
         ' --cluster={clusterId}'
+        ' --boot-disk-kms-key={bootDiskKmsKey}'
         ' --local-ssd-volumes count=2,type=nvme,format=fs'
         ' --local-ssd-volumes count=1,type=scsi,format=block'
         ' --workload-metadata-from-node=secure'
@@ -877,20 +988,17 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
          '{name} {version}\n').format(name=pool.name, version=pool.version),
         normalize_space=True)
 
-  @parameterized.parameters(
-      (1, 'notatype', 'fs'),
-      (4, 'scsi', 'notaformat'),
-      ('notacount', 'scsi', 'fs'),
-      (0, 'scsi', 'fs'))
+  @parameterized.parameters((1, 'notatype', 'fs'), (4, 'scsi', 'notaformat'),
+                            ('notacount', 'scsi', 'fs'), (0, 'scsi', 'fs'))
   def testCreateInvalidLocalSsdVolumeConfig(self, ssd_count, ssd_type,
                                             ssd_format):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.Run(
           self.node_pools_command_base.format(self.ZONE) +
           ' create {0} --cluster={1} --local-ssd-volumes '
-          'count={2},type={3},format={4}'.format(self.NODE_POOL_NAME,
-                                                 self.CLUSTER_NAME, ssd_count,
-                                                 ssd_type, ssd_format))
+          'count={2},type={3},format={4}'.format(
+              self.NODE_POOL_NAME, self.CLUSTER_NAME, ssd_count, ssd_type,
+              ssd_format))
     self.AssertErrContains('argument --local-ssd-volumes')
 
   def testCreateEmptyLocalSsdVolumeConfig(self):
@@ -912,16 +1020,13 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
             self.CLUSTER_NAME,
         'linuxNodeConfig':
             self.msgs.LinuxNodeConfig(
-                sysctls=self.msgs.LinuxNodeConfig.SysctlsValue(
-                    additionalProperties=[
-                        self.msgs.LinuxNodeConfig.SysctlsValue
-                        .AdditionalProperty(
-                            key='net.core.somaxconn', value='4096'),
-                        self.msgs.LinuxNodeConfig.SysctlsValue
-                        .AdditionalProperty(
-                            key='net.ipv4.tcp_rmem',
-                            value='4096 87380 6291456'),
-                    ])),
+                sysctls=self.msgs.LinuxNodeConfig
+                .SysctlsValue(additionalProperties=[
+                    self.msgs.LinuxNodeConfig.SysctlsValue.AdditionalProperty(
+                        key='net.core.somaxconn', value='4096'),
+                    self.msgs.LinuxNodeConfig.SysctlsValue.AdditionalProperty(
+                        key='net.ipv4.tcp_rmem', value='4096 87380 6291456'),
+                ])),
     }
 
     self.ExpectCreateNodePool(

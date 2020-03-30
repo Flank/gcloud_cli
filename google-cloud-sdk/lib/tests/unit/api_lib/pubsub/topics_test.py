@@ -146,6 +146,19 @@ class TopicsTest(base.CloudPubsubTestBase):
         topic)
     self.assertEqual(self.topics_client.Patch(topic_ref, labels), topic)
 
+  def testPatchKmsKey(self):
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    kms_key_name = 'projects/foo/locations/global/keyRings/baz/cryptoKeys/qux'
+    topic = self.msgs.Topic(
+        name=topic_ref.RelativeName(), kmsKeyName=kms_key_name)
+    self.topics_service.Patch.Expect(
+        self.msgs.PubsubProjectsTopicsPatchRequest(
+            name=topic_ref.RelativeName(),
+            updateTopicRequest=self.msgs.UpdateTopicRequest(
+                topic=topic, updateMask='kmsKeyName')), topic)
+    self.assertEqual(
+        self.topics_client.Patch(topic_ref, kms_key_name=kms_key_name), topic)
+
   def testPatchNoFieldsSpecified(self):
     topic_ref = util.ParseTopic('topic1', self.Project())
     with self.assertRaises(topics.NoFieldsSpecifiedError):

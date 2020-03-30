@@ -1,0 +1,242 @@
+title: privateca certificates create test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: core/project foo
+- execute:
+  - command: |
+      privateca certificates create --issuer ca --issuer-location europe-west1 --cert-output-file cert_out.pem --csr test_csr.pem --validity P20Y
+  - write_file: cert_out.pem
+  - stderr: |
+      Created Certificate [projects/foo/locations/europe-west1/certificateAuthorities/ca/certificates/20200220-ABC-DEF].
+- execute:
+  - command: |
+      privateca certificates create projects/project/locations/europe-west1/certificateAuthorities/ca/certificates/mycert --cert-output-file cert_out.pem --csr test_csr.pem
+  - write_file: cert_out.pem
+  - stderr: |
+      Created Certificate [projects/foo/locations/europe-west1/certificateAuthorities/ca/certificates/cert].
+actions:
+- load_resource:
+    path: tests/unit/surface/privateca/test_data/test_csr.pem
+- set_property:
+    core/project: foo
+- execute_command:
+    command: |
+      privateca certificates create --issuer ca --issuer-location europe-west1 --cert-output-file cert_out.pem --csr test_csr.pem --validity P20Y
+    events:
+    - api_call:
+        expect_request:
+          uri:
+            matches: ^https://privateca\.googleapis\.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities/ca/certificates.*certificateId=\d{8}-[A-Z0-9]{3}-[A-Z0-9]{3}.*
+          method: POST
+          headers: {}
+          body:
+            json:
+              lifetime: 631138522s
+              pemCsr: |-
+                -----BEGIN CERTIFICATE REQUEST-----
+                MIICGjCCAb8CAQAwgYoxDDAKBgNVBAYTA1VTQTETMBEGA1UECBMKV2FzaGluZ3Rv
+                bjERMA8GA1UEBxMIS2lya2xhbmQxHTAbBgNVBAkTFDc0NyA2dGggU3RyZWV0IFNv
+                dXRoMQ4wDAYDVQQREwU5ODAzMzEPMA0GA1UEChMGR29vZ2xlMRIwEAYDVQQLEwlV
+                bml0IFRlc3QwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQ31V1hJbNJLp5FYXn7
+                UspoYGd9fuBX3+uGSWlS237Bb32U9ZIf+5kUzCm6j+ZmQ1osSaGSb1wz1LAFAPGc
+                5TJjoIHRMIHOBgkqhkiG9w0BCQ4xgcAwgb0wUwYDVR0RBEwwSoIKZ29vZ2xlLmNv
+                bYIMKi5nb29nbGUuY29tgRByb290QGV4YW1wbGUuY29thwTAqAoAhhZodHRwOi8v
+                d3d3LmV4YW1wbGUuY29tMBEGA1UdIAQKMAgwBgYEKgMEBTAOBgNVHQ8BAf8EBAMC
+                BaAwHwYDVR0lBBgwFgYIKwYBBQUHAwMGCisGAQQBgjc9AQEwEgYDVR0TAQH/BAgw
+                BgEB/wIBKjAOBgNVHQ4EBwQFCQoLDA0wCgYIKoZIzj0EAwIDSQAwRgIhAJIDzYUM
+                CQ4Yxnc0poEZPhHnjJksYMXg0+Lk/ZsMIYoNAiEAzhT6MKccL4/eYsjUt6INFkqT
+                5ias31FL7u0R5aMRP74=
+                -----END CERTIFICATE REQUEST-----
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+            response:
+              name: projects/foo/locations/europe-west1/certificateAuthorities/ca/certificates/20200220-ABC-DEF
+              pemCertificate: |-
+                -----BEGIN CERTIFICATE-----
+                MIIEiDCCAnACFBIqqUoIQUU5RgXxiua8ISTU9YMcMA0GCSqGSIb3DQEBCwUAMIGM
+                MQswCQYDVQQGEwJVUzETMBEGA1UECAwKV2FzaGluZ3RvbjERMA8GA1UEBwwIS2ly
+                a2xhbmQxHTAbBgNVBAoMFEludGVybWVkaWF0ZSBDQSBJbmMuMRswGQYDVQQLDBJT
+                dGlsbCBVbml0IFRlc3RpbmcxGTAXBgNVBAMMEGludGVybWVkaWF0ZS5jb20wHhcN
+                MTkwOTA0MjMwNTE1WhcNNDcwMTIwMjMwNTE1WjB0MQswCQYDVQQGEwJDQTETMBEG
+                A1UECAwKU29tZS1TdGF0ZTENMAsGA1UEBwwETGVhZjEfMB0GA1UECgwWTGVhZiBD
+                ZXJ0IGluIFVuaXQgVGVzdDENMAsGA1UECwwETGVhZjERMA8GA1UEAwwIbGVhZi5j
+                b20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCwgxbW4gZypGqAHVer
+                aMbHsig7A29xb8FllK2uT0kTIIu869qMsLWVyBVr0TVB+8ubycTQzR49bNQ5QuUL
+                wK19VVWf/r8dSA1COj2ZxeWpV3sWVB1cAPbqYKTSz+afoXWAPM04N47OW18Uu4dp
+                Gqzoj2TW5VKkltagCuCP2jA6Cp+GQOH5sTpQ2d7YCO93Z6QqvdWUqYEMFU/Lo9M7
+                6Vt3sFVpwrOLInQnuhct28T6puOb212kX+mCLsgrQmzf6NmxaElaaNMTHSXL2xRF
+                hBSZFU1M5IzAi2h3AS3E5ulbEVgJkZsgN2yFDjCkV9XvlSWOtxBETrITCQU5fRGh
+                2pxHAgMBAAEwDQYJKoZIhvcNAQELBQADggIBAGr2foGrMdqJlb7Xc7vR1nDP125l
+                pGUdf9W92tFJ2b/sbEw/Xhh5gfqaCcx8bcygBY82PIXnL7Pt5ahfRdihTR4Xkads
+                miePA8Jk5pkNmXzhoNE9EbFAGEFUGKSfUJnngnt6FuHVpmTG5AwHLlkTJcFDuwQN
+                ZfiOUm7lkebHJy8W+Fb7cBDzyxmcr/lHG1qsbYjaqlnTt/WjnRrsOYgSwdFXnP95
+                3DCQvfQg6kvNZ2zj/1iIXDsQ0mYTTjNQzeWzlOF/CLL0mUk6xpSXY1HnW4Y7hREI
+                hEJNcfJX6cLmq0XK+H3MgLtSB+6dTQ5TLISZwYYrAyHGdJDDu9DEsEZXgGZCZCdP
+                mlBvmxoXlW9NFD9TBTD3M/txNg/UySLJjK/wxfaR/XXGnLv5PgYcHc2ajdZmArba
+                aW+svhFsZ2biuAeCloOAOPlISg9Lr3ydTrUMZHQB3a7W42NEkcxdO4ab1FEArsVA
+                uS1zHs1yhoRXtfNgyQ9zykxHlBgjXDZsFxfUuzJZa4t7VqtWgLeUXdewCBSaf63+
+                SKOLgx8l6QnTHnUh5700ApIuoXBuaSqc6BfTl1nkQqUZEoGlcuFZqJXe2sWN1oDP
+                rI7NPXRWJqTdNuSjUznzSMO+AsBcZBcYad1pjhWDNnW4n1UFoMpaIYzb6jZSedo9
+                y4+LpDFE2AxuNZ/x
+                -----END CERTIFICATE-----
+              lifetime: P30D
+              pemCertificateChain:
+              - |-
+                -----BEGIN CERTIFICATE-----
+                MIIBTjCB9aADAgECAgEBMAoGCCqGSM49BAMCMCYxJDAiBgNVBAMTG1VuaXRUZXN0
+                OiBTZWxmLXNpZ25lZCBFQ0RTQTAgFw0xMDA4MDExNzAwMDBaGA8zMDEwMDgwMTE3
+                MDAwMFowJjEkMCIGA1UEAxMbVW5pdFRlc3Q6IFNlbGYtc2lnbmVkIEVDRFNBMFkw
+                EwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEN9VdYSWzSS6eRWF5+1LKaGBnfX7gV9/r
+                hklpUtt+wW99lPWSH/uZFMwpuo/mZkNaLEmhkm9cM9SwBQDxnOUyY6MSMBAwDgYD
+                VR0PAQH/BAQDAgIEMAoGCCqGSM49BAMCA0gAMEUCID/dNgLyTUSHN4eaFCUc2L3t
+                yIKLqy1HdDQ8VakrOSCUAiEAoGoDcrlhiQE866/PnqWVM0S2sxwpQLYJ7F8Zjx9N
+                3AM=
+                -----END CERTIFICATE----
+    - expect_file_written:
+        path: cert_out.pem
+        contents: |-
+          -----BEGIN CERTIFICATE-----
+          MIIEiDCCAnACFBIqqUoIQUU5RgXxiua8ISTU9YMcMA0GCSqGSIb3DQEBCwUAMIGM
+          MQswCQYDVQQGEwJVUzETMBEGA1UECAwKV2FzaGluZ3RvbjERMA8GA1UEBwwIS2ly
+          a2xhbmQxHTAbBgNVBAoMFEludGVybWVkaWF0ZSBDQSBJbmMuMRswGQYDVQQLDBJT
+          dGlsbCBVbml0IFRlc3RpbmcxGTAXBgNVBAMMEGludGVybWVkaWF0ZS5jb20wHhcN
+          MTkwOTA0MjMwNTE1WhcNNDcwMTIwMjMwNTE1WjB0MQswCQYDVQQGEwJDQTETMBEG
+          A1UECAwKU29tZS1TdGF0ZTENMAsGA1UEBwwETGVhZjEfMB0GA1UECgwWTGVhZiBD
+          ZXJ0IGluIFVuaXQgVGVzdDENMAsGA1UECwwETGVhZjERMA8GA1UEAwwIbGVhZi5j
+          b20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCwgxbW4gZypGqAHVer
+          aMbHsig7A29xb8FllK2uT0kTIIu869qMsLWVyBVr0TVB+8ubycTQzR49bNQ5QuUL
+          wK19VVWf/r8dSA1COj2ZxeWpV3sWVB1cAPbqYKTSz+afoXWAPM04N47OW18Uu4dp
+          Gqzoj2TW5VKkltagCuCP2jA6Cp+GQOH5sTpQ2d7YCO93Z6QqvdWUqYEMFU/Lo9M7
+          6Vt3sFVpwrOLInQnuhct28T6puOb212kX+mCLsgrQmzf6NmxaElaaNMTHSXL2xRF
+          hBSZFU1M5IzAi2h3AS3E5ulbEVgJkZsgN2yFDjCkV9XvlSWOtxBETrITCQU5fRGh
+          2pxHAgMBAAEwDQYJKoZIhvcNAQELBQADggIBAGr2foGrMdqJlb7Xc7vR1nDP125l
+          pGUdf9W92tFJ2b/sbEw/Xhh5gfqaCcx8bcygBY82PIXnL7Pt5ahfRdihTR4Xkads
+          miePA8Jk5pkNmXzhoNE9EbFAGEFUGKSfUJnngnt6FuHVpmTG5AwHLlkTJcFDuwQN
+          ZfiOUm7lkebHJy8W+Fb7cBDzyxmcr/lHG1qsbYjaqlnTt/WjnRrsOYgSwdFXnP95
+          3DCQvfQg6kvNZ2zj/1iIXDsQ0mYTTjNQzeWzlOF/CLL0mUk6xpSXY1HnW4Y7hREI
+          hEJNcfJX6cLmq0XK+H3MgLtSB+6dTQ5TLISZwYYrAyHGdJDDu9DEsEZXgGZCZCdP
+          mlBvmxoXlW9NFD9TBTD3M/txNg/UySLJjK/wxfaR/XXGnLv5PgYcHc2ajdZmArba
+          aW+svhFsZ2biuAeCloOAOPlISg9Lr3ydTrUMZHQB3a7W42NEkcxdO4ab1FEArsVA
+          uS1zHs1yhoRXtfNgyQ9zykxHlBgjXDZsFxfUuzJZa4t7VqtWgLeUXdewCBSaf63+
+          SKOLgx8l6QnTHnUh5700ApIuoXBuaSqc6BfTl1nkQqUZEoGlcuFZqJXe2sWN1oDP
+          rI7NPXRWJqTdNuSjUznzSMO+AsBcZBcYad1pjhWDNnW4n1UFoMpaIYzb6jZSedo9
+          y4+LpDFE2AxuNZ/x
+          -----END CERTIFICATE-----
+    - expect_stderr: |
+        Created Certificate [projects/foo/locations/europe-west1/certificateAuthorities/ca/certificates/20200220-ABC-DEF].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      privateca certificates create projects/project/locations/europe-west1/certificateAuthorities/ca/certificates/mycert --cert-output-file cert_out.pem --csr test_csr.pem
+    events:
+    - api_call:
+        expect_request:
+          uri:
+            matches: ^https://privateca\.googleapis\.com/v1alpha1/projects/project/locations/europe-west1/certificateAuthorities/ca/certificates.*certificateId=mycert.*$
+          method: POST
+          headers: {}
+          body:
+            json:
+              lifetime: 2592000s
+              pemCsr: |-
+                -----BEGIN CERTIFICATE REQUEST-----
+                MIICGjCCAb8CAQAwgYoxDDAKBgNVBAYTA1VTQTETMBEGA1UECBMKV2FzaGluZ3Rv
+                bjERMA8GA1UEBxMIS2lya2xhbmQxHTAbBgNVBAkTFDc0NyA2dGggU3RyZWV0IFNv
+                dXRoMQ4wDAYDVQQREwU5ODAzMzEPMA0GA1UEChMGR29vZ2xlMRIwEAYDVQQLEwlV
+                bml0IFRlc3QwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQ31V1hJbNJLp5FYXn7
+                UspoYGd9fuBX3+uGSWlS237Bb32U9ZIf+5kUzCm6j+ZmQ1osSaGSb1wz1LAFAPGc
+                5TJjoIHRMIHOBgkqhkiG9w0BCQ4xgcAwgb0wUwYDVR0RBEwwSoIKZ29vZ2xlLmNv
+                bYIMKi5nb29nbGUuY29tgRByb290QGV4YW1wbGUuY29thwTAqAoAhhZodHRwOi8v
+                d3d3LmV4YW1wbGUuY29tMBEGA1UdIAQKMAgwBgYEKgMEBTAOBgNVHQ8BAf8EBAMC
+                BaAwHwYDVR0lBBgwFgYIKwYBBQUHAwMGCisGAQQBgjc9AQEwEgYDVR0TAQH/BAgw
+                BgEB/wIBKjAOBgNVHQ4EBwQFCQoLDA0wCgYIKoZIzj0EAwIDSQAwRgIhAJIDzYUM
+                CQ4Yxnc0poEZPhHnjJksYMXg0+Lk/ZsMIYoNAiEAzhT6MKccL4/eYsjUt6INFkqT
+                5ias31FL7u0R5aMRP74=
+                -----END CERTIFICATE REQUEST-----
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+            response:
+              name: projects/foo/locations/europe-west1/certificateAuthorities/ca/certificates/cert
+              pemCertificate: |-
+                -----BEGIN CERTIFICATE-----
+                MIIEiDCCAnACFBIqqUoIQUU5RgXxiua8ISTU9YMcMA0GCSqGSIb3DQEBCwUAMIGM
+                MQswCQYDVQQGEwJVUzETMBEGA1UECAwKV2FzaGluZ3RvbjERMA8GA1UEBwwIS2ly
+                a2xhbmQxHTAbBgNVBAoMFEludGVybWVkaWF0ZSBDQSBJbmMuMRswGQYDVQQLDBJT
+                dGlsbCBVbml0IFRlc3RpbmcxGTAXBgNVBAMMEGludGVybWVkaWF0ZS5jb20wHhcN
+                MTkwOTA0MjMwNTE1WhcNNDcwMTIwMjMwNTE1WjB0MQswCQYDVQQGEwJDQTETMBEG
+                A1UECAwKU29tZS1TdGF0ZTENMAsGA1UEBwwETGVhZjEfMB0GA1UECgwWTGVhZiBD
+                ZXJ0IGluIFVuaXQgVGVzdDENMAsGA1UECwwETGVhZjERMA8GA1UEAwwIbGVhZi5j
+                b20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCwgxbW4gZypGqAHVer
+                aMbHsig7A29xb8FllK2uT0kTIIu869qMsLWVyBVr0TVB+8ubycTQzR49bNQ5QuUL
+                wK19VVWf/r8dSA1COj2ZxeWpV3sWVB1cAPbqYKTSz+afoXWAPM04N47OW18Uu4dp
+                Gqzoj2TW5VKkltagCuCP2jA6Cp+GQOH5sTpQ2d7YCO93Z6QqvdWUqYEMFU/Lo9M7
+                6Vt3sFVpwrOLInQnuhct28T6puOb212kX+mCLsgrQmzf6NmxaElaaNMTHSXL2xRF
+                hBSZFU1M5IzAi2h3AS3E5ulbEVgJkZsgN2yFDjCkV9XvlSWOtxBETrITCQU5fRGh
+                2pxHAgMBAAEwDQYJKoZIhvcNAQELBQADggIBAGr2foGrMdqJlb7Xc7vR1nDP125l
+                pGUdf9W92tFJ2b/sbEw/Xhh5gfqaCcx8bcygBY82PIXnL7Pt5ahfRdihTR4Xkads
+                miePA8Jk5pkNmXzhoNE9EbFAGEFUGKSfUJnngnt6FuHVpmTG5AwHLlkTJcFDuwQN
+                ZfiOUm7lkebHJy8W+Fb7cBDzyxmcr/lHG1qsbYjaqlnTt/WjnRrsOYgSwdFXnP95
+                3DCQvfQg6kvNZ2zj/1iIXDsQ0mYTTjNQzeWzlOF/CLL0mUk6xpSXY1HnW4Y7hREI
+                hEJNcfJX6cLmq0XK+H3MgLtSB+6dTQ5TLISZwYYrAyHGdJDDu9DEsEZXgGZCZCdP
+                mlBvmxoXlW9NFD9TBTD3M/txNg/UySLJjK/wxfaR/XXGnLv5PgYcHc2ajdZmArba
+                aW+svhFsZ2biuAeCloOAOPlISg9Lr3ydTrUMZHQB3a7W42NEkcxdO4ab1FEArsVA
+                uS1zHs1yhoRXtfNgyQ9zykxHlBgjXDZsFxfUuzJZa4t7VqtWgLeUXdewCBSaf63+
+                SKOLgx8l6QnTHnUh5700ApIuoXBuaSqc6BfTl1nkQqUZEoGlcuFZqJXe2sWN1oDP
+                rI7NPXRWJqTdNuSjUznzSMO+AsBcZBcYad1pjhWDNnW4n1UFoMpaIYzb6jZSedo9
+                y4+LpDFE2AxuNZ/x
+                -----END CERTIFICATE-----
+              lifetime: P30D
+              pemCertificateChain:
+              - |-
+                -----BEGIN CERTIFICATE-----
+                MIIBTjCB9aADAgECAgEBMAoGCCqGSM49BAMCMCYxJDAiBgNVBAMTG1VuaXRUZXN0
+                OiBTZWxmLXNpZ25lZCBFQ0RTQTAgFw0xMDA4MDExNzAwMDBaGA8zMDEwMDgwMTE3
+                MDAwMFowJjEkMCIGA1UEAxMbVW5pdFRlc3Q6IFNlbGYtc2lnbmVkIEVDRFNBMFkw
+                EwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEN9VdYSWzSS6eRWF5+1LKaGBnfX7gV9/r
+                hklpUtt+wW99lPWSH/uZFMwpuo/mZkNaLEmhkm9cM9SwBQDxnOUyY6MSMBAwDgYD
+                VR0PAQH/BAQDAgIEMAoGCCqGSM49BAMCA0gAMEUCID/dNgLyTUSHN4eaFCUc2L3t
+                yIKLqy1HdDQ8VakrOSCUAiEAoGoDcrlhiQE866/PnqWVM0S2sxwpQLYJ7F8Zjx9N
+                3AM=
+                -----END CERTIFICATE-----
+    - expect_file_written:
+        path: cert_out.pem
+        contents: |-
+          -----BEGIN CERTIFICATE-----
+          MIIEiDCCAnACFBIqqUoIQUU5RgXxiua8ISTU9YMcMA0GCSqGSIb3DQEBCwUAMIGM
+          MQswCQYDVQQGEwJVUzETMBEGA1UECAwKV2FzaGluZ3RvbjERMA8GA1UEBwwIS2ly
+          a2xhbmQxHTAbBgNVBAoMFEludGVybWVkaWF0ZSBDQSBJbmMuMRswGQYDVQQLDBJT
+          dGlsbCBVbml0IFRlc3RpbmcxGTAXBgNVBAMMEGludGVybWVkaWF0ZS5jb20wHhcN
+          MTkwOTA0MjMwNTE1WhcNNDcwMTIwMjMwNTE1WjB0MQswCQYDVQQGEwJDQTETMBEG
+          A1UECAwKU29tZS1TdGF0ZTENMAsGA1UEBwwETGVhZjEfMB0GA1UECgwWTGVhZiBD
+          ZXJ0IGluIFVuaXQgVGVzdDENMAsGA1UECwwETGVhZjERMA8GA1UEAwwIbGVhZi5j
+          b20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCwgxbW4gZypGqAHVer
+          aMbHsig7A29xb8FllK2uT0kTIIu869qMsLWVyBVr0TVB+8ubycTQzR49bNQ5QuUL
+          wK19VVWf/r8dSA1COj2ZxeWpV3sWVB1cAPbqYKTSz+afoXWAPM04N47OW18Uu4dp
+          Gqzoj2TW5VKkltagCuCP2jA6Cp+GQOH5sTpQ2d7YCO93Z6QqvdWUqYEMFU/Lo9M7
+          6Vt3sFVpwrOLInQnuhct28T6puOb212kX+mCLsgrQmzf6NmxaElaaNMTHSXL2xRF
+          hBSZFU1M5IzAi2h3AS3E5ulbEVgJkZsgN2yFDjCkV9XvlSWOtxBETrITCQU5fRGh
+          2pxHAgMBAAEwDQYJKoZIhvcNAQELBQADggIBAGr2foGrMdqJlb7Xc7vR1nDP125l
+          pGUdf9W92tFJ2b/sbEw/Xhh5gfqaCcx8bcygBY82PIXnL7Pt5ahfRdihTR4Xkads
+          miePA8Jk5pkNmXzhoNE9EbFAGEFUGKSfUJnngnt6FuHVpmTG5AwHLlkTJcFDuwQN
+          ZfiOUm7lkebHJy8W+Fb7cBDzyxmcr/lHG1qsbYjaqlnTt/WjnRrsOYgSwdFXnP95
+          3DCQvfQg6kvNZ2zj/1iIXDsQ0mYTTjNQzeWzlOF/CLL0mUk6xpSXY1HnW4Y7hREI
+          hEJNcfJX6cLmq0XK+H3MgLtSB+6dTQ5TLISZwYYrAyHGdJDDu9DEsEZXgGZCZCdP
+          mlBvmxoXlW9NFD9TBTD3M/txNg/UySLJjK/wxfaR/XXGnLv5PgYcHc2ajdZmArba
+          aW+svhFsZ2biuAeCloOAOPlISg9Lr3ydTrUMZHQB3a7W42NEkcxdO4ab1FEArsVA
+          uS1zHs1yhoRXtfNgyQ9zykxHlBgjXDZsFxfUuzJZa4t7VqtWgLeUXdewCBSaf63+
+          SKOLgx8l6QnTHnUh5700ApIuoXBuaSqc6BfTl1nkQqUZEoGlcuFZqJXe2sWN1oDP
+          rI7NPXRWJqTdNuSjUznzSMO+AsBcZBcYad1pjhWDNnW4n1UFoMpaIYzb6jZSedo9
+          y4+LpDFE2AxuNZ/x
+          -----END CERTIFICATE-----
+    - expect_stderr: |
+        Created Certificate [projects/foo/locations/europe-west1/certificateAuthorities/ca/certificates/cert].
+    - expect_exit:
+        code: 0

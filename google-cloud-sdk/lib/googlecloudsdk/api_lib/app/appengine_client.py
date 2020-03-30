@@ -17,6 +17,7 @@
 
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
 from __future__ import unicode_literals
 
 from __future__ import with_statement
@@ -131,7 +132,7 @@ class AppengineClient(object):
     if notused_indexes.indexes:
       for index in notused_indexes.indexes:
         msg = ('This index is no longer defined in your index.yaml file.\n{0}'
-               .format(six.text_type(index.ToYAML())))
+               .format(six.text_type((index.ToYAML()))))
         prompt = 'Do you want to delete this index'
         if console_io.PromptContinue(msg, prompt, default=True):
           deletions.indexes.append(index)
@@ -181,8 +182,6 @@ class AppengineClient(object):
       return self.UpdateDispatch(parsed_yaml)
     if config_name == yaml_parsing.ConfigYamlInfo.DOS:
       return self.UpdateDos(parsed_yaml)
-    if config_name == yaml_parsing.ConfigYamlInfo.INDEX:
-      return self.UpdateIndexes(parsed_yaml)
     if config_name == yaml_parsing.ConfigYamlInfo.QUEUE:
       return self.UpdateQueues(parsed_yaml)
     raise UnknownConfigType(
@@ -215,15 +214,6 @@ class AppengineClient(object):
     """
     self._GetRpcServer().Send('/api/dos/update',
                               app_id=self.project, payload=dos_yaml.ToYAML())
-
-  def UpdateIndexes(self, index_yaml):
-    """Updates indexes.
-
-    Args:
-      index_yaml: The parsed yaml file with index data.
-    """
-    self._GetRpcServer().Send('/api/datastore/index/add',
-                              app_id=self.project, payload=index_yaml.ToYAML())
 
   def UpdateQueues(self, queue_yaml):
     """Updates any new or changed task queue definitions.
@@ -305,6 +295,7 @@ class AppengineClient(object):
         req = six.moves.urllib.request.Request(
             url, headers={'Metadata-Flavor': 'Google'})
         vm_scopes_string = six.moves.urllib.request.urlopen(req).read()
+        vm_scopes_string = six.ensure_text(vm_scopes_string)
       except six.moves.urllib.error.URLError as e:
         raise Error(
             'Could not obtain scope list from metadata service: %s: %s. This '
@@ -316,7 +307,7 @@ class AppengineClient(object):
         raise Error(
             'You are currently logged into gcloud using a service account '
             'which does not have the appropriate access to [{0}]. The account '
-            'has the following scopes: [{1}].  It needs [{2}] in order to '
+            'has the following scopes: [{1}]. It needs [{2}] in order to '
             'succeed.\nPlease recreate this VM instance with the missing '
             'scopes. You may also log into a standard account that has the '
             'appropriate access by using `gcloud auth login`.'

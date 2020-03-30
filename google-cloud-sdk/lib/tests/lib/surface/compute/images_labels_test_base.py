@@ -97,6 +97,16 @@ class ImagesLabelsTestBase(sdk_test_base.WithFakeAuth,
             project=self.Project()),
         operation)
 
+  def _ExpectOperationWaitRequest(self, operation_ref, operation):
+    self.global_operations.Wait.Expect(
+        self.messages.ComputeGlobalOperationsWaitRequest(
+            operation=operation_ref.operation,
+            project=self.Project()),
+        operation)
+
+  def _ExpectOperationPollingRequest(self, operation_ref, operation):
+    self._ExpectOperationWaitRequest(operation_ref, operation)
+
   def _ExpectLabelsSetRequest(
       self, image_ref, labels, fingerprint, image=None, exception=None):
     labels_value = self._MakeLabelsProto(labels)

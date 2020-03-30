@@ -57,8 +57,28 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create an app profile with a multi-cluster routing policy, run:
+
+        $ gcloud beta bigtable app-profiles create my-app-profile-id \
+            --instance=my-instance-id --route-any
+
+    To create an app profile with a single-cluster routing policy which routes
+    all requests to my-cluster-id, run:
+
+        $ gcloud beta bigtable app-profiles create \
+            my-single-cluster-app-profile --instance=my-instance-id \
+            --route-to=my-cluster-id
+
+    To create an app profile with a friendly description, run:
+
+        $ gcloud beta bigtable app-profiles create my-app-profile-id \
+            --instance=my-instance-id --route-any \
+            --description="Routes requests for my use case"
 
 NOTES
     This command is currently in BETA and may change without notice. These

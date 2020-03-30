@@ -243,6 +243,14 @@ class DurationTest(subtests.Base):
     self.Run(86400, '1d')
     self.Run(172800, '2d')
 
+    self.Run(15778463, '0.5y')
+    self.Run(1296000, 'p0.5m')
+    self.Run(43200, '0.5d')
+    ## Regression test for b/118404992.
+    self.Run(216, '0.06h')
+    self.Run(30, '0.5m')
+    self.Run(0, '0.5s')
+
     self.Run(61, '1m1s')
     self.Run(61, '1s1m')
     self.Run(3601, '1h1s')

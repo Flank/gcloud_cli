@@ -22,8 +22,10 @@ from googlecloudsdk.api_lib.secrets import api as secrets_api
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.secrets import args as secrets_args
 from googlecloudsdk.command_lib.secrets import log as secrets_log
+from googlecloudsdk.command_lib.secrets import util as secrets_util
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
   r"""Enable the version of the provided secret.
 
@@ -44,6 +46,28 @@ class Create(base.CreateCommand):
 
   def Run(self, args):
     version_ref = args.CONCEPTS.version.Parse()
-    result = secrets_api.Versions().Enable(version_ref)
+    result = secrets_api.Versions(
+        version=secrets_util.GetVersionFromReleasePath(
+            self.ReleaseTrack())).Enable(version_ref)
     secrets_log.Versions().Enabled(version_ref)
     return result
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(Create):
+  r"""Enable the version of the provided secret.
+
+  Enable the version of the provided secret. It can be disabled with
+  `{parent_command} disable`.
+
+  ## EXAMPLES
+
+  Enable version '123' of the secret named 'my-secret':
+
+    $ {command} 123 --secret=my-secret
+  """
+
+  @staticmethod
+  def Args(parser):
+    secrets_args.AddBetaVersion(
+        parser, purpose='to enable', positional=True, required=True)

@@ -34,15 +34,19 @@ from mock import patch
 class _InstanceGroupManagerCreateInstanceTestBase(sdk_test_base.WithFakeAuth,
                                                   cli_test_base.CliTestBase):
 
+  API_VERSION = 'v1'
+
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'beta'))
+    self.client = mock.Client(
+        core_apis.GetClientClass('compute', self.API_VERSION))
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
+    self.resources.RegisterApiByName('compute', self.API_VERSION)
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE
-    self.endpoint_uri = 'https://compute.googleapis.com/compute/beta/'
+    self.endpoint_uri = (
+        'https://compute.googleapis.com/compute/{api_version}/'.format(
+            api_version=self.API_VERSION))
     self.project_uri = '{endpoint_uri}projects/fake-project'.format(
         endpoint_uri=self.endpoint_uri)
 
@@ -79,8 +83,127 @@ class _InstanceGroupManagerCreateInstanceTestBase(sdk_test_base.WithFakeAuth,
         key=key, value=value)
 
 
-class InstanceGroupManagerCreateInstanceBetaZonalTest(
+class InstanceGroupManagerCreateInstanceGAZonalTest(
     _InstanceGroupManagerCreateInstanceTestBase):
+
+  API_VERSION = 'v1'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def _ExpectCreateInstance(self,
+                            preserved_state_disks,
+                            preserved_state_metadata,
+                            instance_name='foo'):
+    request = (
+        self.messages.ComputeInstanceGroupManagersCreateInstancesRequest)(
+            instanceGroupManager='group-1',
+            instanceGroupManagersCreateInstancesRequest=(
+                self.messages.InstanceGroupManagersCreateInstancesRequest
+            )(instances=[self.messages.PerInstanceConfig(name=instance_name)]),
+            project='fake-project',
+            zone='us-central2-a')
+    response = self.messages.Operation(
+        selfLink=(self.project_uri + '/zones/us-central2-a/operations/foo'),)
+    self.client.instanceGroupManagers.CreateInstances.Expect(
+        request,
+        response=response,
+    )
+
+  def _ExpectGetOperation(self, name='foo'):
+    request = self.messages.ComputeZoneOperationsGetRequest(
+        operation=name,
+        project='fake-project',
+        zone='us-central2-a',
+    )
+    response = self.messages.Operation(
+        status=self.messages.Operation.StatusValueValuesEnum.DONE,
+        selfLink=self.project_uri + '/zones/us-central2-a/operations/' + name,
+        targetLink=(self.project_uri +
+                    '/zones/us-central2-a/instanceGroupManagers/group-1'),
+    )
+    self.client.zoneOperations.Get.Expect(
+        request,
+        response=response,
+    )
+
+  def _ExpectWaitOperation(self, name='foo'):
+    request = self.messages.ComputeZoneOperationsWaitRequest(
+        operation=name,
+        project='fake-project',
+        zone='us-central2-a',
+    )
+    response = self.messages.Operation(
+        status=self.messages.Operation.StatusValueValuesEnum.DONE,
+        selfLink=self.project_uri + '/zones/us-central2-a/operations/' + name,
+        targetLink=(self.project_uri +
+                    '/zones/us-central2-a/instanceGroupManagers/group-1'),
+    )
+    self.client.zoneOperations.Wait.Expect(
+        request,
+        response=response,
+    )
+
+  def _ExpectPollingOperation(self, name='foo'):
+    self._ExpectWaitOperation(name)
+
+  def _ExpectGetInstanceGroupManager(self):
+    request = self.messages.ComputeInstanceGroupManagersGetRequest(
+        instanceGroupManager='group-1',
+        project='fake-project',
+        zone='us-central2-a',
+    )
+    response = self.messages.InstanceGroupManager(name='group-1')
+    self.client.instanceGroupManagers.Get.Expect(request, response=response)
+
+  def testSimpleCreateInstance(self):
+    self._ExpectCreateInstance(
+        preserved_state_disks=[],
+        preserved_state_metadata=[],
+        instance_name='foo')
+    self._ExpectWaitOperation()
+    self._ExpectGetInstanceGroupManager()
+
+    self.Run("""
+        compute instance-groups managed create-instance group-1
+          --zone us-central2-a
+          --instance foo
+        """)
+
+
+class InstanceGroupManagerCreateInstanceBetaZonalTest(
+    InstanceGroupManagerCreateInstanceGAZonalTest):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def _ExpectCreateInstance(self,
+                            preserved_state_disks,
+                            preserved_state_metadata,
+                            instance_name='foo'):
+    request = (
+        self.messages.ComputeInstanceGroupManagersCreateInstancesRequest
+    )(instanceGroupManager='group-1',
+      instanceGroupManagersCreateInstancesRequest=(
+          self.messages.InstanceGroupManagersCreateInstancesRequest)(instances=[
+              self.messages.PerInstanceConfig(
+                  name=instance_name,
+                  preservedState=self.messages.PreservedState(
+                      disks=self.messages.PreservedState.DisksValue(
+                          additionalProperties=preserved_state_disks),
+                      metadata=self.messages.PreservedState.MetadataValue(
+                          additionalProperties=preserved_state_metadata)))
+          ]),
+      project='fake-project',
+      zone='us-central2-a')
+    response = self.messages.Operation(
+        selfLink=(self.project_uri + '/zones/us-central2-a/operations/foo'),)
+    self.client.instanceGroupManagers.CreateInstances.Expect(
+        request,
+        response=response,
+    )
 
   def _ExpectListPerInstanceConfigs(self,
                                     instance_name='foo',
@@ -113,58 +236,19 @@ class InstanceGroupManagerCreateInstanceBetaZonalTest(
         response=response,
     )
 
-  def _ExpectCreateInstance(self,
-                            preserved_state_disks,
-                            preserved_state_metadata,
-                            instance_name='foo'):
-    request = (
-        self.messages.ComputeInstanceGroupManagersCreateInstancesRequest
-    )(instanceGroupManager='group-1',
-      instanceGroupManagersCreateInstancesRequest=(
-          self.messages.InstanceGroupManagersCreateInstancesRequest
-      )(instances=[
-          self.messages.PerInstanceConfig(
-              name=instance_name,
-              preservedState=self.messages.PreservedState(
-                  disks=self.messages.PreservedState.DisksValue(
-                      additionalProperties=preserved_state_disks),
-                  metadata=self.messages.PreservedState.MetadataValue(
-                      additionalProperties=preserved_state_metadata)))
-      ]),
-      project='fake-project',
-      zone='us-central2-a')
-    response = self.messages.Operation(
-        selfLink=(self.project_uri + '/zones/us-central2-a/operations/foo'),)
-    self.client.instanceGroupManagers.CreateInstances.Expect(
-        request,
-        response=response,
-    )
+  def testSimpleCreateInstance(self):
+    self._ExpectCreateInstance(
+        preserved_state_disks=[],
+        preserved_state_metadata=[],
+        instance_name='foo')
+    self._ExpectPollingOperation()
+    self._ExpectGetInstanceGroupManager()
 
-  def _ExpectGetOperation(self, name='foo'):
-    request = self.messages.ComputeZoneOperationsGetRequest(
-        operation=name,
-        project='fake-project',
-        zone='us-central2-a',
-    )
-    response = self.messages.Operation(
-        status=self.messages.Operation.StatusValueValuesEnum.DONE,
-        selfLink=self.project_uri + '/zones/us-central2-a/operations/' + name,
-        targetLink=(self.project_uri +
-                    '/zones/us-central2-a/instanceGroupManagers/group-1'),
-    )
-    self.client.zoneOperations.Get.Expect(
-        request,
-        response=response,
-    )
-
-  def _ExpectGetInstanceGroupManager(self):
-    request = self.messages.ComputeInstanceGroupManagersGetRequest(
-        instanceGroupManager='group-1',
-        project='fake-project',
-        zone='us-central2-a',
-    )
-    response = self.messages.InstanceGroupManager(name='group-1')
-    self.client.instanceGroupManagers.Get.Expect(request, response=response)
+    self.Run("""
+        compute instance-groups managed create-instance group-1
+          --zone us-central2-a
+          --instance foo
+        """.format(project_uri=self.project_uri))
 
   def testSimpleCase(self):
     disk_source_1 = self.project_uri + '/zones/us-central2-a/disks/foo'
@@ -185,7 +269,7 @@ class InstanceGroupManagerCreateInstanceBetaZonalTest(
     self._ExpectCreateInstance(
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=preserved_state_metadata)
-    self._ExpectGetOperation()
+    self._ExpectPollingOperation()
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -201,7 +285,7 @@ class InstanceGroupManagerCreateInstanceBetaZonalTest(
     self._ExpectCreateInstance(
         preserved_state_disks=[],
         preserved_state_metadata=[])
-    self._ExpectGetOperation()
+    self._ExpectPollingOperation()
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -235,6 +319,11 @@ class InstanceGroupManagerCreateInstanceBetaZonalTest(
 
 class InstanceGroupManagerCreateInstanceBetaRegionalTest(
     _InstanceGroupManagerCreateInstanceTestBase):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _ExpectListManagedInstances(self):
     request = (self.messages
@@ -331,6 +420,26 @@ class InstanceGroupManagerCreateInstanceBetaRegionalTest(
         response=response,
     )
 
+  def _ExpectWaitOperation(self, name='foo'):
+    request = self.messages.ComputeRegionOperationsWaitRequest(
+        operation=name,
+        project='fake-project',
+        region='us-central2',
+    )
+    response = self.messages.Operation(
+        status=self.messages.Operation.StatusValueValuesEnum.DONE,
+        selfLink=self.project_uri + '/regions/us-central2/operations/' + name,
+        targetLink=(self.project_uri +
+                    '/regions/us-central2/instanceGroupManagers/group-1'),
+    )
+    self.client.regionOperations.Wait.Expect(
+        request,
+        response=response,
+    )
+
+  def _ExpectPollingOperation(self, name='foo'):
+    self._ExpectWaitOperation(name)
+
   def _ExpectGetInstanceGroupManager(self):
     request = self.messages.ComputeRegionInstanceGroupManagersGetRequest(
         instanceGroupManager='group-1',
@@ -360,7 +469,7 @@ class InstanceGroupManagerCreateInstanceBetaRegionalTest(
     self._ExpectCreateInstance(
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=preserved_state_metadata)
-    self._ExpectGetOperation()
+    self._ExpectPollingOperation()
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -387,7 +496,7 @@ class InstanceGroupManagerCreateInstanceBetaRegionalTest(
     self._ExpectCreateInstance(
         preserved_state_disks=[],
         preserved_state_metadata=[])
-    self._ExpectGetOperation()
+    self._ExpectPollingOperation()
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -400,33 +509,19 @@ class InstanceGroupManagerCreateInstanceBetaRegionalTest(
 class InstanceGroupManagerCreateInstanceAlphaZonalTest(
     InstanceGroupManagerCreateInstanceBetaZonalTest):
 
-  def SetUp(self):
+  API_VERSION = 'alpha'
+
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
-    self.messages = self.client.MESSAGES_MODULE
-    self.endpoint_uri = 'https://compute.googleapis.com/compute/alpha/'
-    self.project_uri = '{endpoint_uri}projects/fake-project'.format(
-        endpoint_uri=self.endpoint_uri)
 
 
 class InstanceGroupManagerCreateInstanceAlphaRegionalTest(
     InstanceGroupManagerCreateInstanceBetaRegionalTest):
 
-  def SetUp(self):
+  API_VERSION = 'alpha'
+
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
-    self.messages = self.client.MESSAGES_MODULE
-    self.endpoint_uri = 'https://compute.googleapis.com/compute/alpha/'
-    self.project_uri = '{endpoint_uri}projects/fake-project'.format(
-        endpoint_uri=self.endpoint_uri)
 
 
 if __name__ == '__main__':

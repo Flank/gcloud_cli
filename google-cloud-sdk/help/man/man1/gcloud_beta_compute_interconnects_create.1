@@ -46,10 +46,7 @@ request an interconnect.
 
 .TP 2m
 \fB\-\-interconnect\-type\fR=\fIINTERCONNECT_TYPE\fR
-(DEPRECATED) Type of the interconnect.
-
-IT_PRIVATE will be deprecated for interconnect\-type. Please use DEDICATED
-instead. \fIINTERCONNECT_TYPE\fR must be one of:
+Type of the interconnect. \fIINTERCONNECT_TYPE\fR must be one of:
 
 .RS 2m
 .TP 2m
@@ -123,8 +120,9 @@ notifications regarding this interconnect.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -134,12 +132,12 @@ To create an interconnect of type DEDICATED, run:
 
 .RS 2m
 $ gcloud beta compute interconnects create example\-interconnect \e
-    \-\-customer\-name "Example Customer Name" \e
-    \-\-interconnect\-type DEDICATED \e
-    \-\-link\-type LINK_TYPE_ETHERNET_10G_LR \e
-    \-\-location example\-zone1\-1 \-\-requested\-link\-count 1 \e
-    \-\-noc\-contact\-email noc@example.com \e
-    \-\-description "Example interconnect"
+    \-\-customer\-name="Example Customer Name" \e
+    \-\-interconnect\-type=DEDICATED \e
+    \-\-link\-type=LINK_TYPE_ETHERNET_10G_LR \e
+    \-\-location=example\-zone1\-1 \-\-requested\-link\-count=1 \e
+    \-\-noc\-contact\-email=noc@example.com \e
+    \-\-description="Example interconnect"
 .RE
 
 

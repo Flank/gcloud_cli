@@ -11,7 +11,13 @@ gcloud compute network\-endpoint\-groups describe \- describe a Google Compute E
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute network\-endpoint\-groups describe\fR \fINAME\fR [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute network\-endpoint\-groups describe\fR \fINAME\fR [\fB\-\-global\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Describe a Google Compute Engine network endpoint group.
 
 
 
@@ -29,6 +35,15 @@ Name of the network endpoint group to operate on.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the network endpoint group is global.
+
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 Zone of the network endpoint group to operate on. If not specified and the
@@ -59,6 +74,7 @@ Alternatively, the zone can be stored in the environment variable
 
 
 .RE
+.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
@@ -66,8 +82,9 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

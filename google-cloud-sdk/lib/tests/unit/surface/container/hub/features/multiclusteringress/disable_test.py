@@ -28,13 +28,14 @@ class DisableTest(base.FeaturesTestBase):
   """
 
   FEATURE_NAME = 'multiclusteringress'
+  FEATURE_DISPLAY_NAME = 'MultiClusterIngress'
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def _ExpectDeleteCalls(self):
+  def _ExpectDeleteCalls(self, force=False):
     operation = self.features_api._MakeOperation()
-    self.features_api.ExpectDelete(operation)
+    self.features_api.ExpectDelete(operation, force=force)
     self.features_api.ExpectOperation(operation)
     operation = self.features_api._MakeOperation(done=True)
     self.features_api.ExpectOperation(operation)
@@ -42,6 +43,10 @@ class DisableTest(base.FeaturesTestBase):
   def testRunDisable(self):
     self._ExpectDeleteCalls()
     self.RunCommand(['disable'])
+
+  def testRunDisableForce(self):
+    self._ExpectDeleteCalls(force=True)
+    self.RunCommand(['disable', '--force'])
 
 
 if __name__ == '__main__':

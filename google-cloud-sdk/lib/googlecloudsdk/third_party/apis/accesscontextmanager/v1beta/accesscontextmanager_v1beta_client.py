@@ -9,6 +9,7 @@ class AccesscontextmanagerV1beta(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://accesscontextmanager.googleapis.com/'
+  MTLS_BASE_URL = u'https://accesscontextmanager.mtls.googleapis.com/'
 
   _PACKAGE = u'accesscontextmanager'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
@@ -202,11 +203,12 @@ errors will result in an error response for the first error encountered.
       r"""Replace all existing Access Levels in an Access.
 Policy with the
 Access Levels
-provided. This is done within one transaction. The longrunning operation
+provided. This is action done in atomically. The longrunning operation
 from this RPC will have a successful status once all replacements have
 propagated to long-lasting storage. Replacements containing errors will
-result in an error response for the first error encountered and the
-transaction will be cancelled. Operation.response field will contain
+result in an error response for the first error encountered. Replacement
+will be cancelled on error, existing Access Levels will not be
+affected. Operation.response field will contain
 ReplaceAccessLevelsResponse.
 
       Args:
@@ -244,7 +246,7 @@ ReplaceAccessLevelsResponse.
           }
 
     def Create(self, request, global_params=None):
-      r"""Create an Service Perimeter. The.
+      r"""Create a Service Perimeter. The.
 longrunning operation from this RPC will have a successful status once the
 Service Perimeter has
 propagated to long-lasting storage. Service Perimeters containing
@@ -275,7 +277,7 @@ errors will result in an error response for the first error encountered.
     )
 
     def Delete(self, request, global_params=None):
-      r"""Delete an Service Perimeter by resource.
+      r"""Delete a Service Perimeter by resource.
 name. The longrunning operation from this RPC will have a successful status
 once the Service Perimeter has been
 removed from long-lasting storage.
@@ -305,7 +307,7 @@ removed from long-lasting storage.
     )
 
     def Get(self, request, global_params=None):
-      r"""Get an Service Perimeter by resource.
+      r"""Get a Service Perimeter by resource.
 name.
 
       Args:
@@ -361,7 +363,7 @@ access policy.
     )
 
     def Patch(self, request, global_params=None):
-      r"""Update an Service Perimeter. The.
+      r"""Update a Service Perimeter. The.
 longrunning operation from this RPC will have a successful status once the
 changes to the Service Perimeter have
 propagated to long-lasting storage. Service Perimeter containing
@@ -395,11 +397,12 @@ errors will result in an error response for the first error encountered.
       r"""Replace all existing Service Perimeters in an.
 Access Policy
 with the Service Perimeters provided.
-This is done within one transaction. The longrunning operation from this
+This is done atomically. The longrunning operation from this
 RPC will have a successful status once all replacements have propagated to
 long-lasting storage. Replacements containing errors will result in an
-error response for the first error encountered and the transaction will be
-cancelled. Operation.response field will contain
+error response for the first error encountered. Replacement will be
+cancelled on error, existing Service Perimeters will not be
+affected. Operation.response field will contain
 ReplaceServicePerimetersResponse. Either all
 Service Perimeters' spec fields
 should be set or all status fields should be set, but not both.

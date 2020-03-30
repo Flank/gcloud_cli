@@ -11,7 +11,7 @@ gcloud alpha access\-context\-manager levels replace\-all \- replace all existin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha access\-context\-manager levels replace\-all\fR [\fIPOLICY\fR] \fB\-\-source\-file\fR=\fISOURCE_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha access\-context\-manager levels replace\-all\fR [\fIPOLICY\fR] \fB\-\-source\-file\fR=\fISOURCE_FILE\fR [\fB\-\-etag\fR=\fIETAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -19,6 +19,25 @@ gcloud alpha access\-context\-manager levels replace\-all \- replace all existin
 
 \fB(ALPHA)\fR Replace all existing access level in specified access policy with
 access levels specified in a file.
+
+
+.SH "EXAMPLES"
+
+.RS 2m
+To replace all levels within a policy, using etag:
+$ gcloud alpha access\-context\-manager levels replace\-all \e
+    my\-policy\-number \e
+    \-\-source\-file=path\-to\-file\-containing\-all\-replacement\-access\-lev\e
+els.yaml \-\-etag=optional\-latest\-etag\-of\-policy
+.RE
+
+.RS 2m
+To replace all levels within a policy, without using etag:
+$ gcloud alpha access\-context\-manager levels replace\-all \e
+    my\-policy\-number \e
+    \-\-source\-file=path\-to\-file\-containing\-all\-replacement\-access\-lev\e
+els.yaml
+.RE
 
 
 
@@ -48,12 +67,13 @@ ID of the policy or fully qualified identifier for the policy.
 Path to a file containing a list of access levels.
 
 An access level file is a YAML\-formatted list of access levels, which are YAML
-objects representing a Condition as described in the API reference. For example:
+objects representing a Basic or Custom level as described in the API reference.
+For example:
 
 .RS 2m
 \- name: accessPolicies/my_policy/accessLevels/my_level
-  title: My Level
-  description: Level for foo.
+  title: My Basic Level
+  description: Basic level for foo.
   basic:
     combiningFunction: AND
     conditions:
@@ -63,20 +83,29 @@ objects representing a Condition as described in the API reference. For example:
     \- members
       \- user1:user1@example.com
 \- name: accessPolicies/my_policy/accessLevels/my_other_level
-  title: My Other Level
-  description: Level for bar.
-  basic:
-    combiningFunction: OR
-    conditions:
-    \- ipSubnetworks:
-      \- 192.168.100.14/24
-      \- 2001:db8::/48
-    \- members
-      \- user2:user2@example.com
+  title: My Other Custom Level
+  description: Custom level for bar.
+  custom:
+    expr:
+      expression: "origin.region_code in ['US', 'CA']"
 .RE
 
-For more information, see:
-https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1beta/accessPolicies.accessLevels
+For more information about the alpha version, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1alpha/accessPolicies.accessLevels
+For more information about the beta version, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1/accessPolicies.accessLevels
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-etag\fR=\fIETAG\fR
+An etag which specifies the version of the Access Policy. Only etags that
+represent the latest version of the Access Policy will be accepted.
 
 
 .RE
@@ -87,14 +116,15 @@ https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1beta/acc
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "API REFERENCE"
 
-This command uses the \fBaccesscontextmanager/v1beta\fR API. The full
+This command uses the \fBaccesscontextmanager/v1alpha\fR API. The full
 documentation for this API can be found at:
 https://cloud.google.com/access\-context\-manager/docs/reference/rest/
 
@@ -105,5 +135,9 @@ https://cloud.google.com/access\-context\-manager/docs/reference/rest/
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta access\-context\-manager levels replace\-all
+.RE
 

@@ -28,9 +28,11 @@ class UrlMapsRemoveHostRuleTest(test_base.BaseTest):
   _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
 
   def RunRemoveHostRule(self, command):
-    self.Run('compute url-maps remove-host-rule ' + command)
+    self.Run(self._api + ' compute url-maps remove-host-rule ' + command)
 
   def SetUp(self):
+    self.SelectApi('v1')
+    self._api = ''
     self._collection = self.compute_v1.urlMaps
 
     self.url_map = self.messages.UrlMap(
@@ -198,6 +200,7 @@ class UrlMapsRemoveHostRuleBetaTest(UrlMapsRemoveHostRuleTest):
 
   def SetUp(self):
     self.SelectApi('beta')
+    self._api = 'beta'
     self._collection = self.compute_beta.urlMaps
 
     self.url_map = self.messages.UrlMap(
@@ -232,17 +235,15 @@ class UrlMapsRemoveHostRuleBetaTest(UrlMapsRemoveHostRuleTest):
         ],
     )
 
-  def RunRemoveHostRule(self, command):
-    self.Run('beta compute url-maps remove-host-rule --global ' + command)
 
-
-class UrlMapsRemoveHostRuleAlphaTest(UrlMapsRemoveHostRuleTest):
+class UrlMapsRemoveHostRuleAlphaTest(UrlMapsRemoveHostRuleBetaTest):
 
   _V1_URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
   _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
 
   def SetUp(self):
     self.SelectApi('alpha')
+    self._api = 'alpha'
     self._collection = self.compute_alpha.urlMaps
 
     self.url_map = self.messages.UrlMap(
@@ -277,22 +278,20 @@ class UrlMapsRemoveHostRuleAlphaTest(UrlMapsRemoveHostRuleTest):
         ],
     )
 
-  def RunRemoveHostRule(self, command):
-    self.Run('alpha compute url-maps remove-host-rule --global ' + command)
 
-
-class RegionUrlMapsRemoveHostRuleBetaTest(test_base.BaseTest):
+class RegionUrlMapsRemoveHostRuleTest(test_base.BaseTest):
 
   _V1_URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
   _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
 
   def RunRemoveHostRule(self, command):
-    self.Run('beta compute url-maps remove-host-rule --region us-west1 ' +
-             command)
+    self.Run(self._api +
+             ' compute url-maps remove-host-rule --region us-west1 ' + command)
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self._collection = self.compute_beta.regionUrlMaps
+    self.SelectApi('v1')
+    self._api = ''
+    self._collection = self.compute_v1.regionUrlMaps
 
     self.url_map = self.messages.UrlMap(
         name='url-map-1',
@@ -460,17 +459,57 @@ class RegionUrlMapsRemoveHostRuleBetaTest(test_base.BaseTest):
                              region='us-west1'))])
 
 
+class RegionUrlMapsRemoveHostRuleBetaTest(RegionUrlMapsRemoveHostRuleTest):
+
+  _V1_URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
+  _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._collection = self.compute_beta.regionUrlMaps
+
+    self.url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._BACKEND_SERVICES_URI_PREFIX + 'default-service',
+        hostRules=[
+            self.messages.HostRule(
+                hosts=['*.youtube.com', 'youtube.com'], pathMatcher='youtube'),
+            self.messages.HostRule(hosts=['google.com'], pathMatcher='google'),
+            self.messages.HostRule(
+                hosts=['*-youtube.com'], pathMatcher='youtube'),
+        ],
+        pathMatchers=[
+            self.messages.PathMatcher(
+                name='youtube',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'youtube-default',
+                pathRules=[
+                    self.messages.PathRule(
+                        paths=['/search', '/search/*'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-search'),
+                    self.messages.PathRule(
+                        paths=['/watch', '/view', '/preview'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-watch'),
+                ]),
+            self.messages.PathMatcher(
+                name='google',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'google-default'),
+        ],
+    )
+
+
 class RegionUrlMapsRemoveHostRuleAlphaTest(RegionUrlMapsRemoveHostRuleBetaTest):
 
   _V1_URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
   _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
 
-  def RunRemoveHostRule(self, command):
-    self.Run('alpha compute url-maps remove-host-rule --region us-west1 ' +
-             command)
-
   def SetUp(self):
     self.SelectApi('alpha')
+    self._api = 'alpha'
     self._collection = self.compute_alpha.regionUrlMaps
 
     self.url_map = self.messages.UrlMap(

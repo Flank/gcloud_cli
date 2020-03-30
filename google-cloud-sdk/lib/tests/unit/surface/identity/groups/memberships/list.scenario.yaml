@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 title: cloud identity groups memberships list test scenario
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
+  - label: List memberships for a specified group email.
   - command: |
       identity groups memberships list
       --group-email eng-discuss@foo.com
@@ -27,6 +28,8 @@ summary:
       roles:
       - name: MEMBER
 - execute:
+  - label: List memberships for a specified group email with extra arguments (e.g.
+      page-size)
   - command: |
       identity groups memberships list
       --group-email eng-discuss@foo.com
@@ -41,26 +44,36 @@ summary:
       roles:
       - name: MEMBER
 - execute:
+  - label: List memberships for a specified group email, but no membership found.
   - command: |
       identity groups memberships list
       --group-email eng-discuss@foo.com
   - stderr: |
       Listed 0 items.
 - execute:
+  - label: List memberships for an invalid group email.
   - command: |
       identity groups memberships list
       --group-email invalid-group@foo.com
   - error: '1: Invalid value for [group_email]: There is no such a group associated
       with the specified argument:invalid-group@foo.com'
 actions:
-- execute_command:  # List memberships for a specified group email.
+
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha1
+      BETA: v1beta1
+
+- execute_command:
+    label: List memberships for a specified group email.
     command: |
       identity groups memberships list
       --group-email eng-discuss@foo.com
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -73,7 +86,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2/memberships?alt=json&view=BASIC
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships?alt=json&view=BASIC
           method: GET
           headers: {}
           body: null
@@ -106,7 +119,9 @@ actions:
     - expect_exit:
         code: 0
 
-- execute_command:  # List memberships for a specified group email with extra arguments (e.g. page-size)
+- execute_command:
+    label: List memberships for a specified group email with extra arguments (e.g.
+      page-size)
     command: |
       identity groups memberships list
       --group-email eng-discuss@foo.com
@@ -116,7 +131,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -129,7 +144,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2/memberships?alt=json&pageSize=5&view=BASIC
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships?alt=json&pageSize=5&view=BASIC
           method: GET
           headers: {}
           body: null
@@ -162,14 +177,15 @@ actions:
     - expect_exit:
         code: 0
 
-- execute_command:  # List memberships for a specified group email, but no membership found.
+- execute_command:
+    label: List memberships for a specified group email, but no membership found.
     command: |
       identity groups memberships list
       --group-email eng-discuss@foo.com
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -182,7 +198,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2/memberships?alt=json&view=BASIC
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships?alt=json&view=BASIC
           method: GET
           headers: {}
           body: null
@@ -195,14 +211,15 @@ actions:
     - expect_exit:
         code: 0
 
-- execute_command:  # List memberships for an invalid group email.
+- execute_command:
+    label: List memberships for an invalid group email.
     command: |
       identity groups memberships list
       --group-email invalid-group@foo.com
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=invalid-group%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=invalid-group%40foo.com
           method: GET
           headers: {}
           body: null

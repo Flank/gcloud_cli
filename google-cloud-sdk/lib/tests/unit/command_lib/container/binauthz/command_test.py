@@ -26,7 +26,7 @@ from tests.lib.surface.container.binauthz import base as binauthz_test_base
 
 
 class ContaineranalysisClientTest(
-    binauthz_test_base.WithMockBetaContaineranalysis,
+    binauthz_test_base.WithMockV1Containeranalysis,
     binauthz_test_base.BinauthzTestBase,
 ):
 
@@ -41,7 +41,8 @@ class ContaineranalysisClientTest(
     )
     self.artifact_url = self.GenerateArtifactUrl()
     self.pgp_key_fingerprint = 'AAAABBBB'
-    self.signature = 'fake-signature'
+    self.signature = b'fake-signature'
+    self.payload = b'fake-payload'
     self.note_id = 'my-aa-note'
     self.note_project = 'other-' + self.Project()
     self.note_relative_name = binauthz_test_base.GetNoteRelativeName(
@@ -52,12 +53,12 @@ class ContaineranalysisClientTest(
         relative_name=self.note_relative_name,
         collection='containeranalysis.projects.notes',
     )
-    self.request_occurrence = self.CreateRequestOccurrence(
+    self.request_occurrence = self.CreateRequestAttestationOccurrence(
+        note_ref=self.note_ref,
+        plaintext=self.payload,
+        signatures=[(self.pgp_key_fingerprint, self.signature)],
         artifact_url=self.artifact_url,
         project_ref=self.project_ref,
-        note_ref=self.note_ref,
-        pgp_key_fingerprint=self.pgp_key_fingerprint,
-        signature=self.signature,
     )
     self.response_occurrence = self.CreateResponseOccurrence(
         project_ref=self.project_ref,
@@ -69,13 +70,13 @@ class ContaineranalysisClientTest(
         request_occurrence=self.request_occurrence,
         project_ref=self.project_ref,
     )
-    self.ca_client.CreatePgpAttestationOccurrence(
+    self.ca_client.CreateAttestationOccurrence(
         note_ref=self.note_ref,
+        plaintext=self.payload,
         project_ref=self.project_ref,
         artifact_url=self.artifact_url,
-        pgp_key_fingerprint=self.pgp_key_fingerprint,
-        signature=self.signature,
-    )
+        public_key_id=self.pgp_key_fingerprint,
+        signature=self.signature)
 
   def testYieldAttestations(self):
     self.ExpectProjectsNotesOccurrencesList(
@@ -93,14 +94,14 @@ class ContaineranalysisClientTest(
   def testYieldAttestationsFilter(self):
     # Mock a returned occurrence with the wrong kind (but matching artifact URL)
     messages = self.ca_messages
-    unmatched_kind_response_occurrence = self.CreateGenericResponseOccurrence(
-        project_ref=self.project_ref,
+    unmatched_kind_response_occurrence = messages.Occurrence(
         kind=messages.Occurrence.KindValueValuesEnum.BUILD,
-        resource_url=self.artifact_url,
-        note_name=self.note_ref.RelativeName(),
-        build=messages.GrafeasV1beta1BuildDetails(),
-    )
-
+        resourceUri=self.artifact_url,
+        noteName=self.note_ref.RelativeName(),
+        build=messages.BuildOccurrence(
+            provenance=messages.BuildProvenance(),
+            provenanceBytes=b'something',
+        ))
     self.ExpectProjectsNotesOccurrencesList(
         note_relative_name=self.note_relative_name,
         expected_filter_content='resourceUrl="{}"'.format(self.artifact_url),

@@ -81,8 +81,9 @@ Fail if a variable with the specified name already exists.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -92,7 +93,7 @@ To create or update a variable named "my\-var", run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs variables set \e
-    \-\-config\-name my\-config my\-var "my value"
+    \-\-config\-name=my\-config my\-var "my value"
 .RE
 
 To create or update a variable with a hierarchical name, such as
@@ -100,21 +101,21 @@ To create or update a variable with a hierarchical name, such as
 
 .RS 2m
 $ gcloud beta runtime\-config configs variables set \e
-    \-\-config\-name my\-config results/task1 "my value"
+    \-\-config\-name=my\-config results/task1 "my value"
 .RE
 
 To create a variable, but fail if it already exists, run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs variables set \e
-    \-\-config\-name my\-config my\-var "my\-value" \-\-fail\-if\-present
+    \-\-config\-name=my\-config my\-var "my\-value" \-\-fail\-if\-present
 .RE
 
 To update a variable, but fail if it does not exist, run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs variables set \e
-    \-\-config\-name my\-config my\-var "my\-value" \-\-fail\-if\-absent
+    \-\-config\-name=my\-config my\-var "my\-value" \-\-fail\-if\-absent
 .RE
 
 It is possible to provide \-\-is\-text flag if the value contains only text
@@ -123,7 +124,7 @@ requires less quota on the backend.
 
 .RS 2m
 $ gcloud beta runtime\-config configs variables set \e
-    \-\-config\-name my\-config \-\-is\-text my\-var "my value"
+    \-\-config\-name=my\-config \-\-is\-text my\-var "my value"
 .RE
 
 If the variable's value parameter is not specified, the value will be read from

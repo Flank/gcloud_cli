@@ -2,8 +2,7 @@ NAME
     gcloud beta app update - updates an App Engine application
 
 SYNOPSIS
-    gcloud beta app update [--[no-]split-health-checks]
-        [--use-container-optimized-os] [GCLOUD_WIDE_FLAG ...]
+    gcloud beta app update [--[no-]split-health-checks] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) This command is used to update settings on an app engine
@@ -15,21 +14,13 @@ FLAGS
         --split-health-checks to enable and --no-split-health-checks to
         disable.
 
-     --use-container-optimized-os
-        (DEPRECATED) Enables/disables Container-Optimized OS as Flex base VM
-        image by default on new deployments.
-
-        Starting 2019-11-01, Container-Optimized OS is the default VM image
-        type of App Engine Flex deployments. The flag
-        --no-use-container-optimized-os is deprecated and will not have an
-        effect.
-
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To enable split health checks on an application:

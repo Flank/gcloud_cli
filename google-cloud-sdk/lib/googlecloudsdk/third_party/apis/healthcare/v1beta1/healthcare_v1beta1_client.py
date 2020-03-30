@@ -9,6 +9,7 @@ class HealthcareV1beta1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://healthcare.googleapis.com/'
+  MTLS_BASE_URL = u'https://healthcare.mtls.googleapis.com/'
 
   _PACKAGE = u'healthcare'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
@@ -35,6 +36,7 @@ class HealthcareV1beta1(base_api.BaseApiClient):
         default_global_params=default_global_params,
         additional_http_headers=additional_http_headers,
         response_encoding=response_encoding)
+    self.projects_locations_datasets_annotationStores = self.ProjectsLocationsDatasetsAnnotationStoresService(self)
     self.projects_locations_datasets_dicomStores_studies_series_instances_frames = self.ProjectsLocationsDatasetsDicomStoresStudiesSeriesInstancesFramesService(self)
     self.projects_locations_datasets_dicomStores_studies_series_instances = self.ProjectsLocationsDatasetsDicomStoresStudiesSeriesInstancesService(self)
     self.projects_locations_datasets_dicomStores_studies_series = self.ProjectsLocationsDatasetsDicomStoresStudiesSeriesService(self)
@@ -48,6 +50,108 @@ class HealthcareV1beta1(base_api.BaseApiClient):
     self.projects_locations_datasets = self.ProjectsLocationsDatasetsService(self)
     self.projects_locations = self.ProjectsLocationsService(self)
     self.projects = self.ProjectsService(self)
+
+  class ProjectsLocationsDatasetsAnnotationStoresService(base_api.BaseApiService):
+    """Service class for the projects_locations_datasets_annotationStores resource."""
+
+    _NAME = u'projects_locations_datasets_annotationStores'
+
+    def __init__(self, client):
+      super(HealthcareV1beta1.ProjectsLocationsDatasetsAnnotationStoresService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource.
+Returns an empty policy if the resource exists and does not have a policy
+set.
+
+      Args:
+        request: (HealthcareProjectsLocationsDatasetsAnnotationStoresGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}:getIamPolicy',
+        http_method=u'GET',
+        method_id=u'healthcare.projects.locations.datasets.annotationStores.getIamPolicy',
+        ordered_params=[u'resource'],
+        path_params=[u'resource'],
+        query_params=[u'options_requestedPolicyVersion'],
+        relative_path=u'v1beta1/{+resource}:getIamPolicy',
+        request_field='',
+        request_type_name=u'HealthcareProjectsLocationsDatasetsAnnotationStoresGetIamPolicyRequest',
+        response_type_name=u'Policy',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any.
+existing policy.
+
+Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+
+      Args:
+        request: (HealthcareProjectsLocationsDatasetsAnnotationStoresSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}:setIamPolicy',
+        http_method=u'POST',
+        method_id=u'healthcare.projects.locations.datasets.annotationStores.setIamPolicy',
+        ordered_params=[u'resource'],
+        path_params=[u'resource'],
+        query_params=[],
+        relative_path=u'v1beta1/{+resource}:setIamPolicy',
+        request_field=u'setIamPolicyRequest',
+        request_type_name=u'HealthcareProjectsLocationsDatasetsAnnotationStoresSetIamPolicyRequest',
+        response_type_name=u'Policy',
+        supports_download=False,
+    )
+
+    def TestIamPermissions(self, request, global_params=None):
+      r"""Returns permissions that a caller has on the specified resource.
+If the resource does not exist, this will return an empty set of
+permissions, not a NOT_FOUND error.
+
+Note: This operation is designed to be used for building permission-aware
+UIs and command-line tools, not for authorization checking. This operation
+may "fail open" without warning.
+
+      Args:
+        request: (HealthcareProjectsLocationsDatasetsAnnotationStoresTestIamPermissionsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (TestIamPermissionsResponse) The response message.
+      """
+      config = self.GetMethodConfig('TestIamPermissions')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    TestIamPermissions.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}:testIamPermissions',
+        http_method=u'POST',
+        method_id=u'healthcare.projects.locations.datasets.annotationStores.testIamPermissions',
+        ordered_params=[u'resource'],
+        path_params=[u'resource'],
+        query_params=[],
+        relative_path=u'v1beta1/{+resource}:testIamPermissions',
+        request_field=u'testIamPermissionsRequest',
+        request_type_name=u'HealthcareProjectsLocationsDatasetsAnnotationStoresTestIamPermissionsRequest',
+        response_type_name=u'TestIamPermissionsResponse',
+        supports_download=False,
+    )
 
   class ProjectsLocationsDatasetsDicomStoresStudiesSeriesInstancesFramesService(base_api.BaseApiService):
     """Service class for the projects_locations_datasets_dicomStores_studies_series_instances_frames resource."""
@@ -131,7 +235,7 @@ http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
     def Delete(self, request, global_params=None):
       r"""DeleteInstance deletes an instance associated with the given study, series,.
 and SOP Instance UID. Delete requests are equivalent to the GET requests
-specified in the WADO-RS standard.
+specified in the Retrieve transaction.
 
       Args:
         request: (HealthcareProjectsLocationsDatasetsDicomStoresStudiesSeriesInstancesDeleteRequest) input message
@@ -257,8 +361,8 @@ http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
 
     def Delete(self, request, global_params=None):
       r"""DeleteSeries deletes all instances within the given study and series.
-Delete requests are equivalent to the GET requests specified in the WADO-RS
-standard.
+Delete requests are equivalent to the GET requests specified in the
+Retrieve transaction.
 
       Args:
         request: (HealthcareProjectsLocationsDatasetsDicomStoresStudiesSeriesDeleteRequest) input message
@@ -381,7 +485,7 @@ http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
 
     def Delete(self, request, global_params=None):
       r"""DeleteStudy deletes all instances within the given study. Delete requests.
-are equivalent to the GET requests specified in the WADO-RS standard.
+are equivalent to the GET requests specified in the Retrieve transaction.
 
       Args:
         request: (HealthcareProjectsLocationsDatasetsDicomStoresStudiesDeleteRequest) input message
@@ -587,7 +691,7 @@ http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.5.
     )
 
     def Deidentify(self, request, global_params=None):
-      r"""Creates a new DICOM store containing de-identified data from the source.
+      r"""De-identifies data from the source store and writes it to the destination.
 store. The metadata field type
 is OperationMetadata.
 If the request is successful, the
@@ -596,7 +700,11 @@ DeidentifyDicomStoreSummary. If errors occur,
 error
 details field type is
 DeidentifyErrorDetails.
-Errors are also logged to Stackdriver
+The LRO result may still be successful if de-identification fails for some
+DICOM instances. The output DICOM store will not contain
+these failed resources. Failed resource totals are tracked in
+DeidentifySummary.failure_resource_count.
+Error details are also logged to Stackdriver
 (see [Viewing logs](/healthcare/docs/how-tos/stackdriver-logging)).
 
       Args:
@@ -654,6 +762,8 @@ within it.
     def Export(self, request, global_params=None):
       r"""Exports data to the specified destination by copying it from the DICOM.
 store.
+Errors are also logged to Stackdriver Logging. For more information,
+see [Viewing logs](/healthcare/docs/how-tos/stackdriver-logging).
 The metadata field type is
 OperationMetadata.
 
@@ -1016,8 +1126,12 @@ may "fail open" without warning.
 search criteria specified as query parameters, grouped by
 `Observation.code`, sorted from most recent to oldest.
 
-Implements the FHIR extended operation
-[Observation-lastn](http://hl7.org/implement/standards/fhir/STU3/observation-operations.html#lastn).
+Implements the FHIR extended operation Observation-lastn
+([STU3](http://hl7.org/implement/standards/fhir/STU3/observation-operations.html#lastn),
+[R4](http://hl7.org/implement/standards/fhir/R4/observation-operations.html#lastn)).
+
+DSTU2 doesn't define the Observation-lastn method, but the server supports
+it the same way it supports STU3.
 
 Search terms are provided as query parameters following the same pattern as
 the search method. The following search parameters must
@@ -1094,7 +1208,7 @@ GCP error might be returned instead.
         method_id=u'healthcare.projects.locations.datasets.fhirStores.fhir.Patient-everything',
         ordered_params=[u'name'],
         path_params=[u'name'],
-        query_params=[u'_count', u'end', u'pageToken', u'start'],
+        query_params=[u'_count', u'_page_token', u'end', u'start'],
         relative_path=u'v1beta1/{+name}/$everything',
         request_field='',
         request_type_name=u'HealthcareProjectsLocationsDatasetsFhirStoresFhirPatientEverythingRequest',
@@ -1134,13 +1248,20 @@ This is not a FHIR standard operation.
     )
 
     def Capabilities(self, request, global_params=None):
-      r"""Gets the FHIR [capability.
-statement](http://hl7.org/implement/standards/fhir/STU3/capabilitystatement.html)
-for the store, which contains a description of functionality supported by
-the server.
+      r"""Gets the FHIR capability statement.
+([STU3](http://hl7.org/implement/standards/fhir/STU3/capabilitystatement.html),
+[R4](http://hl7.org/implement/standards/fhir/R4/capabilitystatement.html)),
+or the [conformance
+statement](http://hl7.org/implement/standards/fhir/DSTU2/conformance.html)
+in the DSTU2 case for the store, which contains a description of
+functionality supported by the server.
 
-Implements the FHIR standard [capabilities
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#capabilities).
+Implements the FHIR standard capabilities interaction
+([STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#capabilities),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#capabilities)),
+or the [conformance
+interaction](http://hl7.org/implement/standards/fhir/DSTU2/http.html#conformance)
+in the DSTU2 case.
 
 On success, the response body will contain a JSON-encoded representation
 of a `CapabilityStatement` resource.
@@ -1172,8 +1293,10 @@ of a `CapabilityStatement` resource.
     def ConditionalDelete(self, request, global_params=None):
       r"""Deletes FHIR resources that match a search query.
 
-Implements the FHIR standard [conditional delete
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.13.1).
+Implements the FHIR standard conditional delete interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.12.1),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.13.1),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#3.1.0.7.1)).
 If multiple resources match, all of them will be deleted.
 
 Search terms are provided as query parameters following the same pattern as
@@ -1215,8 +1338,12 @@ purge method.
 parameters, updates part of that resource by applying the operations
 specified in a [JSON Patch](http://jsonpatch.com/) document.
 
-Implements the FHIR standard [conditional patch
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#patch).
+Implements the FHIR standard conditional patch interaction
+([STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#patch),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#patch)).
+
+DSTU2 doesn't define a conditional patch method, but the server supports it
+in the same way it supports STU3.
 
 Search terms are provided as query parameters following the same pattern as
 the search method.
@@ -1262,8 +1389,10 @@ GCP error might be returned instead.
       r"""If a resource is found based on the search criteria specified in the query.
 parameters, updates the entire contents of that resource.
 
-Implements the FHIR standard [conditional update
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#cond-update).
+Implements the FHIR standard conditional update interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.10.2),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#cond-update),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#cond-update)).
 
 Search terms are provided as query parameters following the same pattern as
 the search method.
@@ -1315,12 +1444,16 @@ GCP error might be returned instead.
     def Create(self, request, global_params=None):
       r"""Creates a FHIR resource.
 
-Implements the FHIR standard [create
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#create),
+Implements the FHIR standard create interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#create),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#create),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#create)),
 which creates a new resource with a server-assigned resource ID.
 
-Also supports the FHIR standard [conditional create
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#ccreate),
+Also supports the FHIR standard conditional create interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#ccreate),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#ccreate),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#ccreate)),
 specified by supplying an `If-None-Exist` header containing a FHIR search
 query. If no resources match this search query, the server processes the
 create operation as normal.
@@ -1363,8 +1496,10 @@ GCP error might be returned instead.
     def Delete(self, request, global_params=None):
       r"""Deletes a FHIR resource.
 
-Implements the FHIR standard [delete
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#delete).
+Implements the FHIR standard delete interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#delete),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#delete),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#delete)).
 
 Note: Unless resource versioning is disabled by setting the
 disable_resource_versioning flag
@@ -1400,15 +1535,21 @@ purge method.
     def ExecuteBundle(self, request, global_params=None):
       r"""Executes all the requests in the given Bundle.
 
-Implements the FHIR standard [batch/transaction
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#transaction).
+Implements the FHIR standard batch/transaction interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#transaction),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#transaction),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#transaction)).
 
 Supports all interactions within a bundle, except search. This method
 accepts Bundles of type `batch` and `transaction`, processing them
-according to the [batch processing
-rules](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.1)
-and [transaction processing
-rules](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.2).
+according to the batch processing rules
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.16.1),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.1),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#brules))
+and transaction processing rules
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.16.2),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.2),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#trules)).
 
 The request body must contain a JSON-encoded FHIR `Bundle` resource, and
 the request headers must contain `Content-Type: application/fhir+json`.
@@ -1450,8 +1591,10 @@ store, a generic GCP error might be returned instead.
       r"""Lists all the versions of a resource (including the current version and.
 deleted versions) from the FHIR store.
 
-Implements the per-resource form of the FHIR standard [history
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#history).
+Implements the per-resource form of the FHIR standard history interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#history),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#history),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#history)).
 
 On success, the response body will contain a JSON-encoded representation
 of a `Bundle` resource of type `history`, containing the version history
@@ -1477,7 +1620,7 @@ GCP error might be returned instead.
         method_id=u'healthcare.projects.locations.datasets.fhirStores.fhir.history',
         ordered_params=[u'name'],
         path_params=[u'name'],
-        query_params=[u'_page_token', u'at', u'count', u'page', u'since'],
+        query_params=[u'_at', u'_count', u'_page_token', u'_since'],
         relative_path=u'v1beta1/{+name}/_history',
         request_field='',
         request_type_name=u'HealthcareProjectsLocationsDatasetsFhirStoresFhirHistoryRequest',
@@ -1489,8 +1632,12 @@ GCP error might be returned instead.
       r"""Updates part of an existing resource by applying the operations specified.
 in a [JSON Patch](http://jsonpatch.com/) document.
 
-Implements the FHIR standard [patch
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#patch).
+Implements the FHIR standard patch interaction
+([STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#patch),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#patch)).
+
+DSTU2 doesn't define a patch method, but the server supports it in the same
+way it supports STU3.
 
 The request body must contain a JSON Patch document, and the request
 headers must contain `Content-Type: application/json-patch+json`.
@@ -1529,11 +1676,15 @@ GCP error might be returned instead.
     def Read(self, request, global_params=None):
       r"""Gets the contents of a FHIR resource.
 
-Implements the FHIR standard [read
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#read).
+Implements the FHIR standard read interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#read),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#read),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#read)).
 
-Also supports the FHIR standard [conditional read
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#cread)
+Also supports the FHIR standard conditional read interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#cread),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#cread),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#cread))
 specified by supplying an `If-Modified-Since` header with a date/time value
 or an `If-None-Match` header with an ETag value.
 
@@ -1572,10 +1723,14 @@ GCP error might be returned instead.
       r"""Searches for resources in the given FHIR store according to criteria.
 specified as query parameters.
 
-Implements the FHIR standard [search
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#search)
-using the search semantics described in the [FHIR Search
-specification](http://hl7.org/implement/standards/fhir/STU3/search.html).
+Implements the FHIR standard search interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#search),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#search),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#search))
+using the search semantics described in the FHIR Search specification
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/search.html),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/search.html),
+[R4](http://hl7.org/implement/standards/fhir/R4/search.html)).
 
 Supports three methods of search defined by the specification:
 
@@ -1597,11 +1752,14 @@ request cannot be mapped to a valid API method on a FHIR store, a generic
 GCP error might be returned instead.
 
 The server's capability statement, retrieved through
-capabilities, indicates the search parameters
-that are supported on each FHIR resource. For the list of search
-parameters for STU3, see the
-[STU3 FHIR Search Parameter
-Registry](http://hl7.org/implement/standards/fhir/STU3/searchparameter-registry.html).
+capabilities, indicates what search parameters
+are supported on each FHIR resource. A list of all search parameters
+defined by the specification can be found in the FHIR Search Parameter
+Registry
+([STU3](http://hl7.org/implement/standards/fhir/STU3/searchparameter-registry.html),
+[R4](http://hl7.org/implement/standards/fhir/R4/searchparameter-registry.html)).
+FHIR search parameters for DSTU2 can be found on each resource's definition
+page.
 
 Supported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,
 `:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.
@@ -1649,8 +1807,10 @@ is reflected in search results.
     def Update(self, request, global_params=None):
       r"""Updates the entire contents of a resource.
 
-Implements the FHIR standard [update
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#update).
+Implements the FHIR standard update interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#update),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#update),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#update)).
 
 If the specified resource does
 not exist and the FHIR store has
@@ -1697,8 +1857,10 @@ GCP error might be returned instead.
       r"""Gets the contents of a version (current or historical) of a FHIR resource.
 by version ID.
 
-Implements the FHIR standard [vread
-interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#vread).
+Implements the FHIR standard vread interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#vread),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#vread),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#vread)).
 
 On success, the response body will contain a JSON-encoded representation
 of the resource.
@@ -1769,7 +1931,7 @@ GCP error might be returned instead.
     )
 
     def Deidentify(self, request, global_params=None):
-      r"""Creates a new FHIR store containing de-identified data from the source.
+      r"""De-identifies data from the source store and writes it to the destination.
 store. The metadata field type
 is OperationMetadata.
 If the request is successful, the
@@ -1952,6 +2114,9 @@ if the input data contains invalid references or if some resources fail to
 be imported, the FHIR store might be left in a state that violates
 referential integrity.
 
+The import process does not trigger PubSub notification or BigQuery
+streaming update, regardless of how those are configured on the FHIR store.
+
 If a resource with the specified ID already exists, the most recent
 version of the resource is overwritten without creating a new historical
 version, regardless of the
@@ -2076,6 +2241,91 @@ operation is OperationMetadata.
         request_field=u'fhirStore',
         request_type_name=u'HealthcareProjectsLocationsDatasetsFhirStoresPatchRequest',
         response_type_name=u'FhirStore',
+        supports_download=False,
+    )
+
+    def Search(self, request, global_params=None):
+      r"""Searches for resources in the given FHIR store according to criteria.
+specified as query parameters.
+
+Implements the FHIR standard search interaction
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#search),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#search),
+[R4](http://hl7.org/implement/standards/fhir/R4/http.html#search))
+using the search semantics described in the FHIR Search specification
+([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/search.html),
+[STU3](http://hl7.org/implement/standards/fhir/STU3/search.html),
+[R4](http://hl7.org/implement/standards/fhir/R4/search.html)).
+
+Supports three methods of search defined by the specification:
+
+*  `GET [base]?[parameters]` to search across all resources.
+*  `GET [base]/[type]?[parameters]` to search resources of a specified
+type.
+*  `POST [base]/[type]/_search?[parameters]` as an alternate form having
+the same semantics as the `GET` method.
+
+The `GET` methods do not support compartment searches. The `POST` method
+does not support `application/x-www-form-urlencoded` search parameters.
+
+On success, the response body will contain a JSON-encoded representation
+of a `Bundle` resource of type `searchset`, containing the results of the
+search.
+Errors generated by the FHIR store will contain a JSON-encoded
+`OperationOutcome` resource describing the reason for the error. If the
+request cannot be mapped to a valid API method on a FHIR store, a generic
+GCP error might be returned instead.
+
+The server's capability statement, retrieved through
+capabilities, indicates what search parameters
+are supported on each FHIR resource. A list of all search parameters
+defined by the specification can be found in the FHIR Search Parameter
+Registry
+([STU3](http://hl7.org/implement/standards/fhir/STU3/searchparameter-registry.html),
+[R4](http://hl7.org/implement/standards/fhir/R4/searchparameter-registry.html)).
+FHIR search parameters for DSTU2 can be found on each resource's definition
+page.
+
+Supported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,
+`:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.
+
+Supported search result parameters: `_sort`, `_count`, `_include`,
+`_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.
+
+The maximum number of search results returned defaults to 100, which can
+be overridden by the `_count` parameter up to a maximum limit of 1000. If
+there are additional results, the returned `Bundle` will contain
+pagination links.
+
+Resources with a total size larger than 5MB or a field count larger than
+50,000 might not be fully searchable as the server might trim its generated
+search index in those cases.
+
+Note: FHIR resources are indexed asynchronously, so there might be a slight
+delay between the time a resource is created or changes and when the change
+is reflected in search results.
+
+      Args:
+        request: (HealthcareProjectsLocationsDatasetsFhirStoresSearchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (HttpBody) The response message.
+      """
+      config = self.GetMethodConfig('Search')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Search.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/fhir',
+        http_method=u'GET',
+        method_id=u'healthcare.projects.locations.datasets.fhirStores.search',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'resourceType'],
+        relative_path=u'v1beta1/{+parent}/fhir',
+        request_field='',
+        request_type_name=u'HealthcareProjectsLocationsDatasetsFhirStoresSearchRequest',
+        response_type_name=u'HttpBody',
         supports_download=False,
     )
 
@@ -2241,9 +2491,7 @@ asynchronously.
     def Ingest(self, request, global_params=None):
       r"""Ingests a new HL7v2 message from the hospital and sends a notification to.
 the Cloud Pub/Sub topic. Return is an HL7v2 ACK message if the message was
-successfully stored. Otherwise an error is returned.  If an identical
-HL7v2 message is created twice only one resource is created on the server
-and no error is reported.
+successfully stored. Otherwise an error is returned.
 
       Args:
         request: (HealthcareProjectsLocationsDatasetsHl7V2StoresMessagesIngestRequest) input message
@@ -2292,7 +2540,7 @@ through a filter.
         method_id=u'healthcare.projects.locations.datasets.hl7V2Stores.messages.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'filter', u'orderBy', u'pageSize', u'pageToken'],
+        query_params=[u'filter', u'orderBy', u'pageSize', u'pageToken', u'view'],
         relative_path=u'v1beta1/{+parent}/messages',
         request_field='',
         request_type_name=u'HealthcareProjectsLocationsDatasetsHl7V2StoresMessagesListRequest',
@@ -2302,6 +2550,12 @@ through a filter.
 
     def Patch(self, request, global_params=None):
       r"""Update the message.
+
+The contents of the message in Message.data and data extracted from
+the contents such as Message.create_time cannot be altered. Only the
+Message.labels field is allowed to be updated. The labels in the
+request are merged with the existing set of labels. Existing labels with
+the same keys are updated.
 
       Args:
         request: (HealthcareProjectsLocationsDatasetsHl7V2StoresMessagesPatchRequest) input message
@@ -2575,6 +2829,42 @@ may "fail open" without warning.
       self._upload_configs = {
           }
 
+    def Cancel(self, request, global_params=None):
+      r"""Starts asynchronous cancellation on a long-running operation.  The server.
+makes a best effort to cancel the operation, but success is not
+guaranteed.  If the server doesn't support this method, it returns
+`google.rpc.Code.UNIMPLEMENTED`.  Clients can use
+Operations.GetOperation or
+other methods to check whether the cancellation succeeded or whether the
+operation completed despite cancellation. On successful cancellation,
+the operation is not deleted; instead, it becomes an operation with
+an Operation.error value with a google.rpc.Status.code of 1,
+corresponding to `Code.CANCELLED`.
+
+      Args:
+        request: (HealthcareProjectsLocationsDatasetsOperationsCancelRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Empty) The response message.
+      """
+      config = self.GetMethodConfig('Cancel')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Cancel.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/operations/{operationsId}:cancel',
+        http_method=u'POST',
+        method_id=u'healthcare.projects.locations.datasets.operations.cancel',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1beta1/{+name}:cancel',
+        request_field=u'cancelOperationRequest',
+        request_type_name=u'HealthcareProjectsLocationsDatasetsOperationsCancelRequest',
+        response_type_name=u'Empty',
+        supports_download=False,
+    )
+
     def Get(self, request, global_params=None):
       r"""Gets the latest state of a long-running operation.  Clients can use this.
 method to poll the operation result at intervals as recommended by the API
@@ -2694,7 +2984,11 @@ If errors occur,
 error
 details field type is
 DeidentifyErrorDetails.
-Errors are also logged to Stackdriver Logging. For more information,
+The LRO result may still be successful if de-identification fails for some
+DICOM instances. The new de-identified dataset will not contain these
+failed resources. Failed resource totals are tracked in
+DeidentifySummary.failure_resource_count.
+Error details are also logged to Stackdriver Logging. For more information,
 see [Viewing logs](/healthcare/docs/how-tos/stackdriver-logging).
 
       Args:

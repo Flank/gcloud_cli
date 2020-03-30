@@ -11,7 +11,7 @@ gcloud alpha remote\-build\-execution worker\-pools update \- update a Remote Bu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha remote\-build\-execution worker\-pools update\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR] [\fB\-\-network\-access\fR=\fINETWORK_ACCESS\fR] [\fB\-\-reserved\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR] [\fB\-\-clear\-accelerator\-config\fR\ |\ \fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha remote\-build\-execution worker\-pools update\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-max\-concurrent\-actions\fR=\fIMAX_CONCURRENT_ACTIONS\fR] [\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR] [\fB\-\-network\-access\fR=\fINETWORK_ACCESS\fR] [\fB\-\-reserved\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR] [\fB\-\-clear\-accelerator\-config\fR\ |\ \fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -64,11 +64,33 @@ Return immediately, without waiting for the operation in progress to complete.
 Size of the disk, in Gb, for each worker. Defaults to 200Gb.
 
 .TP 2m
+\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR
+Type of persistent disk the worker VMs will use. Default is pd\-standard.
+\fIDISK_TYPE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBpd\-ssd\fR
+SSD persistent disk.
+
+.TP 2m
+\fBpd\-standard\fR
+Standard persistent disk.
+
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
 The type of VM to use for each worker. To get a list of valid machine types, use
 the following command:
 
 $ gcloud compute machine\-types list
+
+.TP 2m
+\fB\-\-max\-concurrent\-actions\fR=\fIMAX_CONCURRENT_ACTIONS\fR
+Maximum actions each worker VM can run concurrently.
 
 .TP 2m
 \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR
@@ -173,6 +195,8 @@ $ gcloud alpha remote\-build\-execution worker\-pools update \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 
 .RE
@@ -184,8 +208,9 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

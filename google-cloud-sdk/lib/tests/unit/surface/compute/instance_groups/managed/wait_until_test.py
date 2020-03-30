@@ -30,11 +30,11 @@ from tests.lib.surface.compute import test_resources
 from mock import patch
 
 
-class InstanceGroupManagersWaitUntilZonalBetaTest(test_base.BaseTest):
+class InstanceGroupManagersWaitUntilZonalGATest(test_base.BaseTest):
 
   def PreSetUp(self):
-    self.api_version = 'beta'
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.SelectApi(self.api_version)
@@ -184,11 +184,11 @@ class InstanceGroupManagersWaitUntilZonalBetaTest(test_base.BaseTest):
     ])
 
 
-class InstanceGroupManagersWaitUntilRegionalBetaTest(test_base.BaseTest):
+class InstanceGroupManagersWaitUntilRegionalGATest(test_base.BaseTest):
 
   def PreSetUp(self):
-    self.api_version = 'beta'
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.SelectApi(self.api_version)
@@ -261,6 +261,22 @@ class InstanceGroupManagersWaitUntilRegionalBetaTest(test_base.BaseTest):
         self._MakeInstanceGroupManager(0),
         self._MakeInstanceGroupManager(0, is_stable=True),
     ])
+
+
+class InstanceGroupManagersWaitUntilZonalBetaTest(
+    InstanceGroupManagersWaitUntilZonalGATest):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstanceGroupManagersWaitUntilRegionalBetaTest(
+    InstanceGroupManagersWaitUntilRegionalGATest):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class InstanceGroupManagersWaitUntilRegionalAlphaTest(

@@ -20,8 +20,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -34,6 +35,9 @@ GROUPS
 
      metrics
         (ALPHA) A group of subcommands for working with Dataflow metrics.
+
+     sql
+        (ALPHA) A group of subcommands for working with Dataflow SQL.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

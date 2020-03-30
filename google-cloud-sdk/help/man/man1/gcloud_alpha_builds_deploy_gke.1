@@ -11,7 +11,7 @@ gcloud alpha builds deploy gke \- build and deploy to a target Google Kubernetes
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds deploy gke\fR [\fISOURCE\fR] \fB\-\-cluster\fR=\fICLUSTER\fR \fB\-\-location\fR=\fILOCATION\fR (\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-tag\fR=\fITAG\fR\ |\ \fB\-\-tag\-default\fR) [\fB\-\-app\-name\fR=\fIAPP_NAME\fR] [\fB\-\-app\-version\fR=\fIAPP_VERSION\fR] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-expose\fR=\fIEXPOSE\fR] [\fB\-\-gcs\-staging\-dir\fR=\fIGCS_STAGING_DIR\fR] [\fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds deploy gke\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] \fB\-\-cluster\fR=\fICLUSTER\fR \fB\-\-location\fR=\fILOCATION\fR [\fB\-\-app\-name\fR=\fIAPP_NAME\fR] [\fB\-\-app\-version\fR=\fIAPP_VERSION\fR] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-expose\fR=\fIEXPOSE\fR] [\fB\-\-gcs\-staging\-dir\fR=\fIGCS_STAGING_DIR\fR] [\fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-tag\fR=\fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,13 +25,22 @@ gcloud alpha builds deploy gke \- build and deploy to a target Google Kubernetes
 
 .RS 2m
 .TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
 [\fISOURCE\fR]
-Location of the source and configs to build and deploy. The \f5\-\-config\fR
-option, if provided, is a relative path in the source directory. The location
-can be a directory on a local disk or a gzipped archive file (.tar.gz) in Google
-Cloud Storage.
+Location of the source and configs to build and deploy. The location can be a
+directory on a local disk or a gzipped archive file (.tar.gz) in Google Cloud
+Storage.
+
+.TP 2m
+\fB\-\-no\-source\fR
+Specify that no source should be uploaded with this build.
 
 
+.RE
 .RE
 .sp
 
@@ -46,40 +55,7 @@ Name of the target cluster to deploy to.
 \fB\-\-location\fR=\fILOCATION\fR
 Region or zone of the target cluster to deploy to.
 
-.TP 2m
 
-Exactly one of these must be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-image\fR=\fIIMAGE\fR
-Existing container image to deploy. If set, Cloud Build deploys the container
-image to the target Kubernetes cluster. The image must be in the gcr.io/* or
-*.gcr.io/* namespaces.
-
-.TP 2m
-\fB\-\-tag\fR=\fITAG\fR
-Tag to use with a 'docker build' image creation. Cloud Build runs a remote
-\'docker build \-t $TAG .' command, where $TAG is the tag provided by this flag.
-The tag must be in the gcr.io/* or *.gcr.io/* namespaces. If you specify a tag
-in this command, your source must include a Dockerfile. For instructions on
-building using a Dockerfile see
-https://cloud.google.com/cloud\-build/docs/quickstart\-docker.
-
-If you would like a default tag to build with, supply the flag
-\f5\-\-tag\-default\fR.
-
-.TP 2m
-\fB\-\-tag\-default\fR
-Default tag to use with a 'docker build' image creation. Cloud Build runs a
-remote 'docker build \-t $TAG .' command, where $TAG is the tag, in the format
-\'gcr.io/$PROJECT_ID/<source directory>:$SHORT_SHA'.
-
-Your source must include a Dockerfile. For instructions on building using a
-Dockerfile see https://cloud.google.com/cloud\-build/docs/quickstart\-docker.
-
-
-.RE
 .RE
 .sp
 
@@ -109,7 +85,8 @@ Return immediately, without waiting for the operation in progress to complete.
 \fB\-\-config\fR=\fICONFIG\fR
 Path to the Kubernetes YAML, or directory containing multiple Kubernetes YAML
 files, used to deploy the container image. The path is relative to the
-repository root. The files must reference the provided container image or tag.
+repository root provided by [SOURCE]. The files must reference the provided
+container image or tag.
 
 If this field is not set, a default Deployment config and Horizontal Pod
 Autoscaler config are used to deploy the image.
@@ -128,23 +105,60 @@ stage and deploy your app. If the bucket in this path doesn't exist, Cloud Build
 creates it.
 
 If this field is not set, the source and configs are written to
-\'gs://[PROJECT_ID]\fIcloudbuild/deploy', where source is written to the
+\f5gs://[PROJECT_ID]_cloudbuild/deploy\fR, where source is written to the
 \'source' sub\-directory and configs are written to the 'config' sub\-directory.
 
 .TP 2m
-\fB\-\-namespace\fR=\fRNAMESPACE\fI
+\fB\-\-namespace\fR=\fINAMESPACE\fR
 Namespace of the target cluster to deploy to. If this field is not set, the
 \'default' namespace is used.
 
 .TP 2m
-\fB\-\-timeout\fR=\fRTIMEOUT\fI
+\fB\-\-timeout\fR=\fITIMEOUT\fR
 Maximum time a build is run before it times out. For example, "2h15m5s" is 2
 hours, 15 minutes, and 5 seconds. If you do not specify a unit, seconds is
 assumed. Overrides the default builds/timeout property value for this command
 invocation.
 
+.RE
+.sp
+.RS 2m
+Image to use to build and/or deploy.
+.RE
 
-\fR
+.RS 2m
+To build an image with a default tag, omit these flags. The resulting
+tag will be in the format 'gcr.io/[PROJECT_ID]/[IMAGE]/[TAG], where
+[PROJECT_ID] is your project ID, [IMAGE] is the value provided by
+`\-\-app\-name`, if provided, else it is the name of the provided source
+directory, and [TAG] is the value provided by `\-\-app\-version`, if
+provided, else it is the commit SHA of your provided source.
+.RE
+
+.RS 2m
+At most one of these may be specified:
+.RE
+
+
+.RS 2m
+.TP 2m
+\fB\-\-image\fR=\fIIMAGE\fR
+Existing container image to deploy. If set, Cloud Build deploys the container
+image to the target Kubernetes cluster. The image must be in the gcr.io/* or
+*.gcr.io/* namespaces.
+
+.RS 2m
+.TP 2m
+\fB\-\-tag\fR=\fITAG\fR
+Tag to use with a 'docker build' image creation. Cloud Build runs a remote
+\'docker build \-t $TAG .' command, where $TAG is the tag provided by this flag.
+The tag must be in the gcr.io/* or *.gcr.io/* namespaces. If you specify a tag
+in this command, your source must include a Dockerfile. For instructions on
+building using a Dockerfile see
+https://cloud.google.com/cloud\-build/docs/quickstart\-docker.
+
+
+.RE
 .RE
 .sp
 
@@ -153,8 +167,9 @@ invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import json
 
 from apitools.base.py import encoding
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import yaml
 from tests.lib import parameterized
@@ -29,10 +30,15 @@ from tests.lib import test_case
 from tests.lib.surface.monitoring import base
 
 
-class MonitoringDescribeTest(base.MonitoringTestBase, parameterized.TestCase,
-                             sdk_test_base.WithLogCapture):
+class ChannelsCreateTest(base.MonitoringTestBase, parameterized.TestCase,
+                         sdk_test_base.WithLogCapture):
+
+  def PreSetUp(self):
+    super(ChannelsCreateTest, self).PreSetUp()
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
+    super(ChannelsCreateTest, self).SetUp()
     self.service = self.client.projects_notificationChannels
     self.project_name = 'projects/' + self.Project()
     self.user_labels_cls = self.messages.NotificationChannel.UserLabelsValue

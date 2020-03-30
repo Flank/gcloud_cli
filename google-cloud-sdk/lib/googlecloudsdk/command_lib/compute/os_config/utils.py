@@ -22,19 +22,21 @@ from apitools.base.py import encoding
 from enum import Enum
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.util.args import common_args
+from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from googlecloudsdk.core import yaml
 import six
 
 
 class InstanceDetailsStates(Enum):
-  """Indicate instance progress during a patch job execution."""
+  """Indicates instance progress during a patch job execution."""
   NOTIFIED = 1
   PATCHING = 2
   FINISHED = 3
 
 
 INSTANCE_DETAILS_KEY_MAP = {
+    # Alpha mapping
     'instancesAcked': InstanceDetailsStates.NOTIFIED,
     'instancesApplyingPatches': InstanceDetailsStates.PATCHING,
     'instancesDownloadingPatches': InstanceDetailsStates.PATCHING,
@@ -49,57 +51,104 @@ INSTANCE_DETAILS_KEY_MAP = {
     'instancesTimedOut': InstanceDetailsStates.FINISHED,
     'instancesRunningPrePatchStep': InstanceDetailsStates.PATCHING,
     'instancesRunningPostPatchStep': InstanceDetailsStates.PATCHING,
+    'instancesNoAgentDetected': InstanceDetailsStates.FINISHED,
+
+    # Beta mapping
+    'ackedInstanceCount': InstanceDetailsStates.NOTIFIED,
+    'applyingPatchesInstanceCount': InstanceDetailsStates.PATCHING,
+    'downloadingPatchesInstanceCount': InstanceDetailsStates.PATCHING,
+    'failedInstanceCount': InstanceDetailsStates.FINISHED,
+    'inactiveInstanceCount': InstanceDetailsStates.FINISHED,
+    'notifiedInstanceCount': InstanceDetailsStates.NOTIFIED,
+    'pendingInstanceCount': InstanceDetailsStates.NOTIFIED,
+    'rebootingInstanceCount': InstanceDetailsStates.PATCHING,
+    'startedInstanceCount': InstanceDetailsStates.PATCHING,
+    'succeededInstanceCount': InstanceDetailsStates.FINISHED,
+    'succeededRebootRequiredInstanceCount': InstanceDetailsStates.FINISHED,
+    'timedOutInstanceCount': InstanceDetailsStates.FINISHED,
+    'prePatchStepInstanceCount': InstanceDetailsStates.PATCHING,
+    'postPatchStepInstanceCount': InstanceDetailsStates.PATCHING,
+    'noAgentDetectedInstanceCount': InstanceDetailsStates.FINISHED,
 }
+
 
 _GCS_PREFIXES = ('gs://', 'https://www.googleapis.com/storage/v1/',
                  'https://storage.googleapis.com/')
 
 
+_MAX_LIST_BATCH_SIZE = 100
+
+
+def GetListBatchSize(args):
+  """Returns the batch size for listing resources."""
+  if args.page_size:
+    return args.page_size
+  elif args.limit:
+    return min(args.limit, _MAX_LIST_BATCH_SIZE)
+  else:
+    return None
+
+
 def GetParentUriPath(parent_name, parent_id):
-  """Return the URI path of a GCP parent resource."""
+  """Returns the URI path of a GCP parent resource."""
   return '/'.join([parent_name, parent_id])
 
 
 def GetProjectUriPath(project):
-  """Return the URI path of a GCP project."""
+  """Returns the URI path of a GCP project."""
   return GetParentUriPath('projects', project)
 
 
 def GetFolderUriPath(folder):
-  """Return the URI path of a GCP folder."""
+  """Returns the URI path of a GCP folder."""
   return GetParentUriPath('folders', folder)
 
 
 def GetOrganizationUriPath(organization):
-  """Return the URI path of a GCP organization."""
+  """Returns the URI path of a GCP organization."""
   return GetParentUriPath('organizations', organization)
 
 
 def GetPatchJobUriPath(project, patch_job):
-  """Return the URI path of an osconfig patch job."""
+  """Returns the URI path of an osconfig patch job."""
   return '/'.join(['projects', project, 'patchJobs', patch_job])
 
 
-def GetPatchJobName(patch_job_uri):
-  """Return the name of a patch job from its URI."""
-  return patch_job_uri.split('/')[3]
+def GetResourceName(uri):
+  """Returns the name of a GCP resource from its URI."""
+  return uri.split('/')[3]
 
 
 def GetGuestPolicyRelativePath(parent, guest_policy):
-  """Return the relative path of an osconfig guest policy."""
+  """Returns the relative path of an osconfig guest policy."""
   return '/'.join([parent, 'guestPolicies', guest_policy])
 
 
 def AddResourceParentArgs(parser, noun, verb):
-  """Add project, folder, and organization flags to the parser."""
+  """Adds project, folder, and organization flags to the parser."""
   parent_resource_group = parser.add_group(
-      help='The scope of the {} which defaults to project if unspecified.'
-      .format(noun),
+      help="""\
+      The scope of the {}. If a scope is not specified, the current project is
+      used as the default.""".format(noun),
       mutex=True,
   )
   common_args.ProjectArgument(
-      help_text_to_prepend='The project of the {} {}.'.format(
-          noun, verb)).AddToParser(parent_resource_group)
+      help_text_to_prepend='The project of the {} {}.'.format(noun, verb),
+      help_text_to_overwrite="""\
+      The project name to use. If a project name is not specified, then the
+      current project is used. The current project can be listed using gcloud
+      config list --format='text(core.project)' and can be set using gcloud
+      config set project PROJECTID.
+
+      `--project` and its fallback `{core_project}` property play two roles. It
+      specifies the project of the resource to operate on, and also specifies
+      the project for API enablement check, quota, and billing. To specify a
+      different project for quota and billing, use `--billing-project` or
+      `{billing_project}` property.
+      """.format(
+          core_project=properties.VALUES.core.project,
+          billing_project=properties.VALUES.billing.quota_project)).AddToParser(
+              parent_resource_group)
   parent_resource_group.add_argument(
       '--folder',
       metavar='FOLDER_ID',
@@ -114,13 +163,18 @@ def AddResourceParentArgs(parser, noun, verb):
   )
 
 
+def GetPatchDeploymentUriPath(project, patch_deployment):
+  """Returns the URI path of an osconfig patch deployment."""
+  return '/'.join(['projects', project, 'patchDeployments', patch_deployment])
+
+
 def GetGuestPolicyUriPath(parent_type, parent_name, policy_id):
-  """Return the URI path of an osconfig guest policy."""
+  """Returns the URI path of an osconfig guest policy."""
   return '/'.join([parent_type, parent_name, 'guestPolicies', policy_id])
 
 
 def GetResourceAndUpdateFieldsFromFile(file_path, resource_message_type):
-  """Return the resource message and update fields in file."""
+  """Returns the resource message and update fields in file."""
   try:
     resource_to_parse = yaml.load_path(file_path)
   except yaml.YAMLParseError as e:

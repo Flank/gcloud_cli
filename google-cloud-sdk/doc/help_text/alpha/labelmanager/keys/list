@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha labelmanager keys list - lists label keys under the specified
+    gcloud alpha labelmanager keys list - lists LabelKeys under the specified
         parent resource
 
 SYNOPSIS
@@ -44,11 +44,12 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To list all the label keys under an organization run:
+    To list all the LabelKeys under 'organizations/123', run:
 
         $ gcloud alpha labelmanager keys list 'organizations/123'
 

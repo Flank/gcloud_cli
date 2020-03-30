@@ -260,6 +260,10 @@ For detailed information on this command and its flags, run:
     self.AssertErrContains("""\
 ERROR: (test.sdk2) Command name argument expected.
 
+Available command groups for test sdk2:
+
+      lotsofargs              A group with required and optional flags.
+
 Available commands for test sdk2:
 
   Category 1
@@ -269,6 +273,36 @@ Available commands for test sdk2:
 
   Category 2
       bool-mutex              A command with a Boolean flag in a mutex group.
+
+  Other
+      command2                     A command with context and flags.
+      common-flags                 A command with common flags and explicit
+                                   NOTES.
+      common-other-flags           A command with common+other flags.
+      deprecated-args              actions.DeprecationAction test command.
+      dynamic-args                 parser_extensions.DynamicPositionalAction
+                                   test command.
+      extra-args                   A command to test the posix '--' workaround.
+      hidden                       A command that is hidden.
+      list-command-flags           A command with list command flags.
+      modal-group                  A command with a modal group with multiple
+                                   required flags.
+      multiple-positional          A command to test argument ordering in usage
+                                   text.
+      nested-groups                A command with nested argument group
+                                   combinations.
+      ordered-choices              A command with required flags.
+      other-flags                  A command with other flags.
+      remainder                    A command to test remainder args.
+      remainder-with-flags         A command to test remainder args.
+      required-common-flags        A command with required+common flags.
+      required-common-other-flags  A command with required+common+other flags.
+      required-flags               A command with required flags.
+      required-other-flags         A command with required+other flags.
+      required-vs-optional         A command with required vs optional flag
+                                   combinations.
+      requiredargcommand           A command with an underscored flag.
+      suppressed-positional        A command to test remainder args.
 """)
 
   def testUncategorizedUsage(self):
@@ -319,7 +353,9 @@ FLAGS
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -389,7 +425,9 @@ OPTIONAL FLAGS
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -410,7 +448,9 @@ SYNOPSIS
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 EXAMPLES
     Don't use this example as an example for writing examples.
@@ -477,6 +517,7 @@ Flag removed_arg has been removed.
 ## TEST WIDE FLAGS
 
 These flags are available to all commands: --configuration, --flags-file, --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled, --verbosity.
+
 Run *$ link:test/help[test help]* for details.
 
 
@@ -528,7 +569,9 @@ FLAGS
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -871,19 +914,24 @@ class GcloudUsageTextTest(util.WithTestTool):
   def testGcloudUsage(self):
     with self.assertRaises(SystemExit):
       self.cli.Execute([])
+    print('error is', self.GetErr(), 'end error')
     expected = r"""ERROR: \(gcloud\) Command name argument expected\.
 
-Available commands for gcloud:
+Available command groups for gcloud:
 
   AI and Machine Learning
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   API Platform and Ecosystems
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
+  CI\/CD
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Compute
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Data Analytics
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Databases
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
+  Identity
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Identity and Security
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
@@ -897,8 +945,10 @@ Available commands for gcloud:
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   SDK Tools
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
+  Security
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Storage
-(      [-\w]+\s+[-./,'\w\s]+?\.\n)+\n\Z"""
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+"""
 
     self.assertIsNotNone(re.match(expected, self.GetErr()))
 
@@ -907,8 +957,10 @@ Available commands for gcloud:
       self.cli.Execute('compute'.split())
     expected = r"""ERROR: \(gcloud\.compute\) Command name argument expected\.
 
-Available commands for gcloud compute:
+Available command groups for gcloud compute:
 
+  Compute
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Disks
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Info
@@ -920,7 +972,7 @@ Available commands for gcloud compute:
   Networking
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Tools
-(      [-\w]+\s+[-./,'\w\s]+?\.\n)+\n\Z"""
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+"""
 
     self.assertIsNotNone(re.match(expected, self.GetErr()))
 
@@ -933,8 +985,10 @@ Available commands for gcloud compute:
         'ERROR: (gcloud.compute) Command name argument expected.\n')
     contents = r"""Command name argument expected\.
 
-Available commands for gcloud compute:
+Available command groups for gcloud compute:
 
+  Compute
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Disks
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Info
@@ -946,7 +1000,7 @@ Available commands for gcloud compute:
   Networking
 (      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Tools
-(      [-\w]+\s+[-./,'\w\s]+?\.\n)+\n\Z"""
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+"""
 
     self.assertEquals(1, mock_more.call_count)
     self.assertEquals(1, len(mock_more.call_args[0]))

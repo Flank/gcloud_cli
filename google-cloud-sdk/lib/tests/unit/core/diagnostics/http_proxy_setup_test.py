@@ -151,12 +151,12 @@ class ChangeGcloudProxySettingsTests(cli_test_base.CliTestBase):
     pi = http_proxy.GetHttpProxyInfo()
     self.assertTrue(callable(pi))
     self.assertEqual(
-        (socks.PROXY_TYPE_HTTP, 'badproxy', 8080, True, 'baduser',
-         'badpassword', None),
+        (socks.PROXY_TYPE_HTTP, 'badproxy', 8080, True, b'baduser',
+         b'badpassword', None),
         pi('http').astuple())
     self.assertEqual(
-        (socks.PROXY_TYPE_HTTP, 'badproxy', 8081, True, 'baduser',
-         'badpassword', None),
+        (socks.PROXY_TYPE_HTTP, 'badproxy', 8081, True, b'baduser',
+         b'badpassword', None),
         pi('https').astuple())
     self.AssertNoGloudProxyProperties()
     self.setAnswers('Y', '1', 'golden', '80', 'Y', 'username', 'password')

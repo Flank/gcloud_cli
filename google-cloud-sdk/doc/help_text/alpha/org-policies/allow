@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha org-policies allow CONSTRAINT [VALUE ...]
         (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
-          | --project=PROJECT_ID) [--condition=CONDITION] [--remove]
-        [GCLOUD_WIDE_FLAG ...]
+          | --project=PROJECT_ID) [--condition=CONDITION]
+        [--label-parent=LABEL_PARENT] [--remove] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Adds (or removes) values to the list of allowed values for a list
@@ -43,9 +43,18 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --condition=CONDITION
         Condition expression for filtering the resources the policy applies to.
-        At the moment, the only allowed syntax for a condition is
+        The standard syntax for a condition is
         'resource.matchLabels("labelKeys/{label_key_id}",
-        "labelValues/{label_value_id}")'.
+        "labelValues/{label_value_id}")'.By using the --label-parent flag you
+        may use the display names for LabelKey and LabelValue with syntax
+        'resource.matchLabels("{label_key_display_name}",
+        "{label_value_display_name}")'.
+
+     --label-parent=LABEL_PARENT
+        Parent of the LabelKey. This must be the form organizations/{org_id}.
+        This flag must be specified as the parent of the LabelKey when the
+        input for a condition expression is set as the LabelKey and LabelValue
+        display names.
 
      --remove
         Remove the specified values from the list of allowed values instead of
@@ -55,23 +64,33 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To add us-east1 and us-west1 to the list of allowed values on the policy
-    associated with the constraint gcp.resourceLocations and the project
-    foo-project, run:
+    To add 'us-east1' and 'us-west1' to the list of allowed values on the
+    policy associated with the constraint 'gcp.resourceLocations' and the
+    Project 'foo-project', run:
 
         $ gcloud alpha org-policies allow gcp.resourceLocations us-east1 \
             us-west1 --project=foo-project
 
-    To only add the values for resources that have the label value 2222
-    associated with the label key 1111, run:
+    To only add the values for resources that have the LabelValue '2222'
+    associated with the LabelKey '1111', run:
 
         $ gcloud alpha org-policies allow gcp.resourceLocations us-east1 \
             us-west1 --project=foo-project \
         --condition='resource.matchLabels("labelKeys/1111", "labelValues/2222")'
+
+    To add the policy behavior for the Project 'foo-project' conditioned on the
+    LabelValue 'dev' under LabelKey 'env' that lives under 'organizations/123'
+    run:
+
+        $ gcloud alpha org-policies allow gcp.resourceLocations us-east1 \
+            us-west1 --project=foo-project \
+        --condition='resource.matchLabels("env", "dev")' \
+        --label-parent='organizations/123'
 
 NOTES
     This command is an internal implementation detail and may change or

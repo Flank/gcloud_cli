@@ -178,3 +178,14 @@ class VpnGatewaysTestBase(sdk_test_base.WithFakeAuth,
             operation=operation_ref.operation,
             project=operation_ref.project,
             region=operation_ref.region), operation)
+
+  def ExpectOperationWaitRequest(self, operation_ref, operation):
+    """Expects the operation Wait request to be invoked."""
+    self.region_operations.Wait.Expect(
+        self.messages.ComputeRegionOperationsWaitRequest(
+            operation=operation_ref.operation,
+            project=operation_ref.project,
+            region=operation_ref.region), operation)
+
+  def ExpectOperationPollingRequest(self, operation_ref, operation):
+    self.ExpectOperationWaitRequest(operation_ref, operation)

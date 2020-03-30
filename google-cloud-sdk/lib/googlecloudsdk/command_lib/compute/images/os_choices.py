@@ -18,31 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-OS_CHOICES_MAP = {
-    'debian-8': 'debian/translate_debian_8.wf.json',
-    'debian-9': 'debian/translate_debian_9.wf.json',
-    'centos-6': 'enterprise_linux/translate_centos_6.wf.json',
-    'centos-7': 'enterprise_linux/translate_centos_7.wf.json',
-    'rhel-6': 'enterprise_linux/translate_rhel_6_licensed.wf.json',
-    'rhel-6-byol': 'enterprise_linux/translate_rhel_6_byol.wf.json',
-    'rhel-7': 'enterprise_linux/translate_rhel_7_licensed.wf.json',
-    'rhel-7-byol': 'enterprise_linux/translate_rhel_7_byol.wf.json',
-    'ubuntu-1404': 'ubuntu/translate_ubuntu_1404.wf.json',
-    'ubuntu-1604': 'ubuntu/translate_ubuntu_1604.wf.json',
-    'windows-2008r2': 'windows/translate_windows_2008_r2.wf.json',
-    'windows-2008r2-byol': 'windows/translate_windows_2008_r2_byol.wf.json',
-    'windows-2012': 'windows/translate_windows_2012.wf.json',
-    'windows-2012-byol': 'windows/translate_windows_2012_byol.wf.json',
-    'windows-2012r2': 'windows/translate_windows_2012_r2.wf.json',
-    'windows-2012r2-byol': 'windows/translate_windows_2012_r2_byol.wf.json',
-    'windows-2016': 'windows/translate_windows_2016.wf.json',
-    'windows-2016-byol': 'windows/translate_windows_2016_byol.wf.json',
-    'windows-2019': 'windows/translate_windows_2019.wf.json',
-    'windows-2019-byol': 'windows/translate_windows_2019_byol.wf.json',
-    'windows-7-byol': 'windows/translate_windows_7_byol.wf.json',
-    'windows-8-1-x64-byol': 'windows/translate_windows_8-1_x64_byol.wf.json',
-    'windows-10-byol': 'windows/translate_windows_10_byol.wf.json',
-}
+_BETA_ADDITIONS = [
+    'centos-8',
+    'opensuse-15',
+    'rhel-8',
+    'rhel-8-byol',
+    'sles-12-byol',
+    'sles-15-byol',
+]
 
 OS_CHOICES_IMAGE_IMPORT_GA = [
     'debian-8',
@@ -55,6 +38,7 @@ OS_CHOICES_IMAGE_IMPORT_GA = [
     'rhel-7-byol',
     'ubuntu-1404',
     'ubuntu-1604',
+    'ubuntu-1804',
     'windows-2008r2',
     'windows-2008r2-byol',
     'windows-2012',
@@ -65,10 +49,16 @@ OS_CHOICES_IMAGE_IMPORT_GA = [
     'windows-2016-byol',
     'windows-2019',
     'windows-2019-byol',
-    'windows-7-byol',
-    'windows-8-1-x64-byol',
-    'windows-10-byol',
+    'windows-7-x64-byol',
+    'windows-7-x86-byol',
+    'windows-8-x64-byol',
+    'windows-8-x86-byol',
+    'windows-10-x64-byol',
+    'windows-10-x86-byol',
 ]
-OS_CHOICES_IMAGE_IMPORT_BETA = OS_CHOICES_IMAGE_IMPORT_GA + []
-OS_CHOICES_IMAGE_IMPORT_ALPHA = OS_CHOICES_IMAGE_IMPORT_BETA + []
-OS_CHOICES_INSTANCE_IMPORT_BETA = OS_CHOICES_IMAGE_IMPORT_GA
+
+OS_CHOICES_IMAGE_IMPORT_BETA = OS_CHOICES_IMAGE_IMPORT_GA + _BETA_ADDITIONS
+OS_CHOICES_IMAGE_IMPORT_ALPHA = OS_CHOICES_IMAGE_IMPORT_BETA
+
+OS_CHOICES_INSTANCE_IMPORT_GA = OS_CHOICES_IMAGE_IMPORT_GA
+OS_CHOICES_INSTANCE_IMPORT_BETA = OS_CHOICES_IMAGE_IMPORT_BETA

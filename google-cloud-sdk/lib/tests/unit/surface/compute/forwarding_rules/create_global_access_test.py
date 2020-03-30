@@ -23,11 +23,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class GlobalAccessApiBetaTest(test_base.BaseTest):
+class GlobalAccessApiGATest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testAllowGlobalAccessInGlobalRequest(self):
     """Tests specifying global access in creating global l7 lb request."""
@@ -116,6 +116,13 @@ class GlobalAccessApiBetaTest(test_base.BaseTest):
                              forwardingRule=expected_forwarding_rule,
                              project='my-project',
                              region='us-central1'))],)
+
+
+class GlobalAccessApiBetaTest(GlobalAccessApiGATest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class GlobalAccessApiAlphaTest(GlobalAccessApiBetaTest):

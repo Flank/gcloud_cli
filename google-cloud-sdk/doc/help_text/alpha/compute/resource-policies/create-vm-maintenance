@@ -27,10 +27,9 @@ REQUIRED FLAGS
 
        --start-time=START_TIME
           Start time of a four-hour window in which maintenance should start in
-          daily cadence. Valid choices are 00:00, 04:00, 08:00,12:00, 16:00 and
-          20:00 UTC. For example, --start-time="03:00-05" (which gets converted
-          to 08:00 UTC). This flag must be specified if any of the other
-          arguments in this group are specified.
+          daily cadence. Valid choices are 00:00, 04:00, 08:00, 12:00, 16:00
+          and 20:00 UTC. For example, --start-time="08:00". This flag must be
+          specified if any of the other arguments in this group are specified.
 
 OPTIONAL FLAGS
      --description=DESCRIPTION
@@ -60,8 +59,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     The following command creates a Google Compute Engine VM Maintenance

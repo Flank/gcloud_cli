@@ -46,15 +46,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create a new composite type, run:
 
         $ gcloud alpha deployment-manager types create my-composite-type \
-            --template=my-template.jinja --status EXPERIMENTAL \
-            --description "My type."
+            --template=my-template.jinja --status=EXPERIMENTAL \
+            --description="My type."
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

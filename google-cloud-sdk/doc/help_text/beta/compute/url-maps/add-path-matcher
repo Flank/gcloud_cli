@@ -101,8 +101,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create a rule for mapping the path /search/* to the hypothetical
@@ -110,12 +111,12 @@ EXAMPLES
     to the images-service under the hosts example.com and *.example.com, run:
 
         $ gcloud beta compute url-maps add-path-matcher MY-URL-MAP \
-            --path-matcher-name MY-MATCHER \
-            --default-service MY-DEFAULT-SERVICE \
-            --backend-service-path-rules \
-            '/search/*=search_service,/images/*=images-service' \
-            --backend-bucket-path-rules '/static/*=static-bucket' \
-            --new-hosts example.com '*.example.com' --global
+            --path-matcher-name=MY-MATCHER \
+            --default-service=MY-DEFAULT-SERVICE \
+            --backend-service-path-rules='/search/*=search_service,/images/*\
+        =images-service' \
+            --backend-bucket-path-rules='/static/*=static-bucket' \
+            --new-hosts=example.com '*.example.com'
 
     Note that a default service or default backend bucket must be provided to
     handle paths for which there is no mapping.

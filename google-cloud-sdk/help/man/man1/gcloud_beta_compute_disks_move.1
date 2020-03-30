@@ -22,18 +22,8 @@ Compute Engine disk volume from one zone to another. You cannot move a disk if
 it is attached to a running or stopped instance; use the gcloud compute
 instances move command instead.
 
-For example, running:
-
-.RS 2m
-$ gcloud compute disks move example\-disk\-1 \-\-zone us\-central1\-b \e
-   \-\-destination\-zone us\-central1\-f
-.RE
-
-will move the disk called example\-disk\-1, currently running in
-us\-central1\-b, to us\-central1\-f.
-
-Please note that gcloud compute disks move does not yet support regional
-persistent disks. Please see
+The \f5gcloud compute disks move\fR command does not support regional persistent
+disks. See
 https://cloud.google.com/compute/docs/disks/regional\-persistent\-disk for more
 details.
 
@@ -105,8 +95,21 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To move the disk called example\-disk\-1 from us\-central1\-b to
+us\-central1\-f, run:
+
+.RS 2m
+$ gcloud beta compute disks move example\-disk\-1 \e
+    \-\-zone=us\-central1\-b \-\-destination\-zone=us\-central1\-f
+.RE
 
 
 

@@ -168,6 +168,22 @@ class NodeTemplatesCreateBetaTest(NodeTemplatesCreateTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi('beta')
 
+  def testCreateWithOvercommitType(self):
+    template = self._CreateBaseNodeTemplateMessage()
+    template.nodeType = 'n1-node-96-624'
+    template.cpuOvercommitType = self.messages.NodeTemplate.CpuOvercommitTypeValueValuesEnum.ENABLED
+    request = self._ExpectCreate(template)
+
+    result = self.Run(
+        'compute sole-tenancy node-templates create my-template '
+        '--node-affinity-labels environment=prod,grouping=frontend '
+        '--cpu-overcommit-type=enabled '
+        '--node-type n1-node-96-624 '
+        '--region {}'.format(self.region))
+
+    self.CheckRequests([(self.compute.nodeTemplates, 'Insert', request)])
+    self.assertEqual(result, template)
+
 
 class NodeTemplatesCreateAlphaTest(NodeTemplatesCreateBetaTest):
 

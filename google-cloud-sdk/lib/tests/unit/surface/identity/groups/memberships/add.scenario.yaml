@@ -1,0 +1,239 @@
+# Copyright 2019 Google LLC. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+title: cloud identity groups memberships add test scenario
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Add a member to a specified group.
+  - command: |
+      identity groups memberships add --organization 433637338589
+      --group-email eng-discuss@foo.com --member-email user@foo.com
+  - stdout: |
+      done: true
+      response:
+        '@type': type.googleapis.com/google.apps.cloudidentity.groups.$$api-version$$.Membership
+        memberKey:
+          id: user@foo.com
+        name: groups/11zu0gzc3tkdgn2/memberships/110293416452252446513
+        roles:
+        - name: MEMBER
+- execute:
+  - label: Add a member to a specified group with OWNER role.
+  - command: |
+      identity groups memberships add --organization 433637338589 --roles OWNER
+      --group-email eng-discuss@foo.com --member-email user@foo.com
+  - stdout: |
+      done: true
+      response:
+        '@type': type.googleapis.com/google.apps.cloudidentity.groups.$$api-version$$.Membership
+        memberKey:
+          id: user@foo.com
+        name: groups/11zu0gzc3tkdgn2/memberships/110293416452252446513
+        roles:
+        - name: OWNER
+- execute:
+  - label: Add a member whose membership is already existed.
+  - command: |
+      identity groups memberships add --organization 433637338589
+      --group-email eng-discuss@foo.com --member-email user@foo.com
+  - error: |-
+      1: Group [11zu0gzc3tkdgn2] is the subject of a conflict: Membership already exists.
+      - '@type': type.googleapis.com/google.rpc.DebugInfo
+        detail: |
+          [ORIGINAL ERROR] generic::already_exists: Membership already exists.
+actions:
+
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha1
+      BETA: v1beta1
+
+- execute_command:
+    label: Add a member to a specified group.
+    command: |
+      identity groups memberships add --organization 433637338589
+      --group-email eng-discuss@foo.com --member-email user@foo.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "groups/11zu0gzc3tkdgn2"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              memberKey:
+                id: user@foo.com
+              roles:
+              - name: MEMBER
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.apps.cloudidentity.groups.$$api-version$$.Membership",
+                "name": "groups/11zu0gzc3tkdgn2/memberships/110293416452252446513",
+                "memberKey": {
+                  "id": "user@foo.com"
+                },
+                "roles": [
+                  {
+                    "name": "MEMBER"
+                  }
+                ]
+              }
+            }
+    - expect_stdout: |
+        done: true
+        response:
+          '@type': type.googleapis.com/google.apps.cloudidentity.groups.$$api-version$$.Membership
+          memberKey:
+            id: user@foo.com
+          name: groups/11zu0gzc3tkdgn2/memberships/110293416452252446513
+          roles:
+          - name: MEMBER
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: Add a member to a specified group with OWNER role.
+    command: |
+      identity groups memberships add --organization 433637338589 --roles OWNER
+      --group-email eng-discuss@foo.com --member-email user@foo.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "groups/11zu0gzc3tkdgn2"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              memberKey:
+                id: user@foo.com
+              roles:
+              - name: OWNER
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.apps.cloudidentity.groups.$$api-version$$.Membership",
+                "name": "groups/11zu0gzc3tkdgn2/memberships/110293416452252446513",
+                "memberKey": {
+                  "id": "user@foo.com"
+                },
+                "roles": [
+                  {
+                    "name": "OWNER"
+                  }
+                ]
+              }
+            }
+    - expect_stdout: |
+        done: true
+        response:
+          '@type': type.googleapis.com/google.apps.cloudidentity.groups.$$api-version$$.Membership
+          memberKey:
+            id: user@foo.com
+          name: groups/11zu0gzc3tkdgn2/memberships/110293416452252446513
+          roles:
+          - name: OWNER
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: Add a member whose membership is already existed.
+    command: |
+      identity groups memberships add --organization 433637338589
+      --group-email eng-discuss@foo.com --member-email user@foo.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "groups/11zu0gzc3tkdgn2"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              memberKey:
+                id: user@foo.com
+              roles:
+              - name: MEMBER
+        return_response:
+          headers:
+            status: '409'
+          body: |
+            {
+              "error": {
+                "code": 409,
+                "message": "Membership already exists.",
+                "status": "ALREADY_EXISTS",
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.rpc.DebugInfo",
+                    "detail": "[ORIGINAL ERROR] generic::already_exists: Membership already exists.\n"
+                  }
+                ]
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: |-
+          Group [11zu0gzc3tkdgn2] is the subject of a conflict: Membership already exists.
+          - '@type': type.googleapis.com/google.rpc.DebugInfo
+            detail: |
+              [ORIGINAL ERROR] generic::already_exists: Membership already exists.

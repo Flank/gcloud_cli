@@ -11,7 +11,7 @@ gcloud beta compute instance\-groups managed rolling\-action start\-update \- up
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute instance\-groups managed rolling\-action start\-update\fR \fINAME\fR \fB\-\-version\fR=[\fItemplate\fR=\fITEMPLATE\fR,[\fIname\fR=\fINAME\fR],...] [\fB\-\-canary\-version\fR=[\fItemplate\fR=\fITEMPLATE\fR,\fItarget\-size\fR=\fIFIXED_OR_PERCENT\fR,[\fIname\fR=\fINAME\fR],...]] [\fB\-\-type\fR=\fITYPE\fR;\ default="proactive"] [\fB\-\-force\fR] [\fB\-\-max\-surge\fR=\fIMAX_SURGE\fR] [\fB\-\-max\-unavailable\fR=\fIMAX_UNAVAILABLE\fR] [\fB\-\-min\-ready\fR=\fIMIN_READY\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute instance\-groups managed rolling\-action start\-update\fR \fINAME\fR \fB\-\-version\fR=[\fItemplate\fR=\fITEMPLATE\fR,[\fIname\fR=\fINAME\fR],...] [\fB\-\-canary\-version\fR=[\fItemplate\fR=\fITEMPLATE\fR,\fItarget\-size\fR=\fIFIXED_OR_PERCENT\fR,[\fIname\fR=\fINAME\fR],...]] [\fB\-\-type\fR=\fITYPE\fR;\ default="proactive"] [\fB\-\-force\fR] [\fB\-\-max\-surge\fR=\fIMAX_SURGE\fR] [\fB\-\-max\-unavailable\fR=\fIMAX_UNAVAILABLE\fR] [\fB\-\-min\-ready\fR=\fIMIN_READY\fR] [\fB\-\-replacement\-method\fR=\fIREPLACEMENT_METHOD\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -100,6 +100,22 @@ available. For example \f510s\fR for 10 seconds. See $ gcloud topic datetimes
 for information on duration formats.
 
 .TP 2m
+\fB\-\-replacement\-method\fR=\fIREPLACEMENT_METHOD\fR
+Type of replacement method. Specifies what action will be taken to update
+instances. \fIREPLACEMENT_METHOD\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBrecreate\fR
+Updated instances will be recreated with the same name.
+.TP 2m
+\fBsubstitute\fR
+Updated instances will be deleted and created again with another name.
+.RE
+.sp
+
+
+.TP 2m
 
 At most one of these may be specified:
 
@@ -142,8 +158,9 @@ invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

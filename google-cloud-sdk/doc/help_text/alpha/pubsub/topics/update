@@ -5,7 +5,12 @@ SYNOPSIS
     gcloud alpha pubsub topics update TOPIC [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]]
         [--message-storage-policy-allowed-regions=[REGION,...]
-          | --recompute-message-storage-policy] [GCLOUD_WIDE_FLAG ...]
+          | --recompute-message-storage-policy]
+        [--topic-encryption-key=TOPIC_ENCRYPTION_KEY
+          : --topic-encryption-key-keyring=TOPIC_ENCRYPTION_KEY_KEYRING
+          --topic-encryption-key-location=TOPIC_ENCRYPTION_KEY_LOCATION
+          --topic-encryption-key-project=TOPIC_ENCRYPTION_KEY_PROJECT]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Updates an existing Cloud Pub/Sub topic.
@@ -48,7 +53,8 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
 
      Message storage policy options. At most one of these may be specified:
 
@@ -61,12 +67,36 @@ FLAGS
           be stored at rest, based on your organization's "Resource Location
           Restriction" policy.
 
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the topic. The specified Cloud KMS key should have
+     purpose set to "ENCRYPT_DECRYPT". The service account,
+     "service-${CONSUMER_PROJECT_NUMBER}@gcp-sa-pubsub.iam.gserviceaccount.com"
+     requires the IAM cryptoKeyEncrypterDecrypter role for the given Cloud KMS
+     key. CONSUMER_PROJECT_NUMBER is the project number of the project that is
+     the parent of the topic being updated. The arguments in this group can be
+     used to specify the attributes of this resource.
+
+       --topic-encryption-key=TOPIC_ENCRYPTION_KEY
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       --topic-encryption-key-keyring=TOPIC_ENCRYPTION_KEY_KEYRING
+          The KMS keyring of the key.
+
+       --topic-encryption-key-location=TOPIC_ENCRYPTION_KEY_LOCATION
+          The Cloud location for the key.
+
+       --topic-encryption-key-project=TOPIC_ENCRYPTION_KEY_PROJECT
+          The Cloud project for the key.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To update existing labels on a Cloud Pub/Sub topic, run:
@@ -81,6 +111,13 @@ EXAMPLES
     To remove an existing label on a Cloud Pub/Sub topic, run:
 
         $ gcloud alpha pubsub topics update mytopic --remove-labels=KEY1,KEY2
+
+    To enable customer-managed encryption for a Cloud Pub/Sub topic by
+    protecting message data with a Cloud KMS CryptoKey, run:
+
+        $ gcloud alpha pubsub topics update mytopic \
+          --topic-encryption-key=projects/PROJECT_ID/locations/\
+        KMS_LOCATION/keyRings/KEYRING/cryptoKeys/KEY
 
     To update a Cloud Pub/Sub topic's message storage policy, run:
 

@@ -31,14 +31,16 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_resources
 
 
-class OrgSecurityPoliciesListAlphaTest(sdk_test_base.WithFakeAuth,
-                                       cli_test_base.CliTestBase):
+class OrgSecurityPoliciesListBetaTest(sdk_test_base.WithFakeAuth,
+                                      cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+    self.client = mock.Client(
+        core_apis.GetClientClass('compute', self.api_version))
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
+    self.resources.RegisterApiByName('compute', self.api_version)
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE
@@ -51,11 +53,11 @@ class OrgSecurityPoliciesListAlphaTest(sdk_test_base.WithFakeAuth,
         ),
         response=self.messages.SecurityPolicyList(
             items=[
-                test_resources.MakeSecurityPolicy(
+                test_resources.MakeOrgSecurityPolicy(
                     self.messages,
                     self.resources.Create(
                         'compute.organizationSecurityPolicies',
-                        securityPolicy='my-policy'))
+                        securityPolicy='123'))
             ],))
 
     self.Run("""
@@ -63,11 +65,25 @@ class OrgSecurityPoliciesListAlphaTest(sdk_test_base.WithFakeAuth,
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-        NAME DESCRIPTION
-        my-policy my description
+        ID DISPLAY_NAME DESCRIPTION
+        123 display-name  test-description
         """),
         normalize_space=True)
     self.AssertErrEquals('')
+
+
+class OrgSecurityPoliciesListAlphaTest(OrgSecurityPoliciesListBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+    self.client = mock.Client(
+        core_apis.GetClientClass('compute', self.api_version))
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', self.api_version)
+    self.client.Mock()
+    self.addCleanup(self.client.Unmock)
+    self.messages = self.client.MESSAGES_MODULE
 
 
 if __name__ == '__main__':

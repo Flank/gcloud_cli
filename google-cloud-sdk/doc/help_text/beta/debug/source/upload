@@ -8,17 +8,23 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) This command uploads a directory tree to a branch in the repository
-    'google-source-captures' hosted on Cloud Source Repositories.
+    (BETA) gcloud beta debug source upload is used to upload a directory tree
+    to a branch in the repository 'google-source-captures' hosted on Cloud
+    Source Repositories.
 
     The files and branches can be managed with git like any other repository.
 
-    When uploading is done, this command can also produce a source context json
-    file describing it.
+    When the upload is finished, this command can also produce a source context
+    json file named 'source-context.json' describing it.
 
-    See https://cloud.google.com/debugger/docs/source-context for details on
-    where to deploy the source context json file in order to enable Stackdriver
-    tools to display the uploaded files.
+    See https://cloud.google.com/debugger/docs/source-context for information
+    on where to deploy the 'source-context.json' file so Cloud Debugger
+    automatically displays the uploaded files.
+
+    NOTE: This command assumes that the 'google-source-captures' repository
+    hosted on Cloud Source Repositories already exists, if it does not, this
+    command will fail and the appropriate command to create it will be provided
+    in the error message.
 
 POSITIONAL ARGUMENTS
      DIRECTORY
@@ -45,8 +51,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To upload the directory tree rooted with the current local directory to
+    branch 'my-branch-name' in the git repository 'google-source-captures'
+    hosted on Cloud Source Repositories under the project name 'my-project',
+    run:
+
+        $ gcloud beta debug source upload --project=my-project \
+            --branch=my-branch-name .
 
 NOTES
     This command is currently in BETA and may change without notice.

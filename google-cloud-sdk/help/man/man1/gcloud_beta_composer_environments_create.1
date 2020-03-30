@@ -11,7 +11,7 @@ gcloud beta composer environments create \- create and initialize a Cloud Compos
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ |\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR\ \fB\-\-cluster\-secondary\-range\-name\fR=\fICLUSTER_SECONDARY_RANGE_NAME\fR\ \fB\-\-enable\-ip\-alias\fR\ \fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-environment\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR\ \fB\-\-services\-ipv4\-cidr\fR=\fISERVICES_IPV4_CIDR\fR\ \fB\-\-services\-secondary\-range\-name\fR=\fISERVICES_SECONDARY_RANGE_NAME\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ |\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR\ \fB\-\-cluster\-secondary\-range\-name\fR=\fICLUSTER_SECONDARY_RANGE_NAME\fR\ \fB\-\-enable\-ip\-alias\fR\ \fB\-\-services\-ipv4\-cidr\fR=\fISERVICES_IPV4_CIDR\fR\ \fB\-\-services\-secondary\-range\-name\fR=\fISERVICES_SECONDARY_RANGE_NAME\fR] [\fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-environment\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-web\-server\-allow\-ip\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIip_range\fR=\fIIP_RANGE\fR]\ |\ \fB\-\-web\-server\-deny\-all\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -182,7 +182,7 @@ be stored.
 .sp
 .TP 2m
 
-Private Clusters and IP Alias (VPC\-native)
+IP Alias (VPC\-native)
 
 .RS 2m
 .TP 2m
@@ -206,6 +206,32 @@ Enable use of alias IPs (https://cloud.google.com/compute/docs/alias\-ip/) for
 Pod IPs. This will require at least two secondary ranges in the subnetwork, one
 for the pod IPs and another to reserve space for the services range.
 
+.TP 2m
+\fB\-\-services\-ipv4\-cidr\fR=\fISERVICES_IPV4_CIDR\fR
+IP range for the services IPs.
+
+Can be specified as a netmask size (e.g. '/20') or as in CIDR notion (e.g.
+\'10.100.0.0/20'). If given as a netmask size, the IP range will be chosen
+automatically from the available space in the network.
+
+If unspecified, the services CIDR range will be chosen with a default mask size.
+
+Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
+
+.TP 2m
+\fB\-\-services\-secondary\-range\-name\fR=\fISERVICES_SECONDARY_RANGE_NAME\fR
+Secondary range to be used for services (e.g. ClusterIPs). NAME must be the name
+of an existing secondary range in the cluster subnetwork.
+
+Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
+
+.RE
+.sp
+.TP 2m
+
+Private Clusters
+
+.RS 2m
 .TP 2m
 \fB\-\-enable\-private\-endpoint\fR
 Environment cluster is managed using the private IP address of the master API
@@ -234,25 +260,6 @@ size /28.
 Cannot be specified unless '\-\-enable\-private\-environnment' is also
 specified.
 
-.TP 2m
-\fB\-\-services\-ipv4\-cidr\fR=\fISERVICES_IPV4_CIDR\fR
-IP range for the services IPs.
-
-Can be specified as a netmask size (e.g. '/20') or as in CIDR notion (e.g.
-\'10.100.0.0/20'). If given as a netmask size, the IP range will be chosen
-automatically from the available space in the network.
-
-If unspecified, the services CIDR range will be chosen with a default mask size.
-
-Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
-
-.TP 2m
-\fB\-\-services\-secondary\-range\-name\fR=\fISERVICES_SECONDARY_RANGE_NAME\fR
-Secondary range to be used for services (e.g. ClusterIPs). NAME must be the name
-of an existing secondary range in the cluster subnetwork.
-
-Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
-
 .RE
 .sp
 .TP 2m
@@ -273,6 +280,29 @@ The Compute Engine subnetwork
 (https://cloud.google.com/compute/docs/subnetworks) to which the environment
 will be connected.
 
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-web\-server\-allow\-ip\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIip_range\fR=\fIIP_RANGE\fR]
+Specifies a list of IPv4 or IPv6 ranges that will be allowed to access the
+Airflow web server. By default, all IPs are allowed to access the web server.
+
+.TP 2m
+\fBip_range\fR
+IPv4 or IPv6 range of addresses allowed to access the Airflow web server.
+
+.TP 2m
+\fBdescription\fR
+An optional description of the IP range.
+.TP 2m
+\fB\-\-web\-server\-deny\-all\fR
+Denies all incoming traffic to the Airflow web server.
+
 
 .RE
 .RE
@@ -283,8 +313,29 @@ will be connected.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create an environment called \f5\fIenv\-1\fR\fR with all the default values,
+run:
+
+.RS 2m
+$ gcloud beta composer environments create env\-1
+.RE
+
+To create a new environment named \f5\fIenv\-1\fR\fR with the Google Compute
+Engine machine\-type \f5\fIn1\-standard\-8\fR\fR, and the Google Compute Engine
+network \f5\fImy\-network\fR\fR, run:
+
+.RS 2m
+$ gcloud beta composer environments create env\-1 \e
+    \-\-machine\-type=n1\-standard\-8 \-\-network=my\-network
+.RE
 
 
 

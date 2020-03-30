@@ -26,8 +26,9 @@ gcloud alpha compute os\-config patch\-jobs \- manage OS patches for Compute Eng
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -38,11 +39,11 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBcancel\fR
-\fB(ALPHA)\fR Cancel the given active OS patch job.
+\fB(ALPHA)\fR Cancel a specific OS patch job which must currently be active.
 
 .TP 2m
 \fBdescribe\fR
-\fB(ALPHA)\fR Describe the given OS patch job.
+\fB(ALPHA)\fR Describe a specified OS patch job.
 
 .TP 2m
 \fBexecute\fR
@@ -65,5 +66,10 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud compute os\-config patch\-jobs
+$ gcloud beta compute os\-config patch\-jobs
+.RE
 

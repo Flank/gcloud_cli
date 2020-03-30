@@ -11,13 +11,13 @@ gcloud alpha logging buckets update \- updates a bucket
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha logging buckets update\fR \fIBUCKET_ID\fR \fB\-\-location\fR=\fILOCATION\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-retention\-days\fR=\fIRETENTION_DAYS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha logging buckets update\fR \fIBUCKET_ID\fR \fB\-\-location\fR=\fILOCATION\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-locked\fR] [\fB\-\-retention\-days\fR=\fIRETENTION_DAYS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Changes one or more proprties associated with a bucket.
+\fB(ALPHA)\fR Updates the properties of a bucket.
 
 
 
@@ -51,8 +51,9 @@ Location of the bucket.
 A new description for the bucket.
 
 .TP 2m
-\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
-A new display name for the bucket.
+\fB\-\-locked\fR
+Lock the bucket and prevent it from being modified or deleted (unless it is
+empty).
 
 .TP 2m
 \fB\-\-retention\-days\fR=\fIRETENTION_DAYS\fR
@@ -67,8 +68,20 @@ A new retention period for the bucket.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update a bucket in your project, run:
+
+.RS 2m
+$ gcloud alpha logging buckets update my\-bucket \-\-location=global \e
+   \-\-description=my\-new\-description
+.RE
 
 
 
@@ -77,5 +90,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta logging buckets update
+.RE
 

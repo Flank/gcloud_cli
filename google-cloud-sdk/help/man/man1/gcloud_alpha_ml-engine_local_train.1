@@ -11,7 +11,7 @@ gcloud alpha ml\-engine local train \- run an AI Platform training job locally
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml\-engine local train\fR  \fB\-\-module\-name\fR=\fIMODULE_NAME\fR [\fB\-\-distributed\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-parameter\-server\-count\fR=\fIPARAMETER_SERVER_COUNT\fR] [\fB\-\-start\-port\fR=\fISTART_PORT\fR;\ default=27182] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
+\f5gcloud alpha ml\-engine local train\fR  \fB\-\-module\-name\fR=\fIMODULE_NAME\fR [\fB\-\-distributed\fR] [\fB\-\-evaluator\-count\fR=\fIEVALUATOR_COUNT\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-parameter\-server\-count\fR=\fIPARAMETER_SERVER_COUNT\fR] [\fB\-\-start\-port\fR=\fISTART_PORT\fR;\ default=27182] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
 
 
 
@@ -77,6 +77,11 @@ Runs the provided code in distributed mode by providing cluster configurations
 as environment variables to subprocesses
 
 .TP 2m
+\fB\-\-evaluator\-count\fR=\fIEVALUATOR_COUNT\fR
+Number of evaluators with which to run. Ignored if \-\-distributed is not
+specified. Default: 0
+
+.TP 2m
 \fB\-\-job\-dir\fR=\fIJOB_DIR\fR
 Google Cloud Storage path or local_directory in which to store training outputs
 and other data needed for training.
@@ -120,8 +125,9 @@ specified. Default: 2
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

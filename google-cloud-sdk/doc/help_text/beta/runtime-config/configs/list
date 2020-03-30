@@ -43,8 +43,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To list all runtime-config resources for the current project, run:
@@ -55,7 +56,7 @@ EXAMPLES
     example, to list all runtime-config resources with names that begin with
     'foo', run:
 
-        $ gcloud beta runtime-config configs list --filter 'name=foo*'
+        $ gcloud beta runtime-config configs list --filter='name=foo*'
 
 NOTES
     This command is currently in BETA and may change without notice.

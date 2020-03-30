@@ -26,6 +26,7 @@ import subprocess
 import sys
 
 from googlecloudsdk.command_lib.interactive import coshell
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -145,7 +146,7 @@ class UnixCoshellTest(_CoshellTestBase):
 
   def testUnixCoshellBashrc(self):
     self.Touch(
-        directory=os.environ.get('HOME'),
+        directory=encoding.GetEncodedValue(os.environ, 'HOME'),
         name='.bashrc',
         contents='set -o vi\nset -o ignoreeof\n')
     self.CoOpen()
@@ -689,7 +690,7 @@ complete -o nospace -F __coshell_test_completer__ tst
         completions)
 
 
-@test_case.Filters.SkipOnMacAndPy3('Failing', 'b/143695427')
+@test_case.Filters.DoNotRunOnMac  # Windows specific tests
 class WindowsCoshellTest(_CoshellTestBase):
   """Funny that the Windows sepcific tests run everywhere."""
 

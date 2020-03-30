@@ -282,7 +282,7 @@ class HelperMethodTests(NamedConfigTestBase):
 
   def testCreateDefaultNoCreate(self):
     self.ClearAllConfigurations()
-    active = named_configs._ActiveConfig(force_create=False)
+    active = named_configs.ActiveConfig(force_create=False)
     self.assertEqual('default', active.name)
     self.assertEqual(True, active.is_active)
     self.assertEqual(
@@ -294,7 +294,7 @@ class HelperMethodTests(NamedConfigTestBase):
     self.ClearAllConfigurations()
     with open(config.Paths().user_properties_path, 'w') as f:
       f.write('[core]\naccount = foo\n')
-    active = named_configs._ActiveConfig(force_create=False)
+    active = named_configs.ActiveConfig(force_create=False)
     self.assertEqual('default', active.name)
     self.assertEqual(True, active.is_active)
     self.assertEqual(

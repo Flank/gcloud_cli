@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud compute sole\-tenancy node\-templates create \- creates a Google Compute Engine node template
+gcloud compute sole\-tenancy node\-templates create \- create a Compute Engine node template
 
 
 
@@ -17,7 +17,7 @@ gcloud compute sole\-tenancy node\-templates create \- creates a Google Compute 
 
 .SH "DESCRIPTION"
 
-Creates a Google Compute Engine node template.
+Create a Compute Engine node template.
 
 
 
@@ -160,8 +160,20 @@ new physical server and assigned a new sole tenant physical server ID.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a node template of type \f5n1\-node\-96\-624\fR, run:
+
+.RS 2m
+$ gcloud compute sole\-tenancy node\-templates create \e
+    my\-node\-template \-\-node\-type=n1\-node\-96\-624
+.RE
 
 
 

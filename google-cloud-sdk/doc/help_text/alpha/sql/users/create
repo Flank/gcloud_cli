@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha sql users create USERNAME --instance=INSTANCE, -i INSTANCE
-        [--async] [--host=HOST] [--password=PASSWORD] [GCLOUD_WIDE_FLAG ...]
+        [--async] [--host=HOST] [--password=PASSWORD] [--type=TYPE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Creates a user in a given instance with specified username, host,
@@ -34,12 +35,18 @@ OPTIONAL FLAGS
      --password=PASSWORD
         Cloud SQL user's password.
 
+     --type=TYPE
+        Cloud SQL user's type. It determines the method to authenticate the
+        user during login. See the list of user types at
+        https://cloud.google.com/sql/docs/postgres/admin-api/v1beta4/users#type
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -11,7 +11,8 @@ DESCRIPTION
 
     App Engine Domain Mappings allow an application to be served via one or
     many custom domains, such as example.com, instead of the default
-    appspot.com address. You can use a custom domain with or without SSL.
+    https://<PROJECT-ID>.<REGION-ID>.r.appspot.com address. You can use a
+    custom domain with or without SSL.
 
     Use the AUTOMATIC management type to automatically provision an SSL
     certificate for your domain. Use the MANUAL management type to provide your
@@ -21,8 +22,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:

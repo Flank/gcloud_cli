@@ -128,8 +128,9 @@ $KUBECONFIG is unset, this defaults to \f5~/.kube/config\fR.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -163,6 +164,10 @@ help\fR for details.
 \fB(BETA)\fR Remove IAM policy binding of a Cloud Run service.
 
 .TP 2m
+\fBreplace\fR
+\fB(BETA)\fR Creates or replaces a service from a YAML Service specification.
+
+.TP 2m
 \fBset\-iam\-policy\fR
 \fB(BETA)\fR Set the IAM policy for a service.
 
@@ -170,6 +175,10 @@ help\fR for details.
 \fBupdate\fR
 \fB(BETA)\fR Update Cloud Run environment variables and other configuration
 settings.
+
+.TP 2m
+\fBupdate\-traffic\fR
+\fB(BETA)\fR Adjust the trafic assignments for a Cloud Run service.
 
 
 .RE

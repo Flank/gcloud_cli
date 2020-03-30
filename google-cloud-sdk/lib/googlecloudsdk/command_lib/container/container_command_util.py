@@ -285,6 +285,8 @@ def ParseUpdateOptionsBase(args, locations):
       locations=locations,
       enable_master_authorized_networks=args.enable_master_authorized_networks,
       master_authorized_networks=args.master_authorized_networks,
+      workload_pool=args.workload_pool,
+      disable_workload_identity=args.disable_workload_identity,
       database_encryption_key=args.database_encryption_key,
       disable_database_encryption=args.disable_database_encryption,
       enable_vertical_pod_autoscaling=args.enable_vertical_pod_autoscaling,
@@ -293,6 +295,16 @@ def ParseUpdateOptionsBase(args, locations):
       autoprovisioning_service_account=args.autoprovisioning_service_account,
       autoprovisioning_scopes=args.autoprovisioning_scopes,
       autoprovisioning_locations=args.autoprovisioning_locations,
+      autoprovisioning_max_surge_upgrade=getattr(
+          args, 'autoprovisioning_max_surge_upgrade', None),
+      autoprovisioning_max_unavailable_upgrade=getattr(
+          args, 'autoprovisioning_max_unavailable_upgrade', None),
+      enable_autoprovisioning_autorepair=getattr(
+          args, 'enable_autoprovisioning_autorepair', None),
+      enable_autoprovisioning_autoupgrade=getattr(
+          args, 'enable_autoprovisioning_autoupgrade', None),
+      autoprovisioning_min_cpu_platform=getattr(
+          args, 'autoprovisioning_min_cpu_platform', None),
       min_cpu=args.min_cpu,
       max_cpu=args.max_cpu,
       min_memory=args.min_memory,

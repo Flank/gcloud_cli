@@ -7,7 +7,16 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Describe a notification channel descriptor.
+    (ALPHA) Describes a notification channel type by fetching its descriptor.
+
+EXAMPLES
+    The following command obtains the descriptor for the email channel type:
+
+        $ gcloud alpha monitoring channel-descriptors describe email
+
+    The following command obtains the descriptor for the sms channel type:
+
+        $ gcloud alpha monitoring channel-descriptors describe sms
 
 POSITIONAL ARGUMENTS
      Channel descriptor resource - The notification channel descriptor to
@@ -25,8 +34,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the monitoring/v3 API. The full documentation for this
@@ -36,5 +46,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta monitoring channel-descriptors describe
 

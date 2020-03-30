@@ -36,6 +36,12 @@ _JSON_FILE_PATH = sdk_test_base.SdkBase.Resource(
 _YAML_FILE_PATH = sdk_test_base.SdkBase.Resource(
     'tests', 'unit', 'surface', 'compute', 'security_policies', 'test_data',
     'security-policy-exported.yaml')
+_JSON_FILE_MATCH_EXPRESSION_PATH = sdk_test_base.SdkBase.Resource(
+    'tests', 'unit', 'surface', 'compute', 'security_policies', 'test_data',
+    'security-policy-match-expression-exported.json')
+_YAML_FILE_MATCH_EXPRESSION_PATH = sdk_test_base.SdkBase.Resource(
+    'tests', 'unit', 'surface', 'compute', 'security_policies', 'test_data',
+    'security-policy-match-expression-exported.yaml')
 _JSON_FILE_PATH_NO_DESCRIPTIONS = sdk_test_base.SdkBase.Resource(
     'tests', 'unit', 'surface', 'compute', 'security_policies', 'test_data',
     'security-policy-no-descriptions-exported.json')
@@ -117,6 +123,26 @@ class SecurityPoliciesCreateTest(test_base.BaseTest, parameterized.TestCase):
     template.close()
 
   @parameterized.named_parameters(
+      ('JsonFile', _JSON_FILE_MATCH_EXPRESSION_PATH, 'json'),
+      ('YamlFile', _YAML_FILE_MATCH_EXPRESSION_PATH, 'yaml'))
+  def testSecurityPolicyMatchExpressionFromFile(self, file_path, file_format):
+    template = open(file_path)
+    actual = security_policies_utils.SecurityPolicyFromFile(
+        template, self.messages, file_format)
+
+    expected = test_resources.MakeSecurityPolicyMatchExpression(
+        self.messages, self.CreateSecurityPolicy())
+
+    # Add fields that are not required for an actual import, but are required
+    # for the sake of this test.
+    actual.name = expected.name
+    actual.id = expected.id
+    actual.selfLink = expected.selfLink
+
+    self.assertEqual(expected, actual)
+    template.close()
+
+  @parameterized.named_parameters(
       ('JsonFile', _JSON_FILE_PATH, 'json', 'my description', 'default rule'),
       ('JsonFileOptionalFieldAbsent', _JSON_FILE_PATH_NO_DESCRIPTIONS, 'json',
        None, None),
@@ -126,7 +152,7 @@ class SecurityPoliciesCreateTest(test_base.BaseTest, parameterized.TestCase):
   def testCreateFromTemplate(self, file_path, file_format, description,
                              rule_description):
     messages = self.messages
-    self.Run('compute security-policies create my-policy --file-name {0} '
+    self.Run('compute security-policies create my-policy --file-name "{0}" '
              '--file-format {1}'.format(file_path, file_format))
 
     self.CheckSecurityPolicyRequest(
@@ -158,14 +184,14 @@ class SecurityPoliciesCreateTest(test_base.BaseTest, parameterized.TestCase):
         exceptions.BadFileException,
         r'Unable to read security policy config from specified file \[{0}\] '
         r'because \[{1}\]'.format(re.escape(file_path), expected_error)):
-      self.Run('compute security-policies create my-policy --file-name {0} '
+      self.Run('compute security-policies create my-policy --file-name "{0}" '
                '--file-format {1}'.format(file_path, file_format))
 
   def testBadFilePath(self):
     with self.AssertRaisesExceptionRegexp(
         exceptions.BadFileException, r'No such file \[{0}\]'.format(
             re.escape(_BAD_FILE_PATH))):
-      self.Run('compute security-policies create my-policy --file-name {0} '
+      self.Run('compute security-policies create my-policy --file-name "{0}" '
                '--file-format {1}'.format(_BAD_FILE_PATH, 'yaml'))
 
 

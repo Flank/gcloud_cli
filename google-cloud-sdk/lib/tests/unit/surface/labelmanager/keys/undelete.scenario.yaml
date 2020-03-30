@@ -1,5 +1,43 @@
-title: label manager label keys undelete test
+title: LabelManager - LabelKeys - Undelete test
 release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: labelmanager keys undelete labelKeys/123 --async
+  - stdout: |
+      done: true
+      name: operations/udlk.12345
+      response:
+        '@type': type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelKey
+        displayName: env
+        name: labelKeys/123
+        parent: organizations/456
+        state: ACTIVE
+- execute:
+  - command: labelmanager keys undelete env --label-parent='organizations/456' --async
+  - stdout: |
+      done: true
+      name: operations/udlk.12345
+      response:
+        '@type': type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelKey
+        displayName: env
+        name: labelKeys/123
+        parent: organizations/456
+        state: ACTIVE
+- execute:
+  - command: labelmanager keys undelete labelKeys/123
+  - progress_tracker:
+    - message: Waiting for LabelKey [labelKeys/123] to be undeleted with [operations/udlk.12345]
+    - status: SUCCESS
+  - stdout: |
+      displayName: env
+      name: labelKeys/123
+      parent: organizations/456
+      state: ACTIVE
+- execute:
+  - command: labelmanager keys undelete labelKeys/123 --async
+  - error: '1: User [fake_account] does not have permission to access labelKey [123:undelete]
+      (or it may not exist): The caller does not have permission'
 
 actions:
 - execute_command:
@@ -16,7 +54,7 @@ actions:
           body: |
             {
               "done": true,
-              "name": "operations/clk.12345",
+              "name": "operations/udlk.12345",
               "response": {
                 "@type": "type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelKey",
                 "displayName": "env",
@@ -27,7 +65,7 @@ actions:
             }
     - expect_stdout: |
         done: true
-        name: operations/clk.12345
+        name: operations/udlk.12345
         response:
           '@type': type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelKey
           displayName: env
@@ -64,7 +102,7 @@ actions:
           body: |
             {
               "done": true,
-              "name": "operations/clk.12345",
+              "name": "operations/udlk.12345",
               "response": {
                 "@type": "type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelKey",
                 "displayName": "env",
@@ -75,7 +113,7 @@ actions:
             }
     - expect_stdout: |
         done: true
-        name: operations/clk.12345
+        name: operations/udlk.12345
         response:
           '@type': type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelKey
           displayName: env
@@ -98,7 +136,7 @@ actions:
           body: |
             {
               "done": true,
-              "name": "operations/clk.12345",
+              "name": "operations/udlk.12345",
               "response": {
                 "@type": "type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelKey",
                 "displayName": "env",
@@ -109,16 +147,16 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/operations/clk.12345?alt=json
+          uri: https://labelmanager.googleapis.com/v1alpha1/operations/udlk.12345?alt=json
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             status: '200'
           body: |
             {
               "done": true,
-              "name": "operations/clk.12345",
+              "name": "operations/udlk.12345",
               "response": {
                 "@type": "type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelKey",
                 "displayName": "env",
@@ -128,13 +166,13 @@ actions:
               }
             }
     - expect_progress_tracker:
-        message: Waiting for label [labelKeys/123] to be undeleted with [operations/clk.12345]
+        message: Waiting for LabelKey [labelKeys/123] to be undeleted with [operations/udlk.12345]
         status: SUCCESS
     - api_call:
         expect_request:
           uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys/123?alt=json
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             status: '200'
@@ -168,4 +206,5 @@ actions:
               status: PERMISSION_DENIED
     - expect_exit:
         code: 1
-        message: 'User [fake_account] does not have permission to access labelKey [123:undelete] (or it may not exist): The caller does not have permission'
+        message: 'User [fake_account] does not have permission to access labelKey
+          [123:undelete] (or it may not exist): The caller does not have permission'

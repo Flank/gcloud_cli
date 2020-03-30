@@ -97,6 +97,19 @@ class TestBase(compute_test_base.BaseTest):
                         interface=ssd_msgs.InterfaceValueValuesEnum.NVME),
                 ])))
 
+  def MakeLicenseCommitment(self, name, amount, license_url, cores=None):
+    license_resource = self.messages.LicenseResourceCommitment(
+        amount=amount,
+        license=license_url,
+    )
+    if cores:
+      license_resource.coresPerLicense = cores
+    return self.messages.Commitment(
+        name=name,
+        plan=self.messages.Commitment.PlanValueValuesEnum.TWELVE_MONTH,
+        licenseResource=license_resource,
+        category=self.messages.Commitment.CategoryValueValuesEnum.LICENSE)
+
   def MakeAcceleratorResourceCommitment(self, amount=3, acce_type='ace-type'):
     return self.messages.ResourceCommitment(
         amount=amount,

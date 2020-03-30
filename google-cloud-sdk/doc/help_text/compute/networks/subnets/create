@@ -8,7 +8,8 @@ SYNOPSIS
         [--enable-private-ip-google-access]
         [--logging-aggregation-interval=LOGGING_AGGREGATION_INTERVAL]
         [--logging-flow-sampling=LOGGING_FLOW_SAMPLING]
-        [--logging-metadata=LOGGING_METADATA] [--region=REGION]
+        [--logging-metadata=LOGGING_METADATA] [--purpose=PURPOSE]
+        [--region=REGION] [--role=ROLE]
         [--secondary-range=PROPERTY=VALUE,[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -61,6 +62,14 @@ OPTIONAL FLAGS
         reported VPC flow logs. Default is to include all metadata.
         LOGGING_METADATA must be one of: exclude-all, include-all.
 
+     --purpose=PURPOSE
+        The purpose of this subnetwork. PURPOSE must be one of:
+
+         INTERNAL_HTTPS_LOAD_BALANCER
+            Reserved for Internal HTTP(S) Load Balancing.
+         PRIVATE
+            Regular user created or automatically created subnet.
+
      --region=REGION
         Region of the subnetwork to create. If not specified, you may be
         prompted to select a region.
@@ -81,6 +90,19 @@ OPTIONAL FLAGS
         Alternatively, the region can be stored in the environment variable
         CLOUDSDK_COMPUTE_REGION.
 
+     --role=ROLE
+        The role of subnetwork. This field is required when
+        purpose=INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE or
+        BACKUP. An ACTIVE subnetwork is one that is currently being used for
+        Internal HTTP(S) Load Balancing. A BACKUP subnetwork is one that is
+        ready to be promoted to ACTIVE or is currently draining. ROLE must be
+        one of:
+
+         ACTIVE
+            The ACTIVE subnet that is currently used.
+         BACKUP
+            The BACKUP subnet that could be promoted to ACTIVE.
+
      --secondary-range=PROPERTY=VALUE,[...]
         Adds a secondary IP range to the subnetwork for use in IP aliasing.
 
@@ -94,8 +116,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     These variants are also available:

@@ -63,6 +63,16 @@ class ConfigureDockerTest(sdk_test_base.WithFakeAuth,
     self.assertEqual(cred_utils.GetGcloudCredentialHelperConfig(),
                      config_info.contents)
 
+  def testConfigureSuccessWithServerSpecified(self):
+    self.WriteInput('Y\n')
+    self.Run('auth configure-docker us-west1-docker.pkg.dev')
+    self.AssertErrContains('Docker configuration file updated.')
+    self.AssertErrContains(self.test_config.replace('\\', '\\\\'))
+    config_info = cred_utils.Configuration.ReadFromDisk()
+    self.assertEqual(
+        cred_utils.GetGcloudCredentialHelperConfig(['us-west1-docker.pkg.dev']),
+        config_info.contents)
+
   def testDockerNotInstalled(self):
     self.StartObjectPatch(
         cred_utils.Configuration, 'ReadFromDisk'
@@ -144,6 +154,58 @@ class ConfigureDockerTest(sdk_test_base.WithFakeAuth,
     config_info = cred_utils.Configuration.ReadFromDisk()
     self.assertEqual(cred_utils.GetGcloudCredentialHelperConfig(),
                      config_info.contents)
+
+  def testMergeConfigurations(self):
+    test_mappings = {
+        'credHelpers': {
+            'us.gcr.io': 'gcloud',
+            'us-west1-docker.pkg.dev': 'not-gcloud'
+        }
+    }
+    self._WriteTestDockerConfig(json.dumps(test_mappings, indent=2))
+    self.WriteInput('Y\n')
+    self.Run(
+        'auth configure-docker us-west1-docker.pkg.dev,us-central1-docker.pkg.dev'
+    )
+    self.AssertErrMatches(r'Your config file at \[.*\] contains these '
+                          r'credential helper entries')
+    self.AssertErrContains('Docker configuration file updated.')
+    config_info = cred_utils.Configuration.ReadFromDisk()
+    self.assertEqual(
+        cred_utils.GetGcloudCredentialHelperConfig([
+            'us.gcr.io', 'us-west1-docker.pkg.dev', 'us-central1-docker.pkg.dev'
+        ]), config_info.contents)
+
+  def testAppendConfigurations(self):
+    test_mappings = {'credHelpers': {'random.com': 'not-gcloud'}}
+    self._WriteTestDockerConfig(json.dumps(test_mappings, indent=2))
+    self.WriteInput('Y\n')
+    self.Run('auth configure-docker us-west1-docker.pkg.dev')
+    self.AssertErrMatches(r'Your config file at \[.*\] contains these '
+                          r'credential helper entries')
+    self.AssertErrContains('Docker configuration file updated.')
+    config_info = cred_utils.Configuration.ReadFromDisk()
+    self.assertEqual(
+        {
+            'credHelpers': {
+                'random.com': 'not-gcloud',
+                'us-west1-docker.pkg.dev': 'gcloud'
+            }
+        }, config_info.contents)
+
+  def testOnlyAppendValidConfigurations(self):
+    test_mappings = {'credHelpers': {'us.gcr.io': 'gcloud'}}
+    self._WriteTestDockerConfig(json.dumps(test_mappings, indent=2))
+    self.WriteInput('Y\n')
+    self.Run('auth configure-docker invalid-domain.com,us-west1-docker.pkg.dev')
+    self.AssertErrMatches(r'Your config file at \[.*\] contains these '
+                          r'credential helper entries')
+    self.AssertErrContains('invalid-domain.com is not a supported registry')
+    self.AssertErrContains('Docker configuration file updated.')
+    config_info = cred_utils.Configuration.ReadFromDisk()
+    self.assertEqual(
+        cred_utils.GetGcloudCredentialHelperConfig(
+            ['us.gcr.io', 'us-west1-docker.pkg.dev']), config_info.contents)
 
   def testConfigureIOError(self):
     self._WriteTestDockerConfig('{}')

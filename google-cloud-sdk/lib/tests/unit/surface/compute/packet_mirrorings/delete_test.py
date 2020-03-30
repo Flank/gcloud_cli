@@ -27,16 +27,16 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class DeleteTestBeta(test_base.BaseTest, completer_test_base.CompleterBase):
+class DeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
 
   def SetUp(self):
-    self.SelectApi('beta')
+    self.SelectApi('v1')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'beta'
+    self.resources.RegisterApiByName('compute', 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
     self.messages = core_apis.GetMessagesModule('compute', self.api_version)
-    self.compute = self.compute_beta
+    self.compute = self.compute_v1
 
   def testSingle(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -92,6 +92,18 @@ class DeleteTestBeta(test_base.BaseTest, completer_test_base.CompleterBase):
                              packetMirroring='pm-1',
                              project='my-project',
                              region='us-central1'))])
+
+
+class DeleteTestBeta(DeleteTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.compute = self.compute_beta
 
 
 class DeleteTestAlpha(DeleteTestBeta):

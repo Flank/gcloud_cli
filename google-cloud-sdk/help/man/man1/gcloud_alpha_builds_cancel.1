@@ -37,8 +37,25 @@ IDs of builds to cancel
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To cancel a build \f5123\-456\-789\fR:
+
+.RS 2m
+$ gcloud alpha builds cancel '123\-456\-789'
+.RE
+
+You may also cancel multiple builds at the same time:
+
+.RS 2m
+$ gcloud alpha builds cancel '123\-456\-789', '987\-654\-321'
+.RE
 
 
 

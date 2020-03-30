@@ -31,7 +31,7 @@ GLOBAL FLAGS
      --configuration=CONFIGURATION
         The configuration to use for this command invocation. For more
         information on how to use configurations, run: gcloud topic
-        configurations. You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME]
+        configurations. You can also use the CLOUDSDK_ACTIVE_CONFIG_NAME
         environment variable to set the equivalent of this flag for a terminal
         session.
 
@@ -135,6 +135,9 @@ GROUPS
      alpha
         (ALPHA) Alpha versions of gcloud commands.
 
+     anthos
+        Anthos command Group.
+
      app
         Manage your App Engine deployments.
 
@@ -168,6 +171,9 @@ GROUPS
      container
         Deploy and manage clusters of machines for running containers.
 
+     data-catalog
+        Manage Cloud Data Catalog resources.
+
      dataflow
         Manage Google Cloud Dataflow resources.
 
@@ -175,7 +181,7 @@ GROUPS
         Create and manage Google Cloud Dataproc clusters and jobs.
 
      datastore
-        Manage your Cloud Datastore indexes.
+        Manage your Cloud Datastore resources.
 
      debug
         Commands for interacting with the Cloud Debugger.
@@ -207,6 +213,9 @@ GROUPS
      iam
         Manage IAM service accounts and keys.
 
+     iap
+        Manage IAP policies.
+
      iot
         Manage Cloud IoT resources.
 
@@ -222,14 +231,23 @@ GROUPS
      ml-engine
         Manage AI Platform jobs and models.
 
+     network-management
+        Manage Network Management resources.
+
      organizations
         Create and manage Google Cloud Platform Organizations.
+
+     policy-troubleshoot
+        Troubleshoot Google Cloud Platform policies.
 
      projects
         Create and manage project access policies.
 
      pubsub
         Manage Cloud Pub/Sub topics, subscriptions, and snapshots.
+
+     recommender
+        Manage Cloud recommendations and recommendation rules.
 
      redis
         Manage Cloud Memorystore Redis resources.
@@ -242,6 +260,9 @@ GROUPS
 
      scheduler
         Manage Cloud Scheduler jobs and schedules.
+
+     secrets
+        Manage secrets on Google Cloud.
 
      services
         List, enable and disable APIs and services.
@@ -278,6 +299,9 @@ COMMANDS
 
      init
         Initialize or reinitialize gcloud.
+
+     survey
+        Invoke a customer satisfaction survey for Cloud SDK.
 
      version
         Print version information for Cloud SDK components.

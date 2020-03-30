@@ -1,0 +1,322 @@
+title: artifacts repositories list
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: artifacts repositories list --location=us-west1
+  - stderr: ^Listing items under project fake-project..*$
+  - stdout: |2+
+                                        ARTIFACT_REGISTRY
+      REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
+      gcloud-repo2  MAVEN   test         us-west1  2019-05-17T15:30:40  2019-05-17T15:30:40
+      gcloud-repo3  NPM                  us-west1  2019-05-20T14:36:22  2019-05-20T14:36:22
+
+- execute:
+  - command: artifacts repositories list --limit=1 --format=json --location=us-west1
+  - stderr: ^Listing items under project fake-project..*$
+  - stdout: |
+      [
+        {
+          "AR": [
+            {
+              "createTime": "2019-05-17T22:30:40.996826Z",
+              "description": "test",
+              "format": "MAVEN",
+              "name": "projects/fake-project/locations/us-west1/repositories/gcloud-repo2",
+              "updateTime": "2019-05-17T22:30:40.996826Z"
+            },
+            {
+              "createTime": "2019-05-20T21:36:22.491339Z",
+              "format": "NPM",
+              "name": "projects/fake-project/locations/us-west1/repositories/gcloud-repo3",
+              "updateTime": "2019-05-20T21:36:22.491339Z"
+            },
+            {
+              "createTime": "2019-04-11T17:07:58.828698Z",
+              "format": "MAVEN",
+              "name": "projects/fake-project/locations/us-west1/repositories/mvn-repo",
+              "updateTime": "2019-04-11T17:07:58.828698Z"
+            }
+          ],
+          "GCR": []
+        }
+      ]
+- execute:
+  - command: artifacts repositories list --location=us
+  - stderr: ^Listing items under project fake-project..*$
+  - stderr: .*To perform actions on the Container Registry repositories listed below
+      please use.*$
+  - stdout: |2
+                                        ARTIFACT_REGISTRY
+      REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
+      gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
+      gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
+
+           CONTAINER_REGISTRY
+      REPOSITORY  FORMAT  LOCATION
+      us.gcr.io   DOCKER  us
+- execute:
+  - command: artifacts repositories list --location=us --project=my-domain.com:my-project
+  - stderr: ^Listing items under project my-domain.com:my-project..*$
+  - stderr: .*To perform actions on the Container Registry repositories listed below
+      please use.*$
+  - stdout: |2
+                                        ARTIFACT_REGISTRY
+      REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
+      gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
+      gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
+
+           CONTAINER_REGISTRY
+      REPOSITORY  FORMAT  LOCATION
+      us.gcr.io   DOCKER  us
+actions:
+- execute_command:
+    command: artifacts repositories list --location=us-west1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/fake-project/locations/us-west1
+              locationId: us-west1
+    - expect_stderr:
+        matches: ^Listing items under project fake-project..*
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            nextPageToken: asdf
+            repositories:
+            - name: projects/fake-project/locations/us-west1/repositories/gcloud-repo2
+              format: MAVEN
+              description: test
+              updateTime: '2019-05-17T22:30:40.996826Z'
+              createTime: '2019-05-17T22:30:40.996826Z'
+            - name: projects/fake-project/locations/us-west1/repositories/gcloud-repo3
+              format: NPM
+              updateTime: '2019-05-20T21:36:22.491339Z'
+              createTime: '2019-05-20T21:36:22.491339Z'
+    - expect_stdout: |2+
+                                          ARTIFACT_REGISTRY
+        REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
+        gcloud-repo2  MAVEN   test         us-west1  2019-05-17T15:30:40  2019-05-17T15:30:40
+        gcloud-repo3  NPM                  us-west1  2019-05-20T14:36:22  2019-05-20T14:36:22
+
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: artifacts repositories list --limit=1 --format=json --location=us-west1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/fake-project/locations/us-west1
+              locationId: us-west1
+    - expect_stderr:
+        matches: ^Listing items under project fake-project..*
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us-west1/repositories?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            nextPageToken: null
+            repositories:
+            - name: projects/fake-project/locations/us-west1/repositories/gcloud-repo2
+              format: MAVEN
+              description: test
+              updateTime: '2019-05-17T22:30:40.996826Z'
+              createTime: '2019-05-17T22:30:40.996826Z'
+            - name: projects/fake-project/locations/us-west1/repositories/gcloud-repo3
+              format: NPM
+              updateTime: '2019-05-20T21:36:22.491339Z'
+              createTime: '2019-05-20T21:36:22.491339Z'
+            - name: projects/fake-project/locations/us-west1/repositories/mvn-repo
+              format: MAVEN
+              updateTime: '2019-04-11T17:07:58.828698Z'
+              createTime: '2019-04-11T17:07:58.828698Z'
+    - expect_stdout: |
+        [
+          {
+            "AR": [
+              {
+                "createTime": "2019-05-17T22:30:40.996826Z",
+                "description": "test",
+                "format": "MAVEN",
+                "name": "projects/fake-project/locations/us-west1/repositories/gcloud-repo2",
+                "updateTime": "2019-05-17T22:30:40.996826Z"
+              },
+              {
+                "createTime": "2019-05-20T21:36:22.491339Z",
+                "format": "NPM",
+                "name": "projects/fake-project/locations/us-west1/repositories/gcloud-repo3",
+                "updateTime": "2019-05-20T21:36:22.491339Z"
+              },
+              {
+                "createTime": "2019-04-11T17:07:58.828698Z",
+                "format": "MAVEN",
+                "name": "projects/fake-project/locations/us-west1/repositories/mvn-repo",
+                "updateTime": "2019-04-11T17:07:58.828698Z"
+              }
+            ],
+            "GCR": []
+          }
+        ]
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts repositories list --location=us
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/fake-project/locations/us
+              locationId: us
+    - expect_stderr:
+        matches: ^Listing items under project fake-project..*
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/fake-project/locations/us/repositories?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            repositories:
+            - name: projects/fake-project/locations/us/repositories/gcloud-repo2
+              format: MAVEN
+              description: test
+              updateTime: '2019-05-17T22:30:40.996826Z'
+              createTime: '2019-05-17T22:30:40.996826Z'
+            - name: projects/fake-project/locations/us/repositories/gcloud-repo3
+              format: NPM
+              updateTime: '2019-05-20T21:36:22.491339Z'
+              createTime: '2019-05-20T21:36:22.491339Z'
+    - api_call:
+        expect_request:
+          uri: https://storage.googleapis.com/storage/v1/b/us.artifacts.fake-project.appspot.com/iam/testPermissions?alt=json&permissions=storage.objects.list&userProject=fake-project
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "storage#testIamPermissionsResponse"
+            }
+    - expect_stderr:
+        matches: .*To perform actions on the Container Registry repositories listed
+          below please use.*
+    - expect_stdout: |2
+                                          ARTIFACT_REGISTRY
+        REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
+        gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
+        gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
+
+             CONTAINER_REGISTRY
+        REPOSITORY  FORMAT  LOCATION
+        us.gcr.io   DOCKER  us
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: artifacts repositories list --location=us --project=my-domain.com:my-project
+    events:
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-domain.com:my-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/my-domain.com:my-project/locations/us
+              locationId: us
+    - expect_stderr:
+        matches: ^Listing items under project my-domain.com:my-project..*
+    - api_call:
+        expect_request:
+          uri: https://artifactregistry.googleapis.com/v1beta1/projects/my-domain.com:my-project/locations/us/repositories?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            repositories:
+            - name: projects/my-domain.com:my-project/locations/us/repositories/gcloud-repo2
+              format: MAVEN
+              description: test
+              updateTime: '2019-05-17T22:30:40.996826Z'
+              createTime: '2019-05-17T22:30:40.996826Z'
+            - name: projects/my-domain.com:my-project/locations/us/repositories/gcloud-repo3
+              format: NPM
+              updateTime: '2019-05-20T21:36:22.491339Z'
+              createTime: '2019-05-20T21:36:22.491339Z'
+    - api_call:
+        expect_request:
+          uri: https://storage.googleapis.com/storage/v1/b/us.artifacts.my-project.my-domain.com.a.appspot.com/iam/testPermissions?alt=json&permissions=storage.objects.list&userProject=my-domain.com%3Amy-project
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "kind": "storage#testIamPermissionsResponse"
+            }
+    - expect_stderr:
+        matches: .*To perform actions on the Container Registry repositories listed
+          below please use.*
+    - expect_stdout: |2
+                                          ARTIFACT_REGISTRY
+        REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
+        gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
+        gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
+
+             CONTAINER_REGISTRY
+        REPOSITORY  FORMAT  LOCATION
+        us.gcr.io   DOCKER  us
+    - expect_exit:
+        code: 0

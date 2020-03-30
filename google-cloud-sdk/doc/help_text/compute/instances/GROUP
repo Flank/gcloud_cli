@@ -12,8 +12,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -64,6 +65,10 @@ COMMANDS
 
      detach-disk
         Detach disks from Compute Engine virtual machine instances.
+
+     export
+        Export a Compute Engine virtual machine instance's configuration to a
+        file.
 
      get-guest-attributes
         Get the Guest Attributes for a compute instance.
@@ -139,6 +144,10 @@ COMMANDS
      update-container
         Updates Google Compute engine virtual machine instances running
         container images.
+
+     update-from-file
+        Update a Compute Engine virtual machine instance using a configuration
+        file.
 
 NOTES
     These variants are also available:

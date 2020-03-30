@@ -109,8 +109,9 @@ will cause the latest non\-deprecated image in the family to be used.
 
 .TP 2m
 \fB\-\-forbidden\-database\-file\fR=[\fIDBX_VALUE\fR,...]
-List of revoked certificates file paths used when booting up shieled instance
-from this image.
+Comma\-separated list of file paths pointing to revoked X.509 certificates or
+raw binary files to be added to the forbidden signature database (dbx) when
+creating a shielded instance from this image.
 
 .TP 2m
 \fB\-\-force\fR
@@ -136,10 +137,6 @@ for their boot disks. The following features are available:
 MULTI_IP_SUBNET \- For configuring interfaces with a netmask other than /32.
 
 .IP "\(em" 2m
-SECURE_BOOT \- Enables UEFI secure boot, which restrics unsigned software from
-booting or unsigned drivers from loading on the VM instance.
-
-.IP "\(em" 2m
 UEFI_COMPATIBLE \- Enables UEFI booting, which is an alternative system boot
 method. Most public images use the GRUB bootloader as their primary boot method.
 
@@ -163,14 +160,15 @@ server include the WINDOWS parameter to indicate that it is a Windows image.
 .RE
 .RE
 .sp
-\fIGUEST_OS_FEATURE\fR must be one of: \fBMULTI_IP_SUBNET\fR, \fBSECURE_BOOT\fR,
+\fIGUEST_OS_FEATURE\fR must be one of: \fBMULTI_IP_SUBNET\fR,
 \fBUEFI_COMPATIBLE\fR, \fBVIRTIO_SCSI_MULTIQUEUE\fR, \fBWINDOWS\fR, \fBGVNIC\fR.
 
 .RS 2m
 .TP 2m
 \fB\-\-key\-exchange\-key\-file\fR=[\fIKEK_VALUE\fR,...]
-List of key exchange key file paths used when booting up shieled instance from
-this image.
+Comma\-separated list of file paths pointing to X.509 certificates or raw binary
+files to be used as key exchange keys (KEK) when creating a shielded instance
+from this image.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -187,8 +185,8 @@ Comma\-separated list of URIs to license resources.
 
 .TP 2m
 \fB\-\-platform\-key\-file\fR=\fIPLATFORM_KEY_FILE\fR
-Single Platform Key file path used when booting up shielded instance from this
-image.
+File path pointing to an X.509 certificate or raw binary file to be used as the
+platform key (PK) when creating a shielded instance from this image.
 
 .TP 2m
 \fB\-\-require\-csek\-key\-create\fR
@@ -203,7 +201,8 @@ for more details. Enabled by default, use
 
 .TP 2m
 \fB\-\-signature\-database\-file\fR=[\fIDB_VALUE\fR,...]
-List of valid public certificates file paths used when booting up shieled
+Comma\-separated list of file paths pointing to valid X.509 certificates or raw
+binary files to be added to the signature database (db) when creating a shielded
 instance from this image.
 
 .TP 2m
@@ -280,8 +279,9 @@ The Cloud project for the key.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

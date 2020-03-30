@@ -2,7 +2,6 @@
 # Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
-# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -61,6 +60,29 @@ class SetIamPolicyUnitTestGA(base.MlGaPlatformTestBase):
 
     response = self.Run('{} models set-iam-policy myModel policy_file '
                         '--format disable'.format(module_name))
+
+    self.assertEqual(response, self.policy)
+    self.set_iam_policy.assert_called_once_with(
+        'policy_file', self.msgs.GoogleIamV1Policy)
+
+  def testSetIamPolicyWithResource(self, module_name):
+    self.set_iam_policy = self.StartObjectPatch(
+        iam_util, 'ParsePolicyFileWithUpdateMask',
+        return_value=(self.policy, 'bindings,etag,version'))
+
+    iam_request = self.msgs.GoogleIamV1SetIamPolicyRequest(
+        policy=self.policy,
+        updateMask='bindings,etag,version')
+    ml_set_iam_request = self.msgs.MlProjectsModelsSetIamPolicyRequest(
+        googleIamV1SetIamPolicyRequest=iam_request,
+        resource='projects/{}/models/myModel'.format(self.Project()))
+    self.client.projects_models.SetIamPolicy.Expect(
+        request=ml_set_iam_request,
+        response=self.policy)
+
+    response = self.Run(
+        '{} models set-iam-policy projects/{}/models/myModel policy_file '
+        '--format disable'.format(module_name, self.Project()))
 
     self.assertEqual(response, self.policy)
     self.set_iam_policy.assert_called_once_with(

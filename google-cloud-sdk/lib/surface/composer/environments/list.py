@@ -24,16 +24,29 @@ from googlecloudsdk.command_lib.composer import flags
 from googlecloudsdk.command_lib.composer import resource_args
 
 
+DETAILED_HELP = {
+    'EXAMPLES':
+        """\
+          To list the Cloud Composer environments under the project 'project-1'
+          and in location 'us-central1', run:
+
+            $ {command} --project=project-1 --locations=us-central1
+        """
+}
+
+
 class List(base.ListCommand):
   """List the Cloud Composer environments under a project and location.
 
-  List environments that not have been successfully deleted. Prints a table
+  List environments that have not been successfully deleted. Prints a table
   with the following columns:
   * name
   * location
   * status
   * creation timestamp
   """
+
+  detailed_help = DETAILED_HELP
 
   @staticmethod
   def Args(parser):

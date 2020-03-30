@@ -55,8 +55,21 @@ property value for this command invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To instantiate a workflow template from a yaml file 'template.yaml' in region
+\'us\-central1', run:
+
+.RS 2m
+$ gcloud alpha dataproc workflow\-templates instantiate\-from\-file \e
+    \-\-file=template.yaml \-\-region=us\-central1
+.RE
 
 
 

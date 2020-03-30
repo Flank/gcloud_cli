@@ -1,60 +1,66 @@
 title: Tests that server giving new fields sends new fields, and vice versa.
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: run/platform gke
 - set_property: run/cluster crgke
 - set_property: run/cluster_location us-central1-a
 - execute:
-  - command: run services update-traffic aahello --to-revisions=gchello-hwk6z=90,gchello-vdcjl=10
+  - command: run services update-traffic gchello --to-revisions=gchello-00001-abc=90,gchello-00002-def=10
   - staged_progress_tracker:
     - message: Updating traffic...
     - status: SUCCESS
   - stdout: |
-      TRAFFIC  REVISION
-      90%      gchello-hwk6z
-      10%      gchello-vdcjl
+      Traffic: http://helloworld-go.default.example.com
+        90% gchello-00001-abc
+        10% gchello-00002-def
 - execute:
-  - command: run services update-traffic aahello --to-revisions=gchello-hwk6z=90,LATEST=10
+  - command: run services update-traffic gchello --to-revisions=gchello-00001-abc=90,LATEST=10
   - staged_progress_tracker:
     - message: Updating traffic...
     - status: SUCCESS
   - stdout: |
-      TRAFFIC  REVISION
-      90%      gchello-hwk6z
-      10%      LATEST (currently gchello-vdcjl)
+      Traffic: http://helloworld-go.default.example.com
+        90% gchello-00001-abc
+        10% LATEST (currently gchello-00002-def)
 - execute:
-  - command: run services update-traffic aahello --to-revisions LATEST=100
+  - command: run services update-traffic gchello --to-revisions LATEST=100
   - staged_progress_tracker:
     - message: Updating traffic...
     - status: SUCCESS
   - stdout: |
-      TRAFFIC  REVISION
-      100%     LATEST (currently gchello-abcde)
+      Traffic: http://helloworld-go.default.example.com
+        100% LATEST (currently gchello-00002-def)
 - execute:
-  - command: run services update-traffic aahello --to-latest
+  - command: run services update-traffic gchello --to-latest
   - staged_progress_tracker:
     - message: Updating traffic...
     - status: SUCCESS
   - stdout: |
-      TRAFFIC  REVISION
-      100%     LATEST (currently gchello-abcde)
+      Traffic: http://helloworld-go.default.example.com
+        100% LATEST (currently gchello-00002-def)
 - execute:
-  - command: run services update-traffic aahello --to-latest
+  - command: run services update-traffic gchello --to-latest
   - staged_progress_tracker:
     - message: Updating traffic...
     - status: FAILURE
   - stdout: |
-      TRAFFIC               REVISION
-      100% (currently 10%)  LATEST (currently gchello-abcde)
+      Traffic: http://helloworld-go.default.example.com
+        100% (currently 10%) LATEST (currently gchello-00002-def)
   - error: '1: Too bad.'
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1alpha1
+      BETA: v1alpha1
+      ALPHA: v1
 - set_property:
     run/platform: gke
     run/cluster: crgke
     run/cluster_location: us-central1-a
 - execute_command:
-    command: run services update-traffic aahello --to-revisions=gchello-hwk6z=90,gchello-vdcjl=10
+    command: run services update-traffic gchello --to-revisions=gchello-00001-abc=90,gchello-00002-def=10
     events:
     - api_call:
         expect_request:
@@ -155,7 +161,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -165,7 +171,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               annotations:
@@ -173,17 +179,16 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
               creationTimestamp: '2019-07-23T18:13:29Z'
-              generation: 1
-              name: aahello
+              generation: 2
+              name: gchello
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -196,13 +201,13 @@ actions:
               traffic:
               - latestRevision: false
                 percent: 70
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 30
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
@@ -213,18 +218,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: service-name-20190711-192405-ul07-rnchc
-              latestReadyRevisionName: service-name-20190711-192405-ul07-rnchc
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 2
               traffic:
               - latestRevision: false
                 percent: 70
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 30
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - api_call:
@@ -233,12 +238,12 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: PUT
           headers: {}
           body:
             json:
-              apiVersion: serving.knative.dev/v1alpha1
+              apiVersion: serving.knative.dev/$$api-version$$
               kind: Service
               metadata:
                 annotations:
@@ -246,17 +251,16 @@ actions:
                   serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                   serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 creationTimestamp: '2019-07-23T18:13:29Z'
-                generation: 1
-                name: aahello
+                generation: 2
+                name: gchello
                 namespace: default
                 resourceVersion: '51639050'
-                selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello
+                selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello
                 uid: 92610cc6-ad75-11e9-b545-42010a800168
               spec:
                 template:
                   metadata:
-                    labels:
-                      client.knative.dev/nonce: dmwqrjmbba
+                    name: gchello-00002-def
                   spec:
                     containers:
                     - env:
@@ -268,12 +272,12 @@ actions:
                       timeoutSeconds: 300
                 traffic:
                 - percent: 90
-                  revisionName: gchello-hwk6z
+                  revisionName: gchello-00001-abc
                 - percent: 10
-                  revisionName: gchello-vdcjl
+                  revisionName: gchello-00002-def
               status:
                 address:
-                  hostname: aahello.default.svc.cluster.local
+                  hostname: gchello.default.svc.cluster.local
                 conditions:
                 - lastTransitionTime: '2019-07-23T20:10:28Z'
                   status: 'True'
@@ -284,18 +288,18 @@ actions:
                 - lastTransitionTime: '2019-07-23T20:10:28Z'
                   status: 'True'
                   type: RoutesReady
-                domain: aahello.default.example.com
-                domainInternal: aahello.default.svc.cluster.local
-                latestCreatedRevisionName: service-name-20190711-192405-ul07-rnchc
-                latestReadyRevisionName: service-name-20190711-192405-ul07-rnchc
-                observedGeneration: 1
+                domain: gchello.default.example.com
+                domainInternal: gchello.default.svc.cluster.local
+                latestCreatedRevisionName: gchello-00002-def
+                latestReadyRevisionName: gchello-00002-def
+                observedGeneration: 2
                 traffic:
                 - latestRevision: false
                   percent: 70
-                  revisionName: gchello-hwk6z
+                  revisionName: gchello-00001-abc
                 - latestRevision: false
                   percent: 30
-                  revisionName: gchello-vdcjl
+                  revisionName: gchello-00002-def
                 url: http://helloworld-go.default.example.com
         return_response:
           headers:
@@ -306,8 +310,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -318,13 +321,15 @@ actions:
                     resources: {}
                     timeoutSeconds: 300
               traffic:
-              - percent: 90
-                revisionName: gchello-hwk6z
-              - percent: 10
-                revisionName: gchello-vdcjl
+              - latestRevision: false
+                percent: 90
+                revisionName: gchello-00001-abc
+              - latestRevision: false
+                percent: 10
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
@@ -335,18 +340,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: service-name-20190711-192405-ul07-rnchc
-              latestReadyRevisionName: service-name-20190711-192405-ul07-rnchc
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00001-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 2
               traffic:
               - latestRevision: false
-                percent: 90
-                revisionName: gchello-hwk6z
-              - latestRevision: true
-                percent: 10
-                revisionName: gchello-vdcjl
+                percent: 70
+                revisionName: gchello-00001-abc
+              - latestRevision: false
+                percent: 30
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
 
@@ -356,7 +361,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -366,15 +371,15 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               name: gchello
               namespace: fake-project
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/fake-project/services/compris
               uid: 92610cc6-ad75-11e9-b545-42010a800168
               resourceVersion: '51639050'
-              generation: 1
+              generation: 3
               creationTimestamp: '2019-07-23T18:13:29Z'
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -385,8 +390,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -399,13 +403,13 @@ actions:
               traffic:
               - latestRevision: false
                 percent: 90
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 10
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
@@ -416,18 +420,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: service-name-20190711-192405-ul07-rnchc
-              latestReadyRevisionName: service-name-20190711-192405-ul07-rnchc
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 3
               traffic:
               - latestRevision: false
                 percent: 90
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 10
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
         repeatable: true
 
@@ -441,7 +445,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -451,15 +455,15 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               name: gchello
               namespace: fake-project
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/fake-project/services/compris
               uid: 92610cc6-ad75-11e9-b545-42010a800168
               resourceVersion: '51639050'
-              generation: 1
+              generation: 3
               creationTimestamp: '2019-07-23T18:13:29Z'
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -470,8 +474,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -484,13 +487,13 @@ actions:
               traffic:
               - latestRevision: false
                 percent: 90
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 10
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
@@ -501,28 +504,28 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: service-name-20190711-192405-ul07-rnchc
-              latestReadyRevisionName: service-name-20190711-192405-ul07-rnchc
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 3
               traffic:
               - latestRevision: false
                 percent: 90
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 10
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - expect_stdout: |
-        TRAFFIC  REVISION
-        90%      gchello-hwk6z
-        10%      gchello-vdcjl
+        Traffic: http://helloworld-go.default.example.com
+          90% gchello-00001-abc
+          10% gchello-00002-def
     - expect_exit:
         code: 0
 - execute_command:
-    command: run services update-traffic aahello --to-revisions=gchello-hwk6z=90,LATEST=10
+    command: run services update-traffic gchello --to-revisions=gchello-00001-abc=90,LATEST=10
     events:
     - api_call:
         expect_request:
@@ -623,7 +626,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -633,7 +636,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               annotations:
@@ -641,17 +644,16 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
               creationTimestamp: '2019-07-23T18:13:29Z'
-              generation: 1
-              name: aahello
+              generation: 2
+              name: gchello
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -664,13 +666,13 @@ actions:
               traffic:
               - latestRevision: false
                 percent: 70
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 30
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
@@ -681,18 +683,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: service-name-20190711-192405-ul07-rnchc
-              latestReadyRevisionName: service-name-20190711-192405-ul07-rnchc
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 2
               traffic:
               - latestRevision: false
                 percent: 70
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 30
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - api_call:
@@ -701,12 +703,12 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: PUT
           headers: {}
           body:
             json:
-              apiVersion: serving.knative.dev/v1alpha1
+              apiVersion: serving.knative.dev/$$api-version$$
               kind: Service
               metadata:
                 annotations:
@@ -714,17 +716,16 @@ actions:
                   serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                   serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 creationTimestamp: '2019-07-23T18:13:29Z'
-                generation: 1
-                name: aahello
+                generation: 2
+                name: gchello
                 namespace: default
                 resourceVersion: '51639050'
-                selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello
+                selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello
                 uid: 92610cc6-ad75-11e9-b545-42010a800168
               spec:
                 template:
                   metadata:
-                    labels:
-                      client.knative.dev/nonce: dmwqrjmbba
+                    name: gchello-00002-def
                   spec:
                     containers:
                     - env:
@@ -736,12 +737,12 @@ actions:
                       timeoutSeconds: 300
                 traffic:
                 - percent: 90
-                  revisionName: gchello-hwk6z
+                  revisionName: gchello-00001-abc
                 - percent: 10
                   latestRevision: true
               status:
                 address:
-                  hostname: aahello.default.svc.cluster.local
+                  hostname: gchello.default.svc.cluster.local
                 conditions:
                 - lastTransitionTime: '2019-07-23T20:10:28Z'
                   status: 'True'
@@ -752,18 +753,18 @@ actions:
                 - lastTransitionTime: '2019-07-23T20:10:28Z'
                   status: 'True'
                   type: RoutesReady
-                domain: aahello.default.example.com
-                domainInternal: aahello.default.svc.cluster.local
-                latestCreatedRevisionName: service-name-20190711-192405-ul07-rnchc
-                latestReadyRevisionName: service-name-20190711-192405-ul07-rnchc
-                observedGeneration: 1
+                domain: gchello.default.example.com
+                domainInternal: gchello.default.svc.cluster.local
+                latestCreatedRevisionName: gchello-00002-def
+                latestReadyRevisionName: gchello-00002-def
+                observedGeneration: 2
                 traffic:
                 - latestRevision: false
                   percent: 70
-                  revisionName: gchello-hwk6z
+                  revisionName: gchello-00001-abc
                 - latestRevision: false
                   percent: 30
-                  revisionName: gchello-vdcjl
+                  revisionName: gchello-00002-def
                 url: http://helloworld-go.default.example.com
         return_response:
           headers:
@@ -774,8 +775,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -786,13 +786,15 @@ actions:
                     resources: {}
                     timeoutSeconds: 300
               traffic:
-              - percent: 90
-                revisionName: gchello-hwk6z
-              - percent: 10
-                revisionName: gchello-vdcjl
+              - latestRevision: false
+                percent: 70
+                revisionName: gchello-00001-abc
+              - latestRevision: false
+                percent: 30
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
@@ -803,18 +805,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: service-name-20190711-192405-ul07-rnchc
-              latestReadyRevisionName: service-name-20190711-192405-ul07-rnchc
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 2
               traffic:
               - latestRevision: false
-                percent: 90
-                revisionName: gchello-hwk6z
-              - latestRevision: true
-                percent: 10
-                revisionName: gchello-vdcjl
+                percent: 70
+                revisionName: gchello-00001-abc
+              - latestRevision: false
+                percent: 30
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
 
@@ -824,7 +826,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -834,15 +836,15 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               name: gchello
               namespace: fake-project
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/fake-project/services/compris
               uid: 92610cc6-ad75-11e9-b545-42010a800168
               resourceVersion: '51639050'
-              generation: 1
+              generation: 3
               creationTimestamp: '2019-07-23T18:13:29Z'
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -853,8 +855,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -867,13 +868,13 @@ actions:
               traffic:
               - latestRevision: false
                 percent: 90
-                revisionName: gchello-hwk6z
-              - latestRevision: false
+                revisionName: gchello-00001-abc
+              - latestRevision: true
                 percent: 10
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
@@ -884,18 +885,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: service-name-20190711-192405-ul07-rnchc
-              latestReadyRevisionName: service-name-20190711-192405-ul07-rnchc
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 3
               traffic:
               - latestRevision: false
                 percent: 90
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: true
                 percent: 10
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
         repeatable: true
 
@@ -909,7 +910,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -919,15 +920,15 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               name: gchello
               namespace: fake-project
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/fake-project/services/compris
               uid: 92610cc6-ad75-11e9-b545-42010a800168
               resourceVersion: '51639050'
-              generation: 1
+              generation: 3
               creationTimestamp: '2019-07-23T18:13:29Z'
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -938,8 +939,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -952,13 +952,13 @@ actions:
               traffic:
               - latestRevision: false
                 percent: 90
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: true
                 percent: 10
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
@@ -969,29 +969,29 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-vdcjl
-              latestReadyRevisionName: gchello-vdcjl
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
               observedGeneration: 1
               traffic:
               - latestRevision: false
                 percent: 90
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: true
                 percent: 10
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - expect_stdout: |
-        TRAFFIC  REVISION
-        90%      gchello-hwk6z
-        10%      LATEST (currently gchello-vdcjl)
+        Traffic: http://helloworld-go.default.example.com
+          90% gchello-00001-abc
+          10% LATEST (currently gchello-00002-def)
     - expect_exit:
         code: 0
 
 - execute_command:
-    command: run services update-traffic aahello --to-revisions LATEST=100
+    command: run services update-traffic gchello --to-revisions LATEST=100
     events:
     - api_call:
         expect_request:
@@ -1092,7 +1092,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -1102,7 +1102,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               annotations:
@@ -1110,17 +1110,16 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
               creationTimestamp: '2019-07-23T18:13:29Z'
-              generation: 1
-              name: aahello
+              generation: 2
+              name: gchello
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -1133,13 +1132,13 @@ actions:
               traffic:
               - latestRevision: false
                 percent: 70
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 30
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
@@ -1150,18 +1149,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 2
               traffic:
               - latestRevision: false
                 percent: 70
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 30
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - api_call:
@@ -1170,12 +1169,12 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: PUT
           headers: {}
           body:
             json:
-              apiVersion: serving.knative.dev/v1alpha1
+              apiVersion: serving.knative.dev/$$api-version$$
               kind: Service
               metadata:
                 annotations:
@@ -1183,17 +1182,16 @@ actions:
                   serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                   serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 creationTimestamp: '2019-07-23T18:13:29Z'
-                generation: 1
-                name: aahello
+                generation: 2
+                name: gchello
                 namespace: default
                 resourceVersion: '51639050'
-                selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello
+                selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello
                 uid: 92610cc6-ad75-11e9-b545-42010a800168
               spec:
                 template:
                   metadata:
-                    labels:
-                      client.knative.dev/nonce: dmwqrjmbba
+                    name: gchello-00002-def
                   spec:
                     containers:
                     - env:
@@ -1208,7 +1206,7 @@ actions:
                   percent: 100
               status:
                 address:
-                  hostname: aahello.default.svc.cluster.local
+                  hostname: gchello.default.svc.cluster.local
                 conditions:
                 - lastTransitionTime: '2019-07-23T20:10:28Z'
                   status: 'True'
@@ -1219,18 +1217,18 @@ actions:
                 - lastTransitionTime: '2019-07-23T20:10:28Z'
                   status: 'True'
                   type: RoutesReady
-                domain: aahello.default.example.com
-                domainInternal: aahello.default.svc.cluster.local
-                latestCreatedRevisionName: gchello-abcde
-                latestReadyRevisionName: gchello-abcde
-                observedGeneration: 1
+                domain: gchello.default.example.com
+                domainInternal: gchello.default.svc.cluster.local
+                latestCreatedRevisionName: gchello-00002-def
+                latestReadyRevisionName: gchello-00002-def
+                observedGeneration: 2
                 traffic:
                 - latestRevision: false
                   percent: 70
-                  revisionName: gchello-hwk6z
+                  revisionName: gchello-00001-abc
                 - latestRevision: false
                   percent: 30
-                  revisionName: gchello-vdcjl
+                  revisionName: gchello-00002-def
                 url: http://helloworld-go.default.example.com
         return_response:
           headers:
@@ -1241,8 +1239,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -1255,10 +1252,9 @@ actions:
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
@@ -1269,15 +1265,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 2
               traffic:
-              - latestRevision: true
-                percent: 200
-                revisionName: gchello-abcde
+              - latestRevision: false
+                percent: 70
+                revisionName: gchello-00001-abc
+              - latestRevision: false
+                percent: 30
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - api_call:
@@ -1286,7 +1285,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -1296,15 +1295,15 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               name: gchello
               namespace: fake-project
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/fake-project/services/compris
               uid: 92610cc6-ad75-11e9-b545-42010a800168
               resourceVersion: '51639050'
-              generation: 1
+              generation: 3
               creationTimestamp: '2019-07-23T18:13:29Z'
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -1315,8 +1314,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -1329,10 +1327,10 @@ actions:
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
@@ -1343,15 +1341,15 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 3
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
               repeatable: true
         repeatable: true
@@ -1365,7 +1363,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -1375,15 +1373,15 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               name: gchello
               namespace: fake-project
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/fake-project/services/compris
               uid: 92610cc6-ad75-11e9-b545-42010a800168
               resourceVersion: '51639050'
-              generation: 1
+              generation: 3
               creationTimestamp: '2019-07-23T18:13:29Z'
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -1394,8 +1392,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -1408,10 +1405,10 @@ actions:
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
@@ -1422,25 +1419,25 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 3
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - expect_stdout: |
-        TRAFFIC  REVISION
-        100%     LATEST (currently gchello-abcde)
+        Traffic: http://helloworld-go.default.example.com
+          100% LATEST (currently gchello-00002-def)
     - expect_exit:
         code: 0
 
 - execute_command:
-    command: run services update-traffic aahello --to-latest
+    command: run services update-traffic gchello --to-latest
     events:
     - api_call:
         expect_request:
@@ -1541,7 +1538,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -1551,7 +1548,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               annotations:
@@ -1559,17 +1556,16 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
               creationTimestamp: '2019-07-23T18:13:29Z'
-              generation: 1
-              name: aahello
+              generation: 2
+              name: gchello
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -1582,13 +1578,13 @@ actions:
               traffic:
               - latestRevision: false
                 percent: 70
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 30
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
@@ -1599,18 +1595,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 2
               traffic:
               - latestRevision: false
                 percent: 70
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 30
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - api_call:
@@ -1619,12 +1615,12 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: PUT
           headers: {}
           body:
             json:
-              apiVersion: serving.knative.dev/v1alpha1
+              apiVersion: serving.knative.dev/$$api-version$$
               kind: Service
               metadata:
                 annotations:
@@ -1632,17 +1628,16 @@ actions:
                   serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                   serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 creationTimestamp: '2019-07-23T18:13:29Z'
-                generation: 1
-                name: aahello
+                generation: 2
+                name: gchello
                 namespace: default
                 resourceVersion: '51639050'
-                selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello
+                selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello
                 uid: 92610cc6-ad75-11e9-b545-42010a800168
               spec:
                 template:
                   metadata:
-                    labels:
-                      client.knative.dev/nonce: dmwqrjmbba
+                    name: gchello-00002-def
                   spec:
                     containers:
                     - env:
@@ -1657,7 +1652,7 @@ actions:
                   percent: 100
               status:
                 address:
-                  hostname: aahello.default.svc.cluster.local
+                  hostname: gchello.default.svc.cluster.local
                 conditions:
                 - lastTransitionTime: '2019-07-23T20:10:28Z'
                   status: 'True'
@@ -1668,18 +1663,18 @@ actions:
                 - lastTransitionTime: '2019-07-23T20:10:28Z'
                   status: 'True'
                   type: RoutesReady
-                domain: aahello.default.example.com
-                domainInternal: aahello.default.svc.cluster.local
-                latestCreatedRevisionName: gchello-abcde
-                latestReadyRevisionName: gchello-abcde
-                observedGeneration: 1
+                domain: gchello.default.example.com
+                domainInternal: gchello.default.svc.cluster.local
+                latestCreatedRevisionName: gchello-00002-def
+                latestReadyRevisionName: gchello-00002-def
+                observedGeneration: 2
                 traffic:
                 - latestRevision: false
                   percent: 70
-                  revisionName: gchello-hwk6z
+                  revisionName: gchello-00001-abc
                 - latestRevision: false
                   percent: 30
-                  revisionName: gchello-vdcjl
+                  revisionName: gchello-00002-def
                 url: http://helloworld-go.default.example.com
         return_response:
           headers:
@@ -1690,8 +1685,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -1702,12 +1696,15 @@ actions:
                     resources: {}
                     timeoutSeconds: 300
               traffic:
-              - latestRevision: true
-                percent: 100
-                revisionName: gchello-abcde
+              - latestRevision: false
+                percent: 70
+                revisionName: gchello-00001-abc
+              - latestRevision: false
+                percent: 30
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
@@ -1718,15 +1715,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 2
               traffic:
-              - latestRevision: true
-                percent: 200
-                revisionName: gchello-abcde
+              - latestRevision: false
+                percent: 70
+                revisionName: gchello-00001-abc
+              - latestRevision: false
+                percent: 30
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - api_call:
@@ -1735,7 +1735,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -1745,15 +1745,15 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               name: gchello
               namespace: fake-project
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/fake-project/services/compris
               uid: 92610cc6-ad75-11e9-b545-42010a800168
               resourceVersion: '51639050'
-              generation: 1
+              generation: 3
               creationTimestamp: '2019-07-23T18:13:29Z'
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -1764,8 +1764,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -1778,10 +1777,10 @@ actions:
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
@@ -1792,15 +1791,15 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 3
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
               repeatable: true
         repeatable: true
@@ -1814,7 +1813,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -1824,15 +1823,15 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               name: gchello
               namespace: fake-project
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/fake-project/services/compris
               uid: 92610cc6-ad75-11e9-b545-42010a800168
               resourceVersion: '51639050'
-              generation: 1
+              generation: 3
               creationTimestamp: '2019-07-23T18:13:29Z'
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -1843,8 +1842,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -1857,10 +1855,10 @@ actions:
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
@@ -1871,25 +1869,25 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 3
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - expect_stdout: |
-        TRAFFIC  REVISION
-        100%     LATEST (currently gchello-abcde)
+        Traffic: http://helloworld-go.default.example.com
+          100% LATEST (currently gchello-00002-def)
     - expect_exit:
         code: 0
 
 - execute_command:
-    command: run services update-traffic aahello --to-latest
+    command: run services update-traffic gchello --to-latest
     events:
     - api_call:
         expect_request:
@@ -1990,7 +1988,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -2000,7 +1998,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               annotations:
@@ -2008,17 +2006,16 @@ actions:
                 serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
               creationTimestamp: '2019-07-23T18:13:29Z'
-              generation: 1
-              name: aahello
+              generation: 2
+              name: gchello
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -2031,13 +2028,13 @@ actions:
               traffic:
               - latestRevision: false
                 percent: 70
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 30
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
@@ -2048,18 +2045,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 2
               traffic:
               - latestRevision: false
                 percent: 70
-                revisionName: gchello-hwk6z
+                revisionName: gchello-00001-abc
               - latestRevision: false
                 percent: 30
-                revisionName: gchello-vdcjl
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - api_call:
@@ -2068,12 +2065,12 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: PUT
           headers: {}
           body:
             json:
-              apiVersion: serving.knative.dev/v1alpha1
+              apiVersion: serving.knative.dev/$$api-version$$
               kind: Service
               metadata:
                 annotations:
@@ -2081,17 +2078,16 @@ actions:
                   serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                   serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
                 creationTimestamp: '2019-07-23T18:13:29Z'
-                generation: 1
-                name: aahello
+                generation: 2
+                name: gchello
                 namespace: default
                 resourceVersion: '51639050'
-                selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello
+                selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello
                 uid: 92610cc6-ad75-11e9-b545-42010a800168
               spec:
                 template:
                   metadata:
-                    labels:
-                      client.knative.dev/nonce: dmwqrjmbba
+                    name: gchello-00002-def
                   spec:
                     containers:
                     - env:
@@ -2106,7 +2102,7 @@ actions:
                   percent: 100
               status:
                 address:
-                  hostname: aahello.default.svc.cluster.local
+                  hostname: gchello.default.svc.cluster.local
                 conditions:
                 - lastTransitionTime: '2019-07-23T20:10:28Z'
                   status: 'True'
@@ -2117,18 +2113,18 @@ actions:
                 - lastTransitionTime: '2019-07-23T20:10:28Z'
                   status: 'True'
                   type: RoutesReady
-                domain: aahello.default.example.com
-                domainInternal: aahello.default.svc.cluster.local
-                latestCreatedRevisionName: gchello-abcde
-                latestReadyRevisionName: gchello-abcde
-                observedGeneration: 1
+                domain: gchello.default.example.com
+                domainInternal: gchello.default.svc.cluster.local
+                latestCreatedRevisionName: gchello-00002-def
+                latestReadyRevisionName: gchello-00002-def
+                observedGeneration: 2
                 traffic:
                 - latestRevision: false
                   percent: 70
-                  revisionName: gchello-hwk6z
+                  revisionName: gchello-00001-abc
                 - latestRevision: false
                   percent: 30
-                  revisionName: gchello-vdcjl
+                  revisionName: gchello-00002-def
                 url: http://helloworld-go.default.example.com
         return_response:
           headers:
@@ -2139,8 +2135,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -2151,12 +2146,15 @@ actions:
                     resources: {}
                     timeoutSeconds: 300
               traffic:
-              - latestRevision: true
-                percent: 100
-                revisionName: gchello-abcde
+              - latestRevision: false
+                percent: 70
+                revisionName: gchello-00001-abc
+              - latestRevision: false
+                percent: 30
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
@@ -2167,15 +2165,18 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:28Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 2
               traffic:
-              - latestRevision: true
-                percent: 200
-                revisionName: gchello-abcde
+              - latestRevision: false
+                percent: 70
+                revisionName: gchello-00001-abc
+              - latestRevision: false
+                percent: 30
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
 
     - api_call:
@@ -2184,7 +2185,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -2194,15 +2195,15 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               name: gchello
               namespace: fake-project
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/fake-project/services/compris
               uid: 92610cc6-ad75-11e9-b545-42010a800168
               resourceVersion: '51639050'
-              generation: 1
+              generation: 3
               creationTimestamp: '2019-07-23T18:13:29Z'
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -2213,8 +2214,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -2227,10 +2227,10 @@ actions:
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
@@ -2242,15 +2242,15 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
-              observedGeneration: 1
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
+              observedGeneration: 3
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
               repeatable: true
         repeatable: true
@@ -2265,7 +2265,7 @@ actions:
             # The uri hostname varies. With python2 it would be kubernetes.default. With
             # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
             # patch information: CL/217804288.
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/aahello\?alt=json
+            matches: https://.*/apis/serving.knative.dev/$$api-version$$/namespaces/default/services/gchello\?alt=json
           method: GET
           headers: {}
           body: null
@@ -2275,15 +2275,15 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/$$api-version$$
             kind: Service
             metadata:
               name: gchello
               namespace: fake-project
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              selfLink: /apis/serving.knative.dev/$$api-version$$/namespaces/fake-project/services/compris
               uid: 92610cc6-ad75-11e9-b545-42010a800168
               resourceVersion: '51639050'
-              generation: 1
+              generation: 3
               creationTimestamp: '2019-07-23T18:13:29Z'
               labels:
                 cloud.googleapis.com/location: us-central1
@@ -2294,8 +2294,7 @@ actions:
             spec:
               template:
                 metadata:
-                  labels:
-                    client.knative.dev/nonce: dmwqrjmbba
+                  name: gchello-00002-def
                 spec:
                   containers:
                   - env:
@@ -2308,10 +2307,10 @@ actions:
               traffic:
               - latestRevision: true
                 percent: 100
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
             status:
               address:
-                hostname: aahello.default.svc.cluster.local
+                hostname: gchello.default.svc.cluster.local
               conditions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
@@ -2323,22 +2322,22 @@ actions:
               - lastTransitionTime: '2019-07-23T20:10:29Z'
                 status: 'True'
                 type: RoutesReady
-              domain: aahello.default.example.com
-              domainInternal: aahello.default.svc.cluster.local
-              latestCreatedRevisionName: gchello-abcde
-              latestReadyRevisionName: gchello-abcde
+              domain: gchello.default.example.com
+              domainInternal: gchello.default.svc.cluster.local
+              latestCreatedRevisionName: gchello-00002-def
+              latestReadyRevisionName: gchello-00002-def
               observedGeneration: 1
               traffic:
               - latestRevision: true
                 percent: 10
-                revisionName: gchello-abcde
+                revisionName: gchello-00002-def
               url: http://helloworld-go.default.example.com
               repeatable: true
         repeatable: true
 
     - expect_stdout: |
-        TRAFFIC               REVISION
-        100% (currently 10%)  LATEST (currently gchello-abcde)
+        Traffic: http://helloworld-go.default.example.com
+          100% (currently 10%) LATEST (currently gchello-00002-def)
 
     - expect_exit:
         code: 1

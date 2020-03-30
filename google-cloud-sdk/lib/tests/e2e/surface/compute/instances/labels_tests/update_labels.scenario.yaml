@@ -5,14 +5,16 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --format="text(name,labels)"
-  - stderr: |
+  - stderr: |-
       Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
   - stdout: |
       ---
       name: $$instance$$
 - execute:
-  - command: compute instances describe $$instance$$ --format="text(name,labels)"
-  - error: '1: Underspecified resource [$$instance$$]. Specify the [--zone] flag.'
+  - command: compute instances describe $$instance$$ --zone us-central1-f --format="text(name,labels)"
+  - stdout: |
+      name: $$instance$$
 - execute:
   - command: compute instances update $$instance$$ --zone us-central1-f --update-labels="x=y,abc=xyz"
   - progress_tracker:
@@ -43,8 +45,9 @@ summary:
         The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
          - [$$instance$$] in [us-central1-f]
     - input: y
-  - stderr: |
+  - stderr: |-
       Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
@@ -64,9 +67,9 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '510'
+            Content-Length: '572'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"fO5zscsuquR46lNBG-x25JzMeEE=/NyMkbdvipJFiFAZH6IGYRrIS3GI="'
+            ETag: '"ymCKiRPdwfsSPPgydmum3Q0v1j8=/m40Blr6ixQLvZoHkbewoWopZeCY="'
             status: '200'
           body:
             kind: compute#zone
@@ -78,10 +81,13 @@ actions:
             region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             availableCpuPlatforms:
+            - Intel Cascade Lake
             - Intel Skylake
             - Intel Broadwell
             - Intel Haswell
             - Intel Ivy Bridge
+            - Intel Sandy Bridge
+            - AMD Rome
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing?alt=json
@@ -148,22 +154,23 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '824'
+            Content-Length: '880'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
             kind: compute#operation
-            id: '4778175742082758458'
-            name: operation-1536592337364-57585c86ee423-44b4c7d6-b929a143
+            id: '1288920576748206452'
+            name: operation-1583941530765-5a096204946e2-4497bdae-9c967f1c
             zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             operationType: insert
             targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
-            targetId: '6781703321955284798'
-            status: PENDING
+            targetId: '5030594539111627124'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-09-10T08:12:21.730-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536592337364-57585c86ee423-44b4c7d6-b929a143
+            insertTime: '2020-03-11T08:45:32.108-07:00'
+            startTime: '2020-03-11T08:45:32.110-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1583941530765-5a096204946e2-4497bdae-9c967f1c
         poll_operation: true
     - expect_stderr:
         matches: |
@@ -177,14 +184,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2564'
+            Content-Length: '2612'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"mMMivrPF7opLuOjo3qsOsjbSPn4=/-pigOrrttK8DBIIJ1mgDBvgfJoU="'
+            ETag: '"4r_lfjAGqsHtOSz4Oxn4Gi91pKc=/kW4riZCHMa7vcPU6OkH1Vu61NxE="'
             status: '200'
           body:
             kind: compute#instance
-            id: '6781703321955284798'
-            creationTimestamp: '2018-09-10T08:12:21.107-07:00'
+            id: '5030594539111627124'
+            creationTimestamp: '2020-03-11T08:45:31.925-07:00'
             name: $$instance$$
             tags:
               fingerprint: 42WmSpB8rSM=
@@ -195,15 +202,15 @@ actions:
             networkInterfaces:
             - kind: compute#networkInterface
               network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
-              networkIP: 10.240.2.208
+              networkIP: 10.240.2.67
               name: nic0
               accessConfigs:
               - kind: compute#accessConfig
                 type: ONE_TO_ONE_NAT
                 name: external-nat
-                natIP: 35.188.98.82
+                natIP: 104.154.191.29
                 networkTier: PREMIUM
-              fingerprint: 09JZ24CF5ak=
+              fingerprint: ii0xOjK3gxE=
             disks:
             - kind: compute#attachedDisk
               type: PERSISTENT
@@ -218,6 +225,7 @@ actions:
               interface: SCSI
               guestOsFeatures:
               - type: VIRTIO_SCSI_MULTIQUEUE
+              diskSizeGb: '10'
             metadata:
               kind: compute#metadata
               fingerprint: 4_QxQ57NQak=
@@ -236,7 +244,7 @@ actions:
               onHostMaintenance: MIGRATE
               automaticRestart: true
               preemptible: false
-            cpuPlatform: Intel Ivy Bridge
+            cpuPlatform: Intel Haswell
             labelFingerprint: 42WmSpB8rSM=
             startRestricted: false
             deletionProtection: false
@@ -246,11 +254,85 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute instances describe $$instance$$ --format="text(name,labels)"
+    command: compute instances describe $$instance$$ --zone us-central1-f --format="text(name,labels)"
     events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2612'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"AogM__CVVIlj0HcX8UHZ3WO1zhg=/A1NWVdmkEBaF1QU4DWpyQR-6f9A="'
+            status: '200'
+          body:
+            kind: compute#instance
+            id: '5030594539111627124'
+            creationTimestamp: '2020-03-11T08:45:31.925-07:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - kind: compute#networkInterface
+              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.67
+              name: nic0
+              accessConfigs:
+              - kind: compute#accessConfig
+                type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 104.154.191.29
+                networkTier: PREMIUM
+              fingerprint: ii0xOjK3gxE=
+            disks:
+            - kind: compute#attachedDisk
+              type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+              diskSizeGb: '10'
+            metadata:
+              kind: compute#metadata
+              fingerprint: 4_QxQ57NQak=
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Haswell
+            labelFingerprint: 42WmSpB8rSM=
+            startRestricted: false
+            deletionProtection: false
+    - expect_stdout: |
+        name: $$instance$$
     - expect_exit:
-        code: 1
-        message: Underspecified resource [$$instance$$]. Specify the [--zone] flag.
+        code: 0
 - execute_command:
     command: compute instances update $$instance$$ --zone us-central1-f --update-labels="x=y,abc=xyz"
     events:
@@ -262,15 +344,14 @@ actions:
           body: null
         return_response:
           headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '2564'
+            cache-control: private
+            content-length: '2844'
             content-type: application/json; charset=UTF-8
-            etag: '"f6-IH0WMAbO-HY_s_RsiZBOmpJM=/7Vb7Zk3RAUS6jpudyQ2EGEDi0MQ="'
+            etag: CvSdk48H7Pic8h2Mjax455l0vDY=/HT4rgTrVLhzqacEStN3yRELuiWE=
             status: '200'
           body:
-            kind: compute#instance
-            id: '6781703321955284798'
-            creationTimestamp: '2018-09-10T08:12:21.107-07:00'
+            id: '5030594539111627124'
+            creationTimestamp: '2020-03-11T08:45:31.925-07:00'
             name: $$instance$$
             tags:
               fingerprint: 42WmSpB8rSM=
@@ -279,20 +360,19 @@ actions:
             zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             canIpForward: false
             networkInterfaces:
-            - kind: compute#networkInterface
-              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
-              networkIP: 10.240.2.208
+            - network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.67
               name: nic0
               accessConfigs:
-              - kind: compute#accessConfig
-                type: ONE_TO_ONE_NAT
+              - type: ONE_TO_ONE_NAT
                 name: external-nat
-                natIP: 35.188.98.82
+                natIP: 104.154.191.29
                 networkTier: PREMIUM
-              fingerprint: 09JZ24CF5ak=
+                kind: compute#accessConfig
+              fingerprint: ii0xOjK3gxE=
+              kind: compute#networkInterface
             disks:
-            - kind: compute#attachedDisk
-              type: PERSISTENT
+            - type: PERSISTENT
               mode: READ_WRITE
               source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
               deviceName: persistent-disk-0
@@ -304,9 +384,11 @@ actions:
               interface: SCSI
               guestOsFeatures:
               - type: VIRTIO_SCSI_MULTIQUEUE
+              diskSizeGb: '10'
+              kind: compute#attachedDisk
             metadata:
-              kind: compute#metadata
               fingerprint: 4_QxQ57NQak=
+              kind: compute#metadata
             serviceAccounts:
             - email: 462803083913-compute@developer.gserviceaccount.com
               scopes:
@@ -322,10 +404,12 @@ actions:
               onHostMaintenance: MIGRATE
               automaticRestart: true
               preemptible: false
-            cpuPlatform: Intel Ivy Bridge
+            cpuPlatform: Intel Haswell
             labelFingerprint: 42WmSpB8rSM=
             startRestricted: false
             deletionProtection: false
+            fingerprint: cDRSTljW2Ng=
+            kind: compute#instance
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/setLabels?alt=json
@@ -339,24 +423,24 @@ actions:
                 x: y
         return_response:
           headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '827'
+            cache-control: private
+            content-length: '895'
             content-type: application/json; charset=UTF-8
-            pragma: no-cache
             status: '200'
           body:
-            kind: compute#operation
-            id: '4896261362465584903'
-            name: operation-1536592359841-57585c9c5dce9-da9975a5-23178aaa
+            id: '405928781623376201'
+            name: operation-1583941541445-5a09620ec3dac-7e2f966c-8ca54901
             zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             operationType: setLabels
             targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
-            targetId: '6781703321955284798'
-            status: PENDING
+            targetId: '5030594539111627124'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-09-10T08:12:40.608-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536592359841-57585c9c5dce9-da9975a5-23178aaa
+            insertTime: '2020-03-11T08:45:42.225-07:00'
+            startTime: '2020-03-11T08:45:42.234-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1583941541445-5a09620ec3dac-7e2f966c-8ca54901
+            kind: compute#operation
         poll_operation: true
     - expect_progress_tracker:
         message: Updating labels of instance [$$instance$$]
@@ -369,15 +453,14 @@ actions:
           body: null
         return_response:
           headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '2608'
+            cache-control: private
+            content-length: '2894'
             content-type: application/json; charset=UTF-8
-            etag: '"iBmzoA4bPhoOlCuK5jQYxJiMuoM=/wJtYNFqWTltBffXFI-MqQZLFW3Y="'
+            etag: eehxYnFqyUA11QcQKtBr0CvrTgE=/29XVnT0PgYtVN_WOWa1ms-QF6Ys=
             status: '200'
           body:
-            kind: compute#instance
-            id: '6781703321955284798'
-            creationTimestamp: '2018-09-10T08:12:21.107-07:00'
+            id: '5030594539111627124'
+            creationTimestamp: '2020-03-11T08:45:31.925-07:00'
             name: $$instance$$
             tags:
               fingerprint: 42WmSpB8rSM=
@@ -386,20 +469,19 @@ actions:
             zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             canIpForward: false
             networkInterfaces:
-            - kind: compute#networkInterface
-              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
-              networkIP: 10.240.2.208
+            - network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.67
               name: nic0
               accessConfigs:
-              - kind: compute#accessConfig
-                type: ONE_TO_ONE_NAT
+              - type: ONE_TO_ONE_NAT
                 name: external-nat
-                natIP: 35.188.98.82
+                natIP: 104.154.191.29
                 networkTier: PREMIUM
-              fingerprint: 09JZ24CF5ak=
+                kind: compute#accessConfig
+              fingerprint: ii0xOjK3gxE=
+              kind: compute#networkInterface
             disks:
-            - kind: compute#attachedDisk
-              type: PERSISTENT
+            - type: PERSISTENT
               mode: READ_WRITE
               source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
               deviceName: persistent-disk-0
@@ -411,9 +493,11 @@ actions:
               interface: SCSI
               guestOsFeatures:
               - type: VIRTIO_SCSI_MULTIQUEUE
+              diskSizeGb: '10'
+              kind: compute#attachedDisk
             metadata:
-              kind: compute#metadata
               fingerprint: 4_QxQ57NQak=
+              kind: compute#metadata
             serviceAccounts:
             - email: 462803083913-compute@developer.gserviceaccount.com
               scopes:
@@ -429,13 +513,15 @@ actions:
               onHostMaintenance: MIGRATE
               automaticRestart: true
               preemptible: false
-            cpuPlatform: Intel Ivy Bridge
+            cpuPlatform: Intel Haswell
             labels:
               abc: xyz
               x: y
             labelFingerprint: ecVX6WS0TtA=
             startRestricted: false
             deletionProtection: false
+            fingerprint: eP-hhG9rppU=
+            kind: compute#instance
     - expect_exit:
         code: 0
 - execute_command:
@@ -450,14 +536,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2608'
+            Content-Length: '2656'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"pph6-0sLCD1kjRY7_kzFASGJ_ao=/mpTP4_PVinDgRJQ5SHfQ8t-M4Y0="'
+            ETag: '"Cl7YjuaXYNEcbOQmXRilCjQ_p_c=/PNvIa1wDaLfPpgDGek7hSNcMUVs="'
             status: '200'
           body:
             kind: compute#instance
-            id: '6781703321955284798'
-            creationTimestamp: '2018-09-10T08:12:21.107-07:00'
+            id: '5030594539111627124'
+            creationTimestamp: '2020-03-11T08:45:31.925-07:00'
             name: $$instance$$
             tags:
               fingerprint: 42WmSpB8rSM=
@@ -468,15 +554,15 @@ actions:
             networkInterfaces:
             - kind: compute#networkInterface
               network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
-              networkIP: 10.240.2.208
+              networkIP: 10.240.2.67
               name: nic0
               accessConfigs:
               - kind: compute#accessConfig
                 type: ONE_TO_ONE_NAT
                 name: external-nat
-                natIP: 35.188.98.82
+                natIP: 104.154.191.29
                 networkTier: PREMIUM
-              fingerprint: 09JZ24CF5ak=
+              fingerprint: ii0xOjK3gxE=
             disks:
             - kind: compute#attachedDisk
               type: PERSISTENT
@@ -491,6 +577,7 @@ actions:
               interface: SCSI
               guestOsFeatures:
               - type: VIRTIO_SCSI_MULTIQUEUE
+              diskSizeGb: '10'
             metadata:
               kind: compute#metadata
               fingerprint: 4_QxQ57NQak=
@@ -509,7 +596,7 @@ actions:
               onHostMaintenance: MIGRATE
               automaticRestart: true
               preemptible: false
-            cpuPlatform: Intel Ivy Bridge
+            cpuPlatform: Intel Haswell
             labels:
               abc: xyz
               x: y
@@ -534,124 +621,14 @@ actions:
           body: null
         return_response:
           headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '2608'
-            content-type: application/json; charset=UTF-8
-            etag: '"Xs54koRu2S68f_J3UBR00M7iAgM=/p1vYN4WxW5phc4IaC0soFqTiy3E="'
-            status: '200'
-          body:
-            kind: compute#instance
-            id: '6781703321955284798'
-            creationTimestamp: '2018-09-10T08:12:21.107-07:00'
-            name: $$instance$$
-            tags:
-              fingerprint: 42WmSpB8rSM=
-            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
-            status: RUNNING
-            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            canIpForward: false
-            networkInterfaces:
-            - kind: compute#networkInterface
-              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
-              networkIP: 10.240.2.208
-              name: nic0
-              accessConfigs:
-              - kind: compute#accessConfig
-                type: ONE_TO_ONE_NAT
-                name: external-nat
-                natIP: 35.188.98.82
-                networkTier: PREMIUM
-              fingerprint: 09JZ24CF5ak=
-            disks:
-            - kind: compute#attachedDisk
-              type: PERSISTENT
-              mode: READ_WRITE
-              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
-              deviceName: persistent-disk-0
-              index: 0
-              boot: true
-              autoDelete: true
-              licenses:
-              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-              interface: SCSI
-              guestOsFeatures:
-              - type: VIRTIO_SCSI_MULTIQUEUE
-            metadata:
-              kind: compute#metadata
-              fingerprint: 4_QxQ57NQak=
-            serviceAccounts:
-            - email: 462803083913-compute@developer.gserviceaccount.com
-              scopes:
-              - https://www.googleapis.com/auth/devstorage.read_only
-              - https://www.googleapis.com/auth/logging.write
-              - https://www.googleapis.com/auth/monitoring.write
-              - https://www.googleapis.com/auth/pubsub
-              - https://www.googleapis.com/auth/service.management.readonly
-              - https://www.googleapis.com/auth/servicecontrol
-              - https://www.googleapis.com/auth/trace.append
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
-            scheduling:
-              onHostMaintenance: MIGRATE
-              automaticRestart: true
-              preemptible: false
-            cpuPlatform: Intel Ivy Bridge
-            labels:
-              abc: xyz
-              x: y
-            labelFingerprint: ecVX6WS0TtA=
-            startRestricted: false
-            deletionProtection: false
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/setLabels?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              labelFingerprint: ecVX6WS0TtA=
-              labels:
-                t123: t7890
-                x: a
-        return_response:
-          headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '827'
-            content-type: application/json; charset=UTF-8
-            pragma: no-cache
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '1283435340945372958'
-            name: operation-1536592369682-57585ca5c0651-de5a9ea5-0919712a
-            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            operationType: setLabels
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
-            targetId: '6781703321955284798'
-            status: PENDING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2018-09-10T08:12:49.979-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536592369682-57585ca5c0651-de5a9ea5-0919712a
-        poll_operation: true
-    - expect_progress_tracker:
-        message: Updating labels of instance [$$instance$$]
-        status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
             cache-control: private
-            content-length: '2813'
+            content-length: '2894'
             content-type: application/json; charset=UTF-8
-            etag: uBHAEIEjtGbu6mL93WXsSQi4e5s=/R4V38Q7-RnLVh0NUbytnZQCK_Yk=
+            etag: Ep9ygyGnppeawRMgarmdnu76k7U=/kki-gCi5_2IGTo_Hi54xYhrMC0M=
             status: '200'
           body:
-            id: '6781703321955284798'
-            creationTimestamp: '2018-09-10T08:12:21.107-07:00'
+            id: '5030594539111627124'
+            creationTimestamp: '2020-03-11T08:45:31.925-07:00'
             name: $$instance$$
             tags:
               fingerprint: 42WmSpB8rSM=
@@ -661,15 +638,15 @@ actions:
             canIpForward: false
             networkInterfaces:
             - network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
-              networkIP: 10.240.2.208
+              networkIP: 10.240.2.67
               name: nic0
               accessConfigs:
               - type: ONE_TO_ONE_NAT
                 name: external-nat
-                natIP: 35.188.98.82
+                natIP: 104.154.191.29
                 networkTier: PREMIUM
                 kind: compute#accessConfig
-              fingerprint: 09JZ24CF5ak=
+              fingerprint: ii0xOjK3gxE=
               kind: compute#networkInterface
             disks:
             - type: PERSISTENT
@@ -684,6 +661,7 @@ actions:
               interface: SCSI
               guestOsFeatures:
               - type: VIRTIO_SCSI_MULTIQUEUE
+              diskSizeGb: '10'
               kind: compute#attachedDisk
             metadata:
               fingerprint: 4_QxQ57NQak=
@@ -703,13 +681,126 @@ actions:
               onHostMaintenance: MIGRATE
               automaticRestart: true
               preemptible: false
-            cpuPlatform: Intel Ivy Bridge
+            cpuPlatform: Intel Haswell
+            labels:
+              abc: xyz
+              x: y
+            labelFingerprint: ecVX6WS0TtA=
+            startRestricted: false
+            deletionProtection: false
+            fingerprint: eP-hhG9rppU=
+            kind: compute#instance
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/setLabels?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              labelFingerprint: ecVX6WS0TtA=
+              labels:
+                t123: t7890
+                x: a
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '896'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '1633822187377178946'
+            name: operation-1583941548623-5a0962159c755-735ccbb7-8d1cb7dd
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: setLabels
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            targetId: '5030594539111627124'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2020-03-11T08:45:49.074-07:00'
+            startTime: '2020-03-11T08:45:49.084-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1583941548623-5a0962159c755-735ccbb7-8d1cb7dd
+            kind: compute#operation
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Updating labels of instance [$$instance$$]
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2897'
+            content-type: application/json; charset=UTF-8
+            etag: Xcuk1SoVlY-2o2YcTkLJbt6Pedk=/Tb2sUZCyrbFM2I1zuQSc9_2HKMQ=
+            status: '200'
+          body:
+            id: '5030594539111627124'
+            creationTimestamp: '2020-03-11T08:45:31.925-07:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.2.67
+              name: nic0
+              accessConfigs:
+              - type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 104.154.191.29
+                networkTier: PREMIUM
+                kind: compute#accessConfig
+              fingerprint: ii0xOjK3gxE=
+              kind: compute#networkInterface
+            disks:
+            - type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+              diskSizeGb: '10'
+              kind: compute#attachedDisk
+            metadata:
+              fingerprint: 4_QxQ57NQak=
+              kind: compute#metadata
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Haswell
             labels:
               t123: t7890
               x: a
             labelFingerprint: KCoiqxISIcU=
             startRestricted: false
             deletionProtection: false
+            fingerprint: e1U7r-rQD8o=
             kind: compute#instance
     - expect_exit:
         code: 0
@@ -725,14 +816,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2611'
+            Content-Length: '2659'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"TJaHhUz_kxeS2W1S0gUrECl5mlk=/qhNWl-cT9OuclHXPBYAxjL3jmW8="'
+            ETag: '"tlvw99NcgPCnWGQwUWol0JpPCOk=/8nd2o5JgvijRX4KrHXKKmXAYM3w="'
             status: '200'
           body:
             kind: compute#instance
-            id: '6781703321955284798'
-            creationTimestamp: '2018-09-10T08:12:21.107-07:00'
+            id: '5030594539111627124'
+            creationTimestamp: '2020-03-11T08:45:31.925-07:00'
             name: $$instance$$
             tags:
               fingerprint: 42WmSpB8rSM=
@@ -743,15 +834,15 @@ actions:
             networkInterfaces:
             - kind: compute#networkInterface
               network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
-              networkIP: 10.240.2.208
+              networkIP: 10.240.2.67
               name: nic0
               accessConfigs:
               - kind: compute#accessConfig
                 type: ONE_TO_ONE_NAT
                 name: external-nat
-                natIP: 35.188.98.82
+                natIP: 104.154.191.29
                 networkTier: PREMIUM
-              fingerprint: 09JZ24CF5ak=
+              fingerprint: ii0xOjK3gxE=
             disks:
             - kind: compute#attachedDisk
               type: PERSISTENT
@@ -766,6 +857,7 @@ actions:
               interface: SCSI
               guestOsFeatures:
               - type: VIRTIO_SCSI_MULTIQUEUE
+              diskSizeGb: '10'
             metadata:
               kind: compute#metadata
               fingerprint: 4_QxQ57NQak=
@@ -784,7 +876,7 @@ actions:
               onHostMaintenance: MIGRATE
               automaticRestart: true
               preemptible: false
-            cpuPlatform: Intel Ivy Bridge
+            cpuPlatform: Intel Haswell
             labels:
               t123: t7890
               x: a
@@ -814,22 +906,23 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '824'
+            Content-Length: '880'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
             kind: compute#operation
-            id: '2719454710015407895'
-            name: operation-1536592375764-57585cab8d423-65d26047-59e74756
+            id: '1316499721396992344'
+            name: operation-1583941558279-5a09621ed1c33-383df4e6-a119e172
             zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             operationType: delete
             targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
-            targetId: '6781703321955284798'
-            status: PENDING
+            targetId: '5030594539111627124'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-09-10T08:12:56.228-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536592375764-57585cab8d423-65d26047-59e74756
+            insertTime: '2020-03-11T08:45:59.058-07:00'
+            startTime: '2020-03-11T08:45:59.102-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1583941558279-5a09621ed1c33-383df4e6-a119e172
         poll_operation: true
     - expect_stderr:
         matches: |

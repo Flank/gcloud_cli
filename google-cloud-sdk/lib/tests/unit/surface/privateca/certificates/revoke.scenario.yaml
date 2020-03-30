@@ -1,0 +1,110 @@
+title: privateca certificates revoke scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: core/project foo
+- execute:
+  - command: |
+      privateca certificates revoke --certificate my-cert --issuer my-ca --issuer-location europe-west1
+  - stdout: |
+      Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
+- execute:
+  - command: |
+      privateca certificates revoke --serial-number FFF --issuer-location europe-west1 --issuer my-ca --reason key-compromise
+  - stdout: |
+      Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
+- execute:
+  - command: |
+      privateca certificates revoke --serial-number FFF --issuer-location europe-west1 --issuer my-ca --reason key-compromise
+  - error: '1: Invalid value for [serial number]: The serial number specified does
+      not exist under the certificate authority [projects/foo/locations/europe-west1/certificateAuthorities/my-ca]]'
+actions:
+- set_property:
+    core/project: foo
+- execute_command:
+    command: |
+      privateca certificates revoke --certificate my-cert --issuer my-ca --issuer-location europe-west1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert:revoke?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              reason: REVOCATION_REASON_UNSPECIFIED
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/foo/locations/europe-west1/operations/operation-123
+            done: true
+            response:
+              revocationDetails:
+                revocationState: REVOCATION_REASON_UNSPECIFIED
+                revocationTime: '2020-04-17T15:14:00.105-07:00'
+              name: projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
+    - expect_stdout: |
+        Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      privateca certificates revoke --serial-number FFF --issuer-location europe-west1 --issuer my-ca --reason key-compromise
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates?alt=json&filter=certificate_description.subject_description.hex_serial_number%3AFFF
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            certificates:
+            - name: projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
+              certificate_description:
+                subject_description:
+                  hex_serial_number: FFF
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert:revoke?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              reason: KEY_COMPROMISE
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/foo/locations/europe-west1/operations/operation-123
+            done: true
+            response:
+              revocationDetails:
+                revocationState: KEY_COMPROMISE
+                revocationTime: '2020-04-17T15:14:00.105-07:00'
+              name: projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
+    - expect_stdout: |
+        Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      privateca certificates revoke --serial-number FFF --issuer-location europe-west1 --issuer my-ca --reason key-compromise
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates?alt=json&filter=certificate_description.subject_description.hex_serial_number%3AFFF
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [serial number]: The serial number specified does
+          not exist under the certificate authority [projects/foo/locations/europe-west1/certificateAuthorities/my-ca]]'

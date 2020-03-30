@@ -50,6 +50,8 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
         name_generator,
         'GenerateName',
         side_effect=lambda **kwargs: '{}-genr8d'.format(kwargs['prefix']))
+    self.traffic_mock = self.StartObjectPatch(
+        traffic, 'TrafficTargets', autospec=True)
 
   def testReplaceServiceChange(self):
     new_service = service.Service.New(
@@ -500,19 +502,19 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     self.resource = vpc_connector_change.Adjust(self.resource)
     self.assertDictEqual({
         'run.googleapis.com/vpc-access-connector': 'test-change-name',
-    }, dict(self.resource.annotations))
+    }, dict(self.resource.template.annotations))
 
   def testClearVpcConnector(self):
-    self.resource.annotations[
+    self.resource.template.annotations[
         'run.googleapis.com/vpc-access-connector'] = 'something'
     self.resource = config_changes.ClearVpcConnectorChange(
         ).Adjust(self.resource)
-    self.assertDictEqual({}, dict(self.resource.annotations))
+    self.assertDictEqual({}, dict(self.resource.template.annotations))
 
   def testClearVpcConnectorDoesntExist(self):
     self.resource = config_changes.ClearVpcConnectorChange(
         ).Adjust(self.resource)
-    self.assertDictEqual({}, dict(self.resource.annotations))
+    self.assertDictEqual({}, dict(self.resource.template.annotations))
 
   def testSetTemplateAnnotationChange(self):
     config_changes.SetTemplateAnnotationChange(
@@ -529,20 +531,56 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     self.assertDictEqual({'k': 'v'}, dict(self.template.annotations))
 
   def testTrafficChanges(self):
-    latest100 = self.serverless_messages.TrafficTarget(
-        latestRevision=True, percent=100)
-    self.resource.traffic[traffic.LATEST_REVISION_KEY] = latest100
-    self.resource = config_changes.TrafficChanges(
-        {'r1': 90, 'LATEST': 10}).Adjust(self.resource)
-    latest10 = self.serverless_messages.TrafficTarget(
-        latestRevision=True, percent=10)
-    r190 = self.serverless_messages.TrafficTarget(
-        revisionName='r1', percent=90)
-    expect = {'r1': r190, traffic.LATEST_REVISION_KEY: latest10}
-    self.assertEqual(expect, self.resource.traffic)
+    config_changes.TrafficChanges({
+        'r1': 90,
+        'LATEST': 10
+    }).Adjust(self.resource)
+    self.traffic_mock.return_value.UpdateTags.assert_not_called()
+    self.traffic_mock.return_value.UpdateTraffic.assert_called_once_with({
+        'r1': 90,
+        'LATEST': 10
+    })
+
+  def testTrafficTagsChangesUpdateOnly(self):
+    config_changes.TrafficChanges(
+        None, tags_to_update={
+            'head': 'LATEST'
+        }).Adjust(self.resource)
+    self.traffic_mock.return_value.UpdateTags.assert_called_once_with(
+        {'head': 'LATEST'}, [], False)
+    self.traffic_mock.return_value.UpdateTraffic.assert_not_called()
+
+  def testTrafficTagsChangesRemoveOnly(self):
+    config_changes.TrafficChanges(
+        None, tags_to_remove=['head']).Adjust(self.resource)
+    self.traffic_mock.return_value.UpdateTags.assert_called_once_with({},
+                                                                      ['head'],
+                                                                      False)
+    self.traffic_mock.return_value.UpdateTraffic.assert_not_called()
+
+  def testTrafficTagsChangesClearOnly(self):
+    config_changes.TrafficChanges(
+        None, clear_other_tags=True).Adjust(self.resource)
+    self.traffic_mock.return_value.UpdateTags.assert_called_once_with({}, [],
+                                                                      True)
+    self.traffic_mock.return_value.UpdateTraffic.assert_not_called()
+
+  def testTrafficAndTagsChanges(self):
+    config_changes.TrafficChanges({
+        'r1': 90,
+        'LATEST': 10
+    }, {
+        'staging': 'LATEST'
+    }, ['prod'], False).Adjust(self.resource)
+    self.traffic_mock.return_value.UpdateTags.assert_called_once_with(
+        {'staging': 'LATEST'}, ['prod'], False)
+    self.traffic_mock.return_value.UpdateTraffic.assert_called_once_with({
+        'r1': 90,
+        'LATEST': 10
+    })
 
   def testContainerPortChangeNumberNewPort(self):
-    self.reource = config_changes.ContainerPortChange(port='123').Adjust(
+    self.resource = config_changes.ContainerPortChange(port='123').Adjust(
         self.resource)
     self.assertEqual(1, len(self.resource.template.container.ports))
     self.assertIsNone(self.resource.template.container.ports[0].name)
@@ -550,7 +588,7 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
         123, self.resource.template.container.ports[0].containerPort)
 
   def testContainerPortChangeNameNewPort(self):
-    self.reource = config_changes.ContainerPortChange(use_http2=True).Adjust(
+    self.resource = config_changes.ContainerPortChange(use_http2=True).Adjust(
         self.resource)
     self.assertEqual(1, len(self.resource.template.container.ports))
     self.assertEqual(
@@ -559,7 +597,7 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
         8080, self.resource.template.container.ports[0].containerPort)
 
   def testContainerPortChangeUnnameNewPort(self):
-    self.reource = config_changes.ContainerPortChange(use_http2=False).Adjust(
+    self.resource = config_changes.ContainerPortChange(use_http2=False).Adjust(
         self.resource)
     self.assertEqual(0, len(self.resource.template.container.ports))
 
@@ -567,7 +605,7 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     self.resource.template.container.ports = [
         self.serverless_messages.ContainerPort(containerPort=456)
     ]
-    self.reource = config_changes.ContainerPortChange(port='123').Adjust(
+    self.resource = config_changes.ContainerPortChange(port='123').Adjust(
         self.resource)
     self.assertEqual(1, len(self.resource.template.container.ports))
     self.assertIsNone(self.resource.template.container.ports[0].name)
@@ -578,7 +616,7 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     self.resource.template.container.ports = [
         self.serverless_messages.ContainerPort(containerPort=456)
     ]
-    self.reource = config_changes.ContainerPortChange(use_http2=True).Adjust(
+    self.resource = config_changes.ContainerPortChange(use_http2=True).Adjust(
         self.resource)
     self.assertEqual(1, len(self.resource.template.container.ports))
     self.assertEqual(
@@ -590,7 +628,7 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     self.resource.template.container.ports = [
         self.serverless_messages.ContainerPort(name='h2c', containerPort=456)
     ]
-    self.reource = config_changes.ContainerPortChange(use_http2=False).Adjust(
+    self.resource = config_changes.ContainerPortChange(use_http2=False).Adjust(
         self.resource)
     self.assertEqual(1, len(self.resource.template.container.ports))
     self.assertIsNone(self.resource.template.container.ports[0].name)
@@ -601,7 +639,7 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     self.resource.template.container.ports = [
         self.serverless_messages.ContainerPort(containerPort=456)
     ]
-    self.reource = config_changes.ContainerPortChange(port='default').Adjust(
+    self.resource = config_changes.ContainerPortChange(port='default').Adjust(
         self.resource)
     self.assertEqual(0, len(self.resource.template.container.ports))
 
@@ -609,7 +647,7 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     self.resource.template.container.ports = [
         self.serverless_messages.ContainerPort(name='h2c', containerPort=456)
     ]
-    self.reource = config_changes.ContainerPortChange(port='default').Adjust(
+    self.resource = config_changes.ContainerPortChange(port='default').Adjust(
         self.resource)
     self.assertEqual(1, len(self.resource.template.container.ports))
     self.assertEqual(
@@ -621,6 +659,6 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     self.resource.template.container.ports = [
         self.serverless_messages.ContainerPort(name='h2c', containerPort=456)
     ]
-    self.reource = config_changes.ContainerPortChange(
+    self.resource = config_changes.ContainerPortChange(
         port='default', use_http2=False).Adjust(self.resource)
     self.assertEqual(0, len(self.resource.template.container.ports))

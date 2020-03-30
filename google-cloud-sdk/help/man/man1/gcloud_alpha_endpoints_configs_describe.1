@@ -50,8 +50,9 @@ The name of the service from which to retrieve the configuration..
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -61,7 +62,7 @@ To print the configuration with ID \f5\fI2017\-01\-01R0\fR\fR for the service
 called \f5\fImy\-service\fR\fR, run:
 
 .RS 2m
-$ gcloud alpha endpoints configs describe \-\-service my\-service \e
+$ gcloud alpha endpoints configs describe \-\-service=my\-service \e
     2017\-01\-01R0
 .RE
 

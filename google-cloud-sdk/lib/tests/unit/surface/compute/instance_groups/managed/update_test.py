@@ -23,12 +23,16 @@ from googlecloudsdk.api_lib.compute import managed_instance_groups_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
+from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from mock import patch
 
+import six
 
-class InstanceGroupManagersUpdateZonalTestGA(test_base.BaseTest):
+
+class InstanceGroupManagersUpdateZonalTestGA(test_base.BaseTest,
+                                             sdk_test_base.WithLogCapture):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
@@ -68,7 +72,8 @@ class InstanceGroupManagersUpdateZonalTestGA(test_base.BaseTest):
                                 disks=None,
                                 health_check=None,
                                 initial_delay=None,
-                                clear_autohealing=False):
+                                clear_autohealing=False,
+                                with_empty_stateful_policy=False):
     autohealing_policies = None
     if clear_autohealing or \
         health_check is not None or initial_delay is not None:
@@ -80,9 +85,11 @@ class InstanceGroupManagersUpdateZonalTestGA(test_base.BaseTest):
       if initial_delay:
         autohealing_policies[0].initialDelaySec = initial_delay
 
-    stateful_policy = None
+    stateful_policy = (
+        self._GetStatefulPolicyWithDisks(disks=[]) if with_empty_stateful_policy
+        else None)
     if disks is not None:
-      stateful_policy = self._getStatefulPolicyWithDisks(disks)
+      stateful_policy = self._GetStatefulPolicyWithDisks(disks)
 
     self.CheckRequests([
         (self.compute.instanceGroupManagers, 'Get', self._getGetRequestStub())
@@ -243,17 +250,6 @@ class InstanceGroupManagersUpdateZonalTestBeta(
     InstanceGroupManagersUpdateZonalTestGA.SetUp(self)
     self.SelectApi('beta')
 
-
-class InstanceGroupManagersUpdateZonalTestAlpha(
-    InstanceGroupManagersUpdateZonalTestBeta):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def SetUp(self):
-    InstanceGroupManagersUpdateZonalTestBeta.SetUp(self)
-    self.SelectApi('alpha')
-
   def _getUpdateRequestStub(self,
                             stateful_policy=None,
                             autohealing_policies=None):
@@ -281,25 +277,24 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
             self.messages.StatefulPolicyPreservedStateDiskDevice
             .AutoDeleteValueValuesEnum.ON_PERMANENT_INSTANCE_DELETION
     }
-    return self.messages.StatefulPolicyPreservedState \
+    disk_proto = self.messages.StatefulPolicyPreservedState \
         .DisksValue.AdditionalProperty(
-            key=stateful_disk['device-name'],
-            value=self.messages.StatefulPolicyPreservedStateDiskDevice(
-                autoDelete=auto_delete_map[
-                    stateful_disk['auto-delete']
-                    if 'auto-delete' in stateful_disk else 'never']
-            )
-        )
+            key=stateful_disk['device_name'],
+            value=self.messages.StatefulPolicyPreservedStateDiskDevice())
+    if 'auto_delete' in stateful_disk:
+      disk_proto.value.autoDelete = (
+          auto_delete_map[stateful_disk['auto_delete']])
+    return disk_proto
 
-  def _getStatefulPolicyWithDisks(self, disks=None):
-    preserved_state = None
+  def _GetStatefulPolicyWithDisks(self, disks=None):
+    preserved_state = self.messages.StatefulPolicyPreservedState(
+        disks=self.messages.StatefulPolicyPreservedState.DisksValue(
+            additionalProperties=[]))
     if disks:
-      preserved_state = self.messages.StatefulPolicyPreservedState(
-          disks=self.messages.StatefulPolicyPreservedState.DisksValue(
-              additionalProperties=[
-                  self._MakePreservedStateDisksMapEntry(stateful_disk)
-                  for stateful_disk in disks
-              ]))
+      preserved_state.disks.additionalProperties = [
+          self._MakePreservedStateDisksMapEntry(stateful_disk)
+          for stateful_disk in disks
+      ]
     return self.messages.StatefulPolicy(preservedState=preserved_state)
 
   def _checkGetAndUpdateRequests(self,
@@ -308,7 +303,7 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
                                  initial_delay=None):
     stateful_policy = None
     if with_empty_stateful_policy:
-      stateful_policy = self._getStatefulPolicyWithDisks()
+      stateful_policy = self._GetStatefulPolicyWithDisks(disks=[])
     autohealing_policies = None
     if health_check is not None or initial_delay is not None:
       autohealing_policies = [
@@ -324,15 +319,35 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
     ], [(self.compute.instanceGroupManagers, 'Update',
          self._getUpdateRequestStub(stateful_policy, autohealing_policies))])
 
-  def _createStatefulDiskDict(self, device_name, auto_delete='never'):
-    return {'device-name': device_name, 'auto-delete': auto_delete}
+  def _createStatefulDiskDict(self, device_name, auto_delete=None):
+    stateful_dict = {'device_name': device_name}
+    if auto_delete:
+      stateful_dict['auto_delete'] = auto_delete
+    return stateful_dict
+
+  def _ParseDiskDictArgs(self, disks):
+    stateful_disk_dicts = []
+    for disk in disks:
+      arg_dict = disk
+      if isinstance(disk, six.string_types):
+        arg_dict = {'device_name': disk}
+      stateful_disk_dicts.append(arg_dict)
+    return stateful_disk_dicts
 
   def _setInitialIgmWithStatefulPolicy(self, *disks):
+    """Set intial IGM with stateful policy.
+
+    Args:
+      *disks: A list of Strings (device_names) or a list of dicts (in the format
+        {'device_name': 'disk1', 'auto_delete':
+          'on-permanent-instance-deletion'}) of disks to set in the stateful
+          policy
+    """
     igm = self.messages.InstanceGroupManager(
         name='group-1',
         zone=self.zone_name,
-        statefulPolicy=self._getStatefulPolicyWithDisks(
-            [self._createStatefulDiskDict(disk) for disk in disks]))
+        statefulPolicy=self._GetStatefulPolicyWithDisks(
+            self._ParseDiskDictArgs(disks)))
     self.make_requests.side_effect = iter([[
         igm,
     ], []])
@@ -343,7 +358,7 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
     self.Run("""
         compute instance-groups managed update group-1
           --{} {}
-          --update-stateful-disk device-name=disk-1,auto-delete=on-permanent-instance-deletion
+          --stateful-disk device-name=disk-1,auto-delete=on-permanent-instance-deletion
         """.format(*self.scope_params))
 
     self._checkGetAndPatchRequests(disks=[
@@ -356,9 +371,9 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
     self.Run("""
         compute instance-groups managed update group-1
           --{} {}
-          --update-stateful-disk device-name=disk-1
-          --update-stateful-disk device-name=disk-2,auto-delete=never
-          --update-stateful-disk device-name=disk-3,auto-delete=on-permanent-instance-deletion
+          --stateful-disk device-name=disk-1
+          --stateful-disk device-name=disk-2,auto-delete=never
+          --stateful-disk device-name=disk-3,auto-delete=on-permanent-instance-deletion
         """.format(*self.scope_params))
 
     self._checkGetAndPatchRequests(disks=[
@@ -372,14 +387,14 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
 
     with self.AssertRaisesExceptionMatches(
         calliope_exceptions.InvalidArgumentException,
-        'Invalid value for [--update-stateful-disk]: '
+        'Invalid value for [--stateful-disk]: '
         '[device-name] `disk-1` is not unique in the collection'):
       self.Run("""
           compute instance-groups managed update group-1
             --{} {}
-            --update-stateful-disk device-name=disk-1
-            --update-stateful-disk device-name=disk-1,auto-delete=never
-            --update-stateful-disk device-name=disk-3,auto-delete=never
+            --stateful-disk device-name=disk-1
+            --stateful-disk device-name=disk-1,auto-delete=never
+            --stateful-disk device-name=disk-3,auto-delete=never
           """.format(*self.scope_params))
 
   def testUpdateAddStatefulDiskToExistingPolicy(self):
@@ -388,12 +403,27 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
     self.Run("""
         compute instance-groups managed update group-1
           --{} {}
-          --update-stateful-disk device-name=disk-2,auto-delete=on-permanent-instance-deletion
+          --stateful-disk device-name=disk-2,auto-delete=on-permanent-instance-deletion
         """.format(*self.scope_params))
 
     self._checkGetAndPatchRequests(disks=[
         self._createStatefulDiskDict('disk-1'),
         self._createStatefulDiskDict('disk-2', 'on-permanent-instance-deletion')
+    ])
+
+  def testUpdateStatefulDiskPatchesAutoDelete(self):
+    self._setInitialIgmWithStatefulPolicy({
+        'device_name': 'disk-1',
+        'auto_delete': 'on-permanent-instance-deletion'
+    })
+    self.Run("""
+        compute instance-groups managed update group-1
+          --{} {}
+          --stateful-disk device-name=disk-1
+        """.format(*self.scope_params))
+
+    self._checkGetAndPatchRequests(disks=[
+        self._createStatefulDiskDict('disk-1', 'on-permanent-instance-deletion')
     ])
 
   def testUpdateAddStatefulDiskToExistingPolicy_sameDisk(self):
@@ -402,7 +432,7 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
     self.Run("""
         compute instance-groups managed update group-1
           --{} {}
-          --update-stateful-disk device-name=disk-1,auto-delete=on-permanent-instance-deletion
+          --stateful-disk device-name=disk-1,auto-delete=on-permanent-instance-deletion
         """.format(*self.scope_params))
 
     self._checkGetAndPatchRequests(disks=[
@@ -482,7 +512,7 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
       self.Run("""
           compute instance-groups managed update group-1
             --{} {}
-            --update-stateful-disk device-name=disk-1
+            --stateful-disk device-name=disk-1
             --remove-stateful-disks disk-1
           """.format(*self.scope_params))
 
@@ -497,9 +527,8 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
 
     self._checkGetAndPatchRequests()
 
-  def testUpdateRemoveAllStatefulDisksFromStatefulPolicy_createsUpdateRequest(
+  def testUpdateRemoveAllStatefulDisksFromStatefulPolicy_createsPatchRequest(
       self):
-    # TODO(b/70314588): Fix this test to expect Patch instead of Update.
     self._setInitialIgmWithStatefulPolicy('disk-1', 'disk-2')
 
     self.Run("""
@@ -508,7 +537,7 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
           --remove-stateful-disks disk-1,disk-2
         """.format(*self.scope_params))
 
-    self._checkGetAndUpdateRequests(with_empty_stateful_policy=True)
+    self._checkGetAndPatchRequests(with_empty_stateful_policy=True)
 
   def testUpdateWithHealthCheckAndStatefulDisk(self):
     self._setInitialIgm()
@@ -520,7 +549,7 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
         compute instance-groups managed update group-1
         --{} {}
         --health-check health-check-1
-        --update-stateful-disk device-name=disk-1
+        --stateful-disk device-name=disk-1
         """.format(*self.scope_params))
     self._checkGetAndPatchRequests(
         disks=[self._createStatefulDiskDict('disk-1')],
@@ -544,6 +573,33 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
         health_check=health_check_uri2, initial_delay=120)
 
 
+class InstanceGroupManagersUpdateZonalTestAlpha(
+    InstanceGroupManagersUpdateZonalTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def SetUp(self):
+    InstanceGroupManagersUpdateZonalTestBeta.SetUp(self)
+    self.SelectApi('alpha')
+
+  def testUpdateAddStatefulDisk(self):
+    self._setInitialIgm()
+
+    self.Run("""
+        compute instance-groups managed update group-1
+          --{} {}
+          --update-stateful-disk device-name=disk-1,auto-delete=on-permanent-instance-deletion
+        """.format(*self.scope_params))
+
+    self._checkGetAndPatchRequests(disks=[
+        self._createStatefulDiskDict('disk-1', 'on-permanent-instance-deletion')
+    ])
+
+    self.AssertLogContains('The --update-stateful-disk option is deprecated; '
+                           'use --stateful-disk instead.')
+
+
 class InstanceGroupManagersUpdateRegionalTestGA(
     InstanceGroupManagersUpdateZonalTestGA):
 
@@ -556,6 +612,35 @@ class InstanceGroupManagersUpdateRegionalTestGA(
     self.region_name = 'us-central2'
     self.igm_name = 'group-1'
     self.scope_params = ('region', self.region_name)
+
+  def testUpdateChangeInstanceRedistributionType(self):
+    self._setInitialIgm()
+
+    self.Run("""
+        compute instance-groups managed update group-1
+          --{} {}
+          --instance-redistribution-type NONE
+        """.format(*self.scope_params))
+
+    self._checkGetAndPatchRequests(
+        update_policy=self.messages.InstanceGroupManagerUpdatePolicy(
+            instanceRedistributionType=self.messages
+            .InstanceGroupManagerUpdatePolicy
+            .InstanceRedistributionTypeValueValuesEnum.NONE))
+
+  def testUpdateInstanceRedistributionTypeForZonalScope_throws(self):
+    igm = self.messages.InstanceGroupManager(
+        name='group-1', zone=self.zone_name)
+    self.make_requests.side_effect = iter([[igm], []])
+    with self.assertRaisesRegex(
+        calliope_exceptions.InvalidArgumentException,
+        'Flag --instance-redistribution-type may be specified for regional '
+        'managed instance groups only.'):
+      self.Run("""
+          compute instance-groups managed update group-1
+            --zone us-central2-a
+            --instance-redistribution-type PROACTIVE
+          """)
 
   def _getGetRequestStub(self):
     return self.messages.ComputeRegionInstanceGroupManagersGetRequest(
@@ -584,7 +669,8 @@ class InstanceGroupManagersUpdateRegionalTestGA(
                                 update_policy=None,
                                 health_check=None,
                                 initial_delay=None,
-                                clear_autohealing=False):
+                                clear_autohealing=False,
+                                with_empty_stateful_policy=False):
     autohealing_policies = None
     if clear_autohealing or \
         health_check is not None or initial_delay is not None:
@@ -596,9 +682,12 @@ class InstanceGroupManagersUpdateRegionalTestGA(
       if initial_delay:
         autohealing_policies[0].initialDelaySec = initial_delay
 
-    stateful_policy = None
+    stateful_policy = (
+        self._GetStatefulPolicyWithDisks(disks=[]) if with_empty_stateful_policy
+        else None)
     if disks is not None:
-      stateful_policy = self._getStatefulPolicyWithDisks(disks)
+      stateful_policy = self._GetStatefulPolicyWithDisks(
+          self._ParseDiskDictArgs(disks))
 
     self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Get',
                          self._getGetRequestStub())],
@@ -631,7 +720,8 @@ class InstanceGroupManagersUpdateRegionalTestGA(
 
 
 class InstanceGroupManagersUpdateRegionalTestBeta(
-    InstanceGroupManagersUpdateRegionalTestGA):
+    InstanceGroupManagersUpdateRegionalTestGA,
+    InstanceGroupManagersUpdateZonalTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
@@ -639,44 +729,6 @@ class InstanceGroupManagersUpdateRegionalTestBeta(
   def SetUp(self):
     InstanceGroupManagersUpdateRegionalTestGA.SetUp(self)
     self.SelectApi('beta')
-
-  def testUpdateChangeInstanceRedistributionType(self):
-    self._setInitialIgm()
-
-    self.Run("""
-        compute instance-groups managed update group-1
-          --{} {}
-          --instance-redistribution-type none
-        """.format(*self.scope_params))
-
-    self._checkGetAndPatchRequests(
-        update_policy=self.messages.InstanceGroupManagerUpdatePolicy(
-            instanceRedistributionType=self.messages
-            .InstanceGroupManagerUpdatePolicy
-            .InstanceRedistributionTypeValueValuesEnum.NONE))
-
-  def testUpdateInstanceRedistributionTypeForZonalScope_throws(self):
-    with self.assertRaisesRegex(
-        calliope_exceptions.InvalidArgumentException,
-        'Flag --instance-redistribution-type may be specified for regional '
-        'managed instance groups only.'):
-      self.Run("""
-          compute instance-groups managed update group-1
-            --zone us-central2-a
-            --instance-redistribution-type proactive
-          """)
-
-
-class InstanceGroupManagersUpdateRegionalTestAlpha(
-    InstanceGroupManagersUpdateRegionalTestBeta,
-    InstanceGroupManagersUpdateZonalTestAlpha):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def SetUp(self):
-    InstanceGroupManagersUpdateRegionalTestBeta.SetUp(self)
-    self.SelectApi('alpha')
 
   def _getUpdateRequestStub(self,
                             stateful_policy=None,
@@ -706,7 +758,7 @@ class InstanceGroupManagersUpdateRegionalTestAlpha(
                                  initial_delay=None):
     stateful_policy = None
     if with_empty_stateful_policy:
-      stateful_policy = self._getStatefulPolicyWithDisks()
+      stateful_policy = self._GetStatefulPolicyWithDisks()
     autohealing_policies = None
     if health_check is not None or initial_delay is not None:
       autohealing_policies = [
@@ -725,11 +777,19 @@ class InstanceGroupManagersUpdateRegionalTestAlpha(
                                      autohealing_policies))])
 
   def _setInitialIgmWithStatefulPolicy(self, *disks):
+    """Set intial IGM with stateful policy.
+
+    Args:
+      *disks: A list of Strings (device_names) or a list of dicts (in the format
+        {'device_name': 'disk1', 'auto_delete':
+          'on-permanent-instance-deletion'}) of disks to set in the stateful
+          policy
+    """
     igm = self.messages.InstanceGroupManager(
         name='group-1',
         region=self.region_name,
-        statefulPolicy=self._getStatefulPolicyWithDisks(
-            [self._createStatefulDiskDict(disk) for disk in disks]),
+        statefulPolicy=self._GetStatefulPolicyWithDisks(
+            self._ParseDiskDictArgs(disks)),
     )
     self.make_requests.side_effect = iter([[
         igm,
@@ -741,8 +801,8 @@ class InstanceGroupManagersUpdateRegionalTestAlpha(
     self.Run("""
         compute instance-groups managed update group-1
           --{} {}
-          --update-stateful-disk device-name=disk-1
-          --instance-redistribution-type none
+          --stateful-disk device-name=disk-1
+          --instance-redistribution-type NONE
         """.format(*self.scope_params))
 
     self._checkGetAndPatchRequests(
@@ -767,7 +827,7 @@ class InstanceGroupManagersUpdateRegionalTestAlpha(
       self.Run("""
           compute instance-groups managed update group-1
             --{} {}
-            --update-stateful-disk device-name=disk-1
+            --stateful-disk device-name=disk-1
           """.format(*self.scope_params))
 
   def testUpdateAddStatefulDiskWhenReplacementMethodSubstitute(self):
@@ -786,24 +846,20 @@ class InstanceGroupManagersUpdateRegionalTestAlpha(
       self.Run("""
           compute instance-groups managed update group-1
             --{} {}
-            --update-stateful-disk device-name=disk-1
+            --stateful-disk device-name=disk-1
           """.format(*self.scope_params))
 
-  def testUpdateInstanceRedistributionType_createsUpdateRequest(self):
-    # TODO(b/70314588): Fix this test to expect Patch instead of Update.
-    self._setInitialIgm()
 
-    self.Run("""
-        compute instance-groups managed update group-1
-          --{} {}
-          --instance-redistribution-type none
-        """.format(*self.scope_params))
+class InstanceGroupManagersUpdateRegionalTestAlpha(
+    InstanceGroupManagersUpdateRegionalTestBeta,
+    InstanceGroupManagersUpdateZonalTestAlpha):
 
-    self._checkGetAndPatchRequests(
-        update_policy=self.messages.InstanceGroupManagerUpdatePolicy(
-            instanceRedistributionType=self.messages.
-            InstanceGroupManagerUpdatePolicy.
-            InstanceRedistributionTypeValueValuesEnum.NONE))
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def SetUp(self):
+    InstanceGroupManagersUpdateRegionalTestBeta.SetUp(self)
+    self.SelectApi('alpha')
 
 
 if __name__ == '__main__':

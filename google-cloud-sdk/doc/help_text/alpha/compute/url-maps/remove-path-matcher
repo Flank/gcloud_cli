@@ -50,15 +50,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To remove the path matcher named MY-MATCHER from the URL map named
     MY-URL-MAP, you can use this command:
 
         $ gcloud alpha compute url-maps remove-path-matcher MY-URL-MAP \
-            --path-matcher MY-MATCHER
+            --path-matcher-name=MY-MATCHER
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

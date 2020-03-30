@@ -25,7 +25,8 @@ actions:
     - api_call:
         expect_request:
           uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:getIamPolicy?alt=json
-          method: POST
+          method: GET
+          headers: {}
           body: null
         return_response:
           headers:
@@ -47,16 +48,17 @@ actions:
         expect_request:
           uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:setIamPolicy?alt=json
           method: POST
+          headers: {}
           body:
             json:
               policy:
                 bindings:
-                - role: roles/another-non-primitive
-                  members:
+                - members:
                   - user:owner@gmail.com
-                - role: roles/non-primitive
-                  members:
+                  role: roles/another-non-primitive
+                - members:
                   - user:test@gmail.com
+                  role: roles/non-primitive
                 etag: etag
                 version: 1
         return_response:

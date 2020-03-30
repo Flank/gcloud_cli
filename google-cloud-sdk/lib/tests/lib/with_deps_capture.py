@@ -27,6 +27,7 @@ import sys
 
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.resource import yaml_printer
+from googlecloudsdk.core.util import encoding
 from tests.lib import sdk_test_base
 
 from six.moves import range  # pylint: disable=redefined-builtin
@@ -136,7 +137,7 @@ class _LoadModuleMock(object):
     deps_file = test_module.__file__.rsplit('.', 1)[0] + '.deps'
     deps_file_relpath = os.path.relpath(deps_file, self._test.Resource())
 
-    regen_root = os.environ.get(TEST_ROOT_DIR_ENV_VAR)
+    regen_root = encoding.GetEncodedValue(os.environ, TEST_ROOT_DIR_ENV_VAR)
     if regen_root:
       if not os.path.isdir(regen_root):
         raise ValueError('Environment variable {} points to [{}] but there is '

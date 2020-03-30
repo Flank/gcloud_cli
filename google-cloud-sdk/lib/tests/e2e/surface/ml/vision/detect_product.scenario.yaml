@@ -216,7 +216,8 @@ actions:
                 message: No matching products found.
     - expect_exit:
         code: 1
-        message: 'Code: [5] Message: [No matching products found.]'
+        message:
+          matches: .*No matching products found.*
 - execute_command:
     command: ml vision product-search images delete $$my-image$$ --location=us-east1
       --product=$$my-product$$

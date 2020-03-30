@@ -455,19 +455,98 @@ class RemoveBackendTest(test_base.BaseTest):
               project='my-project'))],
     )
 
+  def testWithExistingBackendSingleGlobalNeg(self):
+    messages = self.messages
+    self.make_requests.side_effect = [
+        [
+            messages.BackendService(
+                name='my-backend-service',
+                backends=[
+                    messages.Backend(
+                        group=(
+                            self.compute_uri +
+                            '/projects/my-project/global/networkEndpointGroups/my-global-neg'
+                        ))
+                ],
+                port=80,
+                fingerprint=b'my-fingerprint',
+                timeoutSec=120)
+        ],
+        [],
+    ]
 
-class RemoveBackendBetaTest(RemoveBackendTest):
+    self.Run("""\
+        compute backend-services remove-backend my-backend-service
+          --network-endpoint-group my-global-neg
+          --global-network-endpoint-group
+          --global
+    """)
 
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='my-backend-service', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='my-backend-service',
+              backendServiceResource=messages.BackendService(
+                  name='my-backend-service',
+                  port=80,
+                  fingerprint=b'my-fingerprint',
+                  backends=[],
+                  timeoutSec=120),
+              project='my-project'))],
+    )
 
 
-class RemoveBackendAlphaTest(RemoveBackendBetaTest):
+class RemoveBackendAlphaTest(RemoveBackendTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testWithExistingBackendSingleRegionNeg(self):
+    messages = self.messages
+    self.make_requests.side_effect = [
+        [
+            messages.BackendService(
+                name='my-backend-service',
+                backends=[
+                    messages.Backend(
+                        group=(
+                            self.compute_uri +
+                            '/projects/my-project/regions/us-central1/networkEndpointGroups/my-region-neg'
+                        ))
+                ],
+                port=80,
+                fingerprint=b'my-fingerprint',
+                timeoutSec=120)
+        ],
+        [],
+    ]
+
+    self.Run("""\
+        compute backend-services remove-backend my-backend-service
+          --network-endpoint-group my-region-neg
+          --network-endpoint-group-region us-central1
+          --global
+    """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='my-backend-service', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='my-backend-service',
+              backendServiceResource=messages.BackendService(
+                  name='my-backend-service',
+                  port=80,
+                  fingerprint=b'my-fingerprint',
+                  backends=[],
+                  timeoutSec=120),
+              project='my-project'))],
+    )
 
 
 if __name__ == '__main__':

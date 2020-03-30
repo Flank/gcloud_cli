@@ -40,12 +40,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the tpu/v1 API. The full documentation for this API can
     be found at: https://cloud.google.com/tpu/
+
+EXAMPLES
+    The following command lists all of the zones where TPUs are available:
+
+        $ gcloud beta compute tpus locations list
 
 NOTES
     This command is currently in BETA and may change without notice. These

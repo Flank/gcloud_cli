@@ -35,7 +35,7 @@ class HealthChecksDescribeTest(test_base.BaseTest,
                                test_case.WithOutputCapture):
 
   def RunDescribe(self, command):
-    self.Run('compute health-checks describe ' + command)
+    self.Run('compute health-checks describe %s' % command)
 
   def testSimpleCaseHttp(self):
     self.make_requests.side_effect = iter([
@@ -165,7 +165,7 @@ class HealthChecksDescribeTest(test_base.BaseTest,
 
   def testDescribeCompletion(self):
     self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson',
         return_value=resource_projector.MakeSerializable(
             test_resources.HEALTH_CHECKS),
         autospec=True)
@@ -181,53 +181,51 @@ class HealthChecksDescribeTest(test_base.BaseTest,
         ])
 
 
-class HealthChecksDescribeHttp2Test(test_base.BaseTest,
-                                    completer_test_base.CompleterBase,
-                                    test_case.WithOutputCapture):
+class HealthChecksDescribeBetaTest(HealthChecksDescribeTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
-  def testSimpleCaseHttp2(self):
+
+class HealthChecksDescribeAlphaTest(HealthChecksDescribeBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+
+  def testSimpleCaseGrpc(self):
     self.make_requests.side_effect = iter([
-        [test_resources.HEALTH_CHECKS_BETA[0]],
+        [test_resources.HEALTH_CHECKS_ALPHA[0]],
     ])
 
-    self.Run("""
-        compute health-checks describe my-health-check --global
-        """)
+    self.RunDescribe('my-health-check')
 
-    health_check = self.compute_beta.healthChecks
     self.CheckRequests(
-        [(health_check,
+        [(self.compute.healthChecks,
           'Get',
           self.messages.ComputeHealthChecksGetRequest(
               healthCheck='my-health-check',
               project='my-project'))],
     )
     self.assertMultiLineEqual(self.GetOutput(), textwrap.dedent("""\
-            http2HealthCheck:
-              host: www.example.com
-              port: 80
-              portName: happy-http2-port
-              proxyHeader: NONE
-              requestPath: /
-            name: health-check-http2
-            selfLink: https://compute.googleapis.com/compute/beta/projects/my-project/global/healthChecks/health-check-http2
-            type: HTTP2
+            grpcHealthCheck:
+              grpcServiceName: gRPC-service
+              port: 88
+            name: health-check-grpc
+            selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/health-check-grpc
+            type: GRPC
             """))
 
 
-class RegionHealthChecksDescribeBetaTest(test_base.BaseTest,
-                                         completer_test_base.CompleterBase,
-                                         test_case.WithOutputCapture):
+class RegionHealthChecksDescribeTest(test_base.BaseTest,
+                                     completer_test_base.CompleterBase,
+                                     test_case.WithOutputCapture):
 
-  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
+  URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
 
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson')
@@ -290,7 +288,7 @@ class RegionHealthChecksDescribeBetaTest(test_base.BaseTest,
     ]
 
   def RunDescribe(self, command):
-    self.Run('compute health-checks describe --region us-west-1 ' + command)
+    self.Run('compute health-checks describe --region us-west-1 %s' % command)
 
   def testSimpleCaseHttp(self):
     self.make_requests.side_effect = iter([
@@ -424,7 +422,7 @@ class RegionHealthChecksDescribeBetaTest(test_base.BaseTest,
 
   def testDescribeCompletion(self):
     self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson',
         return_value=resource_projector.MakeSerializable(
             test_resources.HEALTH_CHECKS),
         autospec=True)
@@ -476,6 +474,15 @@ class RegionHealthChecksDescribeBetaTest(test_base.BaseTest,
     )
 
 
+class RegionHealthChecksDescribeBetaTest(RegionHealthChecksDescribeTest):
+
+  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+
+
 class RegionHealthChecksDescribeAlphaTest(RegionHealthChecksDescribeBetaTest):
 
   URI_PREFIX = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
@@ -483,6 +490,27 @@ class RegionHealthChecksDescribeAlphaTest(RegionHealthChecksDescribeBetaTest):
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
+
+  def testSimpleCaseGrpc(self):
+    self.make_requests.side_effect = iter([
+        [test_resources.HEALTH_CHECKS_ALPHA[0]],
+    ])
+
+    self.RunDescribe('my-health-check')
+
+    self.CheckRequests([(self.compute.regionHealthChecks, 'Get',
+                         self.messages.ComputeRegionHealthChecksGetRequest(
+                             healthCheck='my-health-check',
+                             project='my-project',
+                             region='us-west-1'))],)
+    self.assertMultiLineEqual(self.GetOutput(), textwrap.dedent("""\
+            grpcHealthCheck:
+              grpcServiceName: gRPC-service
+              port: 88
+            name: health-check-grpc
+            selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/health-check-grpc
+            type: GRPC
+            """))
 
 
 if __name__ == '__main__':

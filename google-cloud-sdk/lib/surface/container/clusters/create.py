@@ -84,9 +84,9 @@ characters.
   parser.add_argument(
       '--timeout',
       type=int,
-      default=1800,
+      default=3600,
       hidden=True,
-      help='THIS ARGUMENT NEEDS HELP TEXT.')
+      help='Timeout (seconds) for waiting on the operation to complete.')
   flags.AddAsyncFlag(parser)
   parser.add_argument(
       '--num-nodes',
@@ -181,6 +181,7 @@ for examples.
   flags.AddMetadataFlags(parser)
   flags.AddDatabaseEncryptionFlag(parser)
   flags.AddShieldedInstanceFlags(parser)
+  flags.AddEnableShieldedNodesFlags(parser)
 
 
 def ValidateBasicAuthFlags(args):
@@ -299,12 +300,19 @@ def ParseCreateOptionsBase(args):
       enable_resource_consumption_metering=\
           args.enable_resource_consumption_metering,
       database_encryption_key=args.database_encryption_key,
+      workload_pool=args.workload_pool,
+      workload_metadata_from_node=args.workload_metadata_from_node,
       enable_vertical_pod_autoscaling=args.enable_vertical_pod_autoscaling,
       enable_autoprovisioning=args.enable_autoprovisioning,
       autoprovisioning_config_file=args.autoprovisioning_config_file,
       autoprovisioning_service_account=args.autoprovisioning_service_account,
       autoprovisioning_scopes=args.autoprovisioning_scopes,
       autoprovisioning_locations=args.autoprovisioning_locations,
+      autoprovisioning_max_surge_upgrade=getattr(args, 'autoprovisioning_max_surge_upgrade', None),
+      autoprovisioning_max_unavailable_upgrade=getattr(args, 'autoprovisioning_max_unavailable_upgrade', None),
+      enable_autoprovisioning_autorepair=getattr(args, 'enable_autoprovisioning_autorepair', None),
+      enable_autoprovisioning_autoupgrade=getattr(args, 'enable_autoprovisioning_autoupgrade', None),
+      autoprovisioning_min_cpu_platform=getattr(args, 'autoprovisioning_min_cpu_platform', None),
       min_cpu=args.min_cpu,
       max_cpu=args.max_cpu,
       min_memory=args.min_memory,
@@ -312,12 +320,28 @@ def ParseCreateOptionsBase(args):
       min_accelerator=args.min_accelerator,
       max_accelerator=args.max_accelerator,
       shielded_secure_boot=args.shielded_secure_boot,
-      shielded_integrity_monitoring=args.shielded_integrity_monitoring)
+      shielded_integrity_monitoring=args.shielded_integrity_monitoring,
+      reservation_affinity=getattr(args, 'reservation_affinity', None),
+      reservation=getattr(args, 'reservation', None),
+      enable_shielded_nodes=args.enable_shielded_nodes,
+      max_surge_upgrade=args.max_surge_upgrade,
+      max_unavailable_upgrade=args.max_unavailable_upgrade)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
   """Create a cluster for running containers."""
+
+  detailed_help = {
+      'DESCRIPTION':
+          '{description}',
+      'EXAMPLES':
+          """\
+          To create a cluster with the default configuration, run:
+
+            $ {command} sample-cluster
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -343,16 +367,21 @@ class Create(base.CreateCommand):
     flags.AddNodeTaintsFlag(parser)
     flags.AddPreemptibleFlag(parser)
     flags.AddClusterNodeIdentityFlags(parser)
-    flags.AddPrivateClusterFlags(
-        parser, with_deprecated=False, with_alpha=False)
+    flags.AddPrivateClusterFlags(parser, with_deprecated=False)
     flags.AddClusterVersionFlag(parser)
     flags.AddNodeVersionFlag(parser)
     flags.AddEnableAutoUpgradeFlag(parser, default=True)
     flags.AddEnableIntraNodeVisibilityFlag(parser)
     flags.AddTpuFlags(parser, hidden=False)
-    flags.AddAutoprovisioningFlags(parser, hidden=False, for_create=True)
+    flags.AddAutoprovisioningFlags(
+        parser, hidden=False, for_create=True, ga=True)
     flags.AddResourceUsageExportFlags(parser)
     flags.AddVerticalPodAutoscalingFlag(parser)
+    flags.AddWorkloadIdentityFlags(parser)
+    flags.AddWorkloadMetadataFromNodeFlag(parser)
+    flags.AddReservationAffinityFlags(parser)
+    flags.AddSurgeUpgradeFlag(parser)
+    flags.AddMaxUnavailableUpgradeFlag(parser)
 
   def ParseCreateOptions(self, args):
     return ParseCreateOptionsBase(args)
@@ -393,14 +422,10 @@ class Create(base.CreateCommand):
           'https://cloud.google.com'
           '/kubernetes-engine/docs/how-to/private-clusters')
 
-    if not (options.metadata and
-            'disable-legacy-endpoints' in options.metadata):
-      log.warning('Starting in 1.12, default node pools in new clusters '
-                  'will have their legacy Compute Engine instance metadata '
-                  'endpoints disabled by default. To create a cluster with '
-                  'legacy instance metadata endpoints disabled in the default '
-                  'node pool, run `clusters create` with the flag '
-                  '`--metadata disable-legacy-endpoints=true`.')
+    if not options.enable_shielded_nodes:
+      log.warning(
+          'Starting with version 1.18, clusters will have shielded GKE nodes by default.'
+      )
 
     if options.enable_ip_alias:
       log.warning(
@@ -472,11 +497,13 @@ class CreateBeta(Create):
     _AddAdditionalZonesFlag(group, deprecated=True)
     flags.AddNodeLocationsFlag(group)
     flags.AddBetaAddonsFlags(parser)
+    flags.AddBootDiskKmsKeyFlag(parser)
     flags.AddClusterAutoscalingFlags(parser)
     flags.AddMaxPodsPerNodeFlag(parser)
     flags.AddEnableAutoRepairFlag(parser, for_create=True)
     flags.AddEnableBinAuthzFlag(parser)
     flags.AddEnableKubernetesAlphaFlag(parser)
+    flags.AddEnableLoggingMonitoringSystemOnlyFlag(parser)
     flags.AddEnableCloudRunAlphaFlag(parser)
     flags.AddEnableLegacyAuthorizationFlag(parser)
     flags.AddIPAliasFlags(parser)
@@ -486,34 +513,36 @@ class CreateBeta(Create):
     flags.AddMaintenanceWindowGroup(parser)
     flags.AddMasterAuthorizedNetworksFlags(parser)
     flags.AddMinCpuPlatformFlag(parser)
-    flags.AddWorkloadMetadataFromNodeFlag(parser)
     flags.AddNetworkPolicyFlags(parser)
     flags.AddNodeTaintsFlag(parser)
     flags.AddPreemptibleFlag(parser)
     flags.AddPodSecurityPolicyFlag(parser)
     flags.AddAllowRouteOverlapFlag(parser)
     flags.AddClusterNodeIdentityFlags(parser)
-    flags.AddPrivateClusterFlags(parser, with_deprecated=True, with_alpha=False)
+    flags.AddPrivateClusterFlags(parser, with_deprecated=True)
     flags.AddEnableStackdriverKubernetesFlag(parser)
-    flags.AddTpuFlags(parser, hidden=False)
+    flags.AddTpuFlags(parser, hidden=False, enable_tpu_service_networking=True)
     flags.AddAutoprovisioningFlags(parser, hidden=False, for_create=True)
+    flags.AddAutoscalingProfilesFlag(parser)
     flags.AddVerticalPodAutoscalingFlag(parser)
     flags.AddResourceUsageExportFlags(parser)
     flags.AddAuthenticatorSecurityGroupFlags(parser)
     flags.AddEnableIntraNodeVisibilityFlag(parser)
-    flags.AddWorkloadIdentityFlags(parser)
-    flags.AddEnableShieldedNodesFlags(parser)
+    flags.AddWorkloadIdentityFlags(parser, use_workload_pool=False)
+    flags.AddWorkloadMetadataFromNodeFlag(parser, use_mode=False)
     flags.AddEnableAutoUpgradeFlag(parser, default=True)
     flags.AddSurgeUpgradeFlag(parser, default=1)
     flags.AddMaxUnavailableUpgradeFlag(parser, is_create=True)
+    flags.AddReservationAffinityFlags(parser)
+    flags.AddMasterGlobalAccessFlag(parser)
     _AddReleaseChannelGroup(parser)
 
   def ParseCreateOptions(self, args):
     ops = ParseCreateOptionsBase(args)
     flags.WarnForNodeVersionAutoUpgrade(args)
     flags.ValidateSurgeUpgradeSettings(args)
+    ops.boot_disk_kms_key = args.boot_disk_kms_key
     ops.min_cpu_platform = args.min_cpu_platform
-    ops.workload_metadata_from_node = args.workload_metadata_from_node
     ops.enable_pod_security_policy = args.enable_pod_security_policy
     ops.allow_route_overlap = args.allow_route_overlap
     ops.private_cluster = args.private_cluster
@@ -521,11 +550,14 @@ class CreateBeta(Create):
     ops.enable_vertical_pod_autoscaling = args.enable_vertical_pod_autoscaling
     ops.security_group = args.security_group
     ops.identity_namespace = args.identity_namespace
-    ops.enable_shielded_nodes = args.enable_shielded_nodes
     flags.ValidateIstioConfigCreateArgs(args.istio_config, args.addons)
     ops.release_channel = args.release_channel
     ops.max_surge_upgrade = args.max_surge_upgrade
     ops.max_unavailable_upgrade = args.max_unavailable_upgrade
+    ops.autoscaling_profile = args.autoscaling_profile
+    ops.enable_tpu_service_networking = args.enable_tpu_service_networking
+    ops.enable_logging_monitoring_system_only = args.enable_logging_monitoring_system_only
+    ops.enable_master_global_access = args.enable_master_global_access
     return ops
 
 
@@ -540,6 +572,7 @@ class CreateAlpha(Create):
     _AddAdditionalZonesFlag(group, deprecated=True)
     flags.AddNodeLocationsFlag(group)
     flags.AddAlphaAddonsFlags(parser)
+    flags.AddBootDiskKmsKeyFlag(parser)
     flags.AddClusterAutoscalingFlags(parser)
     flags.AddMaxPodsPerNodeFlag(parser)
     flags.AddEnableAutoRepairFlag(parser, for_create=True)
@@ -554,20 +587,21 @@ class CreateAlpha(Create):
     flags.AddMaintenanceWindowGroup(parser)
     flags.AddMasterAuthorizedNetworksFlags(parser)
     flags.AddMinCpuPlatformFlag(parser)
-    flags.AddWorkloadMetadataFromNodeFlag(parser)
     flags.AddNetworkPolicyFlags(parser)
+    flags.AddILBSubsettingFlags(parser)
     flags.AddAutoprovisioningFlags(parser, hidden=False, for_create=True)
-    flags.AddAutoscalingProfilesFlag(parser, hidden=True)
+    flags.AddAutoscalingProfilesFlag(parser)
     flags.AddNodeTaintsFlag(parser)
     flags.AddPreemptibleFlag(parser)
     flags.AddPodSecurityPolicyFlag(parser)
     flags.AddAllowRouteOverlapFlag(parser)
-    flags.AddPrivateClusterFlags(parser, with_deprecated=True, with_alpha=True)
+    flags.AddPrivateClusterFlags(parser, with_deprecated=True)
     flags.AddClusterNodeIdentityFlags(parser)
     flags.AddTpuFlags(parser, hidden=False, enable_tpu_service_networking=True)
     flags.AddEnableStackdriverKubernetesFlag(parser)
-    flags.AddManagedPodIdentityFlags(parser)
-    flags.AddWorkloadIdentityFlags(parser)
+    flags.AddEnableLoggingMonitoringSystemOnlyFlag(parser)
+    flags.AddWorkloadIdentityFlags(parser, use_workload_pool=False)
+    flags.AddWorkloadMetadataFromNodeFlag(parser, use_mode=False)
     flags.AddResourceUsageExportFlags(parser)
     flags.AddAuthenticatorSecurityGroupFlags(parser)
     flags.AddVerticalPodAutoscalingFlag(parser)
@@ -575,7 +609,6 @@ class CreateAlpha(Create):
     flags.AddInitialNodePoolNameArg(parser, hidden=False)
     flags.AddEnablePrivateIpv6AccessFlag(parser, hidden=True)
     flags.AddEnableIntraNodeVisibilityFlag(parser)
-    flags.AddEnableShieldedNodesFlags(parser)
     flags.AddDisableDefaultSnatFlag(parser, for_cluster_create=True)
     _AddReleaseChannelGroup(parser)
     flags.AddEnableAutoUpgradeFlag(parser, default=True)
@@ -584,14 +617,17 @@ class CreateAlpha(Create):
     flags.AddLinuxSysctlFlags(parser)
     flags.AddNodeConfigFlag(parser)
     flags.AddCostManagementConfigFlag(parser)
+    flags.AddReservationAffinityFlags(parser)
+    flags.AddDatapathProviderFlag(parser)
+    flags.AddMasterGlobalAccessFlag(parser)
 
   def ParseCreateOptions(self, args):
     ops = ParseCreateOptionsBase(args)
     flags.WarnForNodeVersionAutoUpgrade(args)
     flags.ValidateSurgeUpgradeSettings(args)
+    ops.boot_disk_kms_key = args.boot_disk_kms_key
     ops.autoscaling_profile = args.autoscaling_profile
     ops.local_ssd_volume_configs = args.local_ssd_volumes
-    ops.workload_metadata_from_node = args.workload_metadata_from_node
     ops.enable_pod_security_policy = args.enable_pod_security_policy
     ops.allow_route_overlap = args.allow_route_overlap
     ops.private_cluster = args.private_cluster
@@ -600,9 +636,7 @@ class CreateAlpha(Create):
     ops.master_ipv4_cidr = args.master_ipv4_cidr
     ops.enable_tpu_service_networking = args.enable_tpu_service_networking
     ops.istio_config = args.istio_config
-    ops.enable_managed_pod_identity = args.enable_managed_pod_identity
     ops.identity_namespace = args.identity_namespace
-    ops.federating_service_account = args.federating_service_account
     ops.security_group = args.security_group
     flags.ValidateIstioConfigCreateArgs(args.istio_config, args.addons)
     ops.enable_vertical_pod_autoscaling = args.enable_vertical_pod_autoscaling
@@ -612,18 +646,17 @@ class CreateAlpha(Create):
     ops.enable_network_egress_metering = args.enable_network_egress_metering
     ops.enable_resource_consumption_metering = args.enable_resource_consumption_metering
     ops.enable_private_ipv6_access = args.enable_private_ipv6_access
-    ops.enable_peering_route_sharing = args.enable_peering_route_sharing
-    ops.enable_shielded_nodes = args.enable_shielded_nodes
     ops.release_channel = args.release_channel
     ops.max_surge_upgrade = args.max_surge_upgrade
     ops.max_unavailable_upgrade = args.max_unavailable_upgrade
     ops.linux_sysctls = args.linux_sysctls
+    ops.enable_l4_ilb_subsetting = args.enable_l4_ilb_subsetting
     ops.disable_default_snat = args.disable_default_snat
-
     ops.node_config = args.node_config
-
     ops.enable_cost_management = args.enable_cost_management
-
+    ops.enable_logging_monitoring_system_only = args.enable_logging_monitoring_system_only
+    ops.datapath_provider = args.datapath_provider
+    ops.enable_master_global_access = args.enable_master_global_access
     return ops
 
 

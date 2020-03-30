@@ -140,8 +140,21 @@ formats.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To connect to the serial port of the instance 'my\-instance' in zone
+\'us\-central1\-f', run:
+
+.RS 2m
+$ gcloud beta compute connect\-to\-serial\-port my\-instance \e
+    \-\-zone=us\-central1\-f
+.RE
 
 
 

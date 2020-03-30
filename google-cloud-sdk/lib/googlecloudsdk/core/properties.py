@@ -255,6 +255,8 @@ class _Sections(object):
     builds: Section, The section containing builds properties for the Cloud SDK.
     build_artifacts: Section, The section containing build artifacts properties
       for the Cloud SDK.
+    artifacts: Section, The section containing artifacts properties for the
+      Cloud SDK.
     component_manager: Section, The section containing properties for the
       component_manager.
     composer: Section, The section containing composer properties for the Cloud
@@ -302,6 +304,8 @@ class _Sections(object):
       SDK.
     ml_engine: Section, The section containing ml_engine properties for the
       Cloud SDK.
+    notebooks: Section, The section containing notebook properties for the
+      Cloud SDK.
     proxy: Section, The section containing proxy properties for the Cloud SDK.
     pubsub: Section, The section containing pubsub properties for the Cloud SDK.
     redis: Section, The section containing redis properties for the Cloud SDK.
@@ -314,6 +318,8 @@ class _Sections(object):
       SDK.
     survey: Section, The section containing survey properties for the Cloud SDK.
     test: Section, The section containing test properties for the Cloud SDK.
+    workflows: Section, The section containing workflows properties for the
+      Cloud SDK.
   """
 
   class _ValueFlag(object):
@@ -328,6 +334,7 @@ class _Sections(object):
     self.api_client_overrides = _SectionApiClientOverrides()
     self.api_endpoint_overrides = _SectionApiEndpointOverrides()
     self.app = _SectionApp()
+    self.artifacts = _SectionArtifacts()
     self.auth = _SectionAuth()
     self.billing = _SectionBilling()
     self.builds = _SectionBuilds()
@@ -356,6 +363,7 @@ class _Sections(object):
     self.lifesciences = _SectionLifeSciences()
     self.metrics = _SectionMetrics()
     self.ml_engine = _SectionMlEngine()
+    self.notebooks = _SectionNotebooks()
     self.proxy = _SectionProxy()
     self.pubsub = _SectionPubsub()
     self.redis = _SectionRedis()
@@ -365,6 +373,7 @@ class _Sections(object):
     self.storage = _SectionStorage()
     self.survey = _SectionSurvey()
     self.test = _SectionTest()
+    self.workflows = _SectionWorkflows()
 
     sections = [
         self.access_context_manager,
@@ -375,6 +384,7 @@ class _Sections(object):
         self.auth,
         self.billing,
         self.builds,
+        self.artifacts,
         self.build_artifacts,
         self.component_manager,
         self.composer,
@@ -400,6 +410,7 @@ class _Sections(object):
         self.lifesciences,
         self.metrics,
         self.ml_engine,
+        self.notebooks,
         self.proxy,
         self.redis,
         self.run,
@@ -407,6 +418,7 @@ class _Sections(object):
         self.spanner,
         self.survey,
         self.test,
+        self.workflows,
     ]
     self.__sections = {section.name: section for section in sections}
     self.__invocation_value_stack = [{}]
@@ -579,7 +591,8 @@ class _Section(object):
   def __le__(self, other):
     return self.name <= other.name
 
-  def _Add(self,  # pylint: disable=missing-docstring
+  #  pylint: disable=missing-docstring
+  def _Add(self,
            name,
            help_text=None,
            internal=False,
@@ -751,7 +764,18 @@ class _SectionSecrets(_Section):
   """Contains the properties for the 'secrets' section."""
 
   def __init__(self):
-    super(_SectionSecrets, self).__init__('secrets', hidden=True)
+    super(_SectionSecrets, self).__init__('secrets')
+    self.replication_policy = self._Add(
+        'replication-policy',
+        choices=['automatic', 'user-managed'],
+        help_text='The type of replication policy to apply to secrets. Allowed '
+        'values are "automatic" and "user-managed". If user-managed then '
+        'locations must also be provided.',
+    )
+    self.locations = self._Add(
+        'locations',
+        help_text='A comma separated list of the locations to replicate '
+        'secrets to. Only applies to secrets with a user-managed policy.')
 
 
 class _SectionSpanner(_Section):
@@ -789,7 +813,15 @@ class _SectionCompute(_Section):
         completer=('googlecloudsdk.command_lib.compute.completers:'
                    'RegionsCompleter'))
     self.gce_metadata_read_timeout_sec = self._Add(
-        'gce_metadata_read_timeout_sec', default=1, hidden=True)
+        'gce_metadata_read_timeout_sec',
+        default=20,
+        help_text='Timeout of requesting data from gce metadata endpoints.',
+        hidden=True)
+    self.gce_metadata_check_timeout_sec = self._Add(
+        'gce_metadata_check_timeout_sec',
+        default=3,
+        help_text='Timeout of checking if it is on gce environment.',
+        hidden=True)
     self.use_new_list_usable_subnets_api = self._AddBool(
         'use_new_list_usable_subnets_api',
         default=False,
@@ -864,12 +896,29 @@ class _SectionGameServices(_Section):
 
   def __init__(self):
     super(_SectionGameServices, self).__init__('game_services')
+    self.deployment = self._Add(
+        'default_deployment',
+        default='-',
+        help_text=('Default deployment to use when working with Cloud Game '
+                   'Services list configs. When a --deployment flag is '
+                   'required in a list command but not provided, the command '
+                   'will fall back to this value which envokes aggregated '
+                   'list from the backend.'))
     self.location = self._Add(
         'location',
         default='global',
-        help_text='Default location to use when working with Cloud Game '
-        'Services resources. When a `--location` flag is required but not '
-        'provided, the command will fall back to this value.')
+        help_text=(
+            'Default location to use when working with Cloud Game Services '
+            'resources. When a `--location` flag is required but not provided, '
+            'the command will fall back to this value.'))
+    self.realm = self._Add(
+        'default_realm',
+        default='-',
+        help_text=(
+            'Default realm to use when working with Cloud Game Services list '
+            'clusters. When a --realm flag is required in a list command but '
+            'not provided, the command will fall back to this value which '
+            'envokes aggregated list from the backend.'))
 
 
 class _SectionAccessibility(_Section):
@@ -1001,6 +1050,26 @@ class _SectionBuildArtifacts(_Section):
         help_text='Default repository to use when working with Cloud '
         'Build Artifacts resources. When a `repository` is required but not '
         'provided by a flag, the command will fall back to this value, if set.')
+
+
+class _SectionArtifacts(_Section):
+  """Contains the properties for the 'artifacts' section."""
+
+  def __init__(self):
+    super(_SectionArtifacts, self).__init__('artifacts')
+
+    self.repository = self._Add(
+        'repository',
+        help_text='Default repository to use when working with Artifact '
+        'Registry resources. When a `repository` value is required but not '
+        'provided, the command will fall back to this value, if set.')
+
+    self.location = self._Add(
+        'location',
+        help_text='Default location to use when working with Artifact Registry '
+        'resources. When a `location` value is required but not provided, the '
+        'command will fall back to this value, if set. If this value is unset, '
+        'the default location is `global` when `location` value is optional.')
 
 
 class _SectionContainer(_Section):
@@ -1325,8 +1394,17 @@ class _SectionAuth(_Section):
     self.credential_file_override = self._Add(
         'credential_file_override', hidden=True)
     self.impersonate_service_account = self._Add(
-        'impersonate_service_account', hidden=True)
-    self.pkce_code_verifier = self._Add('pkce_code_verifier', hidden=True)
+        'impersonate_service_account',
+        help_text='After setting this property, all API requests will be made '
+        'as the given service account instead of the currently selected '
+        'account. This is done without needing to create, download, and '
+        'activate a key for the account. In order to perform operations as the '
+        'service account, your currently selected account must have an IAM '
+        'role that includes the iam.serviceAccounts.getAccessToken permission '
+        'for the service account. The roles/iam.serviceAccountTokenCreator '
+        'role has this permission or you may create a custom role.')
+    self.disable_google_auth = self._AddBool(
+        'disable_google_auth', default=False, hidden=True)
 
 
 class _SectionBilling(_Section):
@@ -1437,6 +1515,19 @@ class _SectionMlEngine(_Section):
                    'interpreter found on system `PATH`.'))
 
 
+class _SectionNotebooks(_Section):
+  """Contains the properties for the 'notebooks' section."""
+
+  def __init__(self):
+    super(_SectionNotebooks, self).__init__('notebooks')
+
+    self.location = self._Add(
+        'location',
+        help_text='Default location to use when working with Notebook '
+        'resources. When a `location` value is required but not provided, the '
+        'command will fall back to this value, if set.')
+
+
 class _SectionPubsub(_Section):
   """Contains the properties for the 'pubsub' section."""
 
@@ -1475,6 +1566,11 @@ class _SectionDataflow(_Section):
         'disable_public_ips',
         help_text='Specifies that Cloud Dataflow workers '
         'must not use public IP addresses.',
+        default=False)
+    self.print_only = self._AddBool(
+        'print_only',
+        help_text='Prints the container spec to stdout. Does not save in '
+        'Google Cloud Storage.',
         default=False)
 
 
@@ -1667,12 +1763,16 @@ class _SectionApiEndpointOverrides(_Section):
     super(_SectionApiEndpointOverrides, self).__init__(
         'api_endpoint_overrides', hidden=True)
     self.remotebuildexecution = self._Add('remotebuildexecution')
+    self.accessapproval = self._Add('accessapproval')
     self.accesscontextmanager = self._Add('accesscontextmanager')
+    self.apigateway = self._Add('apigateway')
     self.appengine = self._Add('appengine')
     self.bigtableadmin = self._Add('bigtableadmin')
     self.binaryauthorization = self._Add('binaryauthorization')
     self.buildartifacts = self._Add('buildartifacts')
+    self.artifactregistry = self._Add('artifactregistry')
     self.categorymanager = self._Add('categorymanager')
+    self.cloudasset = self._Add('cloudasset')
     self.cloudbilling = self._Add('cloudbilling')
     self.cloudbuild = self._Add('cloudbuild')
     self.clouddebugger = self._Add('clouddebugger')
@@ -1714,18 +1814,22 @@ class _SectionApiEndpointOverrides(_Section):
     self.logging = self._Add('logging')
     self.managedidentities = self._Add('managedidentities')
     self.manager = self._Add('manager')
+    self.memcache = self._Add('memcache')
     self.ml = self._Add('ml')
     self.monitoring = self._Add('monitoring')
+    self.networkmanagement = self._Add('networkmanagement')
     self.orgpolicy = self._Add('orgpolicy')
     self.osconfig = self._Add('osconfig')
     self.oslogin = self._Add('oslogin')
     self.policytroubleshooter = self._Add('policytroubleshooter')
+    self.privateca = self._Add('privateca')
     self.pubsub = self._Add('pubsub')
     self.recommender = self._Add('recommender')
     self.replicapoolupdater = self._Add('replicapoolupdater')
     self.runtimeconfig = self._Add('runtimeconfig')
     self.redis = self._Add('redis')
     self.run = self._Add('run')
+    self.scc = self._Add('scc')
     self.servicemanagement = self._Add('servicemanagement')
     self.serviceregistry = self._Add('serviceregistry')
     self.serviceusage = self._Add('serviceusage')
@@ -1733,6 +1837,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.source = self._Add('source')
     self.sourcerepo = self._Add('sourcerepo')
     self.secrets = self._Add('secretmanager')
+    self.servicedirectory = self._Add('servicedirectory')
     self.spanner = self._Add('spanner')
     self.speech = self._Add('speech')
     self.sql = self._Add('sql')
@@ -1742,6 +1847,8 @@ class _SectionApiEndpointOverrides(_Section):
     self.tpu = self._Add('tpu')
     self.vision = self._Add('vision')
     self.vpcaccess = self._Add('vpcaccess')
+    self.workflowexecutions = self._Add('workflowexecutions')
+    self.workflows = self._Add('workflows')
 
   def EndpointValidator(self, value):
     """Checks to see if the endpoint override string is valid."""
@@ -1771,6 +1878,7 @@ class _SectionApiClientOverrides(_Section):
     self.cloudidentity = self._Add('cloudidentity')
     self.compute = self._Add('compute')
     self.container = self._Add('container')
+    self.speech = self._Add('speech')
     self.sql = self._Add('sql')
     self.run = self._Add('run')
 
@@ -1827,7 +1935,12 @@ class _SectionContextAware(_Section):
     self.use_client_certificate = self._AddBool(
         'use_client_certificate',
         help_text=('If True, use client certificate to authorize user '
-                   'device using context aware access.'))
+                   'device using Context-aware access. Some services may not '
+                   'support client certificate authorization. If a command '
+                   'sends requests to such services, the client certificate '
+                   'will not be validated. '
+                   'Run `gcloud topic client-certificate` for list of services '
+                   'supporting this feature.'))
     self.auto_discovery_file_path = self._Add(
         'auto_discovery_file_path',
         validator=ExistingAbsoluteFilepathValidator,
@@ -1876,6 +1989,19 @@ class _SectionSurvey(_Section):
         default=False,
         help_text='If True, gcloud will not prompt you to take periodic usage '
         'experience surveys.')
+
+
+class _SectionWorkflows(_Section):
+  """Contains the properties for the 'workflows' section."""
+
+  def __init__(self):
+    super(_SectionWorkflows, self).__init__('workflows', hidden=True)
+    self.location = self._Add(
+        'location',
+        default='us-central1',
+        help_text='The default region to use when working with Cloud '
+        'Workflows resources. When a `--location` flag is required '
+        'but not provided, the command will fall back to this value, if set.')
 
 
 class _Property(object):
@@ -2269,17 +2395,16 @@ def PersistProperty(prop, value, scope=None):
   else:
     active_config = named_configs.ConfigurationStore.ActiveConfig()
     active_config.PersistProperty(prop.section, prop.name, value)
-  # Print message if value being set is overridden by environment var
+  # Print message if value being set/unset is overridden by environment var
   # to prevent user confusion
-  if value is not None:
-    env_name = prop.EnvironmentName()
-    override = os.getenv(env_name)
-    if override:
-      warning_message = ('WARNING: Property [{0}] is overridden '
-                         'by environment setting [{1}={2}]\n')
-      # Writing to sys.stderr because of circular dependency
-      # in googlecloudsdk.core.log on properties
-      sys.stderr.write(warning_message.format(prop.name, env_name, override))
+  env_name = prop.EnvironmentName()
+  override = encoding.GetEncodedValue(os.environ, env_name)
+  if override:
+    warning_message = ('WARNING: Property [{0}] is overridden '
+                       'by environment setting [{1}={2}]\n')
+    # Writing to sys.stderr because of circular dependency
+    # in googlecloudsdk.core.log on properties
+    sys.stderr.write(warning_message.format(prop.name, env_name, override))
 
 
 def _GetProperty(prop, properties_file, required):

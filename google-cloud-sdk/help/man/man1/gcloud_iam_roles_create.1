@@ -112,27 +112,29 @@ The title of the role you want to create.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To create a custom role from a yaml file, run:
+To create a custom role \f5\fIProjectUpdater\fR\fR from a YAML file, run:
 
 .RS 2m
-$ gcloud iam roles create viewer \-\-organization 12345 \e
-    \-\-file role_file_path
+$ gcloud iam roles create ProjectUpdater \-\-organization=12345 \e
+    \-\-file=role_file_path
 .RE
 
-To create a custom role with flags, run:
+To create a custom role \f5\fIProjectUpdater\fR\fR with flags, run:
 
 .RS 2m
-$ gcloud iam roles create editor \-\-project myproject \e
-    \-\-title myrole \-\-description \e
-    "Have access to get and update the project" \-\-permissions \e
-    resourcemanager.projects.get,resourcemanager.projects.update
+$ gcloud iam roles create ProjectUpdater \-\-project=myproject \e
+    \-\-title=ProjectUpdater \e
+    \-\-description="Have access to get and update the project" \e
+    \-\-permissions=resourcemanager.projects.get,\e
+resourcemanager.projects.update
 .RE
 
 

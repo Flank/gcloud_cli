@@ -46,7 +46,8 @@ class _BaseInstancesRestartTest(object):
                 0,
                 1,
                 81000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -55,7 +56,8 @@ class _BaseInstancesRestartTest(object):
                 0,
                 1,
                 142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 8,
@@ -64,22 +66,22 @@ class _BaseInstancesRestartTest(object):
                 0,
                 1,
                 142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='reset-test',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/reset-test'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/reset-test'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='3c4bb339-858a-4225-aa21-43caa613cc62',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/3c4bb339-858a-4225-aa21-43caa613cc62'.
-            format(self.Project()),
-            operationType='RESTART',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/3c4bb339-858a-4225-aa21-43caa613cc62'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .RESTART,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
     self.mocked_client.operations.Get.Expect(
@@ -97,7 +99,8 @@ class _BaseInstancesRestartTest(object):
                 0,
                 1,
                 81000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -106,7 +109,8 @@ class _BaseInstancesRestartTest(object):
                 0,
                 1,
                 142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 8,
@@ -115,22 +119,22 @@ class _BaseInstancesRestartTest(object):
                 0,
                 1,
                 142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=None,
             importContext=None,
             targetId='reset-test',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/reset-test'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/reset-test'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='3c4bb339-858a-4225-aa21-43caa613cc62',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/3c4bb339-858a-4225-aa21-43caa613cc62'.
-            format(self.Project()),
-            operationType='RESTART',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/3c4bb339-858a-4225-aa21-43caa613cc62'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .RESTART,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -140,7 +144,7 @@ class _BaseInstancesRestartTest(object):
 
     self.Run('sql instances restart reset-test')
     self.AssertErrContains(
-        'Restarted [https://www.googleapis.com/sql/v1beta4/'
+        'Restarted [https://sqladmin.googleapis.com/sql/v1beta4/'
         'projects/{0}/instances/reset-test].'.format(self.Project()))
 
   def testRestartAsync(self):
@@ -149,7 +153,7 @@ class _BaseInstancesRestartTest(object):
 
     self.Run('sql instances restart reset-test --async')
     self.AssertErrNotContains(
-        'Restarted [https://www.googleapis.com/sql/v1beta4/'
+        'Restarted [https://sqladmin.googleapis.com/sql/v1beta4/'
         'projects/{0}/instances/reset-test].'.format(self.Project()))
 
   def testRestartNoConfirmCancels(self):

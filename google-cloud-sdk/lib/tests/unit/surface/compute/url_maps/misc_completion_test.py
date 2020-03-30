@@ -32,11 +32,14 @@ class UrlMapsCompletionTests(test_base.BaseTest,
                              completer_test_base.CompleterBase):
 
   def testUrlMapsInvalidateCdnCacheCompletion(self):
-    lister_mock = self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        autospec=True)
-    lister_mock.return_value = resource_projector.MakeSerializable(
-        test_resources.URL_MAPS)
+    list_json_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
+    self.addCleanup(list_json_patcher.stop)
+    self.list_json = list_json_patcher.start()
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(
+            resource_projector.MakeSerializable(test_resources.URL_MAPS))
+    ]
     self.RunCompletion('compute url-maps invalidate-cdn-cache u',
                        ['url-map-1', 'url-map-2', 'url-map-3', 'url-map-4'])
 
@@ -44,10 +47,10 @@ class UrlMapsCompletionTests(test_base.BaseTest,
 class RegionUrlMapsCompletionTests(test_base.BaseTest,
                                    completer_test_base.CompleterBase):
 
-  URI_PREFIX = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
+  URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
 
   def SetUp(self):
-    self.SelectApi('alpha')
+    self.SelectApi('v1')
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson')
     self.addCleanup(list_json_patcher.stop)
@@ -91,7 +94,6 @@ class RegionUrlMapsCompletionTests(test_base.BaseTest,
         flags.UrlMapsCompleterAlpha,
         expected_command=[
             [
-                'alpha',
                 'compute',
                 'url-maps',
                 'list',
@@ -101,7 +103,6 @@ class RegionUrlMapsCompletionTests(test_base.BaseTest,
                 '--format=disable',
             ],
             [
-                'alpha',
                 'compute',
                 'url-maps',
                 'list',

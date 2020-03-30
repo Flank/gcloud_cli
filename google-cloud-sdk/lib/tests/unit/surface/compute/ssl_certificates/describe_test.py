@@ -85,7 +85,7 @@ class SslCertificatesDescribeBetaTest(test_base.BaseTest,
     ])
 
     self.Run("""
-        beta compute ssl-certificates describe --global ssl-cert-1
+        beta compute ssl-certificates describe ssl-cert-1
         """)
 
     self.CheckRequests(
@@ -173,7 +173,7 @@ class SslCertificatesDescribeAlphaTest(test_base.BaseTest,
     ])
 
     self.Run("""
-        alpha compute ssl-certificates describe --global ssl-cert-1
+        alpha compute ssl-certificates describe ssl-cert-1
         """)
 
     self.CheckRequests(

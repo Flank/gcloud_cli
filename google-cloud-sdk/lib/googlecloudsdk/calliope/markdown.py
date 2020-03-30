@@ -51,7 +51,7 @@ def _GetIndexFromCapsule(capsule):
     The help doc index line for a capsule line.
   """
   # Strip leading tags: <markdown>(TAG)<markdown> or <markdown>[TAG]<markdown>.
-  capsule = re.sub(r'(\*?[[(][A-Z]+[])]\*? +)*', '', capsule)
+  capsule = re.sub(r'(\*?[\[(][A-Z]+[\])]\*? +)*', '', capsule)
   # Lower case first word if not an abbreviation.
   match = re.match(r'([A-Z])([^A-Z].*)', capsule)
   if match:
@@ -522,8 +522,9 @@ class MarkdownGenerator(six.with_metaclass(abc.ABCMeta, object)):
       if not disable_header:
         self.PrintSectionHeader(
             '{} WIDE FLAGS'.format(self._top.upper()), sep=False)
+      # NOTE: We need two newlines before 'Run' for a paragraph break.
       self._out('\nThese flags are available to all commands: {}.'
-                '\nRun *$ {} help* for details.\n'
+                '\n\nRun *$ {} help* for details.\n'
                 .format(', '.join(sorted(self._global_flags)),
                         self._top))
 
@@ -672,6 +673,11 @@ class MarkdownGenerator(six.with_metaclass(abc.ABCMeta, object)):
       doc = rep + doc[pos:]
     return doc
 
+  def _IsNotThisCommand(self, cmd):
+    # We should not include the link if it refers to the current page, per
+    # our research with screen readers. (See b/1723464.)
+    return '.'.join(cmd) != '.'.join(self._command_path)
+
   def _LinkMarkdown(self, doc, pat, with_args=True):
     """Build a representation of a doc, finding all command examples.
 
@@ -695,7 +701,7 @@ class MarkdownGenerator(six.with_metaclass(abc.ABCMeta, object)):
         break
       cmd, args = self._SplitCommandFromArgs(match.group('command').split(' '))
       lnk = self.FormatExample(cmd, args, with_args=with_args)
-      if lnk:
+      if self._IsNotThisCommand(cmd) and lnk:
         rep += doc[pos:match.start('command')] + lnk
       else:
         # Skip invalid commands.

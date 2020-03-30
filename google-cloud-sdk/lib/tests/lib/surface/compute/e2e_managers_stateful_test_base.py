@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.calliope import exceptions
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_managers_test_base
 from tests.lib.surface.compute import e2e_test_base
@@ -32,25 +31,20 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+    self.stateful_igms = set()
 
   def TearDown(self):
-    # Remove all disks left for MIGs (they may not be deleted by design)
-    for instance_group_manager_name in (
-        self.instance_group_manager_names +
-        self.region_instance_group_manager_names):
-      for disk in self._GetDiskUris(instance_group_manager_name):
-        try:
-          self.DeleteDisk(disk)
-        except (AssertionError, exceptions.ToolException):
-          # Delete may not be successful for some cases (it may still be linked
-          # to MIG being deleted), cleanup will take care for these
-          pass
+    # Add all disks from the stateful migs to potential_stateful_disks list to
+    # be cleaned up in the TearDown
+    for instance_group_manager_name in self.stateful_igms:
+      self.potential_stateful_disk_urls.update(
+          self._GetDiskUris(instance_group_manager_name))
 
   def _GetDiskUris(self, filter_name):
     self.ClearOutput()
     self.Run('compute disks list --uri --filter name~{0}'.format(filter_name))
     output = self.GetNewOutput()
-    return re.findall(r'\S+', output)
+    return list(re.findall(r'\S+', output))
 
   def CreateInstanceGroupManagerStateful(self,
                                          instance_template_name,
@@ -81,6 +75,8 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
           --stateful-disk device-name={0}""".format(device_name)
     self.Run(command)
     self.AssertNewOutputContains(name)
+    if stateful_disks:
+      self.stateful_igms.add(name)
     return name
 
   def UpdateInstanceGroupManagerStateful(self,
@@ -99,6 +95,8 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
       command += """\
         --remove-stateful-disks {0}""".format(','.join(remove_stateful_disks))
     self.Run(command)
+    if add_stateful_disks:
+      self.stateful_igms.add(name)
     return name
 
   def DescribeInstance(self, name):
@@ -115,6 +113,37 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
     stderr = self.GetNewErr()
     # Return URI to the disk
     return re.search(r'Created \[(.*)\]', stderr).group(1)
+
+  def CreateDiskForStateful(self, zone=None):
+    """Create a disk for use in the stateful API.
+
+    Use this method if you're creating a disk to specify in a per-instance
+    config. This is required to cleanup the disk properly at the end.
+
+    Args:
+      zone: Zone to create the disk in. None for default.
+
+    Returns:
+      URI of the created disk.
+    """
+    disk_uri = self.CreateDisk(zone=zone)
+    self.potential_stateful_disk_urls.add(disk_uri)
+    return disk_uri
+
+  def CreateInstanceConfigs(self, name, instance, stateful_disks):
+    command = """\
+      compute instance-groups managed instance-configs create {group_name} \
+        {scope_flag} \
+        --instance {instance}""".format(
+            group_name=name, scope_flag=self.GetScopeFlag(), instance=instance)
+    for stateful_disk in stateful_disks:
+      command += (' --stateful-disk device-name={disk_name}'.format(
+          disk_name=stateful_disk))
+    self.Run(command)
+
+  def MarkIgmAsStatefulForCleanup(self, name):
+    """Mark the IGM with name as stateful, for test resource cleanup."""
+    self.stateful_igms.add(name)
 
 
 if __name__ == '__main__':

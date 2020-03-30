@@ -832,6 +832,10 @@ Invalid request API reason: Precondition check failed.
     payload = exceptions.HttpErrorPayload(err)
     return payload.field_violations
 
+  def _GetViolations(self, err):
+    payload = exceptions.HttpErrorPayload(err)
+    return payload.violations
+
   def testGetOneFieldViolation(self):
     err = http_error.MakeDetailedHttpError(
         400,
@@ -851,7 +855,7 @@ Invalid request API reason: Precondition check failed.
                             ' or @digest], obtained really/bad/image',
                     }]}]}},
         details=http_error.ExampleErrorDetails())
-    self.assertEquals(  # pylint:disable=g-deprecated-assert
+    self.assertEqual(
         self._GetFieldViolations(err),
         {'spec.revisionTemplate.spec.container.image':
              'Invalid image provided in the revision'
@@ -874,11 +878,11 @@ Invalid request API reason: Precondition check failed.
                         {'field': 'doop.doop', 'description': 'lol'},
                     ]}]}},
         details=http_error.ExampleErrorDetails())
-    self.assertEquals(  # pylint:disable=g-deprecated-assert
+    self.assertEqual(
         self._GetFieldViolations(err),
         {'blog.blug': 'hahaha', 'doop.doop': 'lol'})
 
-  def testGetSeveralFieldViolationsOtherDetails(self):
+  def testGetSeveralFieldViolationsAndViolations(self):
     err = http_error.MakeDetailedHttpError(
         400,
         url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
@@ -894,6 +898,7 @@ Invalid request API reason: Precondition check failed.
                             {
                                 'type': 'type.googleapis.com/google.rpc.lien',
                                 'subject': 'liens/123-456-abc',
+                                'description': 'This house has a lien.'
                             }]},
                     {
                         '@type': 'type.googleapis.com/google.rpc.BadRequest',
@@ -904,9 +909,12 @@ Invalid request API reason: Precondition check failed.
                     }
                 ]}},
         details=http_error.ExampleErrorDetails())
-    self.assertEquals(  # pylint:disable=g-deprecated-assert
+    self.assertEqual(
         self._GetFieldViolations(err),
         {'blog.blug': 'hahaha', 'doop.doop': 'lol'})
+    self.assertEqual(
+        self._GetViolations(err),
+        {'liens/123-456-abc': 'This house has a lien.'})
 
   def testGetNoFieldViolations(self):
     err = http_error.MakeDetailedHttpError(
@@ -919,7 +927,7 @@ Invalid request API reason: Precondition check failed.
                 'status': 'INVALID_ARGUMENT',
                 'details': []}},
         details=http_error.ExampleErrorDetails())
-    self.assertEquals(self._GetFieldViolations(err), {})  # pylint:disable=g-deprecated-assert
+    self.assertEqual(self._GetFieldViolations(err), {})
 
   def testGetFieldViolationsBadJson(self):
     err = http_error.MakeDetailedHttpError(
@@ -929,7 +937,86 @@ Invalid request API reason: Precondition check failed.
         details=http_error.ExampleErrorDetails())
     # Override content, since the factory doesn't let us make it invalid.
     err.content = 'this is bad json yo . it is . like. so bad'
-    self.assertEquals(self._GetFieldViolations(err), {})  # pylint:disable=g-deprecated-assert
+    self.assertEqual(self._GetFieldViolations(err), {})
+
+  def testGetOneViolation(self):
+    err = http_error.MakeDetailedHttpError(
+        400,
+        url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
+        content={
+            'error': {
+                'code': 400,
+                'message':
+                    'The request has violated one or more Org Policies. Please '
+                    'refer to the respective violations for more information.',
+                'status': 'FAILED_PRECONDITION',
+                'details': [{
+                    '@type':
+                        'type.googleapis.com/google.rpc.PreconditionFailure',
+                    'violations': [{
+                        'subject': 'orgpolicy:projects/you-rusff',
+                        'description':
+                            'Constraint constraints/gcp.resourceLocations '
+                            'violated for projects/your-stuff attempting to '
+                            'create a function with location set to us-east4. '
+                            'See https://cloud.google.com/resource-manager/docs'
+                            '/organization-policy/org-policy-constraints for '
+                            'more information.',
+                    }]}]}},
+        details=http_error.ExampleErrorDetails())
+    self.assertEqual(
+        self._GetViolations(err),
+        {'orgpolicy:projects/you-rusff':
+             'Constraint constraints/gcp.resourceLocations '
+             'violated for projects/your-stuff attempting to '
+             'create a function with location set to us-east4. '
+             'See https://cloud.google.com/resource-manager/docs'
+             '/organization-policy/org-policy-constraints for '
+             'more information.'})
+
+  def testGetSeveralViolations(self):
+    err = http_error.MakeDetailedHttpError(
+        400,
+        url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
+        content={
+            'error': {
+                'code': 400,
+                'message': 'The request has errors.',
+                'status': 'FAILED_PRECONDITION',
+                'details': [{
+                    '@type':
+                        'type.googleapis.com/google.rpc.PreconditionFailure',
+                    'violations': [
+                        {'subject': 'blog', 'description': 'hahaha'},
+                        {'subject': 'doop', 'description': 'lol'},
+                    ]}]}},
+        details=http_error.ExampleErrorDetails())
+    self.assertEqual(
+        self._GetViolations(err),
+        {'blog': 'hahaha', 'doop': 'lol'})
+
+  def testGetNoViolations(self):
+    err = http_error.MakeDetailedHttpError(
+        400,
+        url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
+        content={
+            'error': {
+                'code': 400,
+                'message': 'The request has errors.',
+                'status': 'INVALID_ARGUMENT',
+                'details': []}},
+        details=http_error.ExampleErrorDetails())
+    self.assertEqual(self._GetViolations(err), {})
+
+  def testGetViolationsBadJson(self):
+    err = http_error.MakeDetailedHttpError(
+        400,
+        url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
+        content={},
+        details=http_error.ExampleErrorDetails())
+    # Override content, since the factory doesn't let us make it invalid.
+    err.content = 'this is bad json yo . it is . like. so bad'
+    self.assertEqual(self._GetViolations(err), {})
 
 
 if __name__ == '__main__':

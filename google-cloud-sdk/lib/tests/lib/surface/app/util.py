@@ -143,6 +143,25 @@ class WithFakeRPC(sdk_test_base.SdkBase):
     if self._WasRequested(url):
       self.fail('URL [{0}] was unexpectedly requested.'.format(url))
 
+  def AssertRequestMatches(self, url, regex, params=None):
+    """Returns True if there's a request matching regex."""
+    url = self._MakeURL(url, params)
+    if not self.rpcserver:
+      self.fail('URL [{0}] was never requested.'.format(url))
+    if not self.rpcserver.opener.save_request_data:
+      self.fail('We were not saving request data')
+    found_data = None
+    for req, data in self.rpcserver.opener.request_data:
+      if req == url:
+        found_data = data
+        if regex.search(data):
+          return
+    if found_data:
+      self.fail('That URL was requested but did not match.\n'
+                'Looking for {0} but found {1}'.format(regex, found_data))
+    else:
+      self.fail('URL [{0}] was never requested'.format(url))
+
 
 class WithAppData(sdk_test_base.WithOutputCapture):
   """A base class that lets you write common .yaml files for testing."""
@@ -177,6 +196,7 @@ indexes:
   - name: name
   - name: age
     direction: desc
+  - name: "y"
 """)
 
   QUEUE_DATA = ('queue.yaml', """\
@@ -221,14 +241,6 @@ handlers:
   script: home.app
 - url: /static
   static_dir: foo
-"""
-
-  APP_DATA_ENV2_RUNTIME = """\
-threadsafe: true
-env: 2
-handlers:
-- url: /
-  script: home.app
 """
 
   APP_DATA_JAVA = """\
@@ -341,11 +353,6 @@ handlers:
                      version=None, module=None):
     return self.WriteApp(file_name, project, version, module,
                          self.APP_DATA_VM_TRUE, runtime=runtime)
-
-  def WriteEnv2Runtime(self, file_name, runtime, project=None,
-                       version=None, module=None):
-    return self.WriteApp(file_name, project, version, module,
-                         self.APP_DATA_ENV2_RUNTIME, runtime=runtime)
 
   def WriteJavaApp(self, module='default', directory=None, app_data=None):
     if app_data is None:

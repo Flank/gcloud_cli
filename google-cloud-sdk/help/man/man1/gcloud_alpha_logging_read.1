@@ -11,7 +11,7 @@ gcloud alpha logging read \- read log entries
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha logging read\fR [\fILOG_FILTER\fR] [\fB\-\-freshness\fR=\fIFRESHNESS\fR;\ default="1d"] [\fB\-\-order\fR=\fIORDER\fR;\ default="desc"] [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha logging read\fR [\fILOG_FILTER\fR] [\fB\-\-freshness\fR=\fIFRESHNESS\fR;\ default="1d"] [\fB\-\-order\fR=\fIORDER\fR;\ default="desc"] [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-bucket\fR=\fIBUCKET\fR\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-view\fR=\fIVIEW\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -83,6 +83,32 @@ specifies the project for API enablement check, quota, and billing. To specify a
 different project for quota and billing, use \f5\-\-billing\-project\fR or
 \f5billing/quota_project\fR property.
 
+.RE
+.sp
+.TP 2m
+
+These arguments are used in conjunction with the parent to construct a view
+resource.
+
+.RS 2m
+.TP 2m
+\fB\-\-bucket\fR=\fIBUCKET\fR
+Id of the bucket. If this argument is provided then \f5\-\-location\fR and
+\f5\-\-view\fR must also be specified. This flag must be specified if any of the
+other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the bucket. If this argument is provided then \f5\-\-bucket\fR and
+\f5\-\-view\fR must also be specified. This flag must be specified if any of the
+other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-view\fR=\fIVIEW\fR
+Id of the view. If this argument is provided then \f5\-\-location\fR and
+\f5\-\-bucket\fR must also be specified. This flag must be specified if any of
+the other arguments in this group are specified.
+
 
 .RE
 .RE
@@ -106,8 +132,9 @@ interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

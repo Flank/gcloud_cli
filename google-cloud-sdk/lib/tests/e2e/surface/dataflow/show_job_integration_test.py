@@ -19,7 +19,6 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import datetime
-from googlecloudsdk.command_lib.dataflow import dataflow_util
 from tests.lib import test_case
 from tests.lib.surface.dataflow import e2e_base
 
@@ -42,11 +41,12 @@ class ShowJobIntegrationTest(e2e_base.DataflowIntegrationTestBase):
 
   def testShowJob(self):
     try:
-      test_job = self.FindOldTerminatedJob()
+      test_job = self.GetOldTerminatedJobFromList()
     except ValueError:
       self.skipTest('No jobs in terminated state. Skipping test.')
+      return
 
-    job = self.ShowJob(test_job.id)
+    job = self.ShowJob(test_job.id, test_job.location)
 
     # Both jobs should exist
     self.assertIsNotNone(test_job)
@@ -70,11 +70,12 @@ class ShowJobIntegrationTest(e2e_base.DataflowIntegrationTestBase):
 
   def testShowJobWithRegion(self):
     try:
-      test_job = self.FindOldTerminatedJob(region='europe-west1')
+      test_job = self.GetOldTerminatedJobFromList()
     except ValueError:
       self.skipTest('No jobs in terminated state. Skipping test.')
+      return
 
-    job = self.ShowJob(test_job.id, region='europe-west1')
+    job = self.ShowJob(test_job.id, test_job.location)
 
     # Both jobs should exist
     self.assertIsNotNone(test_job)
@@ -98,12 +99,12 @@ class ShowJobIntegrationTest(e2e_base.DataflowIntegrationTestBase):
 
   def testShowJobWithUri(self):
     try:
-      test_job = self.FindOldTerminatedJob()
+      test_job = self.GetOldTerminatedJobFromList()
     except ValueError:
       self.skipTest('No jobs in terminated state. Skipping test.')
+      return
 
-    resource_uri = dataflow_util.JobsUriFromId(test_job.id, 'us-central1')
-    job = self.ShowJob(resource_uri)
+    job = self.ShowJob(test_job.id, test_job.location)
 
     # Make sure we successfully retrieved a job via the URI
     self.assertIsNotNone(job)
@@ -122,13 +123,13 @@ class ShowJobIntegrationTest(e2e_base.DataflowIntegrationTestBase):
 
   def testShowJobWithUriWithRegion(self):
     try:
-      test_job = self.FindOldTerminatedJob(region='europe-west1')
+      test_job = self.GetOldTerminatedJobFromList()
     except ValueError:
       self.skipTest('No jobs in terminated state. Skipping test.')
+      return
 
-    resource_uri = dataflow_util.JobsUriFromId(test_job.id, 'europe-west1')
     # Note that the region is inferred from the URI
-    job = self.ShowJob(resource_uri)
+    job = self.ShowJob(test_job.id, test_job.location)
 
     # Make sure we successfully retrieved a job via the URI
     self.assertIsNotNone(job)

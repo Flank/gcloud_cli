@@ -76,12 +76,6 @@ class ProjectsAddIamPolicyBindingTestBeta(ProjectsAddIamPolicyBindingTestGA):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
-
-class ProjectsAddIamPolicyBindingTestAlpha(ProjectsAddIamPolicyBindingTestBeta):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def SetUp(self):
     self.messages = projects_util.GetMessages()
     self.test_iam_policy_with_condition = projects_util.GetMessages().Policy(
@@ -103,109 +97,6 @@ class ProjectsAddIamPolicyBindingTestAlpha(ProjectsAddIamPolicyBindingTestBeta):
         ],
         etag=b'an etag',
         version=1)
-
-  def testPromptForExistingCondition(self):
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    test_project = test_util.GetTestActiveProject()
-    new_role = 'roles/another-non-primitive'
-    new_user = 'user:owner@google.com'
-    start_policy = copy.deepcopy(self.test_iam_policy_with_condition)
-    new_policy = copy.deepcopy(start_policy)
-    new_condition = self.messages.Expr(
-        expression='expr', title='title', description='descr')
-    new_policy.bindings.append(
-        self.messages.Binding(
-            members=['user:owner@google.com'],
-            role='roles/another-non-primitive',
-            condition=new_condition))
-    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
-
-    self.WriteInput('1')
-    self.mock_client.projects.GetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
-                options=self.messages.GetPolicyOptions(
-                    requestedPolicyVersion=
-                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
-        start_policy)
-    self.mock_client.projects.SetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
-            resource=test_project.projectId,
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=new_policy)), new_policy)
-
-    response = self.RunProjects(
-        'add-iam-policy-binding', test_project.projectId,
-        '--role={0}'.format(new_role), '--member={0}'.format(new_user))
-    self.assertEqual(response, new_policy)
-    self.AssertErrContains('The policy contains bindings with conditions')
-
-  def testPromptForNewCondition(self):
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    test_project = test_util.GetTestActiveProject()
-    new_role = 'roles/another-non-primitive'
-    new_user = 'user:owner@google.com'
-    start_policy = copy.deepcopy(self.test_iam_policy_with_condition)
-    new_policy = copy.deepcopy(start_policy)
-    new_condition = self.messages.Expr(
-        expression='expr', title='title', description='descr')
-    new_policy.bindings.append(
-        self.messages.Binding(
-            members=['user:owner@google.com'],
-            role='roles/another-non-primitive',
-            condition=new_condition))
-    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
-
-    self.WriteInput('3')
-    self.WriteInput('expression=expr,title=title,description=descr')
-    self.mock_client.projects.GetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
-                options=self.messages.GetPolicyOptions(
-                    requestedPolicyVersion=
-                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
-        start_policy)
-    self.mock_client.projects.SetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
-            resource=test_project.projectId,
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=new_policy)), new_policy)
-
-    response = self.RunProjects(
-        'add-iam-policy-binding', test_project.projectId,
-        '--role={0}'.format(new_role), '--member={0}'.format(new_user))
-    self.assertEqual(response, new_policy)
-    self.AssertErrContains('The policy contains bindings with conditions')
-    self.AssertErrContains('Condition is either `None`')
-
-  def testPromptForNewCondition_Condition_And_PrimitiveRole(self):
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    test_project = test_util.GetTestActiveProject()
-    new_role = 'roles/editor'
-    new_user = 'user:owner@google.com'
-    start_policy = copy.deepcopy(self.test_iam_policy_with_condition)
-    self.WriteInput('3')
-    self.WriteInput('expression=expr,title=title,description=descr')
-    self.mock_client.projects.GetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
-                options=self.messages.GetPolicyOptions(
-                    requestedPolicyVersion=
-                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
-        start_policy)
-
-    with self.AssertRaisesExceptionRegexp(
-        iam_util.IamPolicyBindingInvalidError,
-        '.*Binding with a condition and a primitive role is not allowed.*'):
-      self.RunProjects('add-iam-policy-binding', test_project.projectId,
-                       '--role={0}'.format(new_role),
-                       '--member={0}'.format(new_user))
 
   def testPromptForCondition_CannotPrompt(self):
     self.StartPatch(
@@ -229,6 +120,12 @@ class ProjectsAddIamPolicyBindingTestAlpha(ProjectsAddIamPolicyBindingTestBeta):
       self.RunProjects('add-iam-policy-binding', test_project.projectId,
                        '--role={0}'.format(new_role),
                        '--member={0}'.format(new_user))
+
+
+class ProjectsAddIamPolicyBindingTestAlpha(ProjectsAddIamPolicyBindingTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 class ProjectsAddIamPolicyBindingCompletionTestGA(base.ProjectsUnitTestBase):

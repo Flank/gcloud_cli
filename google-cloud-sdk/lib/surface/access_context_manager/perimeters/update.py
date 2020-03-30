@@ -77,28 +77,28 @@ class UpdatePerimetersGA(base.UpdateCommand):
 class UpdatePerimetersBeta(UpdatePerimetersGA):
   """Update an existing access zone."""
   _INCLUDE_UNRESTRICTED = False
-  _API_VERSION = 'v1beta'
+  _API_VERSION = 'v1'
 
   @staticmethod
   def Args(parser):
-    UpdatePerimetersGA.ArgsVersioned(parser, version='v1beta', track='BETA')
+    UpdatePerimetersGA.ArgsVersioned(parser, version='v1', track='BETA')
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class UpdatePerimetersAlpha(UpdatePerimetersGA):
   """Update an existing access zone."""
   _INCLUDE_UNRESTRICTED = False
-  _API_VERSION = 'v1beta'
+  _API_VERSION = 'v1alpha'
 
   @staticmethod
   def Args(parser):
-    UpdatePerimetersGA.ArgsVersioned(parser, version='v1beta', track='ALPHA')
+    UpdatePerimetersGA.ArgsVersioned(parser, version='v1alpha', track='ALPHA')
 
   def Patch(self, client, args, perimeter_ref, result, description, title,
             perimeter_type, resources, restricted_services, levels):
     vpc_allowed_services = perimeters.ParseVpcRestriction(
         args, result, self._API_VERSION)
-    enable_vpc_restriction = args.enable_vpc_service_restriction
+    enable_vpc_accessible_services = args.enable_vpc_accessible_services
 
     return client.Patch(
         perimeter_ref,
@@ -109,5 +109,5 @@ class UpdatePerimetersAlpha(UpdatePerimetersGA):
         restricted_services=restricted_services,
         levels=levels,
         vpc_allowed_services=vpc_allowed_services,
-        enable_vpc_service_restriction=enable_vpc_restriction,
+        enable_vpc_accessible_services=enable_vpc_accessible_services,
     )

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta debug targets list \- list debug targets
+gcloud beta debug targets list \- list the debug targets (debuggees) registered with the Cloud Debugger
 
 
 
@@ -17,8 +17,10 @@ gcloud beta debug targets list \- list debug targets
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR This command displays a list of the active debug targets registered
-with the Cloud Debugger.
+\fB(BETA)\fR \fBgcloud beta debug targets list\fR is used to display a list of
+the debug targets (debuggees) registered with the Cloud Debugger. By default
+only the active targets are shown, the \-\-include\-inactive can be provided to
+also include the targets that are no longer active.
 
 
 
@@ -78,8 +80,27 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list the active debug targets (debuggees) registered with the Cloud Debugger,
+run:
+
+.RS 2m
+$ gcloud beta debug targets list
+.RE
+
+To list all (both active and inactive) debug targets (debuggees) registered with
+the Cloud Debugger, run:
+
+.RS 2m
+$ gcloud beta debug targets list \-\-include\-inactive
+.RE
 
 
 

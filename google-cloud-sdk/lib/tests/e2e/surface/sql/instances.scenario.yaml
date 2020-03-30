@@ -4,31 +4,33 @@ release_tracks: [GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: sql instances create $$instance$$ --tier D1 --backup --enable-bin-log
-      --backup-start-time 00:00
+  - command: sql instances create $$instance$$ --tier db-n1-standard-1 --backup --enable-bin-log
+      --backup-start-time 00:00 --format 'yaml(name, databaseVersion, region, settings.tier,
+      state)'
   - stderr: |
       WARNING: Starting with release 233.0.0, you will need to specify either a region or a zone to create an instance.
-      WARNING: First Generation instances will be automatically upgraded to Second Generation starting March 4th, 2020, and First Generation will be fully decommissioned on March 25, 2020. We recommend you create a Second Generation instance.
-  - prompt:
-    - input: y
   - progress_tracker:
     - message: Creating Cloud SQL instance
     - status: SUCCESS
   - stderr: |
-      Created [https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$].
+      Created [https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$].
   - stdout: |
-      NAME                               DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS  PRIVATE_ADDRESS  STATUS
-      $$instance$$  MYSQL_5_6         us-central  D1    -                -                RUNNABLE
-- execute:
-  - command: sql instances describe $$instance$$ --format 'yaml(name, selfLink, project,
-      region)'
-  - stderr: |
-      WARNING: Upgrade your First Generation instance to Second Generation before we auto-upgrade it on March 4, 2020, ahead of the full decommission of First Generation on March 25, 2020.
-  - stdout: |
+      databaseVersion: MYSQL_5_7
       name: $$instance$$
-      project: cloud-sdk-integration-testing
-      region: us-central
-      selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+      region: us-central1
+      settings:
+        tier: db-n1-standard-1
+      state: RUNNABLE
+- execute:
+  - command: sql instances describe $$instance$$ --format 'yaml(name, databaseVersion,
+      region, settings.tier, state)'
+  - stdout: |
+      databaseVersion: MYSQL_5_7
+      name: $$instance$$
+      region: us-central1
+      settings:
+        tier: db-n1-standard-1
+      state: RUNNABLE
 - execute:
   - command: sql instances delete $$instance$$
   - prompt:
@@ -38,7 +40,7 @@ summary:
     - message: Deleting Cloud SQL instance
     - status: SUCCESS
   - stderr: |
-      Deleted [https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$].
+      Deleted [https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$].
 actions:
 
 - generate_resource_id:
@@ -46,22 +48,20 @@ actions:
     prefix: sql-instance
 
 - execute_command:
-    command: sql instances create $$instance$$ --tier D1 --backup --enable-bin-log
-      --backup-start-time 00:00
+    command: sql instances create $$instance$$ --tier db-n1-standard-1 --backup --enable-bin-log
+      --backup-start-time 00:00 --format 'yaml(name, databaseVersion, region, settings.tier,
+      state)'
     events:
     - expect_stderr: |
         WARNING: Starting with release 233.0.0, you will need to specify either a region or a zone to create an instance.
-        WARNING: First Generation instances will be automatically upgraded to Second Generation starting March 4th, 2020, and First Generation will be fully decommissioned on March 25, 2020. We recommend you create a Second Generation instance.
-    - expect_prompt_continue:
-        user_input: y
     - api_call:
-        poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances?alt=json
+          uri: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances?alt=json
           method: POST
           headers: {}
           body:
             json:
+              kind: sql#instance
               name: $$instance$$
               project: cloud-sdk-integration-testing
               region: us-central
@@ -69,198 +69,221 @@ actions:
                 backupConfiguration:
                   binaryLogEnabled: true
                   enabled: true
+                  kind: sql#backupConfiguration
                   startTime: 00:00
+                kind: sql#settings
                 pricingPlan: PER_USE
                 replicationType: SYNCHRONOUS
-                tier: D1
+                tier: db-n1-standard-1
         return_response:
           headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '642'
+            cache-control: private
+            content-length: '662'
             content-type: application/json; charset=UTF-8
-            etag: '"6fNGoGJ6WfWOiGfCa02dVapvSvA/3FR5HaZD_1RaF5UbPzmZKxc5u14"'
-            pragma: no-cache
             status: '200'
           body:
             kind: sql#operation
-            selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/624f0bc1-f964-4dfc-9bdc-261233ee8bc4
-            targetProject: cloud-sdk-integration-testing
-            targetId: $$instance$$
-            targetLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
-            name: 624f0bc1-f964-4dfc-9bdc-261233ee8bc4
-            operationType: CREATE
+            targetLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            insertTime: '2018-08-29T21:57:44.297Z'
+            insertTime: '2020-01-18T02:43:24.654Z'
+            operationType: CREATE
+            name: f52130d3-618b-4a33-99c5-c970c1eb752e
+            targetId: $$instance$$
+            selfLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/f52130d3-618b-4a33-99c5-c970c1eb752e
+            targetProject: cloud-sdk-integration-testing
+        poll_operation: true
     - expect_progress_tracker:
         message: Creating Cloud SQL instance
         status: SUCCESS
     - expect_stderr: |
-        Created [https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$].
+        Created [https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$?alt=json
+          uri: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '2625'
+            cache-control: private
+            content-length: '3272'
             content-type: application/json; charset=UTF-8
-            etag: '"6fNGoGJ6WfWOiGfCa02dVapvSvA/MQ"'
             status: '200'
           body:
             kind: sql#instance
-            selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
-            name: $$instance$$
-            connectionName: cloud-sdk-integration-testing:$$instance$$
-            etag: '"6fNGoGJ6WfWOiGfCa02dVapvSvA/MQ"'
-            project: cloud-sdk-integration-testing
             state: RUNNABLE
-            backendType: FIRST_GEN
-            databaseVersion: MYSQL_5_6
-            region: us-central
-            currentDiskSize: '0'
-            maxDiskSize: '268435456000'
+            databaseVersion: MYSQL_5_7
             settings:
-              kind: sql#settings
-              settingsVersion: '1'
               authorizedGaeApplications: []
-              tier: D1
-              backupConfiguration:
-                kind: sql#backupConfiguration
-                startTime: 00:00
-                enabled: true
-                binaryLogEnabled: true
+              tier: db-n1-standard-1
+              kind: sql#settings
               pricingPlan: PER_USE
               replicationType: SYNCHRONOUS
-              activationPolicy: ON_DEMAND
+              activationPolicy: ALWAYS
               ipConfiguration:
-                ipv4Enabled: false
                 authorizedNetworks: []
+                ipv4Enabled: true
+              locationPreference:
+                zone: us-central1-a
+                kind: sql#locationPreference
+              dataDiskType: PD_SSD
+              backupConfiguration:
+                startTime: 00:00
+                kind: sql#backupConfiguration
+                enabled: true
+                binaryLogEnabled: true
+              settingsVersion: '1'
+              storageAutoResizeLimit: '0'
+              storageAutoResize: true
+              dataDiskSizeGb: '10'
+            etag: b63e84f62d1f54c99d4144e19b135a06a05560aaa24e03c2b065462ecbb675fe
+            ipAddresses:
+            - type: PRIMARY
+              ipAddress: 35.224.157.122
             serverCaCert:
               kind: sql#sslCert
-              instance: $$instance$$
-              sha1Fingerprint: 6da055f4ebc52adc6d1d4b78fbabb1d1a61bfbec
-              commonName: C=US,O=Google\, Inc,CN=Google Cloud SQL Server CA
               certSerialNumber: '0'
               cert: |-
                 -----BEGIN CERTIFICATE-----
-                MIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBIMSMwIQYDVQQDExpHb29n
-                bGUgQ2xvdWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJ
-                BgNVBAYTAlVTMB4XDTE4MDgyOTIxNTY0MFoXDTI4MDgyNjIxNTc0MFowSDEjMCEG
-                A1UEAxMaR29vZ2xlIENsb3VkIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2ds
-                ZSwgSW5jMQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
-                ggEBANjFCuzr4ZwoBjgA/KSVzIfWqt2uNF/L2RdMH0He3MJ2UKVOTouQbswdTX0k
-                kdpT5La7I1OxAYdWb7k4mwW17x9gUf/L7YlK/T741VI6+l3s1DZ7KcysZIrVgubc
-                U3NGvumNG+LvgQojTDsIiafPxVE1D3EqxF+ixe5sZfmDK1Xjs8gXkio2z7jlkmv1
-                m8aTpJniJ/KJt0a40q/FSFXZH7dtYlZgbzRQ2TCN6NCQxCi7HX3xgapR8OJqZfCT
-                Che/HdyMPcg1G+eguJQtCOqvMm38JmmPDd+VKv3eas+OS1IG4pqRQPRE0+lJYsRb
-                3M4XAG0abzb2uggM5wWCXc2GpJ0CAwEAAaMWMBQwEgYDVR0TAQH/BAgwBgEB/wIB
-                ADANBgkqhkiG9w0BAQsFAAOCAQEAH5GkaxSjRnBCV0Iho3fFcPsEJM6Px0P5O2zo
-                3nIDBGO0il/T0a+OSQUFqppGsFC16EoSRr8T3Pmze7J0OUzkzWx3JmEtkbAvyK2Q
-                3OciYyLxRVdgH9MWVnvhH9DPyoEocqLkCkhNP7rbwg5xdcaCo0JeB0KVIsv7GSt/
-                Ox2SSOrrEQ1/pP5wz4YZ5NRVr6dXtQYm4ZfNMB33iyzRv9ZhJC7cfTU84YPMjTB1
-                yvspkBwzIJddnVavQZobAGICZCg8auhEV+u8dOqVjh11lytQB8zvsUtJTtmXoy/L
-                udkdOtVvXEqOhitRJr8y7sKnpOfnasFQPHHlNiamyJWNxXp4gQ==
+                MIIDfzCCAmegAwIBAgIBADANBgkqhkiG9w0BAQsFADB3MS0wKwYDVQQuEyQ3ODE4
+                Mzg3NS0xOTQ5LTQxNDEtODMzMy01ZWE2NDM3NTNmMjMxIzAhBgNVBAMTGkdvb2ds
+                ZSBDbG91ZCBTUUwgU2VydmVyIENBMRQwEgYDVQQKEwtHb29nbGUsIEluYzELMAkG
+                A1UEBhMCVVMwHhcNMjAwMTE4MDI0MzE1WhcNMzAwMTE1MDI0NDE1WjB3MS0wKwYD
+                VQQuEyQ3ODE4Mzg3NS0xOTQ5LTQxNDEtODMzMy01ZWE2NDM3NTNmMjMxIzAhBgNV
+                BAMTGkdvb2dsZSBDbG91ZCBTUUwgU2VydmVyIENBMRQwEgYDVQQKEwtHb29nbGUs
+                IEluYzELMAkGA1UEBhMCVVMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
+                AQCblIOADbEl6UH4Ardw4m+/qRyWD1pVFG2/og/DR3u1Xmludjrzmm2h+ERU0gMb
+                SKAQMYZ8sdwGvPLkM6c5OO4GHopY4AO/o7V4bvgo3sCJ1tpuF7V9AtmmA9h3LXlK
+                SDqc8WNTHfJX8ODObhxS3L/lfXexgeYp12iq/v3PTjV9dn/QLnCk0kFv2EvYZGvb
+                jyxILnMuvvYs3g9E4X+eYjVTb7VD6skWz0EpiAiEswQos5i4ytz5lXDdAtr/IHwl
+                Vxh1/hs282dhJvBmwCwCgjStWLrw53rxBTfqvD4i0G97hJxZSaEKEkRfojnYlZj5
+                +q8amjq7x77+eocUoqpG4VpVAgMBAAGjFjAUMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+                DQYJKoZIhvcNAQELBQADggEBAABGsi4HdsjLnung52GYFGdQttUMQfgmSzHra8+z
+                UsOenotMQf9TmrCOTcKJY51giB2+bylhQCvyg4DPG6Wtu3vWip+1owUcD6IwZpIt
+                XQx39hFwn9JazIFi9HP865rFlwdUfJaK1L+LsI0X8E5FkrSAuxHlLuksSQtJBcah
+                wiVploQ6gOwn6+1MFqK3293PDrsE+Qrz8Jtz9SjuochjGHD0ojh0TDE1xbcYjZHE
+                aE5BFcaq07Oeoidk35smw4JRZyKCaJ1tQ2kCaaqJmpwU4jZ110Wi6JmQQaPVx4do
+                RY426t9tcvczRSe0FbbJes9LfJYja9Eo9zuCOFocv2si/20=
                 -----END CERTIFICATE-----
-              createTime: '2018-08-29T21:56:40.934Z'
-              expirationTime: '2028-08-26T21:57:40.934Z'
+              commonName: C=US,O=Google\, Inc,CN=Google Cloud SQL Server CA,dnQualifier=78183875-1949-4141-8333-5ea643753f23
+              sha1Fingerprint: 99d863e7c43587d191463ad3fbdcd952c3cb72ae
+              instance: $$instance$$
+              createTime: '2020-01-18T02:43:15.855Z'
+              expirationTime: '2030-01-15T02:44:15.855Z'
             instanceType: CLOUD_SQL_INSTANCE
-            ipv6Address: 2001:4860:4864:1:5548:a250:279d:f5c6
+            project: cloud-sdk-integration-testing
+            serviceAccountEmailAddress: p462803083913-kqbj9g@gcp-sa-cloud-sql.iam.gserviceaccount.com
+            backendType: SECOND_GEN
+            selfLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+            connectionName: cloud-sdk-integration-testing:us-central1:$$instance$$
+            name: $$instance$$
+            region: us-central1
+            gceZone: us-central1-a
     - expect_stdout: |
-        NAME                               DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS  PRIVATE_ADDRESS  STATUS
-        $$instance$$  MYSQL_5_6         us-central  D1    -                -                RUNNABLE
+        databaseVersion: MYSQL_5_7
+        name: $$instance$$
+        region: us-central1
+        settings:
+          tier: db-n1-standard-1
+        state: RUNNABLE
     - expect_exit:
         code: 0
-
 - execute_command:
-    command: sql instances describe $$instance$$ --format 'yaml(name, selfLink, project,
-      region)'
+    command: sql instances describe $$instance$$ --format 'yaml(name, databaseVersion,
+      region, settings.tier, state)'
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$?alt=json
+          uri: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '2625'
+            cache-control: private
+            content-length: '3272'
             content-type: application/json; charset=UTF-8
-            etag: '"6fNGoGJ6WfWOiGfCa02dVapvSvA/MQ"'
             status: '200'
           body:
             kind: sql#instance
-            selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
-            name: $$instance$$
-            connectionName: cloud-sdk-integration-testing:$$instance$$
-            etag: '"6fNGoGJ6WfWOiGfCa02dVapvSvA/MQ"'
-            project: cloud-sdk-integration-testing
             state: RUNNABLE
-            backendType: FIRST_GEN
-            databaseVersion: MYSQL_5_6
-            region: us-central
-            currentDiskSize: '0'
-            maxDiskSize: '268435456000'
+            databaseVersion: MYSQL_5_7
             settings:
-              kind: sql#settings
-              settingsVersion: '1'
               authorizedGaeApplications: []
-              tier: D1
-              backupConfiguration:
-                kind: sql#backupConfiguration
-                startTime: 00:00
-                enabled: true
-                binaryLogEnabled: true
+              tier: db-n1-standard-1
+              kind: sql#settings
               pricingPlan: PER_USE
               replicationType: SYNCHRONOUS
-              activationPolicy: ON_DEMAND
+              activationPolicy: ALWAYS
               ipConfiguration:
-                ipv4Enabled: false
                 authorizedNetworks: []
+                ipv4Enabled: true
+              locationPreference:
+                zone: us-central1-a
+                kind: sql#locationPreference
+              dataDiskType: PD_SSD
+              backupConfiguration:
+                startTime: 00:00
+                kind: sql#backupConfiguration
+                enabled: true
+                binaryLogEnabled: true
+              settingsVersion: '1'
+              storageAutoResizeLimit: '0'
+              storageAutoResize: true
+              dataDiskSizeGb: '10'
+            etag: b63e84f62d1f54c99d4144e19b135a06a05560aaa24e03c2b065462ecbb675fe
+            ipAddresses:
+            - type: PRIMARY
+              ipAddress: 35.224.157.122
             serverCaCert:
               kind: sql#sslCert
-              instance: $$instance$$
-              sha1Fingerprint: 6da055f4ebc52adc6d1d4b78fbabb1d1a61bfbec
-              commonName: C=US,O=Google\, Inc,CN=Google Cloud SQL Server CA
               certSerialNumber: '0'
               cert: |-
                 -----BEGIN CERTIFICATE-----
-                MIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBIMSMwIQYDVQQDExpHb29n
-                bGUgQ2xvdWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJ
-                BgNVBAYTAlVTMB4XDTE4MDgyOTIxNTY0MFoXDTI4MDgyNjIxNTc0MFowSDEjMCEG
-                A1UEAxMaR29vZ2xlIENsb3VkIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2ds
-                ZSwgSW5jMQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
-                ggEBANjFCuzr4ZwoBjgA/KSVzIfWqt2uNF/L2RdMH0He3MJ2UKVOTouQbswdTX0k
-                kdpT5La7I1OxAYdWb7k4mwW17x9gUf/L7YlK/T741VI6+l3s1DZ7KcysZIrVgubc
-                U3NGvumNG+LvgQojTDsIiafPxVE1D3EqxF+ixe5sZfmDK1Xjs8gXkio2z7jlkmv1
-                m8aTpJniJ/KJt0a40q/FSFXZH7dtYlZgbzRQ2TCN6NCQxCi7HX3xgapR8OJqZfCT
-                Che/HdyMPcg1G+eguJQtCOqvMm38JmmPDd+VKv3eas+OS1IG4pqRQPRE0+lJYsRb
-                3M4XAG0abzb2uggM5wWCXc2GpJ0CAwEAAaMWMBQwEgYDVR0TAQH/BAgwBgEB/wIB
-                ADANBgkqhkiG9w0BAQsFAAOCAQEAH5GkaxSjRnBCV0Iho3fFcPsEJM6Px0P5O2zo
-                3nIDBGO0il/T0a+OSQUFqppGsFC16EoSRr8T3Pmze7J0OUzkzWx3JmEtkbAvyK2Q
-                3OciYyLxRVdgH9MWVnvhH9DPyoEocqLkCkhNP7rbwg5xdcaCo0JeB0KVIsv7GSt/
-                Ox2SSOrrEQ1/pP5wz4YZ5NRVr6dXtQYm4ZfNMB33iyzRv9ZhJC7cfTU84YPMjTB1
-                yvspkBwzIJddnVavQZobAGICZCg8auhEV+u8dOqVjh11lytQB8zvsUtJTtmXoy/L
-                udkdOtVvXEqOhitRJr8y7sKnpOfnasFQPHHlNiamyJWNxXp4gQ==
+                MIIDfzCCAmegAwIBAgIBADANBgkqhkiG9w0BAQsFADB3MS0wKwYDVQQuEyQ3ODE4
+                Mzg3NS0xOTQ5LTQxNDEtODMzMy01ZWE2NDM3NTNmMjMxIzAhBgNVBAMTGkdvb2ds
+                ZSBDbG91ZCBTUUwgU2VydmVyIENBMRQwEgYDVQQKEwtHb29nbGUsIEluYzELMAkG
+                A1UEBhMCVVMwHhcNMjAwMTE4MDI0MzE1WhcNMzAwMTE1MDI0NDE1WjB3MS0wKwYD
+                VQQuEyQ3ODE4Mzg3NS0xOTQ5LTQxNDEtODMzMy01ZWE2NDM3NTNmMjMxIzAhBgNV
+                BAMTGkdvb2dsZSBDbG91ZCBTUUwgU2VydmVyIENBMRQwEgYDVQQKEwtHb29nbGUs
+                IEluYzELMAkGA1UEBhMCVVMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
+                AQCblIOADbEl6UH4Ardw4m+/qRyWD1pVFG2/og/DR3u1Xmludjrzmm2h+ERU0gMb
+                SKAQMYZ8sdwGvPLkM6c5OO4GHopY4AO/o7V4bvgo3sCJ1tpuF7V9AtmmA9h3LXlK
+                SDqc8WNTHfJX8ODObhxS3L/lfXexgeYp12iq/v3PTjV9dn/QLnCk0kFv2EvYZGvb
+                jyxILnMuvvYs3g9E4X+eYjVTb7VD6skWz0EpiAiEswQos5i4ytz5lXDdAtr/IHwl
+                Vxh1/hs282dhJvBmwCwCgjStWLrw53rxBTfqvD4i0G97hJxZSaEKEkRfojnYlZj5
+                +q8amjq7x77+eocUoqpG4VpVAgMBAAGjFjAUMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+                DQYJKoZIhvcNAQELBQADggEBAABGsi4HdsjLnung52GYFGdQttUMQfgmSzHra8+z
+                UsOenotMQf9TmrCOTcKJY51giB2+bylhQCvyg4DPG6Wtu3vWip+1owUcD6IwZpIt
+                XQx39hFwn9JazIFi9HP865rFlwdUfJaK1L+LsI0X8E5FkrSAuxHlLuksSQtJBcah
+                wiVploQ6gOwn6+1MFqK3293PDrsE+Qrz8Jtz9SjuochjGHD0ojh0TDE1xbcYjZHE
+                aE5BFcaq07Oeoidk35smw4JRZyKCaJ1tQ2kCaaqJmpwU4jZ110Wi6JmQQaPVx4do
+                RY426t9tcvczRSe0FbbJes9LfJYja9Eo9zuCOFocv2si/20=
                 -----END CERTIFICATE-----
-              createTime: '2018-08-29T21:56:40.934Z'
-              expirationTime: '2028-08-26T21:57:40.934Z'
+              commonName: C=US,O=Google\, Inc,CN=Google Cloud SQL Server CA,dnQualifier=78183875-1949-4141-8333-5ea643753f23
+              sha1Fingerprint: 99d863e7c43587d191463ad3fbdcd952c3cb72ae
+              instance: $$instance$$
+              createTime: '2020-01-18T02:43:15.855Z'
+              expirationTime: '2030-01-15T02:44:15.855Z'
             instanceType: CLOUD_SQL_INSTANCE
-            ipv6Address: 2001:4860:4864:1:5548:a250:279d:f5c6
-    - expect_stderr: |
-        WARNING: Upgrade your First Generation instance to Second Generation before we auto-upgrade it on March 4, 2020, ahead of the full decommission of First Generation on March 25, 2020.
+            project: cloud-sdk-integration-testing
+            serviceAccountEmailAddress: p462803083913-kqbj9g@gcp-sa-cloud-sql.iam.gserviceaccount.com
+            backendType: SECOND_GEN
+            selfLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+            connectionName: cloud-sdk-integration-testing:us-central1:$$instance$$
+            name: $$instance$$
+            region: us-central1
+            gceZone: us-central1-a
     - expect_stdout: |
+        databaseVersion: MYSQL_5_7
         name: $$instance$$
-        project: cloud-sdk-integration-testing
-        region: us-central
-        selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+        region: us-central1
+        settings:
+          tier: db-n1-standard-1
+        state: RUNNABLE
     - expect_exit:
         code: 0
-
 - execute_command:
     command: sql instances delete $$instance$$
     cleanup_for: instance
@@ -269,35 +292,65 @@ actions:
         message: All of the instance data will be lost when the instance is deleted.
         user_input: y
     - api_call:
-        poll_operation: true
+        poll_operation: false
         expect_request:
-          uri: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$?alt=json
+          uri: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$?alt=json
           method: DELETE
           headers: {}
           body: null
         return_response:
           headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '639'
+            cache-control: private
+            content-length: '662'
             content-type: application/json; charset=UTF-8
-            etag: '"6fNGoGJ6WfWOiGfCa02dVapvSvA/splBZbrb1oGodyNBvgWoWaBvfQk"'
-            pragma: no-cache
             status: '200'
           body:
             kind: sql#operation
-            selfLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/8392a7bd-607a-4a77-90f2-a117b4b782dc
-            targetProject: cloud-sdk-integration-testing
-            targetId: $$instance$$
-            targetLink: https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
-            name: 8392a7bd-607a-4a77-90f2-a117b4b782dc
+            targetLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            insertTime: '2020-01-18T02:47:41.094Z'
             operationType: DELETE
+            name: da8b4c4f-c14d-42f2-8441-b7c6d96fb12e
+            targetId: $$instance$$
+            selfLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/da8b4c4f-c14d-42f2-8441-b7c6d96fb12e
+            targetProject: cloud-sdk-integration-testing
+        expect_response:
+          extract_references:
+          - field: name
+            reference: operation
+          body:
+            json: {}
+    - api_call:
+        expect_request:
+          uri: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/$$operation$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '743'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: sql#operation
+            targetLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$
             status: DONE
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            insertTime: '2018-08-29T21:58:42.241Z'
+            insertTime: '2020-01-18T02:47:41.094Z'
+            startTime: '2020-01-18T02:47:41.422Z'
+            endTime: '2020-01-18T02:49:17.774Z'
+            operationType: DELETE
+            name: da8b4c4f-c14d-42f2-8441-b7c6d96fb12e
+            targetId: $$instance$$
+            selfLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/operations/da8b4c4f-c14d-42f2-8441-b7c6d96fb12e
+            targetProject: cloud-sdk-integration-testing
+        repeatable: true
     - expect_progress_tracker:
         message: Deleting Cloud SQL instance
         status: SUCCESS
     - expect_stderr: |
-        Deleted [https://www.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$].
+        Deleted [https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-sdk-integration-testing/instances/$$instance$$].
     - expect_exit:
         code: 0

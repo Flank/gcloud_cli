@@ -8,6 +8,13 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) Delete a Cloud Game Server Realm.
 
+EXAMPLES
+    To delete Realm 'my-realm' in project 'my-project' and location
+    'my-location', run:
+
+        $ gcloud alpha game servers realms delete my-realm \
+            --project=my-project --location=my-location
+
 POSITIONAL ARGUMENTS
      Realm resource - Cloud Game Server Realm to describe. The arguments in
      this group can be used to specify the attributes of this resource. (NOTE)
@@ -34,8 +41,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the gameservices/v1alpha API. The full documentation for
@@ -45,5 +53,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta game servers realms delete
 

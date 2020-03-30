@@ -8,7 +8,8 @@ class StorageV1(base_api.BaseApiClient):
   """Generated client library for service storage version v1."""
 
   MESSAGES_MODULE = messages
-  BASE_URL = u'https://www.googleapis.com/storage/v1/'
+  BASE_URL = u'https://storage.googleapis.com/storage/v1/'
+  MTLS_BASE_URL = u''
 
   _PACKAGE = u'storage'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform', u'https://www.googleapis.com/auth/cloud-platform.read-only', u'https://www.googleapis.com/auth/devstorage.full_control', u'https://www.googleapis.com/auth/devstorage.read_only', u'https://www.googleapis.com/auth/devstorage.read_write']
@@ -1052,7 +1053,7 @@ class StorageV1(base_api.BaseApiClient):
         method_id=u'storage.objects.copy',
         ordered_params=[u'sourceBucket', u'sourceObject', u'destinationBucket', u'destinationObject'],
         path_params=[u'destinationBucket', u'destinationObject', u'sourceBucket', u'sourceObject'],
-        query_params=[u'destinationPredefinedAcl', u'ifGenerationMatch', u'ifGenerationNotMatch', u'ifMetagenerationMatch', u'ifMetagenerationNotMatch', u'ifSourceGenerationMatch', u'ifSourceGenerationNotMatch', u'ifSourceMetagenerationMatch', u'ifSourceMetagenerationNotMatch', u'projection', u'provisionalUserProject', u'sourceGeneration', u'userProject'],
+        query_params=[u'destinationKmsKeyName', u'destinationPredefinedAcl', u'ifGenerationMatch', u'ifGenerationNotMatch', u'ifMetagenerationMatch', u'ifMetagenerationNotMatch', u'ifSourceGenerationMatch', u'ifSourceGenerationNotMatch', u'ifSourceMetagenerationMatch', u'ifSourceMetagenerationNotMatch', u'projection', u'provisionalUserProject', u'sourceGeneration', u'userProject'],
         relative_path=u'b/{sourceBucket}/o/{sourceObject}/copyTo/b/{destinationBucket}/o/{destinationObject}',
         request_field=u'object',
         request_type_name=u'StorageObjectsCopyRequest',
@@ -1189,7 +1190,7 @@ class StorageV1(base_api.BaseApiClient):
         method_id=u'storage.objects.list',
         ordered_params=[u'bucket'],
         path_params=[u'bucket'],
-        query_params=[u'delimiter', u'includeTrailingDelimiter', u'maxResults', u'pageToken', u'prefix', u'projection', u'provisionalUserProject', u'userProject', u'versions'],
+        query_params=[u'delimiter', u'endOffset', u'includeTrailingDelimiter', u'maxResults', u'pageToken', u'prefix', u'projection', u'provisionalUserProject', u'startOffset', u'userProject', u'versions'],
         relative_path=u'b/{bucket}/o',
         request_field='',
         request_type_name=u'StorageObjectsListRequest',
@@ -1345,7 +1346,7 @@ class StorageV1(base_api.BaseApiClient):
         method_id=u'storage.objects.watchAll',
         ordered_params=[u'bucket'],
         path_params=[u'bucket'],
-        query_params=[u'delimiter', u'includeTrailingDelimiter', u'maxResults', u'pageToken', u'prefix', u'projection', u'provisionalUserProject', u'userProject', u'versions'],
+        query_params=[u'delimiter', u'endOffset', u'includeTrailingDelimiter', u'maxResults', u'pageToken', u'prefix', u'projection', u'provisionalUserProject', u'startOffset', u'userProject', u'versions'],
         relative_path=u'b/{bucket}/o/watch',
         request_field=u'channel',
         request_type_name=u'StorageObjectsWatchAllRequest',

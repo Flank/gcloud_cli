@@ -1,23 +1,19 @@
-filters:
-  skip:
-    reason: Failing
-    bug: b/138577275
 title: Cloud Dataflow snapshots
 release_tracks: [ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: dataflow snapshots list --region europe-west1
+  - command: dataflow snapshots list --region us-central1
   - stdout: |
       {}
 actions:
 
 - execute_command:
-    command: dataflow snapshots list --region europe-west1
+    command: dataflow snapshots list --region us-central1
     events:
     - api_call:
         expect_request:
-          uri: https://dataflow.googleapis.com/v1b3/projects/cloud-sdk-integration-testing/locations/europe-west1/snapshots?alt=json
+          uri: https://dataflow.googleapis.com/v1b3/projects/cloud-sdk-integration-testing/locations/us-central1/snapshots?alt=json
           method: GET
           headers: {}
           body: null

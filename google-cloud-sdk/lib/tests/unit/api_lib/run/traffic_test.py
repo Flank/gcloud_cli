@@ -24,18 +24,23 @@ from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 
 
-MESSAGES = core_apis.GetMessagesModule('run', 'v1alpha1')
+MESSAGES = core_apis.GetMessagesModule('run', 'v1')
 
 
 def NewTrafficTargets(percentages):
-  targets = []
-  for revision_name in percentages:
-    targets.append(
-        traffic.NewTrafficTarget(
-            MESSAGES, revision_name, percentages[revision_name]))
+  targets = [
+      TrafficTarget(name, percentage)
+      for name, percentage in percentages.items()
+  ]
+  return TrafficTargets(targets)
 
-  sorted(targets, key=traffic.SortKeyFromTarget)
-  return traffic.TrafficTargets(MESSAGES, targets)
+
+def TrafficTarget(key, percent=None, tag=None):
+  return traffic.NewTrafficTarget(MESSAGES, key, percent, tag)
+
+
+def TrafficTargets(targets_to_wrap):
+  return traffic.TrafficTargets(MESSAGES, targets_to_wrap)
 
 
 class TrafficTest(test_case.TestCase):
@@ -45,7 +50,7 @@ class TrafficTest(test_case.TestCase):
     return sorted([k for k in targets], key=traffic.SortKeyFromKey)
 
   def test_access_empty_traffic_targets(self):
-    targets = NewTrafficTargets([])
+    targets = NewTrafficTargets({})
     with self.assertRaises(KeyError):
       unused = targets['r1']
       del unused
@@ -68,9 +73,9 @@ class TrafficTest(test_case.TestCase):
     latest = traffic.NewTrafficTarget(
         MESSAGES, traffic.LATEST_REVISION_KEY, 70)
 
-    self.assertEqual(targets['r0'], r0)
-    self.assertEqual(targets['r1'], r1)
-    self.assertEqual(targets[traffic.LATEST_REVISION_KEY], latest)
+    self.assertEqual(targets['r0'], [r0])
+    self.assertEqual(targets['r1'], [r1])
+    self.assertEqual(targets[traffic.LATEST_REVISION_KEY], [latest])
     self.assertIn('r1', targets)
     self.assertIn(traffic.LATEST_REVISION_KEY, targets)
     self.assertEqual(len(targets), 3)
@@ -81,6 +86,44 @@ class TrafficTest(test_case.TestCase):
     self.assertIn(r0, targets.MakeSerializable())
     self.assertIn(r1, targets.MakeSerializable())
     self.assertIn(latest, targets.MakeSerializable())
+    self.assertIn('r0:', str(targets))
+    self.assertIn('r1:', str(targets))
+    self.assertIn('LATEST:', str(targets))
+
+  def test_delete_missing(self):
+    targets = NewTrafficTargets({'r0': 30, 'LATEST': 70})
+    with self.assertRaises(KeyError):
+      del targets['r1']
+
+  def test_access_not_empty_multiple_targets_per_revision(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 10), TrafficTarget('r1', 20),
+        TrafficTarget('r0', 25), TrafficTarget('r0', 30),
+        TrafficTarget('LATEST', 15)])
+
+    r0 = [
+        TrafficTarget('r0', 10),
+        TrafficTarget('r0', 25),
+        TrafficTarget('r0', 30)
+    ]
+    r1 = [TrafficTarget('r1', 20)]
+    latest = [TrafficTarget(traffic.LATEST_REVISION_KEY, 15)]
+
+    self.assertEqual(targets['r0'], r0)
+    self.assertEqual(targets['r1'], r1)
+    self.assertEqual(targets[traffic.LATEST_REVISION_KEY], latest)
+    self.assertIn('r1', targets)
+    self.assertIn(traffic.LATEST_REVISION_KEY, targets)
+    self.assertEqual(len(targets), 3)
+    self.assertEqual(
+        self.GetTargetsKeys(targets),
+        [u'r0', u'r1', traffic.LATEST_REVISION_KEY])
+    self.assertEqual(len(targets.MakeSerializable()), 5)
+    self.assertIn(r0[0], targets.MakeSerializable())
+    self.assertIn(r0[1], targets.MakeSerializable())
+    self.assertIn(r0[2], targets.MakeSerializable())
+    self.assertIn(r1[0], targets.MakeSerializable())
+    self.assertIn(latest[0], targets.MakeSerializable())
     self.assertIn('r0:', str(targets))
     self.assertIn('r1:', str(targets))
     self.assertIn('LATEST:', str(targets))
@@ -97,21 +140,21 @@ class TrafficTest(test_case.TestCase):
         MESSAGES, traffic.LATEST_REVISION_KEY, 70)
 
     self.assertEqual(len(targets), 2)
-    self.assertEqual(targets['r0'], r0)
-    self.assertEqual(targets[traffic.LATEST_REVISION_KEY], latest)
+    self.assertEqual(targets['r0'], [r0])
+    self.assertEqual(targets[traffic.LATEST_REVISION_KEY], [latest])
     self.assertNotIn('r1', targets)
-    targets['r1'] = r1
+    targets['r1'] = [r1]
     self.assertIn('r1', targets)
     self.assertEqual(len(targets), 3)
-    self.assertEqual(targets['r1'], r1)
+    self.assertEqual(targets['r1'], [r1])
     self.assertEqual(
         self.GetTargetsKeys(targets),
         [u'r0', u'r1', traffic.LATEST_REVISION_KEY])
 
-    targets['r1'] = r1b
+    targets['r1'] = [r1b]
     self.assertIn('r1', targets)
     self.assertEqual(len(targets), 3)
-    self.assertEqual(targets['r1'], r1b)
+    self.assertEqual(targets['r1'], [r1b])
     self.assertEqual(
         self.GetTargetsKeys(targets),
         [u'r0', u'r1', traffic.LATEST_REVISION_KEY])
@@ -127,11 +170,82 @@ class TrafficTest(test_case.TestCase):
     self.assertEqual(len(targets), 1)
     self.assertEqual(self.GetTargetsKeys(targets), [u'r0'])
 
+    targets[traffic.LATEST_REVISION_KEY] = [latest]
+    self.assertIn(traffic.LATEST_REVISION_KEY, targets)
+    self.assertEqual(len(targets), 2)
+    self.assertEqual(
+        self.GetTargetsKeys(targets), [u'r0', traffic.LATEST_REVISION_KEY])
+
+  def test_modify_traffic_targets_multiple_targets_per_revision(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 10),
+        TrafficTarget('r0', 25),
+        TrafficTarget('LATEST', 15)])
+
+    r0 = [TrafficTarget('r0', 10), TrafficTarget('r0', 25)]
+    r1 = [TrafficTarget('r1', 20), TrafficTarget('r1', 30)]
+    r1b = [TrafficTarget('r1', 25)]
+    latest = [TrafficTarget(traffic.LATEST_REVISION_KEY, 15)]
+
+    self.assertEqual(len(targets), 2)
+    self.assertEqual(targets['r0'], r0)
+    self.assertEqual(targets[traffic.LATEST_REVISION_KEY], latest)
+    self.assertNotIn('r1', targets)
+    self.assertEqual(len(targets.MakeSerializable()), 3)
+    targets['r1'] = r1
+    self.assertIn('r1', targets)
+    self.assertEqual(len(targets), 3)
+    self.assertEqual(targets['r1'], r1)
+    self.assertEqual(
+        self.GetTargetsKeys(targets),
+        [u'r0', u'r1', traffic.LATEST_REVISION_KEY])
+    self.assertEqual(len(targets.MakeSerializable()), 5)
+
+    targets['r1'] = r1b
+    self.assertIn('r1', targets)
+    self.assertEqual(len(targets), 3)
+    self.assertEqual(targets['r1'], r1b)
+    self.assertEqual(
+        self.GetTargetsKeys(targets),
+        [u'r0', u'r1', traffic.LATEST_REVISION_KEY])
+    self.assertEqual(len(targets.MakeSerializable()), 4)
+
+    del targets['r1']
+    self.assertNotIn('r1', targets)
+    self.assertEqual(len(targets), 2)
+    self.assertEqual(
+        self.GetTargetsKeys(targets), [u'r0', traffic.LATEST_REVISION_KEY])
+    self.assertEqual(len(targets.MakeSerializable()), 3)
+
+    del targets[traffic.LATEST_REVISION_KEY]
+    self.assertNotIn(traffic.LATEST_REVISION_KEY, targets)
+    self.assertEqual(len(targets), 1)
+    self.assertEqual(self.GetTargetsKeys(targets), [u'r0'])
+    self.assertEqual(len(targets.MakeSerializable()), 2)
+
     targets[traffic.LATEST_REVISION_KEY] = latest
     self.assertIn(traffic.LATEST_REVISION_KEY, targets)
     self.assertEqual(len(targets), 2)
     self.assertEqual(
         self.GetTargetsKeys(targets), [u'r0', traffic.LATEST_REVISION_KEY])
+    self.assertEqual(len(targets.MakeSerializable()), 3)
+
+  def test_traffic_targets_equality_order_independent(self):
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r0', 10),
+            TrafficTarget('LATEST', 15, tag='test'),
+            TrafficTarget('LATEST', 15, tag='foo'),
+            TrafficTarget('r0', 25),
+            TrafficTarget('LATEST', 15)
+        ]),
+        TrafficTargets([
+            TrafficTarget('LATEST', 15, tag='foo'),
+            TrafficTarget('LATEST', 15, tag='test'),
+            TrafficTarget('r0', 25),
+            TrafficTarget('r0', 10),
+            TrafficTarget('LATEST', 15)
+        ]))
 
   def test_validate_current_traffic_99_fails(self):
     targets = NewTrafficTargets({'r0': 10, 'r1': 20, 'LATEST': 69})
@@ -338,387 +452,375 @@ class TrafficTest(test_case.TestCase):
     targets.UpdateTraffic({'r0': 100})
     self.assertEqual(targets, NewTrafficTargets({'r0': 100}))
 
+  def test_merges_existing_duplicate_percent_targets(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 10),
+        TrafficTarget('r1', 70),
+        TrafficTarget('r0', 20)
+    ])
+    targets.UpdateTraffic({'r1': 75})
+    self.assertEqual(targets, NewTrafficTargets({'r0': 25, 'r1': 75}))
 
-def NewTrafficTargetPair(
-    latest_revision_name,
-    spec_percent=None,
-    spec_latest=None,
-    spec_revision_name=None,
-    status_percent=None,
-    status_latest=None,
-    status_revision_name=None,
-    status_percent_override=None):
+  def test_ignores_zero_percent_tags(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25),
+        TrafficTarget('r1', 75),
+        TrafficTarget('r0', tag='staging'),
+        TrafficTarget('r1', tag='prod'),
+        TrafficTarget('r2', tag='candidate')
+    ])
+    targets.UpdateTraffic({'r1': 80})
+    self.assertEqual(
+        targets,
+        TrafficTargets([
+            TrafficTarget('r0', 20),
+            TrafficTarget('r1', 80),
+            TrafficTarget('r0', tag='staging'),
+            TrafficTarget('r1', tag='prod'),
+            TrafficTarget('r2', tag='candidate')
+        ]))
 
-  if (spec_percent is not None
-      or spec_latest is not None
-      or spec_revision_name is not None):
-    spec_target = MESSAGES.TrafficTarget(
-        latestRevision=spec_latest,
-        revisionName=spec_revision_name,
-        percent=spec_percent)
-  else:
-    spec_target = None
+  def test_sorts_by_key_and_puts_tags_last(self):
+    wrapped_targets = [
+        TrafficTarget('r0', tag='staging'),
+        TrafficTarget('r1', 75),
+        TrafficTarget('LATEST', tag='head'),
+        TrafficTarget('r0', 25),
+        TrafficTarget('r0', tag='alpha'),
+        TrafficTarget('r1', tag='prod'),
+    ]
+    targets = TrafficTargets(wrapped_targets)
+    targets.UpdateTraffic({'r1': 80})
+    self.assertEqual(wrapped_targets, [
+        TrafficTarget('r0', 20),
+        TrafficTarget('r1', 80),
+        TrafficTarget('r0', tag='staging'),
+        TrafficTarget('LATEST', tag='head'),
+        TrafficTarget('r0', tag='alpha'),
+        TrafficTarget('r1', tag='prod'),
+    ])
 
-  if (status_percent is not None
-      and (status_latest is not None
-           or status_revision_name is not None)):
-    status_target = MESSAGES.TrafficTarget(
-        latestRevision=status_latest,
-        revisionName=status_revision_name,
-        percent=status_percent)
-  else:
-    status_target = None
+  def test_drops_existing_zero_percent_without_tag(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 80),
+        TrafficTarget('r1', 20),
+        TrafficTarget('r2'),
+    ])
+    targets.UpdateTraffic({'r0': 30})
+    self.assertEqual(
+        targets,
+        TrafficTargets([
+            TrafficTarget('r0', 30),
+            TrafficTarget('r1', 70)
+        ]))
 
-  return traffic.TrafficTargetPair(
-      spec_target, status_target, latest_revision_name, status_percent_override)
+  def test_moves_tags_to_zero_percent_targets(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25, tag='test'),
+        TrafficTarget('r1', 75, tag='prod'),
+    ])
+    targets.UpdateTraffic({'r0': 30})
+    self.assertEqual(
+        targets,
+        TrafficTargets([
+            TrafficTarget('r0', 30),
+            TrafficTarget('r1', 70),
+            TrafficTarget('r0', tag='test'),
+            TrafficTarget('r1', tag='prod')
+        ]))
 
+  def test_keeps_tags_on_targets_that_go_to_zero(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25),
+        TrafficTarget('r1', 75, tag='prod'),
+    ])
+    targets.UpdateTraffic({'r0': 100})
+    self.assertEqual(
+        targets,
+        TrafficTargets(
+            [TrafficTarget('r0', 100),
+             TrafficTarget('r1', tag='prod')]))
 
-class TrafficTargetPairTest(test_case.TestCase):
+  def test_zero_latest_traffic_latest_revision_not_present_handles_tags(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25),
+        TrafficTarget('LATEST', 75),
+        TrafficTarget('r0', tag='prod'),
+        TrafficTarget('r1', tag='test'),
+        TrafficTarget('LATEST', tag='staging'),
+        TrafficTarget('LATEST', tag='candidate')
+    ])
+    targets.ZeroLatestTraffic('r1')
+    self.assertEqual(
+        targets,
+        TrafficTargets([
+            TrafficTarget('r0', 25),
+            TrafficTarget('r1', 75),
+            TrafficTarget('r0', tag='prod'),
+            TrafficTarget('r1', tag='test'),
+            TrafficTarget('LATEST', tag='staging'),
+            TrafficTarget('LATEST', tag='candidate')
+        ]))
 
-  def testSpecOnlyLatest(self):
-    target_pair = NewTrafficTargetPair(
-        's1-r1', spec_percent=100, spec_latest=True)
-    self.assertEqual(target_pair.key, traffic.LATEST_REVISION_KEY)
-    self.assertTrue(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, None)
-    self.assertTrue(target_pair.specTarget)
-    self.assertFalse(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '100')
-    self.assertEqual(target_pair.statusPercent, '-')
-    self.assertEqual(target_pair.displayRevisionId,
-                     'LATEST (currently s1-r1)')
-    self.assertEqual(target_pair.displayPercent, '100% (currently -)')
-
-  def testSpecOnlyRevisionName(self):
-    target_pair = NewTrafficTargetPair(
-        's1-r1', spec_percent=100, spec_revision_name='s1-r2')
-    self.assertEqual(target_pair.key, 's1-r2')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r2')
-    self.assertTrue(target_pair.specTarget)
-    self.assertFalse(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '100')
-    self.assertEqual(target_pair.statusPercent, '-')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r2')
-    self.assertEqual(target_pair.displayPercent, '100% (currently -)')
-
-  def testStatusOnlyLatest(self):
-    target_pair = NewTrafficTargetPair(
-        's1-r1', status_percent=100, status_latest=True)
-    self.assertEqual(target_pair.key, traffic.LATEST_REVISION_KEY)
-    self.assertTrue(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, None)
-    self.assertFalse(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '-')
-    self.assertEqual(target_pair.statusPercent, '100')
-    self.assertEqual(target_pair.displayRevisionId,
-                     'LATEST (currently s1-r1)')
-    self.assertEqual(target_pair.displayPercent, '-    (currently 100%)')
-
-  def testStatusOnlyRevisionName(self):
-    target_pair = NewTrafficTargetPair(
-        's1-r1', status_percent=100, status_revision_name='s1-r2')
-    self.assertEqual(target_pair.key, 's1-r2')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r2')
-    self.assertFalse(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.statusPercent, '100')
-    self.assertEqual(target_pair.specPercent, '-')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r2')
-    self.assertEqual(target_pair.displayPercent, '-    (currently 100%)')
-
-  def testBothLatest(self):
-    target_pair = NewTrafficTargetPair(
-        's1-r1', spec_percent=100, spec_latest=True,
-        status_percent=100, status_revision_name='s1-r1', status_latest=True)
-    self.assertEqual(target_pair.key, traffic.LATEST_REVISION_KEY)
-    self.assertTrue(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '100')
-    self.assertEqual(target_pair.statusPercent, '100')
-    self.assertEqual(target_pair.displayRevisionId,
-                     'LATEST (currently s1-r1)')
-    self.assertEqual(target_pair.displayPercent, '100%')
-
-  def testBothRevisionName(self):
-    target_pair = NewTrafficTargetPair(
-        's1-r1', spec_percent=100, spec_revision_name='s1-r2',
-        status_percent=100, status_revision_name='s1-r2')
-    self.assertEqual(target_pair.key, 's1-r2')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r2')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.statusPercent, '100')
-    self.assertEqual(target_pair.specPercent, '100')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r2')
-    self.assertEqual(target_pair.displayPercent, '100%')
-
-  def testBothStatusLatest(self):
-    target_pair = NewTrafficTargetPair(
-        's1-r1', spec_percent=40, spec_latest=True,
-        status_percent=60, status_revision_name='s1-r1')
-    self.assertEqual(target_pair.key, traffic.LATEST_REVISION_KEY)
-    self.assertTrue(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '40')
-    self.assertEqual(target_pair.statusPercent, '60')
-    self.assertEqual(target_pair.displayRevisionId,
-                     'LATEST (currently s1-r1)')
-    self.assertEqual(target_pair.displayPercent, '40%  (currently 60%)')
-
-  def testBothStatusLatestWithStatusPercentOverride(self):
-    target_pair = NewTrafficTargetPair(
-        's1-r1', spec_percent=40, spec_latest=True,
-        status_percent=60, status_revision_name='s1-r1',
-        status_percent_override=40)
-    self.assertEqual(target_pair.key, traffic.LATEST_REVISION_KEY)
-    self.assertTrue(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '40')
-    self.assertEqual(target_pair.statusPercent, '40')
-    self.assertEqual(target_pair.displayRevisionId,
-                     'LATEST (currently s1-r1)')
-    self.assertEqual(target_pair.displayPercent, '40%')
+  def test_zero_latest_traffic_latest_revision_present_handles_tags(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25),
+        TrafficTarget('LATEST', 75),
+        TrafficTarget('r0', tag='prod'),
+        TrafficTarget('r1', tag='test'),
+        TrafficTarget('LATEST', tag='staging'),
+        TrafficTarget('LATEST', tag='candidate')
+    ])
+    targets.ZeroLatestTraffic('r0')
+    self.assertEqual(
+        targets,
+        TrafficTargets([
+            TrafficTarget('r0', 100),
+            TrafficTarget('r0', tag='prod'),
+            TrafficTarget('r1', tag='test'),
+            TrafficTarget('LATEST', tag='staging'),
+            TrafficTarget('LATEST', tag='candidate')
+        ]))
 
 
-def GetTrafficTargetPairs(
-    spec_traffic, status_traffic, is_platform_managed,
-    latest_ready_revision_name):
-  return traffic.GetTrafficTargetPairs(
-      list(spec_traffic.values()),
-      list(status_traffic.values()),
-      is_platform_managed,
-      latest_ready_revision_name)
+class TrafficTagsTest(test_case.TestCase):
+
+  def test_adds_tag_to_existing_target(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25),
+        TrafficTarget('r1', 75),
+    ])
+    targets.UpdateTags({'candidate': 'r0'}, [], False)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r0', 25),
+            TrafficTarget('r1', 75),
+            TrafficTarget('r0', tag='candidate'),
+        ]), targets)
+
+  def test_adds_tag_to_latest(self):
+    targets = TrafficTargets([
+        TrafficTarget('LATEST', 25),
+        TrafficTarget('r1', 75),
+    ])
+    targets.UpdateTags({'candidate': 'LATEST'}, [], False)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('LATEST', 25),
+            TrafficTarget('r1', 75),
+            TrafficTarget('LATEST', tag='candidate'),
+        ]), targets)
+
+  def test_adds_tag_to_new_target(self):
+    targets = TrafficTargets([
+        TrafficTarget('r1', 100),
+    ])
+    targets.UpdateTags({'candidate': 'r0'}, [], False)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r1', 100),
+            TrafficTarget('r0', tag='candidate'),
+        ]), targets)
+
+  def test_adds_multiple_tags(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25),
+        TrafficTarget('r1', 75),
+    ])
+    targets.UpdateTags({'candidate': 'r0', 'prod': 'r1'}, [], False)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r0', 25),
+            TrafficTarget('r1', 75),
+            TrafficTarget('r0', tag='candidate'),
+            TrafficTarget('r1', tag='prod'),
+        ]), targets)
+
+  def test_adds_multiple_tags_to_same_revision(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25),
+        TrafficTarget('r1', 75),
+    ])
+    targets.UpdateTags({'candidate': 'r0', 'staging': 'r0'}, [], False)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r0', 25),
+            TrafficTarget('r1', 75),
+            TrafficTarget('r0', tag='candidate'),
+            TrafficTarget('r0', tag='staging'),
+        ]), targets)
+
+  def test_adds_tag_to_revision_with_existing_tag(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25, tag='staging'),
+        TrafficTarget('r1', 75),
+    ])
+    targets.UpdateTags({'candidate': 'r0'}, [], False)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r0', 25, tag='staging'),
+            TrafficTarget('r1', 75),
+            TrafficTarget('r0', tag='candidate'),
+        ]), targets)
+
+  def test_adds_tag_to_revision_with_same_existing_tag(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25, tag='staging'),
+        TrafficTarget('r1', 75),
+    ])
+    targets.UpdateTags({'staging': 'r0'}, [], False)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r0', 25),
+            TrafficTarget('r1', 75),
+            TrafficTarget('r0', tag='staging'),
+        ]), targets)
+
+  def test_adds_tag_to_zero_percent_revision_with_existing_tag(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', tag='staging'),
+        TrafficTarget('r1', 100),
+    ])
+    targets.UpdateTags({'candidate': 'r0'}, [], False)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r1', 100),
+            TrafficTarget('r0', tag='staging'),
+            TrafficTarget('r0', tag='candidate'),
+        ]), targets)
+
+  def test_adds_tag_to_zero_percent_revision_with_same_existing_tag(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', tag='staging'),
+        TrafficTarget('r1', 100),
+    ])
+    targets.UpdateTags({'staging': 'r0'}, [], False)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r1', 100),
+            TrafficTarget('r0', tag='staging')
+        ]), targets)
+
+  def test_adds_tag_to_latest_with_existing_tag(self):
+    targets = TrafficTargets([
+        TrafficTarget('LATEST', tag='staging'),
+        TrafficTarget('r1', 100),
+    ])
+    targets.UpdateTags({'candidate': 'LATEST'}, [], False)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r1', 100),
+            TrafficTarget('LATEST', tag='staging'),
+            TrafficTarget('LATEST', tag='candidate'),
+        ]), targets)
+
+  def test_removes_tag(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25, tag='staging'),
+        TrafficTarget('r1', 75),
+    ])
+    targets.UpdateTags({}, ['staging'], False)
+    self.assertEqual(TrafficTargets([
+        TrafficTarget('r0', 25),
+        TrafficTarget('r1', 75),
+    ]), targets)
+
+  def test_removes_tag_from_zero_percent_target(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', tag='staging'),
+        TrafficTarget('r1', 100),
+    ])
+    targets.UpdateTags({}, ['staging'], False)
+    self.assertEqual(TrafficTargets([
+        TrafficTarget('r1', 100)
+    ]), targets)
+
+  def test_removes_multiple_tags(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', 25, tag='staging'),
+        TrafficTarget('r1', 75, tag='prod'),
+    ])
+    targets.UpdateTags({}, ['staging', 'prod'], False)
+    self.assertEqual(TrafficTargets([
+        TrafficTarget('r0', 25),
+        TrafficTarget('r1', 75),
+    ]), targets)
+
+  def test_removes_latest_tag(self):
+    targets = TrafficTargets([
+        TrafficTarget('LATEST', tag='staging'),
+        TrafficTarget('r1', 100),
+    ])
+    targets.UpdateTags({}, ['staging'], False)
+    self.assertEqual(TrafficTargets([
+        TrafficTarget('r1', 100),
+    ]), targets)
+
+  def test_removes_tag_from_revision_with_multiple_tags(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', tag='staging'),
+        TrafficTarget('r0', tag='candidate'),
+        TrafficTarget('r1', 100),
+    ])
+    targets.UpdateTags({}, ['staging'], False)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r1', 100),
+            TrafficTarget('r0', tag='candidate'),
+        ]), targets)
+
+  def test_updates_and_clears_existing_tags(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', tag='staging'),
+        TrafficTarget('r0', tag='candidate'),
+        TrafficTarget('r1', 100, tag='current'),
+    ])
+    targets.UpdateTags({'prod': 'r1'}, [], True)
+    self.assertEqual(
+        TrafficTargets([
+            TrafficTarget('r1', 100),
+            TrafficTarget('r1', tag='prod'),
+        ]), targets)
+
+  def test_clears_tags(self):
+    targets = TrafficTargets([
+        TrafficTarget('r0', tag='staging'),
+        TrafficTarget('r0', tag='candidate'),
+        TrafficTarget('r0', 25, tag='test'),
+        TrafficTarget('r1', 75, tag='prod'),
+    ])
+    targets.UpdateTags({}, [], True)
+    self.assertEqual(TrafficTargets([
+        TrafficTarget('r0', 25),
+        TrafficTarget('r1', 75),
+    ]), targets)
+
+  def test_preserves_existing_target_order_and_sorts_new_tags(self):
+    wrapped_targets = [
+        TrafficTarget('r0', 20),
+        TrafficTarget('r1', 75),
+        TrafficTarget('r0', tag='staging'),
+        TrafficTarget('LATEST', tag='head'),
+        TrafficTarget('r0', 5, tag='canary'),
+        TrafficTarget('LATEST', tag='candidate'),
+        TrafficTarget('r0', tag='alpha'),
+        TrafficTarget('r1', tag='prod'),
+    ]
+    targets = TrafficTargets(wrapped_targets)
+    targets.UpdateTags({'ga': 'r1', 'alpha': 'r1', 'beta': 'r0'}, [], False)
+    self.assertEqual(wrapped_targets, [
+        TrafficTarget('r0', 20),
+        TrafficTarget('r1', 75),
+        TrafficTarget('r0', tag='staging'),
+        TrafficTarget('LATEST', tag='head'),
+        TrafficTarget('r0', 5, tag='canary'),
+        TrafficTarget('LATEST', tag='candidate'),
+        TrafficTarget('r1', tag='prod'),
+        TrafficTarget('r1', tag='alpha'),
+        TrafficTarget('r0', tag='beta'),
+        TrafficTarget('r1', tag='ga'),
+    ])
 
 
-class GetTrafficPairsTest(test_case.TestCase):
-
-  def testSpecOnlyNoLatest(self):
-    traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 10, 's1-r2': 90}),
-        status_traffic=NewTrafficTargets({}),
-        is_platform_managed=False,
-        latest_ready_revision_name=None)
-    self.assertEqual(len(traffic_pairs), 2)
-    target_pair = traffic_pairs[0]
-    self.assertEqual(target_pair.key, 's1-r1')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertFalse(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '10')
-    self.assertEqual(target_pair.statusPercent, '-')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r1')
-    target_pair = traffic_pairs[1]
-    self.assertEqual(target_pair.key, 's1-r2')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r2')
-    self.assertTrue(target_pair.specTarget)
-    self.assertFalse(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '90')
-    self.assertEqual(target_pair.statusPercent, '-')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r2')
-
-  def testBothNoLatestMatch(self):
-    traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 10, 's1-r2': 90}),
-        status_traffic=NewTrafficTargets({'s1-r1': 10, 's1-r2': 90}),
-        is_platform_managed=False,
-        latest_ready_revision_name=None)
-    self.assertEqual(len(traffic_pairs), 2)
-    target_pair = traffic_pairs[0]
-    self.assertEqual(target_pair.key, 's1-r1')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '10')
-    self.assertEqual(target_pair.statusPercent, '10')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r1')
-    target_pair = traffic_pairs[1]
-    self.assertEqual(target_pair.key, 's1-r2')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r2')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '90')
-    self.assertEqual(target_pair.statusPercent, '90')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r2')
-
-  def testBothNoLatestNoMatch(self):
-    traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 100}),
-        status_traffic=NewTrafficTargets({'s1-r2': 100}),
-        is_platform_managed=False,
-        latest_ready_revision_name=None)
-    self.assertEqual(len(traffic_pairs), 2)
-    target_pair = traffic_pairs[0]
-    self.assertEqual(target_pair.key, 's1-r1')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertFalse(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '100')
-    self.assertEqual(target_pair.statusPercent, '-')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r1')
-    target_pair = traffic_pairs[1]
-    self.assertEqual(target_pair.key, 's1-r2')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r2')
-    self.assertFalse(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '-')
-    self.assertEqual(target_pair.statusPercent, '100')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r2')
-
-  def testSpecOnlyExplicitLatest(self):
-    traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 90, 'LATEST': 10}),
-        status_traffic=NewTrafficTargets({}),
-        is_platform_managed=False,
-        latest_ready_revision_name='s1-r1')
-    self.assertEqual(len(traffic_pairs), 2)
-    target_pair = traffic_pairs[0]
-    self.assertEqual(target_pair.key, 's1-r1')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertFalse(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '90')
-    self.assertEqual(target_pair.statusPercent, '-')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r1')
-    target_pair = traffic_pairs[1]
-    self.assertEqual(target_pair.key, traffic.LATEST_REVISION_KEY)
-    self.assertTrue(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, None)
-    self.assertTrue(target_pair.specTarget)
-    self.assertFalse(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '10')
-    self.assertEqual(target_pair.statusPercent, '-')
-    self.assertEqual(target_pair.displayRevisionId,
-                     'LATEST (currently s1-r1)')
-
-  def testBothExplicitLatest(self):
-    traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 90, 'LATEST': 10}),
-        status_traffic=NewTrafficTargets({'s1-r1': 90, 'LATEST': 10}),
-        is_platform_managed=False,
-        latest_ready_revision_name='s1-r1')
-    self.assertEqual(len(traffic_pairs), 2)
-    target_pair = traffic_pairs[0]
-    self.assertEqual(target_pair.key, 's1-r1')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '90')
-    self.assertEqual(target_pair.statusPercent, '90')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r1')
-    target_pair = traffic_pairs[1]
-    self.assertEqual(target_pair.key, traffic.LATEST_REVISION_KEY)
-    self.assertTrue(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, None)
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '10')
-    self.assertEqual(target_pair.statusPercent, '10')
-    self.assertEqual(target_pair.displayRevisionId,
-                     'LATEST (currently s1-r1)')
-
-  def testBothImplicitLatestMissingStatusGke(self):
-    traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 90, 'LATEST': 10}),
-        status_traffic=NewTrafficTargets({'s1-r1': 100}),
-        is_platform_managed=False,
-        latest_ready_revision_name='s1-r1')
-    self.assertEqual(len(traffic_pairs), 2)
-    target_pair = traffic_pairs[0]
-    self.assertEqual(target_pair.key, 's1-r1')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '90')
-    self.assertEqual(target_pair.statusPercent, '100')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r1')
-    target_pair = traffic_pairs[1]
-    self.assertEqual(target_pair.key, traffic.LATEST_REVISION_KEY)
-    self.assertTrue(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, None)
-    self.assertTrue(target_pair.specTarget)
-    self.assertFalse(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '10')
-    self.assertEqual(target_pair.statusPercent, '-')
-    self.assertEqual(target_pair.displayRevisionId,
-                     'LATEST (currently s1-r1)')
-
-  def testBothImplicitManaged(self):
-    traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 90, 'LATEST': 10}),
-        status_traffic=NewTrafficTargets({'s1-r1': 100}),
-        is_platform_managed=True,
-        latest_ready_revision_name='s1-r1')
-    self.assertEqual(len(traffic_pairs), 2)
-    target_pair = traffic_pairs[0]
-    self.assertEqual(target_pair.key, 's1-r1')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '90')
-    self.assertEqual(target_pair.statusPercent, '90')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r1')
-    target_pair = traffic_pairs[1]
-    self.assertEqual(target_pair.key, traffic.LATEST_REVISION_KEY)
-    self.assertTrue(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '10')
-    self.assertEqual(target_pair.statusPercent, '10')
-    self.assertEqual(target_pair.displayRevisionId,
-                     'LATEST (currently s1-r1)')
-
-  def testLatestImplicitManaged(self):
-    traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'LATEST': 100}),
-        status_traffic=NewTrafficTargets({'s1-r1': 100}),
-        is_platform_managed=True,
-        latest_ready_revision_name='s1-r1')
-    self.assertEqual(len(traffic_pairs), 1)
-    target_pair = traffic_pairs[0]
-    self.assertEqual(target_pair.key, traffic.LATEST_REVISION_KEY)
-    self.assertTrue(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '100')
-    self.assertEqual(target_pair.statusPercent, '100')
-    self.assertEqual(target_pair.displayRevisionId,
-                     'LATEST (currently s1-r1)')
-
-  def testLatestByNameOnlyManaged(self):
-    traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 100}),
-        status_traffic=NewTrafficTargets({'s1-r1': 100}),
-        is_platform_managed=True,
-        latest_ready_revision_name='s1-r1')
-    self.assertEqual(len(traffic_pairs), 1)
-    target_pair = traffic_pairs[0]
-    self.assertEqual(target_pair.key, 's1-r1')
-    self.assertFalse(target_pair.latestRevision)
-    self.assertEqual(target_pair.revisionName, 's1-r1')
-    self.assertTrue(target_pair.specTarget)
-    self.assertTrue(target_pair.statusTarget)
-    self.assertEqual(target_pair.specPercent, '100')
-    self.assertEqual(target_pair.statusPercent, '100')
-    self.assertEqual(target_pair.displayRevisionId, 's1-r1')
+if __name__ == '__main__':
+  test_case.main()

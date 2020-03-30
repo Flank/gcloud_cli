@@ -45,7 +45,7 @@ class RemoveLabelsTest(snapshots_labels_test_base.SnapshotsLabelsTestBase):
     self._ExpectGetRequest(snapshot_ref, snapshot)
     self._ExpectLabelsSetRequest(
         snapshot_ref, edited_labels, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(snapshot_ref, updated_snapshot)
 
     response = self.Run(
@@ -69,7 +69,7 @@ class RemoveLabelsTest(snapshots_labels_test_base.SnapshotsLabelsTestBase):
     self._ExpectGetRequest(snapshot_ref, snapshot)
     self._ExpectLabelsSetRequest(
         snapshot_ref, {}, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(snapshot_ref, updated_snapshot)
 
     response = self.Run(

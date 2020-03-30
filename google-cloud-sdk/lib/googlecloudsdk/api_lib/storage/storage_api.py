@@ -35,10 +35,13 @@ from apitools.base.py import transfer
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.api_lib.util import exceptions as http_exc
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core import exceptions as core_exc
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import http
+
+import six
 
 
 class Error(core_exc.Error):
@@ -64,7 +67,7 @@ def _GetMimetype(local_path):
 
 def _GetFileSize(local_path):
   try:
-    return os.path.getsize(local_path)
+    return os.path.getsize(six.ensure_str(local_path))
   except os.error:
     raise exceptions.BadFileException('[{0}] not found or not accessible'
                                       .format(local_path))
@@ -180,7 +183,7 @@ class StorageClient(object):
 
     chunksize = self._GetChunkSize()
     upload = transfer.Upload.FromFile(
-        local_path, mime_type=mime_type, chunksize=chunksize)
+        six.ensure_str(local_path), mime_type=mime_type, chunksize=chunksize)
     insert_req = self.messages.StorageObjectsInsertRequest(
         bucket=target_obj_ref.bucket,
         name=target_obj_ref.object,
@@ -426,3 +429,55 @@ class StorageClient(object):
     """
     self.client.buckets.Delete(
         self.messages.StorageBucketsDeleteRequest(bucket=bucket_ref.bucket))
+
+  def GetIamPolicy(self, bucket_ref):
+    """Fetch the IAM Policy attached to the specified bucket.
+
+    Args:
+      bucket_ref: storage_util.BucketReference to the bucket with the policy.
+
+    Returns:
+      The bucket's IAM Policy.
+    """
+    return self.client.buckets.GetIamPolicy(
+        self.messages.StorageBucketsGetIamPolicyRequest(
+            bucket=bucket_ref.bucket,
+            optionsRequestedPolicyVersion=iam_util
+            .MAX_LIBRARY_IAM_SUPPORTED_VERSION))
+
+  def SetIamPolicy(self, bucket_ref, policy):
+    """Set the IAM Policy attached to the specified bucket to the given policy.
+
+    If 'policy' has no etag specified, this will BLINDLY OVERWRITE the IAM
+    policy!
+
+    Args:
+      bucket_ref: storage_util.BucketReference to the bucket.
+      policy: The new IAM Policy.
+
+    Returns:
+      The new IAM Policy.
+    """
+    return self.client.buckets.SetIamPolicy(
+        self.messages.StorageBucketsSetIamPolicyRequest(
+            bucket=bucket_ref.bucket, policy=policy))
+
+  def AddIamPolicyBinding(self, bucket_ref, member, role):
+    """Add an IAM policy binding on the specified bucket.
+
+    Does an atomic Read-Modify-Write, adding the member to the role.
+
+    Args:
+      bucket_ref: storage_util.BucketReference to the bucket with the policy.
+      member: Principal to add to the policy binding.
+      role: Role to add to the policy binding.
+
+    Returns:
+      The new IAM Policy.
+    """
+    policy = self.GetIamPolicy(bucket_ref)
+    policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
+
+    iam_util.AddBindingToIamPolicy(self.messages.Policy.BindingsValueListEntry,
+                                   policy, member, role)
+    return self.SetIamPolicy(bucket_ref, policy)

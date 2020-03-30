@@ -33,10 +33,9 @@ class ConfigureDockerError(exceptions.Error):
   """General command error class."""
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA,
-                    base.ReleaseTrack.BETA,
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
                     base.ReleaseTrack.GA)
-class ConfigureDocker(base.Command):
+class ConfigureDockerBeta(base.Command):
   # pylint: disable=line-too-long
   r"""Register `gcloud` as a Docker credential helper.
 
@@ -50,6 +49,9 @@ class ConfigureDocker(base.Command):
 
   For more details on Docker credential helpers, see
   [](https://docs.docker.com/engine/reference/commandline/login/#credential-helpers).
+
+  For more details on the Google Container Registry's Docker credential helper,
+  see [](https://github.com/GoogleCloudPlatform/docker-credential-gcr).
   """
   # pylint: enable=line-too-long
 
@@ -61,6 +63,15 @@ class ConfigureDocker(base.Command):
   def DockerExists(self):
     return file_utils.SearchForExecutableOnPath(
         'docker') or file_utils.SearchForExecutableOnPath('docker.exe')
+
+  @staticmethod
+  def Args(parser):
+    """Set args for configure-docker."""
+    parser.add_argument(
+        'registries',
+        nargs='?',
+        help='The comma-separated list of registries to configure the credential helper for.'
+    )
 
   def Run(self, args):
     """Run the configure-docker command."""
@@ -88,25 +99,47 @@ class ConfigureDocker(base.Command):
           'it will not work until this is corrected.')
 
     current_helpers = current_config.GetRegisteredCredentialHelpers()
-    new_helpers = cred_utils.GetGcloudCredentialHelperConfig()
+    current_helper_map = {}
+    if current_helpers:
+      log.warning('Your config file at [{0}] contains these credential helper '
+                  'entries:\n\n{1}'.format(
+                      current_config.path,
+                      json.dumps(current_helpers, indent=2)))
+      current_helper_map = current_helpers[cred_utils.CREDENTIAL_HELPER_KEY]
 
-    if new_helpers == current_helpers:
-      log.status.Print('gcloud credential helpers '
-                       'already registered correctly.')
+    # Use the value from the argument, otherwise the default list.
+    if args.registries:
+      log.status.Print('Adding credentials for: {0}'.format(args.registries))
+      registries = filter(self.CheckValidRegistry, args.registries.split(','))
+      new_helpers = cred_utils.GetGcloudCredentialHelperConfig(registries)
+    else:
+      log.status.Print('Adding credentials for all GCR repositories.')
+      log.warning('A long list of credential helpers may cause delays running '
+                  '\'docker build\'. We recommend passing the registry name to '
+                  'configure only the registry you are using.')
+      new_helpers = cred_utils.GetGcloudCredentialHelperConfig()
+
+    # Merge in the new settings so that existing configs are preserved.
+    merged_helper_map = current_helper_map.copy()
+    merged_helper_map.update(new_helpers[cred_utils.CREDENTIAL_HELPER_KEY])
+
+    if current_helper_map == merged_helper_map:
+      log.status.Print(
+          'gcloud credential helpers already registered correctly.')
       return
 
-    if current_helpers:
-      log.warning(
-          'Your config file at [{0}] contains these credential helper '
-          'entries:\n\n{1}\nThese will be overwritten.'.format(
-              current_config.path, json.dumps(current_helpers, indent=2)))
-
+    merged_helpers = {cred_utils.CREDENTIAL_HELPER_KEY: merged_helper_map}
     console_io.PromptContinue(
-        message='The following settings will be added to your Docker '
+        message='After update, the following will be written to your Docker '
         'config file located at [{0}]:\n {1}'.format(
-            current_config.path,
-            json.dumps(new_helpers, indent=2)),
+            current_config.path, json.dumps(merged_helpers, indent=2)),
         cancel_on_no=True)
 
-    current_config.RegisterCredentialHelpers()
+    current_config.RegisterCredentialHelpers(merged_helper_map)
     log.status.Print('Docker configuration file updated.')
+
+  def CheckValidRegistry(self, registry):
+    if registry not in cred_utils.SupportedRegistries():
+      log.warning('{0} is not a supported registry'.format(registry))
+      return False
+    return True

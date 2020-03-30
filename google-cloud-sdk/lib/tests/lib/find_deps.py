@@ -45,6 +45,7 @@ sys.path[0:0] = [python_dir, lib_dir, third_party_dir]
 
 import googlecloudsdk  # pylint: disable=g-import-not-at-top
 from googlecloudsdk.core import yaml
+from googlecloudsdk.core.util import encoding
 import tests
 from tests.lib import with_deps_capture
 from modulegraph import modulegraph  # pylint: disable=g-import-not-at-top
@@ -183,7 +184,7 @@ def RunBfs(graph, changed_modules):
 
 
 def GetChangedFiles():
-  with open(os.environ.get('PRESUBMIT_FILE')) as f:
+  with open(encoding.GetEncodedValue(os.environ, 'PRESUBMIT_FILE')) as f:
     lines = f.readlines()
 
   for line in lines:

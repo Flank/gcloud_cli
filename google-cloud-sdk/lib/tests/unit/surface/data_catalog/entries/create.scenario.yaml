@@ -14,6 +14,12 @@ summary:
   - stderr: |
       Created entry [entry1].
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta1
+      ALPHA: v1beta1
 - execute_command:
     command: data-catalog entries create entry1 --entry-group=group1 --location=us-central1
       --gcs-file-patterns="gs://bucket1/*,gs://bucket1/folder1/*" --display-name=name1
@@ -21,7 +27,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups/group1/entries?alt=json&entryId=entry1
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1/entries?alt=json&entryId=entry1
           method: POST
           headers: {}
           body:
@@ -106,7 +112,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups/group1/entries?alt=json&entryId=entry1
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1/entries?alt=json&entryId=entry1
           method: POST
           headers: {}
           body:

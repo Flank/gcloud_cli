@@ -1,0 +1,79 @@
+
+.TH "GCLOUD_BETA_ARTIFACTS_VERSIONS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta artifacts versions \- manage Artifact Registry package versions
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta artifacts versions\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdelete\fR
+\fB(BETA)\fR Delete an Artifact Registry package version.
+
+.TP 2m
+\fBlist\fR
+\fB(BETA)\fR List Artifact Registry package versions.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To list all versions for a package when the \f5artifacts/repository\fR and
+\f5artifacts/location\fR properties are set to a repository in the current
+project, run:
+
+.RS 2m
+$ gcloud beta artifacts versions list \-\-package=my\-pkg
+.RE
+
+To delete version \f51.0.0\fR under package \f5my\-pkg\fR, run:
+
+.RS 2m
+$ gcloud beta artifacts versions delete 1.0.0 \-\-package=my\-pkg
+.RE
+
+To delete version \f51.0.0\fR under package \f5my\-pkg\fR with its tags, run:
+
+.RS 2m
+$ gcloud beta artifacts versions delete 1.0.0 \-\-package=my\-pkg \e
+  \-\-delete\-tags
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha artifacts versions
+.RE
+

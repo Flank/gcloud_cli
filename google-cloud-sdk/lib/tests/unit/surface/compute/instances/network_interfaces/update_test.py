@@ -88,6 +88,16 @@ class UpdateNetworkInterfaceTest(sdk_test_base.WithFakeAuth,
             zone=operation_ref.zone,
             project=self.Project()), operation)
 
+  def _ExpectOperationWaitRequest(self, operation, operation_ref):
+    self.zone_operations.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
+            operation=operation_ref.operation,
+            zone=operation_ref.zone,
+            project=self.Project()), operation)
+
+  def _ExpectOperationPollingRequest(self, operation, operation_ref):
+    self._ExpectOperationWaitRequest(operation, operation_ref)
+
   def testUpdateDefaultNic(self):
     instance, instance_ref = self._GetInstance('instance-1', zone='atlanta')
     operation, operation_ref = self._GetOperation(instance_ref)
@@ -108,7 +118,7 @@ class UpdateNetworkInterfaceTest(sdk_test_base.WithFakeAuth,
 
     self._ExpectInstanceGetRequest(instance, instance_ref)
     self.service.UpdateNetworkInterface.Expect(request, response=operation)
-    self._ExpectOperationGetRequest(operation, operation_ref)
+    self._ExpectOperationPollingRequest(operation, operation_ref)
     self._ExpectInstanceGetRequest(instance, instance_ref)
 
     self.Run(
@@ -135,7 +145,7 @@ class UpdateNetworkInterfaceTest(sdk_test_base.WithFakeAuth,
 
     self._ExpectInstanceGetRequest(instance, instance_ref)
     self.service.UpdateNetworkInterface.Expect(request, response=operation)
-    self._ExpectOperationGetRequest(operation, operation_ref)
+    self._ExpectOperationPollingRequest(operation, operation_ref)
     self._ExpectInstanceGetRequest(instance, instance_ref)
 
     self.Run(
@@ -164,7 +174,7 @@ class UpdateNetworkInterfaceTest(sdk_test_base.WithFakeAuth,
 
     self._ExpectInstanceGetRequest(instance, instance_ref)
     self.service.UpdateNetworkInterface.Expect(request, response=operation)
-    self._ExpectOperationGetRequest(operation, operation_ref)
+    self._ExpectOperationPollingRequest(operation, operation_ref)
     self._ExpectInstanceGetRequest(instance, instance_ref)
 
     self.Run(
@@ -184,7 +194,7 @@ class UpdateNetworkInterfaceTest(sdk_test_base.WithFakeAuth,
 
     self._ExpectInstanceGetRequest(instance, instance_ref)
     self.service.UpdateNetworkInterface.Expect(request, response=operation)
-    self._ExpectOperationGetRequest(operation, operation_ref)
+    self._ExpectOperationPollingRequest(operation, operation_ref)
     self._ExpectInstanceGetRequest(instance, instance_ref)
 
     self.Run(

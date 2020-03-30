@@ -1,0 +1,67 @@
+NAME
+    gcloud beta compute org-security-policies - manage Google Compute Engine
+        organization security policies
+
+SYNOPSIS
+    gcloud beta compute org-security-policies GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Manage Google Compute Organization Engine security policies.
+    Organization security policies are used to control incoming/outgoing
+    traffic.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     associations
+        (BETA) Read and manipulate Google Compute Engine organization security
+        policy associations.
+
+     rules
+        (BETA) Read and manipulate Google Compute Engine organization security
+        policy rules.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     copy-rules
+        (BETA) Replace the rules of a Google Compute Engine organization
+        security policy with rules from another policy.
+
+     create
+        (BETA) Create a Google Compute Engine organization security policy.
+
+     delete
+        (BETA) Delete a Google Compute Engine organization security policy.
+
+     describe
+        (BETA) Describe a Google Compute Engine organization security policy.
+
+     list
+        (BETA) List Google Compute Engine organization security policies.
+
+     list-rules
+        (BETA) List the rules of a Google Compute Engine organization security
+        policy.
+
+     move
+        (BETA) Move a Google Compute Engine organization security policy.
+
+     update
+        (BETA) Update a Google Compute Engine organization security policy.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha compute org-security-policies
+

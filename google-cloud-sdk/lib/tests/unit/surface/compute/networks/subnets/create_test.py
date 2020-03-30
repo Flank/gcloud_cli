@@ -248,6 +248,77 @@ class SubnetsCreateTestBeta(SubnetsCreateTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi('beta')
 
+  def testCreateWithPrivateIpv6GoogleAccessDisable(self):
+    """Test creating a subnet with DISABLE_GOOGLE_ACCESS private ipv6 access."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1
+        --private-ipv6-google-access-type disable
+        """)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Insert',
+         self.messages.ComputeSubnetworksInsertRequest(
+             subnetwork=self.messages.Subnetwork(
+                 name='my-subnet',
+                 network=self.compute_uri +
+                 '/projects/my-project/global/networks/my-network',
+                 ipCidrRange='10.240.0.0/16',
+                 privateIpGoogleAccess=False,
+                 privateIpv6GoogleAccess=(self.messages.Subnetwork.
+                                          PrivateIpv6GoogleAccessValueValuesEnum
+                                          .DISABLE_GOOGLE_ACCESS)),
+             region='us-central1',
+             project='my-project'))
+    ],)
+
+  def testCreateWithPrivateIpv6GoogleAccessEnableOutbound(self):
+    """Test creating a subnet with ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE private ipv6 access."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1
+        --private-ipv6-google-access-type enable-outbound-vm-access
+        """)
+
+    self.CheckRequests([(
+        self.compute.subnetworks, 'Insert',
+        self.messages.ComputeSubnetworksInsertRequest(
+            subnetwork=self.messages.Subnetwork(
+                name='my-subnet',
+                network=self.compute_uri +
+                '/projects/my-project/global/networks/my-network',
+                ipCidrRange='10.240.0.0/16',
+                privateIpGoogleAccess=False,
+                privateIpv6GoogleAccess=(self.messages.Subnetwork
+                                         .PrivateIpv6GoogleAccessValueValuesEnum
+                                         .ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE)),
+            region='us-central1',
+            project='my-project'))],)
+
+  def testCreateWithPrivateIpv6GoogleAccessEnableBidirectional(self):
+    """Test creating a subnet with ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE private ipv6 access."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1
+        --private-ipv6-google-access-type enable-bidirectional-access
+        """)
+
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  privateIpGoogleAccess=False,
+                  privateIpv6GoogleAccess=(
+                      self.messages.Subnetwork
+                      .PrivateIpv6GoogleAccessValueValuesEnum
+                      .ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE)),
+              region='us-central1',
+              project='my-project'))],)
+
 
 class SubnetsCreateTestAlpha(SubnetsCreateTest):
 
@@ -521,11 +592,10 @@ class SubnetsCreateAggregateRangesAlphaTest(test_base.BaseTest):
               project='my-project'))],)
 
 
-class SubnetsCreateInternalHttpsLoadBalancerBetaTest(test_base.BaseTest):
+class SubnetsCreateInternalHttpsLoadBalancerTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testCreateWithPurposeAndRole(self):
     """Test creating a subnet with privateIpGoogleAccess disabled."""
@@ -569,6 +639,14 @@ class SubnetsCreateInternalHttpsLoadBalancerBetaTest(test_base.BaseTest):
                   .PRIVATE),
               region='us-central1',
               project='my-project'))],)
+
+
+class SubnetsCreateInternalHttpsLoadBalancerBetaTest(
+    SubnetsCreateInternalHttpsLoadBalancerTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
 
 
 class SubnetsCreateInternalHttpsLoadBalancerAlphaTest(

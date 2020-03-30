@@ -1,0 +1,217 @@
+title: patch-jobs execute, cancel, describe, list-instance-details, list.
+release_tracks: [BETA, ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute os-config patch-jobs execute --async --instance-filter-names="zones/$$zone$$/instances/os-config-patch-jobs-no-match-name"
+  - stderr: Execution in progress for patch job.*$
+  - stdout: .*projects/462803083913/patchJobs/.*state\:\ STARTED.*$
+- execute:
+  - command: compute os-config patch-jobs cancel $$patch-job-id$$
+  - stdout: .*projects/462803083913/patchJobs/.*state\:\ CANCELED.*$
+- execute:
+  - command: compute os-config patch-jobs describe $$patch-job-id$$
+  - stdout: .*projects/462803083913/patchJobs/.*state\:\ CANCELED.*$
+- execute:
+  - command: compute os-config patch-jobs list-instance-details $$patch-job-id$$
+  - stderr: |
+      Listed 0 items.
+- execute:
+  - command: compute os-config patch-jobs list --uri --page-size 1 --limit 10 --filter="name:$$patch-job-id$$"
+  - stdout: |
+      https://osconfig.googleapis.com/$$api-version$$/projects/462803083913/patchJobs/$$patch-job-id$$
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      BETA: v1beta
+      ALPHA: v1alpha2
+- define_reference:
+    reference: zone
+    value: us-central1-f
+- execute_command:
+    command: compute os-config patch-jobs execute --async --instance-filter-names="zones/$$zone$$/instances/os-config-patch-jobs-no-match-name"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/patchJobs:execute?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              dryRun: false
+              instanceFilter:
+                all: false
+                instances:
+                - zones/$$zone$$/instances/os-config-patch-jobs-no-match-name
+              patchConfig: {}
+        expect_response:
+          extract_references:
+          - field: name
+            reference: patch-job-id
+            modifiers:
+              basename: true
+          body:
+            text:
+              is_none: false
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '341'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/462803083913/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+            createTime: '2019-12-09T23:05:36.053Z'
+            updateTime: '2019-12-09T23:05:36.053Z'
+            state: STARTED
+            patchConfig: {}
+            instanceFilter:
+              instances:
+              - zones/$$zone$$/instances/os-config-patch-jobs-no-match-name
+    - expect_stderr:
+        matches: Execution in progress for patch job.*
+    - expect_stdout:
+        matches: .*projects/462803083913/patchJobs/.*state\:\ STARTED.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute os-config patch-jobs cancel $$patch-job-id$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/patchJobs/$$patch-job-id$$:cancel?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '368'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/462803083913/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+            createTime: '2019-12-09T23:05:36.053Z'
+            updateTime: '2019-12-09T23:05:36.421Z'
+            state: CANCELED
+            patchConfig: {}
+            percentComplete: 100
+            instanceFilter:
+              instances:
+              - zones/$$zone$$/instances/os-config-patch-jobs-no-match-name
+    - expect_stdout:
+        matches: .*projects/462803083913/patchJobs/.*state\:\ CANCELED.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute os-config patch-jobs describe $$patch-job-id$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/patchJobs/$$patch-job-id$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '400'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/462803083913/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+            createTime: '2019-12-09T23:05:36.053Z'
+            updateTime: '2019-12-09T23:05:36.421Z'
+            state: CANCELED
+            patchConfig: {}
+            instanceDetailsSummary: {}
+            percentComplete: 100
+            instanceFilter:
+              instances:
+              - zones/$$zone$$/instances/os-config-patch-jobs-no-match-name
+    - expect_stdout:
+        matches: .*projects/462803083913/patchJobs/.*state\:\ CANCELED.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute os-config patch-jobs list-instance-details $$patch-job-id$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/patchJobs/$$patch-job-id$$/instanceDetails?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute os-config patch-jobs list --uri --page-size 1 --limit 10 --filter="name:$$patch-job-id$$"
+    events:
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/patchJobs?alt=json&pageSize=1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '604'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            patchJobs:
+            - name: projects/462803083913/patchJobs/68cb687a-de54-40dc-bdc3-c74ebc23346c
+              createTime: '2019-12-09T23:05:36.053Z'
+              updateTime: '2019-12-09T23:05:36.421Z'
+              state: CANCELED
+              patchConfig: {}
+              instanceDetailsSummary: {}
+              percentComplete: 100
+              instanceFilter:
+                instances:
+                - zones/$$zone$$/instances/os-config-patch-jobs-no-match-name
+            nextPageToken: ChVwcm9qZWN0cy80NjI4MDMwODM5MTMSCwjAprvvBRDA7qIZGiQ2OGNiNjg3YS1kZTU0LTQwZGMtYmRjMy1jNzRlYmMyMzM0NmM=
+    - expect_stdout: |
+        https://osconfig.googleapis.com/$$api-version$$/projects/462803083913/patchJobs/$$patch-job-id$$
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri:
+            matches: https://osconfig.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/patchJobs.*
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '604'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            patchJobs:
+            - name: projects/462803083913/patchJobs/51e0d37a-6203-461c-8704-c00a6fca9c6b
+              createTime: '2019-12-09T23:03:05.718Z'
+              updateTime: '2019-12-09T23:03:06.057Z'
+              state: CANCELED
+              patchConfig: {}
+              instanceDetailsSummary: {}
+              percentComplete: 100
+              instanceFilter:
+                instances:
+                - zones/$$zone$$/instances/os-config-patch-jobs-no-match-name
+            nextPageToken: ChVwcm9qZWN0cy80NjI4MDMwODM5MTMSDAippbvvBRCAn6/WAhokNTFlMGQzN2EtNjIwMy00NjFjLTg3MDQtYzAwYTZmY2E5YzZi
+    - expect_exit:
+        code: 0

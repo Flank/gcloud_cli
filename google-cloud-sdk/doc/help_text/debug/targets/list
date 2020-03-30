@@ -1,5 +1,6 @@
 NAME
-    gcloud debug targets list - list debug targets
+    gcloud debug targets list - list the debug targets (debuggees) registered
+        with the Cloud Debugger
 
 SYNOPSIS
     gcloud debug targets list [--include-inactive] [--filter=EXPRESSION]
@@ -7,8 +8,10 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    This command displays a list of the active debug targets registered with
-    the Cloud Debugger.
+    gcloud debug targets list is used to display a list of the debug targets
+    (debuggees) registered with the Cloud Debugger. By default only the active
+    targets are shown, the --include-inactive can be provided to also include
+    the targets that are no longer active.
 
 FLAGS
      --include-inactive
@@ -47,8 +50,20 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To list the active debug targets (debuggees) registered with the Cloud
+    Debugger, run:
+
+        $ gcloud debug targets list
+
+    To list all (both active and inactive) debug targets (debuggees) registered
+    with the Cloud Debugger, run:
+
+        $ gcloud debug targets list --include-inactive
 
 NOTES
     This variant is also available:

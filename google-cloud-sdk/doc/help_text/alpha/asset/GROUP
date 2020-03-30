@@ -11,8 +11,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -34,6 +35,9 @@ COMMANDS
 
      get-history
         (ALPHA) Get the update history of assets that overlaps a time window.
+
+     list
+        (ALPHA) List the cloud assets.
 
      search-iam-policies
         (ALPHA) Searches accessible IAM policies that match a query.

@@ -14,115 +14,13 @@ package = 'managedidentities'
 
 
 class AttachTrustRequest(_messages.Message):
-  r"""A AttachTrustRequest object.
+  r"""Request message for AttachTrust
 
   Fields:
     trust: Required. The domain trust resource.
   """
 
   trust = _messages.MessageField('Trust', 1)
-
-
-class AuditConfig(_messages.Message):
-  r"""Specifies the audit configuration for a service. The configuration
-  determines which permission types are logged, and what identities, if any,
-  are exempted from logging. An AuditConfig must have one or more
-  AuditLogConfigs.  If there are AuditConfigs for both `allServices` and a
-  specific service, the union of the two AuditConfigs is used for that
-  service: the log_types specified in each AuditConfig are enabled, and the
-  exempted_members in each AuditLogConfig are exempted.  Example Policy with
-  multiple AuditConfigs:      {       "audit_configs": [         {
-  "service": "allServices"           "audit_log_configs": [             {
-  "log_type": "DATA_READ",               "exempted_members": [
-  "user:jose@example.com"               ]             },             {
-  "log_type": "DATA_WRITE",             },             {
-  "log_type": "ADMIN_READ",             }           ]         },         {
-  "service": "sampleservice.googleapis.com"           "audit_log_configs": [
-  {               "log_type": "DATA_READ",             },             {
-  "log_type": "DATA_WRITE",               "exempted_members": [
-  "user:aliya@example.com"               ]             }           ]         }
-  ]     }  For sampleservice, this policy enables DATA_READ, DATA_WRITE and
-  ADMIN_READ logging. It also exempts jose@example.com from DATA_READ logging,
-  and aliya@example.com from DATA_WRITE logging.
-
-  Fields:
-    auditLogConfigs: The configuration for logging of each type of permission.
-    exemptedMembers: A string attribute.
-    service: Specifies a service that will be enabled for audit logging. For
-      example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
-      `allServices` is a special value that covers all services.
-  """
-
-  auditLogConfigs = _messages.MessageField('AuditLogConfig', 1, repeated=True)
-  exemptedMembers = _messages.StringField(2, repeated=True)
-  service = _messages.StringField(3)
-
-
-class AuditLogConfig(_messages.Message):
-  r"""Provides the configuration for logging a type of permissions. Example:
-  {       "audit_log_configs": [         {           "log_type": "DATA_READ",
-  "exempted_members": [             "user:jose@example.com"           ]
-  },         {           "log_type": "DATA_WRITE",         }       ]     }
-  This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-  jose@example.com from DATA_READ logging.
-
-  Enums:
-    LogTypeValueValuesEnum: The log type that this config enables.
-
-  Fields:
-    exemptedMembers: Specifies the identities that do not cause logging for
-      this type of permission. Follows the same format of Binding.members.
-    ignoreChildExemptions: A boolean attribute.
-    logType: The log type that this config enables.
-  """
-
-  class LogTypeValueValuesEnum(_messages.Enum):
-    r"""The log type that this config enables.
-
-    Values:
-      LOG_TYPE_UNSPECIFIED: Default case. Should never be this.
-      ADMIN_READ: Admin reads. Example: CloudIAM getIamPolicy
-      DATA_WRITE: Data writes. Example: CloudSQL Users create
-      DATA_READ: Data reads. Example: CloudSQL Users list
-    """
-    LOG_TYPE_UNSPECIFIED = 0
-    ADMIN_READ = 1
-    DATA_WRITE = 2
-    DATA_READ = 3
-
-  exemptedMembers = _messages.StringField(1, repeated=True)
-  ignoreChildExemptions = _messages.BooleanField(2)
-  logType = _messages.EnumField('LogTypeValueValuesEnum', 3)
-
-
-class AuthorizationLoggingOptions(_messages.Message):
-  r"""Authorization-related information used by Cloud Audit Logging.
-
-  Enums:
-    PermissionTypeValueValuesEnum: The type of the permission that was
-      checked.
-
-  Fields:
-    permissionType: The type of the permission that was checked.
-  """
-
-  class PermissionTypeValueValuesEnum(_messages.Enum):
-    r"""The type of the permission that was checked.
-
-    Values:
-      PERMISSION_TYPE_UNSPECIFIED: Default. Should not be used.
-      ADMIN_READ: A read of admin (meta) data.
-      ADMIN_WRITE: A write of admin (meta) data.
-      DATA_READ: A read of standard data.
-      DATA_WRITE: A write of standard data.
-    """
-    PERMISSION_TYPE_UNSPECIFIED = 0
-    ADMIN_READ = 1
-    ADMIN_WRITE = 2
-    DATA_READ = 3
-    DATA_WRITE = 4
-
-  permissionType = _messages.EnumField('PermissionTypeValueValuesEnum', 1)
 
 
 class Binding(_messages.Message):
@@ -143,9 +41,26 @@ class Binding(_messages.Message):
       `alice@example.com` .   * `serviceAccount:{emailid}`: An email address
       that represents a service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
-      that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: The G Suite domain (primary) that represents all
-      the    users of that domain. For example, `google.com` or `example.com`.
+      that represents a Google group.    For example, `admins@example.com`.  *
+      `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+      identifier) representing a user that has been recently deleted. For
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
+      recovered, this value reverts to `user:{emailid}` and the recovered user
+      retains the role in the binding.  *
+      `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
+      (plus    unique identifier) representing a service account that has been
+      recently    deleted. For example,    `my-other-
+      app@appspot.gserviceaccount.com?uid=123456789012345678901`.    If the
+      service account is undeleted, this value reverts to
+      `serviceAccount:{emailid}` and the undeleted service account retains the
+      role in the binding.  * `deleted:group:{emailid}?uid={uniqueid}`: An
+      email address (plus unique    identifier) representing a Google group
+      that has been recently    deleted. For example,
+      `admins@example.com?uid=123456789012345678901`. If    the group is
+      recovered, this value reverts to `group:{emailid}` and the    recovered
+      group retains the role in the binding.   * `domain:{domain}`: The G
+      Suite domain (primary) that represents all the    users of that domain.
+      For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -159,227 +74,8 @@ class CancelOperationRequest(_messages.Message):
   r"""The request message for Operations.CancelOperation."""
 
 
-class CloudAuditOptions(_messages.Message):
-  r"""Write a Cloud Audit log
-
-  Enums:
-    LogNameValueValuesEnum: The log_name to populate in the Cloud Audit
-      Record.
-
-  Fields:
-    authorizationLoggingOptions: Information used by the Cloud Audit Logging
-      pipeline.
-    logName: The log_name to populate in the Cloud Audit Record.
-  """
-
-  class LogNameValueValuesEnum(_messages.Enum):
-    r"""The log_name to populate in the Cloud Audit Record.
-
-    Values:
-      UNSPECIFIED_LOG_NAME: Default. Should not be used.
-      ADMIN_ACTIVITY: Corresponds to "cloudaudit.googleapis.com/activity"
-      DATA_ACCESS: Corresponds to "cloudaudit.googleapis.com/data_access"
-    """
-    UNSPECIFIED_LOG_NAME = 0
-    ADMIN_ACTIVITY = 1
-    DATA_ACCESS = 2
-
-  authorizationLoggingOptions = _messages.MessageField('AuthorizationLoggingOptions', 1)
-  logName = _messages.EnumField('LogNameValueValuesEnum', 2)
-
-
-class Condition(_messages.Message):
-  r"""A condition to be met.
-
-  Enums:
-    IamValueValuesEnum: Trusted attributes supplied by the IAM system.
-    OpValueValuesEnum: An operator to apply the subject with.
-    SysValueValuesEnum: Trusted attributes supplied by any service that owns
-      resources and uses the IAM system for access control.
-
-  Fields:
-    iam: Trusted attributes supplied by the IAM system.
-    op: An operator to apply the subject with.
-    svc: Trusted attributes discharged by the service.
-    sys: Trusted attributes supplied by any service that owns resources and
-      uses the IAM system for access control.
-    values: The objects of the condition.
-  """
-
-  class IamValueValuesEnum(_messages.Enum):
-    r"""Trusted attributes supplied by the IAM system.
-
-    Values:
-      NO_ATTR: Default non-attribute.
-      AUTHORITY: Either principal or (if present) authority selector.
-      ATTRIBUTION: The principal (even if an authority selector is present),
-        which must only be used for attribution, not authorization.
-      SECURITY_REALM: Any of the security realms in the IAMContext (go
-        /security-realms). When used with IN, the condition indicates "any of
-        the request's realms match one of the given values; with NOT_IN, "none
-        of the realms match any of the given values". Note that a value can
-        be:  - 'self' (i.e., allow connections from clients that are in the
-        same  security realm)  - a realm (e.g., 'campus-abc')  - a realm group
-        (e.g., 'realms-for-borg-cell-xx', see: go/realm-groups) A match is
-        determined by a realm group membership check performed by a
-        RealmAclRep object (go/realm-acl-howto). It is not permitted to grant
-        access based on the *absence* of a realm, so realm conditions can only
-        be used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
-      APPROVER: An approver (distinct from the requester) that has authorized
-        this request. When used with IN, the condition indicates that one of
-        the approvers associated with the request matches the specified
-        principal, or is a member of the specified group. Approvers can only
-        grant additional access, and are thus only used in a strictly positive
-        context (e.g. ALLOW/IN or DENY/NOT_IN).
-      JUSTIFICATION_TYPE: What types of justifications have been supplied with
-        this request. String values should match enum names from
-        security.credentials.JustificationType, e.g. "MANUAL_STRING". It is
-        not permitted to grant access based on the *absence* of a
-        justification, so justification conditions can only be used in a
-        "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).  Multiple
-        justifications, e.g., a Buganizer ID and a manually-entered reason,
-        are normal and supported.
-      CREDENTIALS_TYPE: What type of credentials have been supplied with this
-        request. String values should match enum names from
-        security_loas_l2.CredentialsType - currently, only
-        CREDS_TYPE_EMERGENCY is supported. It is not permitted to grant access
-        based on the *absence* of a credentials type, so the conditions can
-        only be used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
-    """
-    NO_ATTR = 0
-    AUTHORITY = 1
-    ATTRIBUTION = 2
-    SECURITY_REALM = 3
-    APPROVER = 4
-    JUSTIFICATION_TYPE = 5
-    CREDENTIALS_TYPE = 6
-
-  class OpValueValuesEnum(_messages.Enum):
-    r"""An operator to apply the subject with.
-
-    Values:
-      NO_OP: Default no-op.
-      EQUALS: DEPRECATED. Use IN instead.
-      NOT_EQUALS: DEPRECATED. Use NOT_IN instead.
-      IN: The condition is true if the subject (or any element of it if it is
-        a set) matches any of the supplied values.
-      NOT_IN: The condition is true if the subject (or every element of it if
-        it is a set) matches none of the supplied values.
-      DISCHARGED: Subject is discharged
-    """
-    NO_OP = 0
-    EQUALS = 1
-    NOT_EQUALS = 2
-    IN = 3
-    NOT_IN = 4
-    DISCHARGED = 5
-
-  class SysValueValuesEnum(_messages.Enum):
-    r"""Trusted attributes supplied by any service that owns resources and
-    uses the IAM system for access control.
-
-    Values:
-      NO_ATTR: Default non-attribute type
-      REGION: Region of the resource
-      SERVICE: Service name
-      NAME: Resource name
-      IP: IP address of the caller
-    """
-    NO_ATTR = 0
-    REGION = 1
-    SERVICE = 2
-    NAME = 3
-    IP = 4
-
-  iam = _messages.EnumField('IamValueValuesEnum', 1)
-  op = _messages.EnumField('OpValueValuesEnum', 2)
-  svc = _messages.StringField(3)
-  sys = _messages.EnumField('SysValueValuesEnum', 4)
-  values = _messages.StringField(5, repeated=True)
-
-
-class CounterOptions(_messages.Message):
-  r"""Increment a streamz counter with the specified metric and field names.
-  Metric names should start with a '/', generally be lowercase-only, and end
-  in "_count". Field names should not contain an initial slash. The actual
-  exported metric names will have "/iam/policy" prepended.  Field names
-  correspond to IAM request parameters and field values are their respective
-  values.  Supported field names:    - "authority", which is "[token]" if
-  IAMContext.token is present,      otherwise the value of
-  IAMContext.authority_selector if present, and      otherwise a
-  representation of IAMContext.principal; or    - "iam_principal", a
-  representation of IAMContext.principal even if a      token or authority
-  selector is present; or    - "" (empty string), resulting in a counter with
-  no fields.  Examples:   counter { metric: "/debug_access_count"  field:
-  "iam_principal" }   ==> increment counter /iam/policy/debug_access_count
-  {iam_principal=[value of IAMContext.principal]}
-
-  Fields:
-    customFields: Custom fields.
-    field: The field value to attribute.
-    metric: The metric to update.
-  """
-
-  customFields = _messages.MessageField('CustomField', 1, repeated=True)
-  field = _messages.StringField(2)
-  metric = _messages.StringField(3)
-
-
-class CustomField(_messages.Message):
-  r"""Custom fields. These can be used to create a counter with arbitrary
-  field/value pairs. See: go/rpcsp-custom-fields.
-
-  Fields:
-    name: Name is the field name.
-    value: Value is the field value. It is important that in contrast to the
-      CounterOptions.field, the value here is a constant that is not derived
-      from the IAMContext.
-  """
-
-  name = _messages.StringField(1)
-  value = _messages.StringField(2)
-
-
-class DataAccessOptions(_messages.Message):
-  r"""Write a Data Access (Gin) log
-
-  Enums:
-    LogModeValueValuesEnum: Whether Gin logging should happen in a fail-closed
-      manner at the caller. This is relevant only in the LocalIAM
-      implementation, for now.
-
-  Fields:
-    logMode: Whether Gin logging should happen in a fail-closed manner at the
-      caller. This is relevant only in the LocalIAM implementation, for now.
-  """
-
-  class LogModeValueValuesEnum(_messages.Enum):
-    r"""Whether Gin logging should happen in a fail-closed manner at the
-    caller. This is relevant only in the LocalIAM implementation, for now.
-
-    Values:
-      LOG_MODE_UNSPECIFIED: Client is not required to write a partial Gin log
-        immediately after the authorization check. If client chooses to write
-        one and it fails, client may either fail open (allow the operation to
-        continue) or fail closed (handle as a DENY outcome).
-      LOG_FAIL_CLOSED: The application's operation in the context of which
-        this authorization check is being made may only be performed if it is
-        successfully logged to Gin. For instance, the authorization library
-        may satisfy this obligation by emitting a partial log entry at
-        authorization check time and only returning ALLOW to the application
-        if it succeeds.  If a matching Rule has this directive, but the client
-        has not indicated that it will honor such requirements, then the IAM
-        check will result in authorization failure by setting
-        CheckPolicyResponse.success=false.
-    """
-    LOG_MODE_UNSPECIFIED = 0
-    LOG_FAIL_CLOSED = 1
-
-  logMode = _messages.EnumField('LogModeValueValuesEnum', 1)
-
-
 class DetachTrustRequest(_messages.Message):
-  r"""A DetachTrustRequest object.
+  r"""Request message for DetachTrust
 
   Fields:
     trust: Required. The domain trust resource to removed.
@@ -500,21 +196,33 @@ class Empty(_messages.Message):
 
 
 class Expr(_messages.Message):
-  r"""Represents an expression text. Example:      title: "User account
-  presence"     description: "Determines whether the request has a user
-  account"     expression: "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit"     description: "Determines if a summary is
+  less than 100 chars"     expression: "document.summary.size() < 100"
+  Example (Equality):      title: "Requestor is owner"     description:
+  "Determines if requestor is the document owner"     expression:
+  "document.owner == request.auth.claims.email"  Example (Logic):      title:
+  "Public documents"     description: "Determine whether the document should
+  be publicly visible"     expression: "document.type != 'private' &&
+  document.type != 'internal'"  Example (Data Manipulation):      title:
+  "Notification string"     description: "Create a notification string with a
+  timestamp."     expression: "'New message received at ' +
+  string(document.create_time)"  The exact variables and functions that may be
+  referenced within an expression are determined by the service that evaluates
+  it. See the service documentation for additional information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
@@ -523,35 +231,80 @@ class Expr(_messages.Message):
   title = _messages.StringField(4)
 
 
-class Instance(_messages.Message):
-  r"""Instance represents the interface for SLM services to actuate the state
-  of control plane resources.  Example Instance in JSON, where   consumer-
-  project=snapchat,   producer-project=cloud-sql:  ```json Instance: {
-  "name":   "projects/snapchat/locations/us-east1/instances/prod-instance",
-  "create_time": {     "seconds": 1526406431,   },   "labels": {     "env":
-  "prod",     "foo": "bar"   },   "state": READY,   "software_versions": {
-  "software_update": "cloud-sql-09-28-2018",   },
-  "maintenance_policy_names": {     "UpdatePolicy":
-  "projects/snapchat/locations/us-east1/maintenancePolicies/prod-update-
-  policy",   }   "rollout_metadata": {     "projects/cloud-
-  sql/locations/global/rolloutTypes/software_update": {       "release":
-  "projects/cloud-sql/locations/global/releases/cloud-sql-09-28-2018",
-  "rollout":       "projects/cloud-sql/locations/us-east1/rollouts/cloud-
-  sql-09-28-2018-canary",     },     "projects/cloud-
-  sql/locations/global/rolloutTypes/instance_restart": {       "release":
-  "projects/cloud-sql/locations/global/releases/cloud-sql-09-20-repair",
-  "rollout":       "projects/cloud-sql/locations/us-east1/rollouts/cloud-
-  sql-09-20-repair-100-percent",     }   }   "tenant_project_id": "cloud-sql-
-  test-tenant",   "producer_metadata": {     "cloud-sql-tier": "basic",
-  "cloud-sql-instance-size": "1G",   },   "provisioned_resources": [     {
-  "resource-type": "compute-instance",       "resource-url":
-  "https://www.googleapis.com/compute/v1/projects/cloud-sql/zones/us-
-  east1-b/instances/vm-1",     }   ],   "maintenance_schedules": {
-  "csa_rollout": {        "start_time": {           "seconds": 1526406431,
-  },        "end_time": {           "seconds": 1535406431,        },     },
-  "ncsa_rollout": {        "start_time": {           "seconds": 1526406431,
-  },        "end_time": {           "seconds": 1535406431,        },     }
-  },   "consumer_defined_name": "my-sql-instance1", } ```
+class GoogleCloudManagedidentitiesV1OpMetadata(_messages.Message):
+  r"""Represents the metadata of the long-running operation.
+
+  Fields:
+    apiVersion: Output only. API version used to start the operation.
+    createTime: Output only. The time the operation was created.
+    endTime: Output only. The time the operation finished running.
+    requestedCancellation: Output only. Identifies whether the user has
+      requested cancellation of the operation. Operations that have
+      successfully been cancelled have Operation.error value with a
+      google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    target: Output only. Server-defined resource path for the target of the
+      operation.
+    verb: Output only. Name of the verb executed by the operation.
+  """
+
+  apiVersion = _messages.StringField(1)
+  createTime = _messages.StringField(2)
+  endTime = _messages.StringField(3)
+  requestedCancellation = _messages.BooleanField(4)
+  target = _messages.StringField(5)
+  verb = _messages.StringField(6)
+
+
+class GoogleCloudManagedidentitiesV1alpha1OpMetadata(_messages.Message):
+  r"""Represents the metadata of the long-running operation.
+
+  Fields:
+    apiVersion: Output only. API version used to start the operation.
+    createTime: Output only. The time the operation was created.
+    endTime: Output only. The time the operation finished running.
+    requestedCancellation: Output only. Identifies whether the user has
+      requested cancellation of the operation. Operations that have
+      successfully been cancelled have Operation.error value with a
+      google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    target: Output only. Server-defined resource path for the target of the
+      operation.
+    verb: Output only. Name of the verb executed by the operation.
+  """
+
+  apiVersion = _messages.StringField(1)
+  createTime = _messages.StringField(2)
+  endTime = _messages.StringField(3)
+  requestedCancellation = _messages.BooleanField(4)
+  target = _messages.StringField(5)
+  verb = _messages.StringField(6)
+
+
+class GoogleCloudManagedidentitiesV1beta1OpMetadata(_messages.Message):
+  r"""Represents the metadata of the long-running operation.
+
+  Fields:
+    apiVersion: Output only. API version used to start the operation.
+    createTime: Output only. The time the operation was created.
+    endTime: Output only. The time the operation finished running.
+    requestedCancellation: Output only. Identifies whether the user has
+      requested cancellation of the operation. Operations that have
+      successfully been cancelled have Operation.error value with a
+      google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    target: Output only. Server-defined resource path for the target of the
+      operation.
+    verb: Output only. Name of the verb executed by the operation.
+  """
+
+  apiVersion = _messages.StringField(1)
+  createTime = _messages.StringField(2)
+  endTime = _messages.StringField(3)
+  requestedCancellation = _messages.BooleanField(4)
+  target = _messages.StringField(5)
+  verb = _messages.StringField(6)
+
+
+class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message):
+  r"""A GoogleCloudSaasacceleratorManagementProvidersV1Instance object.
 
   Enums:
     StateValueValuesEnum: Output only. Current lifecycle state of the resource
@@ -571,12 +324,6 @@ class Instance(_messages.Message):
     ProducerMetadataValue: Output only. Custom string attributes used
       primarily to expose producer-specific information in monitoring
       dashboards. See go/get-instance-metadata.
-    RolloutMetadataValue: The map between RolloutType and the corresponding
-      RolloutMetadata. This is only mutated by rollout service. For actuation
-      implementation, this information is pass-through for Rollout management.
-      Producer shall not modify by itself. For update of a single entry in
-      this map, the update field mask shall follow this sementics: go
-      /advanced-field-masks
     SoftwareVersionsValue: Software versions that are used to deploy this
       instance. This can be mutated by rollout services.
 
@@ -605,12 +352,10 @@ class Instance(_messages.Message):
     provisionedResources: Output only. The list of data plane resources
       provisioned for this instance, e.g. compute VMs. See go/get-instance-
       metadata.
-    rolloutMetadata: The map between RolloutType and the corresponding
-      RolloutMetadata. This is only mutated by rollout service. For actuation
-      implementation, this information is pass-through for Rollout management.
-      Producer shall not modify by itself. For update of a single entry in
-      this map, the update field mask shall follow this sementics: go
-      /advanced-field-masks
+    slmInstanceTemplate: Link to the SLM instance template. Only populated
+      when updating SLM instances via SSA's Actuation service adaptor. Service
+      producers with custom control plane (e.g. Cloud SQL) doesn't need to
+      populate this field. Instead they should use software_versions.
     sloMetadata: Output only. SLO metadata for instance classification in the
       Standardized dataplane SLO platform. See go/cloud-ssa-standard-slo for
       feature description.
@@ -634,6 +379,7 @@ class Instance(_messages.Message):
       UPDATING: Instance is being updated.
       REPAIRING: Instance is unheathy and under repair.
       DELETING: Instance is being deleted.
+      ERROR: Instance encountered an error and is in indeterministic state.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -641,6 +387,7 @@ class Instance(_messages.Message):
     UPDATING = 3
     REPAIRING = 4
     DELETING = 5
+    ERROR = 6
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -717,11 +464,13 @@ class Instance(_messages.Message):
 
       Fields:
         key: Name of the additional property.
-        value: A MaintenanceSchedule attribute.
+        value: A
+          GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule
+          attribute.
       """
 
       key = _messages.StringField(1)
-      value = _messages.MessageField('MaintenanceSchedule', 2)
+      value = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule', 2)
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
@@ -750,35 +499,6 @@ class Instance(_messages.Message):
 
       key = _messages.StringField(1)
       value = _messages.StringField(2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class RolloutMetadataValue(_messages.Message):
-    r"""The map between RolloutType and the corresponding RolloutMetadata.
-    This is only mutated by rollout service. For actuation implementation,
-    this information is pass-through for Rollout management. Producer shall
-    not modify by itself. For update of a single entry in this map, the update
-    field mask shall follow this sementics: go/advanced-field-masks
-
-    Messages:
-      AdditionalProperty: An additional property for a RolloutMetadataValue
-        object.
-
-    Fields:
-      additionalProperties: Additional properties of type RolloutMetadataValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a RolloutMetadataValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A RolloutMetadata attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.MessageField('RolloutMetadata', 2)
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
@@ -816,17 +536,154 @@ class Instance(_messages.Message):
   maintenanceSchedules = _messages.MessageField('MaintenanceSchedulesValue', 5)
   name = _messages.StringField(6)
   producerMetadata = _messages.MessageField('ProducerMetadataValue', 7)
-  provisionedResources = _messages.MessageField('ProvisionedResource', 8, repeated=True)
-  rolloutMetadata = _messages.MessageField('RolloutMetadataValue', 9)
-  sloMetadata = _messages.MessageField('SloMetadata', 10)
+  provisionedResources = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource', 8, repeated=True)
+  slmInstanceTemplate = _messages.StringField(9)
+  sloMetadata = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata', 10)
   softwareVersions = _messages.MessageField('SoftwareVersionsValue', 11)
   state = _messages.EnumField('StateValueValuesEnum', 12)
   tenantProjectId = _messages.StringField(13)
   updateTime = _messages.StringField(14)
 
 
+class GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule(_messages.Message):
+  r"""Maintenance schedule which is exposed to customer and potentially end
+  user, indicating published upcoming future maintenance schedule
+
+  Fields:
+    canReschedule: Can this scheduled update be rescheduled? By default, it's
+      true and API needs to do explicitly check whether it's set, if it's set
+      as false explicitly, it's false
+    endTime: The scheduled end time for the maintenance.
+    rolloutManagementPolicy: The rollout management policy this maintenance
+      schedule is associated with. When doing reschedule update request, the
+      reschedule should be against this given policy.
+    startTime: The scheduled start time for the maintenance.
+  """
+
+  canReschedule = _messages.BooleanField(1)
+  endTime = _messages.StringField(2)
+  rolloutManagementPolicy = _messages.StringField(3)
+  startTime = _messages.StringField(4)
+
+
+class GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata(_messages.Message):
+  r"""Node information for custom per-node SLO implementations. SSA does not
+  support per-node SLO, but producers can populate per-node information in
+  SloMetadata for custom precomputations. SSA Eligibility Exporter will emit
+  per-node metric based on this information.
+
+  Fields:
+    exclusions: By default node is eligible if instance is eligible. But
+      individual node might be excluded from SLO by adding entry here. For
+      semantic see SloMetadata.exclusions. If both instance and node level
+      exclusions are present for time period, the node level's reason will be
+      reported by Eligibility Exporter.
+    location: The location of the node, if different from instance location.
+    nodeId: The id of the node. This should be equal to
+      SaasInstanceNode.node_id.
+  """
+
+  exclusions = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion', 1, repeated=True)
+  location = _messages.StringField(2)
+  nodeId = _messages.StringField(3)
+
+
+class GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource(_messages.Message):
+  r"""Describes provisioned dataplane resources.
+
+  Fields:
+    resourceType: Type of the resource. This can be either a GCP resource or a
+      custom one (e.g. another cloud provider's VM). For GCP compute resources
+      use singular form of the names listed in GCP compute API documentation
+      (https://cloud.google.com/compute/docs/reference/rest/v1/), prefixed
+      with 'compute-', for example: 'compute-instance', 'compute-disk',
+      'compute-autoscaler'.
+    resourceUrl: URL identifying the resource, e.g.
+      "https://www.googleapis.com/compute/v1/projects/...)".
+  """
+
+  resourceType = _messages.StringField(1)
+  resourceUrl = _messages.StringField(2)
+
+
+class GoogleCloudSaasacceleratorManagementProvidersV1SloEligibility(_messages.Message):
+  r"""SloEligibility is a tuple containing eligibility value: true if an
+  instance is eligible for SLO calculation or false if it should be excluded
+  from all SLO-related calculations along with a user-defined reason.
+
+  Fields:
+    eligible: Whether an instance is eligible or ineligible.
+    reason: User-defined reason for the current value of instance eligibility.
+      Usually, this can be directly mapped to the internal state. An empty
+      reason is allowed.
+  """
+
+  eligible = _messages.BooleanField(1)
+  reason = _messages.StringField(2)
+
+
+class GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion(_messages.Message):
+  r"""SloExclusion represents an exclusion in SLI calculation applies to all
+  SLOs.
+
+  Fields:
+    duration: Exclusion duration. No restrictions on the possible values.
+      When an ongoing operation is taking longer than initially expected, an
+      existing entry in the exclusion list can be updated by extending the
+      duration. This is supported by the subsystem exporting eligibility data
+      as long as such extension is committed at least 10 minutes before the
+      original exclusion expiration - otherwise it is possible that there will
+      be "gaps" in the exclusion application in the exported timeseries.
+    reason: Human-readable reason for the exclusion. This should be a static
+      string (e.g. "Disruptive update in progress") and should not contain
+      dynamically generated data (e.g. instance name). Can be left empty.
+    sliName: Name of an SLI that this exclusion applies to. Can be left empty,
+      signaling that the instance should be excluded from all SLIs defined in
+      the service SLO configuration.
+    startTime: Start time of the exclusion. No alignment (e.g. to a full
+      minute) needed.
+  """
+
+  duration = _messages.StringField(1)
+  reason = _messages.StringField(2)
+  sliName = _messages.StringField(3)
+  startTime = _messages.StringField(4)
+
+
+class GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata(_messages.Message):
+  r"""SloMetadata contains resources required for proper SLO classification of
+  the instance.
+
+  Fields:
+    eligibility: Optional. User-defined instance eligibility.
+    exclusions: List of SLO exclusion windows. When multiple entries in the
+      list match (matching the exclusion time-window against current time
+      point) the exclusion reason used in the first matching entry will be
+      published.  It is not needed to include expired exclusion in this list,
+      as only the currently applicable exclusions are taken into account by
+      the eligibility exporting subsystem (the historical state of exclusions
+      will be reflected in the historically produced timeseries regardless of
+      the current state).  This field can be used to mark the instance as
+      temporary ineligible for the purpose of SLO calculation. For permanent
+      instance SLO exclusion, use of custom instance eligibility is
+      recommended. See 'eligibility' field below.
+    nodes: Optional. List of nodes. Some producers need to use per-node
+      metadata to calculate SLO. This field allows such producers to publish
+      per-node SLO meta data, which will be consumed by SSA Eligibility
+      Exporter and published in the form of per node metric to Monarch.
+    tier: Name of the SLO tier the Instance belongs to. This name will be
+      expected to match the tiers specified in the service SLO configuration.
+      Field is mandatory and must not be empty.
+  """
+
+  eligibility = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloEligibility', 1)
+  exclusions = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion', 2, repeated=True)
+  nodes = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata', 3, repeated=True)
+  tier = _messages.StringField(4)
+
+
 class ListDomainsResponse(_messages.Message):
-  r"""A ListDomainsResponse object.
+  r"""Response message for ListDomains
 
   Fields:
     domains: A list of Managed Identities Service domains in the project.
@@ -946,41 +803,6 @@ class Location(_messages.Message):
   name = _messages.StringField(5)
 
 
-class LogConfig(_messages.Message):
-  r"""Specifies what kind of log the caller must write
-
-  Fields:
-    cloudAudit: Cloud audit options.
-    counter: Counter options.
-    dataAccess: Data access options.
-  """
-
-  cloudAudit = _messages.MessageField('CloudAuditOptions', 1)
-  counter = _messages.MessageField('CounterOptions', 2)
-  dataAccess = _messages.MessageField('DataAccessOptions', 3)
-
-
-class MaintenanceSchedule(_messages.Message):
-  r"""Maintenance schedule which is exposed to customer and potentially end
-  user, indicating published upcoming future maintenance schedule
-
-  Fields:
-    canReschedule: Can this scheduled update be rescheduled? By default, it's
-      true and API needs to do explicitly check whether it's set, if it's set
-      as false explicitly, it's false
-    endTime: The scheduled end time for the maintenance.
-    rolloutManagementPolicy: The rollout management policy this maintenance
-      schedule is associated with. When doing reschedule update request, the
-      reschedule should be against this given policy.
-    startTime: The scheduled start time for the maintenance.
-  """
-
-  canReschedule = _messages.BooleanField(1)
-  endTime = _messages.StringField(2)
-  rolloutManagementPolicy = _messages.StringField(3)
-  startTime = _messages.StringField(4)
-
-
 class ManagedidentitiesProjectsLocationsGetRequest(_messages.Message):
   r"""A ManagedidentitiesProjectsLocationsGetRequest object.
 
@@ -1014,9 +836,11 @@ class ManagedidentitiesProjectsLocationsGlobalDomainsCreateRequest(_messages.Mes
     domainName: Required. The fully qualified domain name. e.g.
       mydomain.myorganization.com, with the following restrictions:   * Must
       contain only lowercase letters, numbers, periods and hyphens.  * Must
-      start with a letter.  * Must contain between 2-255 characters.  * Must
-      end with a number or a letter.  * Must not start with period.  * Must be
-      unique within the project.
+      start with a letter.  * Must contain between 2-64 characters.  * Must
+      end with a number or a letter.  * Must not start with period.  * First
+      segement length (mydomain form example above) shouldn't exceed    15
+      chars.  * The last segment cannot be fully numeric.  * Must be unique
+      within the customer project.
     parent: Required. The resource project name and location using the form:
       `projects/{project_id}/locations/global`
   """
@@ -1276,46 +1100,6 @@ class ManagedidentitiesProjectsLocationsListRequest(_messages.Message):
   pageToken = _messages.StringField(5)
 
 
-class NodeSloMetadata(_messages.Message):
-  r"""Node information for custom per-node SLO implementations. SSA does not
-  support per-node SLO, but producers can populate per-node information in
-  SloMetadata for custom precomputations. SSA Eligibility Exporter will emit
-  per-node metric based on this information.
-
-  Fields:
-    exclusions: By default node is eligible if instance is eligible. But
-      individual node might be excluded from SLO by adding entry here. For
-      semantic see SloMetadata.exclusions. If both instance and node level
-      exclusions are present for time period, the node level's reason will be
-      reported by Eligibility Exporter.
-    location: The location of the node, if different from instance location.
-    nodeId: The id of the node. This should be equal to
-      SaasInstanceNode.node_id.
-  """
-
-  exclusions = _messages.MessageField('SloExclusion', 1, repeated=True)
-  location = _messages.StringField(2)
-  nodeId = _messages.StringField(3)
-
-
-class NotificationMetadata(_messages.Message):
-  r"""NotificationMetadata is the notification state for an instance.
-
-  Fields:
-    rescheduled: Whether the instance update has been rescheduled.
-    scheduledEndTime: The scheduled end time for the maintenance window during
-      which update can be performed on the instance.
-    scheduledStartTime: The scheduled start time for the maintenance window
-      during which update can be performed on the instance.
-    targetRelease: The target release to be applied to the instance.
-  """
-
-  rescheduled = _messages.BooleanField(1)
-  scheduledEndTime = _messages.StringField(2)
-  scheduledStartTime = _messages.StringField(3)
-  targetRelease = _messages.StringField(4)
-
-
 class Operation(_messages.Message):
   r"""This resource represents a long-running operation that is the result of
   a network API call.
@@ -1452,15 +1236,16 @@ class OperationMetadata(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.   A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**      {       "bindings": [         {
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.   A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**      {       "bindings": [         {
   "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-project-
@@ -1469,23 +1254,23 @@ class Policy(_messages.Message):
   ["user:eve@example.com"],           "condition": {             "title":
   "expirable access",             "description": "Does not grant access after
   Sep 2020",             "expression": "request.time <
-  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
-  **YAML Example**      bindings:     - members:       - user:mike@example.com
-  - group:admins@example.com       - domain:google.com       - serviceAccount
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
+  "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
+  bindings:     - members:       - user:mike@example.com       -
+  group:admins@example.com       - domain:google.com       - serviceAccount
   :my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
   grant access after Sep 2020         expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  timestamp('2020-10-01T00:00:00.000Z')     - etag: BwWWja0YfJA=     -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
-    auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1493,57 +1278,33 @@ class Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
-    iamOwned: A boolean attribute.
-    rules: If more than one rule is specified, the rules are applied in the
-      following manner: - All matching LOG rules are always applied. - If any
-      DENY/DENY_WITH_LOG rule matches, permission is denied.   Logging will be
-      applied if one or more matching rule requires logging. - Otherwise, if
-      any ALLOW/ALLOW_WITH_LOG rule matches, permission is   granted.
-      Logging will be applied if one or more matching rule requires logging. -
-      Otherwise, if no rule applies, permission is denied.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy   that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
-  auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
-  bindings = _messages.MessageField('Binding', 2, repeated=True)
-  etag = _messages.BytesField(3)
-  iamOwned = _messages.BooleanField(4)
-  rules = _messages.MessageField('Rule', 5, repeated=True)
-  version = _messages.IntegerField(6, variant=_messages.Variant.INT32)
-
-
-class ProvisionedResource(_messages.Message):
-  r"""Describes provisioned dataplane resources.
-
-  Fields:
-    resourceType: Type of the resource. This can be either a GCP resource or a
-      custom one (e.g. another cloud provider's VM). For GCP compute resources
-      use singular form of the names listed in GCP compute API documentation
-      (https://cloud.google.com/compute/docs/reference/rest/v1/), prefixed
-      with 'compute-', for example: 'compute-instance', 'compute-disk',
-      'compute-autoscaler'.
-    resourceUrl: URL identifying the resource, e.g.
-      "https://www.googleapis.com/compute/v1/projects/...)".
-  """
-
-  resourceType = _messages.StringField(1)
-  resourceUrl = _messages.StringField(2)
+  bindings = _messages.MessageField('Binding', 1, repeated=True)
+  etag = _messages.BytesField(2)
+  version = _messages.IntegerField(3, variant=_messages.Variant.INT32)
 
 
 class ReconfigureTrustRequest(_messages.Message):
-  r"""A ReconfigureTrustRequest object.
+  r"""Request message for ReconfigureTrust
 
   Fields:
     targetDnsIpAddresses: Required. The target DNS server IP addresses to
@@ -1557,86 +1318,18 @@ class ReconfigureTrustRequest(_messages.Message):
 
 
 class ResetAdminPasswordRequest(_messages.Message):
-  r"""A ResetAdminPasswordRequest object."""
+  r"""Request message for
+ResetAdminPassword"""
 
 
 class ResetAdminPasswordResponse(_messages.Message):
-  r"""A ResetAdminPasswordResponse object.
+  r"""Response message for ResetAdminPassword
 
   Fields:
     password: A random password. See admin for more information.
   """
 
   password = _messages.StringField(1)
-
-
-class RolloutMetadata(_messages.Message):
-  r"""RolloutMetadata for an actuation instance. It maps to a single
-  RolloutType.
-
-  Fields:
-    notification: Instance level notification metadata.
-    releaseName: The last Release that has been applied to the instance.
-    rolloutName: The last rollout that has been applied to the instance.
-  """
-
-  notification = _messages.MessageField('NotificationMetadata', 1)
-  releaseName = _messages.StringField(2)
-  rolloutName = _messages.StringField(3)
-
-
-class Rule(_messages.Message):
-  r"""A rule to be applied in a Policy.
-
-  Enums:
-    ActionValueValuesEnum: Required
-
-  Fields:
-    action: Required
-    conditions: Additional restrictions that must be met. All conditions must
-      pass for the rule to match.
-    description: Human-readable description of the rule.
-    in_: If one or more 'in' clauses are specified, the rule matches if the
-      PRINCIPAL/AUTHORITY_SELECTOR is in at least one of these entries.
-    logConfig: The config returned to callers of tech.iam.IAM.CheckPolicy for
-      any entries that match the LOG action.
-    notIn: If one or more 'not_in' clauses are specified, the rule matches if
-      the PRINCIPAL/AUTHORITY_SELECTOR is in none of the entries. The format
-      for in and not_in entries can be found at in the Local IAM documentation
-      (see go/local-iam#features).
-    permissions: A permission is a string of form '<service>.<resource
-      type>.<verb>' (e.g., 'storage.buckets.list'). A value of '*' matches all
-      permissions, and a verb part of '*' (e.g., 'storage.buckets.*') matches
-      all verbs.
-  """
-
-  class ActionValueValuesEnum(_messages.Enum):
-    r"""Required
-
-    Values:
-      NO_ACTION: Default no action.
-      ALLOW: Matching 'Entries' grant access.
-      ALLOW_WITH_LOG: Matching 'Entries' grant access and the caller promises
-        to log the request per the returned log_configs.
-      DENY: Matching 'Entries' deny access.
-      DENY_WITH_LOG: Matching 'Entries' deny access and the caller promises to
-        log the request per the returned log_configs.
-      LOG: Matching 'Entries' tell IAM.Check callers to generate logs.
-    """
-    NO_ACTION = 0
-    ALLOW = 1
-    ALLOW_WITH_LOG = 2
-    DENY = 3
-    DENY_WITH_LOG = 4
-    LOG = 5
-
-  action = _messages.EnumField('ActionValueValuesEnum', 1)
-  conditions = _messages.MessageField('Condition', 2, repeated=True)
-  description = _messages.StringField(3)
-  in_ = _messages.StringField(4, repeated=True)
-  logConfig = _messages.MessageField('LogConfig', 5, repeated=True)
-  notIn = _messages.StringField(6, repeated=True)
-  permissions = _messages.StringField(7, repeated=True)
 
 
 class SetIamPolicyRequest(_messages.Message):
@@ -1647,91 +1340,9 @@ class SetIamPolicyRequest(_messages.Message):
       size of the policy is limited to a few 10s of KB. An empty policy is a
       valid policy but certain Cloud Platform services (such as Projects)
       might reject them.
-    updateMask: OPTIONAL: A FieldMask specifying which fields of the policy to
-      modify. Only the fields in the mask will be modified. If no mask is
-      provided, the following default mask is used: paths: "bindings, etag"
-      This field is only used by Cloud IAM.
   """
 
   policy = _messages.MessageField('Policy', 1)
-  updateMask = _messages.StringField(2)
-
-
-class SloEligibility(_messages.Message):
-  r"""SloEligibility is a tuple containing eligibility value: true if an
-  instance is eligible for SLO calculation or false if it should be excluded
-  from all SLO-related calculations along with a user-defined reason.
-
-  Fields:
-    eligible: Whether an instance is eligible or ineligible.
-    reason: User-defined reason for the current value of instance eligibility.
-      Usually, this can be directly mapped to the internal state. An empty
-      reason is allowed.
-  """
-
-  eligible = _messages.BooleanField(1)
-  reason = _messages.StringField(2)
-
-
-class SloExclusion(_messages.Message):
-  r"""SloExclusion represents an excusion in SLI calculation applies to all
-  SLOs.
-
-  Fields:
-    exclusionDuration: Exclusion duration. No restrictions on the possible
-      values.  When an ongoing operation is taking longer than initially
-      expected, an existing entry in the exclusion list can be updated by
-      extending the duration. This is supported by the subsystem exporting
-      eligibility data as long as such extension is committed at least 10
-      minutes before the original exclusion expiration - otherwise it is
-      possible that there will be "gaps" in the exclusion application in the
-      exported timeseries.
-    exclusionStartTime: Start time of the exclusion. No alignment (e.g. to a
-      full minute) needed.
-    reason: Human-readable reason for the exclusion. This should be a static
-      string (e.g. "Disruptive update in progress") and should not contain
-      dynamically generated data (e.g. instance name). Can be left empty.
-    sliName: Name of an SLI that this exclusion applies to. Can be left empty,
-      signaling that the instance should be excluded from all SLIs defined in
-      the service SLO configuration.
-  """
-
-  exclusionDuration = _messages.StringField(1)
-  exclusionStartTime = _messages.StringField(2)
-  reason = _messages.StringField(3)
-  sliName = _messages.StringField(4)
-
-
-class SloMetadata(_messages.Message):
-  r"""SloMetadata contains resources required for proper SLO classification of
-  the instance.
-
-  Fields:
-    eligibility: Optional: user-defined instance eligibility.
-    exclusions: List of SLO exclusion windows. When multiple entries in the
-      list match (matching the exclusion time-window against current time
-      point) the exclusion reason used in the first matching entry will be
-      published.  It is not needed to include expired exclusion in this list,
-      as only the currently applicable exclusions are taken into account by
-      the eligibility exporting subsystem (the historical state of exclusions
-      will be reflected in the historically produced timeseries regardless of
-      the current state).  This field can be used to mark the instance as
-      temporary ineligible for the purpose of SLO calculation. For permanent
-      instance SLO exclusion, use of custom instance eligibility is
-      recommended. See 'eligibility' field below.
-    nodes: Optional: list of nodes. Some producers need to use per-node
-      metadata to calculate SLO. This field allows such producers to publish
-      per-node SLO meta data, which will be consumed by SSA Eligibility
-      Exporter and published in the form of per node metric to Monarch.
-    tier: Name of the SLO tier the Instance belongs to. This name will be
-      expected to match the tiers specified in the service SLO configuration.
-      Field is mandatory and must not be empty.
-  """
-
-  eligibility = _messages.MessageField('SloEligibility', 1)
-  exclusions = _messages.MessageField('SloExclusion', 2, repeated=True)
-  nodes = _messages.MessageField('NodeSloMetadata', 3, repeated=True)
-  tier = _messages.StringField(4)
 
 
 class StandardQueryParameters(_messages.Message):
@@ -1965,7 +1576,7 @@ class Trust(_messages.Message):
 
 
 class ValidateTrustRequest(_messages.Message):
-  r"""A ValidateTrustRequest object.
+  r"""Request message for ValidateTrust
 
   Fields:
     trust: Required. The domain trust to validate trust state for.
@@ -1974,8 +1585,6 @@ class ValidateTrustRequest(_messages.Message):
   trust = _messages.MessageField('Trust', 1)
 
 
-encoding.AddCustomJsonFieldMapping(
-    Rule, 'in_', 'in')
 encoding.AddCustomJsonFieldMapping(
     StandardQueryParameters, 'f__xgafv', '$.xgafv')
 encoding.AddCustomJsonEnumMapping(

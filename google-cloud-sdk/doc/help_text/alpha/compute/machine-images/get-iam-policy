@@ -9,11 +9,12 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute machine-images get-iam-policy displays the IAM
-    policy associated with a Google Compute Engine machine image in a project.
-    If formatted as JSON, the output can be edited and used as a policy file
-    for set-iam-policy. The output includes an "etag" field identifying the
-    version emitted and allowing detection of concurrent policy updates; see $
-    {parent} set-iam-policy for additional details.
+    policy associated with a Compute Engine machine image in a project. If
+    formatted as JSON, the output can be edited and used as a policy file for
+    gcloud alpha compute machine-images get-iam-policy set-iam-policy. The
+    output includes an etag field that identifies the version emitted and
+    allows detection of concurrent policy updates; see $ gcloud alpha compute
+    machine-images get-iam-policy set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
      Machine image resource - The machine image to display the IAM policy for.
@@ -24,8 +25,8 @@ POSITIONAL ARGUMENTS
      argument [--project] on the command line. This must be specified.
 
        MACHINE_IMAGE
-          ID of the machine_image or fully qualified identifier for the
-          machine_image.
+          ID of the machine image or fully qualified identifier for the machine
+          image.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -57,8 +58,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the compute/alpha API. The full documentation for this
@@ -74,5 +76,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute machine-images get-iam-policy
 

@@ -162,8 +162,21 @@ Remove service account from the instance
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To set a service account with \f5pubsub\fR and \f5trace\fR scopes, run:
+
+.RS 2m
+$ gcloud alpha compute instances set\-scopes example\-instance \e
+    \-\-scopes=pubsub,trace \-\-zone=us\-central1\-b \e
+    \-\-service\-account=example\-account
+.RE
 
 
 

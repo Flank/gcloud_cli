@@ -19,8 +19,8 @@ POSITIONAL ARGUMENTS
      argument [--project] on the command line. This must be specified.
 
        MACHINE_IMAGE
-          ID of the machine_image or fully qualified identifier for the
-          machine_image.
+          ID of the machine image or fully qualified identifier for the machine
+          image.
 
      POLICY_FILE
         Path to a local JSON or YAML formatted file containing a valid policy.
@@ -33,8 +33,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the compute/alpha API. The full documentation for this
@@ -42,8 +43,7 @@ API REFERENCE
     https://developers.google.com/compute/docs/reference/latest/
 
 EXAMPLES
-    The following command will read am IAM policy defined in a JSON file
-    'policy.json' and set it for the machine image my-image:
+    The following command reads an IAM policy defined in a policy.json file        and sets the policy for the machine image `my-image`:
 
         $ gcloud alpha compute machine-images set-iam-policy my-image \
             policy.json
@@ -55,5 +55,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute machine-images set-iam-policy
 

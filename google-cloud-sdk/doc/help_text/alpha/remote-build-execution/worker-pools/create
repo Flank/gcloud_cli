@@ -6,8 +6,10 @@ SYNOPSIS
     gcloud alpha remote-build-execution worker-pools create
         (WORKERPOOL : --instance=INSTANCE) --worker-count=WORKER_COUNT
         [--async] [--disk-size=DISK_SIZE; default=200]
+        [--disk-type=DISK_TYPE; default="pd-standard"]
         [--labels=[KEY=VALUE,...]]
         [--machine-type=MACHINE_TYPE; default="n1-standard-2"]
+        [--max-concurrent-actions=MAX_CONCURRENT_ACTIONS; default=1]
         [--min-cpu-platform=MIN_CPU_PLATFORM]
         [--network-access=NETWORK_ACCESS; default="public"] [--reserved]
         [--accelerator-count=ACCELERATOR_COUNT
@@ -45,6 +47,16 @@ OPTIONAL FLAGS
      --disk-size=DISK_SIZE; default=200
         Size of the disk, in Gb, for each worker. Defaults to 200Gb.
 
+     --disk-type=DISK_TYPE; default="pd-standard"
+        Type of persistent disk the worker VMs will use. Default is
+        pd-standard. DISK_TYPE must be one of:
+
+         pd-ssd
+            SSD persistent disk.
+
+         pd-standard
+            Standard persistent disk.
+
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
 
@@ -58,6 +70,9 @@ OPTIONAL FLAGS
         types, use the following command:
 
         $ gcloud compute machine-types list
+
+     --max-concurrent-actions=MAX_CONCURRENT_ACTIONS; default=1
+        Maximum actions each worker VM can run concurrently.
 
      --min-cpu-platform=MIN_CPU_PLATFORM
         Minimum CPU platform for the workers. For more information see
@@ -93,8 +108,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the remotebuildexecution/v1alpha API. The full

@@ -22,7 +22,7 @@ create\-instance\fR creates a virtual machine instance with a defined name and
 optionally its stateful configuration: stateful disk and stateful metadata
 key\-values. Stateful configuration is stored in the corresponding newly created
 per\-instance config. An instance with a per\-instance config will preserve its
-given name, specified disks, and metadata key\-values during instance
+given name, specified disks, and specified metadata key\-values during instance
 recreation, auto\-healing, and updates and any other lifecycle transitions of
 the instance.
 
@@ -55,61 +55,31 @@ Name of the new instance to create.
 .RS 2m
 .TP 2m
 \fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]
-Stateful disk for the managed instance group to preserve. Usually, a managed
-instance group deletes disks when deleting instances; however, stateful disks
-are detached from deleted instances and are reattached automatically to the
-instance on recreation, autohealing, updates, and any other lifecycle
-transitions of the instance.
+Disks considered stateful by the instance group. Managed instance groups
+preserve and reattach stateful disks on VM autohealing, update, and recreate
+events.
 
-Stateful disks specified here form part of the per\-instance config for the new
-instance.
+You can also attach and preserve disks, not defined in the group's instance
+template, to a given instance.
 
-The same disk can be attached to many instances but only in read\-only mode.
+The same disk can be attached to more than one instance but only in read\-only
+mode.
 
-Use this flag multiple times to attach more disks.
-
-.RS 2m
-.TP 2m
-\fBdevice\-name\fR
-(Required) Device name under which disk is or will be attached.
-
-.TP 2m
-\fBsource\fR
-(Required) URI of an existing persistent disk to attach under the specified
-device\-name.
-
-.TP 2m
-\fBmode\fR
-Specifies the attachment mode of the disk. Supported options are 'ro' for
-read\-only and 'rw' for read\-write. If omitted, defaults to 'rw'. \f5mode\fR
-can only be specified if \f5source\fR is given.
-
-.TP 2m
-\fBauto\-delete\fR
-(Optional) Specifies the auto deletion policy of the stateful disk. Supported
-values are 'never' (never delete this disk) and
-\'on\-permanent\-instance\-deletion' (delete the stateful disk when the given
-instance is permanently deleted from the instance group; for example when the
-group is resized down). If omitted, 'never' is used as the default.
-
-.RE
-.sp
 .TP 2m
 \fB\-\-stateful\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
-Additional metadata to be made available to the guest operating system on the
-instance along with the metadata defined in the instance template.
+Additional metadata to be made available to the guest operating system in
+addition to the metadata defined in the instance template.
 
-Use stateful metadata to define key/value pairs specific to an instance to
-differentiate it from other instances in the managed instance group. The
-stateful metadata forms part of the per\-instance config for the new instance.
+Stateful metadata may be used to define a key/value pair specific for the one
+given instance to differentiate it from the other instances in the managed
+instance group.
 
 Stateful metadata key/value pairs are preserved on instance recreation,
 autohealing, updates, and any other lifecycle transitions of the instance.
 
-Only metadata keys provided in this flag are mutated. Stateful metadata values
-defined for the keys already existing in the instance template override the
-values from the instance template. Other metadata entries from the instance
-template will remain unaffected and available.
+Stateful metadata have priority over the metadata defined in the instance
+template. This means that stateful metadata that is defined for a key that
+already exists in the instance template overrides the instance template value.
 
 Each metadata entry is a key/value pair separated by an equals sign. Metadata
 keys must be unique and less than 128 bytes in length. Multiple entries can be
@@ -159,8 +129,9 @@ invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -185,9 +156,10 @@ $ gcloud alpha compute instance\-groups managed create\-instance \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud compute instance\-groups managed create\-instance
 $ gcloud beta compute instance\-groups managed create\-instance
 .RE
 

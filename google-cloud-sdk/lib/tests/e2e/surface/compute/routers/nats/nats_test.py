@@ -36,10 +36,6 @@ class NatsTest(e2e_test_base.BaseTest):
         prefix='routers-test-router'))
     self.nat_name = next(e2e_utils.GetResourceNameGenerator(
         prefix='routers-test-nat'))
-    self.address_name_1 = next(
-        e2e_utils.GetResourceNameGenerator(prefix='routers-test-address-1'))
-    self.address_name_2 = next(
-        e2e_utils.GetResourceNameGenerator(prefix='routers-test-address-2'))
 
   def TearDown(self):
     logging.info('Starting TearDown (will delete resources if test fails).')
@@ -84,58 +80,6 @@ class NatsTest(e2e_test_base.BaseTest):
     cmd = 'compute networks delete {0}'.format(self.network_name)
     Retry(lambda: self.Run(cmd))
 
-  def testWithStaticIps(self):
-    self.Run('compute networks create {0} --subnet-mode custom'.format(
-        self.network_name))
-    self.Run('compute routers create {0} --network {1} --region {2}'.format(
-        self.router_name, self.network_name, self.region))
-    self.Run('compute addresses create {0} {1} --region {2}'.format(
-        self.address_name_1, self.address_name_2, self.region))
-    self.Run('compute addresses describe {0} --region {1}'.format(
-        self.address_name_1, self.region))
-    output = self.GetNewOutput()
-    # Output contains a line of the form "address: 10.1.2.3"
-    ip_address_1 = [st for st in output.split('\n') if 'address' in st
-                   ][0].split()[1]
-    self.Run('compute addresses describe {0} --region {1}'.format(
-        self.address_name_2, self.region))
-    output = self.GetNewOutput()
-    ip_address_2 = [st for st in output.split('\n') if 'address' in st
-                   ][0].split()[1]
-
-    self.Run('compute routers nats create {0} --router {1} --region {2} '
-             '--nat-all-subnet-ip-ranges --nat-external-ip-pool {3},{4}'.format(
-                 self.nat_name, self.router_name, self.region,
-                 self.address_name_1, self.address_name_2))
-
-    self.Run(
-        'compute routers nats describe {0} --router {1} --region {2}'.format(
-            self.nat_name, self.router_name, self.region))
-    self.AssertNewOutputContains('name: {0}'.format(self.nat_name))
-
-    self.Run('compute routers get-status {0} --region {1}'.format(
-        self.router_name, self.region))
-    output = self.GetNewOutput()
-    self.assertTrue(self.nat_name in output)
-    self.assertTrue(ip_address_1 in output)
-    self.assertTrue(ip_address_2 in output)
-
-    # Retry deletion in case resource was not ready yet.
-    cmd = 'compute routers nats delete {0} --router {1} --region {2}'.format(
-        self.nat_name, self.router_name, self.region)
-    Retry(lambda: self.Run(cmd))
-
-    cmd = 'compute routers delete {0} --region {1}'.format(
-        self.router_name, self.region)
-    Retry(lambda: self.Run(cmd))
-
-    cmd = 'compute networks delete {0}'.format(self.network_name)
-    Retry(lambda: self.Run(cmd))
-
-    cmd = 'compute addresses delete {0} {1} --region {2}'.format(
-        self.address_name_1, self.address_name_2, self.region)
-    Retry(lambda: self.Run(cmd))
-
   def testLogging(self):
     self.Run('compute networks create {0} --subnet-mode custom'.format(
         self.network_name))
@@ -175,6 +119,75 @@ class NatsTest(e2e_test_base.BaseTest):
     Retry(lambda: self.Run(cmd))
 
     cmd = 'compute networks delete {0}'.format(self.network_name)
+    Retry(lambda: self.Run(cmd))
+
+
+class StaticNatsTest(NatsTest):
+
+  def SetUp(self):
+    super(StaticNatsTest, self).SetUp()
+    self.address_name_1 = next(
+        e2e_utils.GetResourceNameGenerator(prefix='routers-test-address-1'))
+    self.address_name_2 = next(
+        e2e_utils.GetResourceNameGenerator(prefix='routers-test-address-2'))
+
+  def TearDown(self):
+    super(StaticNatsTest, self).TearDown()
+    self.CleanUpResource(
+        self.address_name_1, 'addresses', scope=e2e_test_base.REGIONAL)
+    self.CleanUpResource(
+        self.address_name_2, 'addresses', scope=e2e_test_base.REGIONAL)
+
+  def testWithStaticIps(self):
+    self.Run('compute networks create {0} --subnet-mode custom'.format(
+        self.network_name))
+    self.Run('compute routers create {0} --network {1} --region {2}'.format(
+        self.router_name, self.network_name, self.region))
+    self.Run('compute addresses create {0} {1} --region {2}'.format(
+        self.address_name_1, self.address_name_2, self.region))
+    self.Run('compute addresses describe {0} --region {1}'.format(
+        self.address_name_1, self.region))
+    output = self.GetNewOutput()
+    # Output contains a line of the form "address: 10.1.2.3"
+    ip_address_1 = [st for st in output.split('\n') if 'address' in st
+                   ][0].split()[1]
+    self.Run('compute addresses describe {0} --region {1}'.format(
+        self.address_name_2, self.region))
+    output = self.GetNewOutput()
+    ip_address_2 = [st for st in output.split('\n') if 'address' in st
+                   ][0].split()[1]
+
+    self.Run('compute routers nats create {0} --router {1} --region {2} '
+             '--nat-all-subnet-ip-ranges --nat-external-ip-pool {3},{4}'.format(
+                 self.nat_name, self.router_name, self.region,
+                 self.address_name_1, self.address_name_2))
+
+    self.Run(
+        'compute routers nats describe {0} --router {1} --region {2}'.format(
+            self.nat_name, self.router_name, self.region))
+    self.AssertNewOutputContains('name: {0}'.format(self.nat_name))
+
+    self.Run('compute routers get-status {0} --region {1}'.format(
+        self.router_name, self.region))
+    output = self.GetNewOutput()
+    self.assertIn(self.nat_name, output)
+    self.assertIn(ip_address_1, output)
+    self.assertIn(ip_address_2, output)
+
+    # Retry deletion in case resource was not ready yet.
+    cmd = 'compute routers nats delete {0} --router {1} --region {2}'.format(
+        self.nat_name, self.router_name, self.region)
+    Retry(lambda: self.Run(cmd))
+
+    cmd = 'compute routers delete {0} --region {1}'.format(
+        self.router_name, self.region)
+    Retry(lambda: self.Run(cmd))
+
+    cmd = 'compute networks delete {0}'.format(self.network_name)
+    Retry(lambda: self.Run(cmd))
+
+    cmd = 'compute addresses delete {0} {1} --region {2}'.format(
+        self.address_name_1, self.address_name_2, self.region)
     Retry(lambda: self.Run(cmd))
 
 

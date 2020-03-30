@@ -156,8 +156,36 @@ https://cloud.google.com/cloud\-build/docs/quickstart\-docker.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To submit a build with source located at storage URL
+\f5gs://bucket/object.zip\fR:
+
+.RS 2m
+$ gcloud builds submit  `gs://bucket/object.zip` \e
+   \-\-tag=gcr.io/my\-project/image
+.RE
+
+To submit a build with source located at storage URL
+\f5gs://bucket/object.zip\fR using config file \f5config.yaml\fR:
+
+.RS 2m
+$ gcloud builds submit `gs://bucket/object.zip` \e
+    \-\-tag=gcr.io/my\-project/image \-\-config=config.yaml
+.RE
+
+To submit a build with local source \f5source.tgz\fR asynchronously:
+
+.RS 2m
+$ gcloud builds submit `source.tgz` \-\-tag=gcr.io/my\-project/image \e
+    \-\-async
+.RE
 
 
 

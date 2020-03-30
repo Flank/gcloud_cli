@@ -575,6 +575,34 @@ class BetaFirewallRulesUpdateTest(FirewallRulesUpdateTest):
 
       self.CheckRequests(get_request, update_request)
 
+  def testToggleLoggingMetadata(self):
+    self.SetNextGetResult(
+        destinationRanges=['0.0.0.0/0'],
+        logConfig=self.messages.FirewallLogConfig(enable=True))
+
+    self.Run("""
+        compute firewall-rules update firewall-1
+          --logging-metadata include-all
+        """)
+    self.CheckFirewallRequest(
+        destinationRanges=['0.0.0.0/0'],
+        logConfig=self.messages.FirewallLogConfig(
+            enable=True,
+            metadata=self.messages.FirewallLogConfig.MetadataValueValuesEnum(
+                'INCLUDE_ALL_METADATA')))
+
+  def testToggleLoggingMetadataLoggingDisabled(self):
+    self.SetNextGetResult(
+        destinationRanges=['0.0.0.0/0'],
+        logConfig=self.messages.FirewallLogConfig(enable=False))
+
+    self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        '^Invalid value for \\[--logging-metadata\\]: cannot toggle logging'
+        ' metadata if logging is not enabled.', self.Run,
+        'compute firewall-rules update firewall-1'
+        ' --logging-metadata include-all')
+
 
 class AlphaFirewallRulesUpdateTest(BetaFirewallRulesUpdateTest):
 
@@ -617,34 +645,6 @@ class AlphaFirewallRulesUpdateTest(BetaFirewallRulesUpdateTest):
                              project='my-project'))]
 
       self.CheckRequests(get_request, update_request)
-
-  def testToggleLoggingMetadata(self):
-    self.SetNextGetResult(
-        destinationRanges=['0.0.0.0/0'],
-        logConfig=self.messages.FirewallLogConfig(enable=True))
-
-    self.Run("""
-        compute firewall-rules update firewall-1
-          --logging-metadata include-all
-        """)
-    self.CheckFirewallRequest(
-        destinationRanges=['0.0.0.0/0'],
-        logConfig=self.messages.FirewallLogConfig(
-            enable=True,
-            metadata=self.messages.FirewallLogConfig.MetadataValueValuesEnum(
-                'INCLUDE_ALL_METADATA')))
-
-  def testToggleLoggingMetadataLoggingDisabled(self):
-    self.SetNextGetResult(
-        destinationRanges=['0.0.0.0/0'],
-        logConfig=self.messages.FirewallLogConfig(enable=False))
-
-    self.assertRaisesRegex(
-        exceptions.InvalidArgumentException,
-        '^Invalid value for \\[--logging-metadata\\]: cannot toggle logging'
-        ' metadata if logging is not enabled.', self.Run,
-        'compute firewall-rules update firewall-1'
-        ' --logging-metadata include-all')
 
 
 if __name__ == '__main__':

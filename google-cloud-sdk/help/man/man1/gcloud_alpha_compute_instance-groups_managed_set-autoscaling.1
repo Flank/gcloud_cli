@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed set\-autoscaling \- set autoscalin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed set\-autoscaling\fR \fINAME\fR [\fB\-\-autoscaling\-file\fR=\fIPATH\fR] [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-queue\-scaling\-acceptable\-backlog\-per\-instance\fR=\fIQUEUE_SCALING_ACCEPTABLE_BACKLOG_PER_INSTANCE\fR] [\fB\-\-queue\-scaling\-cloud\-pub\-sub\fR=[\fIsubscription\fR=\fISUBSCRIPTION\fR],[\fItopic\fR=\fITOPIC\fR]] [\fB\-\-queue\-scaling\-single\-worker\-throughput\fR=\fIQUEUE_SCALING_SINGLE_WORKER_THROUGHPUT\fR] [\fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-scale\-down\-control\fR=[\fImax\-scaled\-down\-replicas\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\fR],[\fImax\-scaled\-down\-replicas\-percent\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]] [\fB\-\-stackdriver\-metric\-filter\fR=\fIFILTER\fR] [\fB\-\-stackdriver\-metric\-single\-instance\-assignment\fR=\fIASSIGNMENT\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\fR=\fITARGET\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\-type\fR=\fITARGET_TYPE\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-update\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed set\-autoscaling\fR \fINAME\fR [\fB\-\-autoscaling\-file\fR=\fIPATH\fR] [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-cpu\-utilization\-predictive\-method\fR=\fICPU_UTILIZATION_PREDICTIVE_METHOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-queue\-scaling\-acceptable\-backlog\-per\-instance\fR=\fIQUEUE_SCALING_ACCEPTABLE_BACKLOG_PER_INSTANCE\fR] [\fB\-\-queue\-scaling\-cloud\-pub\-sub\fR=[\fIsubscription\fR=\fISUBSCRIPTION\fR],[\fItopic\fR=\fITOPIC\fR]] [\fB\-\-queue\-scaling\-single\-worker\-throughput\fR=\fIQUEUE_SCALING_SINGLE_WORKER_THROUGHPUT\fR] [\fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-scale\-in\-control\fR=[\fImax\-scaled\-in\-replicas\fR=\fIMAX\-SCALED\-IN\-REPLICAS\fR],[\fImax\-scaled\-in\-replicas\-percent\fR=\fIMAX\-SCALED\-IN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]] [\fB\-\-stackdriver\-metric\-filter\fR=\fIFILTER\fR] [\fB\-\-stackdriver\-metric\-single\-instance\-assignment\fR=\fIASSIGNMENT\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\fR=\fITARGET\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\-type\fR=\fITARGET_TYPE\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-update\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -55,6 +55,25 @@ would not be reliable. The default is 60s. See $ gcloud topic datetimes for
 information on duration formats.
 
 .TP 2m
+\fB\-\-cpu\-utilization\-predictive\-method\fR=\fICPU_UTILIZATION_PREDICTIVE_METHOD\fR
+Indicates which method of prediction is used for CPU utilization metric, if any.
+\fICPU_UTILIZATION_PREDICTIVE_METHOD\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBnone\fR
+(Default) No predictions are made based on the scaling metric when calculating
+the number of VM instances.
+.TP 2m
+\fBstandard\fR
+Standard predictive autoscaling predicts the future values of the scaling metric
+and then scales a MIG to ensure that new VM instances are ready in time to cover
+the predicted peak.
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]
 Adds a target metric value for the Autoscaler to use.
 
@@ -92,24 +111,23 @@ Minimum number of replicas Autoscaler will set.
 \fB\-\-mode\fR=\fIMODE\fR
 Set the mode of an autoscaler for a managed instance group.
 
-You can turn off or restrict MIG autoscaler activities (scaling up, scaling
-down) without changing autoscaler configuration and then having to restore it
-later. Autoscaler configuration persists while the activities are turned off or
-restricted, and the activities pick it up when they are turned on again or when
-the restrictions are lifted.
+You can turn off or restrict MIG autoscaler activities without affecting your
+autoscaler configuration. The autoscaler configuration persists while the
+activities are turned off or restricted, and the activities resume when the
+autoscaler is turned on again or when the restrictions are lifted.
 
 \fIMODE\fR must be one of:
 
 .RS 2m
 .TP 2m
 \fBoff\fR
-to turn off autoscaling, while keeping the new configuration.
+To turn off autoscaling, while keeping the new configuration.
 .TP 2m
 \fBon\fR
-to permit autoscaling to scale up and down (default for new autoscalers).
+To permit autoscaling to scale up and down (default for new autoscalers).
 .TP 2m
 \fBonly\-up\fR
-to permit autoscaling to scale only up and not down.
+To permit autoscaling to scale only up and not down.
 .RE
 .sp
 
@@ -157,30 +175,30 @@ Autoscaler will be based on CPU utilization.
 Use autoscaling based on load balancing utilization.
 
 .TP 2m
-\fB\-\-scale\-down\-control\fR=[\fImax\-scaled\-down\-replicas\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\fR],[\fImax\-scaled\-down\-replicas\-percent\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]
-Configuration that allows slower scale down so that even if Autoscaler
-recommends an abrupt scale down of a managed instance group, it will be
-throttled as specified by the parameters.
+\fB\-\-scale\-in\-control\fR=[\fImax\-scaled\-in\-replicas\fR=\fIMAX\-SCALED\-IN\-REPLICAS\fR],[\fImax\-scaled\-in\-replicas\-percent\fR=\fIMAX\-SCALED\-IN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]
+Configuration that allows slower scale in so that even if Autoscaler recommends
+an abrupt scale in of a managed instance group, it will be throttled as
+specified by the parameters.
 
 .RS 2m
 .TP 2m
-\fBmax\-scaled\-down\-replicas\fR
+\fBmax\-scaled\-in\-replicas\fR
 Maximum allowed number of VMs that can be deducted from the peak recommendation
-during the window. Possibly all these VMs can be deleted at once so user service
-needs to be prepared to lose that many VMs in one step. Mutually exclusive with
-\'max\-scaled\-down\-replicas\-percent'.
+during the window. Possibly all these VMs can be deleted at once so the
+application needs to be prepared to lose that many VMs in one step. Mutually
+exclusive with 'max\-scaled\-in\-replicas\-percent'.
 
 .TP 2m
-\fBmax\-scaled\-down\-replicas\-percent\fR
+\fBmax\-scaled\-in\-replicas\-percent\fR
 Maximum allowed percent of VMs that can be deducted from the peak recommendation
-during the window. Possibly all these VMs can be deleted at once so user service
-needs to be prepared to lose that many VMs in one step. Mutually exclusive with
-\'max\-scaled\-down\-replicas'.
+during the window. Possibly all these VMs can be deleted at once so the
+application needs to be prepared to lose that many VMs in one step. Mutually
+exclusive with 'max\-scaled\-in\-replicas'.
 
 .TP 2m
 \fBtime\-window\fR
 How long back autoscaling should look when computing recommendations to include
-directives regarding slower scale down. Measured in seconds.
+directives regarding slower scale in. Measured in seconds.
 
 .RE
 .sp
@@ -275,8 +293,9 @@ invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

@@ -1,0 +1,100 @@
+
+.TH "GCLOUD_ALPHA_NOTEBOOKS_ENVIRONMENTS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha notebooks environments delete \- request for deleting environments
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha notebooks environments delete\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Request for deleting environments.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Environment resource \- User\-defined unique name of this environment. The
+environment name must be 1 to 63 characters long and contain only lowercase
+letters, numeric characters, and dashes. The first character must be a
+lowercaseletter and the last character cannot be a dash. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [environment] on the
+command line with a fully specified name; provide the argument [\-\-project] on
+the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIENVIRONMENT\fR
+ID of the environment or fully qualified identifier for the environment. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Google Cloud location of this environment
+https://cloud.google.com/compute/docs/regions\-zones/#locations.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete environment with id 'example\-environment' in location
+\'us\-central1\-a', run:
+
+.RS 2m
+$ gcloud alpha notebooks environments delete example\-environment \e
+    \-\-location=us\-central1\-a
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta notebooks environments delete
+.RE
+

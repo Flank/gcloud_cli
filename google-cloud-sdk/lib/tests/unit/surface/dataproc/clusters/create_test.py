@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Test of the 'clusters create' command."""
 
 from __future__ import absolute_import
@@ -40,12 +39,15 @@ from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import unit_base
 
 
-class ClustersCreateUnitTest(
-    unit_base.DataprocUnitTestBase, compute_base.BaseComputeUnitTest):
+class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
+                             compute_base.BaseComputeUnitTest):
   """Tests for dataproc clusters create."""
 
-  def ExpectCreateCluster(
-      self, cluster=None, response=None, region=None, exception=None):
+  def ExpectCreateCluster(self,
+                          cluster=None,
+                          response=None,
+                          region=None,
+                          exception=None):
     if not region:
       region = self.REGION
     if not cluster:
@@ -105,6 +107,19 @@ class ClustersCreateUnitTest(
     result = self.RunDataproc('clusters create {0}'.format(self.CLUSTER_NAME))
     self.AssertMessagesEqual(response_cluster, result)
 
+  def testCreateClusterErrorState(self):
+    properties.VALUES.compute.zone.Set(self.ZONE)
+    request_cluster = self.MakeCluster()
+    response_cluster = self.MakeCluster(
+        status=self.messages.ClusterStatus(
+            state=self.messages.ClusterStatus.StateValueValuesEnum.ERROR,
+            detail='foo detail'))
+    self.ExpectCreateCalls(request_cluster, response_cluster)
+    result = self.RunDataproc('clusters create {0}'.format(self.CLUSTER_NAME))
+    self.AssertMessagesEqual(response_cluster, result)
+    self.AssertErrContains('Create cluster failed!')
+    self.AssertErrContains('Details:\nfoo detail')
+
   def testCreateClusterSetRegionProp(self):
     properties.VALUES.compute.zone.Set(self.ZONE)
     properties.VALUES.dataproc.region.Set('us-central1')
@@ -135,18 +150,10 @@ class ClustersCreateUnitTest(
     self.AssertMessagesEqual(response_cluster, result)
 
   def testCreateClusterOmitRegion(self):
-    properties.VALUES.compute.zone.Set(self.ZONE)
-    # Default to global in GA
-    request_cluster = self.MakeCluster()
-    response_cluster = self.MakeRunningCluster()
-    self.ExpectCreateCalls(request_cluster, response_cluster, region='global')
-    result = self.RunDataproc(
-        'clusters create {0}'.format(self.CLUSTER_NAME),
-        output_format='default',
-        set_region=False)
-    self.AssertErrContains(
-        'Dataproc --region flag will become required in January 2020')
-    self.AssertMessagesEqual(response_cluster, result)
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc(
+          'clusters create {0}'.format(self.CLUSTER_NAME), set_region=False)
 
   def testCreateClusterOmitZoneGlobal(self):
     self.MockCompute()
@@ -203,13 +210,23 @@ class ClustersCreateUnitTest(
     worker_machine_type = 'bar-type'
     master_accelerator_type = 'foo-gpu'
     worker_accelerator_type = 'bar-gpu'
-    preemptible_worker_accelerator_type = 'foo-bar-gpu'
+    secondary_worker_accelerator_type = 'foo-bar-gpu'
+    master_local_ssds = 1
+    worker_local_ssds = 2
+    secondary_worker_local_ssds = 3
+    master_boot_disk_size = 42
+    master_boot_disk_type = 'pd-standard'
+    worker_boot_disk_size = 42
+    worker_boot_disk_type = 'pd-standard'
+    secondary_worker_boot_disk_size = 42
+    secondary_worker_boot_disk_type = 'pd-standard'
     master_min_cpu_platform = 'Intel Skylake'
     worker_min_cpu_platform = 'Intel Haswell'
     bucket = 'foo-bucket'
     num_masters = 3
     num_workers = 7
-    num_preemptible_workers = 5
+    num_secondary_workers = 5
+    secondary_worker_preemptibility = 'non-preemptible'
     image_version = '1.7'
     network = 'foo-network'
     network_uri = ('https://compute.googleapis.com/compute/v1/projects/'
@@ -217,23 +234,20 @@ class ClustersCreateUnitTest(
     action_uris = ['gs://my-bucket/action1.sh', 'gs://my-bucket/action2.sh']
     initialization_actions = [
         self.messages.NodeInitializationAction(
-            executableFile=action_uris[0],
-            executionTimeout='120s'),
+            executableFile=action_uris[0], executionTimeout='120s'),
         self.messages.NodeInitializationAction(
-            executableFile=action_uris[1],
-            executionTimeout='120s')]
+            executableFile=action_uris[1], executionTimeout='120s')
+    ]
     service_account = 'test-account'
     scope_list = 'https://www.googleapis.com/auth/dataproc-stuff,cloud-platform'
     scope_uris = [
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/dataproc-stuff',
     ]
-    cluster_properties = collections.OrderedDict([
-        ('core:com.foo', 'foo'),
-        ('hdfs:com.bar', 'bar')])
-    cluster_metadata = collections.OrderedDict([
-        ('key1', 'value1'),
-        ('key2', 'value2')])
+    cluster_properties = collections.OrderedDict([('core:com.foo', 'foo'),
+                                                  ('hdfs:com.bar', 'bar')])
+    cluster_metadata = collections.OrderedDict([('key1', 'value1'),
+                                                ('key2', 'value2')])
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         configBucket=bucket,
@@ -244,12 +258,22 @@ class ClustersCreateUnitTest(
         masterAcceleratorCount=1,
         workerAcceleratorTypeUri=worker_accelerator_type,
         workerAcceleratorCount=2,
-        secondaryWorkerAcceleratorTypeUri=preemptible_worker_accelerator_type,
+        secondaryWorkerAcceleratorTypeUri=secondary_worker_accelerator_type,
         secondaryWorkerAcceleratorCount=3,
+        masterNumLocalSsds=master_local_ssds,
+        workerNumLocalSsds=worker_local_ssds,
+        secondaryWorkerNumLocalSsds=secondary_worker_local_ssds,
+        masterBootDiskSizeGb=master_boot_disk_size,
+        masterBootDiskType=master_boot_disk_type,
+        workerBootDiskSizeGb=worker_boot_disk_size,
+        workerBootDiskType=worker_boot_disk_type,
+        secondaryWorkerBootDiskSizeGb=secondary_worker_boot_disk_size,
+        secondaryWorkerBootDiskType=secondary_worker_boot_disk_type,
         networkUri=network_uri,
         masterConfigNumInstances=num_masters,
         workerConfigNumInstances=num_workers,
-        secondaryWorkerConfigNumInstances=num_preemptible_workers,
+        secondaryWorkerConfigNumInstances=num_secondary_workers,
+        secondaryWorkerPreemptibility=secondary_worker_preemptibility,
         projectId=project,
         zoneUri=zone,
         initializationActions=initialization_actions,
@@ -283,13 +307,23 @@ class ClustersCreateUnitTest(
         '--worker-machine-type {worker_machine_type} '
         '--master-accelerator type={master_accelerator_type},count=1 '
         '--worker-accelerator type={worker_accelerator_type},count=2 '
-        '--preemptible-worker-accelerator '
-        'type={preemptible_worker_accelerator_type},count=3 '
+        '--secondary-worker-accelerator '
+        'type={secondary_worker_accelerator_type},count=3 '
+        '--num-master-local-ssds={master_local_ssds} '
+        '--num-worker-local-ssds={worker_local_ssds} '
+        '--num-secondary-worker-local-ssds={secondary_worker_local_ssds} '
+        '--master-boot-disk-size {master_boot_disk_size}GB'
+        ' --master-boot-disk-type {master_boot_disk_type} '
+        '--worker-boot-disk-size {worker_boot_disk_size}GB'
+        ' --worker-boot-disk-type {worker_boot_disk_type} '
+        '--secondary-worker-boot-disk-size {secondary_worker_boot_disk_size}GB'
+        ' --secondary-worker-boot-disk-type {secondary_worker_boot_disk_type} '
         '--network {network} '
         '--image-version {image_version} '
         '--initialization-action-timeout 2m '
         '--initialization-actions {actions} '
-        '--num-preemptible-workers {num_preemptible} '
+        '--num-secondary-workers {num_secondary} '
+        '--secondary-worker-preemptibility {secondary_worker_preemptibility} '
         '--service-account {service_account} '
         '--scopes {scopes} '
         '--no-address '
@@ -302,27 +336,145 @@ class ClustersCreateUnitTest(
         '--gce-pd-kms-key-project=p '
         '--gce-pd-kms-key-location=l '
         '--gce-pd-kms-key-keyring=kr '
-        '--gce-pd-kms-key=k '
+        '--gce-pd-kms-key=k ').format(
+            project=project,
+            cluster=cluster_name,
+            bucket=bucket,
+            zone=zone,
+            num_masters=num_masters,
+            num_workers=num_workers,
+            master_machine_type=master_machine_type,
+            worker_machine_type=worker_machine_type,
+            master_accelerator_type=master_accelerator_type,
+            worker_accelerator_type=worker_accelerator_type,
+            secondary_worker_accelerator_type=secondary_worker_accelerator_type,
+            master_local_ssds=master_local_ssds,
+            worker_local_ssds=worker_local_ssds,
+            secondary_worker_local_ssds=secondary_worker_local_ssds,
+            master_boot_disk_size=master_boot_disk_size,
+            master_boot_disk_type=master_boot_disk_type,
+            worker_boot_disk_size=worker_boot_disk_size,
+            worker_boot_disk_type=worker_boot_disk_type,
+            secondary_worker_boot_disk_size=secondary_worker_boot_disk_size,
+            secondary_worker_boot_disk_type=secondary_worker_boot_disk_type,
+            master_min_cpu_platform=master_min_cpu_platform,
+            worker_min_cpu_platform=worker_min_cpu_platform,
+            network=network,
+            image_version=image_version,
+            actions=','.join(action_uris),
+            num_secondary=num_secondary_workers,
+            secondary_worker_preemptibility=secondary_worker_preemptibility,
+            service_account=service_account,
+            scopes=scope_list)
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testDeprecatedPreemptibleWorkerFlags(self):
+    project = 'foo-project'
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+    secondary_worker_accelerator_type = 'foo-bar-gpu'
+    secondary_worker_accelerator_count = 3
+    num_secondary_workers = 5
+    secondary_worker_preemptibility = 'preemptible'
+    secondary_worker_boot_disk_size = 42
+    secondary_worker_boot_disk_type = 'pd-standard'
+    secondary_worker_local_ssds = 1
+    expected_request_cluster = self.MakeCluster(
+        clusterName=cluster_name,
+        secondaryWorkerAcceleratorTypeUri=secondary_worker_accelerator_type,
+        secondaryWorkerAcceleratorCount=secondary_worker_accelerator_count,
+        secondaryWorkerConfigNumInstances=num_secondary_workers,
+        secondaryWorkerPreemptibility=secondary_worker_preemptibility,
+        secondaryWorkerBootDiskSizeGb=secondary_worker_boot_disk_size,
+        secondaryWorkerBootDiskType=secondary_worker_boot_disk_type,
+        secondaryWorkerNumLocalSsds=secondary_worker_local_ssds,
+        projectId=project,
+        zoneUri=zone)
+
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    command = (
+        'clusters --project {project} create {cluster} --zone {zone} '
+        '--preemptible-worker-accelerator '
+        'type={secondary_worker_accelerator_type},count={secondary_worker_accelerator_count}'
+        ' --num-preemptible-workers {num_secondary} '
+        '--secondary-worker-preemptibility {secondary_worker_preemptibility} '
+        '--preemptible-worker-boot-disk-size '
+        '{secondary_worker_boot_disk_size}GB '
+        '--preemptible-worker-boot-disk-type {secondary_worker_boot_disk_type}'
+        ' --num-preemptible-worker-local-ssds {secondary_worker_local_ssds} '
     ).format(
         project=project,
         cluster=cluster_name,
-        bucket=bucket,
         zone=zone,
-        num_masters=num_masters,
-        num_workers=num_workers,
-        master_machine_type=master_machine_type,
-        worker_machine_type=worker_machine_type,
-        master_accelerator_type=master_accelerator_type,
-        worker_accelerator_type=worker_accelerator_type,
-        preemptible_worker_accelerator_type=preemptible_worker_accelerator_type,
-        master_min_cpu_platform=master_min_cpu_platform,
-        worker_min_cpu_platform=worker_min_cpu_platform,
-        network=network,
-        image_version=image_version,
-        actions=','.join(action_uris),
-        num_preemptible=num_preemptible_workers,
-        service_account=service_account,
-        scopes=scope_list)
+        secondary_worker_accelerator_type=secondary_worker_accelerator_type,
+        secondary_worker_accelerator_count=secondary_worker_accelerator_count,
+        num_secondary=num_secondary_workers,
+        secondary_worker_preemptibility=secondary_worker_preemptibility,
+        secondary_worker_boot_disk_size=secondary_worker_boot_disk_size,
+        secondary_worker_boot_disk_type=secondary_worker_boot_disk_type,
+        secondary_worker_local_ssds=secondary_worker_local_ssds)
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testSecondaryWorkerFlags(self):
+    project = 'foo-project'
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+    secondary_worker_accelerator_type = 'foo-bar-gpu'
+    secondary_worker_accelerator_count = 3
+    num_secondary_workers = 5
+    secondary_worker_preemptibility = 'non-preemptible'
+    secondary_worker_boot_disk_size = 42
+    secondary_worker_boot_disk_type = 'pd-standard'
+    secondary_worker_local_ssds = 1
+    expected_request_cluster = self.MakeCluster(
+        clusterName=cluster_name,
+        secondaryWorkerAcceleratorTypeUri=secondary_worker_accelerator_type,
+        secondaryWorkerAcceleratorCount=secondary_worker_accelerator_count,
+        secondaryWorkerConfigNumInstances=num_secondary_workers,
+        secondaryWorkerPreemptibility=secondary_worker_preemptibility,
+        secondaryWorkerBootDiskSizeGb=secondary_worker_boot_disk_size,
+        secondaryWorkerBootDiskType=secondary_worker_boot_disk_type,
+        secondaryWorkerNumLocalSsds=secondary_worker_local_ssds,
+        projectId=project,
+        zoneUri=zone)
+
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    command = (
+        'clusters --project {project} create {cluster} --zone {zone} '
+        '--secondary-worker-accelerator '
+        'type={secondary_worker_accelerator_type},count={secondary_worker_accelerator_count}'
+        ' --num-secondary-workers {num_secondary} '
+        '--secondary-worker-preemptibility {secondary_worker_preemptibility} '
+        '--secondary-worker-boot-disk-size {secondary_worker_boot_disk_size}GB'
+        ' --secondary-worker-boot-disk-type {secondary_worker_boot_disk_type} '
+        '--num-secondary-worker-local-ssds {secondary_worker_local_ssds} '
+    ).format(
+        project=project,
+        cluster=cluster_name,
+        zone=zone,
+        secondary_worker_accelerator_type=secondary_worker_accelerator_type,
+        secondary_worker_accelerator_count=secondary_worker_accelerator_count,
+        num_secondary=num_secondary_workers,
+        secondary_worker_preemptibility=secondary_worker_preemptibility,
+        secondary_worker_boot_disk_size=secondary_worker_boot_disk_size,
+        secondary_worker_boot_disk_type=secondary_worker_boot_disk_type,
+        secondary_worker_local_ssds=secondary_worker_local_ssds)
 
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
@@ -336,15 +488,12 @@ class ClustersCreateUnitTest(
     cluster_name = 'foo-cluster'
     zone = 'foo-zone'
     bucket = 'foo-bucket'
-    cluster_properties = collections.OrderedDict([
-        ('core:com.foo', 'foo'),
-        ('hdfs:com.bar', 'bar')])
-    cluster_metadata = collections.OrderedDict([
-        ('key1', 'value1'),
-        ('key2', 'value2')])
-    labels = collections.OrderedDict([
-        ('label1', 'value1'),
-        ('label2', 'value2')])
+    cluster_properties = collections.OrderedDict([('core:com.foo', 'foo'),
+                                                  ('hdfs:com.bar', 'bar')])
+    cluster_metadata = collections.OrderedDict([('key1', 'value1'),
+                                                ('key2', 'value2')])
+    labels = collections.OrderedDict([('label1', 'value1'),
+                                      ('label2', 'value2')])
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         configBucket=bucket,
@@ -360,21 +509,19 @@ class ClustersCreateUnitTest(
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
 
-    command = (
-        'clusters --project {project} create {cluster} '
-        '--bucket {bucket} '
-        '--zone {zone} '
-        '--labels label1=value1 '
-        '--labels label2=value2 '
-        '--properties core:com.foo=foo '
-        '--properties hdfs:com.bar=bar '
-        '--metadata key1=value1 '
-        '--metadata key2=value2 '
-    ).format(
-        project=project,
-        cluster=cluster_name,
-        bucket=bucket,
-        zone=zone)
+    command = ('clusters --project {project} create {cluster} '
+               '--bucket {bucket} '
+               '--zone {zone} '
+               '--labels label1=value1 '
+               '--labels label2=value2 '
+               '--properties core:com.foo=foo '
+               '--properties hdfs:com.bar=bar '
+               '--metadata key1=value1 '
+               '--metadata key2=value2 ').format(
+                   project=project,
+                   cluster=cluster_name,
+                   bucket=bucket,
+                   zone=zone)
 
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
@@ -387,15 +534,28 @@ class ClustersCreateUnitTest(
     request_cluster = self.MakeCluster()
     response_cluster = self.MakeRunningCluster()
     self.ExpectCreateCalls(request_cluster, response_cluster)
-    result = self.RunDataproc((
-        'clusters create {cluster} '
-        '--timeout {timeout} '
-        '--zone {zone} '
-    ).format(
-        cluster=self.CLUSTER_NAME,
-        timeout='42s',
-        zone=self.ZONE))
+    result = self.RunDataproc(('clusters create {cluster} '
+                               '--timeout {timeout} '
+                               '--zone {zone} ').format(
+                                   cluster=self.CLUSTER_NAME,
+                                   timeout='42s',
+                                   zone=self.ZONE))
     self.AssertMessagesEqual(response_cluster, result)
+
+  def testCreateClusterWithMinCpuPlatformSecondaryWorkers(self):
+    expected_request_cluster = self.MakeCluster(
+        secondaryWorkerConfigNumInstances=2)
+    self.AddMinCpuPlatform(expected_request_cluster, None, 'Intel Haswell')
+    expected_response_cluster = self.MakeRunningCluster()
+    self.AddMinCpuPlatform(expected_response_cluster, None, 'Intel Haswell')
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        'clusters create {name} --zone={zone} --num-secondary-workers=2 '
+        '--worker-min-cpu-platform="Intel Haswell"'.format(
+            name=self.CLUSTER_NAME, zone=self.ZONE))
+    self.AssertMessagesEqual(expected_response_cluster, result)
 
   def testCreateClusterWithMinCpuPlatformPreemptibleWorkers(self):
     expected_request_cluster = self.MakeCluster(
@@ -412,7 +572,7 @@ class ClustersCreateUnitTest(
             name=self.CLUSTER_NAME, zone=self.ZONE))
     self.AssertMessagesEqual(expected_response_cluster, result)
 
-  def testCreateClusterWithMinCpuPlatformAndWithoutPreemptibleWorkers(self):
+  def testCreateClusterWithMinCpuPlatformAndWithoutSecondaryWorkers(self):
     expected_request_cluster = self.MakeCluster()
     self.AddMinCpuPlatform(expected_request_cluster, None, 'Intel Haswell')
     expected_response_cluster = self.MakeRunningCluster()
@@ -426,6 +586,56 @@ class ClustersCreateUnitTest(
             name=self.CLUSTER_NAME, zone=self.ZONE))
     self.AssertMessagesEqual(expected_response_cluster, result)
 
+  def testCreateClusterWithSecondaryWorkersPreemptible(self):
+    expected_request_cluster = self.MakeCluster(
+        secondaryWorkerPreemptibility='preemptible')
+    expected_response_cluster = self.MakeRunningCluster(
+        secondaryWorkerPreemptibility='preemptible')
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        'clusters create {name} --zone={zone} '
+        '--secondary-worker-preemptibility="preemptible"'.format(
+            name=self.CLUSTER_NAME, zone=self.ZONE))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateClusterWithSecondaryWorkersNonPreemptible(self):
+    expected_request_cluster = self.MakeCluster(
+        secondaryWorkerPreemptibility='non-preemptible')
+    expected_response_cluster = self.MakeRunningCluster(
+        secondaryWorkerPreemptibility='non-preemptible')
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        'clusters create {name} --zone={zone} '
+        '--secondary-worker-preemptibility="non-preemptible"'.format(
+            name=self.CLUSTER_NAME, zone=self.ZONE))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateClusterWithSecondaryWorkersPreemptibilityUnspecified(self):
+    expected_request_cluster = self.MakeCluster()
+    expected_response_cluster = self.MakeRunningCluster()
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        'clusters create {name} --zone={zone} '
+        '--secondary-worker-preemptibility="unspecified"'.format(
+            name=self.CLUSTER_NAME, zone=self.ZONE))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateClusterWithSecondaryWorkersPreemptibilityOmitted(self):
+    expected_request_cluster = self.MakeCluster()
+    expected_response_cluster = self.MakeRunningCluster()
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc('clusters create {name} --zone={zone} '.format(
+        name=self.CLUSTER_NAME, zone=self.ZONE))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
   def testCreateClustersSubnetwork(self):
     properties.VALUES.compute.zone.Set(self.ZONE)
     request_cluster = self.MakeCluster(
@@ -433,9 +643,8 @@ class ClustersCreateUnitTest(
     response_cluster = self.MakeRunningCluster(
         networkUri=None, subnetworkUri=self.SubnetUri())
     self.ExpectCreateCalls(request_cluster, response_cluster)
-    result = self.RunDataproc(
-        'clusters create {0} --subnet {1}'.format(
-            self.CLUSTER_NAME, self.SUBNET))
+    result = self.RunDataproc('clusters create {0} --subnet {1}'.format(
+        self.CLUSTER_NAME, self.SUBNET))
     self.AssertMessagesEqual(response_cluster, result)
 
   def testCreateClustersLabels(self):
@@ -447,8 +656,8 @@ class ClustersCreateUnitTest(
         networkUri=None, subnetworkUri=self.SubnetUri(), labels=labels)
     self.assertTrue(request_cluster.labels is not None)  # pylint:disable=g-generic-assert
     self.assertTrue(response_cluster.labels is not None)  # pylint:disable=g-generic-assert
-    self.ExpectCreateCalls(request_cluster=request_cluster,
-                           response_cluster=response_cluster)
+    self.ExpectCreateCalls(
+        request_cluster=request_cluster, response_cluster=response_cluster)
     result = self.RunDataproc(
         command='clusters create {0} --labels=k1=v1 --subnet {1}'.format(
             self.CLUSTER_NAME, self.SUBNET))
@@ -467,8 +676,7 @@ class ClustersCreateUnitTest(
 
   def testCreateClustersPermissionsError(self):
     properties.VALUES.compute.zone.Set(self.ZONE)
-    self.ExpectCreateCluster(
-        exception=self.MakeHttpError(403))
+    self.ExpectCreateCluster(exception=self.MakeHttpError(403))
     with self.AssertRaisesHttpExceptionMatches(
         'Permission denied API reason: Permission denied.'):
       self.RunDataproc('clusters create {0}'.format(self.CLUSTER_NAME))
@@ -477,9 +685,8 @@ class ClustersCreateUnitTest(
     with self.AssertRaisesArgumentErrorMatches(
         'argument --network: At most one of '
         '--network | --subnet may be specified.'):
-      self.RunDataproc(
-          'clusters create {0} --network foo --subnet bar'.format(
-              self.CLUSTER_NAME))
+      self.RunDataproc('clusters create {0} --network foo --subnet bar'.format(
+          self.CLUSTER_NAME))
 
   def testCreateClustersAsync(self):
     properties.VALUES.compute.zone.Set(self.ZONE)
@@ -525,17 +732,19 @@ class ClustersCreateUnitTest(
       self.RunDataproc('clusters create {0}'.format(self.CLUSTER_NAME))
     # Ensure newlines are printed correctly.
     self.AssertErrContains('Waiting for cluster creation operation')
-    self.AssertErrContains("""\
+    self.AssertErrContains(
+        """\
         WARNING: If you only have 640 KB of memory.
-        WARNING: You're gonna have a bad time.""", normalize_space=True)
+        WARNING: You're gonna have a bad time.""",
+        normalize_space=True)
     self.AssertErrContains("WARNING: I don't think this is going to work.")
     # Ensure warnings only appear once.
     self.AssertErrNotMatches(r'.*(WARNING(.|\n)*){4}')
 
   def testCreateSingleNode(self):
-    dataproc_properties = encoding.DictToAdditionalPropertyMessage({
-        constants.ALLOW_ZERO_WORKERS_PROPERTY: 'true'
-    }, self.messages.SoftwareConfig.PropertiesValue)
+    dataproc_properties = encoding.DictToAdditionalPropertyMessage(
+        {constants.ALLOW_ZERO_WORKERS_PROPERTY: 'true'},
+        self.messages.SoftwareConfig.PropertiesValue)
     expected_request_cluster = self.MakeCluster(properties=dataproc_properties)
     expected_response_cluster = self.MakeRunningCluster(
         properties=dataproc_properties)
@@ -548,9 +757,9 @@ class ClustersCreateUnitTest(
     self.AssertMessagesEqual(expected_response_cluster, result)
 
   def testCreateSingleNodeUsingNumWorkersFlag(self):
-    dataproc_properties = encoding.DictToAdditionalPropertyMessage({
-        constants.ALLOW_ZERO_WORKERS_PROPERTY: 'true'
-    }, self.messages.SoftwareConfig.PropertiesValue)
+    dataproc_properties = encoding.DictToAdditionalPropertyMessage(
+        {constants.ALLOW_ZERO_WORKERS_PROPERTY: 'true'},
+        self.messages.SoftwareConfig.PropertiesValue)
     expected_request_cluster = self.MakeCluster(
         properties=dataproc_properties, workerConfigNumInstances=0)
     expected_response_cluster = self.MakeRunningCluster(
@@ -566,26 +775,48 @@ class ClustersCreateUnitTest(
   def testCreateSingleNodeWithSingleNodeAndNumWorkersFlagZero(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --single-node: At most one of --single-node | '
-        '--num-preemptible-workers --num-workers may be specified.'):
+        '--num-secondary-workers --num-workers --secondary-worker-preemptibility may be specified.'
+    ):
       self.RunDataproc(
-          'clusters create {name} --zone={zone} --single-node --num-workers=0'.
-          format(name=self.CLUSTER_NAME, zone=self.ZONE))
+          'clusters create {name} --zone={zone} --single-node --num-workers=0'
+          .format(name=self.CLUSTER_NAME, zone=self.ZONE))
 
   def testCreateSingleNodeWithWorkers(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --single-node: At most one of --single-node | '
-        '--num-preemptible-workers --num-workers may be specified.'):
+        '--num-secondary-workers --num-workers --secondary-worker-preemptibility may be specified.'
+    ):
       self.RunDataproc('clusters create {name} --zone={zone} '
                        '--num-workers=2 --single-node'.format(
                            name=self.CLUSTER_NAME, zone=self.ZONE))
 
-  def testCreateSingleNodeWithPreemtibleWorkers(self):
+  def testCreateSingleNodeWithSecondaryWorkers(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --single-node: At most one of --single-node | '
-        '--num-preemptible-workers --num-workers may be specified.'):
+        '--num-secondary-workers --num-workers --secondary-worker-preemptibility may be specified.'
+    ):
+      self.RunDataproc('clusters create {name} --zone={zone} '
+                       '--num-secondary-workers=2 --single-node'.format(
+                           name=self.CLUSTER_NAME, zone=self.ZONE))
+
+  def testCreateSingleNodeWithPreemptibleWorkers(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --single-node: At most one of --single-node | '
+        '--num-secondary-workers --num-workers --secondary-worker-preemptibility may be specified.'
+    ):
       self.RunDataproc('clusters create {name} --zone={zone} '
                        '--num-preemptible-workers=2 --single-node'.format(
                            name=self.CLUSTER_NAME, zone=self.ZONE))
+
+  def testCreateSingleNodeWithSecondaryWorkerPreemptibility(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --single-node: At most one of --single-node | '
+        '--num-secondary-workers --num-workers --secondary-worker-preemptibility may be specified.'
+    ):
+      self.RunDataproc(
+          'clusters create {name} --zone={zone} '
+          '--secondary-worker-preemptibility=non-preemptible --single-node'
+          .format(name=self.CLUSTER_NAME, zone=self.ZONE))
 
   def testCreateSpecifyUnsupportedSingleNodeProperty(self):
     with self.AssertRaisesExceptionMatches(
@@ -749,32 +980,30 @@ class ClustersCreateUnitTest(
     # No Location
     with self.AssertRaisesExceptionMatches(
         exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
-      self.RunDataproc(
-          ('clusters create {cluster} --zone={zone} '
-           '--gce-pd-kms-key-project={keyProject} '
-           '--gce-pd-kms-key-keyring={keyRing} '
-           '--gce-pd-kms-key={key}').format(
-               cluster='test-cluster',
-               zone='test-zone',
-               keyProject='test-project',
-               keyRing='test-keyring',
-               key='test-key'))
+      self.RunDataproc(('clusters create {cluster} --zone={zone} '
+                        '--gce-pd-kms-key-project={keyProject} '
+                        '--gce-pd-kms-key-keyring={keyRing} '
+                        '--gce-pd-kms-key={key}').format(
+                            cluster='test-cluster',
+                            zone='test-zone',
+                            keyProject='test-project',
+                            keyRing='test-keyring',
+                            key='test-key'))
 
   def testCreateClusterWithIncompleteGcePdKmsKeyFlags_NoKeyring(self):
     """Test command partially specified gce-pd-kms-key flags fail."""
     # No KeyRing
     with self.AssertRaisesExceptionMatches(
         exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
-      self.RunDataproc(
-          ('clusters create {cluster} --zone={zone} '
-           '--gce-pd-kms-key-project={keyProject} '
-           '--gce-pd-kms-key-location={keyLocation} '
-           '--gce-pd-kms-key={key}').format(
-               cluster='test-cluster',
-               zone='test-zone',
-               keyProject='test-project',
-               keyLocation='test-key-location',
-               key='test-key'))
+      self.RunDataproc(('clusters create {cluster} --zone={zone} '
+                        '--gce-pd-kms-key-project={keyProject} '
+                        '--gce-pd-kms-key-location={keyLocation} '
+                        '--gce-pd-kms-key={key}').format(
+                            cluster='test-cluster',
+                            zone='test-zone',
+                            keyProject='test-project',
+                            keyLocation='test-key-location',
+                            key='test-key'))
 
   def testCreateClusterWithIncompleteGcePdKmsKeyFlags_NoKey(self):
     """Test command partially specified gce-pd-kms-key flags fail."""
@@ -782,28 +1011,26 @@ class ClustersCreateUnitTest(
     with self.AssertRaisesArgumentErrorMatches(
         'argument --gce-pd-kms-key-keyring --gce-pd-kms-key-location '
         '--gce-pd-kms-key-project: --gce-pd-kms-key must be specified.'):
-      self.RunDataproc(
-          ('clusters create {cluster} --zone={zone} '
-           '--gce-pd-kms-key-project={keyProject} '
-           '--gce-pd-kms-key-location={keyLocation} '
-           '--gce-pd-kms-key-keyring={keyRing}').format(
-               cluster='test-cluster',
-               zone='test-zone',
-               keyProject='test-project',
-               keyLocation='test-key-location',
-               keyRing='test-keyring'))
+      self.RunDataproc(('clusters create {cluster} --zone={zone} '
+                        '--gce-pd-kms-key-project={keyProject} '
+                        '--gce-pd-kms-key-location={keyLocation} '
+                        '--gce-pd-kms-key-keyring={keyRing}').format(
+                            cluster='test-cluster',
+                            zone='test-zone',
+                            keyProject='test-project',
+                            keyLocation='test-key-location',
+                            keyRing='test-keyring'))
 
   def testCreateClusterWithInvalidRelativeName(self):
     """Test command partially specified gce-pd-kms-key flags fail."""
     # Invalid relative name
     with self.AssertRaisesExceptionMatches(
         exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
-      self.RunDataproc(
-          ('clusters create {cluster} --zone={zone} '
-           '--gce-pd-kms-key={key}').format(
-               cluster='test-cluster',
-               zone='test-zone',
-               key='locations/l/keyRings/kr/cryptoKeys/k'))
+      self.RunDataproc(('clusters create {cluster} --zone={zone} '
+                        '--gce-pd-kms-key={key}').format(
+                            cluster='test-cluster',
+                            zone='test-zone',
+                            key='locations/l/keyRings/kr/cryptoKeys/k'))
 
   def testCreateClusterWithExpirationTimeAndMaxIdle(self):
     """Tests TTL cluster related flags."""
@@ -842,14 +1069,13 @@ class ClustersCreateUnitTest(
     with self.AssertRaisesArgumentErrorMatches(
         'argument --expiration-time: At most one of --expiration-time | '
         '--max-age may be specified.'):
-      self.RunDataproc((
-          'clusters create {cluster} --max-idle={max_idle} '
-          '--max-age={max_age} '
-          '--expiration-time={expiration_time} ').format(
-              cluster=self.CLUSTER_NAME,
-              max_idle='30m',
-              max_age='1h',
-              expiration_time='2017-08-25T00:00:00-07:00'))
+      self.RunDataproc(('clusters create {cluster} --max-idle={max_idle} '
+                        '--max-age={max_age} '
+                        '--expiration-time={expiration_time} ').format(
+                            cluster=self.CLUSTER_NAME,
+                            max_idle='30m',
+                            max_age='1h',
+                            expiration_time='2017-08-25T00:00:00-07:00'))
 
   def testCreateKerberosFlagsMissingKmsKey(self):
     password_uri = 'gs://my-bucket/password.encrypted'
@@ -1052,6 +1278,49 @@ class ClustersCreateUnitTest(
              kerberos_config_file=file_name))
     self.AssertMessagesEqual(expected_response_cluster, result)
 
+  def testCreateClusterReservationAffinity(self):
+    project = 'foo-project'
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+    reservation_affinity = 'specific'
+    reservation_name = 'test'
+    expected_request_cluster = self.MakeCluster(
+        clusterName=cluster_name, projectId=project, zoneUri=zone)
+    self.AddReservationAffinity(expected_request_cluster, reservation_affinity,
+                                reservation_name)
+
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    command = ('clusters --project {project} create {cluster} '
+               '--zone {zone} '
+               '--reservation-affinity {reservation_affinity} '
+               '--reservation {reservation_name} ').format(
+                   project=project,
+                   cluster=cluster_name,
+                   zone=zone,
+                   reservation_affinity=reservation_affinity,
+                   reservation_name=reservation_name)
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateClusterReservationSpecificUnspecified(self):
+    """Test command partially specified gce-pd-kms-key flags fail."""
+    # Invalid relative name
+    with self.AssertRaisesExceptionMatches(
+        exceptions.ArgumentError,
+        '--reservation must be specified with --reservation-affinity=specific'):
+      self.RunDataproc(('clusters create {cluster} --zone={zone} '
+                        '--reservation-affinity {reservation_affinity}').format(
+                            cluster='test-cluster',
+                            zone='test-zone',
+                            reservation_affinity='specific'))
+
   def testCreateCluster_autoscalingPolicyIdOnly(self):
     specified_policy = 'cool-policy'
     expected_policy_uri = 'projects/fake-project/regions/antarctica-north42/autoscalingPolicies/cool-policy'
@@ -1095,12 +1364,53 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
     self.assertEqual(self.messages, self._beta_messages)
     self.assertEqual(self.track, calliope.base.ReleaseTrack.BETA)
 
-  def testCreateClusterOmitRegion(self):
-    properties.VALUES.compute.zone.Set(self.ZONE)
-    regex = r'Failed to find attribute \[region\]'
-    with self.assertRaisesRegex(handlers.ParseError, regex):
-      self.RunDataproc(
-          'clusters create {0}'.format(self.CLUSTER_NAME), set_region=False)
+  def testCreateZonalGkeBasedCluster(self):
+    expected_request_cluster = self.MakeCluster(
+        clusterName='test-cluster',
+        projectId='test-project',
+        gkeClusterNamespace='test-namespace',
+        gkeClusterPath='projects/test-project/locations/test-zone/clusters/test-gke-cluster'
+    )
+
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    command = ('clusters create test-cluster '
+               '--project=test-project '
+               '--zone=test-zone '
+               '--gke-cluster=test-gke-cluster '
+               '--gke-cluster-namespace=test-namespace')
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateRegionalGkeBasedCluster(self):
+    expected_request_cluster = self.MakeCluster(
+        clusterName='test-cluster',
+        projectId='test-project',
+        gkeClusterNamespace='test-namespace',
+        gkeClusterPath='projects/test-project/locations/{0}/clusters/test-gke-cluster'
+        .format(self.REGION))
+
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    command = ('clusters create test-cluster '
+               '--project=test-project '
+               '--region={0} '
+               '--gke-cluster=test-gke-cluster '
+               '--gke-cluster-namespace=test-namespace'.format(self.REGION))
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
 
   def testCreateClusterFlags(self):
     """Tests flags that behave differently in Beta track."""
@@ -1140,8 +1450,8 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                '--worker-boot-disk-type pd-ssd '
                '--master-machine-type {master_machine_type} '
                '--worker-machine-type {worker_machine_type} '
-               '--preemptible-worker-boot-disk-size 42GB '
-               '--preemptible-worker-boot-disk-type pd-standard '
+               '--secondary-worker-boot-disk-size 42GB '
+               '--secondary-worker-boot-disk-type pd-standard '
                '--no-address '
                '--gce-pd-kms-key-project=p '
                '--gce-pd-kms-key-location=l '
@@ -1197,39 +1507,6 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
     expected_response_cluster = copy.deepcopy(expected_request_cluster)
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
-
-    self.ExpectCreateCalls(
-        request_cluster=expected_request_cluster,
-        response_cluster=expected_response_cluster)
-    result = self.RunDataproc(command)
-    self.AssertMessagesEqual(expected_response_cluster, result)
-
-  def testCreateClusterReservationAffinity(self):
-    project = 'foo-project'
-    cluster_name = 'foo-cluster'
-    zone = 'foo-zone'
-    reservation_affinity = 'specific'
-    reservation_label = 'key=name,value=test'
-    reservation_label_key = 'name'
-    reservation_label_value = 'test'
-    expected_request_cluster = self.MakeCluster(
-        clusterName=cluster_name, projectId=project, zoneUri=zone)
-    self.AddReservationAffinity(expected_request_cluster, reservation_affinity,
-                                reservation_label_key, reservation_label_value)
-
-    expected_response_cluster = copy.deepcopy(expected_request_cluster)
-    expected_response_cluster.status = self.messages.ClusterStatus(
-        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
-
-    command = ('clusters --project {project} create {cluster} '
-               '--zone {zone} '
-               '--reservation-affinity {reservation_affinity} '
-               '--reservation-label {reservation_label} ').format(
-                   project=project,
-                   cluster=cluster_name,
-                   zone=zone,
-                   reservation_affinity=reservation_affinity,
-                   reservation_label=reservation_label)
 
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,

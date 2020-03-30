@@ -1,5 +1,5 @@
 title: Cloud Game Servers operations crud test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -8,13 +8,19 @@ summary:
   - stdout: |
       name: projects/fake-project/locations/us-central1/operations/my-operation
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha
+      BETA: v1beta
+
 - execute_command:
     command: |
       game operations describe my-operation --location us-central1
     events:
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/operations/my-operation?alt=json
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/operations/my-operation?alt=json
           method: GET
           headers: {}
           body: null

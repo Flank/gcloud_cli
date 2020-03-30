@@ -20,25 +20,6 @@ DESCRIPTION
     is under 60 seconds, you may also use gcloud beta ml speech recognize to
     analyze it.
 
-    To block the command from completing until analysis is finished, run:
-
-        $ gcloud beta ml speech recognize-long-running AUDIO_FILE \
-            --language-code LANGUAGE_CODE --sample-rate SAMPLE_RATE
-
-    You can also receive an operation as the result of the command by running:
-
-        $ gcloud beta ml speech recognize-long-running AUDIO_FILE \
-            --language-code LANGUAGE_CODE --sample-rate SAMPLE_RATE --async
-
-    This will return information about an operation. To get information about
-    the operation, run:
-
-        $ gcloud beta ml speech operations describe OPERATION_ID
-
-    To poll the operation until it's complete, run:
-
-        $ gcloud beta ml speech operations wait OPERATION_ID
-
 POSITIONAL ARGUMENTS
      AUDIO
         The location of the audio file to transcribe. Must be a local path or a
@@ -114,13 +95,34 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the speech/v1p1beta1 API. The full documentation for this
     API can be found at:
     https://cloud.google.com/speech-to-text/docs/quickstart-protocol
+
+EXAMPLES
+    To block the command from completing until analysis is finished, run:
+
+        $ gcloud beta ml speech recognize-long-running AUDIO_FILE \
+            --language-code=LANGUAGE_CODE --sample-rate=SAMPLE_RATE
+
+    You can also receive an operation as the result of the command by running:
+
+        $ gcloud beta ml speech recognize-long-running AUDIO_FILE \
+            --language-code=LANGUAGE_CODE --sample-rate=SAMPLE_RATE --async
+
+    This will return information about an operation. To get information about
+    the operation, run:
+
+        $ gcloud beta ml speech operations describe OPERATION_ID
+
+    To poll the operation until it's complete, run:
+
+        $ gcloud beta ml speech operations wait OPERATION_ID
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -83,8 +83,9 @@ replaces the current state_metadata for this recommendation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -102,18 +103,19 @@ To mark a recommendation as FAILED:
 .RS 2m
 $ gcloud beta recommender recommendations mark\-failed abcd\-1234 \e
     \-\-project=project\-name \-\-location=global \e
-    \-\-recommender=google.iam.policy.Recommender \-\-etag=abc123 \e
-    \-\-state\-metadata=key1=value1,key2=value2
+    \-\-recommender=google.compute.instance.MachineTypeRecommender \e
+    \-\-etag=abc123 \-\-state\-metadata=key1=value1,key2=value2
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud recommender recommendations mark\-failed
 $ gcloud alpha recommender recommendations mark\-failed
 .RE
 

@@ -342,6 +342,23 @@ class InterconnectsCreateAlphaTest(InterconnectsCreateBetaTest):
         'interconnect/docs/how-to/dedicated/retrieving-loas for more detailed '
         'help.')
 
+  def testCreateInterconnect_deprecatedItPrivate(self):
+    self.ExpectInterconnectRequest(interconnectType=self.messages.Interconnect.
+                                   InterconnectTypeValueValuesEnum.IT_PRIVATE)
+
+    self.Run('compute interconnects create my-interconnect '
+             '--interconnect-type IT_PRIVATE '
+             '--location my-location --link-type LINK_TYPE_ETHERNET_10G_LR '
+             '--requested-link-count 5 --admin-enabled '
+             '--customer-name customer-name')
+
+    self.CheckInterconnectRequest(interconnectType=self.messages.Interconnect.
+                                  InterconnectTypeValueValuesEnum.IT_PRIVATE)
+    self.AssertOutputEquals('')
+    self.AssertErrContains(
+        'WARNING: IT_PRIVATE will be deprecated for interconnect-type. Please use '
+        'DEDICATED instead.')
+
 
 if __name__ == '__main__':
   test_case.main()

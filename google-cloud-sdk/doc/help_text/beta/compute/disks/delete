@@ -1,15 +1,14 @@
 NAME
-    gcloud beta compute disks delete - delete Google Compute Engine persistent
-        disks
+    gcloud beta compute disks delete - delete a Google Compute Engine disk
 
 SYNOPSIS
     gcloud beta compute disks delete DISK_NAME [DISK_NAME ...]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute disks delete deletes one or more Google Compute
-    Engine persistent disks. Disks can be deleted only if they are not being
-    used by any virtual machine instances.
+    (BETA) gcloud beta compute disks delete deletes a Google Compute Engine
+    disk. A disk can be deleted only if it is not attached to any virtual
+    machine instances.
 
 POSITIONAL ARGUMENTS
      DISK_NAME [DISK_NAME ...]
@@ -62,8 +61,14 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To delete the disk 'my-disk' in zone 'us-east1-a', run:
+
+        $ gcloud beta compute disks delete my-disk --zone=us-east1-a
 
 NOTES
     This command is currently in BETA and may change without notice. These

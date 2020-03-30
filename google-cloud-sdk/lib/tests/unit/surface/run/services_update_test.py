@@ -16,16 +16,17 @@
 
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.run import service
+from googlecloudsdk.api_lib.run import traffic
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import exceptions
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib.surface.run import base
-
-import mock
 
 
 class UpdateTest(base.ServerlessSurfaceBase, parameterized.TestCase):
@@ -36,8 +37,11 @@ class UpdateTest(base.ServerlessSurfaceBase, parameterized.TestCase):
 
   def SetUp(self):
     self.operations.ReleaseService.return_value = None
-    self.service = mock.NonCallableMock()
+    self.service = service.Service.New(self.mock_serverless_client,
+                                       self.Project())
+    self.service.status.latestReadyRevisionName = 'rev.1'
     self.service.domain = 'info.cern.ch'
+    self.service.spec_traffic.SetPercent(traffic.LATEST_REVISION_KEY, 100)
     self.operations.GetService.return_value = self.service
     self.env_mock = self.StartObjectPatch(
         config_changes, 'EnvVarLiteralChanges')
@@ -48,8 +52,50 @@ class UpdateTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         'run services update --update-env-vars NAME=tim'
         ' s1')
     self.env_mock.assert_called_once_with(env_vars_to_update={'NAME': 'tim'})
-    self.AssertErrContains('Service [s1] revision [rev.1] is active and '
-                           'serving traffic at info.cern.ch')
+    args, _ = self.operations.ReleaseService.call_args
+    tracker = args[2]
+    self.assertIn('RoutesReady', tracker)
+
+    self.AssertErrContains('Service [s1] revision [rev.1] has been deployed '
+                           'and is serving 0 percent of traffic')
+
+  def testUpdateEnvVarsNotLatest(self):
+    """Tests update of env vars."""
+    del self.service.spec_traffic[traffic.LATEST_REVISION_KEY]
+    self.service.spec_traffic.SetPercent('rev.0', 100)
+    self.Run(
+        'run services update --update-env-vars NAME=tim'
+        ' s1')
+    self.env_mock.assert_called_once_with(env_vars_to_update={'NAME': 'tim'})
+    args, _ = self.operations.ReleaseService.call_args
+    tracker = args[2]
+    self.assertNotIn('RoutesReady', tracker)
+
+    self.AssertErrContains('Service [s1] revision [rev.1] has been deployed '
+                           'and is serving 0 percent of traffic')
+
+  def testUpdateEnvVarsLatestServingAllTrafficWithTag(self):
+    """Tests traffic output when updating a service with traffic tags."""
+    self.service.spec_traffic[traffic.LATEST_REVISION_KEY] = [
+        self.serverless_messages.TrafficTarget(
+            latestRevision=True, percent=100),
+        self.serverless_messages.TrafficTarget(
+            latestRevision=True, tag='latest')
+    ]
+    self.service.status_traffic[traffic.LATEST_REVISION_KEY] = [
+        self.serverless_messages.TrafficTarget(
+            revisionName='rev.1', percent=100),
+        self.serverless_messages.TrafficTarget(
+            revisionName='rev.1', tag='latest')
+    ]
+    self.Run('run services update --update-env-vars NAME=tim' ' s1')
+    self.env_mock.assert_called_once_with(env_vars_to_update={'NAME': 'tim'})
+    args, _ = self.operations.ReleaseService.call_args
+    tracker = args[2]
+    self.assertIn('RoutesReady', tracker)
+
+    self.AssertErrContains('Service [s1] revision [rev.1] has been deployed '
+                           'and is serving 100 percent of traffic')
 
   def testSetEnvVars(self):
     """Tests set of env vars."""
@@ -58,8 +104,8 @@ class UpdateTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         ' s1')
     self.env_mock.assert_called_once_with(
         env_vars_to_update={'NAME': 'tim'}, clear_others=True)
-    self.AssertErrContains('Service [s1] revision [rev.1] is active and '
-                           'serving traffic at info.cern.ch')
+    self.AssertErrContains('Service [s1] revision [rev.1] has been deployed '
+                           'and is serving 0 percent of traffic')
 
   def testRemoveEnvVars(self):
     """Tests removal of env vars."""
@@ -67,8 +113,8 @@ class UpdateTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         'run services update --remove-env-vars NAME'
         ' s1')
     self.env_mock.assert_called_once_with(env_vars_to_remove=['NAME'])
-    self.AssertErrContains('Service [s1] revision [rev.1] is active and '
-                           'serving traffic at info.cern.ch')
+    self.AssertErrContains('Service [s1] revision [rev.1] has been deployed '
+                           'and is serving 0 percent of traffic')
 
   def testClearEnvVars(self):
     """Tests clearing of env vars."""
@@ -76,8 +122,8 @@ class UpdateTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         'run services update --clear-env-vars'
         ' s1')
     self.env_mock.assert_called_once_with(clear_others=True)
-    self.AssertErrContains('Service [s1] revision [rev.1] is active and '
-                           'serving traffic at info.cern.ch')
+    self.AssertErrContains('Service [s1] revision [rev.1] has been deployed '
+                           'and is serving 0 percent of traffic')
 
   @parameterized.parameters(base.INVALID_ENV_FLAG_PAIRS)
   def testUpdateAllEnvVars(self, flag1, flag2):
@@ -94,8 +140,8 @@ class UpdateTest(base.ServerlessSurfaceBase, parameterized.TestCase):
     """Tests --concurrency param."""
     self.Run(
         'run services update --concurrency default s1')
-    self.AssertErrContains('Service [s1] revision [rev.1] is active and '
-                           'serving traffic at info.cern.ch')
+    self.AssertErrContains('Service [s1] revision [rev.1] has been deployed '
+                           'and is serving 0 percent of traffic')
 
 
 class UpdateTestBeta(UpdateTest):

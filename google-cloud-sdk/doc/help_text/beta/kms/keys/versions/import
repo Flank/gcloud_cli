@@ -16,10 +16,10 @@ DESCRIPTION
 
 REQUIRED FLAGS
      --algorithm=ALGORITHM
-        The algorithm of the key being imported.
-        Seehttps://cloud.google.com/kms/docs/algorithms for guidance on
-        choosing an algorithm. ALGORITHM must be one of: ec-sign-p256-sha256,
-        ec-sign-p384-sha384, google-symmetric-encryption,
+        The algorithm to assign to the new key version. For more information
+        about supported algorithms, see
+        https://cloud.google.com/kms/docs/algorithms. ALGORITHM must be one of:
+        ec-sign-p256-sha256, ec-sign-p384-sha384, google-symmetric-encryption,
         rsa-decrypt-oaep-2048-sha256, rsa-decrypt-oaep-3072-sha256,
         rsa-decrypt-oaep-4096-sha256, rsa-decrypt-oaep-4096-sha512,
         rsa-sign-pkcs1-2048-sha256, rsa-sign-pkcs1-3072-sha256,
@@ -48,23 +48,26 @@ OPTIONAL FLAGS
         Path to the wrapped RSA AES key file to import.
 
      --target-key-file=TARGET_KEY_FILE
-        Optional path to the target key to import into a KMS key version. If
-        specified, the key will be wrapped in the format produced by the
-        PKCS#11 mechanism CKM_RSA_AES_KEY_WRAP
+        Optional path to the unwrapped target key to import into a Cloud KMS
+        key version. If specified, the key will be securely wrapped before
+        transmission to Google.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     The following command will read the files 'path/to/ephemeral/key' and
     'path/to/target/key' and use them to create a new version with algorithm
     'google-symmetric-encryption' within the 'frodo' crypto key, 'fellowship'
     keyring, and 'us-central1' location using import job 'strider' to unwrap
-    the provided key material.        $ gcloud beta kms keys versions import --location=global \
+    the provided key material.
+
+        $ gcloud beta kms keys versions import --location=global \
              --keyring=fellowship \
              --key=frodo \
              --import-job=strider \
@@ -72,8 +75,9 @@ EXAMPLES
              --algorithm=google-symmetric-encryption
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud kms keys versions import
         $ gcloud alpha kms keys versions import
 

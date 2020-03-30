@@ -17,7 +17,8 @@ gcloud compute security\-policies import \- import security policy configs into 
 
 .SH "DESCRIPTION"
 
-Import security policy configs into your project.
+\fBgcloud compute security\-policies import\fR imports a security policy. The
+command does not support updating rules for the policy.
 
 
 
@@ -61,8 +62,19 @@ of: \fBjson\fR, \fByaml\fR.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To import a security policy from a YAML file run this:
+
+.RS 2m
+$ gcloud compute security\-policies import \-\-file\-name=myFile
+.RE
 
 
 

@@ -43,11 +43,13 @@ class FunctionsListTest(base.FunctionsTestBase):
         status=self.messages.CloudFunction.StatusValueValuesEnum('ACTIVE'))
 
   def _setListResponse(self, functions, project=None, region=None,
-                       page_size=None):
+                       page_size=None, unreachable=None):
     if project is None:
       project = self.Project()
     if region is None:
       region = '-'
+    if unreachable is None:
+      unreachable = []
     location = 'projects/{}/locations/{}'.format(project, region)
 
     page_token = None
@@ -58,14 +60,15 @@ class FunctionsListTest(base.FunctionsTestBase):
           self.messages.CloudfunctionsProjectsLocationsFunctionsListRequest(
               parent=location, pageSize=100, pageToken=page_token),
           self.messages.ListFunctionsResponse(
-              functions=functions[0:100], nextPageToken=next_page))
+              functions=functions[0:100], nextPageToken=next_page,
+              unreachable=unreachable))
       functions = functions[100:]
       page_token = next_page
     self.mock_client.projects_locations_functions.List.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsListRequest(
             parent=location, pageSize=page_size or 100, pageToken=page_token),
         self.messages.ListFunctionsResponse(
-            functions=functions))
+            functions=functions, unreachable=unreachable))
 
   def _setListResponseWithException(self):
     location = 'projects/{0}/locations/-'.format(self.Project())
@@ -179,6 +182,29 @@ class FunctionsListTest(base.FunctionsTestBase):
         r'ResponseError: status=\[404\], code=\[Not Found\], message=\[\]')
     with self.assertRaisesRegex(base_exceptions.HttpException, expected):
       self.Run('functions list')
+
+  def testListLogUnreachable(self):
+    functions = [self._createFunction('one'), self._createFunction('two')]
+    unreachable = ['narnia-1', 'hogwart-2']
+
+    self._setListResponse(functions, unreachable=unreachable)
+    properties.VALUES.core.user_output_enabled.Set(False)
+    result = self.Run('functions list')
+
+    self.AssertErrContains('The following regions were fully or partially '
+                           'unreachable for query: narnia-1, hogwart-2')
+    self._checkResult(result, functions)
+
+  def testListDoNotLogEmptyUnreachable(self):
+    functions = [self._createFunction('one'), self._createFunction('two')]
+
+    self._setListResponse(functions, unreachable=[])
+    properties.VALUES.core.user_output_enabled.Set(False)
+    result = self.Run('functions list')
+
+    self.AssertErrNotContains('The following regions were fully or partially '
+                              'unreachable')
+    self._checkResult(result, functions)
 
 
 class FunctionsListWithoutProjectTest(base.FunctionsTestBase):

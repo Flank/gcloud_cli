@@ -1,0 +1,60 @@
+NAME
+    gcloud alpha identity groups memberships add - create a new membership in
+        an existing group
+
+SYNOPSIS
+    gcloud alpha identity groups memberships add --group-email=GROUP_EMAIL
+        --member-email=MEMBER_EMAIL --organization=ORGANIZATION
+        [--expiration=EXPIRATION] [--roles=[ROLES,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a new membership in an existing group.
+
+REQUIRED FLAGS
+     --group-email=GROUP_EMAIL
+        The email address of the group the new membership is being added to.
+
+     --member-email=MEMBER_EMAIL
+        The email address of the group or user being added to a group.
+
+     --organization=ORGANIZATION
+        The organization the Group being created belongs to.
+
+OPTIONAL FLAGS
+     --expiration=EXPIRATION
+        Optional time of expiration for the membership. This is given as a
+        duration from now, for example '30d', '6m', '3y' for 30 days, 6 months,
+        or 3 years respectively.
+
+     --roles=[ROLES,...]
+        Roles for the membership within the Group. If not specified, MEMBER
+        will be used as a default value.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the cloudidentity/v1alpha1 API. The full documentation
+    for this API can be found at: https://cloud.google.com/identity/
+
+EXAMPLES
+    To create a new membership in a group:
+
+        $ gcloud alpha identity groups memberships add \
+            --group-email="eng-discuss@foo.com"  \
+            --organization="5149234212"  \
+            --member-email="user@foo.com"
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta identity groups memberships add
+

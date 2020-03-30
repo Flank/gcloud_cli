@@ -30,6 +30,7 @@ from six import text_type
 class LevelsDeleteTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -45,18 +46,18 @@ class LevelsDeleteTestGA(accesscontextmanager.Base):
     self._ExpectGetOperation('operations/my-op')
 
   def testDelete_MissingRequired(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run('access-context-manager levels delete --policy 123')
 
   def testDelete_Prompt(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.assertRaises(console_io.UnattendedPromptError):
       self.Run('access-context-manager levels delete my_level --policy 123')
 
   def testDelete(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     self._ExpectDelete('my_level', '123')
 
     self.Run('access-context-manager levels delete my_level --policy 123 '
@@ -65,7 +66,7 @@ class LevelsDeleteTestGA(accesscontextmanager.Base):
     self.AssertOutputEquals('')
 
   def testDelete_PolicyFromProperty(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
     self._ExpectDelete('my_level', policy)
@@ -75,7 +76,7 @@ class LevelsDeleteTestGA(accesscontextmanager.Base):
     self.AssertOutputEquals('')
 
   def testDelete_InvalidPolicyArg(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.assertRaises(properties.InvalidValueError) as ex:
       # Common error is to specify --policy arg as 'accessPolicies/<num>'
       self.Run('access-context-manager levels delete my_level --quiet'
@@ -86,12 +87,14 @@ class LevelsDeleteTestGA(accesscontextmanager.Base):
 class LevelsDeleteTestBeta(LevelsDeleteTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class LevelsDeleteTestAlpha(LevelsDeleteTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 

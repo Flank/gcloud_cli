@@ -60,20 +60,21 @@ JSON string with data that will be passed to the function.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To call a function giving it hello world in message field of its event argument
-(depending on your environment you might need to escape characters in \-\-data
-flag value differently):
+To call a function, giving it 'Hello World!' in the message field of its event
+argument (depending on your environment you might need to escape characters in
+\f5\-\-data\fR flag value differently), run:
 
 .RS 2m
 $ gcloud alpha functions call helloWorld \e
-  \-\-data '{"message": "Hello World!"}'
+  \-\-data='{"message": "Hello World!"}'
 .RE
 
 

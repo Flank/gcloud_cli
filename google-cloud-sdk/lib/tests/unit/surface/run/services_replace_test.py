@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.projects import util as projects_util
 from googlecloudsdk.command_lib.run import exceptions
 from surface.run import deploy
 from tests.lib import parameterized
@@ -40,6 +41,7 @@ class ReplaceTestAlpha(base.ServerlessSurfaceBase, parameterized.TestCase):
     self.operations.ReleaseService.return_value = None
     self.StartObjectPatch(deploy, 'GetStartDeployMessage')
     self.StartObjectPatch(deploy, 'GetSuccessMessageForSynchronousDeploy')
+    self.StartObjectPatch(projects_util, 'GetProjectNumber', return_value=123)
     self._MockConnectionContext()
 
   def _MakeFile(self, yaml_data):
@@ -107,6 +109,29 @@ class ReplaceTestAlpha(base.ServerlessSurfaceBase, parameterized.TestCase):
     self.Run('run services replace {}'.format(filename))
     self.operations.ReleaseService.assert_called_once_with(
         self._ServiceRef('my-service', project='fake-project'),
+        mock.ANY,
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        for_replace=True)
+
+  def testMetadataNamespaceNumericSpecifiedManaged(self):
+    yaml_data = """
+    apiVersion: serving.knative.dev/v1alpha1
+    kind: Service
+    metadata:
+      name: my-service
+      namespace: '123'
+    spec:
+      template:
+        spec:
+          containers:
+          - image: gcr.io/my-image
+    """
+    filename = self._MakeFile(yaml_data)
+    self.Run('run services replace {}'.format(filename))
+    self.operations.ReleaseService.assert_called_once_with(
+        self._ServiceRef('my-service', project='123'),
         mock.ANY,
         mock.ANY,
         asyn=False,

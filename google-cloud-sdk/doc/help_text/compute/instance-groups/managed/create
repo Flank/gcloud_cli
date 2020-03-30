@@ -6,7 +6,8 @@ SYNOPSIS
     gcloud compute instance-groups managed create NAME --size=SIZE
         --template=TEMPLATE [--base-instance-name=BASE_INSTANCE_NAME]
         [--description=DESCRIPTION] [--initial-delay=INITIAL_DELAY]
-        [--target-pool=[TARGET_POOL,...]] [--zones=ZONE,[ZONE,...]]
+        [--instance-redistribution-type=TYPE] [--target-pool=[TARGET_POOL,...]]
+        [--zones=ZONE,[ZONE,...]]
         [--health-check=HEALTH_CHECK | --http-health-check=HTTP_HEALTH_CHECK
           | --https-health-check=HTTPS_HEALTH_CHECK]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -49,6 +50,27 @@ OPTIONAL FLAGS
         initializing and should not be autohealed even if unhealthy. This value
         cannot be greater than 1 hour. See $ gcloud topic datetimes for
         information on duration formats.
+
+     --instance-redistribution-type=TYPE
+        Specifies the type of the instance redistribution policy. An instance
+        redistribution type lets you enable or disable automatic instance
+        redistribution across zones to meet the target distribution. The target
+        distribution is a state of a regional managed instance group where all
+        instances are spread out evenly across all target zones.
+
+        An instance redistribution type can be specified only for a
+        non-autoscaled regional managed instance group. By default it is set to
+        PROACTIVE.
+
+        The following types are available:
+
+        * NONE - The managed instance group does not redistribute instances
+          across zones.
+
+        * PROACTIVE - The managed instance group proactively redistributes
+          instances to meet its target distribution.
+
+    TYPE must be one of: NONE, PROACTIVE.
 
      --target-pool=[TARGET_POOL,...]
         Specifies any target pools you want the instances of this managed
@@ -112,8 +134,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     These variants are also available:

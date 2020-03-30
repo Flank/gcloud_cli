@@ -49,7 +49,7 @@ class Delete(base.DeleteCommand):
     parser.display_info.AddCacheUpdater(None)
 
   def Run(self, args):
-    dns = apis.GetClientInstance('dns', 'v1')
+    dns = util.GetApiClient('v1')
     messages = apis.GetMessagesModule('dns', 'v1')
 
     zone_ref = resources.REGISTRY.Parse(
@@ -89,7 +89,7 @@ class DeleteBeta(base.DeleteCommand):
 
   def Run(self, args):
     api_version = util.GetApiFromTrack(self.ReleaseTrack())
-    dns = apis.GetClientInstance('dns', api_version)
+    dns = util.GetApiClient(api_version)
 
     zone_ref = util.GetRegistry(api_version).Parse(
         args.dns_zone,
@@ -125,3 +125,21 @@ class DeleteAlpha(base.DeleteCommand):
     flags.GetDnsZoneArg(
         'The name of the empty managed-zone to be deleted.').AddToParser(parser)
     parser.display_info.AddCacheUpdater(None)
+
+  def Run(self, args):
+    api_version = util.GetApiFromTrack(self.ReleaseTrack())
+    dns = util.GetApiClient(api_version)
+
+    zone_ref = util.GetRegistry(api_version).Parse(
+        args.dns_zone,
+        params={
+            'project': properties.VALUES.core.project.GetOrFail,
+        },
+        collection='dns.managedZones')
+
+    result = dns.managedZones.Delete(
+        dns.MESSAGES_MODULE.DnsManagedZonesDeleteRequest(
+            managedZone=zone_ref.managedZone,
+            project=zone_ref.project))
+    log.DeletedResource(zone_ref)
+    return result

@@ -224,8 +224,7 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
 
     self.list_json.assert_called_once_with(
         requests=[(self.compute.addresses, 'AggregatedList',
-                   self.messages.ComputeAddressesAggregatedListRequest(
-                       project='my-project'))],
+                   self._getListRequestMessage('my-project'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -369,12 +368,20 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         cli=self.cli,
     )
 
+  def _getListRequestMessage(self, project, include_scopes=True):
+    return self.messages.ComputeAddressesAggregatedListRequest(
+        project=project, includeAllScopes=include_scopes)
+
 
 class AddressesListBetaTest(AddressesListTest):
 
   def PreSetUp(self):
     self.api_version = 'beta'
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def _getListRequestMessage(self, project):
+    return self.messages.ComputeAddressesAggregatedListRequest(
+        project=project, includeAllScopes=True)
 
 
 class AddressesListAlphaTest(AddressesListBetaTest):

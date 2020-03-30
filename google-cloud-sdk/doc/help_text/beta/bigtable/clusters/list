@@ -54,18 +54,19 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To list all clusters in an instance, run:
 
-        $ gcloud beta bigtable clusters list --instances INSTANCE_NAME
+        $ gcloud beta bigtable clusters list --instances=my-instance-id
 
-    To list all clusters in any of several instances, run:
+    To list all clusters in multiple instances, run:
 
         $ gcloud beta bigtable clusters list \
-            --instances INSTANCE_NAME1,INSTANCE_NAME2
+            --instances=my-instance-id,my-other-instance-id
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -24,10 +24,10 @@ import difflib
 from apitools.base.py import encoding
 from apitools.base.py import extra_types
 from apitools.base.py.testing import mock
-
 from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.dataproc import clusters
 from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core.resource import resource_printer_base
 from tests.lib import sdk_test_base
@@ -212,16 +212,24 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
     if ('secondaryWorkerConfigNumInstances' in kwargs or
         'secondaryWorkerBootDiskSizeGb' in kwargs or
         'secondaryWorkerBootDiskType' in kwargs or
-        'secondaryWorkerAcceleratorTypeUri' in kwargs):
+        'secondaryWorkerAcceleratorTypeUri' in kwargs or
+        'secondaryWorkerPreemptibility' in kwargs):
 
-      disk_config = self.messages.DiskConfig(
-          bootDiskSizeGb=kwargs.get('secondaryWorkerBootDiskSizeGb', None),
-          bootDiskType=kwargs.get('secondaryWorkerBootDiskType', None))
+      preemptibility_map = {
+          'preemptible':
+              self.messages.InstanceGroupConfig.PreemptibilityValueValuesEnum(
+                  'PREEMPTIBLE'),
+          'non-preemptible':
+              self.messages.InstanceGroupConfig.PreemptibilityValueValuesEnum(
+                  'NON_PREEMPTIBLE')
+      }
 
       secondary_worker_config = self.messages.InstanceGroupConfig(
           numInstances=kwargs.get('secondaryWorkerConfigNumInstances', None),
-          diskConfig=disk_config,
-          accelerators=make_accelerators('secondaryWorker'))
+          diskConfig=make_disk_config('secondaryWorker'),
+          accelerators=make_accelerators('secondaryWorker'),
+          preemptibility=preemptibility_map.get(
+              kwargs.get('secondaryWorkerPreemptibility', None), None))
 
     endpoint_config = None
     if 'enableHttpPortAccess' in kwargs:
@@ -286,6 +294,17 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         status=kwargs.get('status', None))
     if endpoint_config is not None:
       cluster.config.endpointConfig = endpoint_config
+    if 'gkeClusterPath' in kwargs:
+      cluster.config.gkeClusterConfig = self.messages.GkeClusterConfig(
+          namespacedGkeDeploymentTarget=self.messages
+          .NamespacedGkeDeploymentTarget(
+              targetGkeCluster=kwargs.get('gkeClusterPath', None),
+              clusterNamespace=kwargs.get('gkeClusterNamespace', None)))
+      # zero out the gce configs that wont exist.
+      cluster.config.gceClusterConfig = None
+      cluster.config.masterConfig = None
+      cluster.config.workerConfig = None
+      cluster.config.secondaryWorkerConfig = None
     return cluster
 
   def MakeRunningCluster(self, **kwargs):
@@ -463,7 +482,7 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         exception=exception)
 
   def AddReservationAffinity(self, cluster, reservation_affinity,
-                             reservation_key, reservation_values):
+                             reservation_name):
     if reservation_affinity is not None:
       type_msgs = (
           self.messages
@@ -475,7 +494,8 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         reservation_values = []
       elif reservation_affinity == 'specific':
         reservation_type = type_msgs.SPECIFIC_RESERVATION
-        reservation_values = [reservation_values]
+        reservation_key = clusters.RESERVATION_AFFINITY_KEY
+        reservation_values = [reservation_name]
       else:
         reservation_type = type_msgs.ANY_RESERVATION
         reservation_key = None

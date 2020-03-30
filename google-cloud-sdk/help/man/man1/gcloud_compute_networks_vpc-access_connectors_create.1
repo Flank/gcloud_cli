@@ -11,7 +11,7 @@ gcloud compute networks vpc\-access connectors create \- create a VPC Access con
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute networks vpc\-access connectors create\fR (\fICONNECTOR\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-async\fR] [\fB\-\-max\-throughput\fR=\fIMAX_THROUGHPUT\fR;\ default=1000] [\fB\-\-min\-throughput\fR=\fIMIN_THROUGHPUT\fR;\ default=200] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-range\fR=\fIRANGE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute networks vpc\-access connectors create\fR (\fICONNECTOR\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-async\fR] [\fB\-\-max\-throughput\fR=\fIMAX_THROUGHPUT\fR;\ default=300] [\fB\-\-min\-throughput\fR=\fIMIN_THROUGHPUT\fR;\ default=200] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-range\fR=\fIRANGE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -67,14 +67,16 @@ Compute region (e.g. us\-central1) for the connector.
 Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
-\fB\-\-max\-throughput\fR=\fIMAX_THROUGHPUT\fR; default=1000
+\fB\-\-max\-throughput\fR=\fIMAX_THROUGHPUT\fR; default=300
 Maximum throughput in Mbps. Value must be a multiple of 100 between 200 and
-1000.
+1000. Must be higher than the value specified by \f5\-\-min\-throughput\fR; the
+set value, if applicable, or the default minimum throughput value.
 
 .TP 2m
 \fB\-\-min\-throughput\fR=\fIMIN_THROUGHPUT\fR; default=200
 Minimum throughput in Mbps. Value must be a multiple of 100 between 200 and
-1000.
+1000. Must be lower than the value specified by \f5\-\-max\-throughput\fR; the
+set value, if applicable, or the default maximum throughput value.
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR; default="default"
@@ -96,8 +98,9 @@ ranges in the network.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

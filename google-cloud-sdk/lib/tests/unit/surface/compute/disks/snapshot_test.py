@@ -127,6 +127,16 @@ class DisksSnapshotTestGA(sdk_test_base.WithFakeAuth,
         self.api_mock.messages.ComputeZoneOperationsGetRequest(
             **operation_ref.AsDict()))
 
+  def _GetOperationWaitRequest(self, operation_ref):
+    return (
+        self.api_mock.adapter.apitools_client.zoneOperations,
+        'Wait',
+        self.api_mock.messages.ComputeZoneOperationsWaitRequest(
+            **operation_ref.AsDict()))
+
+  def _GetOperationPollingRequest(self, operation_ref):
+    return self._GetOperationWaitRequest(operation_ref)
+
   def _GetSnapshotRef(self, name):
     return self.api_mock.resources.Parse(
         name,
@@ -173,7 +183,7 @@ class DisksSnapshotTestGA(sdk_test_base.WithFakeAuth,
          self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
     ])
     self.api_mock.batch_responder.ExpectBatch([
-        (self._GetOperationGetRequest(operation_ref),
+        (self._GetOperationPollingRequest(operation_ref),
          self._GetOperationMessage(operation_ref, self.status_enum.DONE)),
     ])
     self.api_mock.batch_responder.ExpectBatch([
@@ -284,7 +294,7 @@ class DisksSnapshotTestGA(sdk_test_base.WithFakeAuth,
         (self._GetCreateSnapshotRequest(disk_ref, snapshot_ref),
          self._GetOperationMessage(operation_ref, self.status_enum.PENDING))])
     self.api_mock.batch_responder.ExpectBatch([
-        (self._GetOperationGetRequest(operation_ref),
+        (self._GetOperationPollingRequest(operation_ref),
          self._GetOperationMessage(
              operation_ref,
              self.status_enum.DONE,
@@ -320,7 +330,7 @@ class DisksSnapshotTestGA(sdk_test_base.WithFakeAuth,
         for c in range(n_disks)
     ])
     self.api_mock.batch_responder.ExpectBatch([
-        (self._GetOperationGetRequest(operation_refs[c]),
+        (self._GetOperationPollingRequest(operation_refs[c]),
          self._GetOperationMessage(operation_refs[c], self.status_enum.DONE))
         for c in range(n_disks)
     ])
@@ -624,7 +634,7 @@ class DisksSnapshotTestGA(sdk_test_base.WithFakeAuth,
          self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
     ])
     self.api_mock.batch_responder.ExpectBatch([
-        (self._GetOperationGetRequest(operation_ref),
+        (self._GetOperationPollingRequest(operation_ref),
          self._GetOperationMessage(operation_ref, self.status_enum.DONE)),
     ])
     self.api_mock.batch_responder.ExpectBatch([

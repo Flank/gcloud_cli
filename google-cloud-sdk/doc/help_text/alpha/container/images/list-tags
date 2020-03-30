@@ -19,7 +19,7 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      IMAGE_NAME
         The name of the image to list tags for. The name format should be
-        *.gcr.io/PROJECT_ID/IMAGE_PATH[:TAG|@sha256:DIGEST].
+        *.gcr.io/PROJECT_ID/IMAGE_PATH.
 
 FLAGS
      --occurrence-filter=OCCURRENCE_FILTER; default='kind = "BUILD_DETAILS" OR kind = "IMAGE_BASIS" OR kind = "DISCOVERY"'
@@ -63,8 +63,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     List the tags in a specified image:

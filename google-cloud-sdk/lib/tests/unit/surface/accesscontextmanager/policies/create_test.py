@@ -26,6 +26,7 @@ from tests.lib.surface import accesscontextmanager
 class PoliciesCreateTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -45,7 +46,7 @@ class PoliciesCreateTestGA(accesscontextmanager.Base):
                              resource_name='accessPolicies/67890')
 
   def testCreate(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
 
     organization_id = '12345'
     policy_req = self._MakePolicy(None,
@@ -64,12 +65,14 @@ class PoliciesCreateTestGA(accesscontextmanager.Base):
 class PoliciesCreateTestBeta(PoliciesCreateTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class PoliciesCreateTestAlpha(PoliciesCreateTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 

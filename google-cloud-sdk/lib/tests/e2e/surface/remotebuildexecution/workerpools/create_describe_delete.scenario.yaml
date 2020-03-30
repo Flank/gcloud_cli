@@ -20,7 +20,6 @@ summary:
       state: RUNNING
       workerConfig:
         diskSizeGb: '200'
-        diskType: pd-standard
         machineType: n1-standard-2
         networkAccess: public
 - execute:
@@ -99,6 +98,7 @@ actions:
 - execute_command:
     command: |
       remote-build-execution worker-pools describe $$test-workerpool$$ --instance=default_instance
+      --format 'yaml(name, state, workerConfig.diskSizeGb, workerConfig.machineType, workerConfig.networkAccess)'
     events:
     - api_call:
         expect_request:
@@ -125,7 +125,6 @@ actions:
         state: RUNNING
         workerConfig:
           diskSizeGb: '200'
-          diskType: pd-standard
           machineType: n1-standard-2
           networkAccess: public
     - expect_exit:

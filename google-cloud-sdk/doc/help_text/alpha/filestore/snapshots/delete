@@ -2,8 +2,8 @@ NAME
     gcloud alpha filestore snapshots delete - delete a Cloud Filestore snapshot
 
 SYNOPSIS
-    gcloud alpha filestore snapshots delete SNAPSHOT --region=REGION [--async]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha filestore snapshots delete SNAPSHOT
+        (--region=REGION | --zone=ZONE) [--async] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Delete a Cloud Filestore snapshot.
@@ -19,8 +19,13 @@ POSITIONAL ARGUMENTS
         delete.
 
 REQUIRED FLAGS
-     --region=REGION
-        Compute region (e.g. us-central1) for the snapshot.
+     Exactly one of these must be specified:
+
+       --region=REGION
+          Compute region (e.g. us-central1) for the snapshot.
+
+       --zone=ZONE
+          Compute zone (e.g. us-central1-c) for the snapshot.
 
 OPTIONAL FLAGS
      --async
@@ -31,8 +36,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the file/v1p1alpha1 API. The full documentation for this
@@ -46,9 +52,8 @@ EXAMPLES
             --region=us-central1
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

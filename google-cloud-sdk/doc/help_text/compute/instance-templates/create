@@ -43,14 +43,8 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute instance-templates create facilitates the creation of Google
-    Compute Engine virtual machine instance templates. For example, running:
-
-        $ gcloud compute instance-templates create INSTANCE-TEMPLATE
-
-    will create one instance templates called 'INSTANCE-TEMPLATE'.
-
-    Instance templates are global resources, and can be used to create
-    instances in any zone.
+    Compute Engine virtual machine instance templates. Instance templates are
+    global resources, and can be used to create instances in any zone.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -189,7 +183,7 @@ FLAGS
             If yes, this persistent disk will be automatically deleted when the
             instance is deleted. However, if the disk is later detached from
             the instance, this option won't apply. The default value for this
-            is no.
+            is yes.
 
          kms-key
             Fully qualified Cloud KMS cryptokey name that will protect the
@@ -302,10 +296,11 @@ FLAGS
      --metadata=KEY=VALUE,[KEY=VALUE,...]
         Metadata to be made available to the guest operating system running on
         the instances. Each metadata entry is a key/value pair separated by an
-        equals sign. Metadata keys must be unique and less than 128 bytes in
-        length. Values must be less than or equal to 32,768 bytes in length.
+        equals sign. Each metadata key must be unique and have a max of 128
+        bytes in length. Each value must have a max of 256 KB in length.
         Multiple arguments can be passed to this flag, e.g., --metadata
-        key-1=value-1,key-2=value-2,key-3=value-3.
+        key-1=value-1,key-2=value-2,key-3=value-3. The combined total size for
+        all metadata entries is 512 KB.
 
         In images that have Compute Engine tools installed on them, such as the
         official images (https://cloud.google.com/compute/docs/images), the
@@ -495,8 +490,12 @@ FLAGS
           instance.
 
        --no-address
-          If provided, the instances will not be assigned external IP
-          addresses.
+          If provided, the instances are not assigned external IP addresses. To
+          pull container images, you must configure private Google access if
+          using Container Registry or configure Cloud NAT for instances to
+          access container images directly. For more information, see:
+          + https://cloud.google.com/vpc/docs/configure-private-google-access
+          + https://cloud.google.com/nat/docs/using-nat
 
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the disk. The arguments in this group can be used to
@@ -687,8 +686,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create an instance template named 'INSTANCE-TEMPLATE' with the 'n2' vm
+    type, '9GB' memory, and 2 CPU cores, run:
+
+        $ gcloud compute instance-templates create INSTANCE-TEMPLATE \
+            --custom-vm-type=n2 --custom-cpu=2 --custom-memory=9GB
 
 NOTES
     These variants are also available:

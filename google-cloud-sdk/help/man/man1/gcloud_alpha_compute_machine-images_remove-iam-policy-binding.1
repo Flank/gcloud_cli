@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute machine\-images remove\-iam\-policy\-binding \- remove IAM policy binding from the IAM policy of a Google Compute Engine machine image
+gcloud alpha compute machine\-images remove\-iam\-policy\-binding \- remove IAM policy binding from the IAM policy of a Compute Engine machine image
 
 
 
@@ -17,8 +17,8 @@ gcloud alpha compute machine\-images remove\-iam\-policy\-binding \- remove IAM 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Remove an IAM policy binding from the IAM policy of a Google
-Compute Engine machine image. One binding consists of a member and a role.
+\fB(ALPHA)\fR Remove an IAM policy binding from the IAM policy of a Compute
+Engine machine image. A policy binding consists of a member and a role.
 
 
 
@@ -27,9 +27,9 @@ Compute Engine machine image. One binding consists of a member and a role.
 .RS 2m
 .TP 2m
 
-Machine image resource \- The machine image for which to remove IAM policy
-binding from. This represents a Cloud resource. (NOTE) Some attributes are not
-given arguments in this group but can be set in other ways. To set the [project]
+Machine image resource \- The machine image from which to remove the IAM policy
+binding. This represents a Cloud resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
 attribute: provide the argument [machine_image] on the command line with a fully
 specified name; set the property [core/project]; provide the argument
 [\-\-project] on the command line. This must be specified.
@@ -37,7 +37,7 @@ specified name; set the property [core/project]; provide the argument
 .RS 2m
 .TP 2m
 \fIMACHINE_IMAGE\fR
-ID of the machine_image or fully qualified identifier for the machine_image.
+ID of the machine image or fully qualified identifier for the machine image.
 
 
 .RE
@@ -82,8 +82,9 @@ The role to remove the member from.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -116,5 +117,9 @@ role and member types.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute machine\-images remove\-iam\-policy\-binding
+.RE
 

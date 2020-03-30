@@ -24,14 +24,44 @@ from apitools.base.protorpclite import util as protorpc_util
 
 from googlecloudsdk.api_lib.sql import exceptions
 from googlecloudsdk.api_lib.util import apis as core_apis
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
+# TODO(b/148447540): Refactor tests to use shared mock method.
+
 
 class _BaseInstancesCloneTest(object):
+  """The base instance clone test class."""
   # pylint:disable=g-tzinfo-datetime
-
-  messages = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
+  _DEFAULT_INSERT_TIME = datetime.datetime(
+      2014,
+      8,
+      7,
+      15,
+      0,
+      1,
+      81000,
+      tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
+  _DEFAULT_START_TIME = datetime.datetime(
+      2014,
+      8,
+      7,
+      15,
+      0,
+      1,
+      142000,
+      tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
+  _DEFAULT_END_TIME = datetime.datetime(
+      2014,
+      8,
+      7,
+      15,
+      0,
+      1,
+      142000,
+      tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
+  messages = core_apis.GetMessagesModule('sql', 'v1beta4')
 
   def testSimpleClone(self):
     self.ExpectInstanceGet(self.GetV2Instance('clone-instance-7'))
@@ -48,48 +78,23 @@ class _BaseInstancesCloneTest(object):
         ),
         self.messages.Operation(
             # pylint:disable=line-too-long
-            insertTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                81000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            startTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            endTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            insertTime=self._DEFAULT_INSERT_TIME,
+            startTime=self._DEFAULT_START_TIME,
+            endTime=self._DEFAULT_END_TIME,
             error=None,
             exportContext=None,
             importContext=None,
             targetId='clone-instance-7a',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='d930826e-80a5-4477-8218-fb7fb55aa250',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
-            format(self.Project()),
-            operationType='CLONE',
-            status='RUNNING',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CLONE,
+            status=self.messages.Operation.StatusValueValuesEnum.RUNNING,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -100,48 +105,23 @@ class _BaseInstancesCloneTest(object):
         ),
         self.messages.Operation(
             # pylint:disable=line-too-long
-            insertTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                81000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            startTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            endTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            insertTime=self._DEFAULT_INSERT_TIME,
+            startTime=self._DEFAULT_START_TIME,
+            endTime=self._DEFAULT_END_TIME,
             error=None,
             exportContext=None,
             importContext=None,
             targetId='clone-instance-7a',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='d930826e-80a5-4477-8218-fb7fb55aa250',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
-            format(self.Project()),
-            operationType='CLONE',
-            status='RUNNING',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CLONE,
+            status=self.messages.Operation.StatusValueValuesEnum.RUNNING,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -152,50 +132,44 @@ class _BaseInstancesCloneTest(object):
         ),
         self.messages.Operation(
             # pylint:disable=line-too-long
-            insertTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                81000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            startTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            endTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            insertTime=self._DEFAULT_INSERT_TIME,
+            startTime=self._DEFAULT_START_TIME,
+            endTime=self._DEFAULT_END_TIME,
             error=None,
             exportContext=None,
             importContext=None,
             targetId='clone-instance-7a',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='d930826e-80a5-4477-8218-fb7fb55aa250',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
-            format(self.Project()),
-            operationType='CLONE',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CLONE,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
+
+    create_time = datetime.datetime(
+        2014,
+        8,
+        13,
+        21,
+        47,
+        29,
+        512000,
+        tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
+    expiration_time = datetime.datetime(
+        2024,
+        8,
+        10,
+        21,
+        47,
+        29,
+        512000,
+        tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
     self.mocked_client.instances.Get.Expect(
         self.messages.SqlInstancesGetRequest(
             instance='clone-instance-7a',
@@ -203,7 +177,8 @@ class _BaseInstancesCloneTest(object):
         ),
         self.messages.DatabaseInstance(
             currentDiskSize=287592789,
-            databaseVersion='MYSQL_5_5',
+            databaseVersion=self.messages.DatabaseInstance
+            .DatabaseVersionValueValuesEnum.MYSQL_5_5,
             etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/Mw"',
             name='clone-instance-7a',
             ipAddresses=[],
@@ -216,30 +191,15 @@ class _BaseInstancesCloneTest(object):
                 cert='-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBg',
                 certSerialNumber='0',
                 commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL Server C',
-                createTime=datetime.datetime(
-                    2014,
-                    8,
-                    13,
-                    21,
-                    47,
-                    29,
-                    512000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-                expirationTime=datetime.datetime(
-                    2024,
-                    8,
-                    10,
-                    21,
-                    47,
-                    29,
-                    512000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                createTime=create_time,
+                expirationTime=expiration_time,
                 instance='clone-instance-7a',
                 kind='sql#sslCert',
                 sha1Fingerprint='2dbfcefd3c962a284035ffb06dccdd2055d32b46',
             ),
             settings=self.messages.Settings(
-                activationPolicy='ON_DEMAND',
+                activationPolicy=self.messages.Settings
+                .ActivationPolicyValueValuesEnum.ON_DEMAND,
                 authorizedGaeApplications=[],
                 backupConfiguration=self.messages.BackupConfiguration(
                     binaryLogEnabled=True,
@@ -254,13 +214,16 @@ class _BaseInstancesCloneTest(object):
                 ),
                 kind='sql#settings',
                 locationPreference=None,
-                pricingPlan='PER_USE',
-                replicationType='SYNCHRONOUS',
+                pricingPlan=self.messages.Settings.PricingPlanValueValuesEnum
+                .PER_USE,
+                replicationType=self.messages.Settings
+                .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
                 settingsVersion=3,
                 tier='D1',
             ),
-            state='RUNNABLE',
-            instanceType='CLOUD_SQL_INSTANCE',
+            state=self.messages.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
+            instanceType=self.messages.DatabaseInstance
+            .InstanceTypeValueValuesEnum.CLOUD_SQL_INSTANCE,
         ))
 
     self.Run('sql instances clone clone-instance-7 clone-instance-7a')
@@ -270,9 +233,9 @@ class _BaseInstancesCloneTest(object):
 NAME               DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS  STATUS
 clone-instance-7a  MYSQL_5_5         us-central  D1    -               -                RUNNABLE
 """,
-        normalize_space=True)\
-    # Ensure that the CMEK message doesn't show up by default.
+        normalize_space=True)
 
+    # Ensure that the CMEK message doesn't show up by default.
     self.AssertErrNotContains(
         'Your clone will be encrypted with the source instance\'s '
         'customer-managed encryption key. If anyone destroys this key, all '
@@ -293,48 +256,23 @@ clone-instance-7a  MYSQL_5_5         us-central  D1    -               -        
         ),
         self.messages.Operation(
             # pylint:disable=line-too-long
-            insertTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                81000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            startTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            endTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            insertTime=self._DEFAULT_INSERT_TIME,
+            startTime=self._DEFAULT_START_TIME,
+            endTime=self._DEFAULT_END_TIME,
             error=None,
             exportContext=None,
             importContext=None,
             targetId='clone-instance-7a',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='d930826e-80a5-4477-8218-fb7fb55cc250',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55cc250'.
-            format(self.Project()),
-            operationType='CLONE',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55cc250'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CLONE,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -345,48 +283,23 @@ clone-instance-7a  MYSQL_5_5         us-central  D1    -               -        
         ),
         self.messages.Operation(
             # pylint:disable=line-too-long
-            insertTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                81000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            startTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            endTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            insertTime=self._DEFAULT_INSERT_TIME,
+            startTime=self._DEFAULT_START_TIME,
+            endTime=self._DEFAULT_END_TIME,
             error=None,
             exportContext=None,
             importContext=None,
             targetId='clone-instance-7a',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='d930826e-80a5-4477-8218-fb7fb55cc250',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55cc250'.
-            format(self.Project()),
-            operationType='CLONE',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55cc250'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CLONE,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -397,21 +310,30 @@ insertTime: '2014-08-07T15:00:01.081000+00:00'
 kind: sql#operation
 name: d930826e-80a5-4477-8218-fb7fb55cc250
 operationType: CLONE
-selfLink: https://www.googleapis.com/sql/v1beta4/projects/fake-project/operations/d930826e-80a5-4477-8218-fb7fb55cc250
+selfLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/fake-project/operations/d930826e-80a5-4477-8218-fb7fb55cc250
 startTime: '2014-08-07T15:00:01.142000+00:00'
 status: DONE
 targetId: clone-instance-7a
-targetLink: https://www.googleapis.com/sql/v1beta4/projects/fake-project/instances/clone-instance-7a
+targetLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/fake-project/instances/clone-instance-7a
 targetProject: fake-project
 user: 170350250316@developer.gserviceaccount.com
 """)
 
-  def testCloneBinLogFromCmekInstance(self):
+  def testSimpleCloneV1(self):
+    self.ExpectInstanceGet(self.GetV1Instance('clone-instance-7'))
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.ArgumentError,
+        r'First Generation instances can no longer be created\.'):
+      self.Run('sql instances clone clone-instance-7 clone-instance-7a')
+
+  def testMySQLCloneBinLogFromCmekInstance(self):
     diff = {
         'name':
             'clone-instance-7',
         'diskEncryptionConfiguration':
-            self.messages.DiskEncryptionConfiguration(kmsKeyName='some-kms-key')
+            self.messages.DiskEncryptionConfiguration(
+                kind='sql#diskEncryptionConfiguration',
+                kmsKeyName='some-kms-key')
     }
     self.ExpectInstanceGet(self.GetV2Instance(), diff)
     self.mocked_client.instances.Clone.Expect(
@@ -428,48 +350,23 @@ user: 170350250316@developer.gserviceaccount.com
         ),
         self.messages.Operation(
             # pylint:disable=line-too-long
-            insertTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                81000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            startTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            endTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            insertTime=self._DEFAULT_INSERT_TIME,
+            startTime=self._DEFAULT_START_TIME,
+            endTime=self._DEFAULT_END_TIME,
             error=None,
             exportContext=None,
             importContext=None,
             targetId='clone-instance-7a',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='d930826e-80a5-4477-8218-fb7fb55aa250',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
-            format(self.Project()),
-            operationType='CLONE',
-            status='RUNNING',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CLONE,
+            status=self.messages.Operation.StatusValueValuesEnum.RUNNING,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -480,48 +377,23 @@ user: 170350250316@developer.gserviceaccount.com
         ),
         self.messages.Operation(
             # pylint:disable=line-too-long
-            insertTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                81000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            startTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            endTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            insertTime=self._DEFAULT_INSERT_TIME,
+            startTime=self._DEFAULT_START_TIME,
+            endTime=self._DEFAULT_END_TIME,
             error=None,
             exportContext=None,
             importContext=None,
             targetId='clone-instance-7a',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='d930826e-80a5-4477-8218-fb7fb55aa250',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
-            format(self.Project()),
-            operationType='CLONE',
-            status='RUNNING',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CLONE,
+            status=self.messages.Operation.StatusValueValuesEnum.RUNNING,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -532,50 +404,44 @@ user: 170350250316@developer.gserviceaccount.com
         ),
         self.messages.Operation(
             # pylint:disable=line-too-long
-            insertTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                81000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            startTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            endTime=datetime.datetime(
-                2014,
-                8,
-                7,
-                15,
-                0,
-                1,
-                142000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+            insertTime=self._DEFAULT_INSERT_TIME,
+            startTime=self._DEFAULT_START_TIME,
+            endTime=self._DEFAULT_END_TIME,
             error=None,
             exportContext=None,
             importContext=None,
             targetId='clone-instance-7a',
-            targetLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
-            format(self.Project()),
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'
+            .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='d930826e-80a5-4477-8218-fb7fb55aa250',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
-            format(self.Project()),
-            operationType='CLONE',
-            status='DONE',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CLONE,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
+
+    create_time = datetime.datetime(
+        2014,
+        8,
+        13,
+        21,
+        47,
+        29,
+        512000,
+        tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
+    expiration_time = datetime.datetime(
+        2024,
+        8,
+        10,
+        21,
+        47,
+        29,
+        512000,
+        tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
     self.mocked_client.instances.Get.Expect(
         self.messages.SqlInstancesGetRequest(
             instance='clone-instance-7a',
@@ -583,7 +449,8 @@ user: 170350250316@developer.gserviceaccount.com
         ),
         self.messages.DatabaseInstance(
             currentDiskSize=287592789,
-            databaseVersion='MYSQL_5_5',
+            databaseVersion=self.messages.DatabaseInstance
+            .DatabaseVersionValueValuesEnum.MYSQL_5_5,
             etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/Mw"',
             name='clone-instance-7a',
             ipAddresses=[],
@@ -596,30 +463,15 @@ user: 170350250316@developer.gserviceaccount.com
                 cert='-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBg',
                 certSerialNumber='0',
                 commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL Server C',
-                createTime=datetime.datetime(
-                    2014,
-                    8,
-                    13,
-                    21,
-                    47,
-                    29,
-                    512000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-                expirationTime=datetime.datetime(
-                    2024,
-                    8,
-                    10,
-                    21,
-                    47,
-                    29,
-                    512000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                createTime=create_time,
+                expirationTime=expiration_time,
                 instance='clone-instance-7a',
                 kind='sql#sslCert',
                 sha1Fingerprint='2dbfcefd3c962a284035ffb06dccdd2055d32b46',
             ),
             settings=self.messages.Settings(
-                activationPolicy='ON_DEMAND',
+                activationPolicy=self.messages.Settings
+                .ActivationPolicyValueValuesEnum.ON_DEMAND,
                 authorizedGaeApplications=[],
                 backupConfiguration=self.messages.BackupConfiguration(
                     binaryLogEnabled=True,
@@ -634,17 +486,20 @@ user: 170350250316@developer.gserviceaccount.com
                 ),
                 kind='sql#settings',
                 locationPreference=None,
-                pricingPlan='PER_USE',
-                replicationType='SYNCHRONOUS',
+                pricingPlan=self.messages.Settings.PricingPlanValueValuesEnum
+                .PER_USE,
+                replicationType=self.messages.Settings
+                .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
                 settingsVersion=3,
                 tier='D1',
             ),
-            state='RUNNABLE',
-            instanceType='CLOUD_SQL_INSTANCE',
+            state=self.messages.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
+            instanceType=self.messages.DatabaseInstance
+            .InstanceTypeValueValuesEnum.CLOUD_SQL_INSTANCE,
         ))
 
-    self.Run('sql instances clone --bin-log-file-name bin.log '
-             '--bin-log-position 1111 clone-instance-7 clone-instance-7a')
+    self.Run('sql instances clone clone-instance-7 clone-instance-7a '
+             '--bin-log-file-name bin.log --bin-log-position 1111')
     # pylint:disable=line-too-long
     self.AssertOutputContains(
         """\
@@ -658,18 +513,20 @@ clone-instance-7a  MYSQL_5_5         us-central  D1    -               -        
         'customer-managed encryption key. If anyone destroys this key, all '
         'data encrypted with it will be permanently lost.')
 
-  def testCloneBinLogInvalidArgs(self):
+  def testCloneBinLogMissingPosition(self):
     with self.assertRaisesRegex(
-        exceptions.ArgumentError,
-        'Both --bin-log-file-name and --bin-log-position must be specified'):
+        cli_test_base.MockArgumentError,
+        'argument --bin-log-position: Must be specified.'):
       self.Run("""
                sql instances clone
-               --bin-log-file-name bin.log
+               --bin-log-file-name mysql-bin.000006
                clone-instance-7 clone-instance-7a
                """)
+
+  def testCloneBinLogMissingFilename(self):
     with self.assertRaisesRegex(
-        exceptions.ArgumentError,
-        'Both --bin-log-file-name and --bin-log-position must be specified'):
+        cli_test_base.MockArgumentError,
+        'argument --bin-log-file-name: Must be specified.'):
       self.Run("""
                sql instances clone
                --bin-log-position 1111
@@ -686,7 +543,211 @@ class InstancesCloneBetaTest(_BaseInstancesCloneTest, base.SqlMockTestBeta):
 
 
 class InstancesCloneAlphaTest(_BaseInstancesCloneTest, base.SqlMockTestAlpha):
-  pass
+
+  def testPostgresCloneTimeFromCmekInstance(self):
+    diff = {
+        'name':
+            'clone-instance-7',
+        'diskEncryptionConfiguration':
+            self.messages.DiskEncryptionConfiguration(
+                kind='sql#diskEncryptionConfiguration',
+                kmsKeyName='some-kms-key')
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.mocked_client.instances.Clone.Expect(
+        self.messages.SqlInstancesCloneRequest(
+            instancesCloneRequest=self.messages.InstancesCloneRequest(
+                cloneContext=self.messages.CloneContext(
+                    pointInTime='2020-01-22T19:12:11.460000Z',
+                    destinationInstanceName='clone-instance-7a',
+                    kind='sql#cloneContext',
+                ),),
+            instance='clone-instance-7',
+            project=self.Project(),
+        ),
+        self.messages.Operation(
+            # pylint:disable=line-too-long
+            insertTime=self._DEFAULT_INSERT_TIME,
+            startTime=self._DEFAULT_START_TIME,
+            endTime=self._DEFAULT_END_TIME,
+            error=None,
+            exportContext=None,
+            importContext=None,
+            targetId='clone-instance-7a',
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'
+            .format(self.Project()),
+            targetProject=self.Project(),
+            kind='sql#operation',
+            name='d930826e-80a5-4477-8218-fb7fb55aa250',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CLONE,
+            status=self.messages.Operation.StatusValueValuesEnum.RUNNING,
+            user='170350250316@developer.gserviceaccount.com',
+        ))
+
+    self.mocked_client.operations.Get.Expect(
+        self.messages.SqlOperationsGetRequest(
+            operation='d930826e-80a5-4477-8218-fb7fb55aa250',
+            project=self.Project(),
+        ),
+        self.messages.Operation(
+            # pylint:disable=line-too-long
+            insertTime=self._DEFAULT_INSERT_TIME,
+            startTime=self._DEFAULT_START_TIME,
+            endTime=self._DEFAULT_END_TIME,
+            error=None,
+            exportContext=None,
+            importContext=None,
+            targetId='clone-instance-7a',
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'
+            .format(self.Project()),
+            targetProject=self.Project(),
+            kind='sql#operation',
+            name='d930826e-80a5-4477-8218-fb7fb55aa250',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CLONE,
+            status=self.messages.Operation.StatusValueValuesEnum.RUNNING,
+            user='170350250316@developer.gserviceaccount.com',
+        ))
+
+    self.mocked_client.operations.Get.Expect(
+        self.messages.SqlOperationsGetRequest(
+            operation='d930826e-80a5-4477-8218-fb7fb55aa250',
+            project=self.Project(),
+        ),
+        self.messages.Operation(
+            # pylint:disable=line-too-long
+            insertTime=self._DEFAULT_INSERT_TIME,
+            startTime=self._DEFAULT_START_TIME,
+            endTime=self._DEFAULT_END_TIME,
+            error=None,
+            exportContext=None,
+            importContext=None,
+            targetId='clone-instance-7a',
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'
+            .format(self.Project()),
+            targetProject=self.Project(),
+            kind='sql#operation',
+            name='d930826e-80a5-4477-8218-fb7fb55aa250',
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'
+            .format(self.Project()),
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .CLONE,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
+            user='170350250316@developer.gserviceaccount.com',
+        ))
+
+    create_time = datetime.datetime(
+        2014,
+        8,
+        13,
+        21,
+        47,
+        29,
+        512000,
+        tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
+    expiration_time = datetime.datetime(
+        2024,
+        8,
+        10,
+        21,
+        47,
+        29,
+        512000,
+        tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))).isoformat()
+    self.mocked_client.instances.Get.Expect(
+        self.messages.SqlInstancesGetRequest(
+            instance='clone-instance-7a',
+            project=self.Project(),
+        ),
+        self.messages.DatabaseInstance(
+            currentDiskSize=287592789,
+            databaseVersion=self.messages.DatabaseInstance
+            .DatabaseVersionValueValuesEnum.POSTGRES_9_6,
+            etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/Mw"',
+            name='clone-instance-7a',
+            ipAddresses=[],
+            ipv6Address='2001:4860:4864:1:df7c:6a7a:d107:ab9d',
+            kind='sql#instance',
+            maxDiskSize=268435456000,
+            project=self.Project(),
+            region='us-central',
+            serverCaCert=self.messages.SslCert(
+                cert='-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBg',
+                certSerialNumber='0',
+                commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL Server C',
+                createTime=create_time,
+                expirationTime=expiration_time,
+                instance='clone-instance-7a',
+                kind='sql#sslCert',
+                sha1Fingerprint='2dbfcefd3c962a284035ffb06dccdd2055d32b46',
+            ),
+            settings=self.messages.Settings(
+                activationPolicy=self.messages.Settings
+                .ActivationPolicyValueValuesEnum.ON_DEMAND,
+                authorizedGaeApplications=[],
+                backupConfiguration=self.messages.BackupConfiguration(
+                    pointInTimeRecoveryEnabled=True,
+                    enabled=True,
+                    kind='sql#backupConfiguration',
+                    startTime='23:00'),
+                databaseFlags=[],
+                ipConfiguration=self.messages.IpConfiguration(
+                    authorizedNetworks=[],
+                    ipv4Enabled=False,
+                    requireSsl=None,
+                ),
+                kind='sql#settings',
+                locationPreference=None,
+                pricingPlan=self.messages.Settings.PricingPlanValueValuesEnum
+                .PER_USE,
+                replicationType=self.messages.Settings
+                .ReplicationTypeValueValuesEnum.SYNCHRONOUS,
+                settingsVersion=3,
+                tier='D1',
+            ),
+            state=self.messages.DatabaseInstance.StateValueValuesEnum.RUNNABLE,
+            instanceType=self.messages.DatabaseInstance
+            .InstanceTypeValueValuesEnum.CLOUD_SQL_INSTANCE,
+        ))
+
+    self.Run('sql instances clone clone-instance-7 clone-instance-7a '
+             '--point-in-time 2020-01-22T19:12:11.460Z')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME               DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+clone-instance-7a  POSTGRES_9_6         us-central  D1    -               -               RUNNABLE
+""",
+        normalize_space=True)
+    # Ensure that the CMEK message is showing up.
+    self.AssertErrContains(
+        'Your clone will be encrypted with the source instance\'s '
+        'customer-managed encryption key. If anyone destroys this key, all '
+        'data encrypted with it will be permanently lost.')
+
+  def testPointInTimeInvalidFormat(self):
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --point-in-time: Failed to parse date/time'):
+      self.Run("""
+               sql instances clone clone-instance-7 clone-instance-7a
+               --point-in-time 123-abc
+               """)
+
+  def testPointInTimeAndBinLogInvalid(self):
+    with self.assertRaisesRegex(
+        cli_test_base.MockArgumentError,
+        r'argument --point-in-time: At most one of --point-in-time | '
+        r'--bin-log-file-name --bin-log-position may be specified'):
+      self.Run("""
+               sql instances clone clone-instance-7 clone-instance-7a
+               --point-in-time 2020-01-22T19:12:11.460Z
+               --bin-log-file-name mysql-bin.000007 --bin-log-position 1111
+               """)
 
 
 if __name__ == '__main__':

@@ -107,15 +107,15 @@ class BatchCreateNotesRequest(_messages.Message):
   r"""Request to create notes in batch.
 
   Messages:
-    NotesValue: The notes to create. Max allowed length is 1000.
+    NotesValue: Required. The notes to create. Max allowed length is 1000.
 
   Fields:
-    notes: The notes to create. Max allowed length is 1000.
+    notes: Required. The notes to create. Max allowed length is 1000.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class NotesValue(_messages.Message):
-    r"""The notes to create. Max allowed length is 1000.
+    r"""Required. The notes to create. Max allowed length is 1000.
 
     Messages:
       AdditionalProperty: An additional property for a NotesValue object.
@@ -154,7 +154,8 @@ class BatchCreateOccurrencesRequest(_messages.Message):
   r"""Request to create occurrences in batch.
 
   Fields:
-    occurrences: The occurrences to create. Max allowed length is 1000.
+    occurrences: Required. The occurrences to create. Max allowed length is
+      1000.
   """
 
   occurrences = _messages.MessageField('Occurrence', 1, repeated=True)
@@ -191,7 +192,7 @@ class Binding(_messages.Message):
       that represents a Google group.    For example, `admins@example.com`.  *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
-      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
       recovered, this value reverts to `user:{emailid}` and the recovered user
       retains the role in the binding.  *
       `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
@@ -477,6 +478,18 @@ class CancelOperationRequest(_messages.Message):
   r"""The request message for Operations.CancelOperation."""
 
 
+class Category(_messages.Message):
+  r"""The category to which the update belongs.
+
+  Fields:
+    categoryId: The identifier of the category.
+    name: The localized name of the category.
+  """
+
+  categoryId = _messages.StringField(1)
+  name = _messages.StringField(2)
+
+
 class CloudRepoSourceContext(_messages.Message):
   r"""A CloudRepoSourceContext denotes a particular revision in a Google Cloud
   Source Repo.
@@ -571,8 +584,8 @@ class ContaineranalysisProjectsNotesBatchCreateRequest(_messages.Message):
   Fields:
     batchCreateNotesRequest: A BatchCreateNotesRequest resource to be passed
       as the request body.
-    parent: The name of the project in the form of `projects/[PROJECT_ID]`,
-      under which the notes are to be created.
+    parent: Required. The name of the project in the form of
+      `projects/[PROJECT_ID]`, under which the notes are to be created.
   """
 
   batchCreateNotesRequest = _messages.MessageField('BatchCreateNotesRequest', 1)
@@ -584,9 +597,9 @@ class ContaineranalysisProjectsNotesCreateRequest(_messages.Message):
 
   Fields:
     note: A Note resource to be passed as the request body.
-    noteId: The ID to use for this note.
-    parent: The name of the project in the form of `projects/[PROJECT_ID]`,
-      under which the note is to be created.
+    noteId: Required. The ID to use for this note.
+    parent: Required. The name of the project in the form of
+      `projects/[PROJECT_ID]`, under which the note is to be created.
   """
 
   note = _messages.MessageField('Note', 1)
@@ -598,7 +611,7 @@ class ContaineranalysisProjectsNotesDeleteRequest(_messages.Message):
   r"""A ContaineranalysisProjectsNotesDeleteRequest object.
 
   Fields:
-    name: The name of the note in the form of
+    name: Required. The name of the note in the form of
       `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
   """
 
@@ -624,7 +637,7 @@ class ContaineranalysisProjectsNotesGetRequest(_messages.Message):
   r"""A ContaineranalysisProjectsNotesGetRequest object.
 
   Fields:
-    name: The name of the note in the form of
+    name: Required. The name of the note in the form of
       `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
   """
 
@@ -639,7 +652,7 @@ class ContaineranalysisProjectsNotesListRequest(_messages.Message):
     pageSize: Number of notes to return in the list. Must be positive. Max
       allowed page size is 1000. If not specified, page size defaults to 20.
     pageToken: Token to provide to skip to a particular spot in the list.
-    parent: The name of the project to list notes for in the form of
+    parent: Required. The name of the project to list notes for in the form of
       `projects/[PROJECT_ID]`.
   """
 
@@ -654,8 +667,8 @@ class ContaineranalysisProjectsNotesOccurrencesListRequest(_messages.Message):
 
   Fields:
     filter: The filter expression.
-    name: The name of the note to list occurrences for in the form of
-      `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
+    name: Required. The name of the note to list occurrences for in the form
+      of `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
     pageSize: Number of occurrences to return in the list.
     pageToken: Token to provide to skip to a particular spot in the list.
   """
@@ -670,7 +683,7 @@ class ContaineranalysisProjectsNotesPatchRequest(_messages.Message):
   r"""A ContaineranalysisProjectsNotesPatchRequest object.
 
   Fields:
-    name: The name of the note in the form of
+    name: Required. The name of the note in the form of
       `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
     note: A Note resource to be passed as the request body.
     updateMask: The fields to update.
@@ -717,8 +730,8 @@ class ContaineranalysisProjectsOccurrencesBatchCreateRequest(_messages.Message):
   Fields:
     batchCreateOccurrencesRequest: A BatchCreateOccurrencesRequest resource to
       be passed as the request body.
-    parent: The name of the project in the form of `projects/[PROJECT_ID]`,
-      under which the occurrences are to be created.
+    parent: Required. The name of the project in the form of
+      `projects/[PROJECT_ID]`, under which the occurrences are to be created.
   """
 
   batchCreateOccurrencesRequest = _messages.MessageField('BatchCreateOccurrencesRequest', 1)
@@ -730,8 +743,8 @@ class ContaineranalysisProjectsOccurrencesCreateRequest(_messages.Message):
 
   Fields:
     occurrence: A Occurrence resource to be passed as the request body.
-    parent: The name of the project in the form of `projects/[PROJECT_ID]`,
-      under which the occurrence is to be created.
+    parent: Required. The name of the project in the form of
+      `projects/[PROJECT_ID]`, under which the occurrence is to be created.
   """
 
   occurrence = _messages.MessageField('Occurrence', 1)
@@ -742,7 +755,7 @@ class ContaineranalysisProjectsOccurrencesDeleteRequest(_messages.Message):
   r"""A ContaineranalysisProjectsOccurrencesDeleteRequest object.
 
   Fields:
-    name: The name of the occurrence in the form of
+    name: Required. The name of the occurrence in the form of
       `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
   """
 
@@ -768,7 +781,7 @@ class ContaineranalysisProjectsOccurrencesGetNotesRequest(_messages.Message):
   r"""A ContaineranalysisProjectsOccurrencesGetNotesRequest object.
 
   Fields:
-    name: The name of the occurrence in the form of
+    name: Required. The name of the occurrence in the form of
       `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
   """
 
@@ -779,7 +792,7 @@ class ContaineranalysisProjectsOccurrencesGetRequest(_messages.Message):
   r"""A ContaineranalysisProjectsOccurrencesGetRequest object.
 
   Fields:
-    name: The name of the occurrence in the form of
+    name: Required. The name of the occurrence in the form of
       `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
   """
 
@@ -795,8 +808,8 @@ class ContaineranalysisProjectsOccurrencesListRequest(_messages.Message):
       Max allowed page size is 1000. If not specified, page size defaults to
       20.
     pageToken: Token to provide to skip to a particular spot in the list.
-    parent: The name of the project to list occurrences for in the form of
-      `projects/[PROJECT_ID]`.
+    parent: Required. The name of the project to list occurrences for in the
+      form of `projects/[PROJECT_ID]`.
   """
 
   filter = _messages.StringField(1)
@@ -809,7 +822,7 @@ class ContaineranalysisProjectsOccurrencesPatchRequest(_messages.Message):
   r"""A ContaineranalysisProjectsOccurrencesPatchRequest object.
 
   Fields:
-    name: The name of the occurrence in the form of
+    name: Required. The name of the occurrence in the form of
       `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
     occurrence: A Occurrence resource to be passed as the request body.
     updateMask: The fields to update.
@@ -1017,6 +1030,7 @@ class DiscoveryOccurrence(_messages.Message):
       is output only and populated by the API.
     continuousAnalysis: Whether the resource is continuously analyzed.
     cpe: The CPE of the resource being scanned.
+    lastScanTime: The last time this resource was scanned.
   """
 
   class AnalysisStatusValueValuesEnum(_messages.Enum):
@@ -1054,6 +1068,7 @@ class DiscoveryOccurrence(_messages.Message):
   analysisStatusError = _messages.MessageField('Status', 2)
   continuousAnalysis = _messages.EnumField('ContinuousAnalysisValueValuesEnum', 3)
   cpe = _messages.StringField(4)
+  lastScanTime = _messages.StringField(5)
 
 
 class Distribution(_messages.Message):
@@ -1110,21 +1125,33 @@ class Empty(_messages.Message):
 
 
 class Expr(_messages.Message):
-  r"""Represents an expression text. Example:      title: "User account
-  presence"     description: "Determines whether the request has a user
-  account"     expression: "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit"     description: "Determines if a summary is
+  less than 100 chars"     expression: "document.summary.size() < 100"
+  Example (Equality):      title: "Requestor is owner"     description:
+  "Determines if requestor is the document owner"     expression:
+  "document.owner == request.auth.claims.email"  Example (Logic):      title:
+  "Public documents"     description: "Determine whether the document should
+  be publicly visible"     expression: "document.type != 'private' &&
+  document.type != 'internal'"  Example (Data Manipulation):      title:
+  "Notification string"     description: "Create a notification string with a
+  timestamp."     expression: "'New message received at ' +
+  string(document.create_time)"  The exact variables and functions that may be
+  referenced within an expression are determined by the service that evaluates
+  it. See the service documentation for additional information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
@@ -1258,6 +1285,18 @@ class Hint(_messages.Message):
   """
 
   humanReadableName = _messages.StringField(1)
+
+
+class Identity(_messages.Message):
+  r"""The unique identifier of the update.
+
+  Fields:
+    revision: The revision number of the update.
+    updateId: The revision independent identifier of the update.
+  """
+
+  revision = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  updateId = _messages.StringField(2)
 
 
 class ImageNote(_messages.Message):
@@ -1721,15 +1760,16 @@ class PackageOccurrence(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.   A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**      {       "bindings": [         {
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.   A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**      {       "bindings": [         {
   "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-project-
@@ -1738,22 +1778,23 @@ class Policy(_messages.Message):
   ["user:eve@example.com"],           "condition": {             "title":
   "expirable access",             "description": "Does not grant access after
   Sep 2020",             "expression": "request.time <
-  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
-  **YAML Example**      bindings:     - members:       - user:mike@example.com
-  - group:admins@example.com       - domain:google.com       - serviceAccount
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
+  "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
+  bindings:     - members:       - user:mike@example.com       -
+  group:admins@example.com       - domain:google.com       - serviceAccount
   :my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
   grant access after Sep 2020         expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  timestamp('2020-10-01T00:00:00.000Z')     - etag: BwWWja0YfJA=     -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1761,19 +1802,24 @@ class Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy   that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
   bindings = _messages.MessageField('Binding', 1, repeated=True)
@@ -2131,7 +2177,10 @@ class UpgradeDistribution(_messages.Message):
 
   Fields:
     classification: The operating system classification of this Upgrade, as
-      specified by the upstream operating system upgrade feed.
+      specified by the upstream operating system upgrade feed. For Windows the
+      classification is one of the category_ids listed at
+      https://docs.microsoft.com/en-us/previous-
+      versions/windows/desktop/ff357803(v=vs.85)
     cpeUri: Required - The specific operating system this metadata applies to.
       See https://cpe.mitre.org/specification/.
     cve: The cve tied to this Upgrade.
@@ -2145,41 +2194,49 @@ class UpgradeDistribution(_messages.Message):
 
 
 class UpgradeNote(_messages.Message):
-  r"""A Upgrade Note represents a potential upgrade of a package to a given
+  r"""An Upgrade Note represents a potential upgrade of a package to a given
   version. For each package version combination (i.e. bash 4.0, bash 4.1, bash
-  4.1.2), there will be a Upgrade Note.
+  4.1.2), there will be an Upgrade Note. For Windows, windows_update field
+  represents the information related to the update.
 
   Fields:
     distributions: Metadata about the upgrade for each specific operating
       system.
-    package: Required - The package this Upgrade is for.
-    version: Required - The version of the package in machine + human readable
-      form.
+    package: Required for non-Windows OS. The package this Upgrade is for.
+    version: Required for non-Windows OS. The version of the package in
+      machine + human readable form.
+    windowsUpdate: Required for Windows OS. Represents the metadata about the
+      Windows update.
   """
 
   distributions = _messages.MessageField('UpgradeDistribution', 1, repeated=True)
   package = _messages.StringField(2)
   version = _messages.MessageField('Version', 3)
+  windowsUpdate = _messages.MessageField('WindowsUpdate', 4)
 
 
 class UpgradeOccurrence(_messages.Message):
-  r"""A Upgrade Occurrence represents that a specific resource_url could
+  r"""An Upgrade Occurrence represents that a specific resource_url could
   install a specific upgrade. This presence is supplied via local sources
   (i.e. it is present in the mirror and the running system has noticed its
-  availability).
+  availability). For Windows, both distribution and windows_update contain
+  information for the Windows update.
 
   Fields:
-    distribution: Metadata about the upgrade for avaiable for the specific
+    distribution: Metadata about the upgrade for available for the specific
       operating system for the resource_url. This allows efficient filtering,
       as well as making it easier to use the occurrence.
-    package: Required - The package this Upgrade is for.
-    parsedVersion: Required - The version of the package in a machine + human
-      readable form.
+    package: Required for non-Windows OS. The package this Upgrade is for.
+    parsedVersion: Required for non-Windows OS. The version of the package in
+      a machine + human readable form.
+    windowsUpdate: Required for Windows OS. Represents the metadata about the
+      Windows update.
   """
 
   distribution = _messages.MessageField('UpgradeDistribution', 1)
   package = _messages.StringField(2)
   parsedVersion = _messages.MessageField('Version', 3)
+  windowsUpdate = _messages.MessageField('WindowsUpdate', 4)
 
 
 class Version(_messages.Message):
@@ -2277,8 +2334,8 @@ class VulnerabilityOccurrence(_messages.Message):
 
   Enums:
     EffectiveSeverityValueValuesEnum: The distro assigned severity for this
-      vulnerability when it is available, and note provider assigned severity
-      when distro has not yet assigned a severity for this vulnerability.
+      vulnerability when it is available, otherwise this is the note provider
+      assigned severity.
     SeverityValueValuesEnum: Output only. The note provider assigned severity
       of this vulnerability.
 
@@ -2287,8 +2344,8 @@ class VulnerabilityOccurrence(_messages.Message):
       is on a scale of 0 - 10 where 0 indicates low severity and 10 indicates
       high severity.
     effectiveSeverity: The distro assigned severity for this vulnerability
-      when it is available, and note provider assigned severity when distro
-      has not yet assigned a severity for this vulnerability.
+      when it is available, otherwise this is the note provider assigned
+      severity.
     fixAvailable: Output only. Whether at least one of the affected packages
       has a fix available.
     longDescription: Output only. A detailed description of this
@@ -2306,8 +2363,7 @@ class VulnerabilityOccurrence(_messages.Message):
 
   class EffectiveSeverityValueValuesEnum(_messages.Enum):
     r"""The distro assigned severity for this vulnerability when it is
-    available, and note provider assigned severity when distro has not yet
-    assigned a severity for this vulnerability.
+    available, otherwise this is the note provider assigned severity.
 
     Values:
       SEVERITY_UNSPECIFIED: Unknown.
@@ -2372,6 +2428,32 @@ class WindowsDetail(_messages.Message):
   description = _messages.StringField(2)
   fixingKbs = _messages.MessageField('KnowledgeBase', 3, repeated=True)
   name = _messages.StringField(4)
+
+
+class WindowsUpdate(_messages.Message):
+  r"""Windows Update represents the metadata about the update for the Windows
+  operating system. The fields in this message come from the Windows Update
+  API documented at https://docs.microsoft.com/en-us/windows/win32/api/wuapi
+  /nn-wuapi-iupdate.
+
+  Fields:
+    categories: The list of categories to which the update belongs.
+    description: The localized description of the update.
+    identity: Required - The unique identifier for the update.
+    kbArticleIds: The Microsoft Knowledge Base article IDs that are associated
+      with the update.
+    lastPublishedTimestamp: The last published timestamp of the update.
+    supportUrl: The hyperlink to the support information for the update.
+    title: The localized title of the update.
+  """
+
+  categories = _messages.MessageField('Category', 1, repeated=True)
+  description = _messages.StringField(2)
+  identity = _messages.MessageField('Identity', 3)
+  kbArticleIds = _messages.StringField(4, repeated=True)
+  lastPublishedTimestamp = _messages.StringField(5)
+  supportUrl = _messages.StringField(6)
+  title = _messages.StringField(7)
 
 
 encoding.AddCustomJsonFieldMapping(

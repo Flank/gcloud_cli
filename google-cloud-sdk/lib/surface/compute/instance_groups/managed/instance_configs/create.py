@@ -32,39 +32,17 @@ import six
 
 
 # TODO(b/70321546): rewrite help
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
 class Create(base.CreateCommand):
-  """Create per instance config for managed instance group.
-
-  *{command}* creates per instance config for instance controlled by a Google
-  Compute Engine managed instance group. An instance with a per instance config
-  will preserve given name and any listed disks during instance recreation and
-  deletion. Preserved names will be (re)used and resources (re)attached in
-  managed instance group during creation of the new instances in effect of
-  recreation, restart and potentially other operations changing existence of the
-  instance.
-
-  You can use this command on an instance that does not exist. In this case
-  config will be added to the pool of per instance configs to utilise for
-  creating new instances. Order of utilisation of these configs from the pool is
-  non deterministic.
-
-  If created for existing instance, changes will be applied during next instance
-  update or recreation - unless it is forced by `--force-instance-update`
-  option.
-
-  When you create config for non existing instance in regional managed instance
-  group, use the full URI to the instance - pointing to target zone. Just
-  instance name will not be resolved.
-  """
+  """Create per instance config for an instance in a managed instance group."""
 
   @staticmethod
   def Args(parser):
     instance_groups_flags.GetInstanceGroupManagerArg(
         region_flag=True).AddArgument(
-            parser, operation_type='create per instance config for')
+            parser, operation_type='create a per instance config for')
     instance_groups_flags.AddMigStatefulFlagsForInstanceConfigs(parser)
-    instance_groups_flags.AddMigStatefulForceInstanceUpdateFlag(parser)
+    instance_groups_flags.AddMigStatefulUpdateInstanceFlag(parser)
 
   @staticmethod
   def _CreateInstanceReference(holder, igm_ref, instance_name):
@@ -124,7 +102,7 @@ class Create(base.CreateCommand):
     create_result = waiter.WaitFor(operation_poller, operation_ref,
                                    'Creating instance config.')
 
-    if args.force_instance_update:
+    if args.update_instance:
       apply_operation_ref = (
           instance_configs_messages.CallApplyUpdatesToInstances)(
               holder=holder,
@@ -134,3 +112,33 @@ class Create(base.CreateCommand):
                             'Applying updates to instances.')
 
     return create_result
+
+
+Create.detailed_help = {
+    'brief':
+        'Create a per-instance config for an instance in a '
+        'managed instance group.',
+    'DESCRIPTION':
+        """\
+        *{command}* creates a per-instance config for an instance controlled by
+        a Google Compute Engine managed instance group. An instance with a per
+        instance config preserves the specified metadata and/or disks during
+        instance recreation and deletion.
+
+        Once created, the config is applied immediately to the corresponding
+        instance, by performing the necessary action (for example, REFRESH),
+        unless overridden by providing the ``--no-update-instance'' flag.
+        """,
+    'EXAMPLES':
+        """\
+        To create a per-instance config with a stateful disk ``my-disk'' and to
+        add stateful metadata ``my-key:my-value'', on instance
+        ``my-instance'', run:
+
+          $ {command} my-group --region=europe-west4 --instance=my-instance --stateful-disk=device-name=my-disk,source=projects/my-project/zones/us-central1-a/disks/my-disk-3 --stateful-metadata="my-key=my-value"
+
+        If ``my-disk'' did not exist previously in the per instance config,
+        and if it does not exist in the group's instance template, then the
+        command adds ``my-disk'' to my-instance.
+        """
+}

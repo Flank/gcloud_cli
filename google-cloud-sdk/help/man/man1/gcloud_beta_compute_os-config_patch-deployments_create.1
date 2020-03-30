@@ -1,0 +1,89 @@
+
+.TH "GCLOUD_BETA_COMPUTE_OS\-CONFIG_PATCH\-DEPLOYMENTS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute os\-config patch\-deployments create \- create a patch deployment for a project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute os\-config patch\-deployments create\fR \fIPATCH_DEPLOYMENT_ID\fR \fB\-\-file\fR=\fIFILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute os\-config patch\-deployments create\fR
+creates a patch deployment in a project from a specified file. A patch
+deployment triggers a patch job to run at specific time(s) according to a
+schedule, and applies instance filters and other patch configurations to the
+patch job at run time. Alternatively, to run a patch job on\-demand, see \fB$
+gcloud\fR \fBbeta compute os\-config patch\-jobs execute\fR.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPATCH_DEPLOYMENT_ID\fR
+Name of the patch deployment to create.
+
+This name must contain only lowercase letters, numbers, and hyphens, start with
+a letter, end with a number or a letter, be between 1\-63 characters, and unique
+within the project.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-file\fR=\fIFILE\fR
+The JSON or YAML file with the patch deployment to create. For information about
+the patch deployment format, see
+https://cloud.google.com/compute/docs/osconfig/rest/v1beta/projects.patchDeployments.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a patch deployment \f5patch\-deployment\-1\fR in the current project,
+run:
+
+.RS 2m
+$ gcloud beta compute os\-config patch\-deployments create \e
+  patch\-deployment\-1 \-\-file=path_to_config_file
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute os\-config patch\-deployments create
+$ gcloud alpha compute os\-config patch\-deployments create
+.RE
+

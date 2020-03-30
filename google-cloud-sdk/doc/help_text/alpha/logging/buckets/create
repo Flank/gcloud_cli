@@ -3,8 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha logging buckets create BUCKET_ID --location=LOCATION
-        [--description=DESCRIPTION] [--display-name=DISPLAY_NAME]
-        [--retention-days=RETENTION_DAYS] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--retention-days=RETENTION_DAYS]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Creates a bucket.
@@ -22,9 +22,6 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         A textual description for the bucket.
 
-     --display-name=DISPLAY_NAME
-        A textual name to display for the bucket.
-
      --retention-days=RETENTION_DAYS
         The period logs will be retained, after which logs will automatically
         be deleted. The default is 30 days.
@@ -33,8 +30,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

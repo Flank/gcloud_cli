@@ -168,6 +168,9 @@ c1,False,
     self.updater_mock.return_value.Restore.assert_called_once_with()
 
   def testUpdate(self):
+    self.StartPatch('googlecloudsdk.core.properties.VALUES'
+                    '.core.disable_prompts.GetBool',
+                    return_value=False)
     self.Run('components update')
     self.updater_mock.return_value.Update.assert_called_once_with(
         [], allow_no_backup=False, version=None)

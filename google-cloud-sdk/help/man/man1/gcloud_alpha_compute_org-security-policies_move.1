@@ -11,7 +11,7 @@ gcloud alpha compute org\-security\-policies move \- move a Google Compute Engin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute org\-security\-policies move\fR \fISECURITY_POLICY_ID\fR (\fB\-\-folder\fR=\fIFOLDER\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute org\-security\-policies move\fR \fISECURITY_POLICY\fR [\fB\-\-folder\fR=\fIFOLDER\fR] [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,19 +26,14 @@ move is used to move organization security policies to new parent nodes.
 
 .RS 2m
 .TP 2m
-\fISECURITY_POLICY_ID\fR
-Resource ID of the security policy to move.
+\fISECURITY_POLICY\fR
+Display name or ID of the security policy to move.
 
 
 .RE
 .sp
 
-.SH "REQUIRED FLAGS"
-
-.RS 2m
-.TP 2m
-
-Exactly one of these must be specified:
+.SH "FLAGS"
 
 .RS 2m
 .TP 2m
@@ -47,10 +42,10 @@ Folder to which the organization security policy is to be moved.
 
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION\fR
-Organization to which the organization security policy is to be moved.
+Organization in which the organization security policy is to be moved. Must be
+set if SECURITY_POLICY is display name.
 
 
-.RE
 .RE
 .sp
 
@@ -59,8 +54,21 @@ Organization to which the organization security policy is to be moved.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To move an organization security policy under folder with ID ``123456789" to
+folder ``987654321", run:
+
+.RS 2m
+$ gcloud alpha compute org\-security\-policies move move 123456789 \e
+    \-\-folder=987654321
+.RE
 
 
 
@@ -69,5 +77,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute org\-security\-policies move
+.RE
 

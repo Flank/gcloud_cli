@@ -85,7 +85,8 @@ information on time formats.
 .TP 2m
 \fB\-\-starting\-urls\fR=[\fISTARTING_URLS\fR,...]
 URLs the scan starts scanning from. These URLs must be 'owned' by the project in
-some way (resolve to a reserved IP address, or be the default *.appspot.com).
+some way (resolve to a reserved IP address, or be the default
+\f5https://<PROJECT\-ID>.<REGION\-ID>.r.appspot.com\fR).
 
 .TP 2m
 \fB\-\-target\-platforms\fR=[\fITARGET_PLATFORMS\fR,...]; default="app_engine,compute"
@@ -140,8 +141,9 @@ The test user to log in as. Required if \f5\-\-auth\-type\fR is not 'none'.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

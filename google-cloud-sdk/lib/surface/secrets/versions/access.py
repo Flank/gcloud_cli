@@ -22,8 +22,10 @@ from googlecloudsdk.api_lib.secrets import api as secrets_api
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.secrets import args as secrets_args
 from googlecloudsdk.command_lib.secrets import fmt as secrets_fmt
+from googlecloudsdk.command_lib.secrets import util as secrets_util
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Access(base.DescribeCommand):
   r"""Access a secret version's data.
 
@@ -44,4 +46,26 @@ class Access(base.DescribeCommand):
 
   def Run(self, args):
     version_ref = args.CONCEPTS.version.Parse()
-    return secrets_api.Versions().Access(version_ref)
+    return secrets_api.Versions(
+        version=secrets_util.GetVersionFromReleasePath(
+            self.ReleaseTrack())).Access(version_ref)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class AccessBeta(Access):
+  r"""Access a secret version's data.
+
+  Access the data for the specified secret version.
+
+  ## EXAMPLES
+
+  Access the data for version 123 of the secret 'my-secret':
+
+    $ {command} 123 --secret=my-secret
+  """
+
+  @staticmethod
+  def Args(parser):
+    secrets_args.AddBetaVersion(
+        parser, purpose='to access', positional=True, required=True)
+    secrets_fmt.UseSecretData(parser)

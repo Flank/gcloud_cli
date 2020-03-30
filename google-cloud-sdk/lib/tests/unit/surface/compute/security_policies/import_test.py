@@ -33,10 +33,10 @@ from tests.lib.surface.compute import test_resources
 
 _JSON_FILE_PATH = sdk_test_base.SdkBase.Resource(
     'tests', 'unit', 'surface', 'compute', 'security_policies', 'test_data',
-    'security-policy-exported.json')
+    'security-policy-exported-cloud-armor-config.json')
 _YAML_FILE_PATH = sdk_test_base.SdkBase.Resource(
     'tests', 'unit', 'surface', 'compute', 'security_policies', 'test_data',
-    'security-policy-exported.yaml')
+    'security-policy-exported-cloud-armor-config.yaml')
 _JSON_FILE_PATH_NO_DESCRIPTIONS = sdk_test_base.SdkBase.Resource(
     'tests', 'unit', 'surface', 'compute', 'security_policies', 'test_data',
     'security-policy-no-descriptions-exported.json')
@@ -57,10 +57,10 @@ _YAML_INVALID_FILE_PATH = sdk_test_base.SdkBase.Resource(
 class SecurityPoliciesImportTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.GA
-    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'v1')
+    self.resources.RegisterApiByName('compute', 'alpha')
     self.my_policy = self.resources.Create(
         'compute.securityPolicies',
         securityPolicy='my-policy',
@@ -73,8 +73,8 @@ class SecurityPoliciesImportTest(test_base.BaseTest):
 
     # Add fields that are not required for an actual import, but are required
     # for the sake of this test.
-    test_policy = test_resources.MakeSecurityPolicy(self.messages,
-                                                    self.my_policy)
+    test_policy = test_resources.MakeSecurityPolicyCloudArmorConfig(
+        self.messages, self.my_policy)
     security_policy.id = test_policy.id
     security_policy.name = test_policy.name
     security_policy.selfLink = test_policy.selfLink
@@ -89,8 +89,8 @@ class SecurityPoliciesImportTest(test_base.BaseTest):
 
     # Add fields that are not required for an actual import, but are required
     # for the sake of this test.
-    test_policy = test_resources.MakeSecurityPolicy(self.messages,
-                                                    self.my_policy)
+    test_policy = test_resources.MakeSecurityPolicyCloudArmorConfig(
+        self.messages, self.my_policy)
     security_policy.id = test_policy.id
     security_policy.name = test_policy.name
     security_policy.selfLink = test_policy.selfLink
@@ -99,11 +99,14 @@ class SecurityPoliciesImportTest(test_base.BaseTest):
     yaml_file.close()
 
   def _ImportFromFileHelper(self, file_path, file_format, has_optional=True):
-    self.Run('compute security-policies import my-policy --file-name {0} '
+    self.Run('compute security-policies import my-policy --file-name "{0}" '
              '--file-format {1}'.format(file_path, file_format))
 
     # Remove fields that are not included in a Patch request.
     resource = test_resources.MakeSecurityPolicy(self.messages, self.my_policy)
+    if has_optional:
+      resource = test_resources.MakeSecurityPolicyCloudArmorConfig(
+          self.messages, self.my_policy)
     resource.id = None
     resource.name = None
     resource.selfLink = None
@@ -114,12 +117,11 @@ class SecurityPoliciesImportTest(test_base.BaseTest):
       for rule in resource.rules:
         rule.description = None
 
-    self.CheckRequests(
-        [(self.compute.securityPolicies, 'Patch',
-          self.messages.ComputeSecurityPoliciesPatchRequest(
-              project='my-project',
-              securityPolicy='my-policy',
-              securityPolicyResource=resource))],)
+    self.CheckRequests([(self.compute.securityPolicies, 'Patch',
+                         self.messages.ComputeSecurityPoliciesPatchRequest(
+                             project='my-project',
+                             securityPolicy='my-policy',
+                             securityPolicyResource=resource))],)
     self.AssertErrContains(
         textwrap.dedent("""\
         Updated [my-policy] with config from [{0}].
@@ -131,7 +133,7 @@ class SecurityPoliciesImportTest(test_base.BaseTest):
         exceptions.BadFileException,
         r'Unable to read security policy config from specified file \[{0}\] '
         r'because \[{1}\]'.format(re.escape(file_path), expected_error)):
-      self.Run('compute security-policies import my-policy --file-name {0} '
+      self.Run('compute security-policies import my-policy --file-name "{0}" '
                '--file-format {1}'.format(file_path, file_format))
 
   def testImportFromJsonFile(self):
@@ -152,7 +154,7 @@ class SecurityPoliciesImportTest(test_base.BaseTest):
     with self.AssertRaisesExceptionRegexp(
         exceptions.BadFileException,
         r'No such file \[{0}\]'.format(re.escape(_BAD_FILE_PATH))):
-      self.Run('compute security-policies import my-policy --file-name {0} '
+      self.Run('compute security-policies import my-policy --file-name "{0}" '
                '--file-format {1}'.format(_BAD_FILE_PATH, 'yaml'))
 
     self.CheckRequests()

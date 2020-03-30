@@ -722,7 +722,8 @@ def _MetadataHasOsloginEnable(metadata):
 
 
 def CheckForOsloginAndGetUser(instance, project, requested_user, public_key,
-                              expiration_time, release_track):
+                              expiration_time, release_track,
+                              username_requested=False):
   """Check instance/project metadata for oslogin and return updated username.
 
   Check to see if OS Login is enabled in metadata and if it is, return
@@ -739,6 +740,8 @@ def CheckForOsloginAndGetUser(instance, project, requested_user, public_key,
       not be set to expire.  If not None, an existing key may be modified
       with the new expiry.
     release_track: release_track, The object representing the release track.
+    username_requested: bool, True if the user has passed a specific username in
+      the args.
 
   Returns:
     tuple, A string containing the oslogin username and a boolean indicating
@@ -763,7 +766,8 @@ def CheckForOsloginAndGetUser(instance, project, requested_user, public_key,
         'OS Login is enabled on Instance/Project, but is not available '
         'in the {0} version of gcloud.'.format(release_track.id))
     return requested_user, use_oslogin
-  user_email = properties.VALUES.core.account.Get()
+  user_email = (properties.VALUES.auth.impersonate_service_account.Get()
+                or properties.VALUES.core.account.Get())
 
   # Check to see if public key is already in profile and POSIX information
   # exists associated with the project. If either are not set, import an SSH
@@ -793,8 +797,15 @@ def CheckForOsloginAndGetUser(instance, project, requested_user, public_key,
     elif pa.primary:
       oslogin_user = pa.username
 
-  log.info('Using OS Login user [{0}] instead of default user [{1}]'.format(
-      oslogin_user, requested_user))
+  # If the user passed in a specific username to the command, show a message
+  # to the user, otherwise just add a message to the log.
+  if username_requested:
+    log.status.Print(
+        'Using OS Login user [{0}] instead of requested user [{1}]'
+        .format(oslogin_user, requested_user))
+  else:
+    log.info('Using OS Login user [{0}] instead of default user [{1}]'.format(
+        oslogin_user, requested_user))
   return oslogin_user, use_oslogin
 
 

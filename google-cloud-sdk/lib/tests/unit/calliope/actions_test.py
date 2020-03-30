@@ -259,6 +259,47 @@ class DeprecationActionTest(sdk_test_base.WithLogCapture):
     self.AssertOutputContains(
         '--testarg TESTARG  (REMOVED) Test help. + Custom Test Error.')
 
+  def testDeprecateHelpSuppressed(self):
+    warning = 'Custom Test Warning.'
+    with self.assertRaises(SystemExit):
+      self.parser.add_argument(
+          '--testarg',
+          action=calliope_actions.DeprecationAction(
+              'testarg',
+              show_add_help=False,
+              show_message=self.custom_validation_func,
+              warn=warning,
+              action=self.custom_action),
+          help='Test help.')
+      self.parser.parse_args(['-h'])
+
+    # NOTICE: This test triggers the argparse -h action directly and bypasses
+    # the calliope markdown intercept. This means that markdown, like \n+\n,
+    # leaks to the output.
+    self.AssertOutputContains(
+        '--testarg TESTARG  Test help.')
+
+  def testRemoveHelpsuppressed(self):
+    error_str = 'Custom Test Error.'
+    with self.assertRaises(SystemExit):
+      self.parser.add_argument(
+          '--testarg',
+          action=calliope_actions.DeprecationAction(
+              'testarg',
+              show_add_help=False,
+              show_message=self.custom_validation_func,
+              error=error_str,
+              removed=True,
+              action=self.custom_action),
+          help='Test help.')
+      self.parser.parse_args(['-h'])
+
+    # NOTICE: This test triggers the argparse -h action directly and bypasses
+    # the calliope markdown intercept. This means that markdown, like \n+\n,
+    # leaks to the output.
+    self.AssertOutputContains(
+        '--testarg TESTARG  Test help.')
+
 
 class DeprecationActionDefaultActionTests(sdk_test_base.WithLogCapture):
 

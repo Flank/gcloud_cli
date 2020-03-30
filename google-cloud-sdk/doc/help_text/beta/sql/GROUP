@@ -20,8 +20,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -67,6 +68,9 @@ COMMANDS
 
      connect
         (BETA) Connects to a Cloud SQL instance.
+
+     reschedule-maintenance
+        (BETA) Reschedule a Cloud SQL instance's maintenance.
 
 NOTES
     This command is currently in BETA and may change without notice. These

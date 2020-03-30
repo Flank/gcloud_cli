@@ -29,6 +29,11 @@ from googlecloudsdk.command_lib.container import constants
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 
+_DATAPATH_PROVIDER = {
+    'legacy': 'Selects legacy datatpath for the cluster.',
+    'advanced': 'Selects advanced datapath for the cluster.',
+}
+
 
 def AddBasicAuthFlags(parser):
   """Adds basic auth flags to the given parser.
@@ -181,7 +186,7 @@ The default Kubernetes version is available using the following command.
   return parser.add_argument('--cluster-version', help=help, hidden=suppressed)
 
 
-def AddReleaseChannelFlag(parser, is_update=False):
+def AddReleaseChannelFlag(parser, is_update=False, hidden=False):
   """Adds a --release-channel flag to the given parser."""
   short_text = """\
 Release channel a cluster is subscribed to.
@@ -193,7 +198,7 @@ Subscribe or unsubscribe this cluster to a release channel.
 
 """
   help_text = short_text + """\
-When a cluster is subscribed to a release channel, Google maintains both the
+When a cluster is subscribed to a release channel, GKE maintains both the
 master version and the node version. Node auto-upgrade defaults to true and
 cannot be disabled. Updates to version related fields (e.g. --cluster-version)
 return an error.
@@ -238,7 +243,7 @@ Clusters on 'rapid' cannot be taken off of the release channel.
       metavar='CHANNEL',
       choices=choices,
       help=help_text,
-      hidden=False)
+      hidden=hidden)
 
 
 def AddClusterAutoscalingFlags(parser, update_group=None, hidden=False):
@@ -327,6 +332,23 @@ https://cloud.google.com/compute/docs/disks/local-ssd for more information."""
       default=0)
 
 
+def AddBootDiskKmsKeyFlag(parser, suppressed=False, help_text=''):
+  """Adds a --boot-disk-kms-key flag to the given parser."""
+  help_text += """\
+The Customer Managed Encryption Key used to encrypt the boot disk attached
+to each node in the node pool. This should be of the form
+projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
+For more information about protecting resources with Cloud KMS Keys please
+see:
+https://cloud.google.com/compute/docs/disks/customer-managed-encryption"""
+  parser.add_argument(
+      '--boot-disk-kms-key',
+      help=help_text,
+      hidden=suppressed,
+      type=str,
+      default='')
+
+
 def AddAcceleratorArgs(parser):
   """Adds Accelerator-related args."""
   parser.add_argument(
@@ -372,7 +394,7 @@ def AddAutoscalingProfilesFlag(parser, hidden=False):
       type=str)
 
 
-def AddAutoprovisioningFlags(parser, hidden=False, for_create=False):
+def AddAutoprovisioningFlags(parser, hidden=False, for_create=False, ga=False):
   """Adds node autoprovisioning related flags to parser.
 
   Autoprovisioning related flags are: --enable-autoprovisioning
@@ -382,6 +404,7 @@ def AddAutoprovisioningFlags(parser, hidden=False, for_create=False):
     parser: A given parser.
     hidden: If true, suppress help text for added options.
     for_create: Add flags for create request.
+    ga: If false adds non GA flags
   """
 
   group = parser.add_argument_group('Node autoprovisioning', hidden=hidden)
@@ -405,8 +428,9 @@ and memory limits to be specified.""",
       help="""\
 Path of the JSON/YAML file which contains information about the
 cluster's node autoprovisioning configuration. Currently it contains
-a list of resource limits, identity defaults for autoprovisioning and node locations
-for autoprovisioning.
+a list of resource limits, identity defaults for autoprovisioning, node upgrade
+settings, node management settings, minimum cpu platform, and node locations for
+autoprovisioning.
 
 Resource limits are specified in the field 'resourceLimits'.
 Each resource limits definition contains three fields:
@@ -419,17 +443,37 @@ Minimum is the minimum allowed amount with the unit of the resource.
 
 Identity default contains at most one of the below fields:
 serviceAccount: The Google Cloud Platform Service Account to be used by node VMs in
-autoprovisioined node pools. If not specified, the project default service account
+autoprovisioned node pools. If not specified, the project's default service account
 is used.
-scopes: A list of scopes be used by node instances in autoprovisioined node pools.
+scopes: A list of scopes to be used by node instances in autoprovisioned node pools.
 Multiple scopes can be specified, separated by commas. For information on defaults,
 look at:
 https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
 
-Autoprovisioning locations is a set of zones where new node pools can be created by
-Autoprovisioning. Autoprovisioning locations are specified in the field
-'autoprovisioningLocations'. All zones must be in the same region as the cluster's
-master(s).
+Note: Node Upgrade settings are implemented only in Beta and Alpha.
+Node Upgrade settings are specified under the field
+'upgradeSettings', which has the following fields:
+maxSurgeUpgrade: Number of extra (surge) nodes to be created on
+each upgrade of an autoprovisioned node pool.
+maxUnavailableUpgrade: Number of nodes that can be unavailable at the
+same time on each upgrade of an autoprovisioned node pool.
+
+Note: Node Management settings are implemented only in Beta and
+Alpha. Node Management settings are specified under the field
+'nodeManagement', which has the following fields:
+enableAutoUpgrade: A boolean field that indicates if node
+autoupgrade is enabled for autoprovisioned node pools.
+enableAutoRepair: A boolean field that indicates if node
+autorepair is enabled for autoprovisioned node pools.
+
+minCpuPlatform: If specified, new autoprovisioned nodes will be
+scheduled on host with specified CPU architecture or a newer one.
+Note: Min CPU platform can only be specified in Beta and Alpha.
+
+Autoprovisioning locations is a set of zones where new node pools
+can be created by Autoprovisioning. Autoprovisioning locations are
+specified in the field 'autoprovisioningLocations'. All zones must
+be in the same region as the cluster's master(s).
 """)
 
   from_flags_group = limits_group.add_argument_group(
@@ -522,7 +566,7 @@ to which the cluster can be scaled.
       hidden=hidden,
       help="""\
 The Google Cloud Platform Service Account to be used by node VMs in
-autoprovisioined node pools. If not specified, the project default
+autoprovisioned node pools. If not specified, the project default
 service account is used.
 """)
   identity_group.add_argument(
@@ -531,7 +575,7 @@ service account is used.
       metavar='SCOPE',
       hidden=hidden,
       help="""\
-The scopes be used by node instances in autoprovisioined node pools.
+The scopes be used by node instances in autoprovisioned node pools.
 Multiple scopes can be specified, separated by commas. For information
 on defaults, look at:
 https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
@@ -545,6 +589,70 @@ All zones must be in the same region as the cluster's master(s).
 Multiple locations can be specified, separated by commas.""",
       metavar='ZONE',
       type=arg_parsers.ArgList(min_length=1))
+  if not ga:
+    AddNonGAAutoscalingFlags(from_flags_group)
+
+
+def AddNonGAAutoscalingFlags(from_flags_group):
+  """Adds node autoprovisioning related non GA flags.
+
+  Args:
+    from_flags_group: Autoprovisioning flags group
+  """
+  upgrade_settings_group = from_flags_group.add_argument_group(
+      'Flags to specify upgrade settings for autoprovisioned nodes:',
+      hidden=True,
+  )
+  upgrade_settings_group.add_argument(
+      '--autoprovisioning-max-surge-upgrade',
+      type=int,
+      hidden=True,
+      required=True,
+      help="""\
+Number of extra (surge) nodes to be created on each upgrade of a
+autoprovisioned node pool.
+""")
+  upgrade_settings_group.add_argument(
+      '--autoprovisioning-max-unavailable-upgrade',
+      type=int,
+      hidden=True,
+      required=True,
+      help="""\
+Number of nodes that can be unavailable at the same time on each
+upgrade of a autoprovisioned node pool.
+""")
+  management_settings_group = from_flags_group.add_argument_group(
+      'Flags to specify node management settings for autoprovisioned nodes:',
+      hidden=True,
+  )
+  management_settings_group.add_argument(
+      '--enable-autoprovisioning-autoupgrade',
+      hidden=True,
+      default=None,
+      required=True,
+      action='store_true',
+      help="""\
+Enable node autoupgrade for autoprovisioned node pools.
+Use --no-enable-autoprovisioning-autoupgrade to disable
+""")
+  management_settings_group.add_argument(
+      '--enable-autoprovisioning-autorepair',
+      default=None,
+      action='store_true',
+      hidden=True,
+      required=True,
+      help="""\
+Enable node autorepair for autoprovisioned node pools.
+Use --no-enable-autoprovisioning-autorepair to disable
+""")
+  from_flags_group.add_argument(
+      '--autoprovisioning-min-cpu-platform',
+      hidden=True,
+      metavar='PLATFORM',
+      help="""\
+If specified, new autoprovisioned nodes will be scheduled on host with
+specified CPU architecture or a newer one.
+""")
 
 
 def AddEnableBinAuthzFlag(parser, hidden=False):
@@ -609,7 +717,19 @@ def AddEnableStackdriverKubernetesFlag(parser):
   """Adds a --enable-stackdriver-kubernetes flag to parser."""
   help_text = """Enable Stackdriver Kubernetes monitoring and logging."""
   parser.add_argument(
-      '--enable-stackdriver-kubernetes', action='store_true', help=help_text)
+      '--enable-stackdriver-kubernetes',
+      action='store_true',
+      default=None,
+      help=help_text)
+
+
+def AddEnableLoggingMonitoringSystemOnlyFlag(parser):
+  """Adds a --enable-stackdriver-kubernetes-system flag to parser."""
+  help_text = """Enable Stackdriver Kubernetes system-only monitoring and logging."""
+  parser.add_argument(
+      '--enable-logging-monitoring-system-only',
+      action='store_true',
+      help=help_text)
 
 
 def AddNodeLabelsFlag(parser, for_node_pool=False):
@@ -903,7 +1023,17 @@ def AddNetworkPolicyFlags(parser, hidden=False):
       '--update-addons=NetworkPolicy=ENABLED flag.')
 
 
-def AddPrivateClusterFlags(parser, with_deprecated=False, with_alpha=False):
+def AddILBSubsettingFlags(parser, hidden=True):
+  """Adds --enable-l4-ilb-subsetting flags to parser."""
+  parser.add_argument(
+      '--enable-l4-ilb-subsetting',
+      action='store_true',
+      default=None,
+      hidden=hidden,
+      help='Enable Subsetting for L4 ILB services created on this cluster.')
+
+
+def AddPrivateClusterFlags(parser, with_deprecated=False):
   """Adds flags related to private clusters to parser."""
   group = parser.add_argument_group('Private Clusters')
   if with_deprecated:
@@ -929,25 +1059,12 @@ def AddPrivateClusterFlags(parser, with_deprecated=False, with_alpha=False):
             'API endpoint.'),
       default=None,
       action='store_true')
-  if with_alpha:
-    AddPeeringRouteSharingFlag(group)
   group.add_argument(
       '--master-ipv4-cidr',
       help=('IPv4 CIDR range to use for the master network.  This should have '
             'a netmask of size /28 and should be used in conjunction with the '
             '--enable-private-nodes flag.'),
       default=None)
-
-
-def AddPeeringRouteSharingFlag(group):
-  group.add_argument(
-      '--enable-peering-route-sharing',
-      help=(
-          'Enable custom route sharing between the master and node VPCs, which '
-          'ensures clients running in networks connected via a Cloud Router, '
-          'VPN, or Interconnect can reach the API server.'),
-      default=None,
-      action='store_true')
 
 
 def AddEnableLegacyAuthorizationFlag(parser, hidden=False):
@@ -1053,7 +1170,8 @@ invalidate old credentials."""
 
 
 def AddMaintenanceWindowGroup(parser,
-                              hidden=False):
+                              hidden=False,
+                              recurring_windows_hidden=False):
   """Adds a mutex for --maintenance-window and --maintenance-window-*."""
   maintenance_group = parser.add_group(hidden=hidden, mutex=True)
   maintenance_group.help = """\
@@ -1061,12 +1179,11 @@ One of either maintenance-window or the group of maintenance-window flags can
 be set.
 """
   AddDailyMaintenanceWindowFlag(maintenance_group)
-  AddRecurringMaintenanceWindowFlags(maintenance_group, hidden=hidden)
+  AddRecurringMaintenanceWindowFlags(
+      maintenance_group, hidden=recurring_windows_hidden)
 
 
-def AddDailyMaintenanceWindowFlag(parser,
-                                  hidden=False,
-                                  add_unset_text=False):
+def AddDailyMaintenanceWindowFlag(parser, hidden=False, add_unset_text=False):
   """Adds a --maintenance-window flag to parser."""
   help_text = """\
 Set a time of day when you prefer maintenance to start on this cluster. \
@@ -1498,38 +1615,52 @@ CPU platform selection is available only in selected zones.
       '--min-cpu-platform', metavar='PLATFORM', hidden=hidden, help=help_text)
 
 
-def AddWorkloadMetadataFromNodeFlag(parser, hidden=False):
+def AddWorkloadMetadataFromNodeFlag(parser, use_mode=True):
   """Adds the --workload-metadata-from-node flag to the parser.
 
   Args:
     parser: A given parser.
-    hidden: Whether or not to hide the help text.
+    use_mode: Whether use Mode or NodeMetadata in WorkloadMetadataConfig.
   """
+  choices = {
+      'GCE_METADATA':
+          "Pods running in this node pool have access to the node's "
+          'underlying Compute Engine Metadata Server.',
+      'GKE_METADATA':
+          'Run the Kubernetes Engine Metadata Server on this node. The '
+          'Kubernetes Engine Metadata Server exposes a metadata API to '
+          'workloads that is compatible with the V1 Compute Metadata APIs '
+          'exposed by the Compute Engine and App Engine Metadata Servers. '
+          'This feature can only be enabled if Workload Identity is enabled '
+          'at the cluster level.',
+  }
+  if not use_mode:
+    choices.update({
+        'SECURE': '[DPRECATED] Prevents pods not in hostNetwork from accessing '
+                  'certain VM metadata, specifically kube-env, which '
+                  'contains Kubelet credentials, and the instance identity '
+                  'token. This is a temporary security solution available '
+                  'while the bootstrapping process for cluster nodes is '
+                  'being redesigned with significant security improvements. '
+                  'This feature is scheduled to be deprecated in the future '
+                  'and later removed.',
+        'EXPOSED':
+            "[DEPRECATED] Pods running in this node pool have access to the node's "
+            'underlying Compute Engine Metadata Server.',
+        'GKE_METADATA_SERVER':
+            '[DEPRECATED] Run the Kubernetes Engine Metadata Server on this node. The '
+            'Kubernetes Engine Metadata Server exposes a metadata API to '
+            'workloads that is compatible with the V1 Compute Metadata APIs '
+            'exposed by the Compute Engine and App Engine Metadata Servers. '
+            'This feature can only be enabled if Workload Identity is enabled '
+            'at the cluster level.',
+    })
 
   parser.add_argument(
       '--workload-metadata-from-node',
       default=None,
-      choices={
-          'SECURE': 'Prevents pods not in hostNetwork from accessing '
-                    'certain VM metadata, specifically kube-env, which '
-                    'contains Kubelet credentials, and the instance identity '
-                    'token. This is a temporary security solution available '
-                    'while the bootstrapping process for cluster nodes is '
-                    'being redesigned with significant security improvements. '
-                    'This feature is scheduled to be deprecated in the future '
-                    'and later removed.',
-          'EXPOSED': "Pods running in this node pool have access to the node's "
-                     'underlying Compute Engine Metadata Server.',
-          'GKE_METADATA_SERVER':
-              'Run the Kubernetes Engine Metadata Server on this node. The Kubernetes '
-              'Engine Metadata Server exposes a metadata API to workloads that is '
-              'compatible with the V1 Compute Metadata APIs exposed by the Compute Engine '
-              'and App Engine Metadata Servers. This feature can only be enabled if '
-              'Workload Identity is enabled at the cluster level.',
-          'UNSPECIFIED': 'Chooses the default.',
-      },
+      choices=choices,
       type=lambda x: x.upper(),
-      hidden=hidden,
       help='Type of metadata server available to pods running in the node pool.'
   )
 
@@ -1560,11 +1691,14 @@ def AddTagOrDigestPositional(parser,
 
 
 def AddImagePositional(parser, verb):
+  image_path_format = '*.gcr.io/PROJECT_ID/IMAGE_PATH[:TAG|@sha256:DIGEST]'
+  if verb == 'list tags for':
+    image_path_format = '*.gcr.io/PROJECT_ID/IMAGE_PATH'
   parser.add_argument(
       'image_name',
       help=('The name of the image to {verb}. The name format should be '
-            '*.gcr.io/PROJECT_ID/IMAGE_PATH[:TAG|@sha256:DIGEST]. '.format(
-                verb=verb)))
+            '{image_format}. '.format(
+                verb=verb, image_format=image_path_format)))
 
 
 def AddNodeLocationsFlag(parser):
@@ -1772,6 +1906,7 @@ def AddTpuFlags(parser, hidden=False, enable_tpu_service_networking=False):
   tpu_group.add_argument(
       '--enable-tpu',
       action='store_true',
+      default=None,
       hidden=hidden,
       help="""\
 Enable Cloud TPUs for this cluster.
@@ -1786,6 +1921,7 @@ Can not be specified unless `--enable-ip-alias` is also specified.
     group.add_argument(
         '--enable-tpu-service-networking',
         action='store_true',
+        default=None,
         hidden=hidden,
         help="""\
 Enable Cloud TPU's Service Networking mode. In this mode, the CIDR blocks used
@@ -1970,64 +2106,30 @@ of RAM:
   parser.add_argument('--machine-type', '-m', help=help_text)
 
 
-def AddManagedPodIdentityFlags(parser):
-  """Adds Managed Pod Identity flags to the parser."""
-  enable_help_text = """\
-Enable Managed Pod Identity on the cluster.
-
-When enabled, pods with cloud.google.com/service-account annotations will be
-able to authenticate to Google Cloud Platform APIs on behalf of service account
-specified in the annotation.
-"""
-  parser.add_argument(
-      '--enable-managed-pod-identity',
-      action=actions.DeprecationAction(
-          '--[no-]enable-managed-pod-identity',
-          warn="""\
-Alpha flag `--[no-]enable-managed-pod-identity` is deprecated and will be removed
-in a future release.
-
-Instead, use the beta `--identity-namespace` flag:
-
-    $ gcloud beta container clusters create --identity-namespace=PROJECT_NAME.svc.id.goog
-""",
-          removed=False,
-          action='store_true'),
-      default=False,
-      hidden=True,
-      help=enable_help_text)
-  sa_help_text = """\
-Federating Service Account to use with Managed Pod Identity.
-
-Sets the name (email) of the GCP Service Account used to connect
-Kubernetes Service Accounts to GCP Service Accounts.
-
-Must be set with `--enable-managed-pod-identity`.
-"""
-  parser.add_argument(
-      '--federating-service-account',
-      action=actions.DeprecationAction(
-          '--federating-service-account',
-          warn="""\
-Alpha flag `--federating-service-account` is deprecated and will be removed
-in a future release.
-
-Instead, use the beta `--identity-namespace` flag:
-
-    $ gcloud beta container clusters create --identity-namespace=PROJECT_NAME.svc.id.goog
-""",
-          removed=False),
-      default=None,
-      hidden=True,
-      help=sa_help_text)
-
-
-def AddWorkloadIdentityFlags(parser):
+def AddWorkloadIdentityFlags(parser, use_workload_pool=True):
   """Adds Workload Identity flags to the parser."""
   parser.add_argument(
-      '--identity-namespace',
+      '--workload-pool',
       default=None,
       help="""\
+Enable Workload Identity on the cluster.
+
+When enabled, Kubernetes service accounts will be able to act as Cloud IAM
+Service Accounts, through the provided workload pool.
+
+Currently, the only accepted workload pool is the workload pool of
+the Cloud project containing the cluster, `PROJECT_NAME.svc.id.goog`.
+
+For more information on Workload Identity, see
+
+            https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+  """)
+  if not use_workload_pool:
+    parser.add_argument(
+        '--identity-namespace',
+        default=None,
+        hidden=True,
+        help="""\
 Enable Workload Identity on the cluster.
 
 When enabled, Kubernetes service accounts will be able to act as Cloud IAM
@@ -2039,7 +2141,7 @@ the Cloud project containing the cluster, `PROJECT_NAME.svc.id.goog`.
 For more information on Workload Identity, see
 
             https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-""")
+    """)
 
 
 def AddWorkloadIdentityUpdateFlags(parser):
@@ -2433,7 +2535,8 @@ def AddEnableShieldedNodesFlags(parser):
   """Adds a --enable-shielded-nodes flag to the given parser."""
   help_text = """\
 Enable Shielded Nodes for this cluster. Enabling Shielded Nodes will enable a
-more secure Node credential bootstrapping implementation.
+more secure Node credential bootstrapping implementation. Starting with version
+1.18, clusters will have shielded GKE nodes by default.
 """
   parser.add_argument(
       '--enable-shielded-nodes',
@@ -2454,6 +2557,8 @@ def ValidateSurgeUpgradeSettings(args):
       'max_unavailable_upgrade' in args._specified_args):
     raise exceptions.InvalidArgumentException(
         '--max-unavailable-upgrade', util.INVALIID_SURGE_UPGRADE_SETTINGS)
+
+
 # pylint: enable=protected-access
 
 
@@ -2679,7 +2784,7 @@ Enable database encryption that will be used to encrypt Kubernetes Secrets at
 the application layer. The key provided should be the resource ID in the format of
 `projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME]`.
 For more information, see
-<https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets>.
+https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets.
 """,
       required=False,
       type=arg_parsers.RegexpValidator(
@@ -2698,7 +2803,7 @@ Disable database encryption.
 
 Disable Database Encryption which encrypt Kubernetes Secrets at
 the application layer. For more information, see
-<https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets>.
+https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets.
       """)
 
 
@@ -2785,3 +2890,52 @@ Use --no-enable-cost-management to disable this feature.
       action='store_true',
       default=None,
       help=help_text)
+
+
+def AddReservationAffinityFlags(parser, for_node_pool=False):
+  """Adds the argument to handle reservation affinity configurations."""
+  target = 'node pool' if for_node_pool else 'default initial node pool'
+
+  group_text = """\
+Specifies the reservation for the {}.""".format(target)
+  group = parser.add_group(help=group_text)
+
+  affinity_text = """\
+The type of the reservation for the {}.""".format(target)
+  group.add_argument(
+      '--reservation-affinity',
+      choices=['any', 'none', 'specific'],
+      default=None,
+      help=affinity_text)
+  group.add_argument(
+      '--reservation',
+      default=None,
+      help="""
+The name of the reservation, required when `--reservation-affinity=specific`.
+""")
+
+
+def AddDatapathProviderFlag(parser):
+  """Adds --datapath-provider={legacy|advanced} flag."""
+  help_text = """
+Select datapath provider for the cluster. Defaults to `legacy`.
+
+$ {command} --datapath-provider=legacy
+$ {command} --datapath-provider=advanced
+"""
+  parser.add_argument(
+      '--datapath-provider', choices=_DATAPATH_PROVIDER, help=help_text)
+
+
+def AddMasterGlobalAccessFlag(parser):
+  help_text = """
+Use with private clusters to allow access to the master's private endpoint from any Google Cloud region or on-premises environment regardless of the
+private cluster's region.
+"""
+
+  parser.add_argument(
+      '--enable-master-global-access',
+      help=help_text,
+      default=None,
+      hidden=True,
+      action='store_true')

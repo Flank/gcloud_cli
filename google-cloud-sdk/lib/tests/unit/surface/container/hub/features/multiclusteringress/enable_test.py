@@ -30,6 +30,7 @@ class EnableTest(base.FeaturesTestBase):
   """
 
   FEATURE_NAME = 'multiclusteringress'
+  FEATURE_DISPLAY_NAME = 'MultiClusterIngress'
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -47,11 +48,12 @@ class EnableTest(base.FeaturesTestBase):
     self.features_api.ExpectOperation(operation)
     response = encoding.PyValueToMessage(
         self.features_api.messages.Operation.ResponseValue, {
-            'name': self.features_api.resource_name
+            'name': self.features_api.resource_name,
         })
     operation = self.features_api._MakeOperation(done=True, response=response)
     self.features_api.ExpectOperation(operation)
     self.features_api.ExpectGet(feature)
+    self.features_api.ExpectOperation(operation)
 
   def testEnableWithNoMemberships(self):
     self.memberships_api.ExpectList(responses=[])

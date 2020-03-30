@@ -91,23 +91,24 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To list the roles for an organization, run:
+To list the roles for the organization \f5\fI12345\fR\fR, run:
 
 .RS 2m
-$ gcloud alpha iam roles list \-\-organization 12345
+$ gcloud alpha iam roles list \-\-organization=12345
 .RE
 
-To list the roles for a project, run:
+To list the roles for the project \f5\fImyproject\fR\fR, run:
 
 .RS 2m
-$ gcloud alpha iam roles list \-\-project myproject
+$ gcloud alpha iam roles list \-\-project=myproject
 .RE
 
 To list the curated roles, run:

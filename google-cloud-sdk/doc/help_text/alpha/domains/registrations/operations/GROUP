@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha domains registrations operations - manage your Cloud Domains
+    gcloud alpha domains registrations operations - manage Cloud Domains
         operations
 
 SYNOPSIS
@@ -7,14 +7,15 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage your Cloud Domains operations.
+    (ALPHA) Commands for managing Cloud Domains operations.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:

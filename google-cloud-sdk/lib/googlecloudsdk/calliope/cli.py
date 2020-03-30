@@ -43,6 +43,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.configurations import named_configs
 from googlecloudsdk.core.console import console_attr
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import pkg_resources
 
@@ -592,7 +593,7 @@ class CLILoader(object):
         help="""\
         The configuration to use for this command invocation. For more
         information on how to use configurations, run:
-        `gcloud topic configurations`.  You can also use the [{0}] environment
+        `gcloud topic configurations`.  You can also use the {0} environment
         variable to set the equivalent of this flag for a terminal
         session.""".format(config.CLOUDSDK_ACTIVE_CONFIG_NAME))
 
@@ -671,7 +672,8 @@ class CLILoader(object):
     # Don't bother setting up logging if we are just doing a completion.
     if '_ARGCOMPLETE' not in os.environ or '_ARGCOMPLETE_TRACE' in os.environ:
       log.AddFileLogging(self.__logs_dir)
-      verbosity_string = os.environ.get('_ARGCOMPLETE_TRACE')
+      verbosity_string = encoding.GetEncodedValue(os.environ,
+                                                  '_ARGCOMPLETE_TRACE')
       if verbosity_string:
         verbosity = log.VALID_VERBOSITY_STRINGS.get(verbosity_string)
         log.SetVerbosity(verbosity)
@@ -766,7 +768,7 @@ class _CompletionFinder(argcomplete.CompletionFinder):
     else:
       special_chars = single_quote_special
 
-    if os.environ.get('_ARGCOMPLETE_SHELL') == 'tcsh':
+    if encoding.GetEncodedValue(os.environ, '_ARGCOMPLETE_SHELL') == 'tcsh':
       # tcsh escapes special characters itself.
       special_chars = ''
     elif cword_prequote == "'":
@@ -796,9 +798,6 @@ def _ArgComplete(ai, **kwargs):
   """Runs argcomplete.autocomplete on a calliope argument interceptor."""
   if '_ARGCOMPLETE' not in os.environ:
     return
-  if '_ARGCOMPLETE_COMP_WORDBREAKS' not in os.environ:
-    # The default would \ escape : and . -- bud tugley for GRIs.
-    os.environ['_ARGCOMPLETE_COMP_WORDBREAKS'] = '\t"\'@><;|&('
   mute_stderr = None
   namespace = None
   try:

@@ -77,6 +77,19 @@ def ParseManagedZoneForwardingConfig(target_servers=None, version="v1"):
   return messages.ManagedZoneForwardingConfig(targetNameServers=target_servers)
 
 
+def PeeringConfig(target_project, target_network):
+  """Returns ManagedZonePeeringConfig."""
+  messages = GetMessages()
+
+  peering_network = ("https://www.googleapis.com/compute/v1/projects/{}/global"
+                     "/networks/{}".format(target_project, target_network))
+  target_network = messages.ManagedZonePeeringConfigTargetNetwork(
+      networkUrl=peering_network)
+  peering_config = messages.ManagedZonePeeringConfig(
+      targetNetwork=target_network)
+  return peering_config
+
+
 def GetPolicies(num=3, name_server_config=None, forwarding=False,
                 networks=None, version="v1", logging=False):
   """Get a list of policies."""
@@ -219,10 +232,13 @@ def GetManagedZonesForFiltering(api_version="v1"):
   ]
 
 
-def GetManagedZoneBeforeCreation(messages,
-                                 dns_sec_config=False,
-                                 visibility_dict=None,
-                                 forwarding_config=None,):
+def GetManagedZoneBeforeCreation(
+    messages,
+    dns_sec_config=False,
+    visibility_dict=None,
+    forwarding_config=None,
+    peering_config=None,
+):
   """Generate a create message for a managed zone."""
   m = messages
   mzone = m.ManagedZone(
@@ -232,6 +248,7 @@ def GetManagedZoneBeforeCreation(messages,
       kind=u"dns#managedZone",
       name="mz",
       forwardingConfig=forwarding_config,
+      peeringConfig=peering_config,
   )
 
   if dns_sec_config:

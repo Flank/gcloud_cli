@@ -611,7 +611,9 @@ OPTIONAL FLAGS
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1370,6 +1372,7 @@ trace_email. Overrides the default *core/trace_email* property value for this co
 ## GCLOUD WIDE FLAGS
 
 These flags are available to all commands: --configuration, --flags-file, --flatten, --format, --help, --log-http, --top-flag, --user-output-enabled, --verbosity.
+
 Run *$ link:gcloud/help[gcloud help]* for details.
 
 
@@ -1493,7 +1496,9 @@ DESCRIPTION
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1521,7 +1526,9 @@ DESCRIPTION
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -1565,7 +1572,9 @@ DESCRIPTION
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1604,7 +1613,9 @@ DESCRIPTION
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1638,7 +1649,9 @@ DESCRIPTION
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This command is an internal implementation detail and may change or
@@ -1670,7 +1683,9 @@ DESCRIPTION
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1704,7 +1719,9 @@ DESCRIPTION
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This command is an internal implementation detail and may change or
@@ -1736,7 +1753,9 @@ DESCRIPTION
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1778,7 +1797,9 @@ DESCRIPTION
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
@@ -1813,7 +1834,9 @@ DESCRIPTION
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
@@ -1849,7 +1872,9 @@ DESCRIPTION
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -1972,7 +1997,9 @@ FLAGS
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -2007,7 +2034,9 @@ FLAGS
 TEST WIDE FLAGS
     These flags are available to all commands: --configuration, --flags-file,
     --flatten, --format, --help, --log-http, --user-output-enabled,
-    --verbosity. Run $ test help for details.
+    --verbosity.
+
+    Run $ test help for details.
 
 NOTES
     This variant is also available:
@@ -2589,6 +2618,17 @@ Usage: test [optional flags] <group | command>
                          mutex-command | newstylecommand | recommand |
                          requiredargcommand | simple-command | unsetprop
 """)
+
+  def testSuggestFlagInOtherTrack(self):
+    err = """\
+ --coolstuff flag is available in one or more alternate release tracks. Try:
+
+  test sdk2 command2 --coolstuff
+"""
+    with self.AssertRaisesArgumentErrorMatches(
+        err):
+      self.cli.Execute('beta sdk2 command2 --coolstuff'.split())
+
 
 if __name__ == '__main__':
   test_case.main()

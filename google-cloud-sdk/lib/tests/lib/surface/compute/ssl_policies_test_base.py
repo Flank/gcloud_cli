@@ -146,3 +146,13 @@ class SslPoliciesTestBase(sdk_test_base.WithFakeAuth,
         self.messages.ComputeGlobalOperationsGetRequest(
             operation=operation_ref.operation, project=operation_ref.project),
         operation)
+
+  def ExpectOperationWaitRequest(self, operation_ref, operation):
+    """Expects the operation Wait request to be invoked."""
+    self.global_operations.Wait.Expect(
+        self.messages.ComputeGlobalOperationsWaitRequest(
+            operation=operation_ref.operation, project=operation_ref.project),
+        operation)
+
+  def ExpectOperationPollingRequest(self, operation_ref, operation):
+    self.ExpectOperationWaitRequest(operation_ref, operation)

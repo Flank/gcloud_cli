@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud debug snapshots wait \- wait for debug snapshots to complete
+gcloud debug snapshots wait \- wait for debug snapshots on a Cloud Debugger debug target (debuggee) to         complete
 
 
 
@@ -17,10 +17,10 @@ gcloud debug snapshots wait \- wait for debug snapshots to complete
 
 .SH "DESCRIPTION"
 
-This command waits for one or more snapshots on a Cloud Debugger debug target to
-become completed. A snapshot is considered completed either if there was an
-error setting the snapshot or if the snapshot was hit on an instance of the
-debug target.
+\fBgcloud debug snapshots wait\fR is used to wait for one or more snapshots on a
+Cloud Debugger debug target to complete. A snapshot is considered completed
+either if there was an error setting the snapshot or if the snapshot was hit on
+an instance of the debug target.
 
 
 
@@ -111,8 +111,34 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To wait for either of the snapshots with IDs of 'ID1' or 'ID2' of the debug
+target (debuggee) to complete, run:
+
+.RS 2m
+$ gcloud debug snapshots wait ID1 ID2 \-\-target=<debuggee_id>
+.RE
+
+To wait for both of the snapshots with IDs 'ID1' and 'ID2' of the debug target
+(debuggee) to complete, run:
+
+.RS 2m
+$ gcloud debug snapshots wait ID1 ID2 \-\-target=<debuggee_id> \-\-all
+.RE
+
+To wait up to 30 seconds for the snapshot with ID 'ID1' of the debug target
+(debuggee) to complete, run:
+
+.RS 2m
+$ gcloud debug snapshots wait ID1 \-\-target=<debuggee_id> \-\-timeout=30
+.RE
 
 
 

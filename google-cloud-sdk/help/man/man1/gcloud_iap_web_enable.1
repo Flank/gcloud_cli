@@ -1,0 +1,87 @@
+
+.TH "GCLOUD_IAP_WEB_ENABLE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud iap web enable \- enable Cloud Identity\-Aware Proxy (Cloud\ IAP) on an IAP resource
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud iap web enable\fR [\fB\-\-oauth2\-client\-id\fR=\fIOAUTH2_CLIENT_ID\fR\ \fB\-\-oauth2\-client\-secret\fR=\fIOAUTH2_CLIENT_SECRET\fR] [\fB\-\-resource\-type\fR=\fIRESOURCE_TYPE\fR\ :\ \fB\-\-service\fR=\fISERVICE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+This command enables Cloud Identity\-Aware Proxy on an IAP resource. OAuth 2.0
+credentials must be set, or must have been previously set, to enable IAP.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-oauth2\-client\-id\fR=\fIOAUTH2_CLIENT_ID\fR
+OAuth 2.0 client ID to use.
+
+.TP 2m
+\fB\-\-oauth2\-client\-secret\fR=\fIOAUTH2_CLIENT_SECRET\fR
+OAuth 2.0 client secret to use.
+
+.TP 2m
+\fB\-\-resource\-type\fR=\fIRESOURCE_TYPE\fR
+Resource type of the IAP resource. \fIRESOURCE_TYPE\fR must be one of:
+\fBapp\-engine\fR, \fBbackend\-services\fR.
+
+.TP 2m
+\fB\-\-service\fR=\fISERVICE\fR
+Service name. Required with \f5\-\-resource\-type=backend\-services\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To enable IAP on an App Engine application, run:
+
+.RS 2m
+$ gcloud iap web enable \-\-resource\-type=app\-engine
+    \-\-oauth2\-client\-id=CLIENT_ID \-\-oauth2\-client\-secret=SECRET
+.RE
+
+To enable IAP on a backend service, run:
+
+.RS 2m
+$ gcloud iap web enable \-\-resource\-type=backend\-service
+    \-\-oauth2\-client\-id=CLIENT_ID \-\-oauth2\-client\-secret=SECRET
+    \-\-service=SERVICE_ID
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha iap web enable
+$ gcloud beta iap web enable
+.RE
+

@@ -1,0 +1,115 @@
+title: service directory locations describe test scenario
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      service-directory locations describe us-east1
+  - stdout: |
+      labels:
+        cloud.googleapis.com/region: us-east1
+      locationId: us-east1
+      name: projects/cloud-sdk-integration-testing/locations/us-east1
+- execute:
+  - command: |
+      service-directory locations describe projects/fake-project/locations/us-east1
+  - stdout: |
+      labels:
+        cloud.googleapis.com/region: us-east1
+      locationId: us-east1
+      name: projects/cloud-sdk-integration-testing/locations/us-east1
+- execute:
+  - command: |
+      service-directory locations describe fake-location1
+  - error: |-
+      1: NOT_FOUND: Requested entity was not found.
+      - '@type': type.googleapis.com/google.rpc.DebugInfo
+        detail: '[ORIGINAL ERROR] generic::not_found: Location is not supported: us-fakelocation1'
+actions:
+- execute_command:
+    command: |
+      service-directory locations describe us-east1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '167'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1
+            labels:
+              cloud.googleapis.com/region: us-east1
+            locationId: us-east1
+    - expect_stdout: |
+        labels:
+          cloud.googleapis.com/region: us-east1
+        locationId: us-east1
+        name: projects/cloud-sdk-integration-testing/locations/us-east1
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      service-directory locations describe projects/fake-project/locations/us-east1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '167'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1
+            labels:
+              cloud.googleapis.com/region: us-east1
+            locationId: us-east1
+    - expect_stdout: |
+        labels:
+          cloud.googleapis.com/region: us-east1
+        locationId: us-east1
+        name: projects/cloud-sdk-integration-testing/locations/us-east1
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      service-directory locations describe fake-location1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/fake-location1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '316'
+            content-type: application/json; charset=UTF-8
+            status: '404'
+          body:
+            error:
+              code: 404
+              message: Requested entity was not found.
+              status: NOT_FOUND
+              details:
+              - '@type': type.googleapis.com/google.rpc.DebugInfo
+                detail: '[ORIGINAL ERROR] generic::not_found: Location is not supported:
+                  fake-location1'
+    - expect_exit:
+        code: 1
+        message: |-
+          NOT_FOUND: Requested entity was not found.
+          - '@type': type.googleapis.com/google.rpc.DebugInfo
+            detail: '[ORIGINAL ERROR] generic::not_found: Location is not supported: fake-location1'

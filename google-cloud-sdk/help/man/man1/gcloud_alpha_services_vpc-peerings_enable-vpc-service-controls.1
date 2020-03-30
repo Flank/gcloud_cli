@@ -1,0 +1,87 @@
+
+.TH "GCLOUD_ALPHA_SERVICES_VPC\-PEERINGS_ENABLE\-VPC\-SERVICE\-CONTROLS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha services vpc\-peerings enable\-vpc\-service\-controls \- enable VPC Service Controls for a connection
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha services vpc\-peerings enable\-vpc\-service\-controls\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-async\fR] [\fB\-\-service\fR=\fISERVICE\fR;\ default="servicenetworking.googleapis.com"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command enables VPC service controls for a connection.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The network in the current project that is peered with the service.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-service\fR=\fISERVICE\fR; default="servicenetworking.googleapis.com"
+The service to enable VPC service controls for.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To enable VPC service controls for a connection peering a network called
+\f5my\-network\fR on the current project to a service called \f5your\-service\fR
+, run:
+
+.RS 2m
+$ gcloud alpha services vpc\-peerings enable\-vpc\-service\-controls \e
+    \-\-network=my\-network \-\-service=your\-service
+.RE
+
+To run the same command asynchronously (non\-blocking), run:
+
+.RS 2m
+$ gcloud alpha services vpc\-peerings enable\-vpc\-service\-controls \e
+    \-\-network=my\-network \-\-service=your\-service \-\-async
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

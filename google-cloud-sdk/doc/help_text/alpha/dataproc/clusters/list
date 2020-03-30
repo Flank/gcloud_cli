@@ -58,29 +58,34 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To see the list of all clusters, run:
+    To see the list of all clusters in Dataproc's 'us-central1' region, run:
 
-        $ gcloud alpha dataproc clusters list
+        $ gcloud alpha dataproc clusters list --region='us=central1'
 
-    To show a cluster whose name is mycluster, run:
+    To show a cluster in Dataproc's 'global' region with the name 'mycluster',
+    run:
 
-        $ gcloud alpha dataproc clusters list \
+        $ gcloud alpha dataproc clusters list --region='global' \
             --filter='clusterName = mycluster'
 
-    To see the list of all clusters with particular labels, run:
+    To see the list of all clusters in Dataproc's 'global' region with
+    specified labels, run:
 
-        $ gcloud alpha dataproc clusters list \
-            --filter='labels.env = staging AND labels.starred = *'
+        $ gcloud alpha dataproc clusters list --region='global' \
+            --filter='labels.env = staging AND
+          labels.starred = *'
 
-    To see a list of all active clusters with particular labels, run:
+    To see a list of all active clusters in Dataproc's 'europe-west1' region
+    with specified labels, run:
 
-        $ gcloud alpha dataproc clusters list \
-            --filter='status.state = ACTIVE labels.env = staging AND
-         labels.starred = *'
+        $ gcloud alpha dataproc clusters list --region='europe-west1' \
+            --filter='status.state = ACTIVE AND
+          labels.env = staging AND labels.starred = *'
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

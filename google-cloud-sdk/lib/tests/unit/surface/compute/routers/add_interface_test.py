@@ -222,9 +222,10 @@ class AddInterfaceWithAttachmentTest(AddInterfaceTest):
 
     self.make_requests.side_effect = iter([[orig]])
     with self.AssertRaisesArgumentErrorMatches(
-        'argument --interconnect-attachment: Exactly one of '
-        '(--interconnect-attachment | --interconnect-attachment-region | '
-        '--vpn-tunnel | --vpn-tunnel-region) must be specified.'):
+        'argument --interconnect-attachment --interconnect-attachment-region: '
+        'Exactly one of '
+        '(--interconnect-attachment --interconnect-attachment-region | '
+        '--vpn-tunnel --vpn-tunnel-region) must be specified.'):
       self.Run("""
           compute routers add-interface my-router
           --interconnect-attachment my-attachment

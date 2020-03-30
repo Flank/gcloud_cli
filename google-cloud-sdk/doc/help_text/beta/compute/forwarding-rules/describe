@@ -44,8 +44,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To get details about a global forwarding rule, run:
@@ -56,7 +57,7 @@ EXAMPLES
     To get details about a regional forwarding rule, run:
 
         $ gcloud beta compute forwarding-rules describe FORWARDING-RULE \
-            --region us-central1
+            --region=us-central1
 
 NOTES
     This command is currently in BETA and may change without notice. These

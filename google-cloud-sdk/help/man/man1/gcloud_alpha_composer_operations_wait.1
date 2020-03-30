@@ -54,8 +54,21 @@ Compute Engine region in which to create the operation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To wait for the asynchronous operation \f5\fIoperation\-1\fR\fR in the location
+\f5\fIus\-central1\fR\fR to complete, run:
+
+.RS 2m
+$ gcloud alpha composer operations wait operation\-1 \e
+    \-\-location=us\-central1
+.RE
 
 
 

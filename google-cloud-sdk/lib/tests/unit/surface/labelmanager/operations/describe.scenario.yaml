@@ -1,5 +1,23 @@
 title: LabelManager - Operations - Describe test
 release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: labelmanager operations describe operations/clk.12345
+  - stdout: |
+      done: true
+      name: operations/clk.12345
+      response:
+        '@type': type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelKey
+        displayName: env
+        name: labelKeys/123
+        parent: organizations/456
+        state: ACTIVE
+- execute:
+  - command: labelmanager operations describe operations/clv.789
+  - stdout: |
+      done: false
+      name: operations/clv.789
 
 actions:
 - execute_command:
@@ -9,7 +27,7 @@ actions:
         expect_request:
           uri: https://labelmanager.googleapis.com/v1alpha1/operations/clk.12345?alt=json
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             status: '200'
@@ -43,7 +61,7 @@ actions:
         expect_request:
           uri: https://labelmanager.googleapis.com/v1alpha1/operations/clv.789?alt=json
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             status: '200'

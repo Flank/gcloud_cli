@@ -18,48 +18,80 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py.testing import mock
+from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.core import resources
+from tests.lib import cli_test_base
+from tests.lib import sdk_test_base
 from tests.lib import test_case
-from tests.lib.surface.compute import test_base
+from tests.lib.api_lib.util import waiter as waiter_test_base
 
 
-class OrgSecurityPoliciesUpdateAlphaTest(test_base.BaseTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+class OrgSecurityPoliciesUpdateBetaTest(sdk_test_base.WithFakeAuth,
+                                        cli_test_base.CliTestBase,
+                                        waiter_test_base.Base):
 
   def SetUp(self):
-    self.SelectApi(self.track.prefix)
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.mock_client = mock.Client(
+        core_apis.GetClientClass('compute', self.api_version),
+        real_client=core_apis.GetClientInstance(
+            'compute', self.api_version, no_http=True))
+    self.mock_client.Mock()
+    self.addCleanup(self.mock_client.Unmock)
 
   def CreateTestOrgSecurityPolicyMessage(self, **kwargs):
-    return self.messages.SecurityPolicy(
-        description='test-description', fingerprint=b'aBSd123')
+    return self.messages.SecurityPolicy(description='test-description')
 
-  def ExpectOrgSecurityPolicyRequest(self, **kwargs):
-    self.make_requests.side_effect = iter(
-        [[self.CreateTestOrgSecurityPolicyMessage(**kwargs)], []])
-
-  def CheckOrgSecurityPolicyRequest(self, **kwargs):
-    self.CheckRequests(
-        [(self.compute.organizationSecurityPolicies, 'Get',
-          self.messages.ComputeOrganizationSecurityPoliciesGetRequest(
-              securityPolicy='12345'))],
-        [(self.compute.organizationSecurityPolicies, 'Patch',
-          self.messages.ComputeOrganizationSecurityPoliciesPatchRequest(
-              securityPolicy='12345',
-              securityPolicyResource=self.CreateTestOrgSecurityPolicyMessage(
-                  **kwargs)))])
+  def _GetOperationMessage(self, operation_name, status, resource_uri=None):
+    return self.messages.Operation(
+        name=operation_name,
+        status=status,
+        selfLink='https://compute.googleapis.com/compute/{0}/projects/locations/'
+        'global/operations/{1}'.format(self.api_version, operation_name),
+        targetLink=resource_uri)
 
   def testUpdateOrgSecurityPolicyWithOrganization(self):
-    self.ExpectOrgSecurityPolicyRequest()
+    self.mock_client.organizationSecurityPolicies.Get.Expect(
+        self.messages.ComputeOrganizationSecurityPoliciesGetRequest(
+            securityPolicy='12345678910'),
+        response=self.CreateTestOrgSecurityPolicyMessage())
+    self.mock_client.organizationSecurityPolicies.Patch.Expect(
+        self.messages.ComputeOrganizationSecurityPoliciesPatchRequest(
+            securityPolicy='12345678910',
+            securityPolicyResource=self.CreateTestOrgSecurityPolicyMessage()),
+        self._GetOperationMessage(
+            operation_name='org-12345-operation-myop',
+            status=self.messages.Operation.StatusValueValuesEnum.PENDING))
+    self.mock_client.globalOrganizationOperations.Get.Expect(
+        self.messages.ComputeGlobalOrganizationOperationsGetRequest(
+            parentId='organizations/12345',
+            operation='org-12345-operation-myop'),
+        self._GetOperationMessage(
+            operation_name='org-12345-operation-myop',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
 
-    self.Run('compute org-security-policies update 12345 '
+    self.Run('compute org-security-policies update 12345678910 '
              '--description test-description')
 
-    self.CheckOrgSecurityPolicyRequest()
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Update the organization Security Policy.')
+
+
+class OrgSecurityPoliciesUpdateAlphaTest(OrgSecurityPoliciesUpdateBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.mock_client = mock.Client(
+        core_apis.GetClientClass('compute', self.api_version),
+        real_client=core_apis.GetClientInstance(
+            'compute', self.api_version, no_http=True))
+    self.mock_client.Mock()
+    self.addCleanup(self.mock_client.Unmock)
 
 
 if __name__ == '__main__':

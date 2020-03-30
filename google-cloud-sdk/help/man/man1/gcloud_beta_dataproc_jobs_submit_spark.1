@@ -128,8 +128,9 @@ property value for this command invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -138,24 +139,25 @@ help\fR for details.
 To submit a Spark job that runs the main class of a jar, run:
 
 .RS 2m
-$ gcloud beta dataproc jobs submit spark \-\-cluster my_cluster \e
-    \-\-jar my_jar.jar \-\- arg1 arg2
+$ gcloud beta dataproc jobs submit spark \-\-cluster=my_cluster \e
+    \-\-region=us\-central1 \-\-jar=my_jar.jar \-\- arg1 arg2
 .RE
 
 To submit a Spark job that runs a specific class of a jar, run:
 
 .RS 2m
-$ gcloud beta dataproc jobs submit spark \-\-cluster my_cluster \e
-    \-\-class org.my.main.Class \e
-    \-\-jars my_jar1.jar,my_jar2.jar \-\- arg1 arg2
+$ gcloud beta dataproc jobs submit spark \-\-cluster=my_cluster \e
+    \-\-region=us\-central1 \-\-class=org.my.main.Class \e
+    \-\-jars=my_jar1.jar,my_jar2.jar \-\- arg1 arg2
 .RE
 
 To submit a Spark job that runs a jar that is already on the cluster, run:
 
 .RS 2m
-$ gcloud beta dataproc jobs submit spark \-\-cluster my_cluster \e
-    \-\-class org.apache.spark.examples.SparkPi \e
-    \-\-jars file:///usr/lib/spark/examples/jars/spark\-examples.jar \e
+$ gcloud beta dataproc jobs submit spark \-\-cluster=my_cluster \e
+    \-\-region=us\-central1 \e
+    \-\-class=org.apache.spark.examples.SparkPi \e
+    \-\-jars=file:///usr/lib/spark/examples/jars/spark\-examples.jar \e
     \-\- 1000
 .RE
 

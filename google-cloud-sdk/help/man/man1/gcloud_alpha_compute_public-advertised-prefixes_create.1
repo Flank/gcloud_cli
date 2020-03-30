@@ -1,0 +1,85 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_PUBLIC\-ADVERTISED\-PREFIXES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute public\-advertised\-prefixes create \- creates a Google Compute Engine public advertised prefix
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute public\-advertised\-prefixes create\fR \fINAME\fR \fB\-\-dns\-verification\-ip\fR=\fIDNS_VERIFICATION_IP\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the public advertised prefix to operate on.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-dns\-verification\-ip\fR=\fIDNS_VERIFICATION_IP\fR
+IPv4 address to use for verification. It must be within the IPv4 range specified
+in \-\-range.
+
+.TP 2m
+\fB\-\-range\fR=\fIRANGE\fR
+IPv4 range allocated to this public advertised prefix, in CIDR format.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Description of this public advertised prefix.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a public advertised prefix:
+
+.RS 2m
+$ gcloud alpha compute public\-advertised\-prefixes create \e
+    my\-public\-advertised\-prefix \-\-range=120.120.10.0/24 \e
+  \-\-dns\-verification\-ip=120.120.10.15
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

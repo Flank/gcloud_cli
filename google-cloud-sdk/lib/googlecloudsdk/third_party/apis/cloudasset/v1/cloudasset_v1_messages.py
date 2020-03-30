@@ -13,30 +13,45 @@ package = 'cloudasset'
 
 
 class Asset(_messages.Message):
-  r"""Cloud asset. This includes all Google Cloud Platform resources, Cloud
-  IAM policies, and other non-GCP assets.
+  r"""An asset in Google Cloud. An asset can be any resource in the Google
+  Cloud [resource hierarchy](https://cloud.google.com/resource-manager/docs
+  /cloud-platform-resource-hierarchy), a resource outside the Google Cloud
+  resource hierarchy (such as Google Kubernetes Engine clusters and objects),
+  or a Cloud IAM policy.
 
   Fields:
     accessLevel: A GoogleIdentityAccesscontextmanagerV1AccessLevel attribute.
     accessPolicy: A GoogleIdentityAccesscontextmanagerV1AccessPolicy
       attribute.
-    ancestors: Asset's ancestry path in Cloud Resource Manager (CRM)
-      hierarchy, represented as a list of relative resource names. Ancestry
-      path starts with the closest CRM ancestor and ends at root. If the asset
-      is a CRM project/folder/organization, this starts from the asset itself.
-      Example: ["projects/123456789", "folders/5432", "organizations/1234"]
-    assetType: Type of the asset. Example: "compute.googleapis.com/Disk".
-    iamPolicy: Representation of the actual Cloud IAM policy set on a cloud
-      resource. For each resource, there must be at most one Cloud IAM policy
-      set on it.
-    name: The full name of the asset. For example: `//compute.googleapis.com/p
-      rojects/my_project_123/zones/zone1/instances/instance1`. See [Resource N
+    ancestors: The ancestry path of an asset in Google Cloud [resource
+      hierarchy](https://cloud.google.com/resource-manager/docs/cloud-
+      platform-resource-hierarchy), represented as a list of relative resource
+      names. An ancestry path starts with the closest ancestor in the
+      hierarchy and ends at root. If the asset is a project, folder, or
+      organization, the ancestry path starts from the asset itself.  For
+      example: `["projects/123456789", "folders/5432", "organizations/1234"]`
+    assetType: The type of the asset. For example:
+      "compute.googleapis.com/Disk"  See [Supported asset
+      types](https://cloud.google.com/asset-inventory/docs/supported-asset-
+      types) for more information.
+    iamPolicy: A representation of the Cloud IAM policy set on a Google Cloud
+      resource. There can be a maximum of one Cloud IAM policy set on any
+      given resource. In addition, Cloud IAM policies inherit their granted
+      access scope from any policies set on parent resources in the resource
+      hierarchy. Therefore, the effectively policy is the union of both the
+      policy set on this resource and each policy set on all of the resource's
+      ancestry resource levels in the hierarchy. See [this
+      topic](https://cloud.google.com/iam/docs/policies#inheritance) for more
+      information.
+    name: The full name of the asset. For example: "//compute.googleapis.com/p
+      rojects/my_project_123/zones/zone1/instances/instance1"  See [Resource n
       ames](https://cloud.google.com/apis/design/resource_names#full_resource_
       name) for more information.
-    orgPolicy: Representation of the Cloud Organization Policy set on an
-      asset. For each asset, there could be multiple Organization policies
-      with different constraints.
-    resource: Representation of the resource.
+    orgPolicy: A representation of an [organization
+      policy](https://cloud.google.com/resource-manager/docs/organization-
+      policy/overview#organization_policy). There can be more than one
+      organization policy with different constraints set on a given resource.
+    resource: A representation of the resource.
     servicePerimeter: A GoogleIdentityAccesscontextmanagerV1ServicePerimeter
       attribute.
   """
@@ -173,7 +188,7 @@ class Binding(_messages.Message):
       that represents a Google group.    For example, `admins@example.com`.  *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
-      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
       recovered, this value reverts to `user:{emailid}` and the recovered user
       retains the role in the binding.  *
       `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
@@ -219,8 +234,8 @@ class CloudassetBatchGetAssetsHistoryRequest(_messages.Message):
       organization number (such as "organizations/123"), a project ID (such as
       "projects/my-project-id")", or a project number (such as
       "projects/12345").
-    readTimeWindow_endTime: End time of the time window (inclusive). Current
-      timestamp if not specified.
+    readTimeWindow_endTime: End time of the time window (inclusive). If not
+      specified, the current timestamp is used instead.
     readTimeWindow_startTime: Start time of the time window (exclusive).
   """
 
@@ -263,6 +278,80 @@ class CloudassetExportAssetsRequest(_messages.Message):
   parent = _messages.StringField(2, required=True)
 
 
+class CloudassetFeedsCreateRequest(_messages.Message):
+  r"""A CloudassetFeedsCreateRequest object.
+
+  Fields:
+    createFeedRequest: A CreateFeedRequest resource to be passed as the
+      request body.
+    parent: Required. The name of the project/folder/organization where this
+      feed should be created in. It can only be an organization number (such
+      as "organizations/123"), a folder number (such as "folders/123"), a
+      project ID (such as "projects/my-project-id")", or a project number
+      (such as "projects/12345").
+  """
+
+  createFeedRequest = _messages.MessageField('CreateFeedRequest', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class CloudassetFeedsDeleteRequest(_messages.Message):
+  r"""A CloudassetFeedsDeleteRequest object.
+
+  Fields:
+    name: Required. The name of the feed and it must be in the format of:
+      projects/project_number/feeds/feed_id
+      folders/folder_number/feeds/feed_id
+      organizations/organization_number/feeds/feed_id
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class CloudassetFeedsGetRequest(_messages.Message):
+  r"""A CloudassetFeedsGetRequest object.
+
+  Fields:
+    name: Required. The name of the Feed and it must be in the format of:
+      projects/project_number/feeds/feed_id
+      folders/folder_number/feeds/feed_id
+      organizations/organization_number/feeds/feed_id
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class CloudassetFeedsListRequest(_messages.Message):
+  r"""A CloudassetFeedsListRequest object.
+
+  Fields:
+    parent: Required. The parent project/folder/organization whose feeds are
+      to be listed. It can only be using project/folder/organization number
+      (such as "folders/12345")", or a project ID (such as "projects/my-
+      project-id").
+  """
+
+  parent = _messages.StringField(1, required=True)
+
+
+class CloudassetFeedsPatchRequest(_messages.Message):
+  r"""A CloudassetFeedsPatchRequest object.
+
+  Fields:
+    name: Required. The format will be projects/{project_number}/feeds
+      /{client-assigned_feed_identifier} or folders/{folder_number}/feeds
+      /{client-assigned_feed_identifier} or
+      organizations/{organization_number}/feeds/{client-
+      assigned_feed_identifier}  The client-assigned feed identifier must be
+      unique within the parent project/folder/organization.
+    updateFeedRequest: A UpdateFeedRequest resource to be passed as the
+      request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  updateFeedRequest = _messages.MessageField('UpdateFeedRequest', 2)
+
+
 class CloudassetOperationsGetRequest(_messages.Message):
   r"""A CloudassetOperationsGetRequest object.
 
@@ -271,6 +360,33 @@ class CloudassetOperationsGetRequest(_messages.Message):
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class CreateFeedRequest(_messages.Message):
+  r"""Create asset feed request.
+
+  Fields:
+    feed: Required. The feed details. The field `name` must be empty and it
+      will be generated in the format of:
+      projects/project_number/feeds/feed_id
+      folders/folder_number/feeds/feed_id
+      organizations/organization_number/feeds/feed_id
+    feedId: Required. This is the client-assigned asset feed identifier and it
+      needs to be unique under a specific parent project/folder/organization.
+  """
+
+  feed = _messages.MessageField('Feed', 1)
+  feedId = _messages.StringField(2)
+
+
+class Empty(_messages.Message):
+  r"""A generic empty message that you can re-use to avoid defining duplicated
+  empty messages in your APIs. A typical example is to use it as the request
+  or the response type of an API method. For instance:      service Foo {
+  rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);     }  The
+  JSON representation for `Empty` is empty JSON object `{}`.
+  """
+
 
 
 class ExportAssetsRequest(_messages.Message):
@@ -291,10 +407,10 @@ class ExportAssetsRequest(_messages.Message):
     outputConfig: Required. Output configuration indicating where the results
       will be output to. All results will be in newline delimited JSON format.
     readTime: Timestamp to take an asset snapshot. This can only be set to a
-      timestamp between 2018-10-02 UTC (inclusive) and the current time. If
-      not specified, the current time will be used. Due to delays in resource
-      data collection and indexing, there is a volatile window during which
-      running the same query may get different results.
+      timestamp between the current time and the current time minus 35 days
+      (inclusive). If not specified, the current time will be used. Due to
+      delays in resource data collection and indexing, there is a volatile
+      window during which running the same query may get different results.
   """
 
   class ContentTypeValueValuesEnum(_messages.Enum):
@@ -321,27 +437,108 @@ class ExportAssetsRequest(_messages.Message):
 
 
 class Expr(_messages.Message):
-  r"""Represents an expression text. Example:      title: "User account
-  presence"     description: "Determines whether the request has a user
-  account"     expression: "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit"     description: "Determines if a summary is
+  less than 100 chars"     expression: "document.summary.size() < 100"
+  Example (Equality):      title: "Requestor is owner"     description:
+  "Determines if requestor is the document owner"     expression:
+  "document.owner == request.auth.claims.email"  Example (Logic):      title:
+  "Public documents"     description: "Determine whether the document should
+  be publicly visible"     expression: "document.type != 'private' &&
+  document.type != 'internal'"  Example (Data Manipulation):      title:
+  "Notification string"     description: "Create a notification string with a
+  timestamp."     expression: "'New message received at ' +
+  string(document.create_time)"  The exact variables and functions that may be
+  referenced within an expression are determined by the service that evaluates
+  it. See the service documentation for additional information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
   expression = _messages.StringField(2)
   location = _messages.StringField(3)
   title = _messages.StringField(4)
+
+
+class Feed(_messages.Message):
+  r"""An asset feed used to export asset updates to a destinations. An asset
+  feed filter controls what updates are exported. The asset feed must be
+  created within a project, organization, or folder. Supported destinations
+  are: Pub/Sub topics.
+
+  Enums:
+    ContentTypeValueValuesEnum: Asset content type. If not specified, no
+      content but the asset name and type will be returned.
+
+  Fields:
+    assetNames: A list of the full names of the assets to receive updates. You
+      must specify either or both of asset_names and asset_types. Only asset
+      updates matching specified asset_names and asset_types are exported to
+      the feed. For example: `//compute.googleapis.com/projects/my_project_123
+      /zones/zone1/instances/instance1`. See [Resource Names](https://cloud.go
+      ogle.com/apis/design/resource_names#full_resource_name) for more info.
+    assetTypes: A list of types of the assets to receive updates. You must
+      specify either or both of asset_names and asset_types. Only asset
+      updates matching specified asset_names and asset_types are exported to
+      the feed. For example: `"compute.googleapis.com/Disk"`  See [this
+      topic](https://cloud.google.com/asset-inventory/docs/supported-asset-
+      types) for a list of all supported asset types.
+    contentType: Asset content type. If not specified, no content but the
+      asset name and type will be returned.
+    feedOutputConfig: Required. Feed output configuration defining where the
+      asset updates are published to.
+    name: Required. The format will be projects/{project_number}/feeds
+      /{client-assigned_feed_identifier} or folders/{folder_number}/feeds
+      /{client-assigned_feed_identifier} or
+      organizations/{organization_number}/feeds/{client-
+      assigned_feed_identifier}  The client-assigned feed identifier must be
+      unique within the parent project/folder/organization.
+  """
+
+  class ContentTypeValueValuesEnum(_messages.Enum):
+    r"""Asset content type. If not specified, no content but the asset name
+    and type will be returned.
+
+    Values:
+      CONTENT_TYPE_UNSPECIFIED: Unspecified content type.
+      RESOURCE: Resource metadata.
+      IAM_POLICY: The actual IAM policy set on a resource.
+      ORG_POLICY: The Cloud Organization Policy set on an asset.
+      ACCESS_POLICY: The Cloud Access context mananger Policy set on an asset.
+    """
+    CONTENT_TYPE_UNSPECIFIED = 0
+    RESOURCE = 1
+    IAM_POLICY = 2
+    ORG_POLICY = 3
+    ACCESS_POLICY = 4
+
+  assetNames = _messages.StringField(1, repeated=True)
+  assetTypes = _messages.StringField(2, repeated=True)
+  contentType = _messages.EnumField('ContentTypeValueValuesEnum', 3)
+  feedOutputConfig = _messages.MessageField('FeedOutputConfig', 4)
+  name = _messages.StringField(5)
+
+
+class FeedOutputConfig(_messages.Message):
+  r"""Output configuration for asset feed destination.
+
+  Fields:
+    pubsubDestination: Destination on Pub/Sub.
+  """
+
+  pubsubDestination = _messages.MessageField('PubsubDestination', 1)
 
 
 class GcsDestination(_messages.Message):
@@ -578,39 +775,46 @@ class GoogleCloudOrgpolicyV1RestoreDefault(_messages.Message):
 
 
 class GoogleIdentityAccesscontextmanagerV1AccessLevel(_messages.Message):
-  r"""An `AccessLevel` is a label that can be applied to requests to GCP
-  services, along with a list of requirements necessary for the label to be
-  applied.
+  r"""An `AccessLevel` is a label that can be applied to requests to Google
+  Cloud services, along with a list of requirements necessary for the label to
+  be applied.
 
   Fields:
     basic: A `BasicLevel` composed of `Conditions`.
     createTime: Output only. Time the `AccessLevel` was created in UTC.
+    custom: A `CustomLevel` written in the Common Expression Language.
     description: Description of the `AccessLevel` and its use. Does not affect
       behavior.
     name: Required. Resource name for the Access Level. The `short_name`
       component must begin with a letter and only include alphanumeric and
-      '_'. Format: `accessPolicies/{policy_id}/accessLevels/{short_name}`
+      '_'. Format: `accessPolicies/{policy_id}/accessLevels/{short_name}`. The
+      maximum length of the `short_name` component is 50 characters.
     title: Human readable title. Must be unique within the Policy.
     updateTime: Output only. Time the `AccessLevel` was updated in UTC.
   """
 
   basic = _messages.MessageField('GoogleIdentityAccesscontextmanagerV1BasicLevel', 1)
   createTime = _messages.StringField(2)
-  description = _messages.StringField(3)
-  name = _messages.StringField(4)
-  title = _messages.StringField(5)
-  updateTime = _messages.StringField(6)
+  custom = _messages.MessageField('GoogleIdentityAccesscontextmanagerV1CustomLevel', 3)
+  description = _messages.StringField(4)
+  name = _messages.StringField(5)
+  title = _messages.StringField(6)
+  updateTime = _messages.StringField(7)
 
 
 class GoogleIdentityAccesscontextmanagerV1AccessPolicy(_messages.Message):
   r"""`AccessPolicy` is a container for `AccessLevels` (which define the
-  necessary attributes to use GCP services) and `ServicePerimeters` (which
-  define regions of services able to freely pass data within a perimeter). An
-  access policy is globally visible within an organization, and the
-  restrictions it specifies apply to all projects within an organization.
+  necessary attributes to use Google Cloud services) and `ServicePerimeters`
+  (which define regions of services able to freely pass data within a
+  perimeter). An access policy is globally visible within an organization, and
+  the restrictions it specifies apply to all projects within an organization.
 
   Fields:
     createTime: Output only. Time the `AccessPolicy` was created in UTC.
+    etag: Output only. An opaque identifier for the current version of the
+      `AccessPolicy`. This will always be a strongly validated etag, meaning
+      that two Access Polices will be identical if and only if their etags are
+      identical. Clients should not expect this to be in any specific format.
     name: Output only. Resource name of the `AccessPolicy`. Format:
       `accessPolicies/{policy_id}`
     parent: Required. The parent of this `AccessPolicy` in the Cloud Resource
@@ -621,10 +825,11 @@ class GoogleIdentityAccesscontextmanagerV1AccessPolicy(_messages.Message):
   """
 
   createTime = _messages.StringField(1)
-  name = _messages.StringField(2)
-  parent = _messages.StringField(3)
-  title = _messages.StringField(4)
-  updateTime = _messages.StringField(5)
+  etag = _messages.StringField(2)
+  name = _messages.StringField(3)
+  parent = _messages.StringField(4)
+  title = _messages.StringField(5)
+  updateTime = _messages.StringField(6)
 
 
 class GoogleIdentityAccesscontextmanagerV1BasicLevel(_messages.Message):
@@ -707,6 +912,18 @@ class GoogleIdentityAccesscontextmanagerV1Condition(_messages.Message):
   negate = _messages.BooleanField(4)
   regions = _messages.StringField(5, repeated=True)
   requiredAccessLevels = _messages.StringField(6, repeated=True)
+
+
+class GoogleIdentityAccesscontextmanagerV1CustomLevel(_messages.Message):
+  r"""`CustomLevel` is an `AccessLevel` using the Cloud Common Expression
+  Language to represent the necessary conditions for the level to apply to a
+  request. See CEL spec at: https://github.com/google/cel-spec
+
+  Fields:
+    expr: Required. A Cloud CEL expression evaluating to a boolean.
+  """
+
+  expr = _messages.MessageField('Expr', 1)
 
 
 class GoogleIdentityAccesscontextmanagerV1DevicePolicy(_messages.Message):
@@ -801,12 +1018,16 @@ class GoogleIdentityAccesscontextmanagerV1OsConstraint(_messages.Message):
       DESKTOP_WINDOWS: A desktop Windows operating system.
       DESKTOP_LINUX: A desktop Linux operating system.
       DESKTOP_CHROME_OS: A desktop ChromeOS operating system.
+      ANDROID: An Android operating system.
+      IOS: An iOS operating system.
     """
     OS_UNSPECIFIED = 0
     DESKTOP_MAC = 1
     DESKTOP_WINDOWS = 2
     DESKTOP_LINUX = 3
     DESKTOP_CHROME_OS = 4
+    ANDROID = 5
+    IOS = 6
 
   minimumVersion = _messages.StringField(1)
   osType = _messages.EnumField('OsTypeValueValuesEnum', 2)
@@ -814,16 +1035,16 @@ class GoogleIdentityAccesscontextmanagerV1OsConstraint(_messages.Message):
 
 
 class GoogleIdentityAccesscontextmanagerV1ServicePerimeter(_messages.Message):
-  r"""`ServicePerimeter` describes a set of GCP resources which can freely
-  import and export data amongst themselves, but not export outside of the
-  `ServicePerimeter`. If a request with a source within this
+  r"""`ServicePerimeter` describes a set of Google Cloud resources which can
+  freely import and export data amongst themselves, but not export outside of
+  the `ServicePerimeter`. If a request with a source within this
   `ServicePerimeter` has a target outside of the `ServicePerimeter`, the
   request will be blocked. Otherwise the request is allowed. There are two
   types of Service Perimeter - Regular and Bridge. Regular Service Perimeters
-  cannot overlap, a single GCP project can only belong to a single regular
-  Service Perimeter. Service Perimeter Bridges can contain only GCP projects
-  as members, a single GCP project may belong to multiple Service Perimeter
-  Bridges.
+  cannot overlap, a single Google Cloud project can only belong to a single
+  regular Service Perimeter. Service Perimeter Bridges can contain only Google
+  Cloud projects as members, a single Google Cloud project may belong to
+  multiple Service Perimeter Bridges.
 
   Enums:
     PerimeterTypeValueValuesEnum: Perimeter type indicator. A single project
@@ -845,11 +1066,26 @@ class GoogleIdentityAccesscontextmanagerV1ServicePerimeter(_messages.Message):
       bridges. A project cannot be a included in a perimeter bridge without
       being included in regular perimeter. For perimeter bridges, the
       restricted service list as well as access level lists must be empty.
+    spec: Proposed (or dry run) ServicePerimeter configuration. This
+      configuration allows to specify and test ServicePerimeter configuration
+      without enforcing actual access restrictions. Only allowed to be set
+      when the "use_explicit_dry_run_spec" flag is set.
     status: Current ServicePerimeter configuration. Specifies sets of
       resources, restricted services and access levels that determine
       perimeter content and boundaries.
     title: Human readable title. Must be unique within the Policy.
     updateTime: Output only. Time the `ServicePerimeter` was updated in UTC.
+    useExplicitDryRunSpec: Use explicit dry run spec flag. Ordinarily, a dry-
+      run spec implicitly exists  for all Service Perimeters, and that spec is
+      identical to the status for those Service Perimeters. When this flag is
+      set, it inhibits the generation of the implicit spec, thereby allowing
+      the user to explicitly provide a configuration ("spec") to use in a dry-
+      run version of the Service Perimeter. This allows the user to test
+      changes to the enforced config ("status") without actually enforcing
+      them. This testing is done through analyzing the differences between
+      currently enforced and suggested restrictions. use_explicit_dry_run_spec
+      must bet set to True if any of the fields in the spec are set to non-
+      default values.
   """
 
   class PerimeterTypeValueValuesEnum(_messages.Enum):
@@ -870,14 +1106,16 @@ class GoogleIdentityAccesscontextmanagerV1ServicePerimeter(_messages.Message):
   description = _messages.StringField(2)
   name = _messages.StringField(3)
   perimeterType = _messages.EnumField('PerimeterTypeValueValuesEnum', 4)
-  status = _messages.MessageField('GoogleIdentityAccesscontextmanagerV1ServicePerimeterConfig', 5)
-  title = _messages.StringField(6)
-  updateTime = _messages.StringField(7)
+  spec = _messages.MessageField('GoogleIdentityAccesscontextmanagerV1ServicePerimeterConfig', 5)
+  status = _messages.MessageField('GoogleIdentityAccesscontextmanagerV1ServicePerimeterConfig', 6)
+  title = _messages.StringField(7)
+  updateTime = _messages.StringField(8)
+  useExplicitDryRunSpec = _messages.BooleanField(9)
 
 
 class GoogleIdentityAccesscontextmanagerV1ServicePerimeterConfig(_messages.Message):
-  r"""`ServicePerimeterConfig` specifies a set of GCP resources that describe
-  specific Service Perimeter configuration.
+  r"""`ServicePerimeterConfig` specifies a set of Google Cloud resources that
+  describe specific Service Perimeter configuration.
 
   Fields:
     accessLevels: A list of `AccessLevel` resource names that allow resources
@@ -885,22 +1123,49 @@ class GoogleIdentityAccesscontextmanagerV1ServicePerimeterConfig(_messages.Messa
       `AccessLevels` listed must be in the same policy as this
       `ServicePerimeter`. Referencing a nonexistent `AccessLevel` is a syntax
       error. If no `AccessLevel` names are listed, resources within the
-      perimeter can only be accessed via GCP calls with request origins within
-      the perimeter. Example:
+      perimeter can only be accessed via Google Cloud calls with request
+      origins within the perimeter. Example:
       `"accessPolicies/MY_POLICY/accessLevels/MY_LEVEL"`. For Service
       Perimeter Bridge, must be empty.
-    resources: A list of GCP resources that are inside of the service
+    resources: A list of Google Cloud resources that are inside of the service
       perimeter. Currently only projects are allowed. Format:
       `projects/{project_number}`
-    restrictedServices: GCP services that are subject to the Service Perimeter
-      restrictions. For example, if `storage.googleapis.com` is specified,
-      access to the storage buckets inside the perimeter must meet the
-      perimeter's access restrictions.
+    restrictedServices: Google Cloud services that are subject to the Service
+      Perimeter restrictions. For example, if `storage.googleapis.com` is
+      specified, access to the storage buckets inside the perimeter must meet
+      the perimeter's access restrictions.
+    vpcAccessibleServices: Configuration for APIs allowed within Perimeter.
   """
 
   accessLevels = _messages.StringField(1, repeated=True)
   resources = _messages.StringField(2, repeated=True)
   restrictedServices = _messages.StringField(3, repeated=True)
+  vpcAccessibleServices = _messages.MessageField('GoogleIdentityAccesscontextmanagerV1VpcAccessibleServices', 4)
+
+
+class GoogleIdentityAccesscontextmanagerV1VpcAccessibleServices(_messages.Message):
+  r"""Specifies how APIs are allowed to communicate within the Service
+  Perimeter.
+
+  Fields:
+    allowedServices: The list of APIs usable within the Service Perimeter.
+      Must be empty unless 'enable_restriction' is True.
+    enableRestriction: Whether to restrict API calls within the Service
+      Perimeter to the list of APIs specified in 'allowed_services'.
+  """
+
+  allowedServices = _messages.StringField(1, repeated=True)
+  enableRestriction = _messages.BooleanField(2)
+
+
+class ListFeedsResponse(_messages.Message):
+  r"""A ListFeedsResponse object.
+
+  Fields:
+    feeds: A list of feeds.
+  """
+
+  feeds = _messages.MessageField('Feed', 1, repeated=True)
 
 
 class Operation(_messages.Message):
@@ -1027,15 +1292,16 @@ class OutputConfig(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.   A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**      {       "bindings": [         {
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.   A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**      {       "bindings": [         {
   "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-project-
@@ -1044,23 +1310,24 @@ class Policy(_messages.Message):
   ["user:eve@example.com"],           "condition": {             "title":
   "expirable access",             "description": "Does not grant access after
   Sep 2020",             "expression": "request.time <
-  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
-  **YAML Example**      bindings:     - members:       - user:mike@example.com
-  - group:admins@example.com       - domain:google.com       - serviceAccount
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
+  "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
+  bindings:     - members:       - user:mike@example.com       -
+  group:admins@example.com       - domain:google.com       - serviceAccount
   :my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
   grant access after Sep 2020         expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  timestamp('2020-10-01T00:00:00.000Z')     - etag: BwWWja0YfJA=     -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
     auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1068,19 +1335,24 @@ class Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy   that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
   auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
@@ -1089,44 +1361,54 @@ class Policy(_messages.Message):
   version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
 
 
+class PubsubDestination(_messages.Message):
+  r"""A Pub/Sub destination.
+
+  Fields:
+    topic: The name of the Pub/Sub topic to publish to. For example:
+      `projects/PROJECT_ID/topics/TOPIC_ID`.
+  """
+
+  topic = _messages.StringField(1)
+
+
 class Resource(_messages.Message):
-  r"""Representation of a cloud resource.
+  r"""A representation of a Google Cloud resource.
 
   Messages:
     DataValue: The content of the resource, in which some sensitive fields are
-      scrubbed away and may not be present.
+      removed and may not be present.
 
   Fields:
     data: The content of the resource, in which some sensitive fields are
-      scrubbed away and may not be present.
+      removed and may not be present.
     discoveryDocumentUri: The URL of the discovery document containing the
       resource's JSON schema. For example:
-      `"https://www.googleapis.com/discovery/v1/apis/compute/v1/rest"`. It
-      will be left unspecified for resources without a discovery-based API,
-      such as Cloud Bigtable.
-    discoveryName: The JSON schema name listed in the discovery document.
-      Example: "Project". It will be left unspecified for resources (such as
-      Cloud Bigtable) without a discovery-based API.
+      "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest"  This
+      value is unspecified for resources that do not have an API based on a
+      discovery document, such as Cloud Bigtable.
+    discoveryName: The JSON schema name listed in the discovery document. For
+      example: "Project"  This value is unspecified for resources that do not
+      have an API based on a discovery document, such as Cloud Bigtable.
     parent: The full name of the immediate parent of this resource. See
       [Resource Names](https://cloud.google.com/apis/design/resource_names#ful
-      l_resource_name) for more information.  For GCP assets, it is the parent
-      resource defined in the [Cloud IAM policy
+      l_resource_name) for more information.  For Google Cloud assets, this
+      value is the parent resource defined in the [Cloud IAM policy
       hierarchy](https://cloud.google.com/iam/docs/overview#policy_hierarchy).
       For example:
-      `"//cloudresourcemanager.googleapis.com/projects/my_project_123"`.  For
-      third-party assets, it is up to the users to define.
-    resourceUrl: The REST URL for accessing the resource. An HTTP GET
-      operation using this URL returns the resource itself. Example:
-      `https://cloudresourcemanager.googleapis.com/v1/projects/my-
-      project-123`. It will be left unspecified for resources without a REST
-      API.
-    version: The API version. Example: "v1".
+      "//cloudresourcemanager.googleapis.com/projects/my_project_123"  For
+      third-party assets, this field may be set differently.
+    resourceUrl: The REST URL for accessing the resource. An HTTP `GET`
+      request using this URL returns the resource itself. For example:
+      "https://cloudresourcemanager.googleapis.com/v1/projects/my-project-123"
+      This value is unspecified for resources without a REST API.
+    version: The API version. For example: "v1"
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class DataValue(_messages.Message):
     r"""The content of the resource, in which some sensitive fields are
-    scrubbed away and may not be present.
+    removed and may not be present.
 
     Messages:
       AdditionalProperty: An additional property for a DataValue object.
@@ -1271,12 +1553,12 @@ class Status(_messages.Message):
 
 
 class TemporalAsset(_messages.Message):
-  r"""Temporal asset. In addition to the asset, the temporal asset includes
-  the status of the asset and valid from and to time of it.
+  r"""An asset in Google Cloud and its temporal metadata, including the time
+  window when it was observed and its status during that window.
 
   Fields:
-    asset: Asset.
-    deleted: If the asset is deleted or not.
+    asset: An asset in Google Cloud.
+    deleted: Whether the asset has been deleted or not.
     window: The time window when the asset data and state was observed.
   """
 
@@ -1286,16 +1568,34 @@ class TemporalAsset(_messages.Message):
 
 
 class TimeWindow(_messages.Message):
-  r"""A time window of (start_time, end_time].
+  r"""A time window specified by its "start_time" and "end_time".
 
   Fields:
-    endTime: End time of the time window (inclusive). Current timestamp if not
-      specified.
+    endTime: End time of the time window (inclusive). If not specified, the
+      current timestamp is used instead.
     startTime: Start time of the time window (exclusive).
   """
 
   endTime = _messages.StringField(1)
   startTime = _messages.StringField(2)
+
+
+class UpdateFeedRequest(_messages.Message):
+  r"""Update asset feed request.
+
+  Fields:
+    feed: Required. The new values of feed details. It must match an existing
+      feed and the field `name` must be in the format of:
+      projects/project_number/feeds/feed_id or
+      folders/folder_number/feeds/feed_id or
+      organizations/organization_number/feeds/feed_id.
+    updateMask: Required. Only updates the `feed` fields indicated by this
+      mask. The field mask must not be empty, and it must not contain fields
+      that are immutable or only set by the server.
+  """
+
+  feed = _messages.MessageField('Feed', 1)
+  updateMask = _messages.StringField(2)
 
 
 encoding.AddCustomJsonFieldMapping(

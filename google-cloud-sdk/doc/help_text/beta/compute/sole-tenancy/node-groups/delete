@@ -1,13 +1,13 @@
 NAME
-    gcloud beta compute sole-tenancy node-groups delete - deletes a Google
-        Compute Engine node group
+    gcloud beta compute sole-tenancy node-groups delete - delete a Compute
+        Engine node group
 
 SYNOPSIS
     gcloud beta compute sole-tenancy node-groups delete NAME [--zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Deletes a Google Compute Engine node group.
+    (BETA) Delete a Compute Engine node group.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -38,8 +38,14 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To delete a node group, run:
+
+        $ gcloud beta compute sole-tenancy node-groups delete my-node-group
 
 NOTES
     This command is currently in BETA and may change without notice. These

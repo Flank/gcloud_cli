@@ -1,0 +1,65 @@
+
+.TH "GCLOUD_ALPHA_ACCESS\-APPROVAL_SETTINGS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha access\-approval settings \- manage Access Approval settings
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha access\-approval settings\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Access Approval settings can be set on projects, folders, or
+organizations. The settings apply hierarchically. For example, enabling Access
+Approval at the organization level enables it for all folders and projects under
+the organization.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdelete\fR
+\fB(ALPHA)\fR Delete Access Approval settings.
+
+.TP 2m
+\fBget\fR
+\fB(ALPHA)\fR Get Access Approval settings.
+
+.TP 2m
+\fBupdate\fR
+\fB(ALPHA)\fR Update Access Approval settings.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

@@ -14,7 +14,9 @@ SYNOPSIS
           | --max-delivery-attempts=MAX_DELIVERY_ATTEMPTS
           [--dead-letter-topic=DEAD_LETTER_TOPIC
           : --dead-letter-topic-project=DEAD_LETTER_TOPIC_PROJECT]]
-        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+        [--clear-labels | --remove-labels=[KEY,...]]
+        [--clear-retry-policy | --max-retry-delay=MAX_RETRY_DELAY
+          --min-retry-delay=MIN_RETRY_DELAY] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Updates an existing Cloud Pub/Sub subscription.
@@ -126,14 +128,39 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
+
+     At most one of these may be specified:
+
+       --clear-retry-policy
+          If set, clear the retry policy from the subscription.
+
+       Retry Policy Options. Retry policy specifies how Cloud Pub/Sub retries
+       message delivery for this subscription. This feature is currently
+       experimental and not recommended for production use.
+
+         --max-retry-delay=MAX_RETRY_DELAY
+            The maximum delay between consecutive deliveries of a given
+            message. Value should be between 0 and 600 seconds. Defaults to 10
+            seconds. Valid values are strings of the form INTEGER[UNIT], where
+            UNIT is one of "s", "m", "h", and "d" for seconds, minutes, hours,
+            and days, respectively. If the unit is omitted, seconds is assumed.
+
+         --min-retry-delay=MIN_RETRY_DELAY
+            The minimum delay between consecutive deliveries of a given
+            message. Value should be between 0 and 600 seconds. Defaults to 10
+            seconds. Valid values are strings of the form INTEGER[UNIT], where
+            UNIT is one of "s", "m", "h", and "d" for seconds, minutes, hours,
+            and days, respectively. If the unit is omitted, seconds is assumed.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -39,7 +39,9 @@ class _BaseBackupsRestoreTest(object):
     self.mocked_client.operations.Get.Expect(
         request=self.messages.SqlOperationsGetRequest(
             project=self.Project(), operation='opName'),
-        response=self.messages.Operation(name='opName', status='DONE'))
+        response=self.messages.Operation(
+            name='opName',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql backups restore 12345 --restore-instance restore-target '
              '--backup-instance backup-source')
     self.assertEqual(prompt_mock.call_count, 1)
@@ -57,7 +59,9 @@ class _BaseBackupsRestoreTest(object):
     self.mocked_client.operations.Get.Expect(
         request=self.messages.SqlOperationsGetRequest(
             project=self.Project(), operation='opName'),
-        response=self.messages.Operation(name='opName', status='DONE'))
+        response=self.messages.Operation(
+            name='opName',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql backups restore 12345 --restore-instance restore-target')
 
   def testRestoreNoConfirm(self):
@@ -79,7 +83,9 @@ class _BaseBackupsRestoreTest(object):
     self.mocked_client.operations.Get.Expect(
         request=self.messages.SqlOperationsGetRequest(
             project=self.Project(), operation='opName'),
-        response=self.messages.Operation(name='opName', status='DONE'))
+        response=self.messages.Operation(
+            name='opName',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
     self.Run(
         'sql backups restore 12345 --restore-instance restore-target --async')
 

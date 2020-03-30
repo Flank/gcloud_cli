@@ -146,7 +146,7 @@ Legacy health checks are not recommended for backend services. It is possible to
 use a legacy health check on a backend service for a HTTP(S) load balancer if
 that backend service uses instance groups. For more information, refer to this
 guide:
-https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide.
 
 .TP 2m
 \fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]
@@ -157,7 +157,7 @@ Legacy health checks are not recommended for backend services. It is possible to
 use a legacy health check on a backend service for a HTTP(S) load balancer if
 that backend service uses instance groups. For more information, refer to this
 guide:
-https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide.
 
 .TP 2m
 \fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]
@@ -208,11 +208,18 @@ INTERNAL.
 \fB\-\-protocol\fR=\fIPROTOCOL\fR
 Protocol for incoming requests.
 
-If the load\-balancing\-scheme is \f5INTERNAL\fR, the protocol must be one of:
-\f5TCP\fR, \f5UDP\fR.
+If the \f5load\-balancing\-scheme\fR is \f5INTERNAL\fR (internal TCP/UDP load
+balancers), the protocol must be one of: TCP, UDP.
 
-If the load\-balancing\-scheme is \f5EXTERNAL\fR, the protocol must be one of:
-\f5HTTP\fR, \f5HTTPS\fR, \f5HTTP2\fR, \f5SSL\fR, \f5TCP\fR.
+If the \f5load\-balancing\-scheme\fR is \f5INTERNAL_SELF_MANAGED\fR (Traffic
+Director), the protocol must be one of: HTTP, HTTPS, HTTP2.
+
+If the \f5load\-balancing\-scheme\fR is \f5INTERNAL_MANAGED\fR (internal HTTP(S)
+load balancers), the protocol must be one of: HTTP, HTTPS, HTTP2.
+
+If the \f5load\-balancing\-scheme\fR is \f5EXTERNAL\fR (HTTP(S), SSL proxy, or
+TCP proxy load balancers), the protocol must be one of: HTTP, HTTPS, HTTP2, SSL,
+TCP.
 
 .TP 2m
 \fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR
@@ -397,8 +404,9 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

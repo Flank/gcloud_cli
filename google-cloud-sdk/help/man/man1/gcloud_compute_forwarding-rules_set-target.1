@@ -11,7 +11,7 @@ gcloud compute forwarding\-rules set\-target \- modify a forwarding rule to dire
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute forwarding\-rules set\-target\fR \fINAME\fR (\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR\ |\ \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR\ |\ \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR\ |\ \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR\ |\ \fB\-\-target\-pool\fR=\fITARGET_POOL\fR\ |\ \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR\ |\ \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR\ |\ \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR) [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR] [\fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR] [\fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR\ |\ \fB\-\-global\-backend\-service\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute forwarding\-rules set\-target\fR \fINAME\fR (\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR\ |\ \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR\ |\ \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR\ |\ \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR\ |\ \fB\-\-target\-pool\fR=\fITARGET_POOL\fR\ |\ \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR\ |\ \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR\ |\ \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR) [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR] [\fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR] [\fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR\ |\ \fB\-\-global\-backend\-service\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-target\-http\-proxy\fR\ |\ \fB\-\-target\-http\-proxy\-region\fR=\fITARGET_HTTP_PROXY_REGION\fR] [\fB\-\-global\-target\-https\-proxy\fR\ |\ \fB\-\-target\-https\-proxy\-region\fR=\fITARGET_HTTPS_PROXY_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -20,8 +20,8 @@ gcloud compute forwarding\-rules set\-target \- modify a forwarding rule to dire
 \fBgcloud compute forwarding\-rules set\-target\fR is used to set a new target
 for a forwarding.RS 2m
 rule.         A forwarding rule directs traffic that matches a destination IP address
- to a forwarding target (load balancer, VPN gateway or VM
-instance).
+ (and possibly a TCP or UDP port) to a forwarding target (load
+balancer, VPN gateway or VM instance).
 .RE
 
 Forwarding rules can be either global or regional, specified with the
@@ -44,7 +44,7 @@ ephemeral internal IP address from the subnet specified with the
 self\-managed forwarding rule.
 
 Different types of load balancers work at different layers of the OSI networking
-model (http://en.wikipedia.org/wiki/Network_layer). Layer 3 targets include
+model (http://en.wikipedia.org/wiki/Network_layer). Layer 3/4 targets include
 target pools, target SSL proxies, target TCP proxies, and backend services.
 Layer 7 targets include target HTTP proxies and target HTTPS proxies. For more
 information, refer to
@@ -167,6 +167,10 @@ External load balancing or forwarding, used with one of \-\-target\-http\-proxy,
 \fBINTERNAL\fR
 Internal load balancing or forwarding, used with \-\-backend\-service.
 .TP 2m
+\fBINTERNAL_MANAGED\fR
+Internal HTTP(S) Load Balancing, used with \-\-target\-http\-proxy,
+\-\-target\-https\-proxy.
+.TP 2m
 \fBINTERNAL_SELF_MANAGED\fR
 Traffic director load balancing or forwarding, used with
 \-\-target\-http\-proxy, \-\-target\-https\-proxy.
@@ -177,9 +181,10 @@ Traffic director load balancing or forwarding, used with
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
 (Only for \-\-load\-balancing\-scheme=INTERNAL or
-\-\-load\-balancing\-scheme=INTERNAL_SELF_MANAGED) Network that this forwarding
-rule applies to. If this field is not specified, the default network is used. In
-the absence of the default network, this field must be specified.
+\-\-load\-balancing\-scheme=INTERNAL_SELF_MANAGED or
+\-\-load\-balancing\-scheme=INTERNAL_MANAGED) Network that this forwarding rule
+applies to. If this field is not specified, the default network is used. In the
+absence of the default network, this field must be specified.
 
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
@@ -265,6 +270,82 @@ $ gcloud config unset compute/region
 Alternatively, the region can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\-target\-http\-proxy\fR
+If set, the http proxy is global.
+
+.TP 2m
+\fB\-\-target\-http\-proxy\-region\fR=\fITARGET_HTTP_PROXY_REGION\fR
+Region of the http proxy to operate on. If not specified, you may be prompted to
+select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\-target\-https\-proxy\fR
+If set, the https proxy is global.
+
+.TP 2m
+\fB\-\-target\-https\-proxy\-region\fR=\fITARGET_HTTPS_PROXY_REGION\fR
+Region of the https proxy to operate on. If not specified, you may be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
 
 .RE
 .RE
@@ -275,8 +356,9 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

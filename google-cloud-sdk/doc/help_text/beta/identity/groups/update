@@ -1,0 +1,58 @@
+NAME
+    gcloud beta identity groups update - update a group
+
+SYNOPSIS
+    gcloud beta identity groups update EMAIL
+        [--clear-description | --description=DESCRIPTION]
+        [--clear-display-name | --display-name=DISPLAY_NAME]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Update a group.
+
+POSITIONAL ARGUMENTS
+     EMAIL
+        The email address of the group to be updated.
+
+FLAGS
+     At most one of these may be specified:
+
+       --clear-description
+          Clear existing description on group being updated.
+
+       --description=DESCRIPTION
+          Replace existing description on group being updated.
+
+     At most one of these may be specified:
+
+       --clear-display-name
+          Clear existing display name on group being updated.
+
+       --display-name=DISPLAY_NAME
+          Replace existing display name on group being updated.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the cloudidentity/v1beta1 API. The full documentation for
+    this API can be found at: https://cloud.google.com/identity/
+
+EXAMPLES
+    To update a group:
+
+        $ gcloud beta identity groups update eng-discuss@foo.com  \
+            --display-name="New Engineer Discuss"  \
+            --description="Group for engineering discussions"
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha identity groups update
+

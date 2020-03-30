@@ -28,6 +28,7 @@ from six import text_type
 class PoliciesDescribeTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -46,7 +47,7 @@ class PoliciesDescribeTestGA(accesscontextmanager.Base):
         request_type(name=policy.name,), policy)
 
   def testDescribe(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     organization_id = '12345'
     policy = self._MakePolicy(
         'MY_POLICY', parent='organizations/' + organization_id)
@@ -57,7 +58,7 @@ class PoliciesDescribeTestGA(accesscontextmanager.Base):
     self.assertEqual(result, policy)
 
   def testDescribe_Format(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     properties.VALUES.core.user_output_enabled.Set(True)
 
     organization_id = '12345'
@@ -76,7 +77,7 @@ class PoliciesDescribeTestGA(accesscontextmanager.Base):
         normalize_space=True)
 
   def test_InvalidPolicyFormatFromProperty(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
 
     with self.assertRaises(properties.InvalidValueError) as ex:
       # Common error is to specify --policy arg as 'accessPolicies/<num>'
@@ -88,12 +89,14 @@ class PoliciesDescribeTestGA(accesscontextmanager.Base):
 class PoliciesDescribeTestBeta(PoliciesDescribeTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class PoliciesDescribeTestAlpha(PoliciesDescribeTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 

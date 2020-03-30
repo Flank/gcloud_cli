@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute os-config guest-policies lookup - display the
-        combination of guest policies that apply to a given instance
+    gcloud alpha compute os-config guest-policies lookup - display the guest
+        policies that are applied to an instance
 
 SYNOPSIS
     gcloud alpha compute os-config guest-policies lookup INSTANCE_NAME
@@ -41,12 +41,13 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To display all effective guest policies of an instance named my-instance,
-    run:
+    To view all guest policies that are applied to an instance named
+    my-instance, run:
 
         $ gcloud alpha compute os-config guest-policies lookup my-instance
 
@@ -54,5 +55,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute os-config guest-policies lookup
 

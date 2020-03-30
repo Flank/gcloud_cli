@@ -73,7 +73,7 @@ class Asset(_messages.Message):
   name = _messages.StringField(2)
   resourceProperties = _messages.MessageField('ResourcePropertiesValue', 3)
   securityCenterProperties = _messages.MessageField('SecurityCenterProperties', 4)
-  securityMarks = _messages.MessageField('SecurityMarks', 5)
+  securityMarks = _messages.MessageField('GoogleCloudSecuritycenterV1beta1SecurityMarks', 5)
   updateTime = _messages.StringField(6)
 
 
@@ -197,7 +197,7 @@ class Binding(_messages.Message):
       that represents a Google group.    For example, `admins@example.com`.  *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
-      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
       recovered, this value reverts to `user:{emailid}` and the recovered user
       retains the role in the binding.  *
       `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
@@ -238,21 +238,33 @@ class Empty(_messages.Message):
 
 
 class Expr(_messages.Message):
-  r"""Represents an expression text. Example:      title: "User account
-  presence"     description: "Determines whether the request has a user
-  account"     expression: "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit"     description: "Determines if a summary is
+  less than 100 chars"     expression: "document.summary.size() < 100"
+  Example (Equality):      title: "Requestor is owner"     description:
+  "Determines if requestor is the document owner"     expression:
+  "document.owner == request.auth.claims.email"  Example (Logic):      title:
+  "Public documents"     description: "Determine whether the document should
+  be publicly visible"     expression: "document.type != 'private' &&
+  document.type != 'internal'"  Example (Data Manipulation):      title:
+  "Notification string"     description: "Create a notification string with a
+  timestamp."     expression: "'New message received at ' +
+  string(document.create_time)"  The exact variables and functions that may be
+  referenced within an expression are determined by the service that evaluates
+  it. See the service documentation for additional information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
@@ -263,10 +275,10 @@ class Expr(_messages.Message):
 
 class Finding(_messages.Message):
   r"""Cloud Security Command Center (Cloud SCC) finding.  A finding is a
-  record of assessment data (security, risk, health or privacy) ingested into
-  Cloud SCC for presentation, notification, analysis, policy testing, and
-  enforcement. For example, an XSS vulnerability in an App Engine application
-  is a finding.
+  record of assessment data like security, risk, health, or privacy, that is
+  ingested into Cloud SCC for presentation, notification, analysis, policy
+  testing, and enforcement. For example, a cross-site scripting (XSS)
+  vulnerability in an App Engine application is a finding.
 
   Enums:
     StateValueValuesEnum: The state of the finding.
@@ -294,14 +306,16 @@ class Finding(_messages.Message):
       https://cloud.google.com/apis/design/resource_names#relative_resource_na
       me Example: "organizations/{organization_id}/sources/{source_id}/finding
       s/{finding_id}"
-    parent: Immutable. The relative resource name of the source the finding
-      belongs to. See: https://cloud.google.com/apis/design/resource_names#rel
-      ative_resource_name This field is immutable after creation time. For
-      example: "organizations/{organization_id}/sources/{source_id}"
-    resourceName: The full resource name of the Google Cloud Platform (GCP)
-      resource this finding is for. See:
+    parent: The relative resource name of the source the finding belongs to.
+      See: https://cloud.google.com/apis/design/resource_names#relative_resour
+      ce_name This field is immutable after creation time. For example:
+      "organizations/{organization_id}/sources/{source_id}"
+    resourceName: For findings on Google Cloud Platform (GCP) resources, the
+      full resource name of the GCP resource this finding is for. See:
       https://cloud.google.com/apis/design/resource_names#full_resource_name
-      This field is immutable after creation time.
+      When the finding is for a non-GCP resource, the resourceName can be a
+      customer or partner defined string. This field is immutable after
+      creation time.
     securityMarks: Output only. User specified security marks. These marks are
       entirely managed by the user and come from the SecurityMarks resource
       that belongs to the finding.
@@ -392,6 +406,20 @@ class GetPolicyOptions(_messages.Message):
   requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
+class GoogleCloudSecuritycenterV1NotificationMessage(_messages.Message):
+  r"""Cloud SCC's Notification
+
+  Fields:
+    finding: If it's a Finding based notification config, this field will be
+      populated.
+    notificationConfigName: Name of the notification config that generated
+      current notification.
+  """
+
+  finding = _messages.MessageField('Finding', 1)
+  notificationConfigName = _messages.StringField(2)
+
+
 class GoogleCloudSecuritycenterV1RunAssetDiscoveryResponse(_messages.Message):
   r"""Response of asset discovery run
 
@@ -423,6 +451,114 @@ class GoogleCloudSecuritycenterV1RunAssetDiscoveryResponse(_messages.Message):
   state = _messages.EnumField('StateValueValuesEnum', 2)
 
 
+class GoogleCloudSecuritycenterV1beta1Finding(_messages.Message):
+  r"""Cloud Security Command Center (Cloud SCC) finding.  A finding is a
+  record of assessment data (security, risk, health or privacy) ingested into
+  Cloud SCC for presentation, notification, analysis, policy testing, and
+  enforcement. For example, an XSS vulnerability in an App Engine application
+  is a finding.
+
+  Enums:
+    StateValueValuesEnum: The state of the finding.
+
+  Messages:
+    SourcePropertiesValue: Source specific properties. These properties are
+      managed by the source that writes the finding. The key names in the
+      source_properties map must be between 1 and 255 characters, and must
+      start with a letter and contain alphanumeric characters or underscores
+      only.
+
+  Fields:
+    category: The additional taxonomy group within findings from a given
+      source. This field is immutable after creation time. Example:
+      "XSS_FLASH_INJECTION"
+    createTime: The time at which the finding was created in Cloud SCC.
+    eventTime: The time at which the event took place. For example, if the
+      finding represents an open firewall it would capture the time the
+      detector believes the firewall became open. The accuracy is determined
+      by the detector.
+    externalUri: The URI that, if available, points to a web page outside of
+      Cloud SCC where additional information about the finding can be found.
+      This field is guaranteed to be either empty or a well formed URL.
+    name: The relative resource name of this finding. See:
+      https://cloud.google.com/apis/design/resource_names#relative_resource_na
+      me Example: "organizations/{organization_id}/sources/{source_id}/finding
+      s/{finding_id}"
+    parent: Immutable. The relative resource name of the source the finding
+      belongs to. See: https://cloud.google.com/apis/design/resource_names#rel
+      ative_resource_name This field is immutable after creation time. For
+      example: "organizations/{organization_id}/sources/{source_id}"
+    resourceName: For findings on Google Cloud Platform (GCP) resources, the
+      full resource name of the GCP resource this finding is for. See:
+      https://cloud.google.com/apis/design/resource_names#full_resource_name
+      When the finding is for a non-GCP resource, the resourceName can be a
+      customer or partner defined string. This field is immutable after
+      creation time.
+    securityMarks: Output only. User specified security marks. These marks are
+      entirely managed by the user and come from the SecurityMarks resource
+      that belongs to the finding.
+    sourceProperties: Source specific properties. These properties are managed
+      by the source that writes the finding. The key names in the
+      source_properties map must be between 1 and 255 characters, and must
+      start with a letter and contain alphanumeric characters or underscores
+      only.
+    state: The state of the finding.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""The state of the finding.
+
+    Values:
+      STATE_UNSPECIFIED: Unspecified state.
+      ACTIVE: The finding requires attention and has not been addressed yet.
+      INACTIVE: The finding has been fixed, triaged as a non-issue or
+        otherwise addressed and is no longer active.
+    """
+    STATE_UNSPECIFIED = 0
+    ACTIVE = 1
+    INACTIVE = 2
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class SourcePropertiesValue(_messages.Message):
+    r"""Source specific properties. These properties are managed by the source
+    that writes the finding. The key names in the source_properties map must
+    be between 1 and 255 characters, and must start with a letter and contain
+    alphanumeric characters or underscores only.
+
+    Messages:
+      AdditionalProperty: An additional property for a SourcePropertiesValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type
+        SourcePropertiesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a SourcePropertiesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  category = _messages.StringField(1)
+  createTime = _messages.StringField(2)
+  eventTime = _messages.StringField(3)
+  externalUri = _messages.StringField(4)
+  name = _messages.StringField(5)
+  parent = _messages.StringField(6)
+  resourceName = _messages.StringField(7)
+  securityMarks = _messages.MessageField('GoogleCloudSecuritycenterV1beta1SecurityMarks', 8)
+  sourceProperties = _messages.MessageField('SourcePropertiesValue', 9)
+  state = _messages.EnumField('StateValueValuesEnum', 10)
+
+
 class GoogleCloudSecuritycenterV1beta1RunAssetDiscoveryResponse(_messages.Message):
   r"""Response of asset discovery run
 
@@ -452,6 +588,436 @@ class GoogleCloudSecuritycenterV1beta1RunAssetDiscoveryResponse(_messages.Messag
 
   duration = _messages.StringField(1)
   state = _messages.EnumField('StateValueValuesEnum', 2)
+
+
+class GoogleCloudSecuritycenterV1beta1SecurityMarks(_messages.Message):
+  r"""User specified security marks that are attached to the parent Cloud
+  Security Command Center (Cloud SCC) resource. Security marks are scoped
+  within a Cloud SCC organization -- they can be modified and viewed by all
+  users who have proper permissions on the organization.
+
+  Messages:
+    MarksValue: Mutable user specified security marks belonging to the parent
+      resource. Constraints are as follows:    * Keys and values are treated
+      as case insensitive   * Keys must be between 1 - 256 characters
+      (inclusive)   * Keys must be letters, numbers, underscores, or dashes
+      * Values have leading and trailing whitespace trimmed, remaining
+      characters must be between 1 - 4096 characters (inclusive)
+
+  Fields:
+    marks: Mutable user specified security marks belonging to the parent
+      resource. Constraints are as follows:    * Keys and values are treated
+      as case insensitive   * Keys must be between 1 - 256 characters
+      (inclusive)   * Keys must be letters, numbers, underscores, or dashes
+      * Values have leading and trailing whitespace trimmed, remaining
+      characters must be between 1 - 4096 characters (inclusive)
+    name: The relative resource name of the SecurityMarks. See:
+      https://cloud.google.com/apis/design/resource_names#relative_resource_na
+      me Examples:
+      "organizations/{organization_id}/assets/{asset_id}/securityMarks" "organ
+      izations/{organization_id}/sources/{source_id}/findings/{finding_id}/sec
+      urityMarks".
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class MarksValue(_messages.Message):
+    r"""Mutable user specified security marks belonging to the parent
+    resource. Constraints are as follows:    * Keys and values are treated as
+    case insensitive   * Keys must be between 1 - 256 characters (inclusive)
+    * Keys must be letters, numbers, underscores, or dashes   * Values have
+    leading and trailing whitespace trimmed, remaining     characters must be
+    between 1 - 4096 characters (inclusive)
+
+    Messages:
+      AdditionalProperty: An additional property for a MarksValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type MarksValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a MarksValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  marks = _messages.MessageField('MarksValue', 1)
+  name = _messages.StringField(2)
+
+
+class GoogleCloudSecuritycenterV1p1beta1Asset(_messages.Message):
+  r"""Cloud Security Command Center's (Cloud SCC) representation of a Google
+  Cloud Platform (GCP) resource.  The Asset is a Cloud SCC resource that
+  captures information about a single GCP resource. All modifications to an
+  Asset are only within the context of Cloud SCC and don't affect the
+  referenced GCP resource.
+
+  Messages:
+    ResourcePropertiesValue: Resource managed properties. These properties are
+      managed and defined by the GCP resource and cannot be modified by the
+      user.
+
+  Fields:
+    createTime: The time at which the asset was created in Cloud SCC.
+    iamPolicy: IAM Policy information associated with the GCP resource
+      described by the Cloud SCC asset. This information is managed and
+      defined by the GCP resource and cannot be modified by the user.
+    name: The relative resource name of this asset. See:
+      https://cloud.google.com/apis/design/resource_names#relative_resource_na
+      me Example: "organizations/{organization_id}/assets/{asset_id}".
+    resourceProperties: Resource managed properties. These properties are
+      managed and defined by the GCP resource and cannot be modified by the
+      user.
+    securityCenterProperties: Cloud SCC managed properties. These properties
+      are managed by Cloud SCC and cannot be modified by the user.
+    securityMarks: User specified security marks. These marks are entirely
+      managed by the user and come from the SecurityMarks resource that
+      belongs to the asset.
+    updateTime: The time at which the asset was last updated, added, or
+      deleted in Cloud SCC.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class ResourcePropertiesValue(_messages.Message):
+    r"""Resource managed properties. These properties are managed and defined
+    by the GCP resource and cannot be modified by the user.
+
+    Messages:
+      AdditionalProperty: An additional property for a ResourcePropertiesValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type
+        ResourcePropertiesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ResourcePropertiesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  createTime = _messages.StringField(1)
+  iamPolicy = _messages.MessageField('GoogleCloudSecuritycenterV1p1beta1IamPolicy', 2)
+  name = _messages.StringField(3)
+  resourceProperties = _messages.MessageField('ResourcePropertiesValue', 4)
+  securityCenterProperties = _messages.MessageField('GoogleCloudSecuritycenterV1p1beta1SecurityCenterProperties', 5)
+  securityMarks = _messages.MessageField('GoogleCloudSecuritycenterV1p1beta1SecurityMarks', 6)
+  updateTime = _messages.StringField(7)
+
+
+class GoogleCloudSecuritycenterV1p1beta1Finding(_messages.Message):
+  r"""Cloud Security Command Center (Cloud SCC) finding.  A finding is a
+  record of assessment data (security, risk, health or privacy) ingested into
+  Cloud SCC for presentation, notification, analysis, policy testing, and
+  enforcement. For example, an XSS vulnerability in an App Engine application
+  is a finding.
+
+  Enums:
+    StateValueValuesEnum: The state of the finding.
+
+  Messages:
+    SourcePropertiesValue: Source specific properties. These properties are
+      managed by the source that writes the finding. The key names in the
+      source_properties map must be between 1 and 255 characters, and must
+      start with a letter and contain alphanumeric characters or underscores
+      only.
+
+  Fields:
+    category: The additional taxonomy group within findings from a given
+      source. This field is immutable after creation time. Example:
+      "XSS_FLASH_INJECTION"
+    createTime: The time at which the finding was created in Cloud SCC.
+    eventTime: The time at which the event took place. For example, if the
+      finding represents an open firewall it would capture the time the
+      detector believes the firewall became open. The accuracy is determined
+      by the detector.
+    externalUri: The URI that, if available, points to a web page outside of
+      Cloud SCC where additional information about the finding can be found.
+      This field is guaranteed to be either empty or a well formed URL.
+    name: The relative resource name of this finding. See:
+      https://cloud.google.com/apis/design/resource_names#relative_resource_na
+      me Example: "organizations/{organization_id}/sources/{source_id}/finding
+      s/{finding_id}"
+    parent: The relative resource name of the source the finding belongs to.
+      See: https://cloud.google.com/apis/design/resource_names#relative_resour
+      ce_name This field is immutable after creation time. For example:
+      "organizations/{organization_id}/sources/{source_id}"
+    resourceName: For findings on Google Cloud Platform (GCP) resources, the
+      full resource name of the GCP resource this finding is for. See:
+      https://cloud.google.com/apis/design/resource_names#full_resource_name
+      When the finding is for a non-GCP resource, the resourceName can be a
+      customer or partner defined string. This field is immutable after
+      creation time.
+    securityMarks: Output only. User specified security marks. These marks are
+      entirely managed by the user and come from the SecurityMarks resource
+      that belongs to the finding.
+    sourceProperties: Source specific properties. These properties are managed
+      by the source that writes the finding. The key names in the
+      source_properties map must be between 1 and 255 characters, and must
+      start with a letter and contain alphanumeric characters or underscores
+      only.
+    state: The state of the finding.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""The state of the finding.
+
+    Values:
+      STATE_UNSPECIFIED: Unspecified state.
+      ACTIVE: The finding requires attention and has not been addressed yet.
+      INACTIVE: The finding has been fixed, triaged as a non-issue or
+        otherwise addressed and is no longer active.
+    """
+    STATE_UNSPECIFIED = 0
+    ACTIVE = 1
+    INACTIVE = 2
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class SourcePropertiesValue(_messages.Message):
+    r"""Source specific properties. These properties are managed by the source
+    that writes the finding. The key names in the source_properties map must
+    be between 1 and 255 characters, and must start with a letter and contain
+    alphanumeric characters or underscores only.
+
+    Messages:
+      AdditionalProperty: An additional property for a SourcePropertiesValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type
+        SourcePropertiesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a SourcePropertiesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  category = _messages.StringField(1)
+  createTime = _messages.StringField(2)
+  eventTime = _messages.StringField(3)
+  externalUri = _messages.StringField(4)
+  name = _messages.StringField(5)
+  parent = _messages.StringField(6)
+  resourceName = _messages.StringField(7)
+  securityMarks = _messages.MessageField('GoogleCloudSecuritycenterV1p1beta1SecurityMarks', 8)
+  sourceProperties = _messages.MessageField('SourcePropertiesValue', 9)
+  state = _messages.EnumField('StateValueValuesEnum', 10)
+
+
+class GoogleCloudSecuritycenterV1p1beta1IamPolicy(_messages.Message):
+  r"""IAM Policy information associated with the GCP resource described by the
+  Cloud SCC asset. This information is managed and defined by the GCP resource
+  and cannot be modified by the user.
+
+  Fields:
+    policyBlob: The JSON representation of the Policy associated with the
+      asset. See https://cloud.google.com/iam/reference/rest/v1p1beta1/Policy
+      for format details.
+  """
+
+  policyBlob = _messages.StringField(1)
+
+
+class GoogleCloudSecuritycenterV1p1beta1NotificationMessage(_messages.Message):
+  r"""Cloud SCC's Notification
+
+  Fields:
+    finding: If it's a Finding based notification config, this field will be
+      populated.
+    notificationConfigName: Name of the notification config that generated
+      current notification.
+    temporalAsset: If it's an asset based notification config, this field will
+      be populated.
+  """
+
+  finding = _messages.MessageField('GoogleCloudSecuritycenterV1p1beta1Finding', 1)
+  notificationConfigName = _messages.StringField(2)
+  temporalAsset = _messages.MessageField('GoogleCloudSecuritycenterV1p1beta1TemporalAsset', 3)
+
+
+class GoogleCloudSecuritycenterV1p1beta1RunAssetDiscoveryResponse(_messages.Message):
+  r"""Response of asset discovery run
+
+  Enums:
+    StateValueValuesEnum: The state of an asset discovery run.
+
+  Fields:
+    duration: The duration between asset discovery run start and end
+    state: The state of an asset discovery run.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""The state of an asset discovery run.
+
+    Values:
+      STATE_UNSPECIFIED: Asset discovery run state was unspecified.
+      COMPLETED: Asset discovery run completed successfully.
+      SUPERSEDED: Asset discovery run was cancelled with tasks still pending,
+        as another run for the same organization was started with a higher
+        priority.
+      TERMINATED: Asset discovery run was killed and terminated.
+    """
+    STATE_UNSPECIFIED = 0
+    COMPLETED = 1
+    SUPERSEDED = 2
+    TERMINATED = 3
+
+  duration = _messages.StringField(1)
+  state = _messages.EnumField('StateValueValuesEnum', 2)
+
+
+class GoogleCloudSecuritycenterV1p1beta1SecurityCenterProperties(_messages.Message):
+  r"""Cloud SCC managed properties. These properties are managed by Cloud SCC
+  and cannot be modified by the user.
+
+  Fields:
+    resourceDisplayName: The user defined display name for this resource.
+    resourceName: The full resource name of the GCP resource this asset
+      represents. This field is immutable after create time. See:
+      https://cloud.google.com/apis/design/resource_names#full_resource_name
+    resourceOwners: Owners of the Google Cloud resource.
+    resourceParent: The full resource name of the immediate parent of the
+      resource. See:
+      https://cloud.google.com/apis/design/resource_names#full_resource_name
+    resourceParentDisplayName: The user defined display name for the parent of
+      this resource.
+    resourceProject: The full resource name of the project the resource
+      belongs to. See:
+      https://cloud.google.com/apis/design/resource_names#full_resource_name
+    resourceProjectDisplayName: The user defined display name for the project
+      of this resource.
+    resourceType: The type of the GCP resource. Examples include: APPLICATION,
+      PROJECT, and ORGANIZATION. This is a case insensitive field defined by
+      Cloud SCC and/or the producer of the resource and is immutable after
+      create time.
+  """
+
+  resourceDisplayName = _messages.StringField(1)
+  resourceName = _messages.StringField(2)
+  resourceOwners = _messages.StringField(3, repeated=True)
+  resourceParent = _messages.StringField(4)
+  resourceParentDisplayName = _messages.StringField(5)
+  resourceProject = _messages.StringField(6)
+  resourceProjectDisplayName = _messages.StringField(7)
+  resourceType = _messages.StringField(8)
+
+
+class GoogleCloudSecuritycenterV1p1beta1SecurityMarks(_messages.Message):
+  r"""User specified security marks that are attached to the parent Cloud
+  Security Command Center (Cloud SCC) resource. Security marks are scoped
+  within a Cloud SCC organization -- they can be modified and viewed by all
+  users who have proper permissions on the organization.
+
+  Messages:
+    MarksValue: Mutable user specified security marks belonging to the parent
+      resource. Constraints are as follows:    * Keys and values are treated
+      as case insensitive   * Keys must be between 1 - 256 characters
+      (inclusive)   * Keys must be letters, numbers, underscores, or dashes
+      * Values have leading and trailing whitespace trimmed, remaining
+      characters must be between 1 - 4096 characters (inclusive)
+
+  Fields:
+    marks: Mutable user specified security marks belonging to the parent
+      resource. Constraints are as follows:    * Keys and values are treated
+      as case insensitive   * Keys must be between 1 - 256 characters
+      (inclusive)   * Keys must be letters, numbers, underscores, or dashes
+      * Values have leading and trailing whitespace trimmed, remaining
+      characters must be between 1 - 4096 characters (inclusive)
+    name: The relative resource name of the SecurityMarks. See:
+      https://cloud.google.com/apis/design/resource_names#relative_resource_na
+      me Examples:
+      "organizations/{organization_id}/assets/{asset_id}/securityMarks" "organ
+      izations/{organization_id}/sources/{source_id}/findings/{finding_id}/sec
+      urityMarks".
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class MarksValue(_messages.Message):
+    r"""Mutable user specified security marks belonging to the parent
+    resource. Constraints are as follows:    * Keys and values are treated as
+    case insensitive   * Keys must be between 1 - 256 characters (inclusive)
+    * Keys must be letters, numbers, underscores, or dashes   * Values have
+    leading and trailing whitespace trimmed, remaining     characters must be
+    between 1 - 4096 characters (inclusive)
+
+    Messages:
+      AdditionalProperty: An additional property for a MarksValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type MarksValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a MarksValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  marks = _messages.MessageField('MarksValue', 1)
+  name = _messages.StringField(2)
+
+
+class GoogleCloudSecuritycenterV1p1beta1TemporalAsset(_messages.Message):
+  r"""Wrapper over asset object that also captures the state change for the
+  asset e.g. if it was a newly created asset vs updated or deleted asset.
+
+  Enums:
+    ChangeTypeValueValuesEnum: Represents if the asset was
+      created/updated/deleted.
+
+  Fields:
+    asset: Asset data that includes attributes, properties and marks about the
+      asset.
+    changeType: Represents if the asset was created/updated/deleted.
+  """
+
+  class ChangeTypeValueValuesEnum(_messages.Enum):
+    r"""Represents if the asset was created/updated/deleted.
+
+    Values:
+      CHANGE_TYPE_UNSPECIFIED: Unspecified or default.
+      CREATED: Newly created Asset
+      UPDATED: Asset was updated.
+      DELETED: Asset was deleted.
+    """
+    CHANGE_TYPE_UNSPECIFIED = 0
+    CREATED = 1
+    UPDATED = 2
+    DELETED = 3
+
+  asset = _messages.MessageField('GoogleCloudSecuritycenterV1p1beta1Asset', 1)
+  changeType = _messages.EnumField('ChangeTypeValueValuesEnum', 2)
 
 
 class GroupAssetsRequest(_messages.Message):
@@ -691,7 +1257,7 @@ class ListFindingsResponse(_messages.Message):
     totalSize: The total number of findings matching the query.
   """
 
-  findings = _messages.MessageField('Finding', 1, repeated=True)
+  findings = _messages.MessageField('GoogleCloudSecuritycenterV1beta1Finding', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
   readTime = _messages.StringField(3)
   totalSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
@@ -852,15 +1418,16 @@ class OrganizationSettings(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.   A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**      {       "bindings": [         {
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.   A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**      {       "bindings": [         {
   "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-project-
@@ -869,23 +1436,24 @@ class Policy(_messages.Message):
   ["user:eve@example.com"],           "condition": {             "title":
   "expirable access",             "description": "Does not grant access after
   Sep 2020",             "expression": "request.time <
-  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
-  **YAML Example**      bindings:     - members:       - user:mike@example.com
-  - group:admins@example.com       - domain:google.com       - serviceAccount
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
+  "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
+  bindings:     - members:       - user:mike@example.com       -
+  group:admins@example.com       - domain:google.com       - serviceAccount
   :my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
   grant access after Sep 2020         expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  timestamp('2020-10-01T00:00:00.000Z')     - etag: BwWWja0YfJA=     -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
     auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -893,19 +1461,24 @@ class Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy   that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
   auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
@@ -954,19 +1527,19 @@ class SecurityMarks(_messages.Message):
 
   Messages:
     MarksValue: Mutable user specified security marks belonging to the parent
-      resource. Constraints are as follows:   - Keys and values are treated as
-      case insensitive   - Keys must be between 1 - 256 characters (inclusive)
-      - Keys must be letters, numbers, underscores, or dashes   - Values have
-      leading and trailing whitespace trimmed, remaining     characters must
-      be between 1 - 4096 characters (inclusive)
+      resource. Constraints are as follows:    * Keys and values are treated
+      as case insensitive   * Keys must be between 1 - 256 characters
+      (inclusive)   * Keys must be letters, numbers, underscores, or dashes
+      * Values have leading and trailing whitespace trimmed, remaining
+      characters must be between 1 - 4096 characters (inclusive)
 
   Fields:
     marks: Mutable user specified security marks belonging to the parent
-      resource. Constraints are as follows:   - Keys and values are treated as
-      case insensitive   - Keys must be between 1 - 256 characters (inclusive)
-      - Keys must be letters, numbers, underscores, or dashes   - Values have
-      leading and trailing whitespace trimmed, remaining     characters must
-      be between 1 - 4096 characters (inclusive)
+      resource. Constraints are as follows:    * Keys and values are treated
+      as case insensitive   * Keys must be between 1 - 256 characters
+      (inclusive)   * Keys must be letters, numbers, underscores, or dashes
+      * Values have leading and trailing whitespace trimmed, remaining
+      characters must be between 1 - 4096 characters (inclusive)
     name: The relative resource name of the SecurityMarks. See:
       https://cloud.google.com/apis/design/resource_names#relative_resource_na
       me Examples:
@@ -978,9 +1551,9 @@ class SecurityMarks(_messages.Message):
   @encoding.MapUnrecognizedFields('additionalProperties')
   class MarksValue(_messages.Message):
     r"""Mutable user specified security marks belonging to the parent
-    resource. Constraints are as follows:   - Keys and values are treated as
-    case insensitive   - Keys must be between 1 - 256 characters (inclusive)
-    - Keys must be letters, numbers, underscores, or dashes   - Values have
+    resource. Constraints are as follows:    * Keys and values are treated as
+    case insensitive   * Keys must be between 1 - 256 characters (inclusive)
+    * Keys must be letters, numbers, underscores, or dashes   * Values have
     leading and trailing whitespace trimmed, remaining     characters must be
     between 1 - 4096 characters (inclusive)
 
@@ -1109,20 +1682,22 @@ class SecuritycenterOrganizationsAssetsUpdateSecurityMarksRequest(_messages.Mess
   r"""A SecuritycenterOrganizationsAssetsUpdateSecurityMarksRequest object.
 
   Fields:
+    googleCloudSecuritycenterV1beta1SecurityMarks: A
+      GoogleCloudSecuritycenterV1beta1SecurityMarks resource to be passed as
+      the request body.
     name: The relative resource name of the SecurityMarks. See:
       https://cloud.google.com/apis/design/resource_names#relative_resource_na
       me Examples:
       "organizations/{organization_id}/assets/{asset_id}/securityMarks" "organ
       izations/{organization_id}/sources/{source_id}/findings/{finding_id}/sec
       urityMarks".
-    securityMarks: A SecurityMarks resource to be passed as the request body.
     startTime: The time at which the updated SecurityMarks take effect.
     updateMask: The FieldMask to use when updating the security marks
       resource.
   """
 
-  name = _messages.StringField(1, required=True)
-  securityMarks = _messages.MessageField('SecurityMarks', 2)
+  googleCloudSecuritycenterV1beta1SecurityMarks = _messages.MessageField('GoogleCloudSecuritycenterV1beta1SecurityMarks', 1)
+  name = _messages.StringField(2, required=True)
   startTime = _messages.StringField(3)
   updateMask = _messages.StringField(4)
 
@@ -1204,16 +1779,18 @@ class SecuritycenterOrganizationsSourcesFindingsCreateRequest(_messages.Message)
   r"""A SecuritycenterOrganizationsSourcesFindingsCreateRequest object.
 
   Fields:
-    finding: A Finding resource to be passed as the request body.
     findingId: Required. Unique identifier provided by the client within the
       parent scope. It must be alphanumeric and less than or equal to 32
       characters and greater than 0 characters in length.
+    googleCloudSecuritycenterV1beta1Finding: A
+      GoogleCloudSecuritycenterV1beta1Finding resource to be passed as the
+      request body.
     parent: Required. Resource name of the new finding's parent. Its format
       should be "organizations/[organization_id]/sources/[source_id]".
   """
 
-  finding = _messages.MessageField('Finding', 1)
-  findingId = _messages.StringField(2)
+  findingId = _messages.StringField(1)
+  googleCloudSecuritycenterV1beta1Finding = _messages.MessageField('GoogleCloudSecuritycenterV1beta1Finding', 2)
   parent = _messages.StringField(3, required=True)
 
 
@@ -1288,7 +1865,9 @@ class SecuritycenterOrganizationsSourcesFindingsPatchRequest(_messages.Message):
   r"""A SecuritycenterOrganizationsSourcesFindingsPatchRequest object.
 
   Fields:
-    finding: A Finding resource to be passed as the request body.
+    googleCloudSecuritycenterV1beta1Finding: A
+      GoogleCloudSecuritycenterV1beta1Finding resource to be passed as the
+      request body.
     name: The relative resource name of this finding. See:
       https://cloud.google.com/apis/design/resource_names#relative_resource_na
       me Example: "organizations/{organization_id}/sources/{source_id}/finding
@@ -1297,7 +1876,7 @@ class SecuritycenterOrganizationsSourcesFindingsPatchRequest(_messages.Message):
       field should not be specified when creating a finding.
   """
 
-  finding = _messages.MessageField('Finding', 1)
+  googleCloudSecuritycenterV1beta1Finding = _messages.MessageField('GoogleCloudSecuritycenterV1beta1Finding', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
 
@@ -1323,20 +1902,22 @@ class SecuritycenterOrganizationsSourcesFindingsUpdateSecurityMarksRequest(_mess
   object.
 
   Fields:
+    googleCloudSecuritycenterV1beta1SecurityMarks: A
+      GoogleCloudSecuritycenterV1beta1SecurityMarks resource to be passed as
+      the request body.
     name: The relative resource name of the SecurityMarks. See:
       https://cloud.google.com/apis/design/resource_names#relative_resource_na
       me Examples:
       "organizations/{organization_id}/assets/{asset_id}/securityMarks" "organ
       izations/{organization_id}/sources/{source_id}/findings/{finding_id}/sec
       urityMarks".
-    securityMarks: A SecurityMarks resource to be passed as the request body.
     startTime: The time at which the updated SecurityMarks take effect.
     updateMask: The FieldMask to use when updating the security marks
       resource.
   """
 
-  name = _messages.StringField(1, required=True)
-  securityMarks = _messages.MessageField('SecurityMarks', 2)
+  googleCloudSecuritycenterV1beta1SecurityMarks = _messages.MessageField('GoogleCloudSecuritycenterV1beta1SecurityMarks', 1)
+  name = _messages.StringField(2, required=True)
   startTime = _messages.StringField(3)
   updateMask = _messages.StringField(4)
 

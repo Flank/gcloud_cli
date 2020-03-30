@@ -286,12 +286,6 @@ class KeysCreateTestGa(base.KmsMockTest, parameterized.TestCase):
                                              self.key_name.key_ring_id,
                                              self.key_name.crypto_key_id))
 
-
-class KeysCreateTestBeta(KeysCreateTestGa):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
   def testCreateSuccessSkipInitialVersion(self):
     ckvt = self.messages.CryptoKeyVersionTemplate(
         algorithm=self.messages.CryptoKeyVersionTemplate
@@ -337,6 +331,43 @@ class KeysCreateTestBeta(KeysCreateTestGa):
              '--skip-initial-version-creation'.format(
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id))
+
+  def testCreateExternalKeySuccess(self):
+    ckvt = self.messages.CryptoKeyVersionTemplate(
+        algorithm=self.messages.CryptoKeyVersionTemplate
+        .AlgorithmValueValuesEnum.EXTERNAL_SYMMETRIC_ENCRYPTION,
+        protectionLevel=self.messages.CryptoKeyVersionTemplate
+        .ProtectionLevelValueValuesEnum.EXTERNAL)
+
+    self.kms.projects_locations_keyRings_cryptoKeys.Create.Expect(
+        self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysCreateRequest(
+            parent=self.key_name.Parent().RelativeName(),
+            cryptoKeyId=self.key_name.crypto_key_id,
+            skipInitialVersionCreation=True,
+            cryptoKey=self.messages.CryptoKey(
+                purpose=self.messages.CryptoKey.PurposeValueValuesEnum
+                .ENCRYPT_DECRYPT,
+                versionTemplate=ckvt)),
+        self.messages.CryptoKey(
+            name=self.key_name.RelativeName(),
+            purpose=self.messages.CryptoKey.PurposeValueValuesEnum
+            .ENCRYPT_DECRYPT,
+            versionTemplate=ckvt,
+            rotationPeriod=None,
+            nextRotationTime=None))
+    self.Run(
+        'kms keys create --location={0} --keyring={1} {2} --purpose=encryption '
+        '--default-algorithm=external-symmetric-encryption '
+        '--protection-level=external '
+        '--skip-initial-version-creation'.format(self.key_name.location_id,
+                                                 self.key_name.key_ring_id,
+                                                 self.key_name.crypto_key_id))
+
+
+class KeysCreateTestBeta(KeysCreateTestGa):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class KeysCreateTestAlpha(KeysCreateTestBeta):

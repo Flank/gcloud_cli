@@ -57,7 +57,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b?alt=json&project=cloud-sdk-integration-testing
+          uri: https://storage.googleapis.com/storage/v1/b?alt=json&project=cloud-sdk-integration-testing
           method: POST
           headers: {}
           body:
@@ -82,7 +82,7 @@ actions:
           body:
             kind: storage#bucket
             id: $$bucket$$
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$
             projectNumber: '462803083913'
             name: $$bucket$$
             timeCreated: '2018-12-04T18:13:58.731Z'
@@ -115,7 +115,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -133,7 +133,7 @@ actions:
           body:
             kind: storage#bucket
             id: $$bucket$$
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$
             projectNumber: '462803083913'
             name: $$bucket$$
             timeCreated: '2018-12-04T18:13:58.731Z'
@@ -165,7 +165,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$?alt=json
           method: PATCH
           headers: {}
           body:
@@ -189,7 +189,7 @@ actions:
           body:
             kind: storage#bucket
             id: $$bucket$$
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$
             projectNumber: '462803083913'
             name: $$bucket$$
             timeCreated: '2018-12-04T18:13:58.731Z'
@@ -198,7 +198,7 @@ actions:
             acl:
             - kind: storage#bucketAccessControl
               id: $$bucket$$/project-owners-462803083913
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/acl/project-owners-462803083913
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/acl/project-owners-462803083913
               bucket: $$bucket$$
               entity: project-owners-462803083913
               role: OWNER
@@ -208,7 +208,7 @@ actions:
               etag: CAI=
             - kind: storage#bucketAccessControl
               id: $$bucket$$/project-editors-462803083913
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/acl/project-editors-462803083913
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/acl/project-editors-462803083913
               bucket: $$bucket$$
               entity: project-editors-462803083913
               role: OWNER
@@ -218,7 +218,7 @@ actions:
               etag: CAI=
             - kind: storage#bucketAccessControl
               id: $$bucket$$/project-viewers-462803083913
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/acl/project-viewers-462803083913
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/acl/project-viewers-462803083913
               bucket: $$bucket$$
               entity: project-viewers-462803083913
               role: READER
@@ -277,7 +277,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b?alt=json&maxResults=1000&project=cloud-sdk-integration-testing
+          uri: https://storage.googleapis.com/storage/v1/b?alt=json&maxResults=1000&project=cloud-sdk-integration-testing
           method: GET
           headers: {}
           body: null
@@ -296,7 +296,7 @@ actions:
             items:
             - kind: storage#bucket
               id: artifacts.cloud-sdk-integration-testing.appspot.com
-              selfLink: https://www.googleapis.com/storage/v1/b/artifacts.cloud-sdk-integration-testing.appspot.com
+              selfLink: https://storage.googleapis.com/storage/v1/b/artifacts.cloud-sdk-integration-testing.appspot.com
               projectNumber: '462803083913'
               name: artifacts.cloud-sdk-integration-testing.appspot.com
               timeCreated: '2015-12-02T17:39:08.044Z'
@@ -307,7 +307,7 @@ actions:
               etag: CAI=
             - kind: storage#bucket
               id: cloud-sdk-integration-test-usage
-              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-test-usage
+              selfLink: https://storage.googleapis.com/storage/v1/b/cloud-sdk-integration-test-usage
               projectNumber: '462803083913'
               name: cloud-sdk-integration-test-usage
               timeCreated: '2016-12-03T22:56:36.589Z'
@@ -318,7 +318,7 @@ actions:
               etag: CAI=
             - kind: storage#bucket
               id: cloud-sdk-integration-testing
-              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing
+              selfLink: https://storage.googleapis.com/storage/v1/b/cloud-sdk-integration-testing
               projectNumber: '462803083913'
               name: cloud-sdk-integration-testing
               timeCreated: '2017-06-01T00:26:51.643Z'
@@ -329,7 +329,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: cloud-sdk-integration-testing-app-staging
-              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-app-staging
+              selfLink: https://storage.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-app-staging
               projectNumber: '462803083913'
               name: cloud-sdk-integration-testing-app-staging
               timeCreated: '2015-05-13T19:09:02.758Z'
@@ -346,7 +346,7 @@ actions:
               etag: CAI=
             - kind: storage#bucket
               id: cloud-sdk-integration-testing-daisy-bkt
-              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-daisy-bkt
+              selfLink: https://storage.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-daisy-bkt
               projectNumber: '462803083913'
               name: cloud-sdk-integration-testing-daisy-bkt
               timeCreated: '2018-03-22T23:41:22.474Z'
@@ -360,7 +360,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: cloud-sdk-integration-testing-deployment-logs
-              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-deployment-logs
+              selfLink: https://storage.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-deployment-logs
               projectNumber: '462803083913'
               name: cloud-sdk-integration-testing-deployment-logs
               timeCreated: '2015-06-12T18:14:14.588Z'
@@ -371,7 +371,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: cloud-sdk-integration-testing-ml
-              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-ml
+              selfLink: https://storage.googleapis.com/storage/v1/b/cloud-sdk-integration-testing-ml
               projectNumber: '462803083913'
               name: cloud-sdk-integration-testing-ml
               timeCreated: '2016-08-23T18:49:37.168Z'
@@ -382,7 +382,7 @@ actions:
               etag: CAU=
             - kind: storage#bucket
               id: cloud-sdk-integration-testing.appspot.com
-              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing.appspot.com
+              selfLink: https://storage.googleapis.com/storage/v1/b/cloud-sdk-integration-testing.appspot.com
               projectNumber: '462803083913'
               name: cloud-sdk-integration-testing.appspot.com
               timeCreated: '2016-01-27T10:22:30.846Z'
@@ -393,7 +393,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: cloud-sdk-integration-testing_cloudbuild
-              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-integration-testing_cloudbuild
+              selfLink: https://storage.googleapis.com/storage/v1/b/cloud-sdk-integration-testing_cloudbuild
               projectNumber: '462803083913'
               name: cloud-sdk-integration-testing_cloudbuild
               timeCreated: '2016-06-30T22:08:30.379Z'
@@ -404,7 +404,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: cloud-sdk-testing
-              selfLink: https://www.googleapis.com/storage/v1/b/cloud-sdk-testing
+              selfLink: https://storage.googleapis.com/storage/v1/b/cloud-sdk-testing
               projectNumber: '462803083913'
               name: cloud-sdk-testing
               timeCreated: '2016-03-01T20:37:41.778Z'
@@ -415,7 +415,7 @@ actions:
               etag: CCE=
             - kind: storage#bucket
               id: cloudsdkbuild
-              selfLink: https://www.googleapis.com/storage/v1/b/cloudsdkbuild
+              selfLink: https://storage.googleapis.com/storage/v1/b/cloudsdkbuild
               projectNumber: '462803083913'
               name: cloudsdkbuild
               timeCreated: '2015-05-08T17:26:42.045Z'
@@ -426,7 +426,7 @@ actions:
               etag: CCI=
             - kind: storage#bucket
               id: compute-backend-test-gcs-bucket-20181204-181359-337e
-              selfLink: https://www.googleapis.com/storage/v1/b/compute-backend-test-gcs-bucket-20181204-181359-337e
+              selfLink: https://storage.googleapis.com/storage/v1/b/compute-backend-test-gcs-bucket-20181204-181359-337e
               projectNumber: '462803083913'
               name: compute-backend-test-gcs-bucket-20181204-181359-337e
               timeCreated: '2018-12-04T18:14:00.196Z'
@@ -440,7 +440,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: compute-https-lb-test-gcs-bucket-20181204-180940-qvvw
-              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-180940-qvvw
+              selfLink: https://storage.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-180940-qvvw
               projectNumber: '462803083913'
               name: compute-https-lb-test-gcs-bucket-20181204-180940-qvvw
               timeCreated: '2018-12-04T18:09:41.197Z'
@@ -454,7 +454,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: compute-https-lb-test-gcs-bucket-20181204-181002-00cm
-              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181002-00cm
+              selfLink: https://storage.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181002-00cm
               projectNumber: '462803083913'
               name: compute-https-lb-test-gcs-bucket-20181204-181002-00cm
               timeCreated: '2018-12-04T18:10:02.693Z'
@@ -468,7 +468,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: compute-https-lb-test-gcs-bucket-20181204-181003-bxcm
-              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181003-bxcm
+              selfLink: https://storage.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181003-bxcm
               projectNumber: '462803083913'
               name: compute-https-lb-test-gcs-bucket-20181204-181003-bxcm
               timeCreated: '2018-12-04T18:10:03.896Z'
@@ -482,7 +482,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: compute-https-lb-test-gcs-bucket-20181204-181101-k0yo
-              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181101-k0yo
+              selfLink: https://storage.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181101-k0yo
               projectNumber: '462803083913'
               name: compute-https-lb-test-gcs-bucket-20181204-181101-k0yo
               timeCreated: '2018-12-04T18:11:01.620Z'
@@ -496,7 +496,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: compute-https-lb-test-gcs-bucket-20181204-181153-w1zq
-              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181153-w1zq
+              selfLink: https://storage.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181153-w1zq
               projectNumber: '462803083913'
               name: compute-https-lb-test-gcs-bucket-20181204-181153-w1zq
               timeCreated: '2018-12-04T18:11:56.195Z'
@@ -510,7 +510,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: compute-https-lb-test-gcs-bucket-20181204-181158-qbwt
-              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181158-qbwt
+              selfLink: https://storage.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181158-qbwt
               projectNumber: '462803083913'
               name: compute-https-lb-test-gcs-bucket-20181204-181158-qbwt
               timeCreated: '2018-12-04T18:11:59.196Z'
@@ -524,7 +524,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: compute-https-lb-test-gcs-bucket-20181204-181209-dc31
-              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181209-dc31
+              selfLink: https://storage.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181209-dc31
               projectNumber: '462803083913'
               name: compute-https-lb-test-gcs-bucket-20181204-181209-dc31
               timeCreated: '2018-12-04T18:12:10.338Z'
@@ -538,7 +538,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: compute-https-lb-test-gcs-bucket-20181204-181216-x27l
-              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181216-x27l
+              selfLink: https://storage.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181216-x27l
               projectNumber: '462803083913'
               name: compute-https-lb-test-gcs-bucket-20181204-181216-x27l
               timeCreated: '2018-12-04T18:12:17.298Z'
@@ -552,7 +552,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: compute-https-lb-test-gcs-bucket-20181204-181301-8ygv
-              selfLink: https://www.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181301-8ygv
+              selfLink: https://storage.googleapis.com/storage/v1/b/compute-https-lb-test-gcs-bucket-20181204-181301-8ygv
               projectNumber: '462803083913'
               name: compute-https-lb-test-gcs-bucket-20181204-181301-8ygv
               timeCreated: '2018-12-04T18:13:01.712Z'
@@ -566,7 +566,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: dataproc-a63ced4c-fa87-4bea-94a5-4d2f8fbbd783-us
-              selfLink: https://www.googleapis.com/storage/v1/b/dataproc-a63ced4c-fa87-4bea-94a5-4d2f8fbbd783-us
+              selfLink: https://storage.googleapis.com/storage/v1/b/dataproc-a63ced4c-fa87-4bea-94a5-4d2f8fbbd783-us
               projectNumber: '462803083913'
               name: dataproc-a63ced4c-fa87-4bea-94a5-4d2f8fbbd783-us
               timeCreated: '2015-09-09T23:12:27.571Z'
@@ -577,7 +577,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: dataproc-f8710048-79ac-41cb-a9df-f3591df3c32b-us
-              selfLink: https://www.googleapis.com/storage/v1/b/dataproc-f8710048-79ac-41cb-a9df-f3591df3c32b-us
+              selfLink: https://storage.googleapis.com/storage/v1/b/dataproc-f8710048-79ac-41cb-a9df-f3591df3c32b-us
               projectNumber: '462803083913'
               name: dataproc-f8710048-79ac-41cb-a9df-f3591df3c32b-us
               timeCreated: '2018-08-02T20:34:12.263Z'
@@ -591,7 +591,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: do-not-delete-genomics-pipelines-test
-              selfLink: https://www.googleapis.com/storage/v1/b/do-not-delete-genomics-pipelines-test
+              selfLink: https://storage.googleapis.com/storage/v1/b/do-not-delete-genomics-pipelines-test
               projectNumber: '462803083913'
               name: do-not-delete-genomics-pipelines-test
               timeCreated: '2016-03-18T20:51:55.838Z'
@@ -608,7 +608,7 @@ actions:
               etag: CAI=
             - kind: storage#bucket
               id: do-not-delete-genomics-pipelines-test-inputs
-              selfLink: https://www.googleapis.com/storage/v1/b/do-not-delete-genomics-pipelines-test-inputs
+              selfLink: https://storage.googleapis.com/storage/v1/b/do-not-delete-genomics-pipelines-test-inputs
               projectNumber: '462803083913'
               name: do-not-delete-genomics-pipelines-test-inputs
               timeCreated: '2017-03-29T14:33:06.515Z'
@@ -619,7 +619,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: do-not-delete-integration-test
-              selfLink: https://www.googleapis.com/storage/v1/b/do-not-delete-integration-test
+              selfLink: https://storage.googleapis.com/storage/v1/b/do-not-delete-integration-test
               projectNumber: '462803083913'
               name: do-not-delete-integration-test
               timeCreated: '2015-03-10T20:27:48.719Z'
@@ -630,7 +630,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: do-not-delete-ml-video-test
-              selfLink: https://www.googleapis.com/storage/v1/b/do-not-delete-ml-video-test
+              selfLink: https://storage.googleapis.com/storage/v1/b/do-not-delete-ml-video-test
               projectNumber: '462803083913'
               name: do-not-delete-ml-video-test
               timeCreated: '2017-06-07T18:44:33.099Z'
@@ -641,7 +641,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: e2e-functions-do-not-delete
-              selfLink: https://www.googleapis.com/storage/v1/b/e2e-functions-do-not-delete
+              selfLink: https://storage.googleapis.com/storage/v1/b/e2e-functions-do-not-delete
               projectNumber: '462803083913'
               name: e2e-functions-do-not-delete
               timeCreated: '2018-01-03T17:34:55.297Z'
@@ -652,7 +652,7 @@ actions:
               etag: CAI=
             - kind: storage#bucket
               id: e2e-input-functions
-              selfLink: https://www.googleapis.com/storage/v1/b/e2e-input-functions
+              selfLink: https://storage.googleapis.com/storage/v1/b/e2e-input-functions
               projectNumber: '462803083913'
               name: e2e-input-functions
               timeCreated: '2017-01-27T10:59:02.335Z'
@@ -663,7 +663,7 @@ actions:
               etag: CMzcEA==
             - kind: storage#bucket
               id: gaedeptest-20181204-171357-xcy9bucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-171357-xcy9bucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-171357-xcy9bucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-171357-xcy9bucket
               timeCreated: '2018-12-04T17:14:00.763Z'
@@ -677,7 +677,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-171500-7rv4bucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-171500-7rv4bucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-171500-7rv4bucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-171500-7rv4bucket
               timeCreated: '2018-12-04T17:15:01.993Z'
@@ -691,7 +691,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-172141-3dr1bucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-172141-3dr1bucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-172141-3dr1bucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-172141-3dr1bucket
               timeCreated: '2018-12-04T17:21:43.588Z'
@@ -705,7 +705,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-172936-yqbhbucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-172936-yqbhbucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-172936-yqbhbucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-172936-yqbhbucket
               timeCreated: '2018-12-04T17:29:41.098Z'
@@ -719,7 +719,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-173605-o3habucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-173605-o3habucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-173605-o3habucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-173605-o3habucket
               timeCreated: '2018-12-04T17:36:09.564Z'
@@ -733,7 +733,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-173721-aqthbucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-173721-aqthbucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-173721-aqthbucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-173721-aqthbucket
               timeCreated: '2018-12-04T17:37:22.801Z'
@@ -747,7 +747,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-174712-5ys1bucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-174712-5ys1bucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-174712-5ys1bucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-174712-5ys1bucket
               timeCreated: '2018-12-04T17:47:16.417Z'
@@ -761,7 +761,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-181100-srgbbucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181100-srgbbucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-181100-srgbbucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-181100-srgbbucket
               timeCreated: '2018-12-04T18:11:01.339Z'
@@ -775,7 +775,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-181226-e71ubucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181226-e71ubucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-181226-e71ubucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-181226-e71ubucket
               timeCreated: '2018-12-04T18:12:30.497Z'
@@ -789,7 +789,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-181304-6ho0bucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181304-6ho0bucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-181304-6ho0bucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-181304-6ho0bucket
               timeCreated: '2018-12-04T18:13:05.796Z'
@@ -803,7 +803,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-181315-4bjmbucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181315-4bjmbucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-181315-4bjmbucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-181315-4bjmbucket
               timeCreated: '2018-12-04T18:13:16.896Z'
@@ -817,7 +817,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-181318-sma8bucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181318-sma8bucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-181318-sma8bucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-181318-sma8bucket
               timeCreated: '2018-12-04T18:13:19.598Z'
@@ -831,7 +831,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gaedeptest-20181204-181341-73nibucket
-              selfLink: https://www.googleapis.com/storage/v1/b/gaedeptest-20181204-181341-73nibucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/gaedeptest-20181204-181341-73nibucket
               projectNumber: '462803083913'
               name: gaedeptest-20181204-181341-73nibucket
               timeCreated: '2018-12-04T18:13:46.505Z'
@@ -845,7 +845,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gcloud-export-test-temp
-              selfLink: https://www.googleapis.com/storage/v1/b/gcloud-export-test-temp
+              selfLink: https://storage.googleapis.com/storage/v1/b/gcloud-export-test-temp
               projectNumber: '462803083913'
               name: gcloud-export-test-temp
               timeCreated: '2015-10-30T18:54:43.174Z'
@@ -862,7 +862,7 @@ actions:
               etag: CAI=
             - kind: storage#bucket
               id: gcloud-ml-productsearch-test
-              selfLink: https://www.googleapis.com/storage/v1/b/gcloud-ml-productsearch-test
+              selfLink: https://storage.googleapis.com/storage/v1/b/gcloud-ml-productsearch-test
               projectNumber: '462803083913'
               name: gcloud-ml-productsearch-test
               timeCreated: '2017-11-29T00:12:15.247Z'
@@ -873,7 +873,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: gcloud-test-integration-test
-              selfLink: https://www.googleapis.com/storage/v1/b/gcloud-test-integration-test
+              selfLink: https://storage.googleapis.com/storage/v1/b/gcloud-test-integration-test
               projectNumber: '462803083913'
               name: gcloud-test-integration-test
               timeCreated: '2015-06-06T00:24:44.543Z'
@@ -884,7 +884,7 @@ actions:
               etag: CAM=
             - kind: storage#bucket
               id: hbchai
-              selfLink: https://www.googleapis.com/storage/v1/b/hbchai
+              selfLink: https://storage.googleapis.com/storage/v1/b/hbchai
               projectNumber: '462803083913'
               name: hbchai
               timeCreated: '2016-02-11T17:38:57.346Z'
@@ -895,7 +895,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: liuvictor-test
-              selfLink: https://www.googleapis.com/storage/v1/b/liuvictor-test
+              selfLink: https://storage.googleapis.com/storage/v1/b/liuvictor-test
               projectNumber: '462803083913'
               name: liuvictor-test
               timeCreated: '2017-04-04T15:48:54.510Z'
@@ -906,7 +906,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: magimaster-bucket
-              selfLink: https://www.googleapis.com/storage/v1/b/magimaster-bucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/magimaster-bucket
               projectNumber: '462803083913'
               name: magimaster-bucket
               timeCreated: '2016-03-09T21:30:02.667Z'
@@ -917,7 +917,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: staging.cloud-sdk-integration-testing.appspot.com
-              selfLink: https://www.googleapis.com/storage/v1/b/staging.cloud-sdk-integration-testing.appspot.com
+              selfLink: https://storage.googleapis.com/storage/v1/b/staging.cloud-sdk-integration-testing.appspot.com
               projectNumber: '462803083913'
               name: staging.cloud-sdk-integration-testing.appspot.com
               timeCreated: '2015-10-04T18:21:21.632Z'
@@ -934,7 +934,7 @@ actions:
               etag: CAg=
             - kind: storage#bucket
               id: stephenmw-test
-              selfLink: https://www.googleapis.com/storage/v1/b/stephenmw-test
+              selfLink: https://storage.googleapis.com/storage/v1/b/stephenmw-test
               projectNumber: '462803083913'
               name: stephenmw-test
               timeCreated: '2015-11-13T22:48:54.099Z'
@@ -945,7 +945,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: $$bucket$$
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$
               projectNumber: '462803083913'
               name: $$bucket$$
               timeCreated: '2018-12-04T18:13:58.731Z'
@@ -963,7 +963,7 @@ actions:
               etag: CAI=
             - kind: storage#bucket
               id: test-lab-9m4rph26ch1z2-ifqcbfj9jm2js
-              selfLink: https://www.googleapis.com/storage/v1/b/test-lab-9m4rph26ch1z2-ifqcbfj9jm2js
+              selfLink: https://storage.googleapis.com/storage/v1/b/test-lab-9m4rph26ch1z2-ifqcbfj9jm2js
               projectNumber: '462803083913'
               name: test-lab-9m4rph26ch1z2-ifqcbfj9jm2js
               timeCreated: '2016-03-29T23:29:53.122Z'
@@ -980,7 +980,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: test-lab-cloud-sdk-integration-testing
-              selfLink: https://www.googleapis.com/storage/v1/b/test-lab-cloud-sdk-integration-testing
+              selfLink: https://storage.googleapis.com/storage/v1/b/test-lab-cloud-sdk-integration-testing
               projectNumber: '462803083913'
               name: test-lab-cloud-sdk-integration-testing
               timeCreated: '2015-06-11T17:47:36.061Z'
@@ -997,7 +997,7 @@ actions:
               etag: CAQ=
             - kind: storage#bucket
               id: us-central1-composer-enviro-5306f81c-bucket
-              selfLink: https://www.googleapis.com/storage/v1/b/us-central1-composer-enviro-5306f81c-bucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/us-central1-composer-enviro-5306f81c-bucket
               projectNumber: '462803083913'
               name: us-central1-composer-enviro-5306f81c-bucket
               timeCreated: '2018-01-12T17:39:20.418Z'
@@ -1011,7 +1011,7 @@ actions:
               etag: CAI=
             - kind: storage#bucket
               id: us-central1-composer-enviro-f1a6ba1a-bucket
-              selfLink: https://www.googleapis.com/storage/v1/b/us-central1-composer-enviro-f1a6ba1a-bucket
+              selfLink: https://storage.googleapis.com/storage/v1/b/us-central1-composer-enviro-f1a6ba1a-bucket
               projectNumber: '462803083913'
               name: us-central1-composer-enviro-f1a6ba1a-bucket
               timeCreated: '2018-01-12T17:26:31.310Z'
@@ -1025,7 +1025,7 @@ actions:
               etag: CAI=
             - kind: storage#bucket
               id: us.artifacts.cloud-sdk-integration-testing.appspot.com
-              selfLink: https://www.googleapis.com/storage/v1/b/us.artifacts.cloud-sdk-integration-testing.appspot.com
+              selfLink: https://storage.googleapis.com/storage/v1/b/us.artifacts.cloud-sdk-integration-testing.appspot.com
               projectNumber: '462803083913'
               name: us.artifacts.cloud-sdk-integration-testing.appspot.com
               timeCreated: '2016-03-26T02:30:04.828Z'
@@ -1036,7 +1036,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: vm-config.cloud-sdk-integration-testing.appspot.com
-              selfLink: https://www.googleapis.com/storage/v1/b/vm-config.cloud-sdk-integration-testing.appspot.com
+              selfLink: https://storage.googleapis.com/storage/v1/b/vm-config.cloud-sdk-integration-testing.appspot.com
               projectNumber: '462803083913'
               name: vm-config.cloud-sdk-integration-testing.appspot.com
               timeCreated: '2015-04-02T22:57:14.558Z'
@@ -1047,7 +1047,7 @@ actions:
               etag: CAI=
             - kind: storage#bucket
               id: vm-containers.cloud-sdk-integration-testing.appspot.com
-              selfLink: https://www.googleapis.com/storage/v1/b/vm-containers.cloud-sdk-integration-testing.appspot.com
+              selfLink: https://storage.googleapis.com/storage/v1/b/vm-containers.cloud-sdk-integration-testing.appspot.com
               projectNumber: '462803083913'
               name: vm-containers.cloud-sdk-integration-testing.appspot.com
               timeCreated: '2015-04-02T22:57:16.748Z'
@@ -1058,7 +1058,7 @@ actions:
               etag: CAI=
             - kind: storage#bucket
               id: wfaris-ml-speech-test
-              selfLink: https://www.googleapis.com/storage/v1/b/wfaris-ml-speech-test
+              selfLink: https://storage.googleapis.com/storage/v1/b/wfaris-ml-speech-test
               projectNumber: '462803083913'
               name: wfaris-ml-speech-test
               timeCreated: '2018-04-13T15:06:53.330Z'
@@ -1072,7 +1072,7 @@ actions:
               etag: CAE=
             - kind: storage#bucket
               id: zjn-upload-test
-              selfLink: https://www.googleapis.com/storage/v1/b/zjn-upload-test
+              selfLink: https://storage.googleapis.com/storage/v1/b/zjn-upload-test
               projectNumber: '462803083913'
               name: zjn-upload-test
               timeCreated: '2016-10-19T21:46:00.268Z'
@@ -1099,7 +1099,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$?alt=json
           method: DELETE
           headers: {}
           body: null

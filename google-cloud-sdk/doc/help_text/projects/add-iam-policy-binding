@@ -39,8 +39,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the cloudresourcemanager/v1 API. The full documentation
@@ -68,8 +69,9 @@ EXAMPLES
         $ gcloud projects add-iam-policy-binding example-project-id-1 \
             --member='allAuthenticatedUsers' --role='roles/editor'
 
-    See https://cloud.google.com/iam/docs/managing-policies for details of
-    policy role and member types.
+    See https://cloud.google.com/iam/help/members/types for details about
+    member types. See https://cloud.google.com/iam/help/roles/reference for
+    details about roles.
 
 NOTES
     These variants are also available:

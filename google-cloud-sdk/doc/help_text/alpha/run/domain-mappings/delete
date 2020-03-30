@@ -91,19 +91,21 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To delete a Cloud Run domain mapping, run:
 
-        $ gcloud alpha run domain-mappings delete --domain www.example.com
+        $ gcloud alpha run domain-mappings delete --domain=www.example.com
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud run domain-mappings delete
         $ gcloud beta run domain-mappings delete
 

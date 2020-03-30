@@ -1,0 +1,179 @@
+
+.TH "GCLOUD_BETA_ASSET_ANALYZE\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta asset analyze\-iam\-policy \- analyzes accessible IAM policies that match a request
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta asset analyze\-iam\-policy\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR) [\fB\-\-full\-resource\-name\fR=\fIFULL_RESOURCE_NAME\fR] [\fB\-\-identity\fR=\fIIDENTITY\fR] [\fB\-\-execution\-timeout\fR=\fIEXECUTION_TIMEOUT\fR\ \fB\-\-expand\-groups\fR\ \fB\-\-expand\-resources\fR\ \fB\-\-expand\-roles\fR\ \fB\-\-output\-group\-edges\fR\ \fB\-\-output\-resource\-edges\fR\ \fB\-\-show\-response\fR] [\fB\-\-permissions\fR=[\fIPERMISSIONS\fR,...]\ \fB\-\-roles\fR=[\fIROLES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Analyzes accessible IAM policies that match a request.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+The folder ID to perform the analysis.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+The organization ID to perform the analysis.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+Specifies a resource for analysis. Leaving it empty means ANY.
+
+.RS 2m
+.TP 2m
+\fB\-\-full\-resource\-name\fR=\fIFULL_RESOURCE_NAME\fR
+The full resource name.
+
+.RE
+.sp
+.TP 2m
+
+Specifies an identity for analysis. Leaving it empty means ANY.
+
+.RS 2m
+.TP 2m
+\fB\-\-identity\fR=\fIIDENTITY\fR
+The identity appearing in the form of members in the IAM policy binding.
+
+.RE
+.sp
+.TP 2m
+
+The analysis options.
+
+.RS 2m
+.TP 2m
+\fB\-\-execution\-timeout\fR=\fIEXECUTION_TIMEOUT\fR
+The amount of time the executable has to complete. See JSON representation of
+Duration (https://developers.google.com/protocol\-buffers/docs/proto3#json).
+Deafult is empty.
+
+.TP 2m
+\fB\-\-expand\-groups\fR
+If true, the identities section of the result will expand any Google groups
+appearing in an IAM policy binding. Default is false.
+
+.TP 2m
+\fB\-\-expand\-resources\fR
+If true, the resource section of the result will expand any resource attached to
+an IAM policy to include resources lower in the resource hierarchy. Default is
+false.
+
+.TP 2m
+\fB\-\-expand\-roles\fR
+If true, the access section of result will expand any roles appearing in IAM
+policy bindings to include their permissions. Default is false.
+
+.TP 2m
+\fB\-\-output\-group\-edges\fR
+If true, the result will output group identity edges, starting from the
+binding's group members, to any expanded identities. Default is false.
+
+.TP 2m
+\fB\-\-output\-resource\-edges\fR
+If true, the result will output resource edges, starting from the policy
+attached resource, to any expanded resources. Default is false.
+
+.TP 2m
+\fB\-\-show\-response\fR
+If true, the response will be showed as\-is in the command output.
+
+.RE
+.sp
+.TP 2m
+
+Specifies roles or permissions for analysis. Leaving it empty means ANY.
+
+.RS 2m
+.TP 2m
+\fB\-\-permissions\fR=[\fIPERMISSIONS\fR,...]
+The permissions to appear in the result.
+
+.TP 2m
+\fB\-\-roles\fR=[\fIROLES\fR,...]
+The roles to appear in the result.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To find out which users have been granted the iam.serviceAccounts.actAs
+permission on a service account, run:
+
+.RS 2m
+$ gcloud beta asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID
+\-\-full\-resource\-name='//iam.googleapis.com/projects/YOUR_PROJ_ID/serviceAccounts/YOUR_SERVICE_ACCOUNT_UNIQUE_ID'
+\-\-permissions='iam.serviceAccounts.actAs'
+.RE
+
+To find out which resources a user can access, run:
+
+.RS 2m
+$ gcloud beta asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID \e
+    \-\-identity='user:u1@foo.com'
+.RE
+
+To find out which roles or permissions a user has been granted on a project,
+run:
+
+.RS 2m
+$ gcloud beta asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID
+\-\-full\-resource\-name='//cloudresourcemanager.googleapis.com/projects/YOUR_PROJ_ID'
+\-\-identity='user:u1@foo.com'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha asset analyze\-iam\-policy
+.RE
+

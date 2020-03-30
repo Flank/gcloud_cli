@@ -58,15 +58,15 @@ Sink will be disabled. Disabled sinks do not export logs.
 Specify an exclusion filter for a log entry that is not to be exported. This
 flag can be repeated.
 
-The \f5name\fR and \f5filter\fR attributes are required. The following keys are
-accepted:
+The \f5\fIname\fR\fR and \f5\fIfilter\fR\fR attributes are required. The
+following keys are accepted:
 
 .RS 2m
 .TP 2m
 \fBname\fR
-An identifier, such as "load\-balancer\-exclusion". Identifiers are limited to
-100 characters and can include only letters, digits, underscores, hyphens, and
-periods.
+An identifier, such as \f5\fIload\-balancer\-exclusion\fR\fR. Identifiers are
+limited to 100 characters and can include only letters, digits, underscores,
+hyphens, and periods.
 
 .TP 2m
 \fBdescription\fR
@@ -169,8 +169,9 @@ specified if any of the other arguments in this group are specified.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -199,6 +200,14 @@ To export Google App Engine logs with ERROR severity, run:
 $ gcloud alpha logging sinks create my\-error\-logs \e
     bigquery.googleapis.com/projects/my\-project/datasets/\e
 my_dataset \-\-log\-filter='resource.type="gae_app" AND severity=ERROR'
+.RE
+
+To export all logs to a Logs bucket in a different project, run:
+
+.RS 2m
+$ gcloud alpha logging sinks create my\-sink \e
+    logging.googleapis.com/projects/my\-central\-project/locations/\e
+global/buckets/my\-central\-bucket
 .RE
 
 Detailed information about filters can be found at:

@@ -19,7 +19,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk import calliope
-
+from googlecloudsdk.calliope.concepts import handlers
+from googlecloudsdk.core import properties
 from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import jobs_unit_base
 
@@ -28,9 +29,10 @@ class WorkflowTemplateRemoveJobUnitTest(jobs_unit_base.JobsUnitTestBase,
                                         compute_base.BaseComputeUnitTest):
   """Tests for dataproc workflow template remove job."""
 
-  def testRemoveJob(self):
-    """Tests removing a job from a template."""
-    workflow_template = self.MakeWorkflowTemplate()
+  def _testRemoveJob(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+    workflow_template = self.MakeWorkflowTemplate(region=region)
     labels = {'some_label_key': 'some_label_value'}
     ordered_job_1 = self.MakeOrderedJob(
         step_id='001',
@@ -42,10 +44,31 @@ class WorkflowTemplateRemoveJobUnitTest(jobs_unit_base.JobsUnitTestBase,
     workflow_template.jobs = [ordered_job_1, ordered_job_2]
     self.WriteInput('y\n')
     expected = self.ExpectUpdateWorkflowTemplatesJobCalls(
-        workflow_template=workflow_template, ordered_jobs=[ordered_job_2])
+        workflow_template=workflow_template,
+        ordered_jobs=[ordered_job_2])
     result = self.RunDataproc('workflow-templates remove-job {0} '
-                              '--step-id 001'.format(self.WORKFLOW_TEMPLATE))
+                              '--step-id 001 {1}'.format(
+                                  self.WORKFLOW_TEMPLATE, region_flag))
     self.AssertMessagesEqual(expected, result)
+
+  def testRemoveJob(self):
+    self._testRemoveJob()
+
+  def testRemoveJob_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testRemoveJob(region='global')
+
+  def testRemoveJob_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testRemoveJob(
+        region='us-central1', region_flag='--region=us-central1')
+
+  def testRemoveJob_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc(
+          'workflow-templates remove-job foo --step-id=step', set_region=False)
 
   def testRemoveJobNoJobWithStepId(self):
     workflow_template = self.MakeWorkflowTemplate()

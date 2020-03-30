@@ -371,7 +371,7 @@ class OperationsListTest(test_base.BaseTest):
                    'AggregatedList',
                    messages.ComputeGlobalOperationsAggregatedListRequest(
                        filter='name eq ".*\\boperation\\-2\\b.*"',
-                       maxResults=1,
+                       maxResults=None,
                        project='my-project'))],
         http=self.mock_http(),
         batch_url=self.batch_url,

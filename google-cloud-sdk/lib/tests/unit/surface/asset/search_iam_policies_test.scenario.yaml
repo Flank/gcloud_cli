@@ -1,7 +1,22 @@
 title: surface unit test for asset search-iam-policies
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
+- set_property: core/project proj-foo
+- execute:
+  - command: asset search-iam-policies --query "policy:roles/owner" $$scope-params$$
+  - stdout: |
+      results:
+      - policy:
+          bindings:
+          - members:
+            - user:user1@google.com
+            - user:user2@google.com
+            role: roles/owner
+          etag: a0052064237355214362
+          version: 1
+        project: projects/123
+        resource: //cloudresourcemanager.googleapis.com/projects/proj-foo
 - execute:
   - command: asset search-iam-policies --query "policy:roles/owner"
   - stdout: |
@@ -9,34 +24,37 @@ summary:
       - policy:
           bindings:
           - members:
-            - serviceAccount:service-123456789123@gcp-sa-cloudasset.iam.gserviceaccount.com
-            - serviceAccount:service-123456789123@gcp-sa-staging-cloudasset.iam.gserviceaccount.com
-            role: roles/cloudasset.serviceAgent
-          - members:
-            - serviceAccount:service-123456789123@compute-system.iam.gserviceaccount.com
-            role: roles/compute.serviceAgent
-          - members:
-            - serviceAccount:123456789123-compute@developer.gserviceaccount.com
-            - serviceAccount:123456789123@cloudservices.gserviceaccount.com
-            role: roles/editor
-          - members:
-            - serviceAccount:admin-231@iam-policy-test.iam.gserviceaccount.com
-            - serviceAccount:test-owner@iam-policy-test.iam.gserviceaccount.com
-            - serviceAccount:test-editor@iam-policy-test.iam.gserviceaccount.com
             - user:user1@google.com
             - user:user2@google.com
             role: roles/owner
           etag: a0052064237355214362
           version: 1
-        project: projects/123456789123
-        resource: //cloudresourcemanager.googleapis.com/projects/iam-policy-test
+        project: projects/123
+        resource: //cloudresourcemanager.googleapis.com/projects/proj-foo
 actions:
+- set_property:
+    core/project: proj-foo  # `projects/proj-foo` has project number `projects/123`
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1p1alpha1
+      BETA: v1p1beta1
+- define_reference:
+    reference: scope-params
+    track_values:
+      ALPHA: ''
+      BETA: '--scope "projects/123"'
+- define_reference:
+    reference: scope-url
+    track_values:
+      ALPHA: ''
+      BETA: '&scope=projects%2F123'
 - execute_command:
-    command: asset search-iam-policies --query "policy:roles/owner"
+    command: asset search-iam-policies --query "policy:roles/owner" $$scope-params$$
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p1alpha1/iamPolicies:search?alt=json&query=policy%3Aroles%2Fowner
+          uri: https://cloudasset.googleapis.com/$$api-version$$/iamPolicies:search?alt=json&query=policy%3Aroles%2Fowner$$scope-url$$
           method: GET
           headers: {}
           body: null
@@ -46,38 +64,15 @@ actions:
           body: |
             {
               "results": {
-                "resource": "//cloudresourcemanager.googleapis.com/projects/iam-policy-test",
-                "project": "projects/123456789123",
+                "resource": "//cloudresourcemanager.googleapis.com/projects/proj-foo",
+                "project": "projects/123",
                 "policy": {
                   "version": 1,
                   "etag": "\\a\\005\\2064\\237\\355\\214\\362",
                   "bindings": [
                     {
-                      "role": "roles/cloudasset.serviceAgent",
-                      "members": [
-                        "serviceAccount:service-123456789123@gcp-sa-cloudasset.iam.gserviceaccount.com",
-                        "serviceAccount:service-123456789123@gcp-sa-staging-cloudasset.iam.gserviceaccount.com"
-                      ]
-                    },
-                    {
-                      "role": "roles/compute.serviceAgent",
-                      "members": [
-                        "serviceAccount:service-123456789123@compute-system.iam.gserviceaccount.com"
-                      ]
-                    },
-                    {
-                      "role": "roles/editor",
-                      "members": [
-                        "serviceAccount:123456789123-compute@developer.gserviceaccount.com",
-                        "serviceAccount:123456789123@cloudservices.gserviceaccount.com"
-                      ]
-                    },
-                    {
                       "role": "roles/owner",
                       "members": [
-                        "serviceAccount:admin-231@iam-policy-test.iam.gserviceaccount.com",
-                        "serviceAccount:test-owner@iam-policy-test.iam.gserviceaccount.com",
-                        "serviceAccount:test-editor@iam-policy-test.iam.gserviceaccount.com",
                         "user:user1@google.com",
                         "user:user2@google.com"
                       ]
@@ -91,26 +86,74 @@ actions:
         - policy:
             bindings:
             - members:
-              - serviceAccount:service-123456789123@gcp-sa-cloudasset.iam.gserviceaccount.com
-              - serviceAccount:service-123456789123@gcp-sa-staging-cloudasset.iam.gserviceaccount.com
-              role: roles/cloudasset.serviceAgent
-            - members:
-              - serviceAccount:service-123456789123@compute-system.iam.gserviceaccount.com
-              role: roles/compute.serviceAgent
-            - members:
-              - serviceAccount:123456789123-compute@developer.gserviceaccount.com
-              - serviceAccount:123456789123@cloudservices.gserviceaccount.com
-              role: roles/editor
-            - members:
-              - serviceAccount:admin-231@iam-policy-test.iam.gserviceaccount.com
-              - serviceAccount:test-owner@iam-policy-test.iam.gserviceaccount.com
-              - serviceAccount:test-editor@iam-policy-test.iam.gserviceaccount.com
               - user:user1@google.com
               - user:user2@google.com
               role: roles/owner
             etag: a0052064237355214362
             version: 1
-          project: projects/123456789123
-          resource: //cloudresourcemanager.googleapis.com/projects/iam-policy-test
+          project: projects/123
+          resource: //cloudresourcemanager.googleapis.com/projects/proj-foo
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Search without --scope specified, will fall back to the core/project.
+    command: asset search-iam-policies --query "policy:roles/owner"
+    events:
+    - api_call:
+        optional: true
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/proj-foo?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '123'
+            projectId: proj-foo
+            lifecycleState: ACTIVE
+            name: Fake Project
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/$$api-version$$/iamPolicies:search?alt=json&query=policy%3Aroles%2Fowner$$scope-url$$
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "results": {
+                "resource": "//cloudresourcemanager.googleapis.com/projects/proj-foo",
+                "project": "projects/123",
+                "policy": {
+                  "version": 1,
+                  "etag": "\\a\\005\\2064\\237\\355\\214\\362",
+                  "bindings": [
+                    {
+                      "role": "roles/owner",
+                      "members": [
+                        "user:user1@google.com",
+                        "user:user2@google.com"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+    - expect_stdout: |
+        results:
+        - policy:
+            bindings:
+            - members:
+              - user:user1@google.com
+              - user:user2@google.com
+              role: roles/owner
+            etag: a0052064237355214362
+            version: 1
+          project: projects/123
+          resource: //cloudresourcemanager.googleapis.com/projects/proj-foo
     - expect_exit:
         code: 0

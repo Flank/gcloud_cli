@@ -12,8 +12,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -36,11 +37,17 @@ COMMANDS
      get-public-key
         Get the public key for a given version.
 
+     import
+        Import a version into an existing crypto key.
+
      list
         List the versions within a key.
 
      restore
         Restore a version scheduled for destruction.
+
+     update
+        Update a key version.
 
 NOTES
     These variants are also available:

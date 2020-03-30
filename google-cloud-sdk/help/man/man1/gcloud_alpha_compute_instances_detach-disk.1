@@ -129,8 +129,28 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To detach a disk named 'my\-disk' to an instance named 'my\-instance', run:
+
+.RS 2m
+$ gcloud alpha compute instances detach\-disk my\-instance \e
+    \-\-disk=my\-disk
+.RE
+
+To detach a device named 'my\-device' from an instance named 'my\-instance',
+run:
+
+.RS 2m
+$ gcloud alpha compute instances detach\-disk my\-instance \e
+    \-\-device\-name=my\-device
+.RE
 
 
 

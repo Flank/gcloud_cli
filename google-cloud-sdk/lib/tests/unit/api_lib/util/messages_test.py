@@ -36,18 +36,23 @@ class UpdateMessageTest(subtests.Base):
         name='test-instance',
         region='us-central',
         settings=self.messages.Settings(
-            userLabels=None, availabilityType='ZONAL'))
+            userLabels=None,
+            availabilityType=self.messages.Settings
+            .AvailabilityTypeValueValuesEnum.ZONAL))
     diff = {
         'name': 'different-test',
         'settings': {
-            'availabilityType': 'REGIONAL'
+            'availabilityType':
+                self.messages.Settings.AvailabilityTypeValueValuesEnum.REGIONAL
         }
     }
     instance = self.update_message(instance, diff)
 
     # Ensure that the values in the diff have changed
     self.assertEqual(instance.name, 'different-test')
-    self.assertEqual(instance.settings.availabilityType, 'REGIONAL')
+    self.assertEqual(
+        instance.settings.availabilityType,
+        self.messages.Settings.AvailabilityTypeValueValuesEnum.REGIONAL)
 
     # Ensure that values outside the diff have not changed
     self.assertEqual(instance.region, 'us-central')
@@ -56,40 +61,53 @@ class UpdateMessageTest(subtests.Base):
     instance = self.messages.DatabaseInstance(
         name='test-instance',
         settings=self.messages.Settings(
-            userLabels=None, availabilityType='ZONAL'))
-    diff = {'settings': {'ohno': 234, 'availabilityType': 'REGIONAL'}}
+            userLabels=None,
+            availabilityType=self.messages.Settings
+            .AvailabilityTypeValueValuesEnum.ZONAL))
+    diff = {
+        'settings': {
+            'ohno':
+                234,
+            'availabilityType':
+                self.messages.Settings.AvailabilityTypeValueValuesEnum.REGIONAL
+        }
+    }
     instance = self.update_message(instance, diff)
 
     # Test that the bad property didn't somehow get added
     self.assertFalse(hasattr(instance, 'ohno'))
 
     # Test that valid property got added
-    self.assertEqual(instance.settings.availabilityType, 'REGIONAL')
+    self.assertEqual(
+        instance.settings.availabilityType,
+        self.messages.Settings.AvailabilityTypeValueValuesEnum.REGIONAL)
 
 
 class DictToMessagesWithErrorCheckTest(test_case.WithContentAssertions):
 
   def SetUp(self):
-    self.messages = core_apis.GetMessagesModule(
-        'binaryauthorization', 'v1alpha2')
+    self.messages = core_apis.GetMessagesModule('binaryauthorization',
+                                                'v1alpha2')
 
   def testValid(self):
     self.assertEqual(
-        messages_util.DictToMessageWithErrorCheck(
-            {'name': 'sam'}, self.messages.Policy),
+        messages_util.DictToMessageWithErrorCheck({'name': 'sam'},
+                                                  self.messages.Policy),
         self.messages.Policy(name='sam'))
 
   def testUnknownField(self):
     with self.assertRaisesRegexp(messages_util.DecodeError, r'\.foo'):
-      messages_util.DictToMessageWithErrorCheck(
-          {'foo': {'bar': 'baz'}}, self.messages.Policy)
+      messages_util.DictToMessageWithErrorCheck({'foo': {
+          'bar': 'baz'
+      }}, self.messages.Policy)
 
   def testRepeatedField(self):
-    with self.assertRaisesRegexp(
-        messages_util.DecodeError, r'\.admissionWhitelistPatterns\[0\]\.foo'):
+    with self.assertRaisesRegexp(messages_util.DecodeError,
+                                 r'\.admissionWhitelistPatterns\[0\]\.foo'):
       messages_util.DictToMessageWithErrorCheck(
-          {'admissionWhitelistPatterns': [{'foo': 'bar'}]},
-          self.messages.Policy)
+          {'admissionWhitelistPatterns': [{
+              'foo': 'bar'
+          }]}, self.messages.Policy)
 
   def testMap(self):
     with self.assertRaisesRegexp(
@@ -102,8 +120,7 @@ class DictToMessagesWithErrorCheckTest(test_case.WithContentAssertions):
                       'evaluationMode': 'NOT_A_REAL_ENUM'
                   }
               }
-          },
-          self.messages.Policy)
+          }, self.messages.Policy)
 
   def testMultiple_SameMessage(self):
     with self.assertRaisesRegexp(
@@ -115,8 +132,7 @@ class DictToMessagesWithErrorCheckTest(test_case.WithContentAssertions):
                   'evaluationMode': 'NOT_A_REAL_ENUM',
                   'nonConformanceAction': 'NOT_A_REAL_ENUM',
               }
-          },
-          self.messages.Policy)
+          }, self.messages.Policy)
 
   def testMultiple_DifferentMessages(self):
     with self.assertRaisesRegexp(
@@ -133,38 +149,35 @@ class DictToMessagesWithErrorCheckTest(test_case.WithContentAssertions):
                       'evaluationMode': 'NOT_A_REAL_ENUM'
                   }
               }
-          },
-          self.messages.Policy)
+          }, self.messages.Policy)
 
   def testTypeMismatch_HeterogeneousRepeated(self):
     with self.assertRaisesRegexp(
         messages_util.DecodeError,
         r'\.admissionWhitelistPatterns\[0\]\.namePatterns'):
       messages_util.DictToMessageWithErrorCheck(
-          {'admissionWhitelistPatterns': [{'namePatterns': ['a', 1]}]},
-          self.messages.Policy)
+          {'admissionWhitelistPatterns': [{
+              'namePatterns': ['a', 1]
+          }]}, self.messages.Policy)
 
   def testTypeMismatch_Scalar(self):
     with self.assertRaisesRegexp(
         messages_util.ScalarTypeMismatchError,
         r'Expected type <(type|class).* for field updateTime, found 1'):
-      messages_util.DictToMessageWithErrorCheck(
-          {'updateTime': 1},
-          self.messages.Policy)
+      messages_util.DictToMessageWithErrorCheck({'updateTime': 1},
+                                                self.messages.Policy)
 
   def testTypeMismatch_Message_None(self):
     # TODO(b/77547931): Improve this error case.
     with self.assertRaises(AttributeError):
       messages_util.DictToMessageWithErrorCheck(
-          {'admissionWhitelistPatterns': [None]},
-          self.messages.Policy)
+          {'admissionWhitelistPatterns': [None]}, self.messages.Policy)
 
   def testTypeMismatch_Message_Int(self):
     # TODO(b/77547931): Improve this error case.
     with self.assertRaises(AttributeError):
       messages_util.DictToMessageWithErrorCheck(
-          {'admissionWhitelistPatterns': [1]},
-          self.messages.Policy)
+          {'admissionWhitelistPatterns': [1]}, self.messages.Policy)
 
 
 if __name__ == '__main__':

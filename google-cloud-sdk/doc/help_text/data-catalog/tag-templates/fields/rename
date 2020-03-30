@@ -1,0 +1,60 @@
+NAME
+    gcloud data-catalog tag-templates fields rename - rename a Cloud Data
+        Catalog tag template field
+
+SYNOPSIS
+    gcloud data-catalog tag-templates fields rename
+        (FIELD : --location=LOCATION --tag-template=TAG_TEMPLATE)
+        --new-id=NEW_ID [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Rename a Cloud Data Catalog tag template field.
+
+POSITIONAL ARGUMENTS
+     Tag template field resource - Tag template field to rename. The arguments
+     in this group can be used to specify the attributes of this resource.
+     (NOTE) Some attributes are not given arguments in this group but can be
+     set in other ways. To set the [project] attribute: provide the argument
+     [field] on the command line with a fully specified name; set the property
+     [core/project]; provide the argument [--project] on the command line. This
+     must be specified.
+
+       FIELD
+          ID of the tag template field or fully qualified identifier for the
+          tag template field. This positional must be specified if any of the
+          other arguments in this group are specified.
+
+       --location=LOCATION
+          Location of the tag template field.
+
+       --tag-template=TAG_TEMPLATE
+          Tag template of the tag template field.
+
+REQUIRED FLAGS
+     --new-id=NEW_ID
+        New ID of the tag template field.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the datacatalog/v1 API. The full documentation for this
+    API can be found at: https://cloud.google.com/data-catalog/docs/
+
+EXAMPLES
+    Update the ID of a tag template field:
+
+        $ gcloud data-catalog tag-templates fields rename FIELD \
+            --new-id="new-id"
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha data-catalog tag-templates fields rename
+        $ gcloud beta data-catalog tag-templates fields rename
+

@@ -24,10 +24,10 @@ from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-class ImportJobsGetIamTestBeta(base.KmsMockTest):
+class ImportJobsGetIamTestGA(base.KmsMockTest):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.import_job_name = self.project_name.ImportJob(
@@ -169,6 +169,12 @@ bindings:
 etag: Zm9v
 """)
     self.AssertErrContains('Updated IAM policy for import job [my_import_job].')
+
+
+class ImportJobsGetIamTestBeta(ImportJobsGetIamTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ImportJobsGetIamTestAlpha(ImportJobsGetIamTestBeta):

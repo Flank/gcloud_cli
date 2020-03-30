@@ -131,10 +131,6 @@ for their boot disks. The following features are available:
 MULTI_IP_SUBNET \- For configuring interfaces with a netmask other than /32.
 
 .IP "\(em" 2m
-SECURE_BOOT \- Enables UEFI secure boot, which restrics unsigned software from
-booting or unsigned drivers from loading on the VM instance.
-
-.IP "\(em" 2m
 UEFI_COMPATIBLE \- Enables UEFI booting, which is an alternative system boot
 method. Most public images use the GRUB bootloader as their primary boot method.
 
@@ -158,7 +154,7 @@ server include the WINDOWS parameter to indicate that it is a Windows image.
 .RE
 .RE
 .sp
-\fIGUEST_OS_FEATURE\fR must be one of: \fBMULTI_IP_SUBNET\fR, \fBSECURE_BOOT\fR,
+\fIGUEST_OS_FEATURE\fR must be one of: \fBMULTI_IP_SUBNET\fR,
 \fBUEFI_COMPATIBLE\fR, \fBVIRTIO_SCSI_MULTIQUEUE\fR, \fBWINDOWS\fR, \fBGVNIC\fR.
 
 .RS 2m
@@ -260,8 +256,9 @@ The Cloud project for the key.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

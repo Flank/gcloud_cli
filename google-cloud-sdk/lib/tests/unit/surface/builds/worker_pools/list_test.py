@@ -33,11 +33,11 @@ class ListTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
   def SetUp(self):
     self.StartPatch('time.sleep')  # To speed up tests with polling
 
-    self.mocked_cloudbuild_v1alpha1 = mock.Client(
-        core_apis.GetClientClass('cloudbuild', 'v1alpha1'))
-    self.mocked_cloudbuild_v1alpha1.Mock()
-    self.addCleanup(self.mocked_cloudbuild_v1alpha1.Unmock)
-    self.msg = core_apis.GetMessagesModule('cloudbuild', 'v1alpha1')
+    self.mocked_cloudbuild_v1alpha2 = mock.Client(
+        core_apis.GetClientClass('cloudbuild', 'v1alpha2'))
+    self.mocked_cloudbuild_v1alpha2.Mock()
+    self.addCleanup(self.mocked_cloudbuild_v1alpha2.Unmock)
+    self.msg = core_apis.GetMessagesModule('cloudbuild', 'v1alpha2')
 
     self.project_id = 'my-project'
     properties.VALUES.core.project.Set(self.project_id)
@@ -58,16 +58,16 @@ class ListTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
 
     wp_1_out = copy.deepcopy(wp_1_in)
     wp_1_out.createTime = self.frozen_time_str
-    wp_1_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
+    wp_1_out.state = self.msg.WorkerPool.StateValueValuesEnum.RUNNING
 
     wp_2_out = copy.deepcopy(wp_2_in)
     wp_2_out.createTime = self.frozen_time_str
-    wp_2_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
+    wp_2_out.state = self.msg.WorkerPool.StateValueValuesEnum.RUNNING
 
     response = self.msg.ListWorkerPoolsResponse()
     response.workerPools = [wp_1_out, wp_2_out]
 
-    self.mocked_cloudbuild_v1alpha1.projects_workerPools.List.Expect(
+    self.mocked_cloudbuild_v1alpha2.projects_workerPools.List.Expect(
         self.msg.CloudbuildProjectsWorkerPoolsListRequest(
             parent=u'projects/{}'.format(self.project_id)),
         response=response)
@@ -75,7 +75,7 @@ class ListTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     self._Run(['alpha', 'builds', 'worker-pools', 'list'])
     self.AssertOutputContains(
         """\
-NAME CREATE_TIME STATUS
+NAME CREATE_TIME STATE
 fake_name_1 {} RUNNING
 fake_name_2 {} RUNNING
 """.format(self.frozen_time_str, self.frozen_time_str),

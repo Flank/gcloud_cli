@@ -1,0 +1,353 @@
+title: privateca subordinates list test
+release_tracks: [ALPHA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: core/project foo
+- execute:
+  - command: privateca subordinates list
+  - stdout: |
+      NAME  LOCATION      STATE     NOT_BEFORE                     NOT_AFTER
+      ca1   europe-west1  DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+      ca2   europe-west1  ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+      ca1   us-west1      DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+      ca2   us-west1      ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+- execute:
+  - command: privateca subordinates list --location asia
+  - stderr: |
+      Listed 0 items.
+- execute:
+  - command: privateca subordinates list --location us-west1
+  - stdout: |
+      NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
+      ca1   us-west1  DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+      ca2   us-west1  ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+- execute:
+  - command: privateca subordinates list --location europe-west1 --limit 1
+  - stdout: |
+      NAME  LOCATION      STATE     NOT_BEFORE                     NOT_AFTER
+      ca1   europe-west1  DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+- execute:
+  - command: privateca subordinates list --location europe-west1 --page-size 1
+  - stdout: |
+      NAME  LOCATION      STATE     NOT_BEFORE                     NOT_AFTER
+      ca1   europe-west1  DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+
+      NAME  LOCATION      STATE    NOT_BEFORE                     NOT_AFTER
+      ca2   europe-west1  ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+- execute:
+  - command: privateca subordinates list --location europe-west1 --sort-by ~name --limit
+      1
+  - stdout: |
+      NAME  LOCATION      STATE    NOT_BEFORE                     NOT_AFTER
+      ca2   europe-west1  ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+- execute:
+  - command: privateca subordinates list --filter state=ENABLED
+  - stderr: |
+      ERROR: (gcloud.alpha.privateca.subordinates.list) unrecognized arguments:
+        --filter (did you mean '--flatten'?)
+        state=ENABLED
+        To search the help text of gcloud commands, run:
+        gcloud help -- SEARCH_TERMS
+  - error: '1: None'
+actions:
+- set_property:
+    core/project: foo
+- execute_command:
+    command: privateca subordinates list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/-/certificateAuthorities?alt=json&filter=type%3ASUBORDINATE&pageSize=100
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [
+                {
+                  "name": "projects/foo/locations/europe-west1/certificateAuthorities/ca1",
+                  "type": "SUBORDINATE",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
+                  "state": "DISABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
+                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/europe-west1/certificateAuthorities/ca2",
+                  "type": "SUBORDINATE",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/us-west1/certificateAuthorities/ca1",
+                  "type": "SUBORDINATE",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
+                  "state": "DISABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
+                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/us-west1/certificateAuthorities/ca2",
+                  "type": "SUBORDINATE",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                }
+              ],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stdout: |
+        NAME  LOCATION      STATE     NOT_BEFORE                     NOT_AFTER
+        ca1   europe-west1  DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+        ca2   europe-west1  ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+        ca1   us-west1      DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+        ca2   us-west1      ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca subordinates list --location asia
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/asia/certificateAuthorities?alt=json&filter=type%3ASUBORDINATE&pageSize=100
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca subordinates list --location us-west1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-west1/certificateAuthorities?alt=json&filter=type%3ASUBORDINATE&pageSize=100
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [
+                {
+                  "name": "projects/foo/locations/us-west1/certificateAuthorities/ca1",
+                  "type": "SUBORDINATE",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
+                  "state": "DISABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
+                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/us-west1/certificateAuthorities/ca2",
+                  "type": "SUBORDINATE",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                }
+              ],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stdout: |
+        NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
+        ca1   us-west1  DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+        ca2   us-west1  ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca subordinates list --location europe-west1 --limit 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities?alt=json&filter=type%3ASUBORDINATE&pageSize=1
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [
+                {
+                  "name": "projects/foo/locations/europe-west1/certificateAuthorities/ca1",
+                  "type": "SUBORDINATE",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
+                  "state": "DISABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
+                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/europe-west1/certificateAuthorities/ca2",
+                  "type": "SUBORDINATE",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                }
+              ],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stdout: |
+        NAME  LOCATION      STATE     NOT_BEFORE                     NOT_AFTER
+        ca1   europe-west1  DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca subordinates list --location europe-west1 --page-size 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities?alt=json&filter=type%3ASUBORDINATE&pageSize=100
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [
+                {
+                  "name": "projects/foo/locations/europe-west1/certificateAuthorities/ca1",
+                  "type": "SUBORDINATE",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
+                  "state": "DISABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
+                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/europe-west1/certificateAuthorities/ca2",
+                  "type": "SUBORDINATE",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                }
+              ],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stdout: |
+        NAME  LOCATION      STATE     NOT_BEFORE                     NOT_AFTER
+        ca1   europe-west1  DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+
+        NAME  LOCATION      STATE    NOT_BEFORE                     NOT_AFTER
+        ca2   europe-west1  ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca subordinates list --location europe-west1 --sort-by ~name --limit
+      1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities?alt=json&filter=type%3ASUBORDINATE&orderBy=name+desc&pageSize=1
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [
+                {
+                  "name": "projects/foo/locations/europe-west1/certificateAuthorities/ca2",
+                  "type": "SUBORDINATE",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe-west1/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                }
+              ],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stdout: |
+        NAME  LOCATION      STATE    NOT_BEFORE                     NOT_AFTER
+        ca2   europe-west1  ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca subordinates list --filter state=ENABLED
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.privateca.subordinates.list) unrecognized arguments:
+          --filter (did you mean '--flatten'?)
+          state=ENABLED
+          To search the help text of gcloud commands, run:
+          gcloud help -- SEARCH_TERMS
+    - expect_exit:
+        code: 1

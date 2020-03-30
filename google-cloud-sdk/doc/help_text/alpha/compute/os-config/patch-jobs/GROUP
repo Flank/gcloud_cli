@@ -12,17 +12,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
 
      cancel
-        (ALPHA) Cancel the given active OS patch job.
+        (ALPHA) Cancel a specific OS patch job which must currently be active.
 
      describe
-        (ALPHA) Describe the given OS patch job.
+        (ALPHA) Describe a specified OS patch job.
 
      execute
         (ALPHA) Execute an OS patch on the specified VM instances.
@@ -37,5 +38,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. These variants are also available:
+
+        $ gcloud compute os-config patch-jobs
+        $ gcloud beta compute os-config patch-jobs
 

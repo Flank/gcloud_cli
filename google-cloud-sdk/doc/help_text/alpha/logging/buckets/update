@@ -3,11 +3,11 @@ NAME
 
 SYNOPSIS
     gcloud alpha logging buckets update BUCKET_ID --location=LOCATION
-        [--description=DESCRIPTION] [--display-name=DISPLAY_NAME]
+        [--description=DESCRIPTION] [--locked]
         [--retention-days=RETENTION_DAYS] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Changes one or more proprties associated with a bucket.
+    (ALPHA) Updates the properties of a bucket.
 
 POSITIONAL ARGUMENTS
      BUCKET_ID
@@ -21,8 +21,9 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         A new description for the bucket.
 
-     --display-name=DISPLAY_NAME
-        A new display name for the bucket.
+     --locked
+        Lock the bucket and prevent it from being modified or deleted (unless
+        it is empty).
 
      --retention-days=RETENTION_DAYS
         A new retention period for the bucket.
@@ -31,12 +32,21 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To update a bucket in your project, run:
+
+        $ gcloud alpha logging buckets update my-bucket --location=global \
+           --description=my-new-description
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta logging buckets update
 

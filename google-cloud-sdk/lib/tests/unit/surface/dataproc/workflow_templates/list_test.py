@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import jobs_unit_base
 
@@ -28,14 +29,18 @@ from tests.lib.surface.dataproc import jobs_unit_base
 class WorkflowTemplatesListUnitTest(jobs_unit_base.JobsUnitTestBase):
   """Tests for dataproc workflow template list."""
 
-  def ExpectListWorkflowTemplates(self, templates=None, exception=None):
+  def ExpectListWorkflowTemplates(
+      self, templates=None, exception=None, region=None):
+    if region is None:
+      region = self.REGION
     response = None
     if not exception:
       response = self.messages.ListWorkflowTemplatesResponse(
           templates=templates)
     self.mock_client.projects_regions_workflowTemplates.List.Expect(
         self.messages.DataprocProjectsRegionsWorkflowTemplatesListRequest(
-            pageSize=100, parent=self.WorkflowTemplateParentName()),
+            pageSize=100,
+            parent=self.WorkflowTemplateParentName(region=region)),
         response=response,
         exception=exception)
 
@@ -70,10 +75,31 @@ class WorkflowTemplatesListUnitTest(jobs_unit_base.JobsUnitTestBase):
     self.AssertMessagesEqual(self.workflow_templates_list,
                              self.FilterOutPageMarkers(result))
 
-  def testListWorkflorTemplates(self):
-    self.ExpectListWorkflowTemplates(self.workflow_templates_list)
-    result = self.RunDataproc('workflow-templates list')
+  def _testListWorkflorTemplates(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+    self.ExpectListWorkflowTemplates(
+        self.workflow_templates_list, region=region)
+    result = self.RunDataproc('workflow-templates list {0}'.format(region_flag))
     self.AssertMessagesEqual(self.workflow_templates_list, list(result))
+
+  def testListWorkflorTemplates(self):
+    self._testListWorkflorTemplates()
+
+  def testListWorkflorTemplates_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testListWorkflorTemplates(region='global')
+
+  def testListWorkflorTemplates_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testListWorkflorTemplates(
+        region='us-central1', region_flag='--region=us-central1')
+
+  def testListWorkflorTemplates_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'The required property \[region\] is not currently set'
+    with self.assertRaisesRegex(properties.RequiredPropertyError, regex):
+      self.RunDataproc('workflow-templates list', set_region=False)
 
   def testListWorkflowTemplatesOutput(self):
     self.ExpectListWorkflowTemplates(self.workflow_templates_list)

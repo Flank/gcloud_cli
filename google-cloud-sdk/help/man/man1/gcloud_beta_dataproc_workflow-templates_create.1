@@ -42,13 +42,10 @@ specified.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-Cloud Dataproc region for the template. Each Cloud Dataproc region constitutes
-an independent resource namespace constrained to deploying instances into Google
-Compute Engine zones inside the region. The default value of \f5global\fR is a
-special multi\-region namespace which is capable of deploying instances into all
-Google Compute Engine zones globally, and is disjoint from other Cloud Dataproc
-regions. Overrides the default \f5dataproc/region\fR property value for this
-command invocation.
+Dataproc region for the template. Each Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. Overrides the default \f5dataproc/region\fR
+property value for this command invocation.
 
 
 .RE
@@ -76,8 +73,22 @@ numbers.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a workflow template named 'my\-workflow\-template' in region
+\'us\-central1' with label params 'key1'='value1' and 'key2'='value2', run:
+
+.RS 2m
+$ gcloud beta dataproc workflow\-templates create \e
+    my\-workflow\-template \-\-region=us\-central1 \e
+    \-\-labels="key1=value1,key2=value2"
+.RE
 
 
 

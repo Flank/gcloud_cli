@@ -1,0 +1,47 @@
+NAME
+    gcloud container hub - centrally manage features and services on all your
+        Kubernetes clusters with Hub
+
+SYNOPSIS
+    gcloud container hub GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    The command group to register GKE or other Kubernetes clusters running in a
+    variety of environments, including Google cloud, on premises in customer
+    datacenters, or other third party clouds with Hub. Hub provides a
+    centralized control-plane to managed features and services on all
+    registered clusters.
+
+    A registered cluster is always associated with a Membership, a resource
+    within Hub.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     memberships
+        Manage memberships of all your GKE and other Kubernetes cluster with
+        HUB.
+
+EXAMPLES
+    Manage memberships of all your GKE and other Kubernetes clusters with Hub:
+
+        $ gcloud container hub memberships --help
+
+    Manage features on all memberships:
+
+        $ gcloud container hub features --help
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha container hub
+        $ gcloud beta container hub
+

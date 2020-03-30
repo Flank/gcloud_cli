@@ -1,5 +1,5 @@
 title: Data Catalog update entry scenario test.
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -110,7 +110,62 @@ summary:
         createTime: '2019-03-29T23:12:05.844Z'
         expireTime: '1970-01-01T00:00:00Z'
         updateTime: '2019-03-29T23:12:05.844Z'
+- execute:
+  - label: Update description
+  - command: data-catalog entries update entry1 --entry-group=group1 --location=us-central1
+      --description=test
+  - stderr: |
+      Updated entry.
+  - stdout: |
+      description: test
+      linkedResource: //datacatalog.googleapis.com/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
+      name: projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
+      sourceSystemTimestamps:
+        createTime: '2019-03-29T23:12:05.844Z'
+        expireTime: '1970-01-01T00:00:00Z'
+        updateTime: '2019-03-29T23:12:05.844Z'
+- execute:
+  - label: Add file pattern
+  - command: data-catalog entries update entry2 --entry-group=group1 --location=us-central1
+      --add-file-patterns="gs://test/new*"
+  - stderr: |
+      Updated entry.
+  - stdout: |
+      description: test
+      gcsFilesetSpec:
+        filePatterns:
+        - gs://test/original*
+        - gs://test/new*
+      linkedResource: //datacatalog.googleapis.com/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
+      name: projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
+      sourceSystemTimestamps:
+        createTime: '2019-03-29T23:12:05.844Z'
+        expireTime: '1970-01-01T00:00:00Z'
+        updateTime: '2019-03-29T23:12:05.844Z'
+- execute:
+  - label: Remove file pattern
+  - command: data-catalog entries update entry2 --entry-group=group1 --location=us-central1
+      --remove-file-patterns="gs://test/new*"
+  - stderr: |
+      Updated entry.
+  - stdout: |
+      description: test
+      gcsFilesetSpec:
+        filePatterns:
+        - gs://test/original*
+      linkedResource: //datacatalog.googleapis.com/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
+      name: projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
+      sourceSystemTimestamps:
+        createTime: '2019-03-29T23:12:05.844Z'
+        expireTime: '1970-01-01T00:00:00Z'
+        updateTime: '2019-03-29T23:12:05.844Z'
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta1
+      ALPHA: v1beta1
 - execute_command:
     label: Inline schema
     command: data-catalog entries update entry1 --entry-group=@pubsub --location=global
@@ -118,7 +173,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/global/entryGroups/@pubsub/entries/entry1?alt=json&updateMask=schema
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/global/entryGroups/@pubsub/entries/entry1?alt=json&updateMask=schema
           method: PATCH
           headers: {}
           body:
@@ -194,7 +249,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/global/entryGroups/@pubsub/entries/entry1?alt=json&updateMask=schema
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/global/entryGroups/@pubsub/entries/entry1?alt=json&updateMask=schema
           method: PATCH
           headers: {}
           body:
@@ -274,7 +329,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/global/entryGroups/@pubsub/entries/entry1?alt=json&updateMask=schema
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/global/entryGroups/@pubsub/entries/entry1?alt=json&updateMask=schema
           method: PATCH
           headers: {}
           body:
@@ -414,7 +469,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/entries:lookup?alt=json&sqlResource=pubsub.topic.fake-project.topic1
+          uri: https://datacatalog.googleapis.com/$$api-version$$/entries:lookup?alt=json&sqlResource=pubsub.topic.fake-project.topic1
           method: GET
           headers: {}
           body: null
@@ -427,7 +482,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/topics/topic1?alt=json&updateMask=schema
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/topics/topic1?alt=json&updateMask=schema
           method: PATCH
           headers: {}
           body:
@@ -468,6 +523,201 @@ actions:
           - column: field1
             mode: NULLABLE
             type: type1
+        sourceSystemTimestamps:
+          createTime: '2019-03-29T23:12:05.844Z'
+          expireTime: '1970-01-01T00:00:00Z'
+          updateTime: '2019-03-29T23:12:05.844Z'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: Update description
+    command: data-catalog entries update entry1 --entry-group=group1 --location=us-central1
+      --description=test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1?alt=json&updateMask=description
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              description: test
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1",
+              "description": "test",
+              "sourceSystemTimestamps": {
+                "createTime": "2019-03-29T23:12:05.844Z",
+                "updateTime": "2019-03-29T23:12:05.844Z",
+                "expireTime": "1970-01-01T00:00:00Z"
+              },
+              "linkedResource": "//datacatalog.googleapis.com/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1"
+            }
+    - expect_stderr: |
+        Updated entry.
+    - expect_stdout: |
+        description: test
+        linkedResource: //datacatalog.googleapis.com/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
+        name: projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
+        sourceSystemTimestamps:
+          createTime: '2019-03-29T23:12:05.844Z'
+          expireTime: '1970-01-01T00:00:00Z'
+          updateTime: '2019-03-29T23:12:05.844Z'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: Add file pattern
+    command: data-catalog entries update entry2 --entry-group=group1 --location=us-central1
+      --add-file-patterns="gs://test/new*"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1",
+              "description": "test",
+              "sourceSystemTimestamps": {
+                "createTime": "2019-03-29T23:12:05.844Z",
+                "updateTime": "2019-03-29T23:12:05.844Z",
+                "expireTime": "1970-01-01T00:00:00Z"
+              },
+              "gcsFilesetSpec": {
+                "filePatterns": [
+                  "gs://test/original*"
+                ]
+              },
+              "linkedResource": "//datacatalog.googleapis.com/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1"
+            }
+
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry2?alt=json&updateMask=%2CgcsFilesetSpec.filePatterns
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              gcsFilesetSpec:
+                filePatterns:
+                - gs://test/original*
+                - gs://test/new*
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1",
+              "description": "test",
+              "gcsFilesetSpec": {
+                "filePatterns": [
+                  "gs://test/original*",
+                  "gs://test/new*"
+                ]
+              },
+              "sourceSystemTimestamps": {
+                "createTime": "2019-03-29T23:12:05.844Z",
+                "updateTime": "2019-03-29T23:12:05.844Z",
+                "expireTime": "1970-01-01T00:00:00Z"
+              },
+              "linkedResource": "//datacatalog.googleapis.com/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1"
+            }
+    - expect_stderr: |
+        Updated entry.
+    - expect_stdout: |
+        description: test
+        gcsFilesetSpec:
+          filePatterns:
+          - gs://test/original*
+          - gs://test/new*
+        linkedResource: //datacatalog.googleapis.com/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
+        name: projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
+        sourceSystemTimestamps:
+          createTime: '2019-03-29T23:12:05.844Z'
+          expireTime: '1970-01-01T00:00:00Z'
+          updateTime: '2019-03-29T23:12:05.844Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Remove file pattern
+    command: data-catalog entries update entry2 --entry-group=group1 --location=us-central1
+      --remove-file-patterns="gs://test/new*"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1",
+              "description": "test",
+              "sourceSystemTimestamps": {
+                "createTime": "2019-03-29T23:12:05.844Z",
+                "updateTime": "2019-03-29T23:12:05.844Z",
+                "expireTime": "1970-01-01T00:00:00Z"
+              },
+              "gcsFilesetSpec": {
+                "filePatterns": [
+                  "gs://test/original*",
+                  "gs://test/new*"
+                ]
+              },
+              "linkedResource": "//datacatalog.googleapis.com/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1"
+            }
+
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry2?alt=json&updateMask=%2CgcsFilesetSpec.filePatterns
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              gcsFilesetSpec:
+                filePatterns:
+                - gs://test/original*
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1",
+              "description": "test",
+              "gcsFilesetSpec": {
+                "filePatterns": [
+                  "gs://test/original*"
+                ]
+              },
+              "sourceSystemTimestamps": {
+                "createTime": "2019-03-29T23:12:05.844Z",
+                "updateTime": "2019-03-29T23:12:05.844Z",
+                "expireTime": "1970-01-01T00:00:00Z"
+              },
+              "linkedResource": "//datacatalog.googleapis.com/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1"
+            }
+    - expect_stderr: |
+        Updated entry.
+    - expect_stdout: |
+        description: test
+        gcsFilesetSpec:
+          filePatterns:
+          - gs://test/original*
+        linkedResource: //datacatalog.googleapis.com/projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
+        name: projects/fake-project/locations/us-central1/entryGroups/group1/entries/entry1
         sourceSystemTimestamps:
           createTime: '2019-03-29T23:12:05.844Z'
           expireTime: '1970-01-01T00:00:00Z'

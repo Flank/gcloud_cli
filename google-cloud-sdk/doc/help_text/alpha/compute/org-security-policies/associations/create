@@ -5,9 +5,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute org-security-policies associations create
-        --security-policy=SECURITY_POLICY
-        (--folder=FOLDER | --organization=ORGANIZATION) [--name=NAME]
-        [--replace-association-on-target] [GCLOUD_WIDE_FLAG ...]
+        --security-policy=SECURITY_POLICY [--folder=FOLDER] [--name=NAME]
+        [--organization=ORGANIZATION] [--replace-association-on-target]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute org-security-policies associations create is
@@ -19,18 +19,17 @@ REQUIRED FLAGS
      --security-policy=SECURITY_POLICY
         Security policy ID of the association.
 
-     Exactly one of these must be specified:
-
-       --folder=FOLDER
-          ID of the folder with which the association is created.
-
-       --organization=ORGANIZATION
-          ID of the organization with which the association is created.
-
 OPTIONAL FLAGS
+     --folder=FOLDER
+        ID of the folder with which the association is created.
+
      --name=NAME
         Name to identify this association. If unspecified, the name will be set
         to "organization-{ORGANIZATION_ID}" or "folder-{FOLDER_ID}".
+
+     --organization=ORGANIZATION
+        ID of the organization in which the security policy is to be
+        associated. Must be set if SECURITY_POLICY is display name.
 
      --replace-association-on-target
         By default, if you attempt to insert an association to an organization
@@ -42,12 +41,22 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To associate an organization security policy under folder with ID
+    ``123456789" to folder ``987654321", run:
+
+        $ gcloud alpha compute org-security-policies associations create \
+            create --security-policy=123456789 --folder=987654321
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute org-security-policies associations create
 

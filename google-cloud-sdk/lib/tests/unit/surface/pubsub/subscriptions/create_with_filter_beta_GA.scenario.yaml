@@ -1,0 +1,13 @@
+title: pubsub subscriptions create with filter non-alpha test scenario
+release_tracks: [BETA, GA]
+
+actions:
+# attempt to create a subscription with filter in beta/GA, assert that error is raised
+- execute_command:
+    command: |
+      pubsub subscriptions create subs1 --topic topic1 --filter "filterString1"
+    events:
+    - expect_stderr:
+        matches: .*unrecognized arguments.*
+    - expect_exit:
+        code: 1

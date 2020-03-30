@@ -45,7 +45,7 @@ class UpdateBgpPeerTestGA(router_test_base.RouterTestBase):
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -70,14 +70,14 @@ class UpdateBgpPeerTestGA(router_test_base.RouterTestBase):
         compute routers update-bgp-peer my-router --region us-central1 --async
         --peer-name my-peer
         """)
-    self.assertEqual('operation-X', result.name)
+    self.assertIn('operation-X', result.name)
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Update in progress for peer [my-peer] in router [my-router] '
-        '[https://compute.googleapis.com/compute/v1/'
+        '[https://compute.googleapis.com/compute/{0}/'
         'projects/fake-project/regions/us-central1/operations/operation-X] '
         'Run the [gcloud compute operations describe] command to check the '
-        'status of this operation.\n')
+        'status of this operation.\n'.format(self.api_version))
 
   def testUpdate_base(self):
     self.SelectApi(self.track, self.api_version)
@@ -95,7 +95,7 @@ class UpdateBgpPeerTestGA(router_test_base.RouterTestBase):
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -121,7 +121,7 @@ class UpdateBgpPeerTestGA(router_test_base.RouterTestBase):
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -153,7 +153,7 @@ class UpdateBgpPeerTestGA(router_test_base.RouterTestBase):
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -235,7 +235,7 @@ class UpdateBgpPeerTestGA(router_test_base.RouterTestBase):
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -285,7 +285,7 @@ class UpdateBgpPeerTestBeta(UpdateBgpPeerTestGA):
     self._UpdateRouterBgpPeerBfdMessage(updated.bgpPeers[0])
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""

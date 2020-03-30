@@ -22,17 +22,41 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.regen import api_def
 from tests.lib import test_case
 
+import six
+
 
 class ApisMapTemplateTest(test_case.Base):
 
-  def testAPIDefRepr(self):
-    api_definition = api_def.APIDef(
-        'fruits.orange.v1',
-        'orange_v1_client.OrangeV1',
-        'orange_v1_messages', True)
+  def testAPIDefRepr_DisableMTLS(self):
+    api_definition = api_def.APIDef('fruits.orange.v1',
+                                    'orange_v1_client.OrangeV1',
+                                    'orange_v1_messages', True, False, '')
 
     expected_repr = ('APIDef("fruits.orange.v1", "orange_v1_client.OrangeV1", '
-                     '"orange_v1_messages", True)')
+                     '"orange_v1_messages", True, False, "")')
+
+    self.assertEqual(expected_repr, six.text_type(api_definition))
+
+  def testAPIDefRepr_EnableMTLS(self):
+    api_definition = api_def.APIDef('fruits.orange.v1',
+                                    'orange_v1_client.OrangeV1',
+                                    'orange_v1_messages', True, True, '')
+
+    expected_repr = ('APIDef("fruits.orange.v1", "orange_v1_client.OrangeV1", '
+                     '"orange_v1_messages", True, True, "")')
+
+    self.assertEqual(expected_repr, six.text_type(api_definition))
+
+  def testAPIDefRepr_EnableMTLS_OverrideEndpoint(self):
+    api_definition = api_def.APIDef(
+        'fruits.orange.v1', 'orange_v1_client.OrangeV1', 'orange_v1_messages',
+        True, True, 'https://compute.mtls.googleapis.com/compute/v1/')
+
+    expected_repr = (
+        'APIDef("fruits.orange.v1", "orange_v1_client.OrangeV1", '
+        '"orange_v1_messages", True, True, '
+        '"https://compute.mtls.googleapis.com/compute/v1/")'
+    )
 
     self.assertEqual(expected_repr, str(api_definition))
 

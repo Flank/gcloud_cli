@@ -1,6 +1,0 @@
-If you want to update the binary jar (gs-spring-boo-docker-0.1.0.jar), you can
-unzip the springboot.zip file, update the gcloud-maven-plugin version to a newer
-version if needed, and then, using a Maven tool (version 3.1 or bigger), run
-mvn clean install
-This will produce the gs-spring-boo-docker-0.1.0.jar file in the target
-directory.

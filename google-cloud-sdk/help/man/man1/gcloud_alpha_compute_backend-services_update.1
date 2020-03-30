@@ -11,7 +11,7 @@ gcloud alpha compute backend\-services update \- update a backend service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-drain\-on\-failover\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-drop\-traffic\-if\-unhealthy\fR] [\fB\-\-[no\-]enable\-cdn\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-logging\-sample\-rate\fR=\fILOGGING_SAMPLE_RATE\fR] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR\ |\ \fB\-\-no\-custom\-request\-headers\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-health\-checks\fR\ |\ \fB\-\-health\-checks\-region\fR=\fIHEALTH_CHECKS_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-drain\-on\-failover\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-drop\-traffic\-if\-unhealthy\fR] [\fB\-\-[no\-]enable\-cdn\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-no\-health\-checks\fR] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-logging\-sample\-rate\fR=\fILOGGING_SAMPLE_RATE\fR] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR\ |\ \fB\-\-no\-custom\-request\-headers\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-health\-checks\fR\ |\ \fB\-\-health\-checks\-region\fR=\fIHEALTH_CHECKS_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -118,6 +118,10 @@ service. Currently at most one health check can be specified. Health checks need
 not be for the same protocol as that of the backend service.
 
 .TP 2m
+\fB\-\-no\-health\-checks\fR
+Removes all health checks for the backend service.
+
+.TP 2m
 \fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]
 Specifies a list of legacy HTTP health check objects for checking the health of
 the backend service.
@@ -126,7 +130,7 @@ Legacy health checks are not recommended for backend services. It is possible to
 use a legacy health check on a backend service for a HTTP(S) load balancer if
 that backend service uses instance groups. For more information, refer to this
 guide:
-https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide.
 
 .TP 2m
 \fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]
@@ -137,7 +141,7 @@ Legacy health checks are not recommended for backend services. It is possible to
 use a legacy health check on a backend service for a HTTP(S) load balancer if
 that backend service uses instance groups. For more information, refer to this
 guide:
-https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide
+https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide.
 
 .TP 2m
 \fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]
@@ -175,11 +179,18 @@ INTERNAL.
 \fB\-\-protocol\fR=\fIPROTOCOL\fR
 Protocol for incoming requests.
 
-If the load\-balancing\-scheme is \f5INTERNAL\fR, the protocol must be one of:
-\f5TCP\fR, \f5UDP\fR.
+If the \f5load\-balancing\-scheme\fR is \f5INTERNAL\fR (internal TCP/UDP load
+balancers), the protocol must be one of: TCP, UDP.
 
-If the load\-balancing\-scheme is \f5EXTERNAL\fR, the protocol must be one of:
-\f5HTTP\fR, \f5HTTPS\fR, \f5HTTP2\fR, \f5SSL\fR, \f5TCP\fR.
+If the \f5load\-balancing\-scheme\fR is \f5INTERNAL_SELF_MANAGED\fR (Traffic
+Director), the protocol must be one of: HTTP, HTTPS, HTTP2, GRPC.
+
+If the \f5load\-balancing\-scheme\fR is \f5INTERNAL_MANAGED\fR (internal HTTP(S)
+load balancers), the protocol must be one of: HTTP, HTTPS, HTTP2.
+
+If the \f5load\-balancing\-scheme\fR is \f5EXTERNAL\fR (HTTP(S), SSL proxy, or
+TCP proxy load balancers), the protocol must be one of: HTTP, HTTPS, HTTP2, SSL,
+TCP.
 
 .TP 2m
 \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR
@@ -194,6 +205,12 @@ The type of TCP session affinity to use. Not supported for UDP.
 .TP 2m
 \fBCLIENT_IP\fR
 Route requests to instances based on the hash of the client's IP address.
+.TP 2m
+\fBCLIENT_IP_NO_DESTINATION\fR
+Directs a particular client's request to the same backend VM based on a hash
+created on the client's IP address only. This is used in L4 ILB as Next\-Hop
+scenarios. It differs from the Client\-IP option in that Client\-IP uses a hash
+based on both client\-IP's address and destination address.
 .TP 2m
 \fBCLIENT_IP_PORT_PROTO\fR
 (Applicable if \f5\-\-load\-balancing\-scheme\fR is \f5INTERNAL\fR) Connections
@@ -390,8 +407,9 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

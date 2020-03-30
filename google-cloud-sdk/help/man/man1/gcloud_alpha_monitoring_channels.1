@@ -20,6 +20,8 @@ gcloud alpha monitoring channels \- manage Stackdriver Monitoring notification c
 \fB(ALPHA)\fR Manage Stackdriver Monitoring notification channels.
 
 More information can be found here: https://cloud.google.com/monitoring/api/v3/
+https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.notificationChannels
+https://cloud.google.com/monitoring/alerts/using\-channels\-api
 
 
 
@@ -28,8 +30,9 @@ More information can be found here: https://cloud.google.com/monitoring/api/v3/
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -67,5 +70,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta monitoring channels
+.RE
 

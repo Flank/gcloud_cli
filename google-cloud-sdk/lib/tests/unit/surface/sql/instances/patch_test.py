@@ -35,7 +35,9 @@ class _BaseInstancePatchTest(object):
     diff = {
         'name': 'patch-instance4',
         'settings': {
-            'maintenanceWindow': self.messages.MaintenanceWindow(day=1, hour=2)
+            'maintenanceWindow':
+                self.messages.MaintenanceWindow(
+                    kind='sql#maintenanceWindow', day=1, hour=2)
         }
     }
     self.ExpectInstanceGet(self.GetV2Instance(), diff)
@@ -412,7 +414,61 @@ class _BaseInstancePatchTest(object):
     self.ExpectInstanceGet(self.GetV2Instance(), diff)
     self.Run('sql instances patch custom-instance --no-backup')
 
-  def testConflictingBackupFlagsError(self):
+  def testBackupStartTime(self):
+    diff = {
+        'name': 'custom-instance',
+        'settings': {
+            'backupConfiguration':
+                self.messages.BackupConfiguration(enabled=False),
+        }
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    diff['settings'].update({
+        'backupConfiguration':
+            self.messages.BackupConfiguration(enabled=True, startTime='23:00'),
+    })
+    self.ExpectInstancePatch(self.GetPatchRequestInstance(), diff)
+    self.ExpectDoneUpdateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances patch custom-instance --backup-start-time=23:00')
+
+  def testBackupLocation(self):
+    diff = {
+        'name': 'custom-instance',
+        'settings': {
+            'backupConfiguration':
+                self.messages.BackupConfiguration(enabled=False),
+        }
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    diff['settings'].update({
+        'backupConfiguration':
+            self.messages.BackupConfiguration(enabled=True, location='us'),
+    })
+    self.ExpectInstancePatch(self.GetPatchRequestInstance(), diff)
+    self.ExpectDoneUpdateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances patch custom-instance --backup-location=us')
+
+  def testBackupLocationEmpty(self):
+    diff = {
+        'name': 'custom-instance',
+        'settings': {
+            'backupConfiguration':
+                self.messages.BackupConfiguration(enabled=True, location='us'),
+        }
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    diff['settings'].update({
+        'backupConfiguration':
+            self.messages.BackupConfiguration(enabled=True, location=''),
+    })
+    self.ExpectInstancePatch(self.GetPatchRequestInstance(), diff)
+    self.ExpectDoneUpdateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.Run('sql instances patch custom-instance --backup-location=')
+
+  def testConflictingBackupFlagsBinLog(self):
     diff = {
         'name': 'custom-instance'
     }
@@ -421,21 +477,45 @@ class _BaseInstancePatchTest(object):
       self.Run('sql instances patch custom-instance --no-backup '
                '--enable-bin-log')
 
+  def testConflictingBackupFlagsLocation(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run('sql instances patch custom-instance --no-backup '
+               '--backup-location=us')
+      self.AssertErrContains(
+          'argument --no-backup: At most one of --no-backup | '
+          '--backup-location --backup-start-time may be specified.'
+      )
+
+  def testConflictingBackupFlagsStartTime(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run('sql instances patch custom-instance --no-backup '
+               '--backup-start-time=23:00')
+      self.AssertErrContains(
+          'argument --no-backup: At most one of --no-backup | '
+          '--backup-location --backup-start-time may be specified.'
+      )
+
   def testPatchRemoveHighAvailability(self):
     instance_name = 'custom-instance'
     diff = {
-        'name': instance_name,
-        'databaseVersion': 'POSTGRES_9_6',
+        'name':
+            instance_name,
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_9_6,
         'settings': {
-            'availabilityType': 'REGIONAL',
-            'tier': 'db-custom-1-1024'
+            'availabilityType':
+                self.messages.Settings.AvailabilityTypeValueValuesEnum.REGIONAL,
+            'tier':
+                'db-custom-1-1024'
         }
     }
     self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
     update_diff = {
         'name': instance_name,
         'settings': {
-            'availabilityType': 'ZONAL'
+            'availabilityType':
+                self.messages.Settings.AvailabilityTypeValueValuesEnum.ZONAL
         }
     }
     self.ExpectInstancePatch(self.GetPatchRequestInstance(), update_diff)
@@ -718,7 +798,35 @@ class InstancesPatchBetaTest(_BaseInstancePatchBetaTest, base.SqlMockTestBeta):
 
 class InstancesPatchAlphaTest(_BaseInstancePatchBetaTest,
                               base.SqlMockTestAlpha):
-  pass
+
+  def testPostgresPointInTimeRecovery(self):
+    instance_name = 'custom-instance'
+    diff = {
+        'name':
+            instance_name,
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_9_6,
+        'settings': {}
+    }
+    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
+    update_diff = {
+        'name': instance_name,
+        'settings': {
+            'backupConfiguration':
+                self.messages.BackupConfiguration(
+                    pointInTimeRecoveryEnabled=True,
+                    enabled=True,
+                    kind='sql#backupConfiguration',
+                    startTime='06:00')
+        }
+    }
+    self.ExpectInstancePatch(self.GetPatchRequestInstance(), update_diff)
+    self.ExpectDoneUpdateOperationGet()
+    diff['settings'].update(update_diff['settings'])
+    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
+    self.Run(
+        'sql instances patch custom-instance --enable-point-in-time-recovery')
 
 
 if __name__ == '__main__':

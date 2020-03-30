@@ -1,13 +1,17 @@
 NAME
     gcloud beta iam service-accounts remove-iam-policy-binding - remove IAM
-        policy binding of a service account
+        policy binding from a service account
 
 SYNOPSIS
     gcloud beta iam service-accounts remove-iam-policy-binding SERVICE_ACCOUNT
-        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+        --member=MEMBER --role=ROLE
+        [--all | --condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Remove an IAM policy binding of a service account.
+    (BETA) Remove an IAM policy binding from the IAM policy of a service
+    account. One binding consists of the member(s), a role, and an optional
+    condition.
 
     When managing IAM roles, you can treat a service account either as a
     resource or as an identity. This command is to remove a policy binding from
@@ -46,12 +50,46 @@ REQUIRED FLAGS
      --role=ROLE
         The role to remove the member from.
 
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --all
+          Remove all bindings with this role and member, irrespective of any
+          conditions.
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be removed. When condition is explicitly
+          specified as None (e.g. --condition=None), it matches a binding
+          without a condition. Otherwise, only the binding with a condition
+          which exactly matches the specified condition (including the optional
+          description) will be removed.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the iam/v1 API. The full documentation for this API can
@@ -73,6 +111,19 @@ EXAMPLES
         $ gcloud beta iam service-accounts remove-iam-policy-binding \
             my-iam-account@somedomain.com --member='allAuthenticatedUsers' \
             --role='roles/editor'
+
+    To remove an IAM policy binding which expires at the end of the year 2018
+    for the role of 'roles/appengine.serviceAdmin' and the user
+    'test-user@gmail.com' on a service account with identifier
+    'my-iam-account@somedomain.com', run:
+
+        $ gcloud beta iam service-accounts remove-iam-policy-binding \
+            my-iam-account@somedomain.com \
+            --member='user:test-user@gmail.com' \
+            --role='roles/appengine.serviceAdmin' \
+            --condition='expression=request.time <
+         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+        tion=Expires at midnight on 2018-12-31'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of
     policy role and member types.

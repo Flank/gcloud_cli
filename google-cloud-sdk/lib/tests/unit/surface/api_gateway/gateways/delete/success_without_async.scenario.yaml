@@ -1,0 +1,54 @@
+title: Cloud API Gateway Gateway Delete with False Confirmation
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway gateways delete test-name --location us-central1
+  - prompt:
+    - message: Are you sure? This will delete the gateway 'projects/fake-project/locations/us-central1/gateways/test-name',
+        along with all of the associated consumer information.
+    - prompt_string: Continue anyway
+    - input: y
+  - progress_tracker:
+    - message: Waiting for API Gateway [test-name] to be deleted
+actions:
+- execute_command:
+    command: |
+      api-gateway gateways delete test-name --location us-central1
+    events:
+    - expect_prompt_continue:
+        message: Are you sure? This will delete the gateway 'projects/fake-project/locations/us-central1/gateways/test-name',
+          along with all of the associated consumer information.
+        prompt_string: Continue anyway
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways/test-name?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: false
+            name: projects/fake-project/locations/us-central1/operations/123456789
+            error: null
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/operations/123456789?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+            name: projects/fake-project/locations/us-central1/operations/123456789
+            error: null
+    - expect_progress_tracker:
+        message: Waiting for API Gateway [test-name] to be deleted
+    - expect_exit:
+        code: 0

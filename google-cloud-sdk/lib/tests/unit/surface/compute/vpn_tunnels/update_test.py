@@ -65,7 +65,7 @@ class ClassicVpnTunnelsUpdateLabelsBetaTest(
     self.ExpectGetRequest(vpn_tunnel_ref, existing_vpn_tunnel)
     self.ExpectSetLabelsRequest(vpn_tunnel_ref, labels_after_update,
                                 self._FINGERPRINT_1, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_tunnel_ref, updated_vpn_tunnel)
     return updated_vpn_tunnel
 

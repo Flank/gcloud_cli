@@ -25,13 +25,16 @@ from tests.lib.surface.compute import test_base
 from mock import patch
 
 
-class InstanceGroupsManagedInstancesConfigsListTestBase(test_base.BaseTest):
+class _InstanceGroupsManagedInstancesConfigsListBetaTestBase(
+    test_base.BaseTest):
 
-  _API_VERSION = 'alpha'
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi(self._API_VERSION)
+    self.SelectApi(self.API_VERSION)
 
   def _MakePreservedStateDiskMapEntry(self, device_name, source, mode):
     mode_map = {
@@ -83,11 +86,10 @@ class InstanceGroupsManagedInstancesConfigsListTestBase(test_base.BaseTest):
     )
 
 
-class InstanceGroupsManagedInstancesConfigsListZonalTest(
-    InstanceGroupsManagedInstancesConfigsListTestBase):
+class InstanceGroupsManagedInstancesConfigsListBetaZonalTest(
+    _InstanceGroupsManagedInstancesConfigsListBetaTestBase):
 
   def SetUp(self):
-    super(InstanceGroupsManagedInstancesConfigsListZonalTest, self).SetUp()
     self.make_requests.side_effect = iter([
         [
             self.messages.InstanceGroupManagersListPerInstanceConfigsResp(
@@ -172,11 +174,11 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
             my-disk-1:
               autoDelete: NEVER
               mode: READ_WRITE
-              source: https://compute.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-1
+              source: https://compute.googleapis.com/compute/{api_version}/projects/my-project/zones/us-central1-a/disks/inst-0001-1
             my-disk-2:
               autoDelete: NEVER
               mode: READ_ONLY
-              source: https://compute.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-2
+              source: https://compute.googleapis.com/compute/{api_version}/projects/my-project/zones/us-central1-a/disks/inst-0001-2
           metadata:
             key-BAR: value BAR
             key-foo: value foo
@@ -186,7 +188,7 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
         .*
         name: custom-inst-0003
         .*
-        """.format(compute_uri=self.compute_uri),
+        """.format(api_version=self.API_VERSION),
         normalize_space=True)
 
   def testListInstanceConfigsWithLimit(self):
@@ -266,11 +268,10 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
         """)
 
 
-class InstanceGroupsManagedInstancesConfigsListRegionalTest(
-    InstanceGroupsManagedInstancesConfigsListTestBase):
+class InstanceGroupsManagedInstancesConfigsListBetaRegionalTest(
+    _InstanceGroupsManagedInstancesConfigsListBetaTestBase):
 
   def SetUp(self):
-    super(InstanceGroupsManagedInstancesConfigsListRegionalTest, self).SetUp()
     self.make_requests.side_effect = iter([
         [
             self.messages.InstanceGroupManagersListPerInstanceConfigsResp(
@@ -348,7 +349,8 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
     self.CheckRequests([(self.compute.regionInstanceGroupManagers,
                          'ListPerInstanceConfigs', request)])
 
-    self.AssertOutputMatches("""\
+    self.AssertOutputMatches(
+        """\
         ---
         name: inst-0001
         preservedState:
@@ -356,11 +358,11 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
             my-disk-1:
               autoDelete: NEVER
               mode: READ_WRITE
-              source: https://compute.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-1
+              source: https://compute.googleapis.com/compute/{api_version}/projects/my-project/zones/us-central1-a/disks/inst-0001-1
             my-disk-2:
               autoDelete: NEVER
               mode: READ_ONLY
-              source: https://compute.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-2
+              source: https://compute.googleapis.com/compute/{api_version}/projects/my-project/zones/us-central1-a/disks/inst-0001-2
           metadata:
             key-BAR: value BAR
             key-foo: value foo
@@ -369,7 +371,8 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
         .*
         name: custom-inst-0003
         .*
-        """.format(compute_uri=self.compute_uri), normalize_space=True)
+        """.format(api_version=self.API_VERSION),
+        normalize_space=True)
 
   def testListInstanceConfigsWithLimit(self):
     self.Run("""
@@ -439,6 +442,27 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
         key3: value3
         """.format(compute_uri=self.compute_uri), normalize_space=True)
     self.AssertOutputNotContains('metadata: {}', normalize_space=True)
+
+
+class _InstanceGroupsManagedInstancesConfigsListAlphaTestBase(
+    test_base.BaseTest):
+
+  API_VERSION = 'alpha'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class InstanceGroupsManagedInstancesConfigsListAlphaZonalTest(
+    _InstanceGroupsManagedInstancesConfigsListAlphaTestBase,
+    InstanceGroupsManagedInstancesConfigsListBetaZonalTest):
+  pass
+
+
+class InstanceGroupsManagedInstancesConfigsListAlphaRegionalTest(
+    _InstanceGroupsManagedInstancesConfigsListAlphaTestBase,
+    InstanceGroupsManagedInstancesConfigsListBetaRegionalTest):
+  pass
 
 
 if __name__ == '__main__':

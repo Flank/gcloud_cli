@@ -105,8 +105,9 @@ invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -116,8 +117,8 @@ For example, to apply the named ports to an entire instance group:
 
 .RS 2m
 $ gcloud beta compute instance\-groups managed set\-named\-ports \e
-    example\-instance\-group \-\-named\-ports example\-service:1111 \e
-    \-\-zone us\-central1\-a
+    example\-instance\-group \-\-named\-ports=example\-service:1111 \e
+    \-\-zone=us\-central1\-a
 .RE
 
 The above example will assign a name 'example\-service' for port 1111 to the
@@ -130,7 +131,7 @@ parameter:
 
 .RS 2m
 $ gcloud beta compute instance\-groups managed set\-named\-ports \e
-    example\-instance\-group \-\-named\-ports "" \-\-zone us\-central1\-a
+    example\-instance\-group \-\-named\-ports="" \-\-zone=us\-central1\-a
 .RE
 
 

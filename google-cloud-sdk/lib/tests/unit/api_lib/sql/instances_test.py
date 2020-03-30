@@ -59,9 +59,17 @@ class DatabaseInstancesTest(base.SqlMockTestBeta):
             nextPageToken=None,
         ))
 
-    expected_instance_list = data.GetDatabaseInstancesListOfOne(
+    instance_list = data.GetDatabaseInstancesListOfOne(
     ) + data.GetDatabaseInstancesListOfTwo()
-    expected_instance_list[0].state = 'STOPPED'
+    instance_list[
+        0].state = self.messages.DatabaseInstance.StateValueValuesEnum.RUNNABLE
+    instance_list[
+        0].settings.activationPolicy = self.messages.Settings.ActivationPolicyValueValuesEnum.NEVER
+
+    expected_instance_list = [
+        instances_util.DatabaseInstancePresentation(instance)
+        for instance in instance_list
+    ]
 
     self.assertEqual(expected_instance_list,
                      list(instances_util._BaseInstances.GetDatabaseInstances()))
@@ -89,12 +97,20 @@ class DatabaseInstancesTest(base.SqlMockTestBeta):
             nextPageToken=None,
         ))
 
-    expected_instance_list = data.GetDatabaseInstancesListOfOne(
+    instance_list = data.GetDatabaseInstancesListOfOne(
     ) + data.GetDatabaseInstancesListOfTwo()
-    expected_instance_list[0].state = 'STOPPED'
+    instance_list[
+        0].state = self.messages.DatabaseInstance.StateValueValuesEnum.RUNNABLE
+    instance_list[
+        0].settings.activationPolicy = self.messages.Settings.ActivationPolicyValueValuesEnum.NEVER
+
+    expected_instance_list = [
+        instances_util.DatabaseInstancePresentation(instance)
+        for instance in instance_list[:2]
+    ]
 
     self.assertEqual(
-        expected_instance_list[:2],
+        expected_instance_list,
         list(instances_util._BaseInstances.GetDatabaseInstances(limit=2)))
 
   def testGetDatabaseInstancesWithBatchSize(self):
@@ -120,9 +136,17 @@ class DatabaseInstancesTest(base.SqlMockTestBeta):
             nextPageToken=None,
         ))
 
-    expected_instance_list = data.GetDatabaseInstancesListOfOne(
+    instance_list = data.GetDatabaseInstancesListOfOne(
     ) + data.GetDatabaseInstancesListOfTwo()
-    expected_instance_list[0].state = 'STOPPED'
+    instance_list[
+        0].state = self.messages.DatabaseInstance.StateValueValuesEnum.RUNNABLE
+    instance_list[
+        0].settings.activationPolicy = self.messages.Settings.ActivationPolicyValueValuesEnum.NEVER
+
+    expected_instance_list = [
+        instances_util.DatabaseInstancePresentation(instance)
+        for instance in instance_list
+    ]
 
     self.assertEqual(
         expected_instance_list,
@@ -134,13 +158,18 @@ class IsPostgresDatabaseVersionTest(base.SqlMockTestBeta):
 
   def testPostgresInstance(self):
     postgres_instance = self.messages.DatabaseInstance(
-        databaseVersion='POSTGRES_9_6')
+        kind='sql#instance',
+        databaseVersion=self.messages.DatabaseInstance
+        .DatabaseVersionValueValuesEnum.POSTGRES_9_6)
     self.assertTrue(
         instances_util._BaseInstances.IsPostgresDatabaseVersion(
             postgres_instance.databaseVersion))
 
   def testMySQLInstance(self):
-    mysql_instance = self.messages.DatabaseInstance(databaseVersion='MYSQL_5_7')
+    mysql_instance = self.messages.DatabaseInstance(
+        kind='sql#instance',
+        databaseVersion=self.messages.DatabaseInstance
+        .DatabaseVersionValueValuesEnum.MYSQL_5_7)
     self.assertFalse(
         instances_util._BaseInstances.IsPostgresDatabaseVersion(
             mysql_instance.databaseVersion))
@@ -169,17 +198,18 @@ class PrintAndConfirmAuthorizedNetworksOverwriteTest(base.SqlMockTestBeta):
     instances_util.InstancesV1Beta4.PrintAndConfirmAuthorizedNetworksOverwrite()
     sys.stderr = sys.__stdout__
 
-    self.assertEqual(json.loads(captured_prompt.getvalue())['message'],
-                     'When adding a new IP address to authorized networks, '
-                     'make sure to also include any IP addresses that have '
-                     'already been authorized. Otherwise, they will be '
-                     'overwritten and de-authorized.')
+    self.assertEqual(
+        json.loads(captured_prompt.getvalue())['message'],
+        'When adding a new IP address to authorized networks, '
+        'make sure to also include any IP addresses that have '
+        'already been authorized. Otherwise, they will be '
+        'overwritten and de-authorized.')
 
 
 class InstanceV1Beta4Test(base.SqlMockTestBeta):
 
   def testSetProjectAndInstanceFromRef(self):
-    instance_resource = self.messages.DatabaseInstance()
+    instance_resource = self.messages.DatabaseInstance(kind='sql#instance')
     instance_ref = common_api_util.SqlClient('v1beta4').resource_parser.Parse(
         'test_instance_id',
         params={'project': 'test_project_name'},
@@ -198,14 +228,15 @@ class InstanceV1Beta4Test(base.SqlMockTestBeta):
         ipConfiguration=None,
         kind='sql#settings',
         locationPreference=None,
-        pricingPlan='PER_USE',
-        replicationType='SYNCHRONOUS',
+        pricingPlan=self.messages.Settings.PricingPlanValueValuesEnum.PER_USE,
+        replicationType=self.messages.Settings.ReplicationTypeValueValuesEnum
+        .SYNCHRONOUS,
         settingsVersion=None,
         tier='D1',
     )
 
-    backup_configuration = (reducers_util.BackupConfiguration(
-        self.messages, enable_bin_log=True))
+    backup_configuration = (
+        reducers_util.BackupConfiguration(self.messages, enable_bin_log=True))
     instances_util.InstancesV1Beta4.AddBackupConfigToSettings(
         settings, backup_configuration)
 
@@ -219,7 +250,9 @@ class StartCloudSqlProxyTest(base.SqlMockTestBeta):
 
   def SetUp(self):
     self.instance = self.messages.DatabaseInstance(
-        name='some-instance', connectionName='storage:some-instance')
+        kind='sql#instance',
+        name='some-instance',
+        connectionName='storage:some-instance')
     self.proxy_process.stderr = mock.Mock()
 
     # Mock out calls to get the SDK path.
@@ -318,17 +351,18 @@ class IsInstanceV2Test(base.SqlMockTestBeta):
   def testV2MySqlInstance(self):
     self.assertTrue(
         instances_util.IsInstanceV2(
-            data.GetV2Instance(self.project, self.instance)))
+            self.messages, data.GetV2Instance(self.project, self.instance)))
 
   def testPostgresInstance(self):
     self.assertTrue(
         instances_util.IsInstanceV2(
-            data.GetPostgresInstance(self.project, self.instance)))
+            self.messages, data.GetPostgresInstance(self.project,
+                                                    self.instance)))
 
   def testV1MySqlInstance(self):
     self.assertFalse(
         instances_util.IsInstanceV2(
-            data.GetV1Instance(self.project, self.instance)))
+            self.messages, data.GetV1Instance(self.project, self.instance)))
 
 
 class IsInstanceV1Test(base.SqlMockTestBeta):
@@ -339,52 +373,35 @@ class IsInstanceV1Test(base.SqlMockTestBeta):
   def testV1MySqlInstance(self):
     self.assertTrue(
         instances_util.IsInstanceV1(
-            data.GetV1Instance(self.project, self.instance)))
+            self.messages, data.GetV1Instance(self.project, self.instance)))
 
   def testV2MySqlInstance(self):
     self.assertFalse(
         instances_util.IsInstanceV1(
-            data.GetV2Instance(self.project, self.instance)))
+            self.messages, data.GetV2Instance(self.project, self.instance)))
 
   def testPostgresInstance(self):
     self.assertFalse(
         instances_util.IsInstanceV1(
-            data.GetPostgresInstance(self.project, self.instance)))
+            self.messages, data.GetPostgresInstance(self.project,
+                                                    self.instance)))
 
   def testV1TierInstance(self):
     instance = data.GetV1Instance(self.project, self.instance)
-    instance.backendType = ''
+    instance.backendType = None
     instance.settings.tier = 'D0'
-    self.assertTrue(instances_util.IsInstanceV1(instance))
+    self.assertTrue(instances_util.IsInstanceV1(self.messages, instance))
 
   def testNonV1TierInstance(self):
     instance = data.GetV2Instance(self.project, self.instance)
-    instance.backendType = ''
+    instance.backendType = None
     instance.settings.tier = 'db-n1-standard-1'
-    self.assertFalse(instances_util.IsInstanceV1(instance))
+    self.assertFalse(instances_util.IsInstanceV1(self.messages, instance))
 
   def testBlankTierInstance(self):
     instance = data.GetV2Instance(self.project, self.instance)
     instance.settings.tier = None
-    self.assertFalse(instances_util.IsInstanceV1(instance))
-
-
-class GetInstanceStateTest(base.SqlMockTestBeta):
-  """Tests instances_util.GetInstanceState."""
-  project = 'some-project'
-  instance = 'some-instance'
-
-  def testRunnableInstance(self):
-    instance = data.GetV2Instance(self.project, self.instance)
-    instance.settings.activationPolicy = 'ON_DEMAND'
-    instance.state = 'RUNNABLE'
-    self.assertEqual('RUNNABLE', instances_util.GetInstanceState(instance))
-
-  def testStoppedInstance(self):
-    instance = data.GetV2Instance(self.project, self.instance)
-    instance.settings.activationPolicy = 'NEVER'
-    instance.state = 'RUNNABLE'
-    self.assertEqual('STOPPED', instances_util.GetInstanceState(instance))
+    self.assertFalse(instances_util.IsInstanceV1(self.messages, instance))
 
 
 if __name__ == '__main__':

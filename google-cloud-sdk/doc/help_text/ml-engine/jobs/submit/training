@@ -13,6 +13,7 @@ SYNOPSIS
         [--python-version=PYTHON_VERSION] [--region=REGION]
         [--runtime-version=RUNTIME_VERSION] [--scale-tier=SCALE_TIER]
         [--staging-bucket=STAGING_BUCKET]
+        [--use-chief-in-tf-config=USE_CHIEF_IN_TF_CONFIG]
         [--worker-accelerator=[count=COUNT],[type=TYPE]]
         [--worker-image-uri=WORKER_IMAGE_URI] [--async | --stream-logs]
         [--parameter-server-count=PARAMETER_SERVER_COUNT
@@ -261,6 +262,11 @@ FLAGS
         include local paths) and no other flags implicitly specify an upload
         path.
 
+     --use-chief-in-tf-config=USE_CHIEF_IN_TF_CONFIG
+        Use "chief" role in the cluster instead of "master". This is required
+        for TensorFlow 2.0 and newer versions. Unlike "master" node, "chief"
+        node does not run evaluation.
+
      --worker-accelerator=[count=COUNT],[type=TYPE]
         Hardware accelerator config for the worker nodes. Must specify both the
         accelerator type (TYPE) for each server and the number of accelerators
@@ -324,8 +330,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     These variants are also available:

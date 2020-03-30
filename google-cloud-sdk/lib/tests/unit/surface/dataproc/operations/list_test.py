@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import collections
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import unit_base
@@ -54,22 +55,45 @@ class OperationsListUnitTest(unit_base.DataprocUnitTestBase):
         self.Project(), self.REGION)
 
   def ExpectListOperations(
-      self, operations=None, op_filter='{}', exception=None):
+      self, operations=None, op_filter='{}', exception=None, region=None):
+    if region is None:
+      region = self.REGION
     response = None
     if not exception:
       response = self.messages.ListOperationsResponse(
           operations=operations)
+    base_name = 'projects/{0}/regions/{1}/operations'.format(
+        self.Project(), region)
     self.mock_client.projects_regions_operations.List.Expect(
         self.messages.DataprocProjectsRegionsOperationsListRequest(
-            pageSize=100, name=self.base_name, filter=op_filter),
+            pageSize=100, name=base_name, filter=op_filter),
         response=response,
         exception=exception)
 
-  def testListOperations(self):
+  def _testListOperations(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
     expected = self.operations
-    self.ExpectListOperations(expected)
-    result = self.RunDataproc('operations list')
+    self.ExpectListOperations(expected, region=region)
+    result = self.RunDataproc('operations list {0}'.format(region_flag))
     self.AssertMessagesEqual(expected, list(result))
+
+  def testListOperations(self):
+    self._testListOperations()
+
+  def testListOperations_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self._testListOperations(region='us-central1')
+
+  def testListOperations_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self._testListOperations(region='us-east4', region_flag='--region=us-east4')
+
+  def testListOperations_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'The required property \[region\] is not currently set'
+    with self.assertRaisesRegex(properties.RequiredPropertyError, regex):
+      self.RunDataproc('operations list', set_region=False)
 
   def testListOperationsOutput(self):
     expected = self.operations

@@ -150,7 +150,7 @@ delete recommand
 delete simple-command
 delete unsetprop
 edit GROUP 104 142
-edit requiredargcommand 15 18
+edit requiredargcommand 17 20
 """
     self.AssertOutputEquals(expected.replace('/', os.path.sep))
 

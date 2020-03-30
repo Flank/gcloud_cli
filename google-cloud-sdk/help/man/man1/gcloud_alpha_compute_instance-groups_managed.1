@@ -26,8 +26,9 @@ gcloud alpha compute instance\-groups managed \- read and manipulate Google Comp
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -78,6 +79,10 @@ with a defined name and optionally its stateful configuration.
 .TP 2m
 \fBdescribe\fR
 \fB(ALPHA)\fR Display detailed information about an instance group.
+
+.TP 2m
+\fBdescribe\-instance\fR
+\fB(ALPHA)\fR Describe an instance in a managed instance group.
 
 .TP 2m
 \fBexport\-autoscaling\fR
@@ -148,7 +153,7 @@ managed instance group.
 
 .TP 2m
 \fBwait\-until\fR
-\fB(ALPHA)\fR Wait until managed instance group reaches desired state.
+\fB(ALPHA)\fR Wait until the managed instance group reaches the desired state.
 
 .TP 2m
 \fBwait\-until\-stable\fR

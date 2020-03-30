@@ -49,12 +49,29 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the language/v1 API. The full documentation for this API
     can be found at: https://cloud.google.com/natural-language/
+
+EXAMPLES
+    To analyze sentiment in raw content 'I love puppies.':
+
+        $ gcloud ml language analyze-sentiment --content='I love puppies.'
+
+    To analyze sentiment in file 'myfile.txt':
+
+        $ gcloud ml language analyze-sentiment --content-file='myfile.txt'
+
+    To analyze sentiment in a remote file 'gs://bucket_name/mycontent.html' for
+    Japanese language using UTF-8 encoding:
+
+        $ gcloud ml language analyze-sentiment \
+            --content-file='gs://bucket_name/mycontent.html' \
+            --content-type=HTML --encoding-type=utf8 --language=ja-JP
 
 NOTES
     These variants are also available:

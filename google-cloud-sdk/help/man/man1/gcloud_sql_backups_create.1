@@ -11,7 +11,7 @@ gcloud sql backups create \- creates a backup of a Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud sql backups create\fR \fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud sql backups create\fR \fB\-\-instance\fR=\fIINSTANCE\fR, \fB\-i\fR \fIINSTANCE\fR [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -43,6 +43,11 @@ Return immediately, without waiting for the operation in progress to complete.
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 A friendly description of the backup.
 
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Choose where to store your backup. Backups are stored in the closest
+multi\-region location to you by default. Only customize if needed.
+
 
 .RE
 .sp
@@ -52,8 +57,9 @@ A friendly description of the backup.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

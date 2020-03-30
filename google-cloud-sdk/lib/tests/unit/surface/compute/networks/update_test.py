@@ -33,12 +33,25 @@ class UpdateTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
-    self.messages = core_apis.GetMessagesModule('compute', 'v1')
+    self.api_version = 'v1'
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
     self.mock_client = mock.Client(
-        core_apis.GetClientClass('compute', 'v1'),
-        real_client=core_apis.GetClientInstance('compute', 'v1', no_http=True))
+        core_apis.GetClientClass('compute', self.api_version),
+        real_client=core_apis.GetClientInstance(
+            'compute', self.api_version, no_http=True))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
+
+  def _GetOperationMessage(self, operation_name, status, resource_uri=None):
+    return self.messages.Operation(
+        name='https://compute.googleapis.com/compute/{0}/projects/{1}/global/'
+        'operations/{2}'.format(self.api_version, 'fake-project',
+                                operation_name),
+        status=status,
+        selfLink='https://compute.googleapis.com/compute/{0}/projects/{1}/'
+        'global/operations/{2}'.format(self.api_version, 'fake-project',
+                                       operation_name),
+        targetLink=resource_uri)
 
   def testUpdate_bgpRoutingMode(self):
     expected = self.messages.Network()
@@ -60,15 +73,17 @@ class UpdateTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
   def testUpdate_switchToCustomSubnetMode_yes(self):
     self.mock_client.networks.SwitchToCustomMode.Expect(
         self.messages.ComputeNetworksSwitchToCustomModeRequest(
-            project='fake-project',
-            network='my-network'),
-        self.messages.Operation(name='myop'))
-    self.mock_client.globalOperations.Get.Expect(
-        self.messages.ComputeGlobalOperationsGetRequest(
+            project='fake-project', network='my-network'),
+        self._GetOperationMessage(
+            operation_name='myop',
+            status=self.messages.Operation.StatusValueValuesEnum.PENDING))
+    self.mock_client.globalOperations.Wait.Expect(
+        self.messages.ComputeGlobalOperationsWaitRequest(
             project='fake-project', operation='myop'),
         self.messages.Operation(
             name='myop',
             status=self.messages.Operation.StatusValueValuesEnum.DONE))
+
     self.mock_client.networks.Get.Expect(
         self.messages.ComputeNetworksGetRequest(
             project='fake-project', network='my-network'),
@@ -113,6 +128,7 @@ class UpdateTestBeta(UpdateTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
     self.messages = core_apis.GetMessagesModule('compute', 'beta')
     self.mock_client = mock.Client(
         core_apis.GetClientClass('compute', 'beta'),
@@ -126,6 +142,7 @@ class UpdateTestAlpha(UpdateTestBeta):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
     self.messages = core_apis.GetMessagesModule('compute', 'alpha')
     self.mock_client = mock.Client(
         core_apis.GetClientClass('compute', 'alpha'),
@@ -133,36 +150,6 @@ class UpdateTestAlpha(UpdateTestBeta):
             'compute', 'alpha', no_http=True))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
-
-  def testUpdateDisabledMulticast(self):
-    expected = self.messages.Network()
-
-    expected.multicastMode = (
-        self.messages.Network.MulticastModeValueValuesEnum.DISABLED)
-    self.mock_client.networks.Patch.Expect(
-        self.messages.ComputeNetworksPatchRequest(
-            project='fake-project',
-            network='my-network',
-            networkResource=expected), self.messages.Operation(name='myop'))
-
-    self.Run("""
-        compute networks update my-network --multicast-mode disabled
-        """)
-
-  def testUpdateZonalMulticast(self):
-    expected = self.messages.Network()
-
-    expected.multicastMode = (
-        self.messages.Network.MulticastModeValueValuesEnum.ZONAL)
-    self.mock_client.networks.Patch.Expect(
-        self.messages.ComputeNetworksPatchRequest(
-            project='fake-project',
-            network='my-network',
-            networkResource=expected), self.messages.Operation(name='myop'))
-
-    self.Run("""
-        compute networks update my-network --multicast-mode zonal
-        """)
 
   def testUpdateMtu(self):
     expected = self.messages.Network()

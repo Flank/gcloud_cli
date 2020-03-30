@@ -135,12 +135,24 @@ Firewall rules are enabled by default.
 .TP 2m
 \fB\-\-enable\-logging\fR
 Enable logging for the firewall rule. Logs will be exported to StackDriver.
-Firewall logging is disabled by default.
+Firewall logging is disabled by default. To enable logging for an existing rule,
+run:
+
+.RS 2m
+$ gcloud alpha compute firewall\-rules create MY\-RULE \-\-enable\-logging
+.RE
+
+To disable logging on an existing rule, run:
+
+.RS 2m
+$ gcloud alpha compute firewall\-rules create MY\-RULE \e
+    \-\-no\-enable\-logging
+.RE
 
 .TP 2m
 \fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR
-Can only be specified if \-\-enable\-logging is true. Configures whether
-metadata fields should be added to the reported firewall logs.
+Configures whether metadata fields should be added to the reported firewall
+logs. Can only be specified if \-\-enable\-logging is true.
 \fILOGGING_METADATA\fR must be one of: \fBexclude\-all\fR, \fBinclude\-all\fR.
 
 .TP 2m
@@ -252,8 +264,9 @@ network can receive connections that match the rule.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -263,9 +276,8 @@ To create a firewall rule allowing incoming TCP traffic on port 8080, run:
 
 .RS 2m
 $ gcloud alpha compute firewall\-rules create FooService \e
-    \-\-allow tcp:8080 \e
-    \-\-description "Allow incoming traffic on TCP port 8080" \e
-    \-\-direction INGRESS
+    \-\-allow=tcp:8080
+    \-\-description="Allow incoming traffic on TCP port 8080" \-\-direction=INGRESS
 .RE
 
 To create a firewall rule that allows TCP traffic through port 80 and determines
@@ -274,8 +286,8 @@ connections, run:
 
 .RS 2m
 $ gcloud alpha compute firewall\-rules create "tcp\-rule" \e
-    \-\-allow tcp:80 \-\-source\-ranges="10.0.0.0/22,10.0.0.0/14" \e
-    \-\-description="Narrowing TCP traffic"
+    \-\-allow=tcp:80
+    \-\-source\-ranges="10.0.0.0/22,10.0.0.0/14" \-\-description="Narrowing TCP traffic"
 .RE
 
 To list existing firewall rules, run:

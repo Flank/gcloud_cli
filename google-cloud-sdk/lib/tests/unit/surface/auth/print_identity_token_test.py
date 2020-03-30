@@ -51,9 +51,9 @@ def GetFakeRefresh(fake_id_token):
 class PrintIdentityTokenTest(sdk_test_base.WithFakeAuth,
                              cli_test_base.CliTestBase):
 
-  def SetUp(self):
+  def TearDown(self):
     # 'gcloud auth print-identity-token' can change the global state
-    # 'config.CLOUDSDK_CLIENT_ID'. Reset it before running each test.
+    # 'config.CLOUDSDK_CLIENT_ID'. Reset it after running each test.
     config.CLOUDSDK_CLIENT_ID = '32555940559.apps.googleusercontent.com'
 
   def testPrintServiceAccount(self):

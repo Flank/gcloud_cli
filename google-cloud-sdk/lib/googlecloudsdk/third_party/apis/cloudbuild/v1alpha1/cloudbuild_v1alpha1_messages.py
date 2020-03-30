@@ -116,6 +116,9 @@ class Build(_messages.Message):
       `${logs_bucket}/log-${build_id}.txt`.
     options: Special options for this build.
     projectId: Output only. ID of the project.
+    queueTtl: TTL in queue for this build. If provided and the build is
+      enqueued longer than this value, the build will expire and the build
+      status will be `EXPIRED`.  The TTL starts ticking from create_time.
     results: Output only. Results of the build.
     secrets: Secrets to decrypt using Cloud Key Management Service.
     source: The location of the source files to build.
@@ -150,6 +153,7 @@ class Build(_messages.Message):
       INTERNAL_ERROR: Build or step failed due to an internal cause.
       TIMEOUT: Build or step took longer than was allowed.
       CANCELLED: Build or step was canceled by a user.
+      EXPIRED: Build was enqueued for longer than the value of `queue_ttl`.
     """
     STATUS_UNKNOWN = 0
     QUEUED = 1
@@ -159,6 +163,7 @@ class Build(_messages.Message):
     INTERNAL_ERROR = 5
     TIMEOUT = 6
     CANCELLED = 7
+    EXPIRED = 8
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class SubstitutionsValue(_messages.Message):
@@ -222,18 +227,19 @@ class Build(_messages.Message):
   logsBucket = _messages.StringField(8)
   options = _messages.MessageField('BuildOptions', 9)
   projectId = _messages.StringField(10)
-  results = _messages.MessageField('Results', 11)
-  secrets = _messages.MessageField('Secret', 12, repeated=True)
-  source = _messages.MessageField('Source', 13)
-  sourceProvenance = _messages.MessageField('SourceProvenance', 14)
-  startTime = _messages.StringField(15)
-  status = _messages.EnumField('StatusValueValuesEnum', 16)
-  statusDetail = _messages.StringField(17)
-  steps = _messages.MessageField('BuildStep', 18, repeated=True)
-  substitutions = _messages.MessageField('SubstitutionsValue', 19)
-  tags = _messages.StringField(20, repeated=True)
-  timeout = _messages.StringField(21)
-  timing = _messages.MessageField('TimingValue', 22)
+  queueTtl = _messages.StringField(11)
+  results = _messages.MessageField('Results', 12)
+  secrets = _messages.MessageField('Secret', 13, repeated=True)
+  source = _messages.MessageField('Source', 14)
+  sourceProvenance = _messages.MessageField('SourceProvenance', 15)
+  startTime = _messages.StringField(16)
+  status = _messages.EnumField('StatusValueValuesEnum', 17)
+  statusDetail = _messages.StringField(18)
+  steps = _messages.MessageField('BuildStep', 19, repeated=True)
+  substitutions = _messages.MessageField('SubstitutionsValue', 20)
+  tags = _messages.StringField(21, repeated=True)
+  timeout = _messages.StringField(22)
+  timing = _messages.MessageField('TimingValue', 23)
 
 
 class BuildOperationMetadata(_messages.Message):
@@ -294,9 +300,8 @@ class BuildOptions(_messages.Message):
       build step.  Using a global volume in a build with only one step is not
       valid as it is indicative of a build request with an incorrect
       configuration.
-    workerPool: Option to specify a `WorkerPool` for the build. User specifies
-      the pool with the format "[WORKERPOOL_PROJECT_ID]/[WORKERPOOL_NAME]".
-      This is an experimental field.
+    workerPool: Option to specify a `WorkerPool` for the build. Format:
+      projects/{project}/workerPools/{workerPool}  This field is experimental.
   """
 
   class LogStreamingOptionValueValuesEnum(_messages.Enum):
@@ -468,6 +473,7 @@ class BuildStep(_messages.Message):
       INTERNAL_ERROR: Build or step failed due to an internal cause.
       TIMEOUT: Build or step took longer than was allowed.
       CANCELLED: Build or step was canceled by a user.
+      EXPIRED: Build was enqueued for longer than the value of `queue_ttl`.
     """
     STATUS_UNKNOWN = 0
     QUEUED = 1
@@ -477,6 +483,7 @@ class BuildStep(_messages.Message):
     INTERNAL_ERROR = 5
     TIMEOUT = 6
     CANCELLED = 7
+    EXPIRED = 8
 
   args = _messages.StringField(1, repeated=True)
   dir = _messages.StringField(2)
@@ -647,6 +654,10 @@ class Network(_messages.Message):
 class RepoSource(_messages.Message):
   r"""Location of the source in a Google Cloud Source Repository.
 
+  Messages:
+    SubstitutionsValue: Substitutions to use in a triggered build. Should only
+      be used with RunBuildTrigger
+
   Fields:
     branchName: Regex matching branches to build.  The syntax of the regular
       expressions accepted is the syntax accepted by RE2 and described at
@@ -655,21 +666,52 @@ class RepoSource(_messages.Message):
     dir: Directory, relative to the source root, in which to run the build.
       This must be a relative path. If a step's `dir` is specified and is an
       absolute path, this value is ignored for that step's execution.
+    invertRegex: Only trigger a build if the revision regex does NOT match the
+      revision regex.
     projectId: ID of the project that owns the Cloud Source Repository. If
       omitted, the project ID requesting the build is assumed.
-    repoName: Name of the Cloud Source Repository. If omitted, the name
-      "default" is assumed.
+    repoName: Required. Name of the Cloud Source Repository.
+    substitutions: Substitutions to use in a triggered build. Should only be
+      used with RunBuildTrigger
     tagName: Regex matching tags to build.  The syntax of the regular
       expressions accepted is the syntax accepted by RE2 and described at
       https://github.com/google/re2/wiki/Syntax
   """
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class SubstitutionsValue(_messages.Message):
+    r"""Substitutions to use in a triggered build. Should only be used with
+    RunBuildTrigger
+
+    Messages:
+      AdditionalProperty: An additional property for a SubstitutionsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type SubstitutionsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a SubstitutionsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   branchName = _messages.StringField(1)
   commitSha = _messages.StringField(2)
   dir = _messages.StringField(3)
-  projectId = _messages.StringField(4)
-  repoName = _messages.StringField(5)
-  tagName = _messages.StringField(6)
+  invertRegex = _messages.BooleanField(4)
+  projectId = _messages.StringField(5)
+  repoName = _messages.StringField(6)
+  substitutions = _messages.MessageField('SubstitutionsValue', 7)
+  tagName = _messages.StringField(8)
 
 
 class Results(_messages.Message):
@@ -1033,7 +1075,7 @@ class WorkerPool(_messages.Message):
       STATUS_UNSPECIFIED: Status of the `WorkerPool` is unknown.
       CREATING: `WorkerPool` is being created.
       RUNNING: `WorkerPool` is running.
-      DELETING: `WorkerPool` is being deleting: cancelling builds and draining
+      DELETING: `WorkerPool` is being deleted: cancelling builds and draining
         workers.
       DELETED: `WorkerPool` is deleted.
     """

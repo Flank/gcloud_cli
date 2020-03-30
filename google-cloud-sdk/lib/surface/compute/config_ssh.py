@@ -195,8 +195,7 @@ def _CreateAlias(instance_resource):
 
 def _BuildComputeSection(instances, private_key_file, known_hosts_file):
   """Returns a string representing the Compute section that should be added."""
-  buf = io.StringIO()
-  buf.write(_HEADER)
+  temp_buf = []
 
   for instance in instances:
     external_ip_address = (
@@ -204,7 +203,7 @@ def _BuildComputeSection(instances, private_key_file, known_hosts_file):
     host_key_alias = 'compute.{0}'.format(instance.id)
 
     if external_ip_address:
-      buf.write(textwrap.dedent("""\
+      temp_buf.extend(textwrap.dedent("""\
           Host {alias}
               HostName {external_ip_address}
               IdentityFile {private_key_file}
@@ -219,9 +218,16 @@ def _BuildComputeSection(instances, private_key_file, known_hosts_file):
                      known_hosts_file=known_hosts_file,
                      host_key_alias=host_key_alias)))
 
-  buf.write(_END_MARKER)
-  buf.write('\n')
-  return buf.getvalue()
+  if temp_buf:
+    buf = io.StringIO()
+    buf.write(_HEADER)
+    for i in temp_buf:
+      buf.write(i)
+    buf.write(_END_MARKER)
+    buf.write('\n')
+    return buf.getvalue()
+  else:
+    return ''
 
 
 class ConfigSSH(base.Command):
@@ -257,6 +263,15 @@ class ConfigSSH(base.Command):
   in the project's metadata. If the user does not have a public
   SSH key, one is generated using *ssh-keygen(1)* (if the `--quiet`
   flag is given, the generated key will have an empty passphrase).
+
+  ## EXAMPLES
+  To populate SSH config file with Host entries from each running instance, run:
+
+    $ {command}
+
+  To remove the change to the SSH config file by this command, run:
+
+    $ {command} --remove
   """
 
   category = base.TOOLS_CATEGORY
@@ -384,6 +399,11 @@ class ConfigSSH(base.Command):
             $ ssh {alias}
 
           """.format(alias=_CreateAlias(instances[0]))))
+
+    elif compute_section == '' and instances:   # pylint: disable=g-explicit-bool-comparison
+      log.warning(
+          'No host aliases were added to your SSH configs because instances'
+          ' have no public IP.')
 
     elif not instances and not args.remove:
       log.warning(

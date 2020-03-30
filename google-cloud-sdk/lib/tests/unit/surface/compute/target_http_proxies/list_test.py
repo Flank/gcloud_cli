@@ -33,71 +33,12 @@ import mock
 class TargetHttpProxiesListTest(test_base.BaseTest,
                                 completer_test_base.CompleterBase):
 
+  URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
+
   def SetUp(self):
+    self._api = ''
     self.SelectApi('v1')
-    lister_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        autospec=True)
-    self.addCleanup(lister_patcher.stop)
-    self.mock_get_global_resources = lister_patcher.start()
-    self.mock_get_global_resources.return_value = (
-        resource_projector.MakeSerializable(test_resources.TARGET_HTTP_PROXIES))
-
-  def testSimpleCase(self):
-    self.Run("""
-        compute target-http-proxies list
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute_v1.targetHttpProxies,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                URL_MAP
-            target-http-proxy-1 url-map-1
-            target-http-proxy-2 url-map-2
-            target-http-proxy-3 url-map-3
-            """), normalize_space=True)
-
-  def testTargetHttpProxiesCompleter(self):
-    self.RunCompleter(
-        flags.TargetHttpProxiesCompleter,
-        expected_command=[
-            'compute',
-            'target-http-proxies',
-            'list',
-            '--uri',
-            '--quiet',
-            '--format=disable',
-        ],
-        expected_completions=[
-            'target-http-proxy-1',
-            'target-http-proxy-2',
-            'target-http-proxy-3',
-        ],
-        cli=self.cli,
-    )
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute_v1.targetHttpProxies,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-
-
-class TargetHttpProxiesListBetaTest(test_base.BaseTest,
-                                    completer_test_base.CompleterBase):
-
-  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
-
-  def SetUp(self):
-    self._api = 'beta'
-    self.SelectApi('beta')
-    self._compute_api = self.compute_beta
+    self._compute_api = self.compute_v1
 
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson')
@@ -131,12 +72,73 @@ class TargetHttpProxiesListBetaTest(test_base.BaseTest,
             region='region-2'),
     ]
 
+  def testSimpleCase(self):
+    expected = """\
+    NAME                URL_MAP
+    target-http-proxy-1 url-map-1
+    target-http-proxy-2 url-map-2
+    target-http-proxy-3 url-map-3
+    """
+    self.RequestOnlyGlobal(
+        self._api + ' compute target-http-proxies list --global',
+        resource_projector.MakeSerializable(test_resources.TARGET_HTTP_PROXIES),
+        expected)
+
+  def testTargetHttpProxiesCompleter(self):
+    # flags.TargetHttpProxiesCompleter uses the v1 interface only.
+    self._api = ''
+    self.SelectApi('v1')
+    self._compute_api = self.compute_v1
+
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.TARGET_HTTP_PROXIES),
+        resource_projector.MakeSerializable(test_resources.TARGET_HTTP_PROXIES)
+    ]
+    expected_global_command = [
+        'compute',
+        'target-http-proxies',
+        'list',
+        '--global',
+        '--uri',
+        '--quiet',
+        '--format=disable',
+    ]
+    expected_region_command = [
+        'compute',
+        'target-http-proxies',
+        'list',
+        '--filter=region:*',
+        '--uri',
+        '--quiet',
+        '--format=disable',
+    ]
+
+    self.RunCompleter(
+        flags.TargetHttpProxiesCompleter,
+        expected_command=[expected_global_command, expected_region_command],
+        expected_completions=[
+            'target-http-proxy-1',
+            'target-http-proxy-2',
+            'target-http-proxy-3',
+        ],
+        cli=self.cli,
+    )
+    self.list_json.assert_called_with(
+        requests=[
+            (self._compute_api.targetHttpProxies, 'AggregatedList',
+             self.messages.ComputeTargetHttpProxiesAggregatedListRequest(
+                 project='my-project', includeAllScopes=True)),
+        ],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+
   def testGlobalOption(self):
     command = self._api + ' compute target-http-proxies list --uri --global'
     output = ("""\
         https://compute.googleapis.com/compute/{0}/projects/my-project/global/targetHttpProxies/target-http-proxy-1
         https://compute.googleapis.com/compute/{0}/projects/my-project/global/targetHttpProxies/target-http-proxy-2
-    """.format(self._api))
+    """.format(self.api))
 
     self.RequestOnlyGlobal(command, self.target_http_proxies, output)
 
@@ -145,7 +147,7 @@ class TargetHttpProxiesListBetaTest(test_base.BaseTest,
                            'region-1')
     output = ("""\
         https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/targetHttpProxies/target-http-proxy-3
-        """.format(self._api))
+        """.format(self.api))
 
     self.RequestOneRegion(command, self.region_target_http_proxies, output)
 
@@ -156,7 +158,7 @@ class TargetHttpProxiesListBetaTest(test_base.BaseTest,
     output = ("""\
         https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/targetHttpProxies/target-http-proxy-3
         https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-2/targetHttpProxies/target-http-proxy-4
-        """.format(self._api))
+        """.format(self.api))
 
     self.RequestTwoRegions(command, self.region_target_http_proxies, output)
 
@@ -196,8 +198,7 @@ class TargetHttpProxiesListBetaTest(test_base.BaseTest,
 
     self.list_json.assert_called_once_with(
         requests=[(self._compute_api.targetHttpProxies, 'AggregatedList',
-                   self.messages.ComputeTargetHttpProxiesAggregatedListRequest(
-                       project='my-project'))],
+                   self._getListRequestMessage('my-project'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -236,6 +237,24 @@ class TargetHttpProxiesListBetaTest(test_base.BaseTest,
         errors=[])
 
     self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
+
+  def _getListRequestMessage(self, project):
+    return self.messages.ComputeTargetHttpProxiesAggregatedListRequest(
+        project=project, includeAllScopes=True)
+
+
+class TargetHttpProxiesListBetaTest(TargetHttpProxiesListTest):
+
+  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi('beta')
+    self._compute_api = self.compute_beta
+
+  def _getListRequestMessage(self, project):
+    return self.messages.ComputeTargetHttpProxiesAggregatedListRequest(
+        project=project, includeAllScopes=True)
 
 
 class TargetHttpProxiesListAlphaTest(TargetHttpProxiesListBetaTest):

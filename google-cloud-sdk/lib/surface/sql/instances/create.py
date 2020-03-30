@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.sql import api_util as common_api_util
+from googlecloudsdk.api_lib.sql import exceptions as sql_exceptions
 from googlecloudsdk.api_lib.sql import instances as api_util
 from googlecloudsdk.api_lib.sql import operations
 from googlecloudsdk.api_lib.sql import validate
@@ -33,7 +34,6 @@ from googlecloudsdk.command_lib.sql import validate as command_validate
 from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resource import resource_lex
 from googlecloudsdk.core.resource import resource_property
 import six
@@ -46,7 +46,6 @@ def AddBaseArgs(parser):
   parser.display_info.AddFormat(flags.GetInstanceListFormat())
   flags.AddActivationPolicy(parser)
   flags.AddAssignIp(parser)
-  flags.AddAuthorizedGAEApps(parser)
   flags.AddAuthorizedNetworks(parser)
   flags.AddAvailabilityType(parser)
   parser.add_argument(
@@ -56,6 +55,7 @@ def AddBaseArgs(parser):
       default=True,
       help='Enables daily backup.')
   flags.AddBackupStartTime(parser)
+  flags.AddBackupLocation(parser, allow_empty=False)
   flags.AddCPU(parser)
   flags.AddDatabaseFlags(parser)
   flags.AddEnableBinLog(parser, show_negated_in_help=False)
@@ -63,12 +63,6 @@ def AddBaseArgs(parser):
       '--failover-replica-name',
       required=False,
       help='Also create a failover replica with the specified name.')
-  parser.add_argument(
-      '--follow-gae-app',
-      required=False,
-      help=('First Generation instances only. The App Engine app this '
-            'instance should follow. It must be in the same region as '
-            'the instance.'))
   parser.add_argument(
       'instance',
       type=command_validate.InstanceNameRegexpValidator(),
@@ -83,14 +77,6 @@ def AddBaseArgs(parser):
             'replication setup. The newly created instance will be a read '
             'replica of the specified master instance.'))
   flags.AddMemory(parser)
-  parser.add_argument(
-      '--pricing-plan',
-      '-p',
-      required=False,
-      choices=['PER_USE', 'PACKAGE'],
-      default='PER_USE',
-      help=('First Generation instances only. The pricing plan for this '
-            'instance.'))
   # TODO(b/31989340): add remote completion
   # TODO(b/73362371): Make specifying a location required.
   location_group = parser.add_mutually_exclusive_group()
@@ -146,6 +132,11 @@ def AddBetaArgs(parser):
   labels_util.AddCreateLabelsFlags(parser)
 
 
+def AddAlphaArgs(parser):
+  """Declare alpha flags for this command parser."""
+  flags.AddEnablePointInTimeRecovery(parser)
+
+
 def RunBaseCreateCommand(args, release_track):
   """Creates a new Cloud SQL instance.
 
@@ -159,6 +150,11 @@ def RunBaseCreateCommand(args, release_track):
   Raises:
     HttpException: A http error response was received while executing api
         request.
+    ArgumentError: An argument supplied by the user was incorrect, such as
+      specifying an invalid CMEK configuration or attempting to create a V1
+      instance.
+    RequiredArgumentException: A required argument was not supplied by the user,
+      such as omitting --root-password on a SQL Server instance.
   """
   client = common_api_util.SqlClient(common_api_util.API_VERSION_DEFAULT)
   sql_client = client.sql_client
@@ -197,12 +193,31 @@ def RunBaseCreateCommand(args, release_track):
     if not args.IsSpecified('region'):
       args.region = master_instance_resource.region
     if not args.IsSpecified('database_version'):
-      args.database_version = master_instance_resource.databaseVersion
+      args.database_version = master_instance_resource.databaseVersion.name
     if not args.IsSpecified('tier') and master_instance_resource.settings:
       args.tier = master_instance_resource.settings.tier
-    # Check for CMEK usage; warn the user about replica inheriting the setting.
+
+    # Validate master/replica CMEK configurations.
     if master_instance_resource.diskEncryptionConfiguration:
-      command_util.ShowCmekWarning('replica', 'the master instance')
+      if args.region == master_instance_resource.region:
+        # Warn user that same-region replicas inherit their master's CMEK
+        # configuration.
+        command_util.ShowCmekWarning('replica', 'the master instance')
+      elif not args.IsSpecified('disk_encryption_key'):
+        # Raise error that cross-region replicas require their own CMEK key if
+        # the master is CMEK.
+        raise exceptions.RequiredArgumentException(
+            '--disk-encryption-key',
+            '`--disk-encryption-key` is required when creating a cross-region '
+            'replica of an instance with customer-managed encryption.')
+      else:
+        command_util.ShowCmekWarning('replica')
+    elif args.IsSpecified('disk_encryption_key'):
+      # Raise error that cross-region replicas cannot be CMEK encrypted if their
+      # master is not.
+      raise sql_exceptions.ArgumentError(
+          '`--disk-encryption-key` cannot be specified when creating a replica '
+          'of an instance without customer-managed encryption.')
 
   # --root-password is required when creating SQL Server instances
   if args.IsSpecified('database_version') and args.database_version.startswith(
@@ -219,20 +234,13 @@ def RunBaseCreateCommand(args, release_track):
           release_track=release_track))
 
   # TODO(b/122660263): Remove when V1 instances are no longer supported.
-  # V1 instances are deprecated. Prompt to continue if one is being created.
-  if api_util.IsInstanceV1(instance_resource):
-    log.warning(
-        'First Generation instances will be automatically upgraded '
-        'to Second Generation starting March 4th, 2020, and First Generation '
-        'will be fully decommissioned on March 25, 2020. We recommend you '
-        'create a Second Generation instance.')
-    console_io.PromptContinue(cancel_on_no=True)
-
-  if args.pricing_plan == 'PACKAGE':
-    console_io.PromptContinue(
-        'Charges will begin accruing immediately. Really create Cloud '
-        'SQL instance?',
-        cancel_on_no=True)
+  # V1 instances are deprecated.
+  # Note that the exception type is intentionally vague because the user may not
+  # have directly supplied the offending argument.  For example, creating a read
+  # replica defaults its tier to that of its master.
+  if api_util.IsInstanceV1(sql_messages, instance_resource):
+    raise sql_exceptions.ArgumentError(
+        'First Generation instances can no longer be created.')
 
   operation_ref = None
   try:
@@ -316,4 +324,5 @@ class CreateAlpha(base.Command):
     """Args is called by calliope to gather arguments for this command."""
     AddBaseArgs(parser)
     AddBetaArgs(parser)
+    AddAlphaArgs(parser)
     flags.AddDatabaseVersion(parser, restrict_choices=False)

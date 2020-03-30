@@ -30,7 +30,7 @@ GLOBAL FLAGS
      --configuration=CONFIGURATION
         The configuration to use for this command invocation. For more
         information on how to use configurations, run: gcloud topic
-        configurations. You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME]
+        configurations. You can also use the CLOUDSDK_ACTIVE_CONFIG_NAME
         environment variable to set the equivalent of this flag for a terminal
         session.
 
@@ -131,8 +131,14 @@ GROUPS
      ai-platform
         (BETA) Manage AI Platform jobs and models.
 
+     anthos
+        (BETA) Anthos command Group.
+
      app
         (BETA) Manage your App Engine deployments.
+
+     artifacts
+        (BETA) Manage Artifact Registry resources.
 
      asset
         (BETA) Manage the Cloud Asset Inventory.
@@ -174,7 +180,7 @@ GROUPS
         (BETA) Create and manage Google Cloud Dataproc clusters and jobs.
 
      datastore
-        (BETA) Manage your Cloud Datastore indexes.
+        (BETA) Manage your Cloud Datastore resources.
 
      debug
         (BETA) Commands for interacting with the Cloud Debugger.
@@ -209,6 +215,9 @@ GROUPS
      functions
         (BETA) Manage Google Cloud Functions.
 
+     game
+        (BETA) Managed Cloud Game Services.
+
      healthcare
         (BETA) Manage Cloud Healthcare resources.
 
@@ -217,6 +226,9 @@ GROUPS
 
      iap
         (BETA) Manage IAP policies.
+
+     identity
+        (BETA) Manage Cloud Identity Groups and Memberships resources.
 
      iot
         (BETA) Manage Cloud IoT resources.
@@ -230,17 +242,30 @@ GROUPS
      logging
         (BETA) Manage Stackdriver Logging.
 
+     memcache
+        (BETA) Manage Cloud Memorystore Memcached resources.
+
      ml
         (BETA) Use Google Cloud machine learning capabilities.
 
      ml-engine
         (BETA) Manage AI Platform jobs and models.
 
+     monitoring
+        (BETA) Manage Stackdriver Monitoring alerting policies and notification
+        channels.
+
+     network-management
+        (BETA) Manage Network Management resources.
+
+     notebooks
+        (BETA) Notebooks Command Group.
+
      organizations
         (BETA) Create and manage Google Cloud Platform Organizations.
 
      policy-troubleshoot
-        (BETA) Troubleshoot Google Cloud Platform Policies.
+        (BETA) Troubleshoot Google Cloud Platform policies.
 
      projects
         (BETA) Create and manage project access policies.
@@ -265,6 +290,12 @@ GROUPS
 
      scheduler
         (BETA) Manage Cloud Scheduler jobs and schedules.
+
+     secrets
+        (BETA) Manage secrets on Google Cloud.
+
+     service-directory
+        (BETA) Command groups for Service Directory.
 
      services
         (BETA) List, enable and disable APIs and services.
@@ -292,6 +323,9 @@ COMMANDS
 
      interactive
         (BETA) Start the gcloud interactive shell.
+
+     survey
+        (BETA) Invoke a customer satisfaction survey for Cloud SDK.
 
 NOTES
     This command is currently in BETA and may change without notice.

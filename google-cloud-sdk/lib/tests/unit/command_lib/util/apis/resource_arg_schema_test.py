@@ -24,6 +24,7 @@ import re
 
 from googlecloudsdk.api_lib.util import resource as resource_util
 from googlecloudsdk.calliope.concepts import concepts
+from googlecloudsdk.command_lib.compute.completers import InstancesCompleter
 from googlecloudsdk.command_lib.util.apis import registry
 from googlecloudsdk.command_lib.util.apis import resource_arg_schema
 from googlecloudsdk.command_lib.util.apis import yaml_command_schema_util as util
@@ -192,7 +193,7 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
         project_attr.fallthroughs,
         concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
 
-  def testResourceWithCompleters(self):
+  def testResourceWithAutoCompleters(self):
     r = resource_arg_schema.YAMLResourceArgument.FromData(
         {
             'help_text': 'group help',
@@ -220,6 +221,68 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     zone_attr = spec.attributes[1]
     self.assertEqual('zoneField', zone_attr.completion_id_field)
     self.assertEqual({'field1': 'value1'}, zone_attr.completion_request_params)
+
+  def testResourceWithCompleters(self):
+    r = resource_arg_schema.YAMLResourceArgument.FromData({
+        'help_text': 'group help',
+        'spec': {
+            'name': 'zone',
+            'collection': 'foo.projects.zones',
+            'attributes': [{
+                'parameter_name': 'projectsId',
+                'attribute_name': 'project',
+                'help': 'help1'
+            }, {
+                'parameter_name': 'zonesId',
+                'attribute_name': 'zone',
+                'help': 'help2',
+                'completer': 'googlecloudsdk.command_lib.compute.'
+                             'completers:InstancesCompleter'
+            }],
+            'disable_auto_completers': False
+        },
+        'removed_flags': ['zone'],
+        'is_positional': False
+    })
+
+    mock_resource = mock.MagicMock(
+        full_name='foo.projects.zones',
+        api_version='v1',
+        detailed_params=['projectsId', 'zonesId'])
+    spec = r.GenerateResourceSpec(mock_resource)
+    self.assertFalse(spec.disable_auto_completers)
+    zone_attr = spec.attributes[1]
+    self.assertEqual(InstancesCompleter, zone_attr.completer)
+
+  def testResourceWithCompletersAndAutoCompletersValidation(self):
+    with self.assertRaisesRegex(
+        ValueError,
+        r'Custom completer and auto-completer should not be specified at the '
+        r'same time'):
+      r = resource_arg_schema.YAMLResourceArgument.FromData(
+          {
+              'help_text': 'group help',
+              'spec': {'name': 'zone', 'collection': 'foo.projects.zones',
+                       'attributes': [
+                           {'parameter_name': 'projectsId',
+                            'attribute_name': 'project',
+                            'help': 'help1'},
+                           {'parameter_name': 'zonesId',
+                            'attribute_name': 'zone',
+                            'help': 'help2',
+                            'completer': 'googlecloudsdk.command_lib.compute.'
+                                         'completers:InstancesCompleter',
+                            'completion_id_field': 'zoneField',
+                            'completion_request_params': [
+                                {'fieldName': 'field1', 'value': 'value1'}]}],
+                       'disable_auto_completers': False},
+              'removed_flags': ['zone'],
+              'is_positional': False})
+      mock_resource = mock.MagicMock(
+          full_name='foo.projects.zones',
+          api_version='v1',
+          detailed_params=['projectsId', 'zonesId'])
+      r.GenerateResourceSpec(mock_resource)
 
   def testRemovedFlagsValidation(self):
     with self.assertRaisesRegex(

@@ -43,6 +43,14 @@ class ExternalVpnGatewayDeleteGaTest(
             self.messages.ComputeGlobalOperationsGetRequest(
                 **operation_ref.AsDict()))
 
+  def _MakeOperationWaitRequest(self, operation_ref):
+    return (self.global_operations, 'Wait',
+            self.messages.ComputeGlobalOperationsWaitRequest(
+                **operation_ref.AsDict()))
+
+  def _MakeOperationPollingRequest(self, operation_ref):
+    return self._MakeOperationWaitRequest(operation_ref)
+
   def testDeleteSingleExternalVpnGateway(self):
     name = 'my-gateway'
     gateway_ref = self.GetExternalVpnGatewayRef(name)
@@ -56,10 +64,12 @@ class ExternalVpnGatewayDeleteGaTest(
 
     self.ExpectDeleteRequest(gateway_ref, pending_operation)
 
-    self.api_mock.batch_responder.ExpectBatch(
-        [(self._MakeOperationGetRequest(operation_ref), pending_operation)])
-    self.api_mock.batch_responder.ExpectBatch(
-        [(self._MakeOperationGetRequest(operation_ref), done_operation)])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._MakeOperationPollingRequest(operation_ref), pending_operation)
+    ])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._MakeOperationPollingRequest(operation_ref), done_operation)
+    ])
 
     self.Run('compute external-vpn-gateways delete {}'.format(name))
 
@@ -100,10 +110,14 @@ class ExternalVpnGatewayDeleteGaTest(
     for n in range(0, 3):
       self.ExpectDeleteRequest(gateway_refs[n], pending_operations[n])
 
-    self.api_mock.batch_responder.ExpectBatch([(self._MakeOperationGetRequest(
-        operation_refs[n]), pending_operations[n]) for n in range(0, 3)])
-    self.api_mock.batch_responder.ExpectBatch([(self._MakeOperationGetRequest(
-        operation_refs[n]), done_operations[n]) for n in range(0, 3)])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._MakeOperationPollingRequest(operation_refs[n]),
+         pending_operations[n]) for n in range(0, 3)
+    ])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._MakeOperationPollingRequest(operation_refs[n]),
+         done_operations[n]) for n in range(0, 3)
+    ])
 
     self.Run('compute external-vpn-gateways delete {}'.format(' '.join(names)))
 

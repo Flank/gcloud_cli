@@ -22,21 +22,24 @@ import copy
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.routers import router_utils
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import router_test_base
 from tests.lib.surface.compute import router_test_utils
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'),
-                          (calliope_base.ReleaseTrack.GA, 'v1'))
-class RemoveAdvertisementPeerTest(parameterized.TestCase,
-                                  router_test_base.RouterTestBase):
+class RemoveAdvertisementPeerTestGA(router_test_base.RouterTestBase):
 
-  def testRemoveAdvertisementPeerGroups_success(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def SetUp(self):
+    self.messages = getattr(self, self.api_version + '_messages')
+    self.mock_client = getattr(self, 'compute_' + self.api_version)
+    self.mock_client.Mock()
+    self.addCleanup(self.mock_client.Unmock)
+
+  def testRemoveAdvertisementPeerGroups_success(self):
 
     # Start with a router in custom mode.
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -46,7 +49,7 @@ class RemoveAdvertisementPeerTest(parameterized.TestCase,
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -57,9 +60,7 @@ class RemoveAdvertisementPeerTest(parameterized.TestCase,
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating peer [my-peer] in router [my-router]')
 
-  def testRemoveAdvertisementPeerGroups_groupNotFoundError(
-      self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisementPeerGroups_groupNotFoundError(self):
 
     # Start with a router in custom mode.
     orig = router_test_utils.CreateEmptyCustomRouterMessage(self.messages)
@@ -75,8 +76,7 @@ class RemoveAdvertisementPeerTest(parameterized.TestCase,
           --remove-advertisement-groups=ALL_SUBNETS
           """)
 
-  def testRemoveAdvertisementPeerRanges_success(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisementPeerRanges_success(self):
 
     # Start with a router in custom mode.
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -90,7 +90,7 @@ class RemoveAdvertisementPeerTest(parameterized.TestCase,
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -101,8 +101,7 @@ class RemoveAdvertisementPeerTest(parameterized.TestCase,
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating peer [my-peer] in router [my-router]')
 
-  def testRemoveAdvertisementPeerRanges_multiSuccess(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisementPeerRanges_multiSuccess(self):
 
     # Start with a router in custom mode.
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -113,7 +112,7 @@ class RemoveAdvertisementPeerTest(parameterized.TestCase,
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -124,9 +123,7 @@ class RemoveAdvertisementPeerTest(parameterized.TestCase,
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating peer [my-peer] in router [my-router]')
 
-  def testRemoveAdvertisementRanges_ipRangeNotFoundError(
-      self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisementRanges_ipRangeNotFoundError(self):
 
     # Start with a router in custom mode.
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -142,9 +139,7 @@ class RemoveAdvertisementPeerTest(parameterized.TestCase,
           --remove-advertisement-ranges=192.168.0.0/30
           """)
 
-  def testRemoveAdvertisementPeer_mutallyExclusiveError(self, track,
-                                                        api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisementPeer_mutallyExclusiveError(self):
 
     error_msg = ('argument --remove-advertisement-groups: At most one of '
                  '--add-advertisement-groups | --add-advertisement-ranges | '
@@ -158,8 +153,7 @@ class RemoveAdvertisementPeerTest(parameterized.TestCase,
           --remove-advertisement-ranges=10.10.10.10/30
           """)
 
-  def testRemoveAdvertisementPeer_peerNotFoundError(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisementPeer_peerNotFoundError(self):
 
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
 
@@ -174,8 +168,7 @@ class RemoveAdvertisementPeerTest(parameterized.TestCase,
           --remove-advertisement-groups=ALL_SUBNETS
           """)
 
-  def testRemoveAdvertisementPeer_defaultModeError(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testRemoveAdvertisementPeer_defaultModeError(self):
 
     # Start with a router in default mode.
     orig = router_test_utils.CreateDefaultRouterMessage(self.messages)
@@ -191,6 +184,20 @@ class RemoveAdvertisementPeerTest(parameterized.TestCase,
           --peer-name=my-peer
           --remove-advertisement-groups=ALL_SUBNETS
           """)
+
+
+class RemoveAdvertisementPeerTestBeta(RemoveAdvertisementPeerTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class RemoveAdvertisementPeerTestAlpha(RemoveAdvertisementPeerTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
 
 if __name__ == '__main__':

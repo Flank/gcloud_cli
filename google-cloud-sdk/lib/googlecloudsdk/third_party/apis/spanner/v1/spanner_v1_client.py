@@ -9,6 +9,7 @@ class SpannerV1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://spanner.googleapis.com/'
+  MTLS_BASE_URL = u'https://spanner.mtls.googleapis.com/'
 
   _PACKAGE = u'spanner'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform', u'https://www.googleapis.com/auth/spanner.admin', u'https://www.googleapis.com/auth/spanner.data']
@@ -36,8 +37,10 @@ class SpannerV1(base_api.BaseApiClient):
         additional_http_headers=additional_http_headers,
         response_encoding=response_encoding)
     self.projects_instanceConfigs = self.ProjectsInstanceConfigsService(self)
+    self.projects_instances_backupOperations = self.ProjectsInstancesBackupOperationsService(self)
     self.projects_instances_backups_operations = self.ProjectsInstancesBackupsOperationsService(self)
     self.projects_instances_backups = self.ProjectsInstancesBackupsService(self)
+    self.projects_instances_databaseOperations = self.ProjectsInstancesDatabaseOperationsService(self)
     self.projects_instances_databases_operations = self.ProjectsInstancesDatabasesOperationsService(self)
     self.projects_instances_databases_sessions = self.ProjectsInstancesDatabasesSessionsService(self)
     self.projects_instances_databases = self.ProjectsInstancesDatabasesService(self)
@@ -106,6 +109,52 @@ class SpannerV1(base_api.BaseApiClient):
         request_field='',
         request_type_name=u'SpannerProjectsInstanceConfigsListRequest',
         response_type_name=u'ListInstanceConfigsResponse',
+        supports_download=False,
+    )
+
+  class ProjectsInstancesBackupOperationsService(base_api.BaseApiService):
+    """Service class for the projects_instances_backupOperations resource."""
+
+    _NAME = u'projects_instances_backupOperations'
+
+    def __init__(self, client):
+      super(SpannerV1.ProjectsInstancesBackupOperationsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def List(self, request, global_params=None):
+      r"""Lists the backup long-running operations in.
+the given instance. A backup operation has a name of the form
+`projects/<project>/instances/<instance>/backups/<backup>/operations/<operation>`.
+The long-running operation
+metadata field type
+`metadata.type_url` describes the type of the metadata. Operations returned
+include those that have completed/failed/canceled within the last 7 days,
+and pending operations. Operations returned are ordered by
+`operation.metadata.value.progress.start_time` in descending order starting
+from the most recently started operation.
+
+      Args:
+        request: (SpannerProjectsInstancesBackupOperationsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListBackupOperationsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/instances/{instancesId}/backupOperations',
+        http_method=u'GET',
+        method_id=u'spanner.projects.instances.backupOperations.list',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'filter', u'pageSize', u'pageToken'],
+        relative_path=u'v1/{+parent}/backupOperations',
+        request_field='',
+        request_type_name=u'SpannerProjectsInstancesBackupOperationsListRequest',
+        response_type_name=u'ListBackupOperationsResponse',
         supports_download=False,
     )
 
@@ -260,13 +309,107 @@ is the parent resource, without the operations collection id.
       self._upload_configs = {
           }
 
+    def Create(self, request, global_params=None):
+      r"""Starts creating a new Cloud Spanner Backup.
+The returned backup long-running operation
+will have a name of the format
+`projects/<project>/instances/<instance>/backups/<backup>/operations/<operation_id>`
+and can be used to track creation of the backup. The
+metadata field type is
+CreateBackupMetadata. The
+response field type is
+Backup, if successful. Cancelling the returned operation will stop the
+creation and delete the backup.
+There can be only one pending backup creation per database. Backup creation
+of different databases can run concurrently.
+
+      Args:
+        request: (SpannerProjectsInstancesBackupsCreateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Create')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Create.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/instances/{instancesId}/backups',
+        http_method=u'POST',
+        method_id=u'spanner.projects.instances.backups.create',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'backupId'],
+        relative_path=u'v1/{+parent}/backups',
+        request_field=u'backup',
+        request_type_name=u'SpannerProjectsInstancesBackupsCreateRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes a pending or completed Backup.
+
+      Args:
+        request: (SpannerProjectsInstancesBackupsDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Empty) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/instances/{instancesId}/backups/{backupsId}',
+        http_method=u'DELETE',
+        method_id=u'spanner.projects.instances.backups.delete',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1/{+name}',
+        request_field='',
+        request_type_name=u'SpannerProjectsInstancesBackupsDeleteRequest',
+        response_type_name=u'Empty',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Gets metadata on a pending or completed Backup.
+
+      Args:
+        request: (SpannerProjectsInstancesBackupsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Backup) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/instances/{instancesId}/backups/{backupsId}',
+        http_method=u'GET',
+        method_id=u'spanner.projects.instances.backups.get',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1/{+name}',
+        request_field='',
+        request_type_name=u'SpannerProjectsInstancesBackupsGetRequest',
+        response_type_name=u'Backup',
+        supports_download=False,
+    )
+
     def GetIamPolicy(self, request, global_params=None):
-      r"""Gets the access control policy for a database resource.
-Returns an empty policy if a database exists but does
-not have a policy set.
+      r"""Gets the access control policy for a database or backup resource.
+Returns an empty policy if a database or backup exists but does not have a
+policy set.
 
 Authorization requires `spanner.databases.getIamPolicy` permission on
 resource.
+For backups, authorization requires `spanner.backups.getIamPolicy`
+permission on resource.
 
       Args:
         request: (SpannerProjectsInstancesBackupsGetIamPolicyRequest) input message
@@ -292,11 +435,69 @@ resource.
         supports_download=False,
     )
 
+    def List(self, request, global_params=None):
+      r"""Lists completed and pending backups.
+Backups returned are ordered by `create_time` in descending order,
+starting from the most recent `create_time`.
+
+      Args:
+        request: (SpannerProjectsInstancesBackupsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListBackupsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/instances/{instancesId}/backups',
+        http_method=u'GET',
+        method_id=u'spanner.projects.instances.backups.list',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'filter', u'pageSize', u'pageToken'],
+        relative_path=u'v1/{+parent}/backups',
+        request_field='',
+        request_type_name=u'SpannerProjectsInstancesBackupsListRequest',
+        response_type_name=u'ListBackupsResponse',
+        supports_download=False,
+    )
+
+    def Patch(self, request, global_params=None):
+      r"""Updates a pending or completed Backup.
+
+      Args:
+        request: (SpannerProjectsInstancesBackupsPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Backup) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/instances/{instancesId}/backups/{backupsId}',
+        http_method=u'PATCH',
+        method_id=u'spanner.projects.instances.backups.patch',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[u'updateMask'],
+        relative_path=u'v1/{+name}',
+        request_field=u'backup',
+        request_type_name=u'SpannerProjectsInstancesBackupsPatchRequest',
+        response_type_name=u'Backup',
+        supports_download=False,
+    )
+
     def SetIamPolicy(self, request, global_params=None):
-      r"""Sets the access control policy on a database resource.
+      r"""Sets the access control policy on a database or backup resource.
 Replaces any existing policy.
 
 Authorization requires `spanner.databases.setIamPolicy`
+permission on resource.
+For backups, authorization requires `spanner.backups.setIamPolicy`
 permission on resource.
 
       Args:
@@ -324,12 +525,16 @@ permission on resource.
     )
 
     def TestIamPermissions(self, request, global_params=None):
-      r"""Returns permissions that the caller has on the specified database resource.
+      r"""Returns permissions that the caller has on the specified database or backup.
+resource.
 
 Attempting this RPC on a non-existent Cloud Spanner database will
 result in a NOT_FOUND error if the user has
 `spanner.databases.list` permission on the containing Cloud
 Spanner instance. Otherwise returns an empty set of permissions.
+Calling this method on a backup that does not exist will
+result in a NOT_FOUND error if the user has
+`spanner.backups.list` permission on the containing instance.
 
       Args:
         request: (SpannerProjectsInstancesBackupsTestIamPermissionsRequest) input message
@@ -352,6 +557,50 @@ Spanner instance. Otherwise returns an empty set of permissions.
         request_field=u'testIamPermissionsRequest',
         request_type_name=u'SpannerProjectsInstancesBackupsTestIamPermissionsRequest',
         response_type_name=u'TestIamPermissionsResponse',
+        supports_download=False,
+    )
+
+  class ProjectsInstancesDatabaseOperationsService(base_api.BaseApiService):
+    """Service class for the projects_instances_databaseOperations resource."""
+
+    _NAME = u'projects_instances_databaseOperations'
+
+    def __init__(self, client):
+      super(SpannerV1.ProjectsInstancesDatabaseOperationsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def List(self, request, global_params=None):
+      r"""Lists database longrunning-operations.
+A database operation has a name of the form
+`projects/<project>/instances/<instance>/databases/<database>/operations/<operation>`.
+The long-running operation
+metadata field type
+`metadata.type_url` describes the type of the metadata. Operations returned
+include those that have completed/failed/canceled within the last 7 days,
+and pending operations.
+
+      Args:
+        request: (SpannerProjectsInstancesDatabaseOperationsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListDatabaseOperationsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/instances/{instancesId}/databaseOperations',
+        http_method=u'GET',
+        method_id=u'spanner.projects.instances.databaseOperations.list',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'filter', u'pageSize', u'pageToken'],
+        relative_path=u'v1/{+parent}/databaseOperations',
+        request_field='',
+        request_type_name=u'SpannerProjectsInstancesDatabaseOperationsListRequest',
+        response_type_name=u'ListDatabaseOperationsResponse',
         supports_download=False,
     )
 
@@ -614,7 +863,7 @@ limit.
 
 Active sessions use additional server resources, so it is a good idea to
 delete idle and unneeded sessions.
-Aside from explicit deletes, Cloud Spanner can delete sessions for which no
+Aside from explicit deletes, Cloud Spanner may delete sessions for which no
 operations are sent for more than an hour. If a session is deleted,
 requests to it return `NOT_FOUND`.
 
@@ -1061,6 +1310,8 @@ Database, if successful.
 
     def DropDatabase(self, request, global_params=None):
       r"""Drops (aka deletes) a Cloud Spanner database.
+Completed backups for the database will be retained according to their
+`expire_time`.
 
       Args:
         request: (SpannerProjectsInstancesDatabasesDropDatabaseRequest) input message
@@ -1143,12 +1394,14 @@ be queried using the Operations API.
     )
 
     def GetIamPolicy(self, request, global_params=None):
-      r"""Gets the access control policy for a database resource.
-Returns an empty policy if a database exists but does
-not have a policy set.
+      r"""Gets the access control policy for a database or backup resource.
+Returns an empty policy if a database or backup exists but does not have a
+policy set.
 
 Authorization requires `spanner.databases.getIamPolicy` permission on
 resource.
+For backups, authorization requires `spanner.backups.getIamPolicy`
+permission on resource.
 
       Args:
         request: (SpannerProjectsInstancesDatabasesGetIamPolicyRequest) input message
@@ -1201,11 +1454,56 @@ resource.
         supports_download=False,
     )
 
+    def Restore(self, request, global_params=None):
+      r"""Create a new database by restoring from a completed backup. The new.
+database must be in the same project and in an instance with the same
+instance configuration as the instance containing
+the backup. The returned database long-running
+operation has a name of the format
+`projects/<project>/instances/<instance>/databases/<database>/operations/<operation_id>`,
+and can be used to track the progress of the operation, and to cancel it.
+The metadata field type is
+RestoreDatabaseMetadata.
+The response type
+is Database, if
+successful. Cancelling the returned operation will stop the restore and
+delete the database.
+There can be only one database being restored into an instance at a time.
+Once the restore operation completes, a new restore operation can be
+initiated, without waiting for the optimize operation associated with the
+first restore to complete.
+
+      Args:
+        request: (SpannerProjectsInstancesDatabasesRestoreRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Restore')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Restore.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/instances/{instancesId}/databases:restore',
+        http_method=u'POST',
+        method_id=u'spanner.projects.instances.databases.restore',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'v1/{+parent}/databases:restore',
+        request_field=u'restoreDatabaseRequest',
+        request_type_name=u'SpannerProjectsInstancesDatabasesRestoreRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
     def SetIamPolicy(self, request, global_params=None):
-      r"""Sets the access control policy on a database resource.
+      r"""Sets the access control policy on a database or backup resource.
 Replaces any existing policy.
 
 Authorization requires `spanner.databases.setIamPolicy`
+permission on resource.
+For backups, authorization requires `spanner.backups.setIamPolicy`
 permission on resource.
 
       Args:
@@ -1233,12 +1531,16 @@ permission on resource.
     )
 
     def TestIamPermissions(self, request, global_params=None):
-      r"""Returns permissions that the caller has on the specified database resource.
+      r"""Returns permissions that the caller has on the specified database or backup.
+resource.
 
 Attempting this RPC on a non-existent Cloud Spanner database will
 result in a NOT_FOUND error if the user has
 `spanner.databases.list` permission on the containing Cloud
 Spanner instance. Otherwise returns an empty set of permissions.
+Calling this method on a backup that does not exist will
+result in a NOT_FOUND error if the user has
+`spanner.backups.list` permission on the containing instance.
 
       Args:
         request: (SpannerProjectsInstancesDatabasesTestIamPermissionsRequest) input message
@@ -1564,7 +1866,7 @@ Soon afterward:
         method_id=u'spanner.projects.instances.get',
         ordered_params=[u'name'],
         path_params=[u'name'],
-        query_params=[],
+        query_params=[u'fieldMask'],
         relative_path=u'v1/{+name}',
         request_field='',
         request_type_name=u'SpannerProjectsInstancesGetRequest',

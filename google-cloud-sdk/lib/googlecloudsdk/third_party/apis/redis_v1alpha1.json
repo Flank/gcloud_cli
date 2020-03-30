@@ -17,6 +17,7 @@
   "documentationLink": "https://cloud.google.com/memorystore/docs/redis/",
   "protocol": "rest",
   "rootUrl": "https://redis.googleapis.com/",
+  "mtlsRootUrl": "https://redis.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://redis.googleapis.com/",
   "batchPath": "batch",
@@ -337,6 +338,31 @@
         },
         "persistenceIamIdentity": {
           "description": "Output only. Cloud IAM identity used by import \/ export operations to\ntransfer data to\/from Cloud Storage. Format is\n\"serviceAccount:<service_account_email>\". The value may change over time\nfor a given instance so should be checked before each import\/export\noperation.",
+          "type": "string"
+        },
+        "connectMode": {
+          "description": "Optional. The connect mode of Redis instance.\nIf not provided, default one will be used.\nCurrent default: DIRECT_PEERING.",
+          "enumDescriptions": [
+            "Not set.",
+            "Connect via directly peering with memorystore redis hosted service.",
+            "Connect with google via private service access and share connection\nacross google managed services."
+          ],
+          "type": "string",
+          "enum": [
+            "CONNECT_MODE_UNSPECIFIED",
+            "DIRECT_PEERING",
+            "PRIVATE_SERVICE_ACCESS"
+          ]
+        }
+      }
+    },
+    "UpgradeInstanceRequest": {
+      "id": "UpgradeInstanceRequest",
+      "description": "Request for UpgradeInstance.",
+      "type": "object",
+      "properties": {
+        "redisVersion": {
+          "description": "Required. Specifies the target version of Redis software to upgrade to.",
           "type": "string"
         }
       }
@@ -841,6 +867,34 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Updates the metadata and configuration of a specific Redis instance."
+                },
+                "upgrade": {
+                  "id": "redis.projects.locations.instances.upgrade",
+                  "path": "v1alpha1/{+name}:upgrade",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/instances/{instancesId}:upgrade",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Redis instance resource name using the form:\n    `projects\/{project_id}\/locations\/{location_id}\/instances\/{instance_id}`\nwhere `location_id` refers to a GCP region.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/instances\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "UpgradeInstanceRequest"
+                  },
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Upgrades Redis instance to the newer Redis version specified in the\nrequest."
                 },
                 "import": {
                   "id": "redis.projects.locations.instances.import",

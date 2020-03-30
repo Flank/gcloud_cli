@@ -6,8 +6,7 @@ summary:
 - execute:
   - label: Base Case
   - command: |
-      compute tpus create mytpu --range 10.20.10.0/29 --version 1.6
-      --network my-tf-network
+      compute tpus create mytpu --version 1.6
   - stderr: |
       Create request issued for: [mytpu]
   - progress_tracker:
@@ -62,8 +61,7 @@ actions:
 - execute_command:
     label: Base Case
     command: |
-      compute tpus create mytpu --range 10.20.10.0/29 --version 1.6
-      --network my-tf-network
+      compute tpus create mytpu --version 1.6
     events:
     - api_call:
         expect_request:
@@ -73,8 +71,7 @@ actions:
             json:
               tensorflowVersion: '1.6'
               acceleratorType: v2-8
-              network: my-tf-network
-              cidrBlock: 10.20.10.0/29
+              network: default
               schedulingConfig:
                 preemptible: false
         return_response:
@@ -84,8 +81,7 @@ actions:
             response:
               tensorflowVersion: '1.6'
               acceleratorType: v2-8
-              network: my-tf-network
-              cidrBlock: 10.20.10.0/29
+              network: default
               schedulingConfig:
                 preemptible: false
             done: true
@@ -106,8 +102,7 @@ actions:
             response:
               tensorflowVersion: '1.6'
               acceleratorType: v2-8
-              network: my-tf-network
-              cidrBlock: 10.20.10.0/29
+              network: default
               schedulingConfig:
                 preemptible: false
             done: true

@@ -11,7 +11,7 @@ gcloud beta compute disks create \- create Google Compute Engine persistent disk
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR;\ default="4096"] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-erase\-windows\-vss\-signature\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR;\ default="4096"] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -62,6 +62,12 @@ more details.
 An optional, textual description for the disks being created.
 
 .TP 2m
+\fB\-\-erase\-windows\-vss\-signature\fR
+Specifies whether the disk restored from a source snapshot should erase Windows
+specific VSS signature. See
+https://cloud.google.com/sdk/gcloud/reference/compute/disks/snapshot#\-\-guest\-flush
+
+.TP 2m
 \fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]
 This parameter enables one or more features for VM instances that use the image
 for their boot disks. The following features are available:
@@ -69,10 +75,6 @@ for their boot disks. The following features are available:
 .RS 2m
 .IP "\(em" 2m
 MULTI_IP_SUBNET \- For configuring interfaces with a netmask other than /32.
-
-.IP "\(em" 2m
-SECURE_BOOT \- Enables UEFI secure boot, which restrics unsigned software from
-booting or unsigned drivers from loading on the VM instance.
 
 .IP "\(em" 2m
 UEFI_COMPATIBLE \- Enables UEFI booting, which is an alternative system boot
@@ -98,7 +100,7 @@ server include the WINDOWS parameter to indicate that it is a Windows image.
 .RE
 .RE
 .sp
-\fIGUEST_OS_FEATURE\fR must be one of: \fBMULTI_IP_SUBNET\fR, \fBSECURE_BOOT\fR,
+\fIGUEST_OS_FEATURE\fR must be one of: \fBMULTI_IP_SUBNET\fR,
 \fBUEFI_COMPATIBLE\fR, \fBVIRTIO_SCSI_MULTIQUEUE\fR, \fBWINDOWS\fR, \fBGVNIC\fR.
 
 .RS 2m
@@ -312,8 +314,9 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

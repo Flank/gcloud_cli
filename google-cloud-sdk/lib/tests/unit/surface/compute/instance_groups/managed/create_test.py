@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -205,234 +206,6 @@ class _InstanceGroupManagersCreateRegionalWithAutohealingTestBase(
     )
 
 
-class _InstanceGroupManagersCreateRegionalWithZoneSelectionTestBase(object):
-
-  def _ZoneUrl(self, zone):
-    return '{}/projects/my-project/zones/{}'.format(self.compute_uri, zone)
-
-  def testWithUnaffixedZone(self):
-    self.Run("""
-        compute instance-groups managed create group-1
-          --zones us-central2-a
-          --template template-1
-          --size 3
-        """)
-
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers, 'Insert',
-          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
-              instanceGroupManager=self.messages.InstanceGroupManager(
-                  name='group-1',
-                  region=self.region_uri,
-                  baseInstanceName='group-1',
-                  instanceTemplate=self.template_1_uri,
-                  targetSize=3,
-                  distributionPolicy=self.messages.DistributionPolicy(zones=[
-                      self.messages.DistributionPolicyZoneConfiguration(
-                          zone=self._ZoneUrl('us-central2-a')),
-                  ])),
-              project='my-project',
-              region='us-central2'))],
-        self.region_ig_list_request,
-        self.region_as_list_request,
-    )
-
-  def testWithUnaffixedZoneByUrl(self):
-    self.Run("""
-        compute instance-groups managed create group-1
-          --zones {}/projects/my-project/zones/us-central2-a
-          --template template-1
-          --size 3
-        """.format(self.compute_uri))
-
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers, 'Insert',
-          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
-              instanceGroupManager=self.messages.InstanceGroupManager(
-                  name='group-1',
-                  region=self.region_uri,
-                  baseInstanceName='group-1',
-                  instanceTemplate=self.template_1_uri,
-                  targetSize=3,
-                  distributionPolicy=self.messages.DistributionPolicy(zones=[
-                      self.messages.DistributionPolicyZoneConfiguration(
-                          zone=self._ZoneUrl('us-central2-a')),
-                  ])),
-              project='my-project',
-              region='us-central2'))],
-        self.region_ig_list_request,
-        self.region_as_list_request,
-    )
-
-  def testWithSelectedZones(self):
-    self.Run("""
-        compute instance-groups managed create group-1
-          --zones us-central2-a,us-central2-b
-          --template template-1
-          --size 3
-        """)
-
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers, 'Insert',
-          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
-              instanceGroupManager=self.messages.InstanceGroupManager(
-                  name='group-1',
-                  region=self.region_uri,
-                  baseInstanceName='group-1',
-                  instanceTemplate=self.template_1_uri,
-                  targetSize=3,
-                  distributionPolicy=self.messages.DistributionPolicy(zones=[
-                      self.messages.DistributionPolicyZoneConfiguration(
-                          zone=self._ZoneUrl('us-central2-a')),
-                      self.messages.DistributionPolicyZoneConfiguration(
-                          zone=self._ZoneUrl('us-central2-b')),
-                  ])),
-              project='my-project',
-              region='us-central2'))],
-        self.region_ig_list_request,
-        self.region_as_list_request,
-    )
-
-  def testWithSelectedZonesAndRegion(self):
-    self.Run("""
-        compute instance-groups managed create group-1
-          --zones us-central2-a,us-central2-b
-          --region us-central2
-          --template template-1
-          --size 3
-        """)
-
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers, 'Insert',
-          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
-              instanceGroupManager=self.messages.InstanceGroupManager(
-                  name='group-1',
-                  region=self.region_uri,
-                  baseInstanceName='group-1',
-                  instanceTemplate=self.template_1_uri,
-                  targetSize=3,
-                  distributionPolicy=self.messages.DistributionPolicy(zones=[
-                      self.messages.DistributionPolicyZoneConfiguration(
-                          zone=self._ZoneUrl('us-central2-a')),
-                      self.messages.DistributionPolicyZoneConfiguration(
-                          zone=self._ZoneUrl('us-central2-b')),
-                  ])),
-              project='my-project',
-              region='us-central2'))],
-        self.region_ig_list_request,
-        self.region_as_list_request,
-    )
-
-  def testWithSelectedZonesAndRegionByUri(self):
-    self.Run("""
-        compute instance-groups managed create group-1
-          --zones us-central2-a,us-central2-b
-          --region {}/projects/my-project/regions/us-central2
-          --template template-1
-          --size 3
-        """.format(self.compute_uri))
-
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers, 'Insert',
-          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
-              instanceGroupManager=self.messages.InstanceGroupManager(
-                  name='group-1',
-                  region=self.region_uri,
-                  baseInstanceName='group-1',
-                  instanceTemplate=self.template_1_uri,
-                  targetSize=3,
-                  distributionPolicy=self.messages.DistributionPolicy(zones=[
-                      self.messages.DistributionPolicyZoneConfiguration(
-                          zone=self._ZoneUrl('us-central2-a')),
-                      self.messages.DistributionPolicyZoneConfiguration(
-                          zone=self._ZoneUrl('us-central2-b')),
-                  ])),
-              project='my-project',
-              region='us-central2'))],
-        self.region_ig_list_request,
-        self.region_as_list_request,
-    )
-
-  def testRegionZonesConflict(self):
-    with self.assertRaises(exceptions.InvalidArgumentException):
-      self.Run("""
-        compute instance-groups managed create group-1
-          --zones us-central1-a
-          --region us-central2
-          --template template-1
-          --size 3
-        """)
-
-  def testZonesZoneConflict(self):
-    with self.assertRaises(exceptions.ConflictingArgumentsException):
-      self.Run("""
-        compute instance-groups managed create group-1
-          --zone us-central1-a
-          --zones us-central1-a,us-central1-b
-          --template template-1
-          --size 3
-        """)
-
-  def testZonesFromDifferentRegions(self):
-    with self.assertRaises(exceptions.InvalidArgumentException):
-      self.Run("""
-        compute instance-groups managed create group-1
-          --zones us-central1-a,us-central2-b
-          --template template-1
-          --size 3
-        """)
-
-
-class _InstanceGroupManagersCreateRegionalWithRedistributionTypeTestBase(
-    object):
-
-  def testCreateSimple(self):
-    self.Run("""
-        compute instance-groups managed create group-1
-          --region us-central2
-          --template template-1
-          --size 1
-          --instance-redistribution-type proactive
-        """)
-
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers, 'Insert',
-          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
-              instanceGroupManager=self.messages.InstanceGroupManager(
-                  name='group-1',
-                  region=self.region_uri,
-                  baseInstanceName='group-1',
-                  instanceTemplate=self.template_1_uri,
-                  targetSize=1,
-                  updatePolicy=self.messages.InstanceGroupManagerUpdatePolicy(
-                      instanceRedistributionType=self.messages
-                      .InstanceGroupManagerUpdatePolicy
-                      .InstanceRedistributionTypeValueValuesEnum.PROACTIVE)),
-              project='my-project',
-              region='us-central2'))],
-        self.region_ig_list_request,
-        self.region_as_list_request,
-    )
-
-  def testCreateForZonalScope(self):
-    self.make_requests.side_effect = iter([
-        [
-            self.messages.Zone(name='us-central2-a'),
-        ],
-    ])
-    with self.assertRaisesRegex(
-        exceptions.InvalidArgumentException,
-        'Flag --instance-redistribution-type may be specified for regional '
-        'managed instance groups only.'):
-      self.Run("""
-          compute instance-groups managed create group-1
-            --zone us-central2-a
-            --template template-1
-            --size 1
-            --instance-redistribution-type proactive
-          """)
-
-
 class _InstanceGroupManagersCreateZonalWithStatefulTestBase(object):
 
   def _CheckInsertRequestWithStateful(self, stateful_policy=None):
@@ -453,9 +226,7 @@ class _InstanceGroupManagersCreateZonalWithStatefulTestBase(object):
         self.zone_as_list_request,
     )
 
-  def _MakePreservedStateDisksMapEntry(self,
-                                       device_name,
-                                       auto_delete_str='never'):
+  def _MakePreservedStateDisksMapEntry(self, device_name, auto_delete=None):
     auto_delete_map = {
         'never':
             self.messages.StatefulPolicyPreservedStateDiskDevice
@@ -464,13 +235,14 @@ class _InstanceGroupManagersCreateZonalWithStatefulTestBase(object):
             self.messages.StatefulPolicyPreservedStateDiskDevice
             .AutoDeleteValueValuesEnum.ON_PERMANENT_INSTANCE_DELETION
     }
-    return self.messages.StatefulPolicyPreservedState \
-        .DisksValue.AdditionalProperty(
+    disk_device_map_entry = (
+        self.messages.StatefulPolicyPreservedState.DisksValue
+        .AdditionalProperty(
             key=device_name,
-            value=self.messages.StatefulPolicyPreservedStateDiskDevice(
-                autoDelete=auto_delete_map[auto_delete_str]
-            )
-        )
+            value=self.messages.StatefulPolicyPreservedStateDiskDevice()))
+    if auto_delete:
+      disk_device_map_entry.value.autoDelete = auto_delete_map[auto_delete]
+    return disk_device_map_entry
 
   def testStatefulDisk(self):
     self.Run("""
@@ -832,6 +604,7 @@ class InstanceGroupManagersCreateZonalTestGA(
 
 
 class InstanceGroupManagersCreateZonalTestBeta(
+    _InstanceGroupManagersCreateZonalWithStatefulTestBase,
     InstanceGroupManagersCreateZonalTestGA):
 
   def PreSetUp(self):
@@ -842,7 +615,6 @@ class InstanceGroupManagersCreateZonalTestBeta(
 
 
 class InstanceGroupManagersCreateZonalTestAlpha(
-    _InstanceGroupManagersCreateZonalWithStatefulTestBase,
     InstanceGroupManagersCreateZonalTestBeta):
 
   def PreSetUp(self):
@@ -1279,11 +1051,56 @@ class InstanceGroupManagersCreateRegionalTestGA(
           --size 3
         """)
 
+  def testCreateSimple(self):
+    self.Run("""
+        compute instance-groups managed create group-1
+          --region us-central2
+          --template template-1
+          --size 1
+          --instance-redistribution-type proactive
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionInstanceGroupManagers, 'Insert',
+          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
+              instanceGroupManager=self.messages.InstanceGroupManager(
+                  name='group-1',
+                  region=self.region_uri,
+                  baseInstanceName='group-1',
+                  instanceTemplate=self.template_1_uri,
+                  targetSize=1,
+                  updatePolicy=self.messages.InstanceGroupManagerUpdatePolicy(
+                      instanceRedistributionType=self.messages
+                      .InstanceGroupManagerUpdatePolicy
+                      .InstanceRedistributionTypeValueValuesEnum.PROACTIVE)),
+              project='my-project',
+              region='us-central2'))],
+        self.region_ig_list_request,
+        self.region_as_list_request,
+    )
+
+  def testCreateForZonalScope(self):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.Zone(name='us-central2-a'),
+        ],
+    ])
+    with self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        'Flag --instance-redistribution-type may be specified for regional '
+        'managed instance groups only.'):
+      self.Run("""
+          compute instance-groups managed create group-1
+            --zone us-central2-a
+            --template template-1
+            --size 1
+            --instance-redistribution-type proactive
+          """)
+
 
 class InstanceGroupManagersCreateRegionalTestBeta(
-    _InstanceGroupManagersCreateRegionalWithZoneSelectionTestBase,
-    _InstanceGroupManagersCreateRegionalWithRedistributionTypeTestBase,
-    InstanceGroupManagersCreateRegionalTestGA):
+    _InstanceGroupManagersCreateRegionalWithStatefulTestBase,
+    InstanceGroupManagersCreateRegionalTestGA, parameterized.TestCase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
@@ -1293,7 +1110,6 @@ class InstanceGroupManagersCreateRegionalTestBeta(
 
 
 class InstanceGroupManagersCreateRegionalTestAlpha(
-    _InstanceGroupManagersCreateRegionalWithStatefulTestBase,
     InstanceGroupManagersCreateRegionalTestBeta):
 
   def PreSetUp(self):
@@ -1301,6 +1117,53 @@ class InstanceGroupManagersCreateRegionalTestAlpha(
 
   def SetUp(self):
     self._SetUpRegional('alpha')
+
+  @parameterized.named_parameters(('Any', 'ANY'), ('Even', 'EVEN'))
+  def testCreateWithDistributionTargetShape(self, target_shape):
+    self.Run("""
+        compute instance-groups managed create group-1
+          --region us-central2
+          --template template-1
+          --size 1
+          --target-distribution-shape {target_shape}
+        """.format(target_shape=target_shape))
+
+    self.CheckRequests(
+        [(self.compute.regionInstanceGroupManagers, 'Insert',
+          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
+              instanceGroupManager=self.messages.InstanceGroupManager(
+                  name='group-1',
+                  region=self.region_uri,
+                  baseInstanceName='group-1',
+                  instanceTemplate=self.template_1_uri,
+                  targetSize=1,
+                  distributionPolicy=self.messages.DistributionPolicy(
+                      targetShape=(self.messages.DistributionPolicy
+                                   .TargetShapeValueValuesEnum)(target_shape))),
+              project='my-project',
+              region='us-central2'))],
+        self.region_ig_list_request,
+        self.region_as_list_request,
+    )
+
+  @parameterized.named_parameters(('Any', 'ANY'), ('Even', 'EVEN'))
+  def testCreateForZonalScopeWithDistributionTargetShape(self, target_shape):
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.Zone(name='us-central2-a'),
+        ],
+    ])
+    with self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        'Flag --target-distribution-shape may be specified for regional managed instance '
+        'groups only.'):
+      self.Run("""
+          compute instance-groups managed create group-1
+            --zone us-central2-a
+            --template template-1
+            --size 1
+            --target-distribution-shape {target_shape}
+        """.format(target_shape=target_shape))
 
 
 if __name__ == '__main__':

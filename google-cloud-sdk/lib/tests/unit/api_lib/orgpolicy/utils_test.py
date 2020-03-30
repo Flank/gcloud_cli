@@ -189,6 +189,5 @@ class UtilsTest(test_base.OrgPolicyUnitTestBase, parameterized.TestCase):
     self.assertEqual(rule.condition.expression, self.CONDITION_EXPRESSION_A)
     self.assertEqual(returned_policy, updated_policy)
 
-
 if __name__ == '__main__':
   test_case.main()

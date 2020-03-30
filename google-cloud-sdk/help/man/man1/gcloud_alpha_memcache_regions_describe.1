@@ -1,0 +1,95 @@
+
+.TH "GCLOUD_ALPHA_MEMCACHE_REGIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha memcache regions describe \- show metadata for a Memorystore Memcached region
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha memcache regions describe\fR \fIREGION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Display all metadata associated with a Memorystore Memcached
+region given a valid region name.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The region specified does not exist.
+.IP "\(bu" 2m
+The active account does not have permission to access the given region.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Region resource \- Arguments and flags that specify the Memorystore Memcached
+region you want to describe. This represents a Cloud resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [region] on the command
+line with a fully specified name; provide the argument [\-\-project] on the
+command line; set the property [core/project]. This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIREGION\fR
+ID of the region or fully qualified identifier for the region.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBmemcache/v1beta2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/memorystore/
+
+
+
+.SH "EXAMPLES"
+
+The following command prints metadata for the region \f5us\-central1\fR
+
+.RS 2m
+$ gcloud alpha memcache regions describe us\-central1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta memcache regions describe
+.RE
+

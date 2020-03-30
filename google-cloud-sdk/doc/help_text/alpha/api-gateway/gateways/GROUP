@@ -1,0 +1,45 @@
+NAME
+    gcloud alpha api-gateway gateways - manage Cloud API Gateway Gateways
+
+SYNOPSIS
+    gcloud alpha api-gateway gateways COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands for managing Cloud API Gateway Gateways.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a new gateway.
+
+     delete
+        (ALPHA) Delete an API Gateway.
+
+     describe
+        (ALPHA) Show details about a specific gateway.
+
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a gateway.
+
+     list
+        (ALPHA) List API Gateways.
+
+     update
+        (ALPHA) Update an API Gateway.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

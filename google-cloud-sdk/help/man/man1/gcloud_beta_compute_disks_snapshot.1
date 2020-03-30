@@ -92,7 +92,11 @@ gcloud beta compute disks snapshot my\-disk\-1 my\-disk\-2 my\-disk\-3 \-\-snaps
 .RE
 
 will result in \f5my\-disk\-1\fR being snapshotted as \f5snapshot\-1\fR,
-\f5my\-disk\-2\fR as \f5snapshot\-2\fR, and so on.
+\f5my\-disk\-2\fR as \f5snapshot\-2\fR, and so on. The name must match the
+\f5(?:[a\-z](?:[\-a\-z0\-9]{0,61}[a\-z0\-9])?)\fR regular expression, which
+means it must start with an alphabetic character followed by one or more
+alphanumeric characters or dashes. The name must not exceed 63 characters and
+must not contain special symbols. All characters must be lowercase.
 
 .TP 2m
 \fB\-\-storage\-location\fR=\fILOCATION\fR
@@ -170,8 +174,9 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

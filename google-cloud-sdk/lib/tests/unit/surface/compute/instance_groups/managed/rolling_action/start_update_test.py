@@ -460,6 +460,20 @@ class InstanceGroupManagersUpdateInstancesZonalTest(test_base.BaseTest):
           '--force --max-surge 101% --version template={1} '
           '--zone {2}'.format(self.IGM_NAME_A, self.TEMPLATE_D_NAME, self.ZONE))
 
+  def testReplacementMethod(self):
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
+    self.Run('compute instance-groups managed rolling-action start-update {0} '
+             '--version template={1} --zone {2} --replacement-method recreate'
+             .format(self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.ZONE))
+
+    get_request = self.generateGetRequestStub(self.IGM_NAME_A)
+    update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
+    (update_request.instanceGroupManagerResource.updatePolicy.replacementMethod
+    ) = (
+        self.messages.InstanceGroupManagerUpdatePolicy
+        .ReplacementMethodValueValuesEnum.RECREATE)
+    self.checkUpdateRequest(get_request, update_request)
+
   def testOneVersionTooMuchUnavailableFail(self):
     with self.AssertRaisesToolExceptionMatches(
         'Invalid value for [--max-unavailable]: percentage cannot be higher '
@@ -714,6 +728,54 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(
   def testTwoVersions(self):
     self.doTestTwoVersions(with_min_ready=True)
 
+  def testReplaceIgmWithStatefulPolicy(self):
+    igm = test_resources.MakeStatefulInstanceGroupManager(
+        self.api_version, self.ZONE)
+    self.make_requests.side_effect = iter([[igm], [], []])
+    self.Run('compute instance-groups managed rolling-action start-update {0} '
+             '--version template={1} --zone {2} --max-unavailable 1'
+             .format(igm.name, self.TEMPLATE_B_NAME, self.ZONE))
+
+    get_request = self.generateGetRequestStub(igm.name)
+    update_request = self.generateUpdateRequestStub(igm.name)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
+    ) = self.FixedOrPercent(fixed=1)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxSurge
+    ) = self.FixedOrPercent(fixed=0)
+    (update_request.instanceGroupManagerResource.updatePolicy.minimalAction
+    ) = self.MinimalActionValueValuesEnum.REPLACE
+    (update_request.instanceGroupManagerResource.updatePolicy.replacementMethod
+    ) = (
+        self.messages.InstanceGroupManagerUpdatePolicy
+        .ReplacementMethodValueValuesEnum.RECREATE)
+    (update_request.instanceGroupManagerResource.versions[0].instanceTemplate
+    ) = self.TEMPLATE_B_NAME
+    self.checkUpdateRequest(get_request, update_request)
+
+  def testReplaceIgmWithPerInstanceConfigs(self):
+    pics = self.messages.InstanceGroupManagersListPerInstanceConfigsResp(
+        items=[self.messages.PerInstanceConfig(name='instance123')])
+    self.make_requests.side_effect = iter([[self.igms[0]], [pics], []])
+    self.Run('compute instance-groups managed rolling-action start-update {0} '
+             '--version template={1} --zone {2} --max-unavailable 1'
+             .format(self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.ZONE))
+
+    get_request = self.generateGetRequestStub(self.IGM_NAME_A)
+    update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
+    ) = self.FixedOrPercent(fixed=1)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxSurge
+    ) = self.FixedOrPercent(fixed=0)
+    (update_request.instanceGroupManagerResource.updatePolicy.minimalAction
+    ) = self.MinimalActionValueValuesEnum.REPLACE
+    (update_request.instanceGroupManagerResource.updatePolicy.replacementMethod
+    ) = (
+        self.messages.InstanceGroupManagerUpdatePolicy
+        .ReplacementMethodValueValuesEnum.RECREATE)
+    (update_request.instanceGroupManagerResource.versions[0].instanceTemplate
+    ) = self.TEMPLATE_B_NAME
+    self.checkUpdateRequest(get_request, update_request)
+
 
 class InstanceGroupManagersUpdateInstancesBetaRegionalTest(
     InstanceGroupManagersUpdateInstancesRegionalTest):
@@ -737,65 +799,6 @@ class InstanceGroupManagersUpdateInstancesAlphaZonalTest(
     self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.should_list_per_instance_configs = True
-
-  def testReplacementMethod(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
-    self.Run('compute instance-groups managed rolling-action start-update {0} '
-             '--version template={1} --zone {2} --replacement-method recreate'
-             .format(self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.ZONE))
-
-    get_request = self.generateGetRequestStub(self.IGM_NAME_A)
-    update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
-    (update_request.instanceGroupManagerResource.updatePolicy.replacementMethod
-    ) = (self.messages.InstanceGroupManagerUpdatePolicy.
-         ReplacementMethodValueValuesEnum.RECREATE)
-    self.checkUpdateRequest(get_request, update_request)
-
-  def testReplaceIgmWithStatefulPolicy(self):
-    igm = test_resources.MakeStatefulInstanceGroupManager(
-        self.api_version, self.ZONE)
-    self.make_requests.side_effect = iter([[igm], [], []])
-    self.Run('compute instance-groups managed rolling-action start-update {0} '
-             '--version template={1} --zone {2} --max-unavailable 1'
-             .format(igm.name, self.TEMPLATE_B_NAME, self.ZONE))
-
-    get_request = self.generateGetRequestStub(igm.name)
-    update_request = self.generateUpdateRequestStub(igm.name)
-    (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
-    ) = self.FixedOrPercent(fixed=1)
-    (update_request.instanceGroupManagerResource.updatePolicy.maxSurge
-    ) = self.FixedOrPercent(fixed=0)
-    (update_request.instanceGroupManagerResource.updatePolicy.minimalAction
-    ) = self.MinimalActionValueValuesEnum.REPLACE
-    (update_request.instanceGroupManagerResource.updatePolicy.replacementMethod
-    ) = (self.messages.InstanceGroupManagerUpdatePolicy.
-         ReplacementMethodValueValuesEnum.RECREATE)
-    (update_request.instanceGroupManagerResource.versions[0].instanceTemplate
-    ) = self.TEMPLATE_B_NAME
-    self.checkUpdateRequest(get_request, update_request)
-
-  def testReplaceIgmWithPerInstanceConfigs(self):
-    pics = self.messages.InstanceGroupManagersListPerInstanceConfigsResp(
-        items=[self.messages.PerInstanceConfig(name='instance123')])
-    self.make_requests.side_effect = iter([[self.igms[0]], [pics], []])
-    self.Run('compute instance-groups managed rolling-action start-update {0} '
-             '--version template={1} --zone {2} --max-unavailable 1'
-             .format(self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.ZONE))
-
-    get_request = self.generateGetRequestStub(self.IGM_NAME_A)
-    update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
-    (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
-    ) = self.FixedOrPercent(fixed=1)
-    (update_request.instanceGroupManagerResource.updatePolicy.maxSurge
-    ) = self.FixedOrPercent(fixed=0)
-    (update_request.instanceGroupManagerResource.updatePolicy.minimalAction
-    ) = self.MinimalActionValueValuesEnum.REPLACE
-    (update_request.instanceGroupManagerResource.updatePolicy.replacementMethod
-    ) = (self.messages.InstanceGroupManagerUpdatePolicy.
-         ReplacementMethodValueValuesEnum.RECREATE)
-    (update_request.instanceGroupManagerResource.versions[0].instanceTemplate
-    ) = self.TEMPLATE_B_NAME
-    self.checkUpdateRequest(get_request, update_request)
 
 
 class InstanceGroupManagersUpdateInstancesAlphaRegionalTest(

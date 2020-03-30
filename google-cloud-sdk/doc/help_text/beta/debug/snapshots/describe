@@ -1,15 +1,17 @@
 NAME
-    gcloud beta debug snapshots describe - describe debug snapshots
+    gcloud beta debug snapshots describe - describe the debug snapshots for a
+        Cloud Debugger debug target (debuggee)
 
 SYNOPSIS
     gcloud beta debug snapshots describe [ID ...] [--location=LOCATION-REGEXP]
         [--target=(ID|DESCRIPTION_REGEXP)] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) This command describes debug snapshots for a Cloud Debugger debug
-    target. If the snapshot has been completed, the output will include details
-    on the stack trace and local variables, stored in a compact form which is
-    primarily intended to be machine-readable rather than human-readable.
+    (BETA) gcloud beta debug snapshots describe is used to describe the debug
+    snapshots for a Cloud Debugger debug target (debuggee). If the snapshot has
+    completed, the output will include details on the stack trace and local
+    variables, stored in a compact form which is primarily intended to be
+    machine-readable rather than human-readable.
 
 POSITIONAL ARGUMENTS
      [ID ...]
@@ -38,8 +40,21 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To describe the debug snapshots for snapshots with IDs 'ID1' and 'ID2' of
+    the debug target (debuggee), run:
+
+        $ gcloud beta debug snapshots describe ID1 ID2 --target=<debuggee_id>
+
+    To describe all active snapshots in file main.py of the debug target
+    (debuggee), run:
+
+        $ gcloud beta debug snapshots describe --target=<debuggee_id> \
+            --location="main.py:.*"
 
 NOTES
     This command is currently in BETA and may change without notice. This

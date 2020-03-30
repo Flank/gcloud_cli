@@ -79,6 +79,8 @@ def AddResourceFlagsToParser(parser):
       help_text_to_overwrite='Project ID.').AddToParser(resource_group)
 
 
+# TODO (b/138656127): One aliasing is implemented for all commands that take in
+# --condition, update this documentation to reflect the newly available input.
 def AddConditionFlagToParser(parser):
   """Adds flag for the condition to the parser.
 
@@ -90,6 +92,9 @@ def AddConditionFlagToParser(parser):
       metavar='CONDITION',
       help=(
           'Condition expression for filtering the resources the policy applies '
-          'to. At the moment, the only allowed syntax for a condition is '
+          'to. The standard syntax for a condition is '
           '\'resource.matchLabels("labelKeys/{label_key_id}", "labelValues/{label_value_id}")\'.'
+          'By using the --label-parent flag you may use the display names for '
+          'LabelKey and LabelValue with syntax '
+          '\'resource.matchLabels("{label_key_display_name}", "{label_value_display_name}")\'.'
       ))

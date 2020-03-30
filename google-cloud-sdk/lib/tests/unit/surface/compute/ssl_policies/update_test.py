@@ -58,7 +58,7 @@ class SslPolicyUpdateGATest(ssl_policies_test_base.SslPoliciesTestBase):
 
     self.ExpectGetRequest(ssl_policy_ref, existing_ssl_policy)
     self.ExpectPatchRequest(ssl_policy_ref, patch_ssl_policy, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(ssl_policy_ref, updated_ssl_policy)
 
     response = self.Run('compute ssl-policies update {} --profile {}'.format(
@@ -99,7 +99,7 @@ class SslPolicyUpdateGATest(ssl_policies_test_base.SslPoliciesTestBase):
 
     self.ExpectGetRequest(ssl_policy_ref, existing_ssl_policy)
     self.ExpectPatchRequest(ssl_policy_ref, patch_ssl_policy, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(ssl_policy_ref, updated_ssl_policy)
 
     response = self.Run('compute ssl-policies update {} --profile {} '
@@ -139,7 +139,7 @@ class SslPolicyUpdateGATest(ssl_policies_test_base.SslPoliciesTestBase):
 
     self.ExpectGetRequest(ssl_policy_ref, existing_ssl_policy)
     self.ExpectPatchRequest(ssl_policy_ref, patch_ssl_policy, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(ssl_policy_ref, updated_ssl_policy)
 
     response = self.Run('compute ssl-policies update {} --profile {}'.format(
@@ -172,7 +172,7 @@ class SslPolicyUpdateGATest(ssl_policies_test_base.SslPoliciesTestBase):
 
     self.ExpectGetRequest(ssl_policy_ref, existing_ssl_policy)
     self.ExpectPatchRequest(ssl_policy_ref, patch_ssl_policy, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(ssl_policy_ref, updated_ssl_policy)
 
     response = self.Run('compute ssl-policies update {} '

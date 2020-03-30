@@ -19,8 +19,8 @@ SYNOPSIS
           | --clear-authorized-networks]
         [--clear-database-flags | --database-flags=FLAG=VALUE,[FLAG=VALUE,...]]
         [--gce-zone=GCE_ZONE | --zone=ZONE]
-        [--no-backup | --backup-start-time=BACKUP_START_TIME]
-        [GCLOUD_WIDE_FLAG ...]
+        [--no-backup | --backup-location=BACKUP_LOCATION
+          --backup-start-time=BACKUP_START_TIME] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Updates the settings of a Cloud SQL instance.
@@ -147,10 +147,6 @@ FLAGS
         https://cloud.google.com/sql/pricing. WARNING: Instance will be
         restarted.
 
-        IMPORTANT: First Generation instances are deprecated. If you're
-        considering any First Generation tiers, we recommend using Second
-        Generation instead.
-
      At most one of these may be specified:
 
        --authorized-gae-apps=APP,[APP,...]
@@ -209,6 +205,11 @@ FLAGS
        --no-backup
           Specified if daily backup should be disabled.
 
+       --backup-location=BACKUP_LOCATION
+          Choose where to store your backups. Backups are stored in the closest
+          multi-region location to you by default. Only customize if needed.
+          Specify empty string to revert to default.
+
        --backup-start-time=BACKUP_START_TIME
           Start time of daily backups, specified in the 24 hour format - HH:MM,
           in the UTC timezone.
@@ -217,8 +218,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     These variants are also available:

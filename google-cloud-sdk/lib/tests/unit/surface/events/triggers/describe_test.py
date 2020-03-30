@@ -38,7 +38,7 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
             self.mock_crd_client, 'fake-project'))
     self.source_crd.spec.names = (
         self.crd_messages.CustomResourceDefinitionNames(
-            kind='PubSub', plural='pubsubs'))
+            kind='CloudPubSubSource', plural='cloudpubsubsources'))
     self.operations.ListSourceCustomResourceDefinitions.return_value = [
         self.source_crd
     ]
@@ -46,7 +46,7 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
   def _MakeSource(self):
     """Creates a source and assigns it as output to GetSource."""
     self.source = source.Source.New(self.mock_serverless_client, 'default',
-                                    'PubSub',
+                                    'CloudPubSubSource',
                                     'sources.eventing.knative.dev')
     self.source.name = 'my-source'
     self.source.sink = 'my-broker'
@@ -56,13 +56,10 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
 
   def _MakeTrigger(self, source_obj):
     """Creates a trigger and assigns it as output to GetTrigger."""
-    self.trigger = trigger.Trigger.New(
-        self.mock_serverless_client, 'default')
+    self.trigger = trigger.Trigger.New(self.mock_serverless_client, 'default')
     self.trigger.name = 'my-trigger'
     self.trigger.status.conditions = [
-        self.serverless_messages.TriggerCondition(
-            type='Ready',
-            status='True')
+        self.serverless_messages.TriggerCondition(type='Ready', status='True')
     ]
     self.trigger.dependency = source_obj
     self.trigger.filter_attributes[
@@ -70,45 +67,76 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
     self.trigger.subscriber = 'my-service'
     self.operations.GetTrigger.return_value = self.trigger
 
-  def testTriggersFailNonGKE(self):
-    """Triggers are not yet supported on managed Cloud Run."""
-    with self.assertRaises(exceptions.UnsupportedArgumentError):
-      self.Run('events triggers describe my-trigger --region=us-central1')
-    self.AssertErrContains(
-        'Events are only available with Cloud Run for Anthos.')
+  def testDescribeManaged(self):
+    """Trigger and source spec are both described with the default output."""
+    self._MakeSourceCrd()
+    self._MakeSource()
+    self._MakeTrigger(self.source)
+    self.Run('events triggers describe my-trigger --region=us-central1')
 
-  def testTriggersDescribe(self):
+    self.operations.GetTrigger.assert_called_once_with(
+        self._TriggerRef('my-trigger', 'fake-project'))
+    self.operations.GetSource.assert_called_once_with(
+        self._SourceRef('my-source', 'cloudpubsubsources', 'default'),
+        self.source_crd)
+    self.AssertOutputContains('name: my-trigger')
+    self.AssertOutputContains(
+        """filter:
+             attributes:
+               type: com.google.event.type""",
+        normalize_space=True)
+    self.AssertOutputContains(
+        """subscriber:
+            ref:
+              apiVersion: serving.knative.dev/v1alpha1
+              kind: Service
+              name: my-service""",
+        normalize_space=True)
+    self.AssertOutputContains(
+        """sink:
+            ref:
+              apiVersion: eventing.knative.dev/v1alpha1
+              kind: Broker
+              name: my-broker""",
+        normalize_space=True)
+    self.AssertOutputContains('topic: my-topic')
+
+  def testDescribeGke(self):
     """Trigger and source spec are both described with the default output."""
     self._MakeSourceCrd()
     self._MakeSource()
     self._MakeTrigger(self.source)
     self.Run('events triggers describe my-trigger --platform=gke '
              '--cluster=cluster-1 --cluster-location=us-central1-a')
+
     self.operations.GetTrigger.assert_called_once_with(
         self._TriggerRef('my-trigger', 'default'))
     self.operations.GetSource.assert_called_once_with(
-        self._SourceRef('my-source', 'pubsubs', 'default'),
+        self._SourceRef('my-source', 'cloudpubsubsources', 'default'),
         self.source_crd)
     self.AssertOutputContains('name: my-trigger')
     self.AssertOutputContains(
         """filter:
              attributes:
-               type: com.google.event.type""", normalize_space=True)
+               type: com.google.event.type""",
+        normalize_space=True)
     self.AssertOutputContains(
         """subscriber:
             ref:
               apiVersion: serving.knative.dev/v1alpha1
               kind: Service
-              name: my-service""", normalize_space=True)
+              name: my-service""",
+        normalize_space=True)
     self.AssertOutputContains(
         """sink:
             ref:
               apiVersion: eventing.knative.dev/v1alpha1
               kind: Broker
-              name: my-broker""", normalize_space=True)
+              name: my-broker""",
+        normalize_space=True)
     self.AssertOutputContains('topic: my-topic')
 
-  def testTriggersDescribeFailsIfMissing(self):
+  def testDescribeFailsIfMissing(self):
     """Error is raised when trigger is not found."""
     self.operations.GetTrigger.return_value = None
     with self.assertRaises(exceptions.TriggerNotFound):
@@ -116,7 +144,7 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
                '--cluster=cluster-1 --cluster-location=us-central1-a')
     self.AssertErrContains('Trigger [my-trigger] not found.')
 
-  def testTriggersDescribeWarnsIfNoSource(self):
+  def testDescribeWarnsIfNoSource(self):
     """Warning is shown when a source is not found."""
     self._MakeSourceCrd()
     self._MakeSource()

@@ -34,7 +34,7 @@ summary:
   - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
 - execute:
-  - command: compute instances list --filter 'machineType:n1-standard-1 AND name:$$manager$$'
+  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
       --format 'value(machineType)'
   - stdout: |
       n1-standard-1
@@ -57,7 +57,7 @@ summary:
   - stderr: |
       Updated [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$\].
 - execute:
-  - command: compute instances list --filter 'machineType:n1-standard-1 AND name:$$manager$$'
+  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
       --format 'value(machineType)'
   - stdout: |
       n1-standard-1
@@ -82,7 +82,7 @@ summary:
   - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
 - execute:
-  - command: compute instances list --filter 'machineType:f1-micro AND name:$$manager$$'
+  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:f1-micro AND name:$$manager$$'
       --format 'value(machineType)'
   - stdout: |
       f1-micro
@@ -132,6 +132,9 @@ summary:
   - stderr: |
       Deleted [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$\].
 actions:
+- define_reference:
+    reference: list_zones
+    value: us-central1-a,us-central1-b,us-central1-c,us-central1-f
 - define_reference:
     reference: compute-uri
     value: compute.googleapis.com/compute
@@ -1073,7 +1076,7 @@ actions:
         code: 0
 - execute_command:
     # There should be 3 instances in this MIG with the original machine type.
-    command: compute instances list --filter 'machineType:n1-standard-1 AND name:$$manager$$'
+    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
       --format 'value(machineType)'
     validation_only: true
     events:
@@ -1274,7 +1277,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute instances list --filter 'machineType:n1-standard-1 AND name:$$manager$$'
+    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
       --format 'value(machineType)'
     validation_only: true
     events:
@@ -1495,7 +1498,7 @@ actions:
         code: 0
 - execute_command:
     # The 3 instances should have changed machine type.
-    command: compute instances list --filter 'machineType:f1-micro AND name:$$manager$$'
+    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:f1-micro AND name:$$manager$$'
       --format 'value(machineType)'
     validation_only: true
     events:

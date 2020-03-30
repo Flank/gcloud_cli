@@ -18,7 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
+import json
 from googlecloudsdk.api_lib.compute import base_classes
+from googlecloudsdk.api_lib.compute import constants
 from googlecloudsdk.api_lib.compute import image_utils
 from googlecloudsdk.api_lib.compute import instance_template_utils
 from googlecloudsdk.api_lib.compute import instance_utils
@@ -30,10 +33,13 @@ from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.command_lib.compute import flags
 from googlecloudsdk.command_lib.compute.instance_templates import flags as instance_templates_flags
+from googlecloudsdk.command_lib.compute.instance_templates import mesh_mode_aux_data
 from googlecloudsdk.command_lib.compute.instances import flags as instances_flags
 from googlecloudsdk.command_lib.compute.sole_tenancy import flags as sole_tenancy_flags
 from googlecloudsdk.command_lib.compute.sole_tenancy import util as sole_tenancy_util
 from googlecloudsdk.command_lib.util.args import labels_util
+
+import six
 
 _INSTANTIATE_FROM_VALUES = [
     'attach-read-only',
@@ -52,7 +58,8 @@ def _CommonArgs(
     support_local_ssd_size=False,
     support_kms=False,
     support_resource_policy=False,
-    support_min_node_cpus=False
+    support_min_node_cpu=False,
+    support_location_hint=False
 ):
   """Adding arguments applicable for creating instance templates."""
   parser.display_info.AddFormat(instance_templates_flags.DEFAULT_LIST_FORMAT)
@@ -84,8 +91,11 @@ def _CommonArgs(
 
   sole_tenancy_flags.AddNodeAffinityFlagToParser(parser)
 
-  if support_min_node_cpus:
-    sole_tenancy_flags.AddMinNodeCpusArg(parser)
+  if support_min_node_cpu:
+    instances_flags.AddMinNodeCpuArg(parser)
+
+  if support_location_hint:
+    instances_flags.AddLocationHintArg(parser)
 
   flags.AddRegionFlag(
       parser,
@@ -263,12 +273,107 @@ def BuildConfidentialInstanceConfigMessage(messages, args):
   return confidential_instance_config_message
 
 
+def PackageLabels(labels_cls, labels):
+  # Sorted for test stability
+  return labels_cls(additionalProperties=[
+      labels_cls.AdditionalProperty(key=key, value=value)
+      for key, value in sorted(six.iteritems(labels))])
+
+
+# Function copied from labels_util.
+# Temporary fix for adoption tracking of Managed Envoy.
+# TODO(b/146051298) Remove this fix when structured metadata is available.
+def ParseCreateArgsWithMeshMode(args, labels_cls, labels_dest='labels'):
+  """Initializes labels based on args and the given class."""
+  labels = getattr(args, labels_dest)
+  if getattr(args, 'mesh',
+             False) and args.mesh['mode'] == mesh_mode_aux_data.MeshModes.ON:
+    if labels is None:
+      labels = collections.OrderedDict()
+    labels['mesh-mode'] = 'on'
+
+  if labels is None:
+    return None
+  return PackageLabels(labels_cls, labels)
+
+
+def AddScopesForMeshMode(args):
+
+  if getattr(args, 'mesh', False) and args.mesh[
+      'mode'] == mesh_mode_aux_data.MeshModes.ON:
+
+    if args.scopes is None:
+      args.scopes = constants.DEFAULT_SCOPES[:]
+
+    if 'cloud-platform' not in args.scopes and 'https://www.googleapis.com/auth/cloud-platform' not in args.scopes:
+      args.scopes.append('cloud-platform')
+
+
+def AddMeshArgsToMetadata(args):
+  """Inserts the Mesh mode arguments provided by the user to the instance metadata.
+
+  Args:
+      args: argparse.Namespace, An object that contains the values for the
+        arguments specified in the .Args() method.
+  """
+  if getattr(args, 'mesh', False):
+
+    mesh_mode_config = collections.OrderedDict()
+
+    # add --mesh flag data to metadata.
+    mesh_mode_config['mode'] = args.mesh['mode']
+    if 'workload-ports' in args.mesh:
+      # convert list of strings to list of integers.
+      workload_ports = list(map(int, args.mesh['workload-ports'].split(';')))
+      # find unique ports by converting list of integers to set of integers.
+      unique_workload_ports = set(workload_ports)
+      # convert it back to list of integers.
+      # this is done to make it JSON serializable.
+      workload_ports = list(unique_workload_ports)
+      mesh_mode_config['service'] = {
+          'workload-ports': workload_ports,
+      }
+
+    # add --mesh_labels flag to metadata as described by go/gce-envoy-gcloud
+    if getattr(args, 'mesh_labels', False):
+      mesh_mode_config['labels'] = args.mesh_labels
+
+    # add --mesh-proxy-config flag to metadata
+    # as described by go/gce-envoy-gcloud
+    if getattr(args, 'mesh_proxy_config', False):
+      mesh_mode_config['proxy-spec'] = {
+          'trafficdirector-config': args.mesh_proxy_config
+      }
+
+    if args.mesh['mode'] == mesh_mode_aux_data.MeshModes.ON:
+      args.metadata['enable-osconfig'] = 'true'
+      gce_software_declaration = collections.OrderedDict()
+      mesh_agent_recipe = collections.OrderedDict()
+
+      mesh_agent_recipe['name'] = 'install-gce-mesh-agent'
+      mesh_agent_recipe['desired_state'] = 'INSTALLED'
+      mesh_agent_recipe['installSteps'] = [{
+          'scriptRun': {
+              'script': mesh_mode_aux_data.startup_script
+          }
+      }]
+
+      gce_software_declaration['softwareRecipes'] = [mesh_agent_recipe]
+
+      args.metadata['gce-software-declaration'] = json.dumps(
+          gce_software_declaration)
+      args.metadata['enable-guest-attributes'] = 'TRUE'
+
+    args.metadata['gce-mesh'] = json.dumps(mesh_mode_config)
+
+
 def _RunCreate(compute_api,
                args,
                support_source_instance,
                support_kms=False,
-               support_min_node_cpus=False,
-               support_confidential_compute=False):
+               support_min_node_cpu=False,
+               support_confidential_compute=False,
+               support_location_hint=False):
   """Common routine for creating instance template.
 
   This is shared between various release tracks.
@@ -279,10 +384,11 @@ def _RunCreate(compute_api,
         arguments specified in the .Args() method.
       support_source_instance: indicates whether source instance is supported.
       support_kms: Indicate whether KMS is integrated or not.
-      support_min_node_cpus: Indicate whether the --min-node-cpus flag for
+      support_min_node_cpu: Indicate whether the --min-node-cpu flag for
         sole tenancy overcommit is supported.
       support_confidential_compute: Indicate whether confidential compute is
         supported.
+      support_location_hint: Indicate whether location hint is supported
 
   Returns:
       A resource object dispatched by display.Displayer().
@@ -290,6 +396,8 @@ def _RunCreate(compute_api,
   _ValidateInstancesFlags(
       args, support_kms=support_kms)
   instances_flags.ValidateNetworkTierArgs(args)
+
+  instance_templates_flags.ValidateMeshModeFlags(args)
 
   client = compute_api.client
 
@@ -299,6 +407,9 @@ def _RunCreate(compute_api,
   instance_template_ref = (
       Create.InstanceTemplateArg.ResolveAsResource(
           args, compute_api.resources))
+
+  AddScopesForMeshMode(args)
+  AddMeshArgsToMetadata(args)
 
   metadata = metadata_utils.ConstructMetadataMessage(
       client.messages,
@@ -342,9 +453,13 @@ def _RunCreate(compute_api,
   node_affinities = sole_tenancy_util.GetSchedulingNodeAffinityListFromArgs(
       args, client.messages)
 
-  min_node_cpus = None
-  if support_min_node_cpus and args.IsSpecified('min_node_cpus'):
-    min_node_cpus = args.min_node_cpus
+  min_node_cpu = None
+  if support_min_node_cpu and args.IsSpecified('min_node_cpu'):
+    min_node_cpu = args.min_node_cpu
+
+  location_hint = None
+  if support_location_hint and args.IsSpecified('location_hint'):
+    location_hint = args.location_hint
 
   scheduling = instance_utils.CreateSchedulingMessage(
       messages=client.messages,
@@ -352,7 +467,8 @@ def _RunCreate(compute_api,
       preemptible=args.preemptible,
       restart_on_failure=args.restart_on_failure,
       node_affinities=node_affinities,
-      min_node_cpus=min_node_cpus)
+      min_node_cpu=min_node_cpu,
+      location_hint=location_hint)
 
   if args.no_service_account:
     service_account = None
@@ -475,7 +591,7 @@ def _RunCreate(compute_api,
       instanceTemplate=instance_template,
       project=instance_template_ref.project)
 
-  request.instanceTemplate.properties.labels = labels_util.ParseCreateArgs(
+  request.instanceTemplate.properties.labels = ParseCreateArgsWithMeshMode(
       args, client.messages.InstanceProperties.LabelsValue)
 
   _AddSourceInstanceToTemplate(
@@ -501,6 +617,8 @@ class Create(base.CreateCommand):
   """
   _support_source_instance = True
   _support_kms = True
+  _support_min_node_cpu = False
+  _support_location_hint = False
 
   @classmethod
   def Args(cls, parser):
@@ -508,7 +626,9 @@ class Create(base.CreateCommand):
         parser,
         release_track=base.ReleaseTrack.GA,
         support_source_instance=cls._support_source_instance,
-        support_kms=cls._support_kms
+        support_kms=cls._support_kms,
+        support_min_node_cpu=cls._support_min_node_cpu,
+        support_location_hint=cls._support_location_hint
     )
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.GA)
 
@@ -526,7 +646,9 @@ class Create(base.CreateCommand):
         base_classes.ComputeApiHolder(base.ReleaseTrack.GA),
         args,
         support_source_instance=self._support_source_instance,
-        support_kms=self._support_kms
+        support_kms=self._support_kms,
+        support_min_node_cpu=self._support_min_node_cpu,
+        support_location_hint=self._support_location_hint
     )
 
 
@@ -547,6 +669,8 @@ class CreateBeta(Create):
   _support_source_instance = True
   _support_kms = True
   _support_resource_policy = True
+  _support_min_node_cpu = True
+  _support_location_hint = False
 
   @classmethod
   def Args(cls, parser):
@@ -556,7 +680,9 @@ class CreateBeta(Create):
         support_local_ssd_size=False,
         support_source_instance=cls._support_source_instance,
         support_kms=cls._support_kms,
-        support_resource_policy=cls._support_resource_policy
+        support_resource_policy=cls._support_resource_policy,
+        support_min_node_cpu=cls._support_min_node_cpu,
+        support_location_hint=cls._support_location_hint
     )
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.BETA)
 
@@ -574,7 +700,9 @@ class CreateBeta(Create):
         base_classes.ComputeApiHolder(base.ReleaseTrack.BETA),
         args=args,
         support_source_instance=self._support_source_instance,
-        support_kms=self._support_kms)
+        support_kms=self._support_kms,
+        support_min_node_cpu=self._support_min_node_cpu,
+        support_location_hint=self._support_location_hint)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -594,8 +722,9 @@ class CreateAlpha(Create):
   _support_source_instance = True
   _support_kms = True
   _support_resource_policy = True
-  _support_min_node_cpus = True
+  _support_min_node_cpu = True
   _support_confidential_compute = True
+  _support_location_hint = True
 
   @classmethod
   def Args(cls, parser):
@@ -606,10 +735,13 @@ class CreateAlpha(Create):
         support_source_instance=cls._support_source_instance,
         support_kms=cls._support_kms,
         support_resource_policy=cls._support_resource_policy,
-        support_min_node_cpus=cls._support_min_node_cpus)
+        support_min_node_cpu=cls._support_min_node_cpu,
+        support_location_hint=cls._support_location_hint
+    )
     instances_flags.AddLocalNvdimmArgs(parser)
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.ALPHA)
     instances_flags.AddConfidentialComputeArgs(parser)
+    instance_templates_flags.AddMeshModeConfigArgs(parser)
 
   def Run(self, args):
     """Creates and runs an InstanceTemplates.Insert request.
@@ -626,5 +758,27 @@ class CreateAlpha(Create):
         args=args,
         support_source_instance=self._support_source_instance,
         support_kms=self._support_kms,
-        support_min_node_cpus=self._support_min_node_cpus,
-        support_confidential_compute=self._support_confidential_compute)
+        support_min_node_cpu=self._support_min_node_cpu,
+        support_confidential_compute=self._support_confidential_compute,
+        support_location_hint=self._support_location_hint)
+
+
+DETAILED_HELP = {
+    'brief':
+        'Create a Compute Engine virtual machine instance template',
+    'DESCRIPTION':
+        '*{command}* facilitates the creation of Google Compute '
+        'Engine virtual machine instance templates. Instance '
+        'templates are global resources, and can be used to create '
+        'instances in any zone.',
+    'EXAMPLES':
+        """\
+        To create an instance template named 'INSTANCE-TEMPLATE' with the 'n2'
+        vm type, '9GB' memory, and 2 CPU cores, run:
+
+          $ {command} INSTANCE-TEMPLATE --custom-vm-type=n2 --custom-cpu=2 --custom-memory=9GB
+        """
+}
+
+
+Create.detailed_help = DETAILED_HELP

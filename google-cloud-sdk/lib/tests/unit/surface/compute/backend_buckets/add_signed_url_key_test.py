@@ -54,7 +54,7 @@ class BackendBucketAddSignedUrlKeyTestGA(
 
     self.ExpectAddSignedUrlKeyRequest(backend_bucket_ref, 'key1', self.KEY,
                                       operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(backend_bucket_ref, updated_backend_bucket)
 
     response = self.RunBackendBuckets(
@@ -75,7 +75,7 @@ class BackendBucketAddSignedUrlKeyTestGA(
 
     self.ExpectAddSignedUrlKeyRequest(backend_bucket_ref, 'key1', self.KEY,
                                       operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(backend_bucket_ref, updated_backend_bucket)
 
     response = self.RunBackendBuckets(

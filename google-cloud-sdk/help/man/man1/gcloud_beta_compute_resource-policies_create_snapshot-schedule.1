@@ -67,8 +67,8 @@ From flags:
 .RS 2m
 .TP 2m
 \fB\-\-start\-time\fR=\fISTART_TIME\fR
-Start time for the disk snapshot schedule. See $ gcloud topic datetimes for
-information on time formats. This flag must be specified if any of the other
+Start time for the disk snapshot schedule in UTC. For example,
+\f5\-\-start\-time="15:00"\fR. This flag must be specified if any of the other
 arguments in this group are specified.
 
 .TP 2m
@@ -186,19 +186,21 @@ multi\-regional location is chosen automatically.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
 The following command creates a Google Compute Engine Snapshot Schedule Resource
-Policy with a daily snapshot and a one day snapshot retention policy.
+Policy with a daily snapshot taken at 13:00Z and a one day snapshot retention
+policy.
 
 .RS 2m
 $ gcloud beta compute resource\-policies create snapshot\-schedule \e
-    my\-resource\-policy \-\-region=REGION \-\-start\-time=04:00Z \e
+    my\-resource\-policy \-\-region=REGION \-\-start\-time=13:00 \e
     \-\-daily\-schedule \-\-max\-retention\-days=1
 .RE
 

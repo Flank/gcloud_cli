@@ -63,8 +63,9 @@ Delete a parent node and all of its children.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -74,21 +75,21 @@ To delete a variable named "my\-var", run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs variables unset \e
-    \-\-config\-name my\-config my\-var
+    \-\-config\-name=my\-config my\-var
 .RE
 
 To delete a variable, but fail if it does not exist, run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs variables unset \e
-    \-\-config\-name my\-config my\-var \-\-fail\-if\-absent
+    \-\-config\-name=my\-config my\-var \-\-fail\-if\-absent
 .RE
 
 To recursively delete a parent variable and its children, run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs variables unset \e
-    \-\-config\-name my\-config my\-parent\-var \-\-recursive
+    \-\-config\-name=my\-config my\-parent\-var \-\-recursive
 .RE
 
 

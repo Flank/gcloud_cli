@@ -27,18 +27,22 @@ from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Describe(base.Command):
-  """Describe domain mappings."""
+  """Describe domain mappings for Cloud Run for Anthos."""
 
   detailed_help = {
       'DESCRIPTION':
-          '{description}',
+          """\
+          {description}
+
+          For domain mapping support with fully managed Cloud Run, use
+          `gcloud beta run domain-mappings describe`.""",
       'EXAMPLES':
           """\
           To describe a Cloud Run domain mapping, run:
 
-              $ {command} --domain www.example.com
+              $ {command} --domain=www.example.com
           """,
   }
 
@@ -61,8 +65,14 @@ class Describe(base.Command):
 
   def Run(self, args):
     """Describe a domain mapping."""
+    # domains.cloudrun.com api group only supports v1alpha1 on clusters.
     conn_context = connection_context.GetConnectionContext(
-        args, self.ReleaseTrack())
+        args,
+        flags.Product.RUN,
+        self.ReleaseTrack(),
+        version_override=('v1alpha1'
+                          if flags.GetPlatform() != flags.PLATFORM_MANAGED else
+                          None))
     domain_mapping_ref = args.CONCEPTS.domain.Parse()
     with serverless_operations.Connect(conn_context) as client:
       domain_mapping = client.GetDomainMapping(domain_mapping_ref)
@@ -73,12 +83,30 @@ class Describe(base.Command):
       return domain_mapping
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class AlphaDescribe(Describe):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class BetaDescribe(Describe):
   """Describe domain mappings."""
+
+  detailed_help = {
+      'DESCRIPTION':
+          '{description}',
+      'EXAMPLES':
+          """\
+          To describe a Cloud Run domain mapping, run:
+
+              $ {command} --domain=www.example.com
+          """,
+  }
 
   @staticmethod
   def Args(parser):
     Describe.CommonArgs(parser)
 
-AlphaDescribe.__doc__ = Describe.__doc__
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class AlphaDescribe(BetaDescribe):
+  """Describe domain mappings."""
+
+  @staticmethod
+  def Args(parser):
+    Describe.CommonArgs(parser)

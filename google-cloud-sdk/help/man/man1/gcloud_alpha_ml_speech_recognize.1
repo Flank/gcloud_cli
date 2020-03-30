@@ -274,8 +274,9 @@ Estimated number of speakers in the conversation being recognized.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -284,6 +285,24 @@ help\fR for details.
 This command uses the \fBspeech/v1p1beta1\fR API. The full documentation for
 this API can be found at:
 https://cloud.google.com/speech\-to\-text/docs/quickstart\-protocol
+
+
+
+.SH "EXAMPLES"
+
+To get a transcript of an audio file 'my\-recording.wav': $ gcloud alpha ml
+speech recognize 'my\-recording.wav' \e.RS 2m
+\-\-language\-code=en\-US
+
+.RE
+
+To get a transcript of an audio file in bucket 'gs://bucket/myaudio' with a
+custom sampling rate and encoding that uses hints and filters profanity: $
+gcloud alpha ml speech recognize 'gs://bucket/myaudio' \e.RS 2m
+\-\-language\-code=es\-ES \-\-sample\-rate=2200 \-\-hints=Bueno \e
+\-\-encoding=OGG_OPUS \-\-filter\-profanity
+
+.RE
 
 
 

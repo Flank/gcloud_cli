@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha domains registrations authorization\-code reset \- resets authorization code of specific registration
+gcloud alpha domains registrations authorization\-code reset \- resets authorization code of a specific Cloud Domains registration
 
 
 
@@ -17,8 +17,10 @@ gcloud alpha domains registrations authorization\-code reset \- resets authoriza
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Can only be called after 60 days have elapsed since initial
-registration.
+\fB(ALPHA)\fR Resets authorization code of a specific registration.
+
+Can only be called after 60 days have elapsed since initial registration. Also,
+the registration must be in state ACTIVE.
 
 
 
@@ -51,14 +53,15 @@ ID of the registration or fully qualified identifier for the registration.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To reset authorization code of example.com run:
+To reset authorization code of \f5\fIexample.com\fR\fR, run:
 
 .RS 2m
 $ gcloud alpha domains registrations authorization\-code reset \e

@@ -162,11 +162,12 @@ ERROR: gcloud failed to load: Exception message
 This usually indicates corruption in your gcloud installation or problems with \
 your Python interpreter.
 
-Please verify that the following is the path to a working Python 2.7 executable:
+Please verify that the following is the path to a working Python 2.7 or 3.5+ \
+executable:
     {0}
 
 If it is not, please set the CLOUDSDK_PYTHON environment variable to point to \
-a working Python 2.7 executable.
+a working Python 2.7 or 3.5+ executable.
 
 If you are still experiencing problems, please reinstall the Cloud SDK using \
 the instructions here:

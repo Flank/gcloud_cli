@@ -78,14 +78,15 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To list the instance details for each instance in the patch job 'job1', run:
+To list the instance details for each instance in the patch job \f5job1\fR, run:
 
 .RS 2m
 $ gcloud alpha compute os\-config patch\-jobs list\-instance\-details \e
@@ -99,5 +100,10 @@ job1
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud compute os\-config patch\-jobs list\-instance\-details
+$ gcloud beta compute os\-config patch\-jobs list\-instance\-details
+.RE
 

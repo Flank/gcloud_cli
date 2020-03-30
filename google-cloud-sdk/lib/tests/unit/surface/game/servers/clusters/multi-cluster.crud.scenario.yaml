@@ -1,0 +1,267 @@
+title: Cloud Game Servers multi-cluster crud test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers clusters create my-gs-cluster --location us-central1 --description description
+       --realm my-realm --hub-membership projects/my-project/locations/global/memberships/098766633
+      --namespace default --labels a=x,b=y --no-dry-run
+  - stderr: |
+      Create request issued for: [my-gs-cluster]
+  - progress_tracker:
+    - message: Waiting for [operation-1559255280321-58a2269190473-0e2d5d3d-27d31e98]
+        to finish
+    - status: SUCCESS
+  - stderr: |
+      Created game server cluster: [my-gs-cluster]
+- execute:
+  - command: |
+      game servers clusters create my-gs-cluster --realm my-realm --hub-membership
+      projects/my-project/locations/global/memberships/098766633 --namespace default
+      --labels a=x,b=y --no-dry-run
+  - stderr: |
+      Create request issued for: [my-gs-cluster]
+  - progress_tracker:
+    - message: Waiting for [operation-1559255280321-58a2269190473-0e2d5d3d-27d31e98]
+        to finish
+    - status: SUCCESS
+  - stderr: |
+      Created game server cluster: [my-gs-cluster]
+- execute:
+  - command: |
+      game servers clusters create my-gs-cluster --location us-central1 --description description
+       --realm my-realm --gke-cluster projects/my-project/locations/us-central1-a/clusters/test
+       --hub-membership projects/my-project/locations/global/memberships/098766633
+      --namespace default --labels a=x,b=y --no-dry-run
+  - stderr: |
+      ERROR: (gcloud.alpha.game.servers.clusters.create) argument --gke-cluster: Exactly one of (--gke-cluster | --hub-membership) must be specified.
+      Usage: gcloud alpha game servers clusters create (CLUSTER : --location=LOCATION --realm=REALM) --dry-run --namespace=NAMESPACE (--gke-cluster=GKE_CLUSTER | --hub-membership=HUB_MEMBERSHIP) [optional flags]
+        optional flags may be  --description | --gke-cluster | --help |
+                               --hub-membership | --labels | --location |
+                               --preview-time | --realm
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha game servers clusters create --help
+  - error: '1: None'
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha
+
+- execute_command:
+    command: |
+      game servers clusters create my-gs-cluster --location us-central1 --description description
+       --realm my-realm --hub-membership projects/my-project/locations/global/memberships/098766633
+      --namespace default --labels a=x,b=y --no-dry-run
+    events:
+    - expect_stderr: |
+        Create request issued for: [my-gs-cluster]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters?alt=json&gameServerClusterId=my-gs-cluster
+          method: POST
+          headers: {}
+          body:
+            json:
+              connectionInfo:
+                gkeHubClusterReference:
+                  membership: projects/my-project/locations/global/memberships/098766633
+                namespace: default
+              labels:
+                a: x
+                b: y
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1559255280321-58a2269190473-0e2d5d3d-27d31e98",
+              "done": true
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/operations/operation-1559255280321-58a2269190473-0e2d5d3d-27d31e98?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1559255280321-58a2269190473-0e2d5d3d-27d31e98",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T06:36:40.690252867Z",
+                "endTime": "2019-06-17T06:36:55.212325164Z",
+                "target": "projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gs-cluster",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerCluster",
+                "name": "projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gs-cluster",
+                "createTime": "2019-06-17T06:36:40.628813618Z",
+                "updateTime": "2019-06-17T06:36:40.714215155Z",
+                "connectionInfo": {
+                  "namespace": "default",
+                  "gkeHubClusterReference": {
+                    "membership": "projects/my-project/locations/global/memberships/098766633"
+                  }
+                }
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for [operation-1559255280321-58a2269190473-0e2d5d3d-27d31e98]
+          to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Created game server cluster: [my-gs-cluster]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm/gameServerClusters/my-gs-cluster?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/gameServerClusters/my-gs-cluster",
+              "description": "description",
+              "createTime": "2019-06-17T06:36:40.628813618Z",
+              "updateTime": "2019-06-17T06:36:55.228742225Z",
+              "connectionInfo": {
+                "namespace": "default",
+                "gkeHubClusterReference": {
+                  "membership": "projects/my-project/locations/global/memberships/098766633"
+                }
+              },
+              "labels": {
+                "a": "x",
+                "b": "y"
+              }
+            }
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers clusters create my-gs-cluster --realm my-realm --hub-membership
+      projects/my-project/locations/global/memberships/098766633 --namespace default
+      --labels a=x,b=y --no-dry-run
+    events:
+    - expect_stderr: |
+        Create request issued for: [my-gs-cluster]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/realms/my-realm/gameServerClusters?alt=json&gameServerClusterId=my-gs-cluster
+          method: POST
+          headers: {}
+          body:
+            json:
+              connectionInfo:
+                gkeHubClusterReference:
+                  membership: projects/my-project/locations/global/memberships/098766633
+                namespace: default
+              labels:
+                a: x
+                b: y
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1559255280321-58a2269190473-0e2d5d3d-27d31e98",
+              "done": true
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1559255280321-58a2269190473-0e2d5d3d-27d31e98?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1559255280321-58a2269190473-0e2d5d3d-27d31e98",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T06:36:40.690252867Z",
+                "endTime": "2019-06-17T06:36:55.212325164Z",
+                "target": "projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gs-cluster",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerCluster",
+                "name": "projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gs-cluster",
+                "createTime": "2019-06-17T06:36:40.628813618Z",
+                "updateTime": "2019-06-17T06:36:40.714215155Z",
+                "connectionInfo": {
+                  "namespace": "default",
+                  "gkeHubClusterReference": {
+                    "membership": "projects/my-project/locations/global/memberships/098766633"
+                  }
+                }
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for [operation-1559255280321-58a2269190473-0e2d5d3d-27d31e98]
+          to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Created game server cluster: [my-gs-cluster]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/realms/my-realm/gameServerClusters/my-gs-cluster?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerClusters/my-gs-cluster",
+              "createTime": "2019-06-17T06:36:40.628813618Z",
+              "updateTime": "2019-06-17T06:36:55.228742225Z",
+              "connectionInfo": {
+                "namespace": "default",
+                "gkeHubClusterReference": {
+                  "membershps": "projects/my-project/locations/global/memberships/098766633"
+                }
+              },
+              "labels": {
+                "a": "x",
+                "b": "y"
+              }
+            }
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers clusters create my-gs-cluster --location us-central1 --description description
+       --realm my-realm --gke-cluster projects/my-project/locations/us-central1-a/clusters/test
+       --hub-membership projects/my-project/locations/global/memberships/098766633
+      --namespace default --labels a=x,b=y --no-dry-run
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.game.servers.clusters.create) argument --gke-cluster: Exactly one of (--gke-cluster | --hub-membership) must be specified.
+        Usage: gcloud alpha game servers clusters create (CLUSTER : --location=LOCATION --realm=REALM) --dry-run --namespace=NAMESPACE (--gke-cluster=GKE_CLUSTER | --hub-membership=HUB_MEMBERSHIP) [optional flags]
+          optional flags may be  --description | --gke-cluster | --help |
+                                 --hub-membership | --labels | --location |
+                                 --preview-time | --realm
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha game servers clusters create --help
+    - expect_exit:
+        code: 1

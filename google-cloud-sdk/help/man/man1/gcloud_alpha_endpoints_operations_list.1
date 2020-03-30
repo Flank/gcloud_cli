@@ -37,7 +37,7 @@ startTime is an ISO 8601 datetime and supports >=, >, <=, and < operators. The
 datetime value must be wrapped in quotation marks. For example:
 
 .RS 2m
-\-\-filter 'startTime < "2017\-03\-20T16:02:32"'
+\-\-filter='startTime < "2017\-03\-20T16:02:32"'
 .RE
 
 done is a boolean value and supports = and != operators.
@@ -87,8 +87,9 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -99,7 +100,7 @@ run:
 
 .RS 2m
 $ gcloud alpha endpoints operations list \e
-    \-\-service api.endpoints.proj.cloud.goog
+    \-\-service=api.endpoints.proj.cloud.goog
 .RE
 
 To list only operations which are complete, add the \f5\-\-filter\fR argument
@@ -107,7 +108,7 @@ with a status filter:
 
 .RS 2m
 $ gcloud alpha endpoints operations list \e
-    \-\-service api.endpoints.proj.cloud.goog \-\-filter 'done = true'
+    \-\-service=api.endpoints.proj.cloud.goog \-\-filter='done = true'
 .RE
 
 To list only operations begun after a certain point in time, add the
@@ -115,8 +116,8 @@ To list only operations begun after a certain point in time, add the
 
 .RS 2m
 $ gcloud alpha endpoints operations list \e
-    \-\-service api.endpoints.proj.cloud.goog \e
-    \-\-filter 'startTime >= "2017\-02\-01"'
+    \-\-service=api.endpoints.proj.cloud.goog \e
+    \-\-filter='startTime >= "2017\-02\-01"'
 .RE
 
 

@@ -7,24 +7,26 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta init launches an interactive Getting Started workflow
-    for gcloud. It performs the following setup steps:
+    for the gcloud command-line tool. It performs the following setup steps:
 
       o Authorizes gcloud and other SDK tools to access Google Cloud Platform
-        using your user account credentials, or lets you select from accounts
-        whose credentials are already available.
-      o Sets properties in a gcloud configuration, including the current
-        project and the default Google Compute Engine region and zone.
+        using your user account credentials, or from an account of your
+        choosing whose credentials are already available.
+      o Sets up a new or existing configuration.
+      o Sets properties in that configuration, including the current project
+        and optionally, the default Google Compute Engine region and zone you'd
+        like to use.
 
     gcloud beta init can be used for initial setup of gcloud and to create new
-    or reinitialize gcloud configurations. More information can be found by
-    running gcloud topic configurations.
+    or reinitialize gcloud configurations. More information about
+    configurations can be found by running gcloud topic configurations.
 
     Properties set by gcloud beta init are local and persistent, and are not
     affected by remote changes to the project. For example, the default Compute
     Engine zone in your configuration remains stable, even if you or another
     user changes the project-level default zone in the Cloud Platform Console.
 
-    To sync the configuration, re-run gcloud beta init
+    To sync the configuration, re-run gcloud beta init.
 
 FLAGS
      --console-only
@@ -37,8 +39,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To launch an interactive Getting Started workflow, run:
+
+        $ gcloud beta init
+
+    To launch an interactive Getting Started workflow without diagnostics, run:
+
+        $ gcloud beta init --skip-diagnostics
 
 NOTES
     This command is currently in BETA and may change without notice. These

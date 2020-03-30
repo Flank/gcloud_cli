@@ -47,7 +47,8 @@ GENERATED_LABEL_PREFIX = 'goog-dataproc-'
 def ArgsForClusterRef(parser,
                       beta=False,
                       include_deprecated=True,
-                      include_ttl_config=False):
+                      include_ttl_config=False,
+                      include_gke_platform_args=False):
   """Register flags for creating a dataproc cluster.
 
   Args:
@@ -55,15 +56,21 @@ def ArgsForClusterRef(parser,
     beta: whether or not this is a beta command (may affect flag visibility)
     include_deprecated: whether deprecated flags should be included
     include_ttl_config: whether to include Scheduled Delete(TTL) args
+    include_gke_platform_args: whether to include GKE-based cluster args
   """
   labels_util.AddCreateLabelsFlags(parser)
-  instances_flags.AddTagsArgs(parser)
   # 30m is backend timeout + 5m for safety buffer.
   flags.AddTimeoutFlag(parser, default='35m')
   flags.AddZoneFlag(parser, short_flags=include_deprecated)
   flags.AddComponentFlag(parser)
 
-  parser.add_argument(
+  platform_group = parser.add_argument_group(mutex=True)
+  gce_platform_group = platform_group.add_argument_group(help="""\
+    Compute Engine options for Dataproc clusters.
+    """)
+
+  instances_flags.AddTagsArgs(gce_platform_group)
+  gce_platform_group.add_argument(
       '--metadata',
       type=arg_parsers.ArgDict(min_length=1),
       action='append',
@@ -74,7 +81,7 @@ def ArgsForClusterRef(parser,
 
   # Either allow creating a single node cluster (--single-node), or specifying
   # the number of workers in the multi-node cluster (--num-workers and
-  # --num-preemptible-workers)
+  # --num-secondary-workers)
   node_group = parser.add_argument_group(mutex=True)  # Mutually exclusive
   node_group.add_argument(
       '--single-node',
@@ -94,9 +101,26 @@ def ArgsForClusterRef(parser,
       help='The number of worker nodes in the cluster. Defaults to '
       'server-specified.')
   worker_group.add_argument(
+      '--secondary-worker-preemptibility',
+      hidden=True,
+      metavar='PREEMPTIBILITY',
+      choices=['preemptible', 'non-preemptible', 'unspecified'],
+      default='unspecified',
+      help='The preemptibility of the secondary worker group.')
+  num_secondary_workers = worker_group.add_argument_group(mutex=True)
+  num_secondary_workers.add_argument(
       '--num-preemptible-workers',
+      action=actions.DeprecationAction(
+          '--num-preemptible-workers',
+          warn=('The `--num-preemptible-workers` flag is deprecated. '
+                'Use the `--num-secondary-workers` flag instead.')),
       type=int,
+      hidden=True,
       help='The number of preemptible worker nodes in the cluster.')
+  num_secondary_workers.add_argument(
+      '--num-secondary-workers',
+      type=int,
+      help='The number of secondary worker nodes in the cluster.')
 
   parser.add_argument(
       '--master-machine-type',
@@ -126,7 +150,7 @@ def ArgsForClusterRef(parser,
       when using this cluster.
       """)
 
-  netparser = parser.add_mutually_exclusive_group()
+  netparser = gce_platform_group.add_argument_group(mutex=True)
   netparser.add_argument(
       '--network',
       help="""\
@@ -148,8 +172,21 @@ def ArgsForClusterRef(parser,
       '--num-master-local-ssds',
       type=int,
       help='The number of local SSDs to attach to the master in a cluster.')
-  parser.add_argument(
+  secondary_worker_local_ssds = parser.add_argument_group(mutex=True)
+  secondary_worker_local_ssds.add_argument(
       '--num-preemptible-worker-local-ssds',
+      type=int,
+      hidden=True,
+      action=actions.DeprecationAction(
+          '--num-preemptible-worker-local-ssds',
+          warn=('The `--num-preemptible-worker-local-ssds` flag is deprecated. '
+                'Use the `--num-secondary-worker-local-ssds` flag instead.')),
+      help="""\
+      The number of local SSDs to attach to each secondary worker in
+      a cluster.
+      """)
+  secondary_worker_local_ssds.add_argument(
+      '--num-secondary-worker-local-ssds',
       type=int,
       help="""\
       The number of local SSDs to attach to each preemptible worker in
@@ -216,10 +253,10 @@ See https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster
 for more information.
 
 """)
-  parser.add_argument(
+  gce_platform_group.add_argument(
       '--service-account',
       help='The Google Cloud IAM service account to be authenticated as.')
-  parser.add_argument(
+  gce_platform_group.add_argument(
       '--scopes',
       type=arg_parsers.ArgList(min_length=1),
       metavar='SCOPE',
@@ -280,8 +317,17 @@ If you want to enable all scopes use the 'cloud-platform' scope.
       '--master-boot-disk-type', help=boot_disk_type_detailed_help)
   parser.add_argument(
       '--worker-boot-disk-type', help=boot_disk_type_detailed_help)
-  parser.add_argument(
-      '--preemptible-worker-boot-disk-type', help=boot_disk_type_detailed_help)
+  secondary_worker_boot_disk_type = parser.add_argument_group(mutex=True)
+  secondary_worker_boot_disk_type.add_argument(
+      '--preemptible-worker-boot-disk-type',
+      help=boot_disk_type_detailed_help,
+      hidden=True,
+      action=actions.DeprecationAction(
+          '--preemptible-worker-boot-disk-type',
+          warn=('The `--preemptible-worker-boot-disk-type` flag is deprecated. '
+                'Use the `--secondary-worker-boot-disk-type` flag instead.')))
+  secondary_worker_boot_disk_type.add_argument(
+      '--secondary-worker-boot-disk-type', help=boot_disk_type_detailed_help)
 
   autoscaling_group = parser.add_argument_group()
   flags.AddAutoscalingPolicyResourceArgForCluster(
@@ -320,13 +366,44 @@ If you want to enable all scopes use the 'cloud-platform' scope.
 
   flags.AddMinCpuPlatformArgs(parser)
 
-  for instance_type in ('master', 'worker', 'preemptible-worker'):
-    help_msg = """\
+  _AddAcceleratorArgs(parser)
+
+  AddReservationAffinityGroup(
+      gce_platform_group,
+      group_text='Specifies the reservation for the instance.',
+      affinity_text='The type of reservation for the instance.')
+  if include_gke_platform_args:
+    gke_based_cluster_group = platform_group.add_argument_group(
+        hidden=True,
+        help="""\
+          Options for creating a GKE-based Dataproc cluster. Specifying any of these
+          will indicate that this cluster is intended to be a GKE-based cluster.
+          These options are mutually exclusive with GCE-based options.
+          """)
+    gke_based_cluster_group.add_argument(
+        '--gke-cluster',
+        hidden=True,
+        help="""\
+            Required for GKE-based clusters. Specify the name of the GKE cluster to
+            deploy this GKE-based Dataproc cluster to. This should be the short name
+            and not the full path name.
+            """)
+    gke_based_cluster_group.add_argument(
+        '--gke-cluster-namespace',
+        hidden=True,
+        help="""\
+            Optional. Specify the name of the namespace to deploy Dataproc system
+            components into. This namespace does not need to already exist.
+            """)
+
+
+def _AddAcceleratorArgs(parser):
+  """Adds accelerator related args to the parser."""
+  accelerator_help_fmt = """\
       Attaches accelerators (e.g. GPUs) to the {instance_type}
       instance(s).
-      """.format(instance_type=instance_type)
-
-    help_msg += """
+      """
+  accelerator_help_fmt += """
       *type*::: The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla
       K80) of accelerator to attach to the instances. Use 'gcloud compute
       accelerator-types list' to learn about all available accelerator
@@ -335,14 +412,49 @@ If you want to enable all scopes use the 'cloud-platform' scope.
       *count*::: The number of pieces of the accelerator to attach to each
       of the instances. The default value is 1.
       """
-    parser.add_argument(
-        '--{0}-accelerator'.format(instance_type),
-        type=arg_parsers.ArgDict(spec={
-            'type': str,
-            'count': int,
-        }),
-        metavar='type=TYPE,[count=COUNT]',
-        help=help_msg)
+
+  parser.add_argument(
+      '--master-accelerator',
+      type=arg_parsers.ArgDict(spec={
+          'type': str,
+          'count': int,
+      }),
+      metavar='type=TYPE,[count=COUNT]',
+      help=accelerator_help_fmt.format(instance_type='master'))
+
+  parser.add_argument(
+      '--worker-accelerator',
+      type=arg_parsers.ArgDict(spec={
+          'type': str,
+          'count': int,
+      }),
+      metavar='type=TYPE,[count=COUNT]',
+      help=accelerator_help_fmt.format(instance_type='worker'))
+
+  secondary_worker_accelerator = parser.add_argument_group(mutex=True)
+
+  secondary_worker_accelerator.add_argument(
+      '--secondary-worker-accelerator',
+      type=arg_parsers.ArgDict(spec={
+          'type': str,
+          'count': int,
+      }),
+      metavar='type=TYPE,[count=COUNT]',
+      help=accelerator_help_fmt.format(instance_type='secondary-worker'))
+
+  secondary_worker_accelerator.add_argument(
+      '--preemptible-worker-accelerator',
+      type=arg_parsers.ArgDict(spec={
+          'type': str,
+          'count': int,
+      }),
+      metavar='type=TYPE,[count=COUNT]',
+      help=accelerator_help_fmt.format(instance_type='preemptible-worker'),
+      hidden=True,
+      action=actions.DeprecationAction(
+          '--preemptible-worker-accelerator',
+          warn=('The `--preemptible-worker-accelerator` flag is deprecated. '
+                'Use the `--secondary-worker-accelerator` flag instead.')))
 
 
 def _AddDiskArgs(parser):
@@ -362,8 +474,18 @@ def _AddDiskArgs(parser):
       '--worker-boot-disk-size',
       type=arg_parsers.BinarySize(lower_bound='10GB'),
       help=boot_disk_size_detailed_help)
-  parser.add_argument(
+  secondary_worker_boot_disk_size = parser.add_argument_group(mutex=True)
+  secondary_worker_boot_disk_size.add_argument(
       '--preemptible-worker-boot-disk-size',
+      type=arg_parsers.BinarySize(lower_bound='10GB'),
+      help=boot_disk_size_detailed_help,
+      hidden=True,
+      action=actions.DeprecationAction(
+          '--preemptible-worker-boot-disk-size',
+          warn=('The `--preemptible-worker-boot-disk-size` flag is deprecated. '
+                'Use the `--secondary-worker-boot-disk-size` flag instead.')))
+  secondary_worker_boot_disk_size.add_argument(
+      '--secondary-worker-boot-disk-size',
       type=arg_parsers.BinarySize(lower_bound='10GB'),
       help=boot_disk_size_detailed_help)
 
@@ -408,8 +530,18 @@ def _AddDiskArgsDeprecated(parser):
       '--worker-boot-disk-size',
       type=arg_parsers.BinarySize(lower_bound='10GB'),
       help=boot_disk_size_detailed_help)
-  parser.add_argument(
+  secondary_worker_boot_disk_size = parser.add_argument_group(mutex=True)
+  secondary_worker_boot_disk_size.add_argument(
       '--preemptible-worker-boot-disk-size',
+      type=arg_parsers.BinarySize(lower_bound='10GB'),
+      help=boot_disk_size_detailed_help,
+      hidden=True,
+      action=actions.DeprecationAction(
+          '--preemptible-worker-boot-disk-size',
+          warn=('The `--preemptible-worker-boot-disk-size` flag is deprecated. '
+                'Use the `--secondary-worker-boot-disk-size` flag instead.')))
+  secondary_worker_boot_disk_size.add_argument(
+      '--secondary-worker-boot-disk-size',
       type=arg_parsers.BinarySize(lower_bound='10GB'),
       help=boot_disk_size_detailed_help)
 
@@ -425,8 +557,6 @@ def BetaArgsForClusterRef(parser):
         through the component gateway.
         """)
 
-  AddReservationAffinityGroup(parser)
-
 
 def GetClusterConfig(args,
                      dataproc,
@@ -434,7 +564,8 @@ def GetClusterConfig(args,
                      compute_resources,
                      beta=False,
                      include_deprecated=True,
-                     include_ttl_config=False):
+                     include_ttl_config=False,
+                     include_gke_platform_args=False):
   """Get dataproc cluster configuration.
 
   Args:
@@ -445,13 +576,14 @@ def GetClusterConfig(args,
     beta: use BETA only features
     include_deprecated: whether to include deprecated args
     include_ttl_config: whether to include Scheduled Delete(TTL) args
+    include_gke_platform_args: whether to include GKE-based cluster args
 
   Returns:
     cluster_config: Dataproc cluster configuration
   """
   master_accelerator_type = None
   worker_accelerator_type = None
-  preemptible_worker_accelerator_type = None
+  secondary_worker_accelerator_type = None
 
   if args.master_accelerator:
     master_accelerator_type = args.master_accelerator['type']
@@ -461,11 +593,12 @@ def GetClusterConfig(args,
     worker_accelerator_type = args.worker_accelerator['type']
     worker_accelerator_count = args.worker_accelerator.get('count', 1)
 
-  if args.preemptible_worker_accelerator:
-    preemptible_worker_accelerator_type = (
-        args.preemptible_worker_accelerator['type'])
-    preemptible_worker_accelerator_count = (
-        args.preemptible_worker_accelerator.get('count', 1))
+  secondary_worker_accelerator = _FirstNonNone(
+      args.secondary_worker_accelerator, args.preemptible_worker_accelerator)
+  if secondary_worker_accelerator:
+    secondary_worker_accelerator_type = secondary_worker_accelerator['type']
+    secondary_worker_accelerator_count = secondary_worker_accelerator.get(
+        'count', 1)
 
   # Resolve non-zonal GCE resources
   # We will let the server resolve short names of zonal resources because
@@ -512,8 +645,10 @@ def GetClusterConfig(args,
   if args.worker_boot_disk_size:
     worker_boot_disk_size_gb = (api_utils.BytesToGb(args.worker_boot_disk_size))
 
-  preemptible_worker_boot_disk_size_gb = (
-      api_utils.BytesToGb(args.preemptible_worker_boot_disk_size))
+  secondary_worker_boot_disk_size_gb = (
+      api_utils.BytesToGb(
+          _FirstNonNone(args.secondary_worker_boot_disk_size,
+                        args.preemptible_worker_boot_disk_size)))
 
   if args.single_node or args.num_workers == 0:
     # Explicitly specifying --num-workers=0 gives you a single node cluster,
@@ -542,9 +677,8 @@ def GetClusterConfig(args,
       serviceAccountScopes=expanded_scopes,
       zoneUri=properties.VALUES.compute.zone.GetOrFail())
 
-  if beta:
-    reservation_affinity = GetReservationAffinity(args, dataproc)
-    gce_cluster_config.reservationAffinity = reservation_affinity
+  reservation_affinity = GetReservationAffinity(args, dataproc)
+  gce_cluster_config.reservationAffinity = reservation_affinity
 
   if args.tags:
     gce_cluster_config.tags = args.tags
@@ -567,12 +701,12 @@ def GetClusterConfig(args,
         dataproc.messages.AcceleratorConfig(
             acceleratorTypeUri=worker_accelerator_type,
             acceleratorCount=worker_accelerator_count))
-  preemptible_worker_accelerators = []
-  if preemptible_worker_accelerator_type:
-    preemptible_worker_accelerators.append(
+  secondary_worker_accelerators = []
+  if secondary_worker_accelerator_type:
+    secondary_worker_accelerators.append(
         dataproc.messages.AcceleratorConfig(
-            acceleratorTypeUri=preemptible_worker_accelerator_type,
-            acceleratorCount=preemptible_worker_accelerator_count))
+            acceleratorTypeUri=secondary_worker_accelerator_type,
+            acceleratorCount=secondary_worker_accelerator_count))
 
   cluster_config = dataproc.messages.ClusterConfig(
       configBucket=args.bucket,
@@ -621,11 +755,6 @@ def GetClusterConfig(args,
     cluster_config.autoscalingConfig = dataproc.messages.AutoscalingConfig(
         policyUri=args.CONCEPTS.autoscaling_policy.Parse().RelativeName())
 
-  if beta:
-    if args.enable_component_gateway:
-      cluster_config.endpointConfig = dataproc.messages.EndpointConfig(
-          enableHttpPortAccess=args.enable_component_gateway)
-
   if include_ttl_config:
     lifecycle_config = dataproc.messages.LifecycleConfig()
     changed_config = False
@@ -660,24 +789,68 @@ def GetClusterConfig(args,
 
   # Secondary worker group is optional. However, users may specify
   # future pVMs configuration at creation time.
-  if (args.num_preemptible_workers is not None or
-      preemptible_worker_boot_disk_size_gb is not None or
-      args.preemptible_worker_boot_disk_type is not None or
-      args.num_preemptible_worker_local_ssds is not None or
-      args.worker_min_cpu_platform is not None):
+  num_secondary_workers = _FirstNonNone(args.num_secondary_workers,
+                                        args.num_preemptible_workers)
+  secondary_worker_boot_disk_type = _FirstNonNone(
+      args.secondary_worker_boot_disk_type,
+      args.preemptible_worker_boot_disk_type)
+  num_secondary_worker_local_ssds = _FirstNonNone(
+      args.num_secondary_worker_local_ssds,
+      args.num_preemptible_worker_local_ssds)
+  if (num_secondary_workers is not None or
+      secondary_worker_boot_disk_size_gb is not None or
+      secondary_worker_boot_disk_type is not None or
+      num_secondary_worker_local_ssds is not None or
+      args.worker_min_cpu_platform is not None or
+      args.secondary_worker_preemptibility != 'unspecified'):
     cluster_config.secondaryWorkerConfig = (
         dataproc.messages.InstanceGroupConfig(
-            numInstances=args.num_preemptible_workers,
-            accelerators=preemptible_worker_accelerators,
+            numInstances=num_secondary_workers,
+            accelerators=secondary_worker_accelerators,
             diskConfig=GetDiskConfig(
                 dataproc,
-                args.preemptible_worker_boot_disk_type,
-                preemptible_worker_boot_disk_size_gb,
-                args.num_preemptible_worker_local_ssds,
+                secondary_worker_boot_disk_type,
+                secondary_worker_boot_disk_size_gb,
+                num_secondary_worker_local_ssds,
             ),
-            minCpuPlatform=args.worker_min_cpu_platform))
+            minCpuPlatform=args.worker_min_cpu_platform,
+            preemptibility=_GetPreemptibility(
+                dataproc, args.secondary_worker_preemptibility)))
+
+  if include_gke_platform_args:
+    if args.enable_component_gateway:
+      cluster_config.endpointConfig = dataproc.messages.EndpointConfig(
+          enableHttpPortAccess=args.enable_component_gateway)
+    if args.gke_cluster is not None:
+      location = args.zone or args.region
+      target_gke_cluster = 'projects/{0}/locations/{1}/clusters/{2}'.format(
+          args.project, location, args.gke_cluster)
+      cluster_config.gkeClusterConfig = dataproc.messages.GkeClusterConfig(
+          namespacedGkeDeploymentTarget=dataproc.messages
+          .NamespacedGkeDeploymentTarget(
+              targetGkeCluster=target_gke_cluster,
+              clusterNamespace=args.gke_cluster_namespace))
+      cluster_config.gceClusterConfig = None
+      cluster_config.masterConfig = None
+      cluster_config.workerConfig = None
+      cluster_config.secondaryWorkerConfig = None
 
   return cluster_config
+
+
+def _FirstNonNone(first, second):
+  return first if first is not None else second
+
+
+def _GetPreemptibility(dataproc, secondary_worker_preemptibility):
+  if secondary_worker_preemptibility == 'preemptible':
+    return dataproc.messages.InstanceGroupConfig.PreemptibilityValueValuesEnum(
+        'PREEMPTIBLE')
+  elif secondary_worker_preemptibility == 'non-preemptible':
+    return dataproc.messages.InstanceGroupConfig.PreemptibilityValueValuesEnum(
+        'NON_PREEMPTIBLE')
+  else:
+    return None
 
 
 def GetDiskConfig(dataproc, boot_disk_type, boot_disk_size, num_local_ssds):
@@ -699,7 +872,12 @@ def GetDiskConfig(dataproc, boot_disk_type, boot_disk_size, num_local_ssds):
       numLocalSsds=num_local_ssds)
 
 
-def CreateCluster(dataproc, cluster_ref, cluster, is_async, timeout):
+def CreateCluster(dataproc,
+                  cluster_ref,
+                  cluster,
+                  is_async,
+                  timeout,
+                  enable_create_on_gke=False):
   """Create a cluster.
 
   Args:
@@ -708,6 +886,7 @@ def CreateCluster(dataproc, cluster_ref, cluster, is_async, timeout):
     cluster: Cluster to create
     is_async: Whether to wait for the operation to complete
     timeout: Timeout used when waiting for the operation to complete
+    enable_create_on_gke: Whether to enable creation of GKE-based clusters
 
   Returns:
     Created cluster, or None if async
@@ -739,20 +918,27 @@ def CreateCluster(dataproc, cluster_ref, cluster, is_async, timeout):
   cluster = dataproc.client.projects_regions_clusters.Get(get_request)
   if cluster.status.state == (
       dataproc.messages.ClusterStatus.StateValueValuesEnum.RUNNING):
+    if enable_create_on_gke and cluster.config.gkeClusterConfig is not None:
+      log.CreatedResource(
+          cluster_ref,
+          details='Cluster created on GKE cluster {0}'.format(
+              cluster.config.gkeClusterConfig.namespacedGkeDeploymentTarget
+              .targetGkeCluster))
+    else:
+      zone_uri = cluster.config.gceClusterConfig.zoneUri
+      zone_short_name = zone_uri.split('/')[-1]
 
-    zone_uri = cluster.config.gceClusterConfig.zoneUri
-    zone_short_name = zone_uri.split('/')[-1]
-
-    # Log the URL of the cluster
-    log.CreatedResource(
-        cluster_ref,
-        # Also indicate which zone the cluster was placed in. This is helpful
-        # if the server picked a zone (auto zone)
-        details='Cluster placed in zone [{0}]'.format(zone_short_name))
+      # Log the URL of the cluster
+      log.CreatedResource(
+          cluster_ref,
+          # Also indicate which zone the cluster was placed in. This is helpful
+          # if the server picked a zone (auto zone)
+          details='Cluster placed in zone [{0}]'.format(zone_short_name))
   else:
+    # The operation didn't have an error, but the cluster is not RUNNING.
     log.error('Create cluster failed!')
-    if operation.details:
-      log.error('Details:\n' + operation.details)
+    if cluster.status.detail:
+      log.error('Details:\n' + cluster.status.detail)
   return cluster
 
 
@@ -779,67 +965,63 @@ def DeleteGeneratedLabels(cluster, dataproc):
           labels, dataproc.messages.Cluster.LabelsValue)
 
 
-def AddReservationAffinityGroup(parser):
+def AddReservationAffinityGroup(parser, group_text, affinity_text):
   """Adds the argument group to handle reservation affinity configurations."""
-  group = parser.add_group(help='Manage the configuration of desired'
-                                'reservation which this instance could'
-                                'take capacity from.'
-                          )
+  group = parser.add_group(help=group_text)
   group.add_argument(
       '--reservation-affinity',
       choices=['any', 'none', 'specific'],
       default='any',
-      hidden=True,
-      help="""
-Specifies the configuration of desired reservation which this instance could
-take capacity from. Choices are 'any', 'none' and 'specific', default is 'any'.
-""")
+      help=affinity_text)
   group.add_argument(
-      '--reservation-label',
-      type=arg_parsers.ArgDict(spec={
-          'key': str,
-          'value': str,
-      }),
-      hidden=True,
+      '--reservation',
       help="""
-The key and values of the label of the reservation resource. Required if the
-value of `--reservation-affinity` is `specific`.
-
-*key*::: The label key of reservation resource.
-
-*value*::: The label value of reservation resource.
+The name of the reservation, required when `--reservation-affinity=specific`.
 """)
+
+
+def ValidateReservationAffinityGroup(args):
+  """Validates flags specifying reservation affinity."""
+  affinity = getattr(args, 'reservation_affinity', None)
+  if affinity == 'specific':
+    if not args.IsSpecified('reservation'):
+      raise exceptions.ArgumentError(
+          '--reservation must be specified with --reservation-affinity=specific'
+      )
 
 
 def GetReservationAffinity(args, client):
   """Returns the message of reservation affinity for the instance."""
-  if not args.IsSpecified('reservation_affinity'):
-    return None
+  if args.IsSpecified('reservation_affinity'):
+    type_msgs = client.messages.ReservationAffinity\
+      .ConsumeReservationTypeValueValuesEnum
 
-  type_msgs = (client.messages.
-               ReservationAffinity.ConsumeReservationTypeValueValuesEnum)
-
-  if args.reservation_affinity == 'none':
-    reservation_type = type_msgs.NO_RESERVATION
-    reservation_key = None
-    reservation_values = []
-  elif args.reservation_affinity == 'specific':
-    reservation_type = type_msgs.SPECIFIC_RESERVATION
-    # Currently, the key is fixed and the value is the name of the reservation.
-    # The value being a repeated field is reserved for future use when user
-    # can specify more than one reservation names from which the Vm can take
-    # capacity from.
-    reservation_key = args.reservation_label.get('key', None)
-    reservation_values = [args.reservation_label.get('value', None)]
-  else:
-    reservation_type = type_msgs.ANY_RESERVATION
     reservation_key = None
     reservation_values = []
 
-  return client.messages.ReservationAffinity(
-      consumeReservationType=reservation_type,
-      key=reservation_key,
-      values=reservation_values)
+    if args.reservation_affinity == 'none':
+      reservation_type = type_msgs.NO_RESERVATION
+    elif args.reservation_affinity == 'specific':
+      reservation_type = type_msgs.SPECIFIC_RESERVATION
+      # Currently, the key is fixed and the value is the name of the
+      # reservation.
+      # The value being a repeated field is reserved for future use when user
+      # can specify more than one reservation names from which the VM can take
+      # capacity from.
+      reservation_key = RESERVATION_AFFINITY_KEY
+      reservation_values = [args.reservation]
+    else:
+      reservation_type = type_msgs.ANY_RESERVATION
+
+    return client.messages.ReservationAffinity(
+        consumeReservationType=reservation_type,
+        key=reservation_key or None,
+        values=reservation_values)
+
+  return None
+
+
+RESERVATION_AFFINITY_KEY = 'compute.googleapis.com/reservation-name'
 
 
 def AddKerberosGroup(parser):

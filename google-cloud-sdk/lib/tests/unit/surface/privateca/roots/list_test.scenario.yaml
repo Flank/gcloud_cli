@@ -1,0 +1,351 @@
+title: privateca roots list test
+release_tracks: [ALPHA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: core/project foo
+- execute:
+  - command: privateca roots list
+  - stdout: |
+      NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
+      ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+      ca2   europe    ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+      ca1   us        DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+      ca2   us        ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+- execute:
+  - command: privateca roots list --location asia
+  - stderr: |
+      Listed 0 items.
+- execute:
+  - command: privateca roots list --location us
+  - stdout: |
+      NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
+      ca1   us        DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+      ca2   us        ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+- execute:
+  - command: privateca roots list --location europe --limit 1
+  - stdout: |
+      NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
+      ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+- execute:
+  - command: privateca roots list --location europe --page-size 1
+  - stdout: |
+      NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
+      ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+
+      NAME  LOCATION  STATE    NOT_BEFORE                     NOT_AFTER
+      ca2   europe    ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+- execute:
+  - command: privateca roots list --location europe --sort-by ~name --limit 1
+  - stdout: |
+      NAME  LOCATION  STATE    NOT_BEFORE                     NOT_AFTER
+      ca2   europe    ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+- execute:
+  - command: privateca roots list --filter state=ENABLED
+  - stderr: |
+      ERROR: (gcloud.alpha.privateca.roots.list) unrecognized arguments:
+        --filter (did you mean '--flatten'?)
+        state=ENABLED
+        To search the help text of gcloud commands, run:
+        gcloud help -- SEARCH_TERMS
+  - error: '1: None'
+actions:
+- set_property:
+    core/project: foo
+- execute_command:
+    command: privateca roots list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/-/certificateAuthorities?alt=json&filter=type%3ASELF_SIGNED&pageSize=100
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [
+                {
+                  "name": "projects/foo/locations/europe/certificateAuthorities/ca1",
+                  "type": "SELF_SIGNED",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
+                  "state": "DISABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
+                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/europe/certificateAuthorities/ca2",
+                  "type": "SELF_SIGNED",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/us/certificateAuthorities/ca1",
+                  "type": "SELF_SIGNED",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/us/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
+                  "state": "DISABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
+                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/us/certificateAuthorities/ca2",
+                  "type": "SELF_SIGNED",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/us/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                }
+              ],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stdout: |
+        NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
+        ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+        ca2   europe    ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+        ca1   us        DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+        ca2   us        ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots list --location asia
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/asia/certificateAuthorities?alt=json&filter=type%3ASELF_SIGNED&pageSize=100
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots list --location us
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us/certificateAuthorities?alt=json&filter=type%3ASELF_SIGNED&pageSize=100
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [
+                {
+                  "name": "projects/foo/locations/us/certificateAuthorities/ca1",
+                  "type": "SELF_SIGNED",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/us/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
+                  "state": "DISABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
+                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/us/certificateAuthorities/ca2",
+                  "type": "SELF_SIGNED",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/us/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                }
+              ],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stdout: |
+        NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
+        ca1   us        DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+        ca2   us        ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots list --location europe --limit 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe/certificateAuthorities?alt=json&filter=type%3ASELF_SIGNED&pageSize=1
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [
+                {
+                  "name": "projects/foo/locations/europe/certificateAuthorities/ca1",
+                  "type": "SELF_SIGNED",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
+                  "state": "DISABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
+                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/europe/certificateAuthorities/ca2",
+                  "type": "SELF_SIGNED",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                }
+              ],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stdout: |
+        NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
+        ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots list --location europe --page-size 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe/certificateAuthorities?alt=json&filter=type%3ASELF_SIGNED&pageSize=100
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [
+                {
+                  "name": "projects/foo/locations/europe/certificateAuthorities/ca1",
+                  "type": "SELF_SIGNED",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv1",
+                  "state": "DISABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
+                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/foo/locations/europe/certificateAuthorities/ca2",
+                  "type": "SELF_SIGNED",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                }
+              ],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stdout: |
+        NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
+        ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+
+        NAME  LOCATION  STATE    NOT_BEFORE                     NOT_AFTER
+        ca2   europe    ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots list --location europe --sort-by ~name --limit 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe/certificateAuthorities?alt=json&filter=type%3ASELF_SIGNED&orderBy=name+desc&pageSize=1
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "certificateAuthorities": [
+                {
+                  "name": "projects/foo/locations/europe/certificateAuthorities/ca2",
+                  "type": "SELF_SIGNED",
+                  "config": {},
+                  "cloud_kms_key_version": "projects/foo/locations/europe/keyRings/kr1/cryptoKeys/ck1/cryptoKeyVersions/ckv2",
+                  "state": "ENABLED",
+                  "ca_certificate_description": {
+                    "subjectDescription": {
+                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
+                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                    }
+                  }
+                }
+              ],
+              "next_page_token": "",
+              "unreachable_locations": []
+            }
+    - expect_stdout: |
+        NAME  LOCATION  STATE    NOT_BEFORE                     NOT_AFTER
+        ca2   europe    ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots list --filter state=ENABLED
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.privateca.roots.list) unrecognized arguments:
+          --filter (did you mean '--flatten'?)
+          state=ENABLED
+          To search the help text of gcloud commands, run:
+          gcloud help -- SEARCH_TERMS
+    - expect_exit:
+        code: 1

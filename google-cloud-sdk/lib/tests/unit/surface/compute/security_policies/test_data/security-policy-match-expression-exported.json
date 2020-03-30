@@ -1,0 +1,23 @@
+{
+  "description": "my description",
+  "fingerprint": "PWfLGDWQDLY=",
+  "id": "123",
+  "name": "my-policy",
+  "rules": [
+    {
+      "action": "allow",
+      "description": "default rule",
+      "match": {
+        "config": {
+          "srcIpRanges": [
+            "*"
+          ]
+        },
+        "expr": "origin.region_code == 'GB'"
+      },
+      "preview": false,
+      "priority": 2147483647
+    }
+  ],
+  "selfLink": "https://compute.googleapis.com/compute/v1/projects/my-project/global/securityPolicies/my-policy"
+}

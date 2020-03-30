@@ -1,0 +1,78 @@
+title: spanner operations cancel test
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Cancel instance operation
+  - command: spanner operations cancel bbe68c05fd6ec0af --instance=test-instance
+  - stdout: |
+      {}
+- execute:
+  - label: Cancel database operation
+  - command: spanner operations cancel _auto_op_aa784c70a52de9fc --instance=test-instance
+      --database=test-database
+  - stdout: |
+      {}
+- execute:
+  - label: Cancel backup operation
+  - command: spanner operations cancel _auto_op_cc199b8f43cabc58 --instance=test-instance
+      --backup=test-backup
+  - stdout: |
+      {}
+actions:
+- execute_command:
+    command: spanner operations cancel bbe68c05fd6ec0af --instance=test-instance
+    label: Cancel instance operation
+    events:
+    - api_call:
+        expect_request:
+          uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/test-instance/operations/bbe68c05fd6ec0af:cancel?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: spanner operations cancel _auto_op_aa784c70a52de9fc --instance=test-instance
+      --database=test-database
+    label: Cancel database operation
+    events:
+    - api_call:
+        expect_request:
+          uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/test-instance/databases/test-database/operations/_auto_op_aa784c70a52de9fc:cancel?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: spanner operations cancel _auto_op_cc199b8f43cabc58 --instance=test-instance
+      --backup=test-backup
+    label: Cancel backup operation
+    events:
+    - api_call:
+        expect_request:
+          uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/test-instance/backups/test-backup/operations/_auto_op_cc199b8f43cabc58:cancel?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0

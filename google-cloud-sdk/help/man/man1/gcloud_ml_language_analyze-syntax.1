@@ -81,8 +81,9 @@ auto\-detect. Both ISO (such as \f5en\fR or \f5es\fR) and BCP\-47 (such as
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -90,6 +91,31 @@ help\fR for details.
 
 This command uses the \fBlanguage/v1\fR API. The full documentation for this API
 can be found at: https://cloud.google.com/natural\-language/
+
+
+
+.SH "EXAMPLES"
+
+To analyze syntax in raw content 'They drink.':
+
+.RS 2m
+$ gcloud ml language analyze\-syntax \-\-content='They drink'
+.RE
+
+To analyze syntax in file 'myfile.txt':
+
+.RS 2m
+$ gcloud ml language analyze\-syntax \-\-content\-file='myfile.txt'
+.RE
+
+To analyze syntax in a remote file 'gs://bucket_name/mycontent.html' for
+Japanese language using UTF\-8 encoding:
+
+.RS 2m
+$ gcloud ml language analyze\-syntax \e
+    \-\-content\-file='gs://bucket_name/mycontent.html' \e
+    \-\-content\-type=HTML \-\-encoding\-type=utf8 \-\-language=ja\-JP
+.RE
 
 
 

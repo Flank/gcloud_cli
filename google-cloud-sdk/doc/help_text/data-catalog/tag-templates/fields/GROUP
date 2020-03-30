@@ -1,0 +1,39 @@
+NAME
+    gcloud data-catalog tag-templates fields - manage tag template fields in
+        Cloud Data Catalog
+
+SYNOPSIS
+    gcloud data-catalog tag-templates fields COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage tag template fields in Cloud Data Catalog.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a Cloud Data Catalog tag template field.
+
+     delete
+        Delete a Cloud Data Catalog tag template field.
+
+     rename
+        Rename a Cloud Data Catalog tag template field.
+
+     update
+        Update a Cloud Data Catalog tag template field.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha data-catalog tag-templates fields
+        $ gcloud beta data-catalog tag-templates fields
+

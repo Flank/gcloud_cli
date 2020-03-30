@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
@@ -25,6 +26,10 @@ from tests.lib.surface.monitoring import base
 
 
 class ChannelsDeleteTest(base.MonitoringTestBase):
+
+  def PreSetUp(self):
+    super(ChannelsDeleteTest, self).PreSetUp()
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _ExpectDelete(self, force=False):
     channel_name = ('projects/{}/'

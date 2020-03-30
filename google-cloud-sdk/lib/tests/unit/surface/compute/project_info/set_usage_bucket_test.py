@@ -90,7 +90,7 @@ class ProjectInfoSetUsageBucketTest(test_base.BaseTest):
           messages.ComputeProjectsSetUsageExportBucketRequest(
               project='my-project',
               usageExportLocation=messages.UsageExportLocation(
-                  bucketName='https://www.googleapis.com/storage/v1/b/31dd')
+                  bucketName='https://storage.googleapis.com/storage/v1/b/31dd')
           ))],
     )
 

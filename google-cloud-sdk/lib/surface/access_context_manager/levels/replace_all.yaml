@@ -1,4 +1,4 @@
-- release_tracks: [ALPHA]
+- release_tracks: [ALPHA, BETA]
   command_type: GENERIC
 
   help_text:
@@ -7,13 +7,30 @@
     description: |
       Replace all existing access level in specified access policy with access levels specified in a
       file.
+
+      ## EXAMPLES
+
+        To replace all levels within a policy, using etag:
+        $ {command} my-policy-number --source-file=path-to-file-containing-all-replacement-access-levels.yaml --etag=optional-latest-etag-of-policy
+
+        To replace all levels within a policy, without using etag:
+        $ {command} my-policy-number --source-file=path-to-file-containing-all-replacement-access-levels.yaml
+
   request:
-    api_version: v1beta
-    method: replaceAll
     collection: accesscontextmanager.accessPolicies.accessLevels
+    ALPHA:
+      api_version: v1alpha
+      method: replaceAll
+    BETA:
+      api_version: v1
+      method: replaceAll
   response:
-    modify_response_hooks:
-    - googlecloudsdk.command_lib.accesscontextmanager.levels:ParseReplaceAccessLevelsResponseBeta
+    ALPHA:
+      modify_response_hooks:
+      - googlecloudsdk.command_lib.accesscontextmanager.levels:ParseReplaceAccessLevelsResponse:api_version=v1alpha
+    BETA:
+      modify_response_hooks:
+      - googlecloudsdk.command_lib.accesscontextmanager.levels:ParseReplaceAccessLevelsResponse:api_version=v1
 
   arguments:
     resource:
@@ -22,6 +39,13 @@
       override_resource_collection: true
 
     params:
+    - api_field: replaceAccessLevelsRequest.etag
+      arg_name: etag
+      required: false
+      help_text: |
+        An etag which specifies the version of the Access Policy. Only etags
+        that represent the latest version of the Access Policy will be accepted.
+      repeated: false
     - api_field: replaceAccessLevelsRequest.accessLevels
       arg_name: source-file
       required: true
@@ -29,13 +53,13 @@
         Path to a file containing a list of access levels.
 
         An access level file is a YAML-formatted list of access levels,
-        which are YAML objects representing a Condition as described in
+        which are YAML objects representing a Basic or Custom level as described in
         the API reference. For example:
 
         ```
         - name: accessPolicies/my_policy/accessLevels/my_level
-          title: My Level
-          description: Level for foo.
+          title: My Basic Level
+          description: Basic level for foo.
           basic:
             combiningFunction: AND
             conditions:
@@ -45,19 +69,19 @@
             - members
               - user1:user1@example.com
         - name: accessPolicies/my_policy/accessLevels/my_other_level
-          title: My Other Level
-          description: Level for bar.
-          basic:
-            combiningFunction: OR
-            conditions:
-            - ipSubnetworks:
-              - 192.168.100.14/24
-              - 2001:db8::/48
-            - members
-              - user2:user2@example.com
+          title: My Other Custom Level
+          description: Custom level for bar.
+          custom:
+            expr:
+              expression: "origin.region_code in ['US', 'CA']"
         ```
 
-        For more information, see:
-        https://cloud.google.com/access-context-manager/docs/reference/rest/v1beta/accessPolicies.accessLevels
+        For more information about the alpha version, see:
+        https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.accessLevels
+        For more information about the beta version, see:
+        https://cloud.google.com/access-context-manager/docs/reference/rest/v1/accessPolicies.accessLevels
       repeated: false
-      processor: googlecloudsdk.command_lib.accesscontextmanager.levels:ParseBasicAccessLevelsBeta
+      ALPHA:
+        processor: googlecloudsdk.command_lib.accesscontextmanager.levels:ParseAccessLevels:api_version=v1alpha
+      BETA:
+        processor: googlecloudsdk.command_lib.accesscontextmanager.levels:ParseAccessLevels:api_version=v1

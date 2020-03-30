@@ -134,6 +134,20 @@ def GetManagedZonesDnsNameArg():
       help='The DNS name suffix that will be managed with the created zone.')
 
 
+def GetZoneIdArg(
+    help_text=(
+        'The unique system generated id for the peering zone to deactivate.')):
+  return base.Argument('--zone-id', required=True, help=help_text)
+
+
+def GetPeeringZoneListArg():
+  return base.Argument(
+      '--target-network',
+      required=True,
+      help='The network url of the Google Compute Engine private network '
+      'to forward queries to.')
+
+
 def GetManagedZonesDescriptionArg(required=False):
   return base.Argument(
       '--description',
@@ -237,18 +251,48 @@ def GetForwardingTargetsArg():
             'Internet. RFC1918 addresses will forward through the VPC.'))
 
 
-# Policy Flags
-def GetPolicyDescriptionArg():
+def GetPrivateForwardingTargetsArg():
   return base.Argument(
-      '--description',
-      help='A description of the policy.')
+      '--private-forwarding-targets',
+      type=arg_parsers.ArgList(),
+      metavar='IP_ADDRESSES',
+      help=(
+          'List of IPv4 addresses of target name servers that the zone '
+          'will forward queries to. Ignored for `public` visibility. '
+          'All addresses specified for this parameter will be reached through the VPC.'
+      ))
 
 
-def GetPolicyNetworksArg():
+def GetReverseLookupArg():
+  return base.Argument(
+      '--managed-reverse-lookup',
+      action='store_true',
+      default=None,
+      help='Whether this zone is a managed reverse lookup zone, required for '
+      'Cloud DNS to correctly resolve Non-RFC1918 PTR records.')
+
+
+def GetServiceDirectoryArg():
+  return base.Argument(
+      '--service-directory-namespace',
+      required=False,
+      help='The fully qualified URL of the service directory namespace that '
+      'should be associated with the zone. Ignored for `public` visibility '
+      'zones.')
+
+
+# Policy Flags
+def GetPolicyDescriptionArg(required=False):
+  return base.Argument(
+      '--description', required=required, help='A description of the policy.')
+
+
+def GetPolicyNetworksArg(required=False):
   return base.Argument(
       '--networks',
       type=arg_parsers.ArgList(),
       metavar='NETWORKS',
+      required=required,
       help=('The comma separated list of network names to associate with '
             'the policy.'))
 
@@ -269,12 +313,25 @@ def GetPolicyLoggingArg():
       help='Specifies whether to enable query logging. Defaults to False.')
 
 
-def GetPolicyAltNameServersnArg():
+def GetPolicyAltNameServersArg():
   return base.Argument(
       '--alternative-name-servers',
       type=arg_parsers.ArgList(),
       metavar='NAME_SERVERS',
-      help=('List of alternative name servers to forward to. Must be a '
-            'comma separated list of IPv4 addresses.'))
+      help=('List of alternative name servers to forward to. Non-RFC1918 '
+            'addresses will forward to the target through the Internet.'
+            'RFC1918 addresses will forward through the VPC.'))
+
+
+def GetPolicyPrivateAltNameServersArg():
+  return base.Argument(
+      '--private-alternative-name-servers',
+      type=arg_parsers.ArgList(),
+      metavar='NAME_SERVERS',
+      help=(
+          'List of alternative name servers to forward to. '
+          'All addresses specified for this parameter will be reached through the VPC.'
+      ))
+
 
 CHANGES_FORMAT = 'table(id, startTime, status)'

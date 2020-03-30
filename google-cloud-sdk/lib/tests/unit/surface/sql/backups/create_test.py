@@ -37,7 +37,9 @@ class _BaseBackupsCreateTest(object):
     self.mocked_client.operations.Get.Expect(
         request=self.messages.SqlOperationsGetRequest(
             project=self.Project(), operation='opName'),
-        response=self.messages.Operation(name='opName', status='DONE'))
+        response=self.messages.Operation(
+            name='opName',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql backups create --instance my-instance '
              '--description "my description"')
     # Ensure that the CMEK message is not showing up.
@@ -60,7 +62,9 @@ class _BaseBackupsCreateTest(object):
     self.mocked_client.operations.Get.Expect(
         request=self.messages.SqlOperationsGetRequest(
             project=self.Project(), operation='opName'),
-        response=self.messages.Operation(name='opName', status='DONE'))
+        response=self.messages.Operation(
+            name='opName',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql backups create --instance my-instance '
              '--description "my description" --async')
 
@@ -69,7 +73,9 @@ class _BaseBackupsCreateTest(object):
         'name':
             'my-instance',
         'diskEncryptionConfiguration':
-            self.messages.DiskEncryptionConfiguration(kmsKeyName='some-kms-key')
+            self.messages.DiskEncryptionConfiguration(
+                kind='sql#diskEncryptionConfiguration',
+                kmsKeyName='some-kms-key')
     }
     self.ExpectInstanceGet(self.GetV2Instance(), diff)
     self.mocked_client.backupRuns.Insert.Expect(
@@ -84,7 +90,9 @@ class _BaseBackupsCreateTest(object):
     self.mocked_client.operations.Get.Expect(
         request=self.messages.SqlOperationsGetRequest(
             project=self.Project(), operation='opName'),
-        response=self.messages.Operation(name='opName', status='DONE'))
+        response=self.messages.Operation(
+            name='opName',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
     self.Run('sql backups create --instance my-instance '
              '--description "my description"')
     # Ensure that the CMEK message is showing up.
@@ -92,6 +100,25 @@ class _BaseBackupsCreateTest(object):
         'Your backup will be encrypted with this instance\'s customer-managed '
         'encryption key. If anyone destroys this key, all data encrypted with '
         'it will be permanently lost.')
+
+  def testBackupsCreateWithLocation(self):
+    self.ExpectInstanceGet(self.GetV2Instance('my-instance'))
+    self.mocked_client.backupRuns.Insert.Expect(
+        request=self.messages.SqlBackupRunsInsertRequest(
+            project=self.Project(),
+            instance='my-instance',
+            backupRun=self.messages.BackupRun(
+                instance='my-instance',
+                location='us',
+                kind='sql#backupRun')),
+        response=self.messages.Operation(name='opName'))
+    self.mocked_client.operations.Get.Expect(
+        request=self.messages.SqlOperationsGetRequest(
+            project=self.Project(), operation='opName'),
+        response=self.messages.Operation(
+            name='opName',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
+    self.Run('sql backups create --instance my-instance --location=us')
 
 
 class BackupsCreateGATest(_BaseBackupsCreateTest, base.SqlMockTestGA):

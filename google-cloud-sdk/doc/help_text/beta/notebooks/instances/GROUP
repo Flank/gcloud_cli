@@ -1,0 +1,65 @@
+NAME
+    gcloud beta notebooks instances - notebooks Instances command group
+
+SYNOPSIS
+    gcloud beta notebooks instances COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Notebooks Instances command group.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (BETA) Add IAM policy binding for an instance.
+
+     create
+        (BETA) Request for creating an instance.
+
+     delete
+        (BETA) Request for deleting instance.
+
+     describe
+        (BETA) Request for describing instances.
+
+     get-iam-policy
+        (BETA) Get IAM policy for an instance.
+
+     list
+        (BETA) Request for listing instances.
+
+     register
+        (BETA) Request for registering instances.
+
+     remove-iam-policy-binding
+        (BETA) Remove IAM policy binding for an instance.
+
+     reset
+        (BETA) Request for resetting instances.
+
+     set-iam-policy
+        (BETA) Set the IAM policy for an Instance.
+
+     start
+        (BETA) Request for starting instances.
+
+     stop
+        (BETA) Request for stoping instances.
+
+     update
+        (BETA) Request for updating instances.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha notebooks instances
+

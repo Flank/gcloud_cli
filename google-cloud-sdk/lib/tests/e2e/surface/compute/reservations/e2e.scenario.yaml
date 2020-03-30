@@ -42,7 +42,7 @@ summary:
   - stdout: .*$$my-reservation$$.*$
 - execute:
   - command: compute reservations get-iam-policy $$my-reservation$$ --zone $$zone$$
-      --format [etag]
+      --format="yaml(etag)"
   - stdout: |
       etag: ACAB
 - execute:
@@ -208,7 +208,7 @@ actions:
 
 - execute_command:
     command: compute reservations get-iam-policy $$my-reservation$$ --zone $$zone$$
-      --format [etag]
+      --format="yaml(etag)"
     validation_only: true
     events:
     - api_call:

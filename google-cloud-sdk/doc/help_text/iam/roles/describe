@@ -43,21 +43,26 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To print metadata for a role of an organization, run:
+    To print metadata for the role spanner.databaseAdmin of the organization
+    1234567, run:
 
-        $ gcloud iam roles describe --organization 1234567 viewer
+        $ gcloud iam roles describe roles/spanner.databaseAdmin \
+            --organization=1234567
 
-    To print metadata for a role of a project, run:
+    To print metadata for the role spanner.databaseAdmin of the project
+    myproject, run:
 
-        $ gcloud iam roles describe --project myproject viewer
+        $ gcloud iam roles describe roles/spanner.databaseAdmin \
+            --project=myproject
 
-    To print metadata for a predefined role, run:
+    To print metadata for a predefined role, spanner.databaseAdmin, run:
 
-        $ gcloud iam roles describe roles/viewer
+        $ gcloud iam roles describe roles/spanner.databaseAdmin
 
 NOTES
     These variants are also available:

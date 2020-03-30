@@ -26,8 +26,9 @@ gcloud beta compute instance\-groups managed \- read and manipulate Google Compu
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -36,6 +37,10 @@ help\fR for details.
 \f5\fIGROUP\fR\fR is one of the following:
 
 .RS 2m
+.TP 2m
+\fBinstance\-configs\fR
+\fB(BETA)\fR Manage instance\-specific settings of managed instance group.
+
 .TP 2m
 \fBrolling\-action\fR
 \fB(BETA)\fR Manipulate rolling actions on Google Compute Engine managed
@@ -86,6 +91,11 @@ with a defined name and optionally its stateful configuration.
 .TP 2m
 \fBlist\fR
 \fB(BETA)\fR List Google Compute Engine managed instance groups.
+
+.TP 2m
+\fBlist\-errors\fR
+\fB(BETA)\fR List errors produced by managed instances in a managed instance
+group.
 
 .TP 2m
 \fBlist\-instances\fR
@@ -139,7 +149,7 @@ managed instance group.
 
 .TP 2m
 \fBwait\-until\fR
-\fB(BETA)\fR Wait until managed instance group reaches desired state.
+\fB(BETA)\fR Wait until the managed instance group reaches the desired state.
 
 .TP 2m
 \fBwait\-until\-stable\fR

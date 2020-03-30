@@ -100,8 +100,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To connect to the serial port of the instance 'my-instance' in zone
+    'us-central1-f', run:
+
+        $ gcloud beta compute connect-to-serial-port my-instance \
+            --zone=us-central1-f
 
 NOTES
     This command is currently in BETA and may change without notice. These

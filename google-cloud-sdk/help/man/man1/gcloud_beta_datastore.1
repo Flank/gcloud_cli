@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta datastore \- manage your Cloud Datastore indexes
+gcloud beta datastore \- manage your Cloud Datastore resources
 
 
 
@@ -17,17 +17,22 @@ gcloud beta datastore \- manage your Cloud Datastore indexes
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR The gcloud datastore command group lets you create and delete
-Google Cloud Datastore indexes.
-
-Cloud Datastore is a highly\-scalable NoSQL database for your applications.
-Cloud Datastore automatically handles sharding and replication, providing you
-with a highly available and durable database that scales automatically to handle
-your applications' load.
+\fB(BETA)\fR Cloud Datastore is a highly\-scalable NoSQL database for your
+applications. Cloud Datastore automatically handles sharding and replication,
+providing you with a highly available and durable database that scales
+automatically to handle your applications' load.
 
 More information on Cloud Datastore can be found here:
 https://cloud.google.com/datastore and detailed documentation can be found here:
 https://cloud.google.com/datastore/docs
+
+export \-\- Export data to Google Cloud Storage
+
+import \-\- Import data from Google Cloud Storage
+
+indexes \-\- Manage your Cloud Firestore indexes.
+
+operations \-\- Manage Long Running Operations for Cloud Firestore.
 
 
 
@@ -36,8 +41,9 @@ https://cloud.google.com/datastore/docs
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -48,7 +54,7 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBindexes\fR
-\fB(BETA)\fR Manage Cloud Datastore indexes.
+\fB(BETA)\fR Manage your Cloud Datastore indexes.
 
 .TP 2m
 \fBoperations\fR
@@ -74,22 +80,6 @@ help\fR for details.
 
 .RE
 .sp
-
-.SH "EXAMPLES"
-
-To create new indexes from a file, run:
-
-.RS 2m
-$ gcloud beta datastore indexes create index.yaml
-.RE
-
-To clean up unused indexes from a file, run:
-
-.RS 2m
-$ gcloud beta datastore indexes cleanup index.yaml
-.RE
-
-
 
 .SH "NOTES"
 

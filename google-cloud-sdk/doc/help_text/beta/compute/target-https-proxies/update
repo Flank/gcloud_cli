@@ -50,9 +50,10 @@ FLAGS
         referenced by a target HTTPS proxy.
 
      --url-map=URL_MAP
-        A reference to a URL map resource that defines the mapping of URLs to
-        backend services. The URL map must exist and cannot be deleted while
-        referenced by a target HTTPS proxy.
+        A reference to a URL map resource. A URL map defines the mapping of
+        URLs to backend services. Before you can refer to a URL map, you must
+        create the URL map. To delete a URL map that a target proxy is
+        referring to, you must first delete the target HTTPS proxy.
 
      At most one of these may be specified:
 
@@ -128,8 +129,30 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    Update the URL map of a global target HTTPS proxy by running:
+
+        $ gcloud beta compute target-https-proxies update PROXY_NAME \
+            --url-map=URL_MAP
+
+    Update the SSL certificate of a global target HTTPS proxy by running:
+
+        $ gcloud beta compute target-https-proxies update PROXY_NAME \
+            --ssl-certificates=SSL_CERTIFIFCATE
+
+    Update the URL map of a global target HTTPS proxy by running:
+
+        $ gcloud beta compute target-https-proxies update PROXY_NAME \
+            --url-map=URL_MAP --region=REGION_NAME
+
+    Update the SSL certificate of a global target HTTPS proxy by running:
+
+        $ gcloud beta compute target-https-proxies update PROXY_NAME \
+            --ssl-certificates=SSL_CERTIFIFCATE --region=REGION_NAME
 
 NOTES
     This command is currently in BETA and may change without notice. These

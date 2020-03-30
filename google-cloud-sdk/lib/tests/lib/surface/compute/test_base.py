@@ -102,15 +102,23 @@ class ApitoolsClientCache(object):
   def AddClient(self, api_name, api_version, client):
     self._cache.setdefault(api_name, {})[api_version] = client
 
-  # This function must match signature of core_apis.GetClientInstance.
-  # pylint:disable=unused-argument
-  def GetClientInstance(self, api_name, api_version, no_http=False):
+  # pylint:disable=unused-argument,g-doc-args,g-doc-return-or-yield
+  def GetClientInstance(self,
+                        api_name,
+                        api_version,
+                        no_http=False,
+                        use_google_auth=False):
+    """The mock of core_apis.GetClientInstance in the compute unit tests.
+
+       This function must match the signature of core_apis.GetClientInstance.
+    """
     versions = self._cache.setdefault(api_name, {})
     if api_version not in versions:
       client = self._get_client_func(api_name, api_version)
       self.AddClient(api_name, api_version, client)
       return client
     return versions[api_version]
+    # pylint:enable=unused-argument,g-doc-args,g-doc-return-or-yield
 
 
 class BaseTest(cli_test_base.CliTestBase, sdk_test_base.WithOutputCapture):
@@ -260,6 +268,26 @@ class BaseTest(cli_test_base.CliTestBase, sdk_test_base.WithOutputCapture):
          self.alpha_messages.ComputeZonesListRequest(
              maxResults=500,
              project='my-project')),
+    ]
+    self.project_get_request_v1 = [
+        (self.compute_v1.projects,
+         'Get',
+         self.v1_messages.ComputeProjectsGetRequest(
+             project=self.Project()))
+    ]
+
+    self.project_get_request_alpha = [
+        (self.compute_alpha.projects,
+         'Get',
+         self.alpha_messages.ComputeProjectsGetRequest(
+             project=self.Project()))
+    ]
+
+    self.project_get_request_beta = [
+        (self.compute_beta.projects,
+         'Get',
+         self.beta_messages.ComputeProjectsGetRequest(
+             project=self.Project()))
     ]
 
     # By default assume 'v1' api
@@ -546,10 +574,12 @@ class BaseSSHTest(BaseTest):
     self.public_key_file = self.private_key_file + '.pub'
     self.known_hosts_file = os.path.join(self.ssh_dir, 'known_hosts')
     self.StartObjectPatch(ssh.KnownHosts, 'DEFAULT_PATH', self.known_hosts_file)
-    self.known_hosts_add = self.StartObjectPatch(ssh.KnownHosts, 'Add',
-                                                 autospec=True)
-    self.known_hosts_write = self.StartObjectPatch(ssh.KnownHosts, 'Write',
-                                                   autospec=True)
+    self.known_hosts_add = self.StartObjectPatch(
+        ssh.KnownHosts, 'Add', autospec=True)
+    self.known_hosts_addmultiple = self.StartObjectPatch(
+        ssh.KnownHosts, 'AddMultiple', autospec=True)
+    self.known_hosts_write = self.StartObjectPatch(
+        ssh.KnownHosts, 'Write', autospec=True)
 
     # Common test vars
     self.remote = ssh.Remote('23.251.133.75', user='me')

@@ -31,8 +31,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -159,11 +160,34 @@ AVAILABLE PROPERTIES
             client tooling. If not set, the default path for each runtime is
             used.
 
+     artifacts
+         location
+            Default location to use when working with Artifact Registry
+            resources. When a location value is required but not provided, the
+            command will fall back to this value, if set. If this value is
+            unset, the default location is global when location value is
+            optional.
+
+         repository
+            Default repository to use when working with Artifact Registry
+            resources. When a repository value is required but not provided,
+            the command will fall back to this value, if set.
+
      auth
          disable_credentials
             If True, gcloud will not attempt to load any credentials or
             authenticate any requests. This is useful when behind a proxy that
             adds authentication to requests.
+
+         impersonate_service_account
+            After setting this property, all API requests will be made as the
+            given service account instead of the currently selected account.
+            This is done without needing to create, download, and activate a
+            key for the account. In order to perform operations as the service
+            account, your currently selected account must have an IAM role that
+            includes the iam.serviceAccounts.getAccessToken permission for the
+            service account. The roles/iam.serviceAccountTokenCreator role has
+            this permission or you may create a custom role.
 
      billing
          quota_project
@@ -250,12 +274,20 @@ AVAILABLE PROPERTIES
      context_aware
          use_client_certificate
             If True, use client certificate to authorize user device using
-            context aware access.
+            Context-aware access. Some services may not support client
+            certificate authorization. If a command sends requests to such
+            services, the client certificate will not be validated. Run gcloud
+            topic client-certificate for list of services supporting this
+            feature.
 
      dataflow
          disable_public_ips
             Specifies that Cloud Dataflow workers must not use public IP
             addresses.
+
+         print_only
+            Prints the container spec to stdout. Does not save in Google Cloud
+            Storage.
 
      datafusion
          location
@@ -294,6 +326,18 @@ AVAILABLE PROPERTIES
             beta functions regions list.
 
      game_services
+         default_deployment
+            Default deployment to use when working with Cloud Game Services
+            list configs. When a --deployment flag is required in a list
+            command but not provided, the command will fall back to this value
+            which envokes aggregated list from the backend.
+
+         default_realm
+            Default realm to use when working with Cloud Game Services list
+            clusters. When a --realm flag is required in a list command but not
+            provided, the command will fall back to this value which envokes
+            aggregated list from the backend.
+
          location
             Default location to use when working with Cloud Game Services
             resources. When a --location flag is required but not provided, the
@@ -374,6 +418,12 @@ AVAILABLE PROPERTIES
             Engine jobs. Note that making it much faster than the default (60)
             will quickly use all of your quota.
 
+     notebooks
+         location
+            Default location to use when working with Notebook resources. When
+            a location value is required but not provided, the command will
+            fall back to this value, if set.
+
      proxy
          address
             Hostname or IP address of proxy server.
@@ -421,6 +471,16 @@ AVAILABLE PROPERTIES
      scc
          organization
             Default organization gcloud should use for scc surface.
+
+     secrets
+         locations
+            A comma separated list of the locations to replicate secrets to.
+            Only applies to secrets with a user-managed policy.
+
+         replication-policy
+            The type of replication policy to apply to secrets. Allowed values
+            are "automatic" and "user-managed". If user-managed then locations
+            must also be provided.
 
      spanner
          instance

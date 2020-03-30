@@ -23,6 +23,7 @@ from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import completers as compute_completers
 from googlecloudsdk.command_lib.compute import flags as compute_flags
+from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.util import completers
 
 
@@ -89,20 +90,6 @@ MULTISCOPE_INSTANCE_GROUP_ARG = compute_flags.ResourceArgument(
     region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION)
 
 
-NETWORK_ENDPOINT_GROUP_ARG = compute_flags.ResourceArgument(
-    name='--network-endpoint-group',
-    resource_name='network endpoint group',
-    zonal_collection='compute.networkEndpointGroups',
-    zone_explanation=compute_flags.ZONE_PROPERTY_EXPLANATION)
-
-
-GLOBAL_NETWORK_ENDPOINT_GROUP_ARG = compute_flags.ResourceArgument(
-    name='--network-endpoint-group',
-    resource_name='network endpoint group',
-    zonal_collection='compute.networkEndpointGroups',
-    global_collection='compute.globalNetworkEndpointGroups',
-    zone_explanation=compute_flags.ZONE_PROPERTY_EXPLANATION)
-
 GLOBAL_BACKEND_SERVICE_ARG = compute_flags.ResourceArgument(
     name='backend_service_name',
     resource_name='backend service',
@@ -145,6 +132,21 @@ NETWORK_ARG = compute_flags.ResourceArgument(
         Network that this backend service applies to. It can only be set if
         the load-balancing-scheme is INTERNAL.
         """)
+
+
+def GetNetworkEndpointGroupArg(support_global_neg=False,
+                               support_region_neg=False):
+  return compute_flags.ResourceArgument(
+      name='--network-endpoint-group',
+      resource_name='network endpoint group',
+      zonal_collection='compute.networkEndpointGroups',
+      global_collection='compute.globalNetworkEndpointGroups'
+      if support_global_neg else None,
+      regional_collection='compute.regionNetworkEndpointGroups'
+      if support_region_neg else None,
+      zone_explanation=compute_flags.ZONE_PROPERTY_EXPLANATION,
+      region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION
+      if support_region_neg else None)
 
 
 def BackendServiceArgumentForUrlMap(required=True,
@@ -391,7 +393,7 @@ def HttpHealthCheckArgument(required=False):
       possible to use a legacy health check on a backend service for a HTTP(S)
       load balancer if that backend service uses instance groups. For more
       information, refer to this guide:
-      https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide
+      https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide.
       """)
 
 
@@ -411,8 +413,17 @@ def HttpsHealthCheckArgument(required=False):
       possible to use a legacy health check on a backend service for a HTTP(S)
       load balancer if that backend service uses instance groups. For more
       information, refer to this guide:
-      https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide
+      https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide.
       """)
+
+
+def AddNoHealthChecks(parser, default=None):
+  """Adds the no health checks argument to the argparse."""
+  parser.add_argument(
+      '--no-health-checks',
+      action='store_true',
+      default=default,
+      help='Removes all health checks for the backend service.')
 
 
 def GetHealthCheckUris(args, resource_resolver, resource_parser):
@@ -437,7 +448,15 @@ def GetHealthCheckUris(args, resource_resolver, resource_parser):
     else:
       health_check_refs.extend(
           resource_resolver.HEALTH_CHECK_ARG.ResolveAsResource(
-              args, resource_parser))
+              args,
+              resource_parser,
+              default_scope=compute_scope.ScopeEnum.GLOBAL))
+
+  if health_check_refs and getattr(args, 'no_health_checks', None):
+    raise exceptions.ToolException(
+        'Combining --health-checks, --http-health-checks, or '
+        '--https-health-checks with --no-health-checks is not supported.'
+    )
 
   return [health_check_ref.SelfLink() for health_check_ref in health_check_refs]
 
@@ -454,8 +473,18 @@ def AddIap(parser, help=None):  # pylint: disable=redefined-builtin
       help=help or 'Specifies a list of settings for IAP service.')
 
 
-def AddSessionAffinity(parser, target_pools=False, hidden=False):
-  """Adds session affinity flag to the argparse."""
+def AddSessionAffinity(parser,
+                       target_pools=False,
+                       hidden=False,
+                       support_client_only=False):
+  """Adds session affinity flag to the argparse.
+
+  Args:
+    parser: An argparse.ArgumentParser instance.
+    target_pools: Indicates if the backend pool is target pool.
+    hidden: if hidden=True, retains help but does not display it.
+    support_client_only: Indicates if CLIENT_IP_NO_DESTINATION is valid choice.
+  """
   choices = {
       'CLIENT_IP': (
           "Route requests to instances based on the hash of the client's IP "
@@ -515,6 +544,16 @@ def AddSessionAffinity(parser, target_pools=False, hidden=False):
             ' is either RING_HASH or MAGLEV and the backend service\'s '
             ' consistent hash specifies the name of the HTTP header.'),
     })
+    if support_client_only:
+      choices.update({
+          'CLIENT_IP_NO_DESTINATION': (
+              'Directs a particular client\'s request to the same backend VM '
+              'based on a hash created on the client\'s IP address only. This '
+              'is used in L4 ILB as Next-Hop scenarios. It differs from the '
+              'Client-IP option in that Client-IP uses a hash based on both '
+              'client-IP\'s address and destination address.'
+              )
+      })
   help_str = 'The type of TCP session affinity to use. Not supported for UDP.'
   parser.add_argument(
       '--session-affinity',
@@ -599,7 +638,16 @@ def AddPortName(parser):
       """)
 
 
-def AddProtocol(parser, default='HTTP'):
+def AddProtocol(parser, default='HTTP', support_grpc_protocol=False):
+  """Adds --protocol flag to the argparse.
+
+  Args:
+    parser: An argparse.ArgumentParser instance.
+    default: The default protocol if this flag is unspecified.
+    support_grpc_protocol: Indicates if GRPC is a valid protocol.
+  """
+  td_protocols = ('HTTP, HTTPS, HTTP2, GRPC'
+                  if support_grpc_protocol else 'HTTP, HTTPS, HTTP2')
   parser.add_argument(
       '--protocol',
       default=default,
@@ -607,12 +655,19 @@ def AddProtocol(parser, default='HTTP'):
       help="""\
       Protocol for incoming requests.
 
-      If the load-balancing-scheme is `INTERNAL`, the protocol must be one of:
-      `TCP`, `UDP`.
+      If the `load-balancing-scheme` is `INTERNAL` (internal TCP/UDP load
+      balancers), the protocol must be one of: TCP, UDP.
 
-      If the load-balancing-scheme is `EXTERNAL`, the protocol must be one of:
-      `HTTP`, `HTTPS`, `HTTP2`, `SSL`, `TCP`.
-      """)
+      If the `load-balancing-scheme` is `INTERNAL_SELF_MANAGED` (Traffic
+      Director), the protocol must be one of: {0}.
+
+      If the `load-balancing-scheme` is `INTERNAL_MANAGED` (internal HTTP(S)
+      load balancers), the protocol must be one of: HTTP, HTTPS, HTTP2.
+
+      If the `load-balancing-scheme` is `EXTERNAL` (HTTP(S), SSL proxy, or TCP
+      proxy load balancers), the protocol must be one of: HTTP, HTTPS, HTTP2,
+      SSL, TCP.
+      """.format(td_protocols))
 
 
 def AddConnectionDrainOnFailover(parser, default):
@@ -685,15 +740,17 @@ def AddLoggingSampleRate(parser):
 
 def AddInstanceGroupAndNetworkEndpointGroupArgs(parser,
                                                 verb,
-                                                support_global_neg=False):
+                                                support_global_neg=False,
+                                                support_region_neg=False):
   """Adds instance group and network endpoint group args to the argparse."""
   backend_group = parser.add_group(required=True, mutex=True)
   instance_group = backend_group.add_group('Instance Group')
   neg_group = backend_group.add_group('Network Endpoint Group')
   MULTISCOPE_INSTANCE_GROUP_ARG.AddArgument(
       instance_group, operation_type='{} the backend service'.format(verb))
-  neg_group_arg = (GLOBAL_NETWORK_ENDPOINT_GROUP_ARG if support_global_neg
-                   else NETWORK_ENDPOINT_GROUP_ARG)
+  neg_group_arg = GetNetworkEndpointGroupArg(
+      support_global_neg=support_global_neg,
+      support_region_neg=support_region_neg)
   neg_group_arg.AddArgument(
       neg_group, operation_type='{} the backend service'.format(verb))
 

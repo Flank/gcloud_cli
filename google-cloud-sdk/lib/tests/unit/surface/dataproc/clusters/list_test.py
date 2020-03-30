@@ -29,7 +29,8 @@ from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import unit_base
 
 _LIST_OUTPUT_COLUMN_NAMES = (
-    'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE SCHEDULED_DELETE')
+    'NAME PLATFORM WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE '
+    'SCHEDULED_DELETE')
 
 
 class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
@@ -67,7 +68,8 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
     self.AssertOutputContains(_LIST_OUTPUT_COLUMN_NAMES, normalize_space=True)
     # Preemptible worker count is 0
     self.AssertOutputContains(
-        'test-cluster-1 2 RUNNING antarctica-north42-a', normalize_space=True)
+        'test-cluster-1 GCE 2 RUNNING antarctica-north42-a',
+        normalize_space=True)
 
   def testListClustersOutput_singleNode(self):
     dataproc_properties = encoding.DictToAdditionalPropertyMessage({
@@ -83,7 +85,7 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
     self.AssertOutputContains(_LIST_OUTPUT_COLUMN_NAMES, normalize_space=True)
     # Worker and preemptible worker counts are 0
     self.AssertOutputContains(
-        'test-cluster-1 RUNNING antarctica-north42-a', normalize_space=True)
+        'test-cluster-1 GCE RUNNING antarctica-north42-a', normalize_space=True)
 
   def testListClustersOutput_preemptibleWorkers(self):
     clusters = [
@@ -95,7 +97,8 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
     self.RunDataproc('clusters list', output_format='')
     self.AssertOutputContains(_LIST_OUTPUT_COLUMN_NAMES, normalize_space=True)
     self.AssertOutputContains(
-        'test-cluster-1 2 4 RUNNING antarctica-north42-a', normalize_space=True)
+        'test-cluster-1 GCE 2 4 RUNNING antarctica-north42-a',
+        normalize_space=True)
 
   def testListClustersFilter(self):
     self.ExpectListClusters(self.clusters, list_filter='labels.k1:v1')
@@ -142,8 +145,9 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
     next(self.RunDataproc('clusters list'))
 
   def testListClustersNoRegion(self):
-    self.ExpectListClusters(self.clusters, region='global')
-    next(self.RunDataproc('clusters list', set_region=False))
+    regex = r'The required property \[region\] is not currently set'
+    with self.assertRaisesRegex(properties.RequiredPropertyError, regex):
+      next(self.RunDataproc('clusters list', set_region=False))
 
   def testListClustersOutput_scheduledDeleteCluster(self):
     cluster = self.MakeRunningCluster()
@@ -155,20 +159,27 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
     self.AssertOutputContains(_LIST_OUTPUT_COLUMN_NAMES, normalize_space=True)
     # SCHEDULED_DELETE column should be marked as enabled.
     self.AssertOutputContains(
-        'test-cluster 2 RUNNING antarctica-north42-a enabled',
+        'test-cluster GCE 2 RUNNING antarctica-north42-a enabled',
         normalize_space=True)
 
 
 class ClustersListUnitTestBeta(ClustersListUnitTest, base.DataprocTestBaseBeta):
   """Tests for dataproc clusters list."""
 
+  def testListClusters_gkeBasedCluster(self):
+    cluster = self.MakeRunningCluster(
+        gkeClusterPath='projects/{0}/locations/{1}/clusters/my-cluster'.format(
+            self.Project(), self.ZONE))
+
+    self.ExpectListClusters([cluster])
+    self.RunDataproc('clusters list', output_format='')
+    self.AssertOutputContains(_LIST_OUTPUT_COLUMN_NAMES, normalize_space=True)
+    self.AssertOutputContains(
+        '{0} GKE RUNNING {1}'.format(self.CLUSTER_NAME, self.ZONE),
+        normalize_space=True)
+
   def testBeta(self):
     self.assertEqual(self.messages, self._beta_messages)
-
-  def testListClustersNoRegion(self):
-    regex = r'The required property \[region\] is not currently set'
-    with self.assertRaisesRegex(properties.RequiredPropertyError, regex):
-      next(self.RunDataproc('clusters list', set_region=False))
 
 
 class ClustersListUnitTestAlpha(ClustersListUnitTestBeta):

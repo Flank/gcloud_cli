@@ -20,10 +20,44 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.secrets import api as secrets_api
 from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.secrets import args as secrets_args
 from googlecloudsdk.command_lib.secrets import fmt as secrets_fmt
+from googlecloudsdk.command_lib.secrets import util as secrets_util
 
 
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class ListBeta(base.ListCommand):
+  r"""List all available locations.
+
+  List all available locations in which secrets can be replicated.
+
+  ## EXAMPLES
+
+  List available secrets locations:
+
+    $ {command}
+  """
+
+  @staticmethod
+  def Args(parser):
+    secrets_args.AddProject(parser)
+    secrets_fmt.UseLocationTable(parser, 'v1beta1')
+
+  def Run(self, args):
+    project_ref = args.CONCEPTS.project.Parse()
+    if not project_ref:
+      raise exceptions.RequiredArgumentException(
+          'project',
+          'Please set a project with "--project" flag or "gcloud config set project <project_id>".'
+      )
+    return secrets_api.Locations(
+        version=secrets_util.GetVersionFromReleasePath(
+            self.ReleaseTrack())).ListWithPager(
+                project_ref=project_ref, limit=args.limit)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class List(base.ListCommand):
   r"""List all available locations.
 
@@ -39,9 +73,16 @@ class List(base.ListCommand):
   @staticmethod
   def Args(parser):
     secrets_args.AddProject(parser)
-    secrets_fmt.UseLocationTable(parser)
+    secrets_fmt.UseLocationTable(parser, 'v1')
 
   def Run(self, args):
     project_ref = args.CONCEPTS.project.Parse()
-    return secrets_api.Locations().ListWithPager(
-        project_ref=project_ref, limit=args.limit)
+    if not project_ref:
+      raise exceptions.RequiredArgumentException(
+          'project',
+          'Please set a project with "--project" flag or "gcloud config set project <project_id>".'
+      )
+    return secrets_api.Locations(
+        version=secrets_util.GetVersionFromReleasePath(
+            self.ReleaseTrack())).ListWithPager(
+                project_ref=project_ref, limit=args.limit)

@@ -1,0 +1,659 @@
+title: Create Filestore Backup
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      filestore backups update backup --region us-west1 --description "New description"
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated backup.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: New description
+      labels:
+        key1: val1
+        key2: val2
+      name: projects/fake-project/locations/us-west1/backups/backup
+      sourceFileShare: vol
+      sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+- execute:
+  - command: |
+      filestore backups update backup --region us-west1 --update-labels "key1=val1,key2=val2"
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated backup.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: Description
+      labels:
+        key1: val1
+        key2: val2
+      name: projects/fake-project/locations/us-west1/backups/backup
+      sourceFileShare: vol
+      sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+- execute:
+  - command: |
+      filestore backups update backup --region us-west1 --update-labels "key2=val22,key3=val3" --remove-labels "key1"
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated backup.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: Description
+      labels:
+        key2: val22
+      name: projects/fake-project/locations/us-west1/backups/backup
+      sourceFileShare: vol
+      sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+- execute:
+  - command: |
+      filestore backups update backup --region us-west1 --clear-labels
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated backup.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: Description
+      name: projects/fake-project/locations/us-west1/backups/backup
+      sourceFileShare: vol
+      sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+actions:
+- execute_command:
+    command: |
+      filestore backups update backup --region us-west1 --description "New description"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/backups/backup",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=description
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: New description
+              labels:
+                key1: val1
+                key2: val2
+              name: projects/fake-project/locations/us-west1/backups/backup
+              sourceFileShare: vol
+              sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/fake-project/locations/us-west1/backups/backup",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/fake-project/locations/us-west1/backups/backup",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Backup",
+                "name": "projects/fake-project/locations/us-west1/backups/backup",
+                "description": "New description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated backup.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/backups/backup",
+              "description": "New description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: New description
+        labels:
+          key1: val1
+          key2: val2
+        name: projects/fake-project/locations/us-west1/backups/backup
+        sourceFileShare: vol
+        sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      filestore backups update backup --region us-west1 --update-labels "key1=val1,key2=val2"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/backups/backup",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: Description
+              labels:
+                key1: val1
+                key2: val2
+              name: projects/fake-project/locations/us-west1/backups/backup
+              sourceFileShare: vol
+              sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/fake-project/locations/us-west1/backups/backup",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/fake-project/locations/us-west1/backups/backup",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Backup",
+                "name": "projects/fake-project/locations/us-west1/backups/backup",
+                "description": "Description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated backup.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/backups/backup",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: Description
+        labels:
+          key1: val1
+          key2: val2
+        name: projects/fake-project/locations/us-west1/backups/backup
+        sourceFileShare: vol
+        sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      filestore backups update backup --region us-west1 --update-labels "key2=val22,key3=val3" --remove-labels "key1"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/backups/backup",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: Description
+              labels:
+                key2: val22
+              name: projects/fake-project/locations/us-west1/backups/backup
+              sourceFileShare: vol
+              sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/fake-project/locations/us-west1/backups/backup",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/fake-project/locations/us-west1/backups/backup",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Backup",
+                "name": "projects/fake-project/locations/us-west1/backups/backup",
+                "description": "Description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated backup.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/backups/backup",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key2": "val22"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: Description
+        labels:
+          key2: val22
+        name: projects/fake-project/locations/us-west1/backups/backup
+        sourceFileShare: vol
+        sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      filestore backups update backup --region us-west1 --clear-labels
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/backups/backup",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: Description
+              labels: {}
+              name: projects/fake-project/locations/us-west1/backups/backup
+              sourceFileShare: vol
+              sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/fake-project/locations/us-west1/backups/backup",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/fake-project/locations/us-west1/backups/backup",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Backup",
+                "name": "projects/fake-project/locations/us-west1/backups/backup",
+                "description": "Description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated backup.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/backups/backup?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-west1/backups/backup",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: Description
+        name: projects/fake-project/locations/us-west1/backups/backup
+        sourceFileShare: vol
+        sourceInstance: projects/fake-project/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0

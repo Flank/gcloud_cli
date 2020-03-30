@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 title: cloud identity groups memberships describe test scenario
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
+  - label: Describe membership for a specified group email and member email.
   - command: |
       identity groups memberships describe
       --group-email eng-discuss@foo.com --member-email user@foo.com
@@ -29,26 +30,36 @@ summary:
       - name: MEMBER
       updateTime: '2019-10-09T21:15:04.077500Z'
 - execute:
+  - label: Describe membership with an invalid group email.
   - command: |
       identity groups memberships describe --group-email invalid-group@foo.com
       --member-email user@foo.com
   - error: '1: Invalid value for [group_email]: There is no such a group associated
       with the specified argument:invalid-group@foo.com'
 - execute:
+  - label: Describe membership with an invalid member email.
   - command: |
       identity groups memberships describe --group-email eng-discuss@foo.com
       --member-email invalid-user@foo.com
   - error: '1: Invalid value for [group_email, member_email]: There is no such a membership
       associated with the specified arguments:eng-discuss@foo.com, invalid-user@foo.com'
 actions:
-- execute_command:  # Describe membership for a specified group email and member email.
+
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha1
+      BETA: v1beta1
+
+- execute_command:
+    label: Describe membership for a specified group email and member email.
     command: |
       identity groups memberships describe
       --group-email eng-discuss@foo.com --member-email user@foo.com
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -61,7 +72,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
           method: GET
           headers: {}
           body: null
@@ -74,7 +85,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2/memberships/110293416452252446513?alt=json
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships/110293416452252446513?alt=json
           method: GET
           headers: {}
           body: null
@@ -110,14 +121,15 @@ actions:
     - expect_exit:
         code: 0
 
-- execute_command:  # Describe membership with an invalid group email.
+- execute_command:
+    label: Describe membership with an invalid group email.
     command: |
       identity groups memberships describe --group-email invalid-group@foo.com
       --member-email user@foo.com
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=invalid-group%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=invalid-group%40foo.com
           method: GET
           headers: {}
           body: null
@@ -142,14 +154,15 @@ actions:
         code: 1
         message: 'Invalid value for [group_email]: There is no such a group associated
           with the specified argument:invalid-group@foo.com'
-- execute_command:  # Describe membership with an invalid member email.
+- execute_command:
+    label: Describe membership with an invalid member email.
     command: |
       identity groups memberships describe --group-email eng-discuss@foo.com
       --member-email invalid-user@foo.com
     events:
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
           method: GET
           headers: {}
           body: null
@@ -162,7 +175,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=invalid-user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=invalid-user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
           method: GET
           headers: {}
           body: null

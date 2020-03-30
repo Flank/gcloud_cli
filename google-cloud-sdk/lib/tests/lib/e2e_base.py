@@ -37,6 +37,7 @@ from googlecloudsdk.core import yaml
 from googlecloudsdk.core.credentials import gce as c_gce
 from googlecloudsdk.core.credentials import http as cred_http
 from googlecloudsdk.core.credentials import store as c_store
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import retry
 from tests.lib import cli_test_base
 from tests.lib import test_case
@@ -193,7 +194,8 @@ class WithMockHttp(cli_test_base.CliTestBase):
 
 def _LoadTestConfig():
   """Loads test config based on environment variable setting."""
-  env_config_file = os.getenv('CLOUD_SDK_TEST_CONFIG')
+  env_config_file = encoding.GetEncodedValue(os.environ,
+                                             'CLOUD_SDK_TEST_CONFIG')
   if not env_config_file:
     env_config_file = cli_test_base.CliTestBase.Resource(
         'tests', 'lib', 'e2e', 'integration_test_config.yaml')

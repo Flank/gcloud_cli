@@ -51,7 +51,7 @@ class _BaseBackupsListTest(object):
                         0,
                         623000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     error=None,
                     instance='integration-test',
                     endTime=None,
@@ -66,8 +66,9 @@ class _BaseBackupsListTest(object):
                         4,
                         555000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
-                    status='SKIPPED',
+                            datetime.timedelta(0))).isoformat(),
+                    status=self.messages.BackupRun.StatusValueValuesEnum
+                    .SKIPPED,
                 ),
                 self.messages.BackupRun(
                     id=2,
@@ -80,7 +81,7 @@ class _BaseBackupsListTest(object):
                         0,
                         451000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     error=None,
                     instance='integration-test',
                     endTime=None,
@@ -95,8 +96,9 @@ class _BaseBackupsListTest(object):
                         7,
                         464000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
-                    status='SKIPPED',
+                            datetime.timedelta(0))).isoformat(),
+                    status=self.messages.BackupRun.StatusValueValuesEnum
+                    .SKIPPED,
                 ),
             ],
             nextPageToken='1396059067464',
@@ -123,7 +125,7 @@ class _BaseBackupsListTest(object):
                         0,
                         623000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     error=None,
                     instance='integration-test',
                     endTime=None,
@@ -137,7 +139,7 @@ class _BaseBackupsListTest(object):
                         0,
                         451000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     enqueuedTime=datetime.datetime(
                         2015,
                         7,
@@ -147,8 +149,9 @@ class _BaseBackupsListTest(object):
                         4,
                         555000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
-                    status='SKIPPED',
+                            datetime.timedelta(0))).isoformat(),
+                    status=self.messages.BackupRun.StatusValueValuesEnum
+                    .SKIPPED,
                 ),
                 self.messages.BackupRun(
                     id=4,
@@ -161,7 +164,7 @@ class _BaseBackupsListTest(object):
                         0,
                         451000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     error=None,
                     instance='integration-test',
                     endTime=None,
@@ -176,8 +179,9 @@ class _BaseBackupsListTest(object):
                         7,
                         464000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
-                    status='SKIPPED',
+                            datetime.timedelta(0))).isoformat(),
+                    status=self.messages.BackupRun.StatusValueValuesEnum
+                    .SKIPPED,
                 ),
             ],
             nextPageToken=None,

@@ -45,7 +45,7 @@ class UpdateTestGA(router_test_base.RouterTestBase):
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -68,14 +68,14 @@ class UpdateTestGA(router_test_base.RouterTestBase):
     result = self.Run("""
         compute routers update my-router --region us-central1 --async
         """)
-    self.assertEqual('operation-X', result.name)
+    self.assertIn('operation-X', result.name)
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Update in progress for router [my-router] '
-        '[https://compute.googleapis.com/compute/v1/'
+        '[https://compute.googleapis.com/compute/{}/'
         'projects/fake-project/regions/us-central1/operations/operation-X] '
         'Run the [gcloud compute operations describe] command to check the '
-        'status of this operation.\n')
+        'status of this operation.\n'.format(self.api_version))
 
   def testUpdateAdvertisements_default(self):
     self.SelectApi(self.track, self.api_version)
@@ -88,7 +88,7 @@ class UpdateTestGA(router_test_base.RouterTestBase):
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -119,7 +119,7 @@ class UpdateTestGA(router_test_base.RouterTestBase):
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -180,7 +180,7 @@ class UpdateTestGA(router_test_base.RouterTestBase):
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""
@@ -227,7 +227,7 @@ class UpdateTestBeta(UpdateTestGA):
 
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(updated)
 
     self.Run("""

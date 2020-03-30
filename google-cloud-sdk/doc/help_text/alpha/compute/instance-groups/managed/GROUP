@@ -13,8 +13,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -47,6 +48,9 @@ COMMANDS
 
      describe
         (ALPHA) Display detailed information about an instance group.
+
+     describe-instance
+        (ALPHA) Describe an instance in a managed instance group.
 
      export-autoscaling
         (ALPHA) Export autoscaling parameters of a managed instance group.
@@ -99,7 +103,8 @@ COMMANDS
         Engine managed instance group.
 
      wait-until
-        (ALPHA) Wait until managed instance group reaches desired state.
+        (ALPHA) Wait until the managed instance group reaches the desired
+        state.
 
      wait-until-stable
         (ALPHA) (DEPRECATED) Waits until state of managed instance group is

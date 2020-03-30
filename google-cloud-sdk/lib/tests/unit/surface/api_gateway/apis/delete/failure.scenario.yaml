@@ -1,0 +1,26 @@
+title: Cloud API Gateway Apis Delete Failure Scenarios
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway apis delete test-name
+  - prompt:
+    - message: Are you sure? This will delete the API 'projects/fake-project/locations/global/apis/test-name',
+        along with all of the associated consumer information.
+    - prompt_string: Continue anyway
+    - input: n
+  - error: '1: Aborted by user.'
+actions:
+- execute_command:
+    command: |
+      api-gateway apis delete test-name
+    events:
+    - expect_prompt_continue:
+        message: Are you sure? This will delete the API 'projects/fake-project/locations/global/apis/test-name',
+          along with all of the associated consumer information.
+        prompt_string: Continue anyway
+        user_input: n
+    - expect_exit:
+        code: 1
+        message: Aborted by user.

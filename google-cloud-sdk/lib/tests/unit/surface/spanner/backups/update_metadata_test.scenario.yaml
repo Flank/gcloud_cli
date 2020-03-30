@@ -1,0 +1,160 @@
+title: spanner backups update test
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Test update metadata with expiration-date flag
+  - command: spanner backups update-metadata test-backup --instance=test-instance
+      --expiration-date=2020-07-13T10:00:00Z
+  - stdout: |
+      createTime: '2020-01-14T22:00:11.573548Z'
+      database: projects/fake-project/instances/test-instance/databases/test-database
+      expireTime: '2020-07-13T10:00:00Z'
+      name: projects/fake-project/instances/test-instance/backups/test-backup
+      sizeBytes: '190'
+      state: READY
+- execute:
+  - label: Test update metadata with retention-period flag
+  - command: spanner backups update-metadata test-backup --instance=test-instance
+      --retention-period=2w
+  - stdout: |
+      createTime: '2020-01-14T22:00:11.573548Z'
+      database: projects/fake-project/instances/test-instance/databases/test-database
+      expireTime: '2020-02-26T18:21:41.901190Z'
+      name: projects/fake-project/instances/test-instance/backups/test-backup
+      sizeBytes: '190'
+      state: READY
+- execute:
+  - label: Test update metadata throws error when both expiration-date and retention-period
+      flags are provided
+  - command: spanner backups update-metadata test-backup --instance=test-instance
+      --expiration-date=2020-03-29T10:00:00Z --retention-period=2w
+  - stderr: |
+      ERROR: (gcloud.spanner.backups.update-metadata) argument --expiration-date: Exactly one of (--expiration-date | --retention-period) must be specified.
+      Usage: gcloud spanner backups update-metadata (BACKUP : --instance=INSTANCE) (--expiration-date=EXPIRATION_DATE | --retention-period=RETENTION_PERIOD) [optional flags]
+        optional flags may be  --expiration-date | --help | --instance |
+                               --retention-period
+
+      For detailed information on this command and its flags, run:
+        gcloud spanner backups update-metadata --help
+  - error: '1: argument --expiration-date: Exactly one of (--expiration-date | --retention-period)
+      must be specified.'
+- execute:
+  - label: Test update metadata throws error when backup ID is missing
+  - command: spanner backups update-metadata --instance=test-instance --expiration-date=2020-03-29T10:00:00Z
+  - stderr: |
+      ERROR: (gcloud.spanner.backups.update-metadata) argument --instance: BACKUP must be specified.
+      Usage: gcloud spanner backups update-metadata (BACKUP : --instance=INSTANCE) (--expiration-date=EXPIRATION_DATE | --retention-period=RETENTION_PERIOD) [optional flags]
+        optional flags may be  --expiration-date | --help | --instance |
+                               --retention-period
+
+      For detailed information on this command and its flags, run:
+        gcloud spanner backups update-metadata --help
+  - error: '1: argument --instance: BACKUP must be specified.'
+actions:
+- execute_command:
+    command: spanner backups update-metadata test-backup --instance=test-instance
+      --expiration-date=2020-07-13T10:00:00Z
+    label: Test update metadata with expiration-date flag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/test-instance/backups/test-backup?alt=json&updateMask=expire_time
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              "expireTime": "2020-07-13T10:00:00Z",
+              "name": "projects/fake-project/instances/test-instance/backups/test-backup"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/instances/test-instance/backups/test-backup",
+              "database": "projects/fake-project/instances/test-instance/databases/test-database",
+              "expireTime": "2020-07-13T10:00:00Z",
+              "createTime": "2020-01-14T22:00:11.573548Z",
+              "sizeBytes": "190",
+              "state": "READY"
+            }
+    - expect_stdout: |
+        createTime: '2020-01-14T22:00:11.573548Z'
+        database: projects/fake-project/instances/test-instance/databases/test-database
+        expireTime: '2020-07-13T10:00:00Z'
+        name: projects/fake-project/instances/test-instance/backups/test-backup
+        sizeBytes: '190'
+        state: READY
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: spanner backups update-metadata test-backup --instance=test-instance
+      --retention-period=2w
+    label: Test update metadata with retention-period flag
+    events:
+    - api_call:
+        expect_request:
+          uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/test-instance/backups/test-backup?alt=json&updateMask=expire_time
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              "expireTime": "2020-02-26T18:21:41.901190Z"
+              "name": "projects/fake-project/instances/test-instance/backups/test-backup"
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/instances/test-instance/backups/test-backup",
+              "database": "projects/fake-project/instances/test-instance/databases/test-database",
+              "expireTime": "2020-02-26T18:21:41.901190Z",
+              "createTime": "2020-01-14T22:00:11.573548Z",
+              "sizeBytes": "190",
+              "state": "READY"
+            }
+
+    - expect_stdout: |
+        createTime: '2020-01-14T22:00:11.573548Z'
+        database: projects/fake-project/instances/test-instance/databases/test-database
+        expireTime: '2020-02-26T18:21:41.901190Z'
+        name: projects/fake-project/instances/test-instance/backups/test-backup
+        sizeBytes: '190'
+        state: READY
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: spanner backups update-metadata test-backup --instance=test-instance
+      --expiration-date=2020-03-29T10:00:00Z --retention-period=2w
+    label: Test update metadata throws error when both expiration-date and retention-period
+      flags are provided
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.spanner.backups.update-metadata) argument --expiration-date: Exactly one of (--expiration-date | --retention-period) must be specified.
+        Usage: gcloud spanner backups update-metadata (BACKUP : --instance=INSTANCE) (--expiration-date=EXPIRATION_DATE | --retention-period=RETENTION_PERIOD) [optional flags]
+          optional flags may be  --expiration-date | --help | --instance |
+                                 --retention-period
+
+        For detailed information on this command and its flags, run:
+          gcloud spanner backups update-metadata --help
+    - expect_exit:
+        code: 1
+        message: 'argument --expiration-date: Exactly one of (--expiration-date |
+          --retention-period) must be specified.'
+- execute_command:
+    command: spanner backups update-metadata --instance=test-instance --expiration-date=2020-03-29T10:00:00Z
+    label: Test update metadata throws error when backup ID is missing
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.spanner.backups.update-metadata) argument --instance: BACKUP must be specified.
+        Usage: gcloud spanner backups update-metadata (BACKUP : --instance=INSTANCE) (--expiration-date=EXPIRATION_DATE | --retention-period=RETENTION_PERIOD) [optional flags]
+          optional flags may be  --expiration-date | --help | --instance |
+                                 --retention-period
+
+        For detailed information on this command and its flags, run:
+          gcloud spanner backups update-metadata --help
+    - expect_exit:
+        code: 1
+        message: 'argument --instance: BACKUP must be specified.'

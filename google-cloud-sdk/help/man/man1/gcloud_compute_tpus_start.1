@@ -66,8 +66,9 @@ Return immediately, without waiting for the operation in progress to complete.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -75,6 +76,17 @@ help\fR for details.
 
 This command uses the \fBtpu/v1\fR API. The full documentation for this API can
 be found at: https://cloud.google.com/tpu/
+
+
+
+.SH "EXAMPLES"
+
+The following command starts a TPU with ID \f5my\-tpu\fR in zone
+\f5us\-central1\-b\fR:
+
+.RS 2m
+$ gcloud compute tpus start my\-tpu \-\-zone=us\-central1\-b
+.RE
 
 
 

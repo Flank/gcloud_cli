@@ -79,23 +79,26 @@ different project for quota and billing, use \f5\-\-billing\-project\fR or
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To delete a role of an organization, run:
+To delete the role \f5\fIProjectUpdater\fR\fR of the organization
+\f5\fI1234567\fR\fR, run:
 
 .RS 2m
-$ gcloud iam roles delete \-\-organization 1234567 viewer
+$ gcloud iam roles delete ProjectUpdater \-\-organization=1234567
 .RE
 
-To delete a role of a project, run:
+To delete the role \f5\fIProjectUpdater\fR\fR of the project
+\f5\fImyproject\fR\fR, run:
 
 .RS 2m
-$ gcloud iam roles delete \-\-project myproject viewer
+$ gcloud iam roles delete ProjectUpdater \-\-project=myproject
 .RE
 
 

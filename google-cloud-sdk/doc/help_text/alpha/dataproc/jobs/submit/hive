@@ -70,21 +70,21 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To submit a Hive job with a local script, run:
 
-        $ gcloud alpha dataproc jobs submit hive --cluster my_cluster \
-            --file my_queries.q
+        $ gcloud alpha dataproc jobs submit hive --cluster=my_cluster \
+            --file=my_queries.q
 
     To submit a Hive job with inline queries, run:
 
-        $ gcloud alpha dataproc jobs submit hive --cluster my_cluster \
-            -e \
-            "CREATE EXTERNAL TABLE foo(bar int) LOCATION\
-         'gs://my_bucket/'" -e "SELECT * FROM foo WHERE bar > 2"
+        $ gcloud alpha dataproc jobs submit hive --cluster=my_cluster
+            -e="CREATE EXTERNAL TABLE foo(bar int) LOCATION 'gs://my_bucket/'"
+            -e="SELECT * FROM foo WHERE bar > 2"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

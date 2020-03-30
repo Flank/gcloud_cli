@@ -58,7 +58,8 @@ FLAGS
 
      --remove-labels=[KEY,...]
         List of label keys to remove. If a label does not exist it is silently
-        ignored.
+        ignored. If --update-labels is also specified then --remove-labels is
+        applied first.
 
      --update-labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to update. If a label exists its value is
@@ -85,31 +86,32 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To update an existing deployment with a new config yaml file, run:
+    To update an existing deployment with a new config YAML file, run:
 
         $ gcloud deployment-manager deployments update my-deployment \
-            --config new_config.yaml
+            --config=new_config.yaml
 
     To update an existing deployment with a new config template file, run:
 
         $ gcloud deployment-manager deployments update my-deployment \
-            --template new_config.{jinja|py}
+            --template=new_config.{jinja|py}
 
     To update an existing deployment with a composite type as a new config,
     run:
 
         $ gcloud deployment-manager deployments update my-deployment \
-            --composite-type <project-id>/composite:<new-config>
+            --composite-type=<project-id>/composite:<new-config>
 
     To preview an update to an existing deployment without actually modifying
     the resources, run:
 
         $ gcloud deployment-manager deployments update my-deployment \
-            --config new_config.yaml --preview
+            --config=new_config.yaml --preview
 
     To apply an update that has been previewed, provide the name of the
     previewed deployment, and no config file:
@@ -117,22 +119,22 @@ EXAMPLES
         $ gcloud deployment-manager deployments update my-deployment
 
     To specify different create, update, or delete policies, include any subset
-    of the following flags;
+    of the following flags:
 
         $ gcloud deployment-manager deployments update my-deployment \
-            --config new_config.yaml --create-policy acquire \
-            --delete-policy abandon
+            --config=new_config.yaml --create-policy=acquire \
+            --delete-policy=abandon
 
     To perform an update without waiting for the operation to complete, run:
 
         $ gcloud deployment-manager deployments update my-deployment \
-            --config new_config.yaml --async
+            --config=new_config.yaml --async
 
     To update an existing deployment with a new config file and a fingerprint,
     run:
 
         $ gcloud deployment-manager deployments update my-deployment \
-            --config new_config.yaml --fingerprint deployment-fingerprint
+            --config=new_config.yaml --fingerprint=deployment-fingerprint
 
     Either the --config, --template, or --composite-type flag is required
     unless launching an already-previewed update to a deployment. If you want

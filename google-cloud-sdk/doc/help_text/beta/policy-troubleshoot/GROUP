@@ -1,24 +1,22 @@
 NAME
     gcloud beta policy-troubleshoot - troubleshoot Google Cloud Platform
-        Policies
+        policies
 
 SYNOPSIS
     gcloud beta policy-troubleshoot COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Policy Troubleshooter troubleshoots cloud policies running on Google
-    Cloud Platform. Policy Troubleshooter works by evaluating the current
-    access a user has on a cloud resource.
-
-    More information on Policy Troubleshooter can be found here:
-    https://cloud.google.com/iam
+    (BETA) Policy Troubleshooter troubleshoots policies for Google Cloud
+    Platform resources. Policy Troubleshooter works by evaluating the user's
+    current access to a resource.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -27,8 +25,9 @@ COMMANDS
         (BETA) Troubleshoot the IAM Policy.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud policy-troubleshoot
         $ gcloud alpha policy-troubleshoot
 

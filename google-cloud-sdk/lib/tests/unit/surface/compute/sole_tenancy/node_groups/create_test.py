@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -60,8 +61,8 @@ class NodeGroupsCreateTest(test_base.BaseTest):
       node_group.autoscalingPolicy = self.messages.NodeGroupAutoscalingPolicy(
           mode=self.messages.NodeGroupAutoscalingPolicy.ModeValueValuesEnum(
               autoscaling_policy['mode']),
-          minSize=autoscaling_policy.get('minSize'),
-          maxSize=autoscaling_policy.get('maxSize'))
+          minNodes=autoscaling_policy.get('minSize'),
+          maxNodes=autoscaling_policy.get('maxSize'))
     return node_group
 
   def testCreate_AllOptions(self):
@@ -104,13 +105,91 @@ class NodeGroupsCreateTestBeta(NodeGroupsCreateTest):
     self.SelectApi(self.api_version)
     self.track = calliope_base.ReleaseTrack.BETA
 
+  def testCreate_AutoscalingPolicy(self):
+    node_group = self._CreateNodeGroup(
+        name='my-node-group',
+        description='Frontend Group',
+        node_template='my-template',
+        autoscaling_policy={'mode': 'ON',
+                            'minSize': 10,
+                            'maxSize': 60})
+    request = self._ExpectCreate(node_group, 3)
 
-class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
+    result = self.Run(
+        'compute sole-tenancy node-groups create my-node-group '
+        '--node-template my-template --target-size 3 '
+        '--autoscaler-mode=on --min-nodes=10 --max-nodes=60 '
+        '--description "Frontend Group" --zone ' + self.zone)
 
-  def SetUp(self):
-    self.api_version = 'alpha'
-    self.SelectApi(self.api_version)
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
+    self.assertEqual(result, node_group)
+
+  def testCreate_AutoscalingPolicyNoMode(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --max-nodes --min-nodes: --autoscaler-mode must '
+        'be specified.'):
+      self.Run(
+          'compute sole-tenancy node-groups create my-node-group '
+          '--node-template my-template --target-size 3 '
+          '--min-nodes=10 --max-nodes=60 '
+          '--description "Frontend Group" --zone ' + self.zone)
+
+  def testCreate_AutoscalingPolicyWrongMode(self):
+    with self.AssertRaisesArgumentErrorRegexp(
+        r"argument --autoscaler-mode: Invalid choice: 'foo'\." '\n\n'
+        r'Valid choices are \[off, on, only-scale-out\]'):
+      self.Run(
+          'compute sole-tenancy node-groups create my-node-group '
+          '--node-template my-template --target-size 3 '
+          '--autoscaler-mode=foo '
+          '--description "Frontend Group" --zone ' + self.zone)
+
+  def testCreate_AutoscalingPolicyModeMin(self):
+    node_group = self._CreateNodeGroup(
+        name='my-node-group',
+        description='Frontend Group',
+        node_template='my-template',
+        autoscaling_policy={'mode': 'OFF',
+                            'minSize': 10})
+    request = self._ExpectCreate(node_group, 3)
+
+    result = self.Run(
+        'compute sole-tenancy node-groups create my-node-group '
+        '--node-template my-template --target-size 3 '
+        '--autoscaler-mode=off --min-nodes=10 '
+        '--description "Frontend Group" --zone ' + self.zone)
+
+    self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
+    self.assertEqual(result, node_group)
+
+  def testCreate_AutoscalingPolicyModeMax(self):
+    node_group = self._CreateNodeGroup(
+        name='my-node-group',
+        description='Frontend Group',
+        node_template='my-template',
+        autoscaling_policy={'mode': 'ON',
+                            'maxSize': 60})
+    request = self._ExpectCreate(node_group, 3)
+
+    result = self.Run(
+        'compute sole-tenancy node-groups create my-node-group '
+        '--node-template my-template --target-size 3 '
+        '--autoscaler-mode=on --max-nodes=60 '
+        '--description "Frontend Group" --zone ' + self.zone)
+
+    self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
+    self.assertEqual(result, node_group)
+
+  def testCreateNotOffMode(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.RequiredArgumentException,
+        r'Missing required argument [--max-nodes]:'
+        r' --autoscaler-mode is on'):
+      self.Run(
+          'compute sole-tenancy node-groups create my-node-group '
+          '--node-template my-template --target-size 3 '
+          '--autoscaler-mode=only-scale-out '
+          '--zone ' + self.zone)
 
   def testCreate_MaintenancePolicy(self):
     node_group = self._CreateNodeGroup(
@@ -129,78 +208,31 @@ class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
     self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
     self.assertEqual(result, node_group)
 
-  def testCreate_AutoscalingPolicy(self):
+
+class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
+
+  def SetUp(self):
+    self.api_version = 'alpha'
+    self.SelectApi(self.api_version)
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateMaintenanceStartTime(self):
     node_group = self._CreateNodeGroup(
         name='my-node-group',
         description='Frontend Group',
-        node_template='my-template',
-        autoscaling_policy={'mode': 'ON',
-                            'minSize': 10,
-                            'maxSize': 60})
+        node_template='my-template')
+    node_group.maintenanceWindow = self.messages.NodeGroupMaintenanceWindow(
+        startTime='04:00')
     request = self._ExpectCreate(node_group, 3)
 
-    result = self.Run(
-        'compute sole-tenancy node-groups create my-node-group '
-        '--node-template my-template --target-size 3 '
-        '--mode=on --min-size=10 --max-size=60 '
-        '--description "Frontend Group" --zone ' + self.zone)
+    result = self.Run('compute sole-tenancy node-groups create my-node-group '
+                      '--node-template my-template --target-size 3 '
+                      '--maintenance-window-start-time 04:00 '
+                      '--description "Frontend Group" --zone ' + self.zone)
 
     self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
     self.assertEqual(result, node_group)
 
-  def testCreate_AutoscalingPolicyNoMode(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --max-size --min-size: --mode must be specified.'):
-      self.Run(
-          'compute sole-tenancy node-groups create my-node-group '
-          '--node-template my-template --target-size 3 '
-          '--min-size=10 --max-size=60 '
-          '--description "Frontend Group" --zone ' + self.zone)
-
-  def testCreate_AutoscalingPolicyWrongMode(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --mode: [mode] must be one of [off,on]'):
-      self.Run(
-          'compute sole-tenancy node-groups create my-node-group '
-          '--node-template my-template --target-size 3 '
-          '--mode=foo '
-          '--description "Frontend Group" --zone ' + self.zone)
-
-  def testCreate_AutoscalingPolicyModeMin(self):
-    node_group = self._CreateNodeGroup(
-        name='my-node-group',
-        description='Frontend Group',
-        node_template='my-template',
-        autoscaling_policy={'mode': 'ON',
-                            'minSize': 10})
-    request = self._ExpectCreate(node_group, 3)
-
-    result = self.Run(
-        'compute sole-tenancy node-groups create my-node-group '
-        '--node-template my-template --target-size 3 '
-        '--mode=on --min-size=10 '
-        '--description "Frontend Group" --zone ' + self.zone)
-
-    self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
-    self.assertEqual(result, node_group)
-
-  def testCreate_AutoscalingPolicyModeMax(self):
-    node_group = self._CreateNodeGroup(
-        name='my-node-group',
-        description='Frontend Group',
-        node_template='my-template',
-        autoscaling_policy={'mode': 'ON',
-                            'maxSize': 60})
-    request = self._ExpectCreate(node_group, 3)
-
-    result = self.Run(
-        'compute sole-tenancy node-groups create my-node-group '
-        '--node-template my-template --target-size 3 '
-        '--mode=on --max-size=60 '
-        '--description "Frontend Group" --zone ' + self.zone)
-
-    self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
-    self.assertEqual(result, node_group)
 
 if __name__ == '__main__':
   test_case.main()

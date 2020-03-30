@@ -1,0 +1,96 @@
+title: api-keys delete test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Base case
+  - command: |
+      services api-keys delete projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5
+  - error: "1: (34, 'Numerical result out of range')"
+  - stderr: |
+      Operation "operations/akmf.8c4d71c2-77a2-43cc-a058-adaf82ef6b2a" finished successfully.
+- execute:
+  - label: Delete a key that is already in DELETED state.
+  - command: |
+      services api-keys delete projects/fake-project/keys/already-deleted
+  - stderr: |
+      Operation "operations/noop.DONE_OPERATION" finished successfully.
+- execute:
+  - label: Delete a non-existing key.
+  - command: |
+      services api-keys delete projects/fake-project/keys/not-found
+  - error: '1: Request missing required parameter name'
+actions:
+- execute_command:
+    label: Base case
+    command: |
+      services api-keys delete projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {name: operations/akmf.8c4d71c2-77a2-43cc-a058-adaf82ef6b2a}
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/operations/akmf.8c4d71c2-77a2-43cc-a058-adaf82ef6b2a?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {name: operations/akmf.8c4d71c2-77a2-43cc-a058-adaf82ef6b2a, done: true,
+            response: {'@type': type.googleapis.com/google.protobuf.Empty}}
+    - expect_stderr: |
+        Operation "operations/akmf.8c4d71c2-77a2-43cc-a058-adaf82ef6b2a" finished successfully.
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Delete a key that is already in DELETED state.
+    command: |
+      services api-keys delete projects/fake-project/keys/already-deleted
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys/already-deleted?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {name: operations/noop.DONE_OPERATION, done: true, response: {'@type': type.googleapis.com/google.protobuf.Empty}}
+    - expect_stderr: |
+        Operation "operations/noop.DONE_OPERATION" finished successfully.
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Delete a non-existing key.
+    command: |
+      services api-keys delete projects/fake-project/keys/not-found
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys/not-found?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {error: {code: 404, message: The specified key projects/fake-project/keys/not-found
+                not found., status: NOT_FOUND, details: [{'@type': type.googleapis.com/google.rpc.DebugInfo,
+                  detail: "[ORIGINAL ERROR] generic::not_found: Key not found :projects/fake-project/keys/not-found\n\
+                    com.google.api.tenant.exceptions.ExternalStatusException: Key\
+                    \ not found :projects/fake-project/keys/not-found [google.rpc.error_details_ext]\
+                    \ { message: \"The specified key projects/fake-project/keys/not-found\
+                    \ not found.\" }"}]}}
+    - expect_exit:
+        code: 1
+        message: Request missing required parameter name

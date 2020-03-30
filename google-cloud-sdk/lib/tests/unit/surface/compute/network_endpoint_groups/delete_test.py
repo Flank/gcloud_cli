@@ -44,13 +44,6 @@ class NetworkEndpointGroupsDeleteTest(test_base.BaseTest):
               zone='zone-1'))],)
     self.AssertErrContains('Deleted network endpoint group [my-neg1]')
 
-
-class AlphaNetworkEndpointGroupsDeleteTest(NetworkEndpointGroupsDeleteTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
-
   def testGlobal(self):
     self.make_requests.side_effect = iter([[
         self.messages.Operation(
@@ -63,6 +56,30 @@ class AlphaNetworkEndpointGroupsDeleteTest(NetworkEndpointGroupsDeleteTest):
         [(self.compute.globalNetworkEndpointGroups, 'Delete',
           self.messages.ComputeGlobalNetworkEndpointGroupsDeleteRequest(
               networkEndpointGroup='my-neg1', project='my-project'))],)
+    self.AssertErrContains('Deleted network endpoint group [my-neg1]')
+
+
+class AlphaNetworkEndpointGroupsDeleteTest(NetworkEndpointGroupsDeleteTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+
+  def testRegional(self):
+    self.make_requests.side_effect = iter([[
+        self.messages.Operation(
+            operationType='delete',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE)
+    ]])
+    self.WriteInput('y\n')
+    self.Run(
+        'compute network-endpoint-groups delete my-neg1 --region us-central1')
+    self.CheckRequests(
+        [(self.compute.regionNetworkEndpointGroups, 'Delete',
+          self.messages.ComputeRegionNetworkEndpointGroupsDeleteRequest(
+              networkEndpointGroup='my-neg1',
+              project='my-project',
+              region='us-central1'))],)
     self.AssertErrContains('Deleted network endpoint group [my-neg1]')
 
 

@@ -1,5 +1,5 @@
 title: Cloud Game Servers realms crud test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -9,6 +9,17 @@ summary:
       Create request issued for: [my-realm]
   - progress_tracker:
     - message: Waiting for operation [projects/fake-project/locations/us-central1/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created realm [my-realm].
+- execute:
+  - command: |
+      game servers realms create my-realm --time-zone UTC --labels a=x,b=y
+  - stderr: |
+      Create request issued for: [my-realm]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9]
         to complete
     - status: SUCCESS
   - stderr: |
@@ -27,37 +38,20 @@ summary:
 - execute:
   - command: |
       game servers realms update my-realm --location us-central1 --time-zone
-      EST
+      EST --no-dry-run
   - stderr: |
-      Request issued for: [my-realm]
+      Update request issued for: [my-realm]
   - progress_tracker:
-    - message: Waiting for operation [projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
-        to complete
+    - message: Waiting for [operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
+        to finish
     - status: SUCCESS
   - stderr: |
-      Updated realm [my-realm].
+      Updated realm: [my-realm]
   - stdout: |
       createTime: '2019-06-19T01:08:49.202077751Z'
+      etag: PuOjLGgdmVSK530TQzvcK8GqvxgT0C2BqmhBYs6CNr0
       name: projects/fake-project/locations/us-central1/realms/my-realm
       timeZone: EST
-      updateTime: '2019-06-19T01:23:42.336919018Z'
-- execute:
-  - command: |
-      game servers realms update my-realm --location us-central1 --update-labels "key1=val1"
-  - stderr: |
-      Request issued for: [my-realm]
-  - progress_tracker:
-    - message: Waiting for operation [projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
-        to complete
-    - status: SUCCESS
-  - stderr: |
-      Updated realm [my-realm].
-  - stdout: |
-      createTime: '2019-06-19T01:08:49.202077751Z'
-      labels:
-        key1: val1
-      name: projects/fake-project/locations/us-central1/realms/my-realm
-      timeZone: UTC
       updateTime: '2019-06-19T01:23:42.336919018Z'
 - execute:
   - command: |
@@ -74,7 +68,7 @@ summary:
       game servers realms list
   - stdout: |
       NAME         LOCATION     DESCRIPTION  CREATE_TIME  UPDATE_TIME  TIME_ZONE  LABELS
-      my-realms-1  us-central1                                         UTC
+      my-realms-1  global                                              UTC
       my-realms-2  us-central1                                         UTC
       my-realms-3  us-central1                                         UTC
       my-realms-4  us-central2                                         UTC
@@ -93,14 +87,39 @@ summary:
     - status: SUCCESS
   - stderr: |
       Deleted realm [my-realm].
+- execute:
+  - command: |
+      game servers realms update my-realm --location us-central1 --update-labels "key1=val1" --no-dry-run
+  - stderr: |
+      Update request issued for: [my-realm]
+  - progress_tracker:
+    - message: Waiting for [operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
+        to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated realm: [my-realm]
+  - stdout: |
+      createTime: '2019-06-19T01:08:49.202077751Z'
+      etag: DptJvDOBfHehrEQPFFCv148cFcVakECb_gCJ_iYK_mo
+      labels:
+        key1: val1
+      name: projects/fake-project/locations/us-central1/realms/my-realm
+      timeZone: UTC
+      updateTime: '2019-06-19T01:23:42.336919018Z'
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha
+      BETA: v1beta
+
 - execute_command:
     command: |
-      game servers realms create my-realm --location us-central1 --time-zone UTC --labels a=x,b=y
+      game servers realms create my-realm --description description --location us-central1 --time-zone UTC --labels a=x,b=y
     events:
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/realms?alt=json&realmId=my-realm
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms?alt=json&realmId=my-realm
           method: POST
           headers: {}
           body:
@@ -121,7 +140,7 @@ actions:
         Create request issued for: [my-realm]
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9?alt=json
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9?alt=json
           method: GET
           headers: {}
           body: null
@@ -132,20 +151,21 @@ actions:
             {
               "name": "projects/fake-project/locations/us-central1/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9",
               "metadata": {
-                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
                 "createTime": "2019-06-17T06:36:40.690252867Z",
                 "endTime": "2019-06-17T06:36:55.212325164Z",
                 "target": "projects/fake-project/locations/us-central1/realms/my-realm",
                 "verb": "create",
                 "requestedCancellation": false,
-                "apiVersion": "v1alpha"
+                "apiVersion": "$$api-version$$"
               },
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.Realm",
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.Realm",
                 "name": "projects/fake-project/locations/us-central1/realms/my-realm",
                 "createTime": "2019-06-17T06:36:40.628813618Z",
                 "updateTime": "2019-06-17T06:36:40.714215155Z",
+                "etag": "PuOjLGgdmVSK530TQzvcK8GqvxgT0C2BqmhBYs6CNr0",
                 "timeZone": "UTC"
               }
             }
@@ -155,7 +175,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
           method: GET
           headers: {}
           body: null
@@ -165,6 +185,91 @@ actions:
           body: |
             {
               "name": "projects/fake-project/locations/us-central1/realms/my-realm",
+              "description": "description",
+              "createTime": "2019-06-17T06:36:40.628813618Z",
+              "updateTime": "2019-06-17T06:36:55.228742225Z",
+              "timeZone": "UTC",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              }
+            }
+    - expect_stderr: |
+        Created realm [my-realm].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers realms create my-realm --time-zone UTC --labels a=x,b=y
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/realms?alt=json&realmId=my-realm
+          method: POST
+          headers: {}
+          body:
+            json:
+              timeZone: UTC
+              labels:
+                a: x
+                b: y
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-realm]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T06:36:40.690252867Z",
+                "endTime": "2019-06-17T06:36:55.212325164Z",
+                "target": "projects/fake-project/locations/global/realms/my-realm",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.Realm",
+                "name": "projects/fake-project/locations/global/realms/my-realm",
+                "createTime": "2019-06-17T06:36:40.628813618Z",
+                "updateTime": "2019-06-17T06:36:40.714215155Z",
+                "etag": "PuOjLGgdmVSK530TQzvcK8GqvxgT0C2BqmhBYs6CNr0",
+                "timeZone": "UTC"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/realms/my-realm?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/realms/my-realm",
               "createTime": "2019-06-17T06:36:40.628813618Z",
               "updateTime": "2019-06-17T06:36:55.228742225Z",
               "timeZone": "UTC",
@@ -183,7 +288,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
           method: GET
           headers: {}
           body: null
@@ -214,11 +319,11 @@ actions:
 - execute_command:
     command: |
       game servers realms update my-realm --location us-central1 --time-zone
-      EST
+      EST --no-dry-run
     events:
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
           method: GET
           headers: {}
           body: null
@@ -230,15 +335,19 @@ actions:
               "name": "projects/fake-project/locations/us-central1/realms/my-realm",
               "createTime": "2019-06-19T01:08:49.202077751Z",
               "updateTime": "2019-06-19T01:23:42.336919018Z",
-              "timeZone": "UTC"
+              "timeZone": "UTC",
+              "etag": "PuOjLGgdmVSK530TQzvcK8GqvxgT0C2BqmhBYs6CNr0"
             }
+    - expect_stderr: |
+        Update request issued for: [my-realm]
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/realms/my-realm?alt=json&updateMask=timeZone
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm?alt=json&updateMask=timeZone
           method: PATCH
           headers: {}
           body:
-            json: {}
+            json:
+              timeZone: EST
         return_response:
           headers:
             status: '200'
@@ -248,11 +357,9 @@ actions:
               "done": true
             }
         repeatable: true
-    - expect_stderr: |
-        Request issued for: [my-realm]
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00?alt=json
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00?alt=json
           method: GET
           headers: {}
           body: null
@@ -263,30 +370,33 @@ actions:
             {
               "name": "projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
               "metadata": {
-                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
                 "createTime": "2019-06-19T01:23:42.325431698Z",
                 "endTime": "2019-06-19T01:23:51.099152052Z",
                 "target": "projects/fake-project/locations/us-central1/realms/my-realm",
                 "verb": "update",
                 "requestedCancellation": false,
-                "apiVersion": "v1alpha"
+                "apiVersion": "$$api-version$$"
               },
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.Realm",
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.Realm",
                 "name": "projects/fake-project/locations/us-central1/realms/my-realm",
                 "createTime": "2019-06-19T01:08:49.202077751Z",
                 "updateTime": "2019-06-19T01:23:42.336919018Z",
-                "timeZone": "UTC"
+                "timeZone": "UTC",
+                "etag": "PuOjLGgdmVSK530TQzvcK8GqvxgT0C2BqmhBYs6CNr0"
               }
             }
     - expect_progress_tracker:
-        message: Waiting for operation [projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
-          to complete
+        message: Waiting for [operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
+          to finish
         status: SUCCESS
+    - expect_stderr: |
+        Updated realm: [my-realm]
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
           method: GET
           headers: {}
           body: null
@@ -298,116 +408,14 @@ actions:
               "name": "projects/fake-project/locations/us-central1/realms/my-realm",
               "createTime": "2019-06-19T01:08:49.202077751Z",
               "updateTime": "2019-06-19T01:23:42.336919018Z",
-              "timeZone": "EST"
+              "timeZone": "EST",
+              "etag": "PuOjLGgdmVSK530TQzvcK8GqvxgT0C2BqmhBYs6CNr0"
             }
-    - expect_stderr: |
-        Updated realm [my-realm].
     - expect_stdout: |
         createTime: '2019-06-19T01:08:49.202077751Z'
+        etag: PuOjLGgdmVSK530TQzvcK8GqvxgT0C2BqmhBYs6CNr0
         name: projects/fake-project/locations/us-central1/realms/my-realm
         timeZone: EST
-        updateTime: '2019-06-19T01:23:42.336919018Z'
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: |
-      game servers realms update my-realm --location us-central1 --update-labels "key1=val1"
-    events:
-    - api_call:
-        expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/us-central1/realms/my-realm",
-              "createTime": "2019-06-19T01:08:49.202077751Z",
-              "updateTime": "2019-06-19T01:23:42.336919018Z",
-              "timeZone": "UTC"
-            }
-    - api_call:
-        expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/realms/my-realm?alt=json&updateMask=labels
-          method: PATCH
-          headers: {}
-          body:
-            json: {}
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
-              "done": true
-            }
-        repeatable: true
-    - expect_stderr: |
-        Request issued for: [my-realm]
-    - api_call:
-        expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
-              "metadata": {
-                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
-                "createTime": "2019-06-19T01:23:42.325431698Z",
-                "endTime": "2019-06-19T01:23:51.099152052Z",
-                "target": "projects/fake-project/locations/us-central1/realms/my-realm",
-                "verb": "update",
-                "requestedCancellation": false,
-                "apiVersion": "v1alpha"
-              },
-              "done": true,
-              "response": {
-                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.Realm",
-                "name": "projects/fake-project/locations/us-central1/realms/my-realm",
-                "createTime": "2019-06-19T01:08:49.202077751Z",
-                "updateTime": "2019-06-19T01:23:42.336919018Z",
-                "timeZone": "UTC"
-              }
-            }
-    - expect_progress_tracker:
-        message: Waiting for operation [projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
-          to complete
-        status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "name": "projects/fake-project/locations/us-central1/realms/my-realm",
-              "createTime": "2019-06-19T01:08:49.202077751Z",
-              "updateTime": "2019-06-19T01:23:42.336919018Z",
-              "labels": {
-                "key1": "val1"
-              },
-              "timeZone": "UTC"
-            }
-    - expect_stderr: |
-        Updated realm [my-realm].
-    - expect_stdout: |
-        createTime: '2019-06-19T01:08:49.202077751Z'
-        labels:
-          key1: val1
-        name: projects/fake-project/locations/us-central1/realms/my-realm
-        timeZone: UTC
         updateTime: '2019-06-19T01:23:42.336919018Z'
     - expect_exit:
         code: 0
@@ -417,7 +425,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/realms?alt=json
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms?alt=json
           method: GET
           headers: {}
           body: null
@@ -451,7 +459,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/-/realms?alt=json
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/-/realms?alt=json
           method: GET
           headers: {}
           body: null
@@ -460,7 +468,7 @@ actions:
             status: '200'
           body:
             realms:
-            - name: projects/fake-project/locations/us-central1/realms/my-realms-1
+            - name: projects/fake-project/locations/global/realms/my-realms-1
               timeZone: UTC
             - name: projects/fake-project/locations/us-central1/realms/my-realms-2
               timeZone: UTC
@@ -472,7 +480,7 @@ actions:
               timeZone: UTC
     - expect_stdout: |
         NAME         LOCATION     DESCRIPTION  CREATE_TIME  UPDATE_TIME  TIME_ZONE  LABELS
-        my-realms-1  us-central1                                         UTC
+        my-realms-1  global                                              UTC
         my-realms-2  us-central1                                         UTC
         my-realms-3  us-central1                                         UTC
         my-realms-4  us-central2                                         UTC
@@ -488,7 +496,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
           method: DELETE
           body: null
         return_response:
@@ -503,7 +511,7 @@ actions:
         Delete request issued for: [my-realm]
     - api_call:
         expect_request:
-          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/us-central1/operations/operation-1560791536248-58b88191625fc-90cb0fd4-9f0132cf?alt=json
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/operations/operation-1560791536248-58b88191625fc-90cb0fd4-9f0132cf?alt=json
           method: GET
           headers: {}
           body: null
@@ -514,12 +522,12 @@ actions:
             {
               "name": "projects/fake-project/locations/us-central1/operations/operation-1560791536248-58b88191625fc-90cb0fd4-9f0132cf",
               "metadata": {
-                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
                 "createTime": "2019-06-17T17:12:16.623096375Z",
                 "target": "projects/fake-project/locations/us-central1/realms/my-realm",
                 "verb": "delete",
                 "requestedCancellation": false,
-                "apiVersion": "v1alpha"
+                "apiVersion": "$$api-version$$"
               },
               "done": true
 
@@ -530,5 +538,113 @@ actions:
         status: SUCCESS
     - expect_stderr: |
         Deleted realm [my-realm].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers realms update my-realm --location us-central1 --update-labels "key1=val1" --no-dry-run
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/realms/my-realm",
+              "createTime": "2019-06-19T01:08:49.202077751Z",
+              "updateTime": "2019-06-19T01:23:42.336919018Z",
+              "timeZone": "UTC",
+              "etag": "DptJvDOBfHehrEQPFFCv148cFcVakECb_gCJ_iYK_mo"
+            }
+    - expect_stderr: |
+        Update request issued for: [my-realm]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              labels:
+                key1: val1
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
+              "done": true
+            }
+        repeatable: true
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-19T01:23:42.325431698Z",
+                "endTime": "2019-06-19T01:23:51.099152052Z",
+                "target": "projects/fake-project/locations/us-central1/realms/my-realm",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.Realm",
+                "name": "projects/fake-project/locations/us-central1/realms/my-realm",
+                "createTime": "2019-06-19T01:08:49.202077751Z",
+                "updateTime": "2019-06-19T01:23:42.336919018Z",
+                "timeZone": "UTC",
+                "etag": "PuOjLGgdmVSK530TQzvcK8GqvxgT0C2BqmhBYs6CNr0"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for [operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
+          to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated realm: [my-realm]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/realms/my-realm?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/realms/my-realm",
+              "createTime": "2019-06-19T01:08:49.202077751Z",
+              "updateTime": "2019-06-19T01:23:42.336919018Z",
+              "labels": {
+                "key1": "val1"
+              },
+              "timeZone": "UTC",
+              "etag": "DptJvDOBfHehrEQPFFCv148cFcVakECb_gCJ_iYK_mo"
+            }
+    - expect_stdout: |
+        createTime: '2019-06-19T01:08:49.202077751Z'
+        etag: DptJvDOBfHehrEQPFFCv148cFcVakECb_gCJ_iYK_mo
+        labels:
+          key1: val1
+        name: projects/fake-project/locations/us-central1/realms/my-realm
+        timeZone: UTC
+        updateTime: '2019-06-19T01:23:42.336919018Z'
     - expect_exit:
         code: 0

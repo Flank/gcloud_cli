@@ -113,7 +113,7 @@ class ExternalVpnGatewaysCreateGaTest(
 
     self.ExpectInsertRequest(external_vpn_gateway_ref,
                              external_vpn_gateway_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(external_vpn_gateway_ref,
                           created_external_vpn_gateway)
 

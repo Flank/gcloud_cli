@@ -1,0 +1,210 @@
+title: LabelManager - LabelValues - Describe test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: labelmanager bindings list prodtest --label-key="env" --label-parent="organizations/961309089256"
+  - stdout: |
+      bindings:
+      - labelValue: labelValues/203606104911
+        name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+        resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+- execute:
+  - command: labelmanager bindings list prodtest --label-key="labelKeys/889673984972"
+  - stdout: |
+      bindings:
+      - labelValue: labelValues/203606104911
+        name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+        resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+- execute:
+  - command: labelmanager bindings list labelValues/203606104911
+  - stdout: |
+      bindings:
+      - labelValue: labelValues/203606104911
+        name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+        resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+- execute:
+  - command: labelmanager bindings list --resource="//cloudresourcemanager.googleapis.com/organizations/961309089256"
+  - stdout: |
+      bindings:
+      - labelValue: labelValues/203606104911
+        name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+        resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+
+actions:
+- execute_command:
+    command: labelmanager bindings list prodtest --label-key="env" --label-parent="organizations/961309089256"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F961309089256
+          method: GET
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '312'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            keys:
+            - name: labelKeys/889673984972
+              parent: organizations/961309089256
+              displayName: env
+              description: gcloud test key environment
+              etag: 4JUfEiYOn6pNfcKf0oZVcw==
+              state: ACTIVE
+              createTime: '2019-10-10T22:06:52.891Z'
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F889673984972
+          method: GET
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '552'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            values:
+            - name: labelValues/203606104911
+              parent: labelKeys/889673984972
+              displayName: prodtest
+              description: gcloud test LabelValue
+              etag: kg1ADSpXISocGwWsBdjchQ==
+              state: ACTIVE
+              createTime: '2019-11-07T22:45:59.326Z'
+            - name: labelValues/553654164026
+              parent: labelKeys/889673984972
+              displayName: prod
+              etag: es3/CxFF8QGoHwwAa2anUA==
+              state: ACTIVE
+              createTime: '2019-10-28T22:04:28.614Z'
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelBindings?alt=json&filter=labelValue%3AlabelValues%2F203606104911
+          method: GET
+          body: None
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '321'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            bindings:
+            - labelValue: labelValues/203606104911
+              resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+              name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+    - expect_stdout: |
+        bindings:
+        - labelValue: labelValues/203606104911
+          name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+          resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: labelmanager bindings list prodtest --label-key="labelKeys/889673984972"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F889673984972
+          method: GET
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '552'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            values:
+            - name: labelValues/203606104911
+              parent: labelKeys/889673984972
+              displayName: prodtest
+              description: gcloud test LabelValue
+              etag: kg1ADSpXISocGwWsBdjchQ==
+              state: ACTIVE
+              createTime: '2019-11-07T22:45:59.326Z'
+            - name: labelValues/553654164026
+              parent: labelKeys/889673984972
+              displayName: prod
+              etag: es3/CxFF8QGoHwwAa2anUA==
+              state: ACTIVE
+              createTime: '2019-10-28T22:04:28.614Z'
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelBindings?alt=json&filter=labelValue%3AlabelValues%2F203606104911
+          method: GET
+          body: None
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '321'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            bindings:
+            - labelValue: labelValues/203606104911
+              resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+              name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+    - expect_stdout: |
+        bindings:
+        - labelValue: labelValues/203606104911
+          name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+          resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: labelmanager bindings list labelValues/203606104911
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelBindings?alt=json&filter=labelValue%3AlabelValues%2F203606104911
+          method: GET
+          body: None
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '321'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            bindings:
+            - labelValue: labelValues/203606104911
+              resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+              name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+    - expect_stdout: |
+        bindings:
+        - labelValue: labelValues/203606104911
+          name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+          resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: labelmanager bindings list --resource="//cloudresourcemanager.googleapis.com/organizations/961309089256"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelBindings?alt=json&filter=resource%3A%2F%2Fcloudresourcemanager.googleapis.com%2Forganizations%2F961309089256
+          method: GET
+          body: None
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '321'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            bindings:
+            - labelValue: labelValues/203606104911
+              resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+              name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+    - expect_stdout: |
+        bindings:
+        - labelValue: labelValues/203606104911
+          name: labelBindings/bGFiZWxWYWx1ZXMvMjAzNjA2MTA0OTExfi8vY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vb3JnYW5pemF0aW9ucy85NjEzMDkwODkyNTY=
+          resource: //cloudresourcemanager.googleapis.com/organizations/961309089256
+    - expect_exit:
+        code: 0

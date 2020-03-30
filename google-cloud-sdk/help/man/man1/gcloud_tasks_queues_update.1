@@ -11,7 +11,7 @@ gcloud tasks queues update \- update a Cloud Tasks queue
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud tasks queues update\fR \fIQUEUE\fR [\fB\-\-clear\-max\-attempts\fR\ |\ \fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-clear\-max\-backoff\fR\ |\ \fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-clear\-max\-concurrent\-dispatches\fR\ |\ \fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR] [\fB\-\-clear\-max\-dispatches\-per\-second\fR\ |\ \fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR] [\fB\-\-clear\-max\-doublings\fR\ |\ \fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-clear\-max\-retry\-duration\fR\ |\ \fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-clear\-min\-backoff\fR\ |\ \fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-clear\-routing\-override\fR\ |\ \fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud tasks queues update\fR \fIQUEUE\fR [\fB\-\-clear\-log\-sampling\-ratio\fR\ |\ \fB\-\-log\-sampling\-ratio\fR=\fILOG_SAMPLING_RATIO\fR] [\fB\-\-clear\-max\-attempts\fR\ |\ \fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-clear\-max\-backoff\fR\ |\ \fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-clear\-max\-concurrent\-dispatches\fR\ |\ \fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR] [\fB\-\-clear\-max\-dispatches\-per\-second\fR\ |\ \fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR] [\fB\-\-clear\-max\-doublings\fR\ |\ \fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-clear\-max\-retry\-duration\fR\ |\ \fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-clear\-min\-backoff\fR\ |\ \fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-clear\-routing\-override\fR\ |\ \fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,6 +37,23 @@ The queue to update.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-log\-sampling\-ratio\fR
+Clear the field corresponding to \f5\-\-log\-sampling\-ratio\fR.
+
+.TP 2m
+\fB\-\-log\-sampling\-ratio\fR=\fILOG_SAMPLING_RATIO\fR
+Specifies the fraction of operations to write to Stackdriver Logging. This field
+may contain any value between 0.0 and 1.0, inclusive. 0.0 is the default and
+means that no operations are logged.
+
+.RE
+.sp
 .TP 2m
 
 At most one of these may be specified:
@@ -189,8 +206,9 @@ use the default.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

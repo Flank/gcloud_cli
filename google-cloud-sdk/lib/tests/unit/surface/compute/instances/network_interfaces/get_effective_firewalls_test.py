@@ -28,8 +28,8 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 
-class UpdateNetworkInterfaceTest(sdk_test_base.WithFakeAuth,
-                                 cli_test_base.CliTestBase):
+class GetEffectiveFirewallsAlphaTest(sdk_test_base.WithFakeAuth,
+                                     cli_test_base.CliTestBase):
   """Base class for testing instance get-effective-firewalls command."""
 
   def SetUp(self):
@@ -107,6 +107,25 @@ class UpdateNetworkInterfaceTest(sdk_test_base.WithFakeAuth,
 
     self.Run('compute instances network-interfaces get-effective-firewalls '
              'instance-1 --zone atlanta')
+
+
+class GetEffectiveFirewallsBetaTest(GetEffectiveFirewallsAlphaTest):
+  """Base class for testing instance get-effective-firewalls command."""
+
+  def SetUp(self):
+    self.apitools_client = api_mock.Client(
+        core_apis.GetClientClass('compute', 'beta'),
+        real_client=core_apis.GetClientInstance(
+            'compute', 'beta', no_http=True))
+    self.apitools_client.Mock()
+    self.addCleanup(self.apitools_client.Unmock)
+    self.messages = self.apitools_client.MESSAGES_MODULE
+
+    self.resources = resources.Registry()
+    self.resources.RegisterApiByName('compute', 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.service = self.apitools_client.instances
+    self.zone_operations = self.apitools_client.zoneOperations
 
 
 if __name__ == '__main__':

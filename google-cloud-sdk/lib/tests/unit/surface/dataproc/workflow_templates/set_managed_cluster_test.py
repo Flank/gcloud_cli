@@ -24,7 +24,7 @@ import copy
 from apitools.base.py import encoding
 
 from googlecloudsdk import calliope
-
+from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.core import properties
 from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import unit_base
@@ -73,8 +73,10 @@ class WorkflowTemplateSetManagedClusterUnitTest(
     self.ExpectSetManagedCluster(
         workflow_template, response=response, exception=exception)
 
-  def testSetManagedCluster(self):
-    workflow_template = self.MakeWorkflowTemplate()
+  def _testSetManagedCluster(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+    workflow_template = self.MakeWorkflowTemplate(region=region)
     cluster_name = 'test-cluster'
     managed_cluster = self.MakeManagedCluster(
         clusterName=cluster_name,
@@ -82,13 +84,37 @@ class WorkflowTemplateSetManagedClusterUnitTest(
         masterMachineTypeUri='n1-standard-2',
         workerConfigNumInstances=2)
     self.ExpectCallSetManagedCluster(
-        workflow_template=workflow_template, managed_cluster=managed_cluster)
+        workflow_template=workflow_template,
+        managed_cluster=managed_cluster,
+        region=region)
     result = self.RunDataproc('workflow-templates set-managed-cluster {0} '
                               '--cluster-name {1} '
                               '--zone us-west1-a --num-workers 2 '
-                              '--master-machine-type n1-standard-2'.format(
-                                  self.WORKFLOW_TEMPLATE, cluster_name))
+                              '--master-machine-type n1-standard-2'
+                              ' {2}'.format(
+                                  self.WORKFLOW_TEMPLATE,
+                                  cluster_name,
+                                  region_flag))
     self.AssertMessagesEqual(workflow_template, result)
+
+  def testSetManagedCluster(self):
+    self._testSetManagedCluster()
+
+  def testSetManagedCluster_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testSetManagedCluster(region='global')
+
+  def testSetManagedCluster_region_flag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testSetManagedCluster(
+        region='us-central1', region_flag='--region=us-central1')
+
+  def testSetManagedCluster_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('workflow-templates set-managed-cluster foo '
+                       '--cluster-name bar', set_region=False)
 
   def testSetManagedClusterFlags(self):
     cluster_name = 'test-cluster'
@@ -98,7 +124,7 @@ class WorkflowTemplateSetManagedClusterUnitTest(
     bucket = 'foo-bucket'
     num_masters = 3
     num_workers = 7
-    num_preemptible_workers = 5
+    num_secondary_workers = 5
     image_version = '1.7'
     network = 'foo-network'
     network_uri = ('https://compute.googleapis.com/compute/v1/projects/'
@@ -132,7 +158,7 @@ class WorkflowTemplateSetManagedClusterUnitTest(
         networkUri=network_uri,
         masterConfigNumInstances=num_masters,
         workerConfigNumInstances=num_workers,
-        secondaryWorkerConfigNumInstances=num_preemptible_workers,
+        secondaryWorkerConfigNumInstances=num_secondary_workers,
         zoneUri=zone,
         initializationActions=initialization_actions,
         serviceAccount=service_account,
@@ -159,7 +185,7 @@ class WorkflowTemplateSetManagedClusterUnitTest(
                '--image-version {image_version} '
                '--initialization-action-timeout 2m '
                '--initialization-actions {actions} '
-               '--num-preemptible-workers {num_preemptible} '
+               '--num-secondary-workers {num_secondary} '
                '--service-account {service_account} '
                '--scopes {scopes} '
                '--properties core:com.foo=foo,hdfs:com.bar=bar '
@@ -176,7 +202,7 @@ class WorkflowTemplateSetManagedClusterUnitTest(
                    network=network,
                    image_version=image_version,
                    actions=','.join(action_uris),
-                   num_preemptible=num_preemptible_workers,
+                   num_secondary=num_secondary_workers,
                    service_account=service_account,
                    scopes=scope_list)
 
@@ -256,7 +282,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
     bucket = 'foo-bucket'
     num_masters = 3
     num_workers = 7
-    num_preemptible_workers = 5
+    num_secondary_workers = 5
     image_version = '1.7'
     network = 'foo-network'
     network_uri = ('https://compute.googleapis.com/compute/beta/projects/'
@@ -289,7 +315,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
         networkUri=network_uri,
         masterConfigNumInstances=num_masters,
         workerConfigNumInstances=num_workers,
-        secondaryWorkerConfigNumInstances=num_preemptible_workers,
+        secondaryWorkerConfigNumInstances=num_secondary_workers,
         zoneUri=zone,
         initializationActions=initialization_actions,
         serviceAccount=service_account,
@@ -316,7 +342,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                '--image-version {image_version} '
                '--initialization-action-timeout 2m '
                '--initialization-actions {actions} '
-               '--num-preemptible-workers {num_preemptible} '
+               '--num-secondary-workers {num_secondary} '
                '--service-account {service_account} '
                '--scopes {scopes} '
                '--properties core:com.foo=foo,hdfs:com.bar=bar '
@@ -333,7 +359,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                    network=network,
                    image_version=image_version,
                    actions=','.join(action_uris),
-                   num_preemptible=num_preemptible_workers,
+                   num_secondary=num_secondary_workers,
                    service_account=service_account,
                    scopes=scope_list)
 
@@ -388,8 +414,8 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                '--master-machine-type {master_machine_type} '
                '--worker-machine-type {worker_machine_type} '
                '--image {image} '
-               '--preemptible-worker-boot-disk-size 42GB '
-               '--preemptible-worker-boot-disk-type pd-standard '
+               '--secondary-worker-boot-disk-size 42GB '
+               '--secondary-worker-boot-disk-type pd-standard '
                '--master-min-cpu-platform="{master_min_cpu_platform}" '
                '--worker-min-cpu-platform="{worker_min_cpu_platform}" '
                '--no-address '

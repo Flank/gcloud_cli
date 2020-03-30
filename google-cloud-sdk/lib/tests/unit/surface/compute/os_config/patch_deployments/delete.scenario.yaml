@@ -1,0 +1,63 @@
+title: patch-deployments delete.
+release_tracks: [GA, BETA, ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute os-config patch-deployments delete
+  - stderr: .*argument PATCH_DEPLOYMENT\:\ Must be specified..*$
+  - error: '1: argument PATCH_DEPLOYMENT: Must be specified.'
+- execute:
+  - command: compute os-config patch-deployments delete my-patch-deployment
+  - stderr: |
+      Deleted [projects/fake-project/patchDeployments/my-patch-deployment].
+- execute:
+  - command: compute os-config patch-deployments delete projects/fake-project/patchDeployments/my-patch-deployment
+  - stderr: |
+      Deleted [projects/fake-project/patchDeployments/my-patch-deployment].
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta
+      ALPHA: v1alpha2
+- execute_command:
+    command: compute os-config patch-deployments delete
+    events:
+    - expect_stderr:
+        matches: .*argument PATCH_DEPLOYMENT\:\ Must be specified..*$
+    - expect_exit:
+        code: 1
+        message: 'argument PATCH_DEPLOYMENT: Must be specified.'
+- execute_command:
+    command: compute os-config patch-deployments delete my-patch-deployment
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/my-patch-deployment?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+    - expect_stderr: |
+        Deleted [projects/fake-project/patchDeployments/my-patch-deployment].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute os-config patch-deployments delete projects/fake-project/patchDeployments/my-patch-deployment
+    events:
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/fake-project/patchDeployments/my-patch-deployment?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+    - expect_stderr: |
+        Deleted [projects/fake-project/patchDeployments/my-patch-deployment].
+    - expect_exit:
+        code: 0

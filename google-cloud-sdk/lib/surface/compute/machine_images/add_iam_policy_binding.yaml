@@ -1,10 +1,10 @@
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 
 help_text:
   brief: Add IAM policy binding to the IAM policy of a Google Compute Engine machine image.
   description: |
-    Add an IAM policy binding to the IAM policy of a Google Compute Engine machine image. One
-    binding consists of a member and a role.
+    Add an IAM policy binding to the IAM policy of a Compute Engine machine image. A policy binding
+    consists of a member and a role.
 
   examples: |
     To add an IAM policy binding for the role of 'roles/compute.admin' for the user
@@ -18,7 +18,9 @@ help_text:
 request:
   collection: compute.machineImages
   use_relative_name: false
-  api_version: alpha
+  api_version: beta
+  ALPHA:
+    api_version: alpha
 
 arguments:
   resource:

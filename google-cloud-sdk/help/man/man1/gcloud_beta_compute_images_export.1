@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute images export \- export a Google Compute Engine image
+gcloud beta compute images export \- export a Compute Engine image
 
 
 
@@ -17,15 +17,15 @@ gcloud beta compute images export \- export a Google Compute Engine image
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR \fBgcloud beta compute images export\fR exports Virtual Disk images
-from Google Compute Engine.
+\fB(BETA)\fR \fBgcloud beta compute images export\fR exports virtual disk images
+from Compute Engine.
 
-By default, images are exported in the Google Compute Engine format, which is a
-disk.raw file that has been tarred and gzipped.
+By default, images are exported in the Compute Engine format, which is a
+\'disk.raw' file that is tarred and gzipped.
 
-The \f5\-\-export\-format\fR flag will export the image to a format supported by
-QEMU using qemu\-img. Valid formats include \f5vmdk\fR, \f5vhdx\fR, \f5vpc\fR,
-\f5vdi\fR, and \f5qcow2\fR.
+The \f5\-\-export\-format\fR flag exports the image to a format supported by
+QEMU using qemu\-img. Valid formats include 'vmdk', 'vhdx', 'vpc', 'vdi', and
+\'qcow2'.
 
 
 
@@ -124,8 +124,22 @@ the default \fBcompute/zone\fR property value for this command invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To export a VMDK file 'my\-image' from a project 'my\-project' to a Cloud
+Storage bucket 'my\-bucket', run:
+
+.RS 2m
+$ gcloud beta compute images export \-\-image=my\-image \e
+    \-\-destination\-uri=gs://my\-bucket/my\-image.vmdk \e
+    \-\-image=my\-image \-\-format=vmdk \-\-project=my\-project
+.RE
 
 
 

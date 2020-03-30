@@ -35,8 +35,9 @@ https://developers.google.com/identity/protocols/application\-default\-credentia
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -57,11 +58,23 @@ Print an access token for your current Application Default Credentials.
 \fBrevoke\fR
 Revoke previously generated Application Default Credentials.
 
+.TP 2m
+\fBset\-quota\-project\fR
+Update or add a quota project in application default credentials (ADC).
+
 
 .RE
 .sp
 
 .SH "EXAMPLES"
+
+To use your own user credentials for your application to access an API, run:
+
+.RS 2m
+$ gcloud auth application\-default login
+.RE
+
+This will take you through a web flow to acquire new user credentials.
 
 To create a service account and have your application use it for API access,
 run:
@@ -73,14 +86,6 @@ $ gcloud iam service\-accounts keys create key.json
 $ export GOOGLE_APPLICATION_CREDENTIALS=key.json
 $ ./my_application.sh
 .RE
-
-To temporarily use your own user credentials, run:
-
-.RS 2m
-$ gcloud auth application\-default login
-.RE
-
-This will take you through a web flow to acquire new user credentials.
 
 
 

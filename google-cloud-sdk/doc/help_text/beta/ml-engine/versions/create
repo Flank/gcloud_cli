@@ -83,10 +83,10 @@ OPTIONAL FLAGS
         Enable explanations and select the explanation method to use.
 
         The valid options are: integrated-gradients: Use Integrated Gradients.
-        sampled-shapley: Use Sampled Shapley.
+        sampled-shapley: Use Sampled Shapley. xrai: Use XRAI.
 
         EXPLANATION_METHOD must be one of: integrated-gradients,
-        sampled-shapley.
+        sampled-shapley, xrai.
 
      --framework=FRAMEWORK
         The ML framework used to train this version of the model. If not
@@ -108,7 +108,8 @@ OPTIONAL FLAGS
 
      --num-integral-steps=NUM_INTEGRAL_STEPS; default=50
         Number of integral steps for Integrated Gradients. Only valid when
-        --explanation-method=integrated-gradients is specified.
+        --explanation-method=integrated-gradients or --explanation-method=xrai
+        is specified.
 
      --num-paths=NUM_PATHS; default=50
         Number of paths for Sampled Shapley. Only valid when
@@ -164,8 +165,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create an AI Platform version model with the version ID 'versionId' and

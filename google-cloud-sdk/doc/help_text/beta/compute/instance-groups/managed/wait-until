@@ -1,6 +1,6 @@
 NAME
-    gcloud beta compute instance-groups managed wait-until - wait until managed
-        instance group reaches desired state
+    gcloud beta compute instance-groups managed wait-until - wait until the
+        managed instance group reaches the desired state
 
 SYNOPSIS
     gcloud beta compute instance-groups managed wait-until NAME
@@ -8,7 +8,7 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Wait until managed instance group reaches desired state.
+    (BETA) Wait until the managed instance group reaches the desired state.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -25,7 +25,7 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --timeout=TIMEOUT
-        Waiting time in seconds for group to reach desired state.
+        Waiting time in seconds for the group to reach the desired state.
 
      At most one of these may be specified:
 
@@ -55,12 +55,20 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To wait until the managed instance group instance-group-1 is stable, run:
+
+        $ gcloud beta compute instance-groups managed wait-until \
+            --stable instance-group-1
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute instance-groups managed wait-until
         $ gcloud alpha compute instance-groups managed wait-until
 

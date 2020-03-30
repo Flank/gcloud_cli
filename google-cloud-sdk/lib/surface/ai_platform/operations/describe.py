@@ -20,12 +20,14 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.ml_engine import operations
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.ml_engine import endpoint_util
 from googlecloudsdk.command_lib.ml_engine import flags
 from googlecloudsdk.command_lib.ml_engine import operations_util
 
 
 def _AddDescribeArgs(parser):
   flags.OPERATION_NAME.AddToParser(parser)
+  flags.GetRegionArg('operation').AddToParser(parser)
 
 
 class Describe(base.DescribeCommand):
@@ -36,5 +38,6 @@ class Describe(base.DescribeCommand):
     _AddDescribeArgs(parser)
 
   def Run(self, args):
-    return operations_util.Describe(operations.OperationsClient(),
-                                    args.operation)
+    with endpoint_util.MlEndpointOverrides(region=args.region):
+      client = operations.OperationsClient()
+      return operations_util.Describe(client, args.operation)

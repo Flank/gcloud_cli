@@ -4,9 +4,15 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute os-config patch-jobs execute
-        --instance-filter=INSTANCE_FILTER [--apt-dist] [--async]
-        [--description=DESCRIPTION] [--dry-run] [--duration=DURATION]
-        [--reboot-config=REBOOT_CONFIG] [--retry]
+        (--instance-filter=INSTANCE_FILTER | --instance-filter-all
+          | --instance-filter-group-labels=[KEY=VALUE,...]
+          --instance-filter-name-prefixes=[INSTANCE_FILTER_NAME_PREFIXES,...]
+          --instance-filter-names=[INSTANCE_FILTER_NAMES,...]
+          --instance-filter-zones=[INSTANCE_FILTER_ZONES,...]) [--async]
+        [--description=DESCRIPTION] [--display-name=DISPLAY_NAME] [--dry-run]
+        [--duration=DURATION] [--reboot-config=REBOOT_CONFIG] [--retry]
+        [--apt-dist --apt-excludes=[APT_EXCLUDES,...]
+          | --apt-exclusive-packages=[APT_EXCLUSIVE_PACKAGES,...]]
         [--post-patch-linux-executable=POST_PATCH_LINUX_EXECUTABLE
           --post-patch-linux-success-codes=[POST_PATCH_LINUX_SUCCESS_CODES,
           ...]]
@@ -18,32 +24,72 @@ SYNOPSIS
         [--pre-patch-windows-executable=PRE_PATCH_WINDOWS_EXECUTABLE
           --pre-patch-windows-success-codes=[PRE_PATCH_WINDOWS_SUCCESS_CODES,
           ...]]
-        [--windows-classifications=[WINDOWS_CLASSIFICATIONS,...]
+        [--windows-exclusive-patches=[WINDOWS_EXCLUSIVE_PATCHES,...]
+          | --windows-classifications=[WINDOWS_CLASSIFICATIONS,...]
           --windows-excludes=[WINDOWS_EXCLUDES,...]]
-        [--yum-excludes=[YUM_EXCLUDES,...] --yum-minimal --yum-security]
-        [--zypper-categories=[ZYPPER_CATEGORIES,...]
+        [--yum-exclusive-packages=[YUM_EXCLUSIVE_PACKAGES,...]
+          | --yum-excludes=[YUM_EXCLUDES,...] --yum-minimal --yum-security]
+        [--zypper-exclusive-patches=[ZYPPER_EXCLUSIVE_PATCHES,...]
+          | --zypper-categories=[ZYPPER_CATEGORIES,...]
           --zypper-severities=[ZYPPER_SEVERITIES,...]
           --zypper-with-optional --zypper-with-update] [GCLOUD_WIDE_FLAG ...]
 
+DESCRIPTION
+    (ALPHA) Execute an OS patch on the specified VM instances.
+
 REQUIRED FLAGS
-     --instance-filter=INSTANCE_FILTER
-        Filter for selecting the instances to patch. Patching supports the same
-        filter mechanisms as gcloud compute instances list, allowing one to
-        patch specific instances by name, zone, label, or other criteria.
+     Filters for selecting which instances to patch: Exactly one of these must
+     be specified:
+
+       --instance-filter=INSTANCE_FILTER
+          (DEPRECATED) Filter expression for selecting the instances to patch.
+          Patching supports the same filter mechanisms as gcloud compute
+          instances list, allowing one to patch specific instances by name,
+          zone, label, or other criteria.
+
+              --instance-filter is deprecated; use individual filter flags instead. See
+              the command help text for more details.
+
+       --instance-filter-all
+          A filter that targets all instances in the project.
+
+       Individual filters. The targeted instances must meet all criteria
+       specified.
+
+         --instance-filter-group-labels=[KEY=VALUE,...]
+            A filter that represents a label set. Targeted instances must have
+            all specified labels in this set. For example, "env=prod and
+            app=web".
+
+            This flag can be repeated. Targeted instances must have at least
+            one of these label sets. This allows targeting of disparate groups,
+            for example, "(env=prod and app=web) or (env=staging and app=web)".
+
+         --instance-filter-name-prefixes=[INSTANCE_FILTER_NAME_PREFIXES,...]
+            A filter that targets instances whose name starts with one of these
+            prefixes. For example, "prod-".
+
+         --instance-filter-names=[INSTANCE_FILTER_NAMES,...]
+            A filter that targets instances of any of the specified names.
+            Instances are specified by the URI in the form
+            "zones/<ZONE>/instances/<INSTANCE_NAME>",
+            "projects/<PROJECT_ID>/zones/<ZONE>/instances/<INSTANCE_NAME>", or
+            "https://www.googleapis.com/compute/v1/projects/<PROJECT_ID>/zones/<ZONE>/instances/<INSTANCE_NAME>".
+
+         --instance-filter-zones=[INSTANCE_FILTER_ZONES,...]
+            A filter that targets instances in any of the specified zones.
+            Leave empty to target instances in any zone.
 
 OPTIONAL FLAGS
-     Settings for machines running Apt:
-
-       --apt-dist
-          If specified, machines running Apt use the apt-get dist-upgrade
-          command; otherwise the apt-get upgrade command is used.
-
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
 
      --description=DESCRIPTION
         Textual description of the patch job.
+
+     --display-name=DISPLAY_NAME
+        Display name for this patch job. This does not have to be unique.
 
      --dry-run
         Whether to execute this patch job as a dry run. If this patch job is a
@@ -74,6 +120,22 @@ OPTIONAL FLAGS
         Specifies whether to attempt to retry, within the duration window, if
         patching initially fails. If omitted, the agent uses its default retry
         strategy.
+
+     Settings for machines running Apt:
+
+       --apt-dist
+          If specified, machines running Apt use the apt-get dist-upgrade
+          command; otherwise the apt-get upgrade command is used.
+
+       At most one of these may be specified:
+
+         --apt-excludes=[APT_EXCLUDES,...]
+            List of packages to exclude from update.
+
+         --apt-exclusive-packages=[APT_EXCLUSIVE_PACKAGES,...]
+            An exclusive list of packages to be updated. These are the only
+            packages that will be updated. If these packages are not installed,
+            they will be ignored.
 
      Post-patch step settings for Linux machines:
 
@@ -151,107 +213,151 @@ OPTIONAL FLAGS
           Additional exit codes that the executable can return to indicate a
           successful run. The default exit code for success is 0.
 
-     Settings for machines running Windows:
+     Settings for machines running Windows: At most one of these may be
+     specified:
 
-       --windows-classifications=[WINDOWS_CLASSIFICATIONS,...]
-          List of classifications to use to restrict the Windows update. Only
-          patches of the given classifications are applied. If omitted, a
-          default Windows update is performed. For more information on
-          classifications, see:
-          https://support.microsoft.com/en-us/help/824684.
-          WINDOWS_CLASSIFICATIONS must be one of: critical, security,
-          definition, driver, feature-pack, service-pack, tool, update-rollup,
-          update.
+       --windows-exclusive-patches=[WINDOWS_EXCLUSIVE_PATCHES,...]
+          An exclusive list of KBs to be updated. These are the only patches
+          that will be updated.
 
-       --windows-excludes=[WINDOWS_EXCLUDES,...]
-          Optional list of KBs to exclude from the update operation.
+       Windows patch options
 
-     Settings for machines running Yum:
+         --windows-classifications=[WINDOWS_CLASSIFICATIONS,...]
+            List of classifications to use to restrict the Windows update. Only
+            patches of the given classifications are applied. If omitted, a
+            default Windows update is performed. For more information on
+            classifications, see:
+            https://support.microsoft.com/en-us/help/824684.
+            WINDOWS_CLASSIFICATIONS must be one of: critical, security,
+            definition, driver, feature-pack, service-pack, tool,
+            update-rollup, update.
 
-       --yum-excludes=[YUM_EXCLUDES,...]
-          Optional list of packages to exclude from updating. If this argument
-          is specified, machines running Yum exclude the given list of packages
-          using the Yum --exclude flag.
+         --windows-excludes=[WINDOWS_EXCLUDES,...]
+            Optional list of KBs to exclude from the update operation.
 
-       --yum-minimal
-          If specified, machines running Yum use the command yum
-          update-minimal; otherwise the patch uses yum-update.
+     Settings for machines running Yum: At most one of these may be specified:
 
-       --yum-security
-          If specified, machines running Yum append the --security flag to the
-          patch command.
+       --yum-exclusive-packages=[YUM_EXCLUSIVE_PACKAGES,...]
+          An exclusive list of packages to be updated. These are the only
+          packages that will be updated. If these packages are not installed,
+          they will be ignored.
 
-     Settings for machines running Zypper:
+       Yum patch options
 
-       --zypper-categories=[ZYPPER_CATEGORIES,...]
-          If specified, machines running Zypper install only patches with the
-          specified categories. Categories include security, recommended, and
-          feature.
+         --yum-excludes=[YUM_EXCLUDES,...]
+            Optional list of packages to exclude from updating. If this
+            argument is specified, machines running Yum exclude the given list
+            of packages using the Yum --exclude flag.
 
-       --zypper-severities=[ZYPPER_SEVERITIES,...]
-          If specified, machines running Zypper install only patch with the
-          specified severities. Severities include critical, important,
-          moderate, and low.
+         --yum-minimal
+            If specified, machines running Yum use the command yum
+            update-minimal; otherwise the patch uses yum-update.
 
-       --zypper-with-optional
-          If specified, machines running Zypper add the --with-optional flag to
-          zypper patch.
+         --yum-security
+            If specified, machines running Yum append the --security flag to
+            the patch command.
 
-       --zypper-with-update
-          If specified, machines running Zypper add the --with-update flag to
-          zypper patch.
+     Settings for machines running Zypper: At most one of these may be
+     specified:
+
+       --zypper-exclusive-patches=[ZYPPER_EXCLUSIVE_PATCHES,...]
+          An exclusive list of patches to be updated. These are the only
+          patches that will be installed using the 'zypper patch
+          patch:<patch_name>' command.
+
+       Zypper patch options
+
+         --zypper-categories=[ZYPPER_CATEGORIES,...]
+            If specified, machines running Zypper install only patches with the
+            specified categories. Categories include security, recommended, and
+            feature.
+
+         --zypper-severities=[ZYPPER_SEVERITIES,...]
+            If specified, machines running Zypper install only patch with the
+            specified severities. Severities include critical, important,
+            moderate, and low.
+
+         --zypper-with-optional
+            If specified, machines running Zypper add the --with-optional flag
+            to zypper patch.
+
+         --zypper-with-update
+            If specified, machines running Zypper add the --with-update flag to
+            zypper patch.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To patch all instances in the current project, use --instance-filter="" (or
-    equivalently, --instance-filter="id="):
+    To start a patch job named my patch job that patches all instances in the
+    current project, run:
 
         $ gcloud alpha compute os-config patch-jobs execute \
-        --instance-filter=""
+        --display-name="my patch job" --instance-filter-all
 
-    To patch the instances named 'my-instance1' and 'my-instance2', run:
+    To patch an instance named my-instance-1 in the us-east1-b zone, run:
 
         $ gcloud alpha compute os-config patch-jobs execute \
-        --instance-filter="name=my-instance-1 OR name=my-instance-2"
+        --instance-filter-names=          \
+        "zones/us-east1-b/instances/my-instance-1"
 
-    To patch all instances in the 'us-central1-b' and 'europe-west1-d' zones,
+    To patch all instances in the us-central1-b and europe-west1-d zones, run:
+
+        $ gcloud alpha compute os-config patch-jobs execute \
+        --instance-filter-zones="us-central1-b,europe-west1-d"
+
+    To patch all instances where the env label is test and app label is web,
     run:
 
         $ gcloud alpha compute os-config patch-jobs execute \
-        --instance-filter="zone:(us-central1-b europe-west1-d)"
+        --instance-filter-group-labels="env=test,app=web"
 
-    To patch all instances where their 'env' label is 'test', run:
+    To patch all instances where the env label is test and app label is web or
+    where the env label is staging and app label is web, run:
+
+        $ gcloud alpha compute os-config patch-jobs execute           \
+        --instance-filter-group-labels="env=test,app=web"           \
+        --instance-filter-group-labels="env=staging,app=web"
+
+    To apply security and critical patches to Windows instances with the prefix
+    windows- in the instance name, run:
 
         $ gcloud alpha compute os-config patch-jobs execute \
-        --instance-filter="labels.env=test"
-
-    To apply security and critical patches to a Windows instance named
-    'my-instance', run:
-
-        $ gcloud alpha compute os-config patch-jobs execute \
-        --instance-filter="name=my-instance" \
+        --instance-filter-name-prefixes="windows-"           \
         --windows-classifications=SECURITY,CRITICAL
+
+    To update only KB4339284 on Windows instances with the prefix windows- in
+    the instance name, run:
+
+        $ gcloud alpha compute os-config patch-jobs execute \
+        --instance-filter-name-prefixes="windows-"           \
+        --windows-exclusive-patches=KB4339284
 
     To patch all instances in the current project and specify scripts to run
     pre-patch and post-patch, run:
 
         $ gcloud alpha compute os-config patch-jobs execute \
-        --instance-filter="" \
-        --pre-patch-linux-executable="/bin/my-script" \
-        --pre-patch-linux-success-codes=0,200 \
-        --pre-patch-windows-executable="C:\\Users\\user\\test-script.ps1" \
-        --post-patch-linux-executable="gs://my-bucket/my-linux-script#12345" \
-        --post-patch-windows-executable="gs://my-bucket/my-windows-script#67890"
+        --instance-filter-all           \
+        --pre-patch-linux-executable="/bin/my-script"           \
+        --pre-patch-linux-success-codes=0,200           \
+        --pre-patch-windows-executable="C:\Users\user\test-script.ps1" \
+                  \
+        --post-patch-linux-executable="gs://my-bucket/my-linux-script#12\
+        345"           \
+            --post-patch-windows-executable="gs://my-bucket/my-windows-scrip\
+        t#67890"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. These variants are also available:
+
+        $ gcloud compute os-config patch-jobs execute
+        $ gcloud beta compute os-config patch-jobs execute
 

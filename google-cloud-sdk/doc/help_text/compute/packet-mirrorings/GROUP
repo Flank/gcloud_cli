@@ -1,0 +1,42 @@
+NAME
+    gcloud compute packet-mirrorings - manage Google Compute Engine packet
+        mirroring resources
+
+SYNOPSIS
+    gcloud compute packet-mirrorings COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage Google Compute Engine packet mirroring resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a Google Compute Engine packet mirroring policy.
+
+     delete
+        Delete a Google Compute Engine packet mirroring policy.
+
+     describe
+        Describe a Google Compute Engine packet mirroring policy.
+
+     list
+        List Google Compute Engine packet mirroring policies.
+
+     update
+        Update a Google Compute Engine packet mirroring policy.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute packet-mirrorings
+        $ gcloud beta compute packet-mirrorings
+

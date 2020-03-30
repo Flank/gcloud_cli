@@ -97,15 +97,20 @@ class Bucket(_messages.Message):
       storageClass is specified for a newly-created object. This defines how
       objects in the bucket are stored and determines the SLA and the cost of
       storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE,
-      COLDLINE, and DURABLE_REDUCED_AVAILABILITY. If this value is not
-      specified when the bucket is created, it will default to STANDARD. For
-      more information, see storage classes.
+      COLDLINE, ARCHIVE, and DURABLE_REDUCED_AVAILABILITY. If this value is
+      not specified when the bucket is created, it will default to STANDARD.
+      For more information, see storage classes.
     timeCreated: The creation time of the bucket in RFC 3339 format.
     updated: The modification time of the bucket in RFC 3339 format.
     versioning: The bucket's versioning configuration.
     website: The bucket's website configuration, controlling how the service
       behaves when accessing bucket contents as a web site. See the Static
       Website Examples for more information.
+    zoneAffinity: The zone or zones from which the bucket is intended to use
+      zonal quota. Requests for data from outside the specified affinities are
+      still allowed but won't be able to use zonal quota. The zone or zones
+      need to be within the bucket location otherwise the requests will fail
+      with a 400 Bad Request response.
   """
 
   class BillingValue(_messages.Message):
@@ -152,18 +157,32 @@ class Bucket(_messages.Message):
     r"""The bucket's IAM configuration.
 
     Messages:
-      BucketPolicyOnlyValue: The bucket's Bucket Policy Only configuration.
+      BucketPolicyOnlyValue: The bucket's uniform bucket-level access
+        configuration. The feature was formerly known as Bucket Policy Only.
+        For backward compatibility, this field will be populated with
+        identical information as the uniformBucketLevelAccess field. We
+        recommend using the uniformBucketLevelAccess field to enable and
+        disable the feature.
       UniformBucketLevelAccessValue: The bucket's uniform bucket-level access
         configuration.
 
     Fields:
-      bucketPolicyOnly: The bucket's Bucket Policy Only configuration.
+      bucketPolicyOnly: The bucket's uniform bucket-level access
+        configuration. The feature was formerly known as Bucket Policy Only.
+        For backward compatibility, this field will be populated with
+        identical information as the uniformBucketLevelAccess field. We
+        recommend using the uniformBucketLevelAccess field to enable and
+        disable the feature.
       uniformBucketLevelAccess: The bucket's uniform bucket-level access
         configuration.
     """
 
     class BucketPolicyOnlyValue(_messages.Message):
-      r"""The bucket's Bucket Policy Only configuration.
+      r"""The bucket's uniform bucket-level access configuration. The feature
+      was formerly known as Bucket Policy Only. For backward compatibility,
+      this field will be populated with identical information as the
+      uniformBucketLevelAccess field. We recommend using the
+      uniformBucketLevelAccess field to enable and disable the feature.
 
       Fields:
         enabled: If set, access is controlled only by bucket-level or above
@@ -279,8 +298,8 @@ class Bucket(_messages.Message):
             incompatible ways and that it is not guaranteed to be released.
           matchesStorageClass: Objects having any of the storage classes
             specified by this condition will be matched. Values include
-            MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, STANDARD, and
-            DURABLE_REDUCED_AVAILABILITY.
+            MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE, STANDARD,
+            and DURABLE_REDUCED_AVAILABILITY.
           numNewerVersions: Relevant only for versioned objects. If the value
             is N, this condition is satisfied when there are at least N
             versions (including the live version) newer than this version of
@@ -405,6 +424,7 @@ class Bucket(_messages.Message):
   updated = _message_types.DateTimeField(24)
   versioning = _messages.MessageField('VersioningValue', 25)
   website = _messages.MessageField('WebsiteValue', 26)
+  zoneAffinity = _messages.StringField(27, repeated=True)
 
 
 class BucketAccessControl(_messages.Message):
@@ -2261,6 +2281,10 @@ class StorageObjectsCopyRequest(_messages.Message):
       Overrides the provided object metadata's bucket value, if any.For
       information about how to URL encode object names to be path safe, see
       Encoding URI Path Parts.
+    destinationKmsKeyName: Resource name of the Cloud KMS key, of the form
+      projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key,
+      that will be used to encrypt the object. Overrides the object metadata's
+      kms_key_name value, if any.
     destinationObject: Name of the new object. Required when the object
       metadata is not otherwise provided. Overrides the object metadata's name
       value, if any.
@@ -2337,23 +2361,24 @@ class StorageObjectsCopyRequest(_messages.Message):
     noAcl = 1
 
   destinationBucket = _messages.StringField(1, required=True)
-  destinationObject = _messages.StringField(2, required=True)
-  destinationPredefinedAcl = _messages.EnumField('DestinationPredefinedAclValueValuesEnum', 3)
-  ifGenerationMatch = _messages.IntegerField(4)
-  ifGenerationNotMatch = _messages.IntegerField(5)
-  ifMetagenerationMatch = _messages.IntegerField(6)
-  ifMetagenerationNotMatch = _messages.IntegerField(7)
-  ifSourceGenerationMatch = _messages.IntegerField(8)
-  ifSourceGenerationNotMatch = _messages.IntegerField(9)
-  ifSourceMetagenerationMatch = _messages.IntegerField(10)
-  ifSourceMetagenerationNotMatch = _messages.IntegerField(11)
-  object = _messages.MessageField('Object', 12)
-  projection = _messages.EnumField('ProjectionValueValuesEnum', 13)
-  provisionalUserProject = _messages.StringField(14)
-  sourceBucket = _messages.StringField(15, required=True)
-  sourceGeneration = _messages.IntegerField(16)
-  sourceObject = _messages.StringField(17, required=True)
-  userProject = _messages.StringField(18)
+  destinationKmsKeyName = _messages.StringField(2)
+  destinationObject = _messages.StringField(3, required=True)
+  destinationPredefinedAcl = _messages.EnumField('DestinationPredefinedAclValueValuesEnum', 4)
+  ifGenerationMatch = _messages.IntegerField(5)
+  ifGenerationNotMatch = _messages.IntegerField(6)
+  ifMetagenerationMatch = _messages.IntegerField(7)
+  ifMetagenerationNotMatch = _messages.IntegerField(8)
+  ifSourceGenerationMatch = _messages.IntegerField(9)
+  ifSourceGenerationNotMatch = _messages.IntegerField(10)
+  ifSourceMetagenerationMatch = _messages.IntegerField(11)
+  ifSourceMetagenerationNotMatch = _messages.IntegerField(12)
+  object = _messages.MessageField('Object', 13)
+  projection = _messages.EnumField('ProjectionValueValuesEnum', 14)
+  provisionalUserProject = _messages.StringField(15)
+  sourceBucket = _messages.StringField(16, required=True)
+  sourceGeneration = _messages.IntegerField(17)
+  sourceObject = _messages.StringField(18, required=True)
+  userProject = _messages.StringField(19)
 
 
 class StorageObjectsDeleteRequest(_messages.Message):
@@ -2580,6 +2605,9 @@ class StorageObjectsListRequest(_messages.Message):
       delimiter. Objects whose names, aside from the prefix, contain delimiter
       will have their name, truncated after the delimiter, returned in
       prefixes. Duplicate prefixes are omitted.
+    endOffset: Filter results to objects whose names are lexicographically
+      before endOffset. If startOffset is also set, the objects listed will
+      have names between startOffset (inclusive) and endOffset (exclusive).
     includeTrailingDelimiter: If true, objects that end in exactly one
       instance of delimiter will have their metadata included in items in
       addition to prefixes.
@@ -2593,6 +2621,10 @@ class StorageObjectsListRequest(_messages.Message):
     projection: Set of properties to return. Defaults to noAcl.
     provisionalUserProject: The project to be billed for this request if the
       target bucket is requester-pays bucket.
+    startOffset: Filter results to objects whose names are lexicographically
+      equal to or after startOffset. If endOffset is also set, the objects
+      listed will have names between startOffset (inclusive) and endOffset
+      (exclusive).
     userProject: The project to be billed for this request. Required for
       Requester Pays buckets.
     versions: If true, lists all versions of an object as distinct results.
@@ -2611,14 +2643,16 @@ class StorageObjectsListRequest(_messages.Message):
 
   bucket = _messages.StringField(1, required=True)
   delimiter = _messages.StringField(2)
-  includeTrailingDelimiter = _messages.BooleanField(3)
-  maxResults = _messages.IntegerField(4, variant=_messages.Variant.UINT32, default=1000)
-  pageToken = _messages.StringField(5)
-  prefix = _messages.StringField(6)
-  projection = _messages.EnumField('ProjectionValueValuesEnum', 7)
-  provisionalUserProject = _messages.StringField(8)
-  userProject = _messages.StringField(9)
-  versions = _messages.BooleanField(10)
+  endOffset = _messages.StringField(3)
+  includeTrailingDelimiter = _messages.BooleanField(4)
+  maxResults = _messages.IntegerField(5, variant=_messages.Variant.UINT32, default=1000)
+  pageToken = _messages.StringField(6)
+  prefix = _messages.StringField(7)
+  projection = _messages.EnumField('ProjectionValueValuesEnum', 8)
+  provisionalUserProject = _messages.StringField(9)
+  startOffset = _messages.StringField(10)
+  userProject = _messages.StringField(11)
+  versions = _messages.BooleanField(12)
 
 
 class StorageObjectsPatchRequest(_messages.Message):
@@ -2973,6 +3007,9 @@ class StorageObjectsWatchAllRequest(_messages.Message):
       delimiter. Objects whose names, aside from the prefix, contain delimiter
       will have their name, truncated after the delimiter, returned in
       prefixes. Duplicate prefixes are omitted.
+    endOffset: Filter results to objects whose names are lexicographically
+      before endOffset. If startOffset is also set, the objects listed will
+      have names between startOffset (inclusive) and endOffset (exclusive).
     includeTrailingDelimiter: If true, objects that end in exactly one
       instance of delimiter will have their metadata included in items in
       addition to prefixes.
@@ -2986,6 +3023,10 @@ class StorageObjectsWatchAllRequest(_messages.Message):
     projection: Set of properties to return. Defaults to noAcl.
     provisionalUserProject: The project to be billed for this request if the
       target bucket is requester-pays bucket.
+    startOffset: Filter results to objects whose names are lexicographically
+      equal to or after startOffset. If endOffset is also set, the objects
+      listed will have names between startOffset (inclusive) and endOffset
+      (exclusive).
     userProject: The project to be billed for this request. Required for
       Requester Pays buckets.
     versions: If true, lists all versions of an object as distinct results.
@@ -3005,14 +3046,16 @@ class StorageObjectsWatchAllRequest(_messages.Message):
   bucket = _messages.StringField(1, required=True)
   channel = _messages.MessageField('Channel', 2)
   delimiter = _messages.StringField(3)
-  includeTrailingDelimiter = _messages.BooleanField(4)
-  maxResults = _messages.IntegerField(5, variant=_messages.Variant.UINT32, default=1000)
-  pageToken = _messages.StringField(6)
-  prefix = _messages.StringField(7)
-  projection = _messages.EnumField('ProjectionValueValuesEnum', 8)
-  provisionalUserProject = _messages.StringField(9)
-  userProject = _messages.StringField(10)
-  versions = _messages.BooleanField(11)
+  endOffset = _messages.StringField(4)
+  includeTrailingDelimiter = _messages.BooleanField(5)
+  maxResults = _messages.IntegerField(6, variant=_messages.Variant.UINT32, default=1000)
+  pageToken = _messages.StringField(7)
+  prefix = _messages.StringField(8)
+  projection = _messages.EnumField('ProjectionValueValuesEnum', 9)
+  provisionalUserProject = _messages.StringField(10)
+  startOffset = _messages.StringField(11)
+  userProject = _messages.StringField(12)
+  versions = _messages.BooleanField(13)
 
 
 class StorageProjectsHmacKeysCreateRequest(_messages.Message):

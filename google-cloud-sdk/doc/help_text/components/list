@@ -17,10 +17,6 @@ DESCRIPTION
         components] commands)
       o Size of the component
 
-    In addition, if the --show-versions flag is specified, the command lists
-    the currently installed version (if any) and the latest available version
-    of each individual component.
-
 FLAGS
      --only-local-state
         Only show locally installed components.
@@ -51,10 +47,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    $ gcloud components list
+    To list the status of all Cloud SDK components, run:
 
-    $ gcloud components list --show-versions
+        $ gcloud components list
+
+    To show the currently installed version (if any) and the latest available
+    version of each component, run:
+
+        $ gcloud components list --show-versions

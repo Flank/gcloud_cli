@@ -28,18 +28,13 @@ from tests.lib.surface.sql import base
 
 
 class InstancesExportBakGATest(base.SqlMockTestGA):
-  pass
-
-
-class InstancesExportBakBetaTest(InstancesExportBakGATest,
-                                 base.SqlMockTestBeta):
   # pylint:disable=g-tzinfo-datetime
 
   def _ExpectExport(self, databases):
     # Generate BAK export context.
     export_context = self.messages.ExportContext(
         databases=databases,
-        fileType='BAK',
+        fileType=self.messages.ExportContext.FileTypeValueValuesEnum.BAK,
         kind='sql#exportContext',
         uri='gs://speckletest/testinstance.bak',
     )
@@ -62,22 +57,24 @@ class InstancesExportBakBetaTest(InstancesExportBakGATest,
                 50,
                 43,
                 963000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=None,
             endTime=None,
             error=None,
             exportContext=export_context,
             importContext=None,
             targetId='testinstance',
-            targetLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
             .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='af859489-ca9c-470f-8340-86da167b368f',
-            selfLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'
             .format(self.Project()),
-            operationType='EXPORT',
-            status='PENDING',
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .EXPORT,
+            status=self.messages.Operation.StatusValueValuesEnum.PENDING,
             user='170350250316@developer.gserviceaccount.com',
         ))
     self.mocked_client.operations.Get.Expect(
@@ -95,7 +92,8 @@ class InstancesExportBakBetaTest(InstancesExportBakGATest,
                 50,
                 43,
                 963000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -104,7 +102,8 @@ class InstancesExportBakBetaTest(InstancesExportBakGATest,
                 50,
                 44,
                 13000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             endTime=datetime.datetime(
                 2014,
                 8,
@@ -113,20 +112,22 @@ class InstancesExportBakBetaTest(InstancesExportBakGATest,
                 50,
                 49,
                 639000,
-                tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
+                tzinfo=protorpc_util.TimeZoneOffset(
+                    datetime.timedelta(0))).isoformat(),
             error=None,
             exportContext=export_context,
             importContext=None,
             targetId='testinstance',
-            targetLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
+            targetLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'
             .format(self.Project()),
             targetProject=self.Project(),
             kind='sql#operation',
             name='af859489-ca9c-470f-8340-86da167b368f',
-            selfLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'
             .format(self.Project()),
-            operationType='EXPORT',
-            status='DONE',
+            operationType=self.messages.Operation.OperationTypeValueValuesEnum
+            .EXPORT,
+            status=self.messages.Operation.StatusValueValuesEnum.DONE,
             user='170350250316@developer.gserviceaccount.com',
         ))
 
@@ -154,6 +155,11 @@ class InstancesExportBakBetaTest(InstancesExportBakGATest,
     self._ExpectExport(databases=['db1'])
     self.Run('sql export bak testinstance --async -d db1 '
              'gs://speckletest/testinstance.bak')
+
+
+class InstancesExportBakBetaTest(InstancesExportBakGATest,
+                                 base.SqlMockTestBeta):
+  pass
 
 
 class InstancesExportBakAlphaTest(InstancesExportBakBetaTest,

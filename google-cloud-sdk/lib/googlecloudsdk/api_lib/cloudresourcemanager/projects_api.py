@@ -48,16 +48,18 @@ def List(limit=None,
   return list_pager.YieldFromList(
       client.projects,
       messages.CloudresourcemanagerProjectsListRequest(
-          filter=_AddActiveProjectFilter(filter)),
+          filter=_AddActiveProjectFilterIfNotSpecified(filter)),
       batch_size=batch_size,
       limit=limit,
       field='projects',
       batch_size_attribute='pageSize')
 
 
-def _AddActiveProjectFilter(filter_expr):
+def _AddActiveProjectFilterIfNotSpecified(filter_expr):
   if not filter_expr:
     return 'lifecycleState:ACTIVE'
+  if 'lifecycleState' in filter_expr:
+    return filter_expr
   return 'lifecycleState:ACTIVE AND ({})'.format(filter_expr)
 
 
@@ -250,6 +252,20 @@ def RemoveIamPolicyBindingWithCondition(project_ref,
   iam_util.RemoveBindingFromIamPolicyWithCondition(policy, member, role,
                                                    condition, all_conditions)
   return SetIamPolicy(project_ref, policy, api_version=api_version)
+
+
+def TestIamPermissions(project_ref,
+                       permissions,
+                       api_version=DEFAULT_API_VERSION):
+  """Return a subset of the given permissions that a caller has on project_ref."""
+  client = projects_util.GetClient(api_version)
+  messages = projects_util.GetMessages(api_version)
+
+  request = messages.CloudresourcemanagerProjectsTestIamPermissionsRequest(
+      resource=project_ref.Name(),
+      testIamPermissionsRequest=messages.TestIamPermissionsRequest(
+          permissions=permissions))
+  return client.projects.TestIamPermissions(request)
 
 
 def ParentNameToResourceId(parent_name, api_version=DEFAULT_API_VERSION):

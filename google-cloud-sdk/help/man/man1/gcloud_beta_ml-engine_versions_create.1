@@ -111,10 +111,10 @@ The description of the version.
 Enable explanations and select the explanation method to use.
 
 The valid options are: integrated\-gradients: Use Integrated Gradients.
-sampled\-shapley: Use Sampled Shapley.
+sampled\-shapley: Use Sampled Shapley. xrai: Use XRAI.
 
 \fIEXPLANATION_METHOD\fR must be one of: \fBintegrated\-gradients\fR,
-\fBsampled\-shapley\fR.
+\fBsampled\-shapley\fR, \fBxrai\fR.
 
 .TP 2m
 \fB\-\-framework\fR=\fIFRAMEWORK\fR
@@ -140,7 +140,8 @@ https://cloud.google.com/ml\-engine/docs/tensorflow/online\-predict#machine\-typ
 .TP 2m
 \fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR; default=50
 Number of integral steps for Integrated Gradients. Only valid when
-\f5\-\-explanation\-method=integrated\-gradients\fR is specified.
+\f5\-\-explanation\-method=integrated\-gradients\fR or
+\f5\-\-explanation\-method=xrai\fR is specified.
 
 .TP 2m
 \fB\-\-num\-paths\fR=\fINUM_PATHS\fR; default=50
@@ -213,8 +214,9 @@ For example, \f5\-\-prediction\-class=my_package.SequenceModel\fR.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

@@ -80,8 +80,28 @@ Number of nodes to serve.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To add a cluster in zone \f5us\-east1\-c\fR to the instance with id
+\f5my\-instance\-id\fR, run:
+
+.RS 2m
+$ gcloud alpha bigtable clusters create my\-cluster\-id \e
+    \-\-instance=my\-instance\-id \-\-zone=us\-east1\-c
+.RE
+
+To add a cluster with \f510\fR nodes, run:
+
+.RS 2m
+$ gcloud alpha bigtable clusters create my\-cluster\-id \e
+    \-\-instance=my\-instance\-id \-\-zone=us\-east1\-c \-\-num\-nodes=10
+.RE
 
 
 

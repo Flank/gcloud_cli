@@ -44,17 +44,20 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To undelete a role of an organization, run:
+    To undelete the role ProjectUpdater of the organization 1234567, run:
 
-        $ gcloud alpha iam roles undelete --organization 1234567 viewer
+        $ gcloud alpha iam roles undelete roles/ProjectUpdater \
+            --organization=1234567
 
-    To undelete a role of a project, run:
+    To undelete the role ProjectUpdater of the project myproject, run:
 
-        $ gcloud alpha iam roles undelete --project myproject viewer
+        $ gcloud alpha iam roles undelete roles/ProjectUpdater \
+            --project=myproject
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -50,7 +50,7 @@ class _BaseSslCertsDescribeTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     expirationTime=datetime.datetime(
                         2024,
                         2,
@@ -60,7 +60,7 @@ class _BaseSslCertsDescribeTest(object):
                         29,
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
-                            datetime.timedelta(0))),
+                            datetime.timedelta(0))).isoformat(),
                     instance='integration-test',
                     kind='sql#sslCert',
                     sha1Fingerprint='77299aad4c8136911c1f0b07dd9802a9a72124e8',

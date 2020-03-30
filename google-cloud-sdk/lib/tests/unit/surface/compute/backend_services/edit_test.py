@@ -378,9 +378,59 @@ class BackendServicesEditTest(test_base.BaseEditTest):
         protocol=messages.BackendService.ProtocolValueValuesEnum.HTTPS,
     )
 
-    self.Run("""
-        compute backend-services edit my-backend-service --region alaska --format yaml
-        """)
+    self.Run('compute backend-services edit my-backend-service '
+             + '--region alaska --format yaml')
+
+    self.AssertFileOpenedWith(yaml_contents)
+    self.CheckRequests(
+        [(self.compute.regionBackendServices,
+          'Get',
+          messages.ComputeRegionBackendServicesGetRequest(
+              project='my-project',
+              region='alaska',
+              backendService='my-backend-service'))],
+
+        [(self.compute.regionBackendServices,
+          'Update',
+          messages.ComputeRegionBackendServicesUpdateRequest(
+              project='my-project',
+              region='alaska',
+              backendService='my-backend-service',
+              backendServiceResource=updated_service
+              ))],
+        )
+
+  def testRegionHealthChecks_RegionBackendService(self):
+    messages = self.messages
+
+    self.mock_edit.side_effect = iter([textwrap.dedent("""\
+        ---
+        description: I changed this.
+        healthChecks:
+        - https://compute.googleapis.com/compute/v1/projects/my-project/regions/alaska/healthChecks/generic-health-check
+        """)])
+
+    yaml_contents = (edit_util.YAML_FILE_CONTENTS_HEADER +
+                     '{}\n' +
+                     edit_util.YAML_FILE_CONTENTS_EXAMPLE +
+                     '#   name: my-backend-service\n')
+
+    self.make_requests.side_effect = iter([
+        [messages.BackendService(name='my-backend-service')],
+        [],
+    ])
+
+    updated_service = messages.BackendService(
+        healthChecks=[
+            ('https://compute.googleapis.com/compute/v1/projects/my-project/'
+             'regions/alaska/healthChecks/generic-health-check')
+        ],
+        description='I changed this.',
+        name='my-backend-service'
+    )
+
+    self.Run('compute backend-services edit my-backend-service '
+             + '--region alaska --format yaml')
 
     self.AssertFileOpenedWith(yaml_contents)
     self.CheckRequests(

@@ -29,6 +29,7 @@ from six import text_type
 class PerimetersDescribeTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -42,13 +43,13 @@ class PerimetersDescribeTestGA(accesscontextmanager.Base):
         request_type(name=perimeter.name), perimeter)
 
   def testDescribe_MissingRequired(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run('access-context-manager perimeters describe --policy 123')
 
   def testDescribe(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter = self._MakePerimeter('my_perimeter')
     self._ExpectGet(perimeter)
 
@@ -58,7 +59,7 @@ class PerimetersDescribeTestGA(accesscontextmanager.Base):
     self.assertEqual(result, perimeter)
 
   def testDescribe_PolicyFromProperty(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     perimeter = self._MakePerimeter('my_perimeter')
     policy = '456'
     perimeter.name = ('accessPolicies/456/servicePerimeters/my_perimeter')
@@ -80,12 +81,14 @@ class PerimetersDescribeTestGA(accesscontextmanager.Base):
 class PerimetersDescribeTestBeta(PerimetersDescribeTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class PerimetersDescribeTestAlpha(PerimetersDescribeTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 

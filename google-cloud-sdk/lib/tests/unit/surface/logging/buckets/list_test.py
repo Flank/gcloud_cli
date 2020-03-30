@@ -47,21 +47,21 @@ class ProjectBucketsListTest(BucketsListTestBase):
   def testList(self):
     self._setProjectBucketsListResponse(self._buckets)
     self.RunLogging('buckets list --location my-location',
-                    calliope_base.ReleaseTrack.ALPHA)
+                    calliope_base.ReleaseTrack.BETA)
     for bucket in self._buckets:
       self.AssertOutputContains(bucket.name)
 
   def testListLocationDefaulted(self):
     self._setProjectBucketsListResponse(
         self._buckets, 'projects/my-project/locations/-')
-    self.RunLogging('buckets list', calliope_base.ReleaseTrack.ALPHA)
+    self.RunLogging('buckets list', calliope_base.ReleaseTrack.BETA)
     for bucket in self._buckets:
       self.AssertOutputContains(bucket.name)
 
   def testListLimit(self):
     self._setProjectBucketsListResponse(self._buckets)
     self.RunLogging('buckets list --location=my-location --limit 1',
-                    calliope_base.ReleaseTrack.ALPHA)
+                    calliope_base.ReleaseTrack.BETA)
     self.AssertOutputContains(self._buckets[0].name)
     self.AssertOutputNotContains(self._buckets[1].name)
 
@@ -71,13 +71,13 @@ class ProjectBucketsListTest(BucketsListTestBase):
             parent='projects/my-project/locations/my-location'),
         exception=http_error.MakeHttpError(403))
     self.RunWithoutPerms('buckets list --location=my-location',
-                         calliope_base.ReleaseTrack.ALPHA)
+                         calliope_base.ReleaseTrack.BETA)
 
   def testListNoProject(self):
-    self.RunWithoutProject('buckets list', calliope_base.ReleaseTrack.ALPHA)
+    self.RunWithoutProject('buckets list', calliope_base.ReleaseTrack.BETA)
 
   def testListNoAuth(self):
-    self.RunWithoutAuth('buckets list', calliope_base.ReleaseTrack.ALPHA)
+    self.RunWithoutAuth('buckets list', calliope_base.ReleaseTrack.BETA)
 
 
 if __name__ == '__main__':

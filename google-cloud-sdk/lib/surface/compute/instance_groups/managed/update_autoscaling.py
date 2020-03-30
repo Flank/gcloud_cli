@@ -23,6 +23,7 @@ from googlecloudsdk.api_lib.compute import managed_instance_groups_utils as mig_
 from googlecloudsdk.api_lib.compute.instance_groups.managed import autoscalers as autoscalers_api
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
+from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core import exceptions
 
 
@@ -36,11 +37,12 @@ class NoMatchingAutoscalerFoundError(exceptions.Error):
   pass
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class UpdateAutoscalingBeta(base.Command):
+@base.ReleaseTracks(base.ReleaseTrack.GA)
+class UpdateAutoscaling(base.Command):
   """Update autoscaling parameters of a managed instance group."""
 
-  scale_down = False
+  scale_in = False
+  predictive = False
 
   @staticmethod
   def Args(parser):
@@ -69,25 +71,58 @@ class UpdateAutoscalingBeta(base.Command):
     if args.IsSpecified('mode'):
       mode = mig_utils.ParseModeString(args.mode, client.messages)
       new_autoscaler.autoscalingPolicy.mode = mode
-    if self.scale_down:
-      new_autoscaler.autoscalingPolicy.scaleDownControl = \
-        mig_utils.BuildScaleDown(args, client.messages)
 
-    return autoscalers_client.Patch(igm_ref, new_autoscaler)
+    if self.scale_in:
+      if args.IsSpecified('clear_scale_in_control'):
+        new_autoscaler.autoscalingPolicy.scaleDownControl = None
+      else:
+        new_autoscaler.autoscalingPolicy.scaleDownControl = \
+          mig_utils.BuildScaleDown(args, client.messages)
+
+    if self.predictive and args.IsSpecified(
+        'cpu_utilization_predictive_method'):
+      cpu_predictive_enum = client.messages.AutoscalingPolicyCpuUtilization.PredictiveMethodValueValuesEnum
+      new_autoscaler.autoscalingPolicy.cpuUtilization = client.messages.AutoscalingPolicyCpuUtilization(
+      )
+      new_autoscaler.autoscalingPolicy.cpuUtilization.predictiveMethod = arg_utils.ChoiceToEnum(
+          args.cpu_utilization_predictive_method, cpu_predictive_enum)
+
+    return self._SendPatchRequest(args, client, autoscalers_client, igm_ref,
+                                  new_autoscaler)
+
+  def _SendPatchRequest(self, args, client, autoscalers_client, igm_ref,
+                        new_autoscaler):
+    if self.scale_in and args.IsSpecified('clear_scale_in_control'):
+      # Apitools won't send null fields unless explicitly told to.
+      with client.apitools_client.IncludeFields(
+          ['autoscalingPolicy.scaleDownControl']):
+        return autoscalers_client.Patch(igm_ref, new_autoscaler)
+    else:
+      return autoscalers_client.Patch(igm_ref, new_autoscaler)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class UpdateAutoscalingBeta(UpdateAutoscaling):
+  """Update autoscaling parameters of a managed instance group."""
+
+  scale_in = False
+  predictive = False
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class UpdateAutoscalingAlpha(UpdateAutoscalingBeta):
   """Update autoscaling parameters of a managed instance group."""
 
-  scale_down = True
+  scale_in = True
+  predictive = True
 
   @staticmethod
   def Args(parser):
     _CommonArgs(parser)
-    mig_utils.AddScaleDownControlFlag(parser)
+    mig_utils.AddScaleInControlFlag(parser, include_clear=True)
+    mig_utils.AddPredictiveAutoscaling(parser)
 
-UpdateAutoscalingBeta.detailed_help = {
+UpdateAutoscaling.detailed_help = {
     'brief': 'Update autoscaling parameters of a managed instance group',
     'EXAMPLES':
         """\
@@ -96,7 +131,7 @@ UpdateAutoscalingBeta.detailed_help = {
             $ {command} --mode=only-up
 
         """,
-    'DESCRIPTION': """\
+    'DESCRIPTION': """
 *{command}* updates autoscaling parameters of specified managed instance
 group.
 
@@ -112,4 +147,5 @@ would change the *mode* field of the autoscaler policy, but leave the rest of
 the settings intact.
         """,
 }
-UpdateAutoscalingAlpha.detailed_help = UpdateAutoscalingBeta.detailed_help
+UpdateAutoscalingAlpha.detailed_help = UpdateAutoscaling.detailed_help
+UpdateAutoscalingBeta.detailed_help = UpdateAutoscaling.detailed_help

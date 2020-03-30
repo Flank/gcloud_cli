@@ -11,7 +11,7 @@ gcloud beta pubsub topics update \- updates an existing Cloud Pub/Sub topic
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta pubsub topics update\fR \fITOPIC\fR [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-message\-storage\-policy\-allowed\-regions\fR=[\fIREGION\fR,...]\ |\ \fB\-\-recompute\-message\-storage\-policy\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta pubsub topics update\fR \fITOPIC\fR [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-message\-storage\-policy\-allowed\-regions\fR=[\fIREGION\fR,...]\ |\ \fB\-\-recompute\-message\-storage\-policy\fR] [\fB\-\-topic\-encryption\-key\fR=\fITOPIC_ENCRYPTION_KEY\fR\ :\ \fB\-\-topic\-encryption\-key\-keyring\fR=\fITOPIC_ENCRYPTION_KEY_KEYRING\fR\ \fB\-\-topic\-encryption\-key\-location\fR=\fITOPIC_ENCRYPTION_KEY_LOCATION\fR\ \fB\-\-topic\-encryption\-key\-project\fR=\fITOPIC_ENCRYPTION_KEY_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -81,6 +81,8 @@ $ gcloud beta pubsub topics update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 .RE
 .sp
@@ -99,6 +101,38 @@ rest.
 If given, Cloud Pub/Sub will recompute the regions where messages can be stored
 at rest, based on your organization's "Resource Location Restriction" policy.
 
+.RE
+.sp
+.TP 2m
+
+Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
+used to protect the topic. The specified Cloud KMS key should have purpose set
+to "ENCRYPT_DECRYPT". The service account,
+"service\-${CONSUMER_PROJECT_NUMBER}@gcp\-sa\-pubsub.iam.gserviceaccount.com"
+requires the IAM cryptoKeyEncrypterDecrypter role for the given Cloud KMS key.
+CONSUMER_PROJECT_NUMBER is the project number of the project that is the parent
+of the topic being updated. The arguments in this group can be used to specify
+the attributes of this resource.
+
+
+.RS 2m
+.TP 2m
+\fB\-\-topic\-encryption\-key\fR=\fITOPIC_ENCRYPTION_KEY\fR
+ID of the key or fully qualified identifier for the key. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-topic\-encryption\-key\-keyring\fR=\fITOPIC_ENCRYPTION_KEY_KEYRING\fR
+The KMS keyring of the key.
+
+.TP 2m
+\fB\-\-topic\-encryption\-key\-location\fR=\fITOPIC_ENCRYPTION_KEY_LOCATION\fR
+The Cloud location for the key.
+
+.TP 2m
+\fB\-\-topic\-encryption\-key\-project\fR=\fITOPIC_ENCRYPTION_KEY_PROJECT\fR
+The Cloud project for the key.
+
 
 .RE
 .RE
@@ -109,8 +143,9 @@ at rest, based on your organization's "Resource Location Restriction" policy.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -133,6 +168,15 @@ To remove an existing label on a Cloud Pub/Sub topic, run:
 
 .RS 2m
 $ gcloud beta pubsub topics update mytopic \-\-remove\-labels=KEY1,KEY2
+.RE
+
+To enable customer\-managed encryption for a Cloud Pub/Sub topic by protecting
+message data with a Cloud KMS CryptoKey, run:
+
+.RS 2m
+$ gcloud beta pubsub topics update mytopic \e
+  \-\-topic\-encryption\-key=projects/PROJECT_ID/locations/\e
+KMS_LOCATION/keyRings/KEYRING/cryptoKeys/KEY
 .RE
 
 To update a Cloud Pub/Sub topic's message storage policy, run:

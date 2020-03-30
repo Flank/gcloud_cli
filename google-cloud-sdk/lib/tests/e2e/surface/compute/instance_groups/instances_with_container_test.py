@@ -78,10 +78,9 @@ class InstancesWithContainerTest(e2e_instances_test_base.InstancesTestBase):
     self.AssertNewOutputContains(name)
     self.instance_group_manager_names.append(name)
 
-    self.Run('compute instance-groups managed wait-until-stable {0} '
+    self.Run('compute instance-groups managed wait-until --stable {0} '
              '--timeout 600 '
-             '--zone {1}'
-             .format(name, self.zone))
+             '--zone {1}'.format(name, self.zone))
     self.AssertNewErrNotContains('Timeout')
 
     self.ClearOutput()

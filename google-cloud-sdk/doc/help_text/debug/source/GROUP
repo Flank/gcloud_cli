@@ -1,26 +1,27 @@
 NAME
-    gcloud debug source - commands to manage source information for Stackdriver
-        tools
+    gcloud debug source - commands to manage source information for Cloud
+        Debugger
 
 SYNOPSIS
     gcloud debug source COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    This set of commands allows you to provide Stackdriver tools with source
-    code version information.
+    This set of commands allows you to provide Cloud Debugger with source code
+    version information.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
 
      gen-repo-info-file
-        Generates repository information files for the Stackdriver Debugger.
+        Generates repository information files for the Cloud Debugger.
 
 NOTES
     This variant is also available:

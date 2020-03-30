@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -25,11 +26,15 @@ from tests.lib.surface.compute import test_resources
 from mock import patch
 
 
-class InstanceGroupManagersUpdateInstancesBetaTest(test_base.BaseTest):
+class InstanceGroupManagersUpdateInstancesTest(test_base.BaseTest):
+
+  API_VERSION = 'v1'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.api_version = 'beta'
-    self.SelectApi(self.api_version)
+    self.SelectApi(self.API_VERSION)
     # Clear the requests side effects, used in the base class
     self.make_requests.side_effect = iter([
         [],
@@ -41,10 +46,9 @@ class InstanceGroupManagersUpdateInstancesBetaTest(test_base.BaseTest):
   def testWithTwoInstances(self):
     result = list(
         self.Run(
-            '{api} compute instance-groups managed update-instances group-1 '
+            'compute instance-groups managed update-instances group-1 '
             '--zone central2-a --instances instance1,instance2 --format=disable'
-            .format(api=self.api_version)
-        ))
+            ))
     instance1_self_link = ('{0}/projects/my-project/zones/central2-a/instances/'
                            'instance1'.format(self.compute_uri))
     instance2_self_link = ('{0}/projects/my-project/zones/central2-a/instances/'
@@ -79,9 +83,9 @@ class InstanceGroupManagersUpdateInstancesBetaTest(test_base.BaseTest):
                'group-1'.format(self.compute_uri))
     instance_uri = ('{0}/projects/my-project/zones/central2-a/instances/'
                     'instance1'.format(self.compute_uri))
-    self.Run('{api} compute instance-groups managed update-instances {0} '
+    self.Run('compute instance-groups managed update-instances {0} '
              '--zone central2-a --instances {1}'
-             .format(igm_uri, instance_uri, api=self.api_version))
+             .format(igm_uri, instance_uri))
 
     instances = self.messages.InstanceGroupManagersApplyUpdatesRequest(
         instances=['{0}/projects/my-project/zones/central2-a/instances/'
@@ -115,8 +119,8 @@ class InstanceGroupManagersUpdateInstancesBetaTest(test_base.BaseTest):
              self.messages.Zone(name='central2-a'),
          ], []])
     self.WriteInput('5\n')
-    self.Run('{api} compute instance-groups managed update-instances group-1 '
-             '--instances instance1'.format(api=self.api_version))
+    self.Run('compute instance-groups managed update-instances group-1 '
+             '--instances instance1')
 
     instances = self.messages.InstanceGroupManagersApplyUpdatesRequest(
         instances=[
@@ -144,10 +148,10 @@ class InstanceGroupManagersUpdateInstancesBetaTest(test_base.BaseTest):
   def testUpdateInstancesWithMinimalAndMostDisruptiveAllowedAction(self):
     igm_uri = ('{0}/projects/my-project/zones/central2-a/instanceGroupManagers/'
                'group-1'.format(self.compute_uri))
-    self.Run('{api} compute instance-groups managed update-instances {0} '
+    self.Run('compute instance-groups managed update-instances {0} '
              '--zone central2-a --instances {1} --minimal-action refresh '
              '--most-disruptive-allowed-action restart'.format(
-                 igm_uri, 'instance1', api=self.api_version))
+                 igm_uri, 'instance1'))
 
     instances = self.messages.InstanceGroupManagersApplyUpdatesRequest(
         instances=['{0}/projects/my-project/zones/central2-a/instances/'
@@ -177,10 +181,10 @@ class InstanceGroupManagersUpdateInstancesBetaTest(test_base.BaseTest):
 
     with self.AssertRaisesToolExceptionRegexp('Some requests did not succeed:'):
       self.Run("""
-          {api} compute instance-groups managed update-instances group-1
+          compute instance-groups managed update-instances group-1
               --instances inst-1
               --zone us-central1-a
-          """.format(api=self.api_version))
+          """)
 
   @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
          'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
@@ -188,23 +192,27 @@ class InstanceGroupManagersUpdateInstancesBetaTest(test_base.BaseTest):
   def testInvalidCollectionPath(self):
     with self.assertRaisesRegex(ValueError, 'Unknown reference type.*'):
       self.Run("""
-          {api} compute instance-groups managed update-instances group-1
+          compute instance-groups managed update-instances group-1
               --instances inst-1
               --zone us-central1-a
-          """.format(api=self.api_version))
+          """)
 
 
-class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
+class InstanceGroupManagersUpdateInstancesRegionalTest(test_base.BaseTest):
+
+  API_VERSION = 'v1'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.api_version = 'beta'
-    self.SelectApi(self.api_version)
+    self.SelectApi(self.API_VERSION)
     self.make_requests.side_effect = iter([
         [
             self.messages.InstanceGroupManagersListManagedInstancesResponse(
                 managedInstances=(
                     test_resources.MakeInstancesInManagedInstanceGroup(
-                        self.messages, self.api_version)))
+                        self.messages, self.API_VERSION)))
         ],
         [],
     ])
@@ -220,10 +228,10 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
 
   def testWithTwoInstances(self):
     self.Run("""
-        {api} compute instance-groups managed update-instances group-1
+        compute instance-groups managed update-instances group-1
             --region central2
             --instances inst-1,inst-2
-        """.format(api=self.api_version))
+        """)
 
     instances = self.messages.RegionInstanceGroupManagersApplyUpdatesRequest(
         instances=[
@@ -257,10 +265,10 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
     instance_uri = ('{0}/projects/my-project/zones/central2-a/instances/'
                     'inst-1'.format(self.compute_uri))
     self.Run("""
-        {api} compute instance-groups managed update-instances {0}
+        compute instance-groups managed update-instances {0}
             --region central2
             --instances {1}
-        """.format(igm_uri, instance_uri, api=self.api_version))
+        """.format(igm_uri, instance_uri))
     instances = self.messages.RegionInstanceGroupManagersApplyUpdatesRequest(
         instances=['{0}/projects/my-project/zones/central2-a/instances/'
                    'inst-1'.format(self.compute_uri)],
@@ -301,13 +309,13 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
              self.messages.InstanceGroupManagersListManagedInstancesResponse(
                  managedInstances=(
                      test_resources.MakeInstancesInManagedInstanceGroup(
-                         self.messages, self.api_version)))
+                         self.messages, self.API_VERSION)))
          ], []])
     self.WriteInput('2\n')
     self.Run("""
-        {api} compute instance-groups managed update-instances group-1
+        compute instance-groups managed update-instances group-1
             --instances inst-1
-        """.format(api=self.api_version))
+        """)
 
     instances = self.messages.RegionInstanceGroupManagersApplyUpdatesRequest(
         instances=['{0}/projects/my-project/zones/central2-a/instances/'
@@ -340,11 +348,11 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
     instance_uri = ('{0}/projects/my-project/zones/central2-a/instances/'
                     'inst-1'.format(self.compute_uri))
     self.Run("""
-        {api} compute instance-groups managed update-instances {0}
+        compute instance-groups managed update-instances {0}
             --region central2
             --instances {1}
             --minimal-action refresh --most-disruptive-allowed-action restart
-        """.format(igm_uri, instance_uri, api=self.api_version))
+        """.format(igm_uri, instance_uri))
     instances = self.messages.RegionInstanceGroupManagersApplyUpdatesRequest(
         instances=['{0}/projects/my-project/zones/central2-a/instances/'
                    'inst-1'.format(self.compute_uri)],
@@ -378,51 +386,46 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
 
     with self.AssertRaisesToolExceptionRegexp('Could not fetch resource:'):
       self.Run("""
-          {api} compute instance-groups managed update-instances group-1
+          compute instance-groups managed update-instances group-1
               --instances inst-1
               --region us-central1
-          """.format(api=self.api_version))
+          """)
+
+
+class InstanceGroupManagersUpdateInstancesBetaTest(
+    InstanceGroupManagersUpdateInstancesTest):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstanceGroupManagersUpdateInstancesBetaRegionalTest(
+    InstanceGroupManagersUpdateInstancesRegionalTest):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class InstanceGroupManagersUpdateInstancesAlphaTest(
     InstanceGroupManagersUpdateInstancesBetaTest):
 
-  def SetUp(self):
-    self.api_version = 'alpha'
-    self.SelectApi(self.api_version)
-    # Clear the requests side effects, used in the base class
-    self.make_requests.side_effect = iter([
-        [],
-    ])
-    self.template_1_uri = (
-        '{0}/projects/my-project/global/instanceTemplates/template-1'.format(
-            self.compute_uri))
+  API_VERSION = 'alpha'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 class InstanceGroupManagersUpdateInstancesAlphaRegionalTest(
     InstanceGroupManagersUpdateInstancesBetaRegionalTest):
 
-  def SetUp(self):
-    self.api_version = 'alpha'
-    self.SelectApi(self.api_version)
-    self.make_requests.side_effect = iter([
-        [
-            self.messages.InstanceGroupManagersListManagedInstancesResponse(
-                managedInstances=(
-                    test_resources.MakeInstancesInManagedInstanceGroup(
-                        self.messages, self.api_version)))
-        ],
-        [],
-    ])
-    self.template_1_uri = (
-        '{0}/projects/my-project/global/instanceTemplates/template-1'.format(
-            self.compute_uri))
-    self.list_instances_request = (
-        self.messages
-        .ComputeRegionInstanceGroupManagersListManagedInstancesRequest(
-            instanceGroupManager='group-1',
-            region='central2',
-            project='my-project'))
+  API_VERSION = 'alpha'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

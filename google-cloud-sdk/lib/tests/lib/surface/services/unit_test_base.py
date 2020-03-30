@@ -177,6 +177,37 @@ class SNUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
         resp,
         exception=error)
 
+  def ExpectEnableVpcServiceControls(self, network, operation, error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    self.mocked_client.services.EnableVpcServiceControls.Expect(
+        self.services_messages
+        .ServicenetworkingServicesEnableVpcServiceControlsRequest(
+            enableVpcServiceControlsRequest=self.services_messages.
+            EnableVpcServiceControlsRequest(consumerNetwork=NETWORK_URL_FORMAT %
+                                            (self.PROJECT_NUMBER, network)),
+            parent='services/%s' % self.service),
+        op,
+        exception=error)
+
+  def ExpectDisableVpcServiceControls(self, network, operation, error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    self.mocked_client.services.DisableVpcServiceControls.Expect(
+        self.services_messages
+        .ServicenetworkingServicesDisableVpcServiceControlsRequest(
+            disableVpcServiceControlsRequest=self.services_messages
+            .DisableVpcServiceControlsRequest(
+                consumerNetwork=NETWORK_URL_FORMAT %
+                (self.PROJECT_NUMBER, network)),
+            parent='services/%s' % self.service),
+        op,
+        exception=error)
+
 
 class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
                      cli_test_base.CliTestBase):
@@ -502,3 +533,26 @@ class SCMUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
             name=name),
         op,
         exception=error)
+
+
+class ApiKeysUnitTestBase(sdk_test_base.WithFakeAuth,
+                          sdk_test_base.WithLogCapture,
+                          cli_test_base.CliTestBase):
+  """Base class for api keys unit tests."""
+
+  DEFAULT_PROJECT = 'helloworld'
+  _PROJECT_RESOURCE = 'projects/%s'
+
+  def SetUp(self):
+    self.services_messages = core_apis.GetMessagesModule('apikeys', 'v2alpha1')
+    self.mocked_client = mock.Client(
+        core_apis.GetClientClass('apikeys', 'v2alpha1'),
+        real_client=core_apis.GetClientInstance('apikeys', 'v2alpha1'))
+    self.mocked_client.Mock()
+    self.addCleanup(self.mocked_client.Unmock)
+
+  def ExpectListKeysCall(self, keys):
+    self.mocked_client.projects_keys.List.Expect(
+        self.services_messages.ApikeysProjectsKeysListRequest(
+            parent=self._PROJECT_RESOURCE % self.DEFAULT_PROJECT),
+        self.services_messages.V2alpha1ListKeysResponse(keys=keys))

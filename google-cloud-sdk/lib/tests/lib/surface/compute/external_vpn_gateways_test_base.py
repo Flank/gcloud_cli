@@ -100,6 +100,16 @@ class ExternalVpnGatewaysTestBase(sdk_test_base.WithFakeAuth,
             operation=operation_ref.operation, project=operation_ref.project),
         operation)
 
+  def ExpectOperationWaitRequest(self, operation_ref, operation):
+    """Expects the operation Get request to be invoked."""
+    self.global_operations.Wait.Expect(
+        self.messages.ComputeGlobalOperationsWaitRequest(
+            operation=operation_ref.operation, project=operation_ref.project),
+        operation)
+
+  def ExpectOperationPollingRequest(self, operation_ref, operation):
+    self.ExpectOperationWaitRequest(operation_ref, operation)
+
   def ExpectGetRequest(self,
                        external_vpn_gateway_ref,
                        external_vpn_gateway=None,

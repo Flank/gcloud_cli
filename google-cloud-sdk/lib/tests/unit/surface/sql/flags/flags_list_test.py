@@ -35,14 +35,16 @@ class _BaseFlagsListSqlTest(object):
                         'NONE',
                     ],
                     appliesTo=[
-                        'MYSQL_5_5',
-                        'MYSQL_5_6',
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_5,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_6,
                     ],
                     kind='sql#flag',
                     maxValue=None,
                     minValue=None,
                     name='log_output',
-                    type='STRING',
+                    type=self.messages.Flag.TypeValueValuesEnum.STRING,
                 ),
                 self.messages.Flag(
                     allowedStringValues=[
@@ -50,25 +52,28 @@ class _BaseFlagsListSqlTest(object):
                         'NONE',
                     ],
                     appliesTo=[
-                        'MYSQL_5_6',
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_6,
                     ],
                     kind='sql#flag',
                     maxValue=None,
                     minValue=None,
                     name='binlog_checksum',
-                    type='STRING',
+                    type=self.messages.Flag.TypeValueValuesEnum.STRING,
                 ),
                 self.messages.Flag(
                     allowedStringValues=[],
                     appliesTo=[
-                        'MYSQL_5_5',
-                        'MYSQL_5_6',
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_5,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_6,
                     ],
                     kind='sql#flag',
                     maxValue=None,
                     minValue=None,
                     name='general_log',
-                    type='BOOLEAN',
+                    type=self.messages.Flag.TypeValueValuesEnum.BOOLEAN,
                 ),
                 self.messages.Flag(
                     allowedStringValues=[
@@ -102,14 +107,16 @@ class _BaseFlagsListSqlTest(object):
                         'TRADITIONAL',
                     ],
                     appliesTo=[
-                        'MYSQL_5_5',
-                        'MYSQL_5_6',
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_5,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_6,
                     ],
                     kind='sql#flag',
                     maxValue=None,
                     minValue=None,
                     name='sql_mode',
-                    type='STRING',
+                    type=self.messages.Flag.TypeValueValuesEnum.STRING,
                 ),
             ],
             kind='sql#flagsList',
@@ -140,26 +147,30 @@ sql_mode                         STRING                 MYSQL_5_5,MYSQL_5_6 ALLO
                         'NONE',
                     ],
                     appliesTo=[
-                        'MYSQL_5_5',
-                        'MYSQL_5_6',
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_5,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_6,
                     ],
                     kind='sql#flag',
                     maxValue=None,
                     minValue=None,
                     name='log_output',
-                    type='STRING',
+                    type=self.messages.Flag.TypeValueValuesEnum.STRING,
                 ),
                 self.messages.Flag(
                     allowedStringValues=[],
                     appliesTo=[
-                        'MYSQL_5_5',
-                        'MYSQL_5_6',
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_5,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_6,
                     ],
                     kind='sql#flag',
                     maxValue=None,
                     minValue=None,
                     name='general_log',
-                    type='BOOLEAN',
+                    type=self.messages.Flag.TypeValueValuesEnum.BOOLEAN,
                 ),
                 self.messages.Flag(
                     allowedStringValues=[
@@ -193,14 +204,16 @@ sql_mode                         STRING                 MYSQL_5_5,MYSQL_5_6 ALLO
                         'TRADITIONAL',
                     ],
                     appliesTo=[
-                        'MYSQL_5_5',
-                        'MYSQL_5_6',
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_5,
+                        self.messages.Flag.AppliesToValueListEntryValuesEnum
+                        .MYSQL_5_6,
                     ],
                     kind='sql#flag',
                     maxValue=None,
                     minValue=None,
                     name='sql_mode',
-                    type='STRING',
+                    type=self.messages.Flag.TypeValueValuesEnum.STRING,
                 ),
             ],
             kind='sql#flagsList',

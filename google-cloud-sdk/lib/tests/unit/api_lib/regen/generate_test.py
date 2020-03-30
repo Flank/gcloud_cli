@@ -35,11 +35,12 @@ import six
 class ApiMapGeneratorTest(test_case.Base):
 
   def testGetAPIsMap(self):
-    config = yaml.load(textwrap.dedent("""\
+    config = yaml.load(
+        textwrap.dedent("""\
         orange:
           v1:
             discovery: organge_v1.json
-            default: True
+            default: true
           v2:
             discovery: organge_v2.json
         banana:
@@ -48,7 +49,7 @@ class ApiMapGeneratorTest(test_case.Base):
           v2_staging:
             version: v2
             discovery: banana_v2_staging.json
-            default: True
+            default: true
         pear:
           v7_test:
             discovery: pear_v7_test.json
@@ -85,14 +86,15 @@ class ApiMapGeneratorTest(test_case.Base):
     self.assertEqual(expected_map, actual_map)
 
   def testGetAPIsMapMultipleDefaultsClientsForAPI(self):
-    config = yaml.load(textwrap.dedent("""\
+    config = yaml.load(
+        textwrap.dedent("""\
         orange:
           v1:
             discovery: organge_v1.json
-            default: True
+            default: true
           v2:
             discovery: organge_v2.json
-            default: True
+            default: true
     """))
 
     with self.assertRaises(Exception) as ctx:
@@ -118,11 +120,12 @@ class ApiMapGeneratorTest(test_case.Base):
     self.assertEqual(msg, 'No default client versions found for [orange]!')
 
   def testCreateAPIsMapFile(self):
-    config = yaml.load(textwrap.dedent("""\
+    config = yaml.load(
+        textwrap.dedent("""\
         orange:
           v1:
             discovery: organge_v1.json
-            default: True
+            default: true
           v2:
             discovery: organge_v2.json
         banana:
@@ -131,7 +134,7 @@ class ApiMapGeneratorTest(test_case.Base):
           v2_staging:
             version: v2
             discovery: banana_v2_staging.json
-            default: True
+            default: true
         pear:
           v7_test:
             discovery: pear_v7_test.json
@@ -143,7 +146,7 @@ class ApiMapGeneratorTest(test_case.Base):
       generate.GenerateApiMap(tmp_dir, 'fruits', config)
       content = files.ReadFileContents(os.path.join(dir_path, 'apis_map.py'))
 
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.assertMultiLineEqual(
         files.ReadFileContents(os.path.join(os.path.dirname(__file__),
                                             'testdata', 'api_map_sample.txt')),
@@ -153,6 +156,101 @@ class ApiMapGeneratorTest(test_case.Base):
     for api_name, ver_map in six.iteritems(apis_map.MAP):
       for ver, api_definition in six.iteritems(ver_map):
         self.assertEqual(api_definition, core_apis._GetApiDef(api_name, ver))
+
+
+class ApiMapGeneratorTestWithMTLS(test_case.Base):
+
+  def testGetAPIsMap(self):
+    config = yaml.load(
+        textwrap.dedent("""\
+        orange:
+          v1:
+            discovery: organge_v1.json
+            enable_mtls: false
+            default: true
+          v2:
+            discovery: organge_v2.json
+            enable_mtls: true
+        banana:
+          v2beta:
+            discovery: banana_v2beta.json
+            enable_mtls: true
+            mtls_endpoint_override: 'https://banana.mtls.googleapis.com/banana/v2beta/'
+          v2_staging:
+            version: v2
+            discovery: banana_v2_staging.json
+            default: true
+        pear:
+          v7_test:
+            discovery: pear_v7_test.json
+    """))
+    expected_map = {
+        'orange': {
+            'v1':
+                api_def.APIDef('fruits.orange.v1', 'orange_v1_client.OrangeV1',
+                               'orange_v1_messages', True),
+            'v2':
+                api_def.APIDef('fruits.orange.v2', 'orange_v2_client.OrangeV2',
+                               'orange_v2_messages', False, True, '')
+        },
+        'banana': {
+            'v2beta':
+                api_def.APIDef(
+                    'fruits.banana.v2beta', 'banana_v2beta_client.BananaV2beta',
+                    'banana_v2beta_messages', False, True,
+                    'https://banana.mtls.googleapis.com/banana/v2beta/'),
+            'v2_staging':
+                api_def.APIDef('fruits.banana.v2_staging',
+                               'banana_v2_client.BananaV2',
+                               'banana_v2_messages', True)
+        },
+        'pear': {
+            'v7_test':
+                api_def.APIDef('fruits.pear.v7_test',
+                               'pear_v7_test_client.PearV7Test',
+                               'pear_v7_test_messages', True)
+        }
+    }
+    actual_map = generate._MakeApiMap('fruits', config)
+    self.assertEqual(expected_map, actual_map)
+
+  def testCreateAPIsMapFile(self):
+    config = yaml.load(
+        textwrap.dedent("""\
+        orange:
+          v1:
+            discovery: organge_v1.json
+            enable_mtls: false
+            default: true
+          v2:
+            discovery: organge_v2.json
+            enable_mtls: true
+        banana:
+          v2beta:
+            discovery: banana_v2beta.json
+            enable_mtls: true
+            mtls_endpoint_override: 'https://banana.mtls.googleapis.com/banana/v2beta/'
+          v2_staging:
+            version: v2
+            discovery: banana_v2_staging.json
+            default: true
+        pear:
+          v7_test:
+            discovery: pear_v7_test.json
+    """))
+
+    with files.TemporaryDirectory() as tmp_dir:
+      dir_path = os.path.join(tmp_dir, 'fruits')
+      os.makedirs(dir_path)
+      generate.GenerateApiMap(tmp_dir, 'fruits', config)
+      content = files.ReadFileContents(os.path.join(dir_path, 'apis_map.py'))
+
+    self.maxDiff = None  # pylint: disable=invalid-name
+    self.assertMultiLineEqual(
+        files.ReadFileContents(
+            os.path.join(
+                os.path.dirname(__file__), 'testdata',
+                'api_map_sample_mtls.txt')), content)
 
 
 if __name__ == '__main__':

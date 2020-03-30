@@ -26,10 +26,10 @@ from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-class ImportJobsCreateTestBeta(base.KmsMockTest, parameterized.TestCase):
+class ImportJobsCreateTestGA(base.KmsMockTest, parameterized.TestCase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.import_job_name = self.project_name.ImportJob(
@@ -118,6 +118,12 @@ class ImportJobsCreateTestBeta(base.KmsMockTest, parameterized.TestCase):
           '--protection-level=hsm --import-method=rsa-oaep-4096-sha1-aes-256'
           .format(self.import_job_name.location_id,
                   self.import_job_name.key_ring_id))
+
+
+class ImportJobsCreateTestBeta(ImportJobsCreateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ImportJobsCreateTestAlpha(ImportJobsCreateTestBeta):

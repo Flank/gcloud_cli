@@ -21,69 +21,38 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute import flags as compute_flags
+from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.compute.ssl_certificates import flags
 from googlecloudsdk.command_lib.compute.ssl_certificates import ssl_certificates_utils
-from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 @base.UnicodeIsSupported
 class Describe(base.DescribeCommand):
   """Describe a Google Compute Engine SSL certificate.
 
-    *{command}* displays all data associated with Google Compute
-  Engine SSL certificate in a project.
+    *{command}* displays all data (except private keys) associated with
+    Google Compute Engine SSL certificate in a project.
   """
 
   SSL_CERTIFICATE_ARG = None
 
   @staticmethod
   def Args(parser):
-    Describe.SSL_CERTIFICATE_ARG = flags.SslCertificateArgument()
+    Describe.SSL_CERTIFICATE_ARG = flags.SslCertificateArgument(
+        include_l7_internal_load_balancing=True,
+        global_help_text='(Default) If set, the SSL certificate is global.')
     Describe.SSL_CERTIFICATE_ARG.AddArgument(parser, operation_type='describe')
 
   def Run(self, args):
-    if self.ReleaseTrack() == base.ReleaseTrack.GA:
-      log.warning('The ssl-certificates describe command will soon require '
-                  'either a --global or --region flag.')
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     client = holder.client
 
     ssl_certificate_ref = self.SSL_CERTIFICATE_ARG.ResolveAsResource(
         args,
         holder.resources,
-        scope_lister=compute_flags.GetDefaultScopeLister(client))
-
-    request = client.messages.ComputeSslCertificatesGetRequest(
-        **ssl_certificate_ref.AsDict())
-
-    return client.MakeRequests([(client.apitools_client.sslCertificates,
-                                 'Get', request)])[0]
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
-class DescribeAlpha(Describe):
-  """Describe a Google Compute Engine SSL certificate.
-
-    *{command}* displays all data associated with Google Compute
-  Engine SSL certificate in a project.
-  """
-
-  SSL_CERTIFICATE_ARG = None
-
-  @classmethod
-  def Args(cls, parser):
-    cls.SSL_CERTIFICATE_ARG = flags.SslCertificateArgument(
-        include_l7_internal_load_balancing=True)
-    cls.SSL_CERTIFICATE_ARG.AddArgument(parser, operation_type='describe')
-
-  def Run(self, args):
-    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    client = holder.client
-
-    ssl_certificate_ref = self.SSL_CERTIFICATE_ARG.ResolveAsResource(
-        args,
-        holder.resources,
+        default_scope=compute_scope.ScopeEnum.GLOBAL,
         scope_lister=compute_flags.GetDefaultScopeLister(client))
 
     if ssl_certificates_utils.IsRegionalSslCertificatesRef(ssl_certificate_ref):
@@ -96,3 +65,20 @@ class DescribeAlpha(Describe):
       collection = client.apitools_client.sslCertificates
 
     return client.MakeRequests([(collection, 'Get', request)])[0]
+
+
+Describe.detailed_help = {
+    'brief':
+        'Describe a Google Compute Engine SSL certificate',
+    'DESCRIPTION':
+        """\
+        *{command}* displays all data (except private keys) associated with
+        Google Compute Engine SSL certificate in a project.
+        """,
+    'EXAMPLES':
+        """\
+        To display a description of a certificate 'my-cert', run:
+
+          $ {command} my-cert
+        """,
+}

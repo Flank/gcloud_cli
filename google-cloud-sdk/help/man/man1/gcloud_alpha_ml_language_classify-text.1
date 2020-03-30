@@ -74,8 +74,9 @@ auto\-detect. Both ISO (such as \f5en\fR or \f5es\fR) and BCP\-47 (such as
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -83,6 +84,32 @@ help\fR for details.
 
 This command uses the \fBlanguage/v1beta2\fR API. The full documentation for
 this API can be found at: https://cloud.google.com/natural\-language/
+
+
+
+.SH "EXAMPLES"
+
+To classify text in raw content 'Long Political Text.':
+
+.RS 2m
+$ gcloud alpha ml language classify\-text \e
+    \-\-content='Long Political Text.'
+.RE
+
+To classify text in file 'myfile.txt':
+
+.RS 2m
+$ gcloud alpha ml language classify\-text \-\-content\-file='myfile.txt'
+.RE
+
+To classify text in a remote file 'gs://bucket_name/mycontent.html' for Japanese
+language:
+
+.RS 2m
+$ gcloud alpha ml language classify\-text \e
+    \-\-content\-file='gs://bucket_name/mycontent.html' \e
+    \-\-content\-type=HTML  \-\-language=ja\-JP
+.RE
 
 
 

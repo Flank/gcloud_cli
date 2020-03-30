@@ -23,6 +23,7 @@ from googlecloudsdk.api_lib.logging import util
 from googlecloudsdk.calliope import base
 
 
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Create(base.CreateCommand):
   """Creates a bucket.
   """
@@ -32,9 +33,6 @@ class Create(base.CreateCommand):
     """Register flags for this command."""
     parser.add_argument(
         'BUCKET_ID', help='ID of the bucket to create.')
-    parser.add_argument(
-        '--display-name',
-        help='A textual name to display for the bucket.')
     parser.add_argument(
         '--description',
         help='A textual description for the bucket.')
@@ -60,8 +58,6 @@ class Create(base.CreateCommand):
     bucket_data = {}
     if args.IsSpecified('retention_days'):
       bucket_data['retentionDays'] = args.retention_days
-    if args.IsSpecified('display_name'):
-      bucket_data['displayName'] = args.display_name
     if args.IsSpecified('description'):
       bucket_data['description'] = args.description
 

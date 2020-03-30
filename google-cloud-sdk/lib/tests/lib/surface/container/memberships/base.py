@@ -37,11 +37,15 @@ class MembershipsTestBase(cli_test_base.CliTestBase,
   MEMBERSHIP_NAME = '12345-abcde'
 
   def SetUp(self):
+    # TODO(b/145953996): All old commands needs to use 'v1beta1' irrespective
+    # of the release track, till they are removed (already deprecation policy
+    # applied).
+    self.api_version = self.API_VERSION
     self.messages = core_apis.GetMessagesModule(self.MODULE_NAME,
-                                                self.API_VERSION)
+                                                self.api_version)
     self.mocked_client = apimock.Client(
         client_class=core_apis.GetClientClass(self.MODULE_NAME,
-                                              self.API_VERSION))
+                                              self.api_version))
     self.mocked_client.Mock()
     self.addCleanup(self.mocked_client.Unmock)
 
@@ -52,7 +56,7 @@ class MembershipsTestBase(cli_test_base.CliTestBase,
             'locationsId': 'global',
             'projectsId': self.Project(),
         },
-        api_version=self.API_VERSION)
+        api_version=self.api_version)
     self.wait_operation_relative_name = self.wait_operation_ref.RelativeName()
 
     self.parent = 'projects/{0}/locations/global'.format(self.Project())
@@ -62,8 +66,8 @@ class MembershipsTestBase(cli_test_base.CliTestBase,
   def _RunMembershipCommand(self, cmd):
     prefix = ['container', 'memberships']
     if isinstance(cmd, six.string_types):
-      return self.Run(' '.join(prefix + [cmd]))
-    return self.Run(prefix + cmd)
+      return self.Run(' '.join(prefix + [cmd]), track=self.track)
+    return self.Run(prefix + cmd, track=self.track)
 
   def _MakeMembership(self,
                       name=None,

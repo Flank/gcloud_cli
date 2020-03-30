@@ -20,7 +20,6 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import copy
-import json
 
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_util
 from googlecloudsdk.calliope import base as calliope_base
@@ -74,13 +73,6 @@ class ProjectsRemoveIamPolicyBindingTestBeta(
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
-
-
-class ProjectsRemoveIamPolicyBindingTestAlpha(
-    ProjectsRemoveIamPolicyBindingTestBeta):
-
-  def SetUp(self):
-    self.track = self.track = calliope_base.ReleaseTrack.ALPHA
     self.messages = projects_util.GetMessages()
     self.test_iam_policy_with_condition = projects_util.GetMessages().Policy(
         auditConfigs=[
@@ -104,120 +96,6 @@ class ProjectsRemoveIamPolicyBindingTestAlpha(
         etag=b'an etag',
         version=1)
 
-  def testBindingWithoutConditionPolicyWithCondition(self):
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    test_project = test_util.GetTestActiveProject()
-    start_policy = copy.deepcopy(self.test_iam_policy_with_condition)
-    new_policy = copy.deepcopy(start_policy)
-    remove_user = 'user:test@gmail.com'
-    remove_role = 'roles/non-primitive'
-    self.WriteInput('1')
-    new_policy.bindings[:] = new_policy.bindings[1:]
-    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
-
-    self.mock_client.projects.GetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
-                options=self.messages.GetPolicyOptions(
-                    requestedPolicyVersion=
-                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
-        start_policy)
-    self.mock_client.projects.SetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
-            resource=test_project.projectId,
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=new_policy)), new_policy)
-
-    response = self.RunProjects(
-        'remove-iam-policy-binding', test_project.projectId,
-        '--role={0}'.format(remove_role), '--member={0}'.format(remove_user))
-    self.assertEqual(response, new_policy)
-    json_string = self.GetErr().split('\n')[0]
-    choices_in_stderr = json.loads(json_string)['choices']
-    expected_choices = [
-        'expression=expr,title=title,description=descr', 'None',
-        'all conditions'
-    ]
-    self.assertEqual(choices_in_stderr, expected_choices)
-
-  def testBindingWithoutConditionPolicyWithCondition_NoneCondition(self):
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    test_project = test_util.GetTestActiveProject()
-    start_policy = copy.deepcopy(self.test_iam_policy_with_condition)
-    new_policy = copy.deepcopy(start_policy)
-    remove_user = 'user:test@gmail.com'
-    remove_role = 'roles/non-primitive'
-    self.WriteInput('2')
-    new_policy.bindings[:] = new_policy.bindings[:1]
-    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
-
-    self.mock_client.projects.GetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
-                options=self.messages.GetPolicyOptions(
-                    requestedPolicyVersion=
-                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
-        start_policy)
-    self.mock_client.projects.SetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
-            resource=test_project.projectId,
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=new_policy)), new_policy)
-
-    response = self.RunProjects(
-        'remove-iam-policy-binding', test_project.projectId,
-        '--role={0}'.format(remove_role), '--member={0}'.format(remove_user))
-    self.assertEqual(response, new_policy)
-    json_string = self.GetErr().split('\n')[0]
-    choices_in_stderr = json.loads(json_string)['choices']
-    expected_choices = [
-        'expression=expr,title=title,description=descr', 'None',
-        'all conditions'
-    ]
-    self.assertEqual(choices_in_stderr, expected_choices)
-
-  def testBindingWithoutConditionPolicyWithCondition_AllConditions(self):
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    test_project = test_util.GetTestActiveProject()
-    start_policy = copy.deepcopy(self.test_iam_policy_with_condition)
-    new_policy = copy.deepcopy(start_policy)
-    remove_user = 'user:test@gmail.com'
-    remove_role = 'roles/non-primitive'
-    self.WriteInput('3')
-    new_policy.bindings[:] = []
-    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
-
-    self.mock_client.projects.GetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
-                options=self.messages.GetPolicyOptions(
-                    requestedPolicyVersion=
-                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
-        start_policy)
-    self.mock_client.projects.SetIamPolicy.Expect(
-        self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
-            resource=test_project.projectId,
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=new_policy)), new_policy)
-
-    response = self.RunProjects(
-        'remove-iam-policy-binding', test_project.projectId,
-        '--role={0}'.format(remove_role), '--member={0}'.format(remove_user))
-    self.assertEqual(response, new_policy)
-    json_string = self.GetErr().split('\n')[0]
-    choices_in_stderr = json.loads(json_string)['choices']
-    expected_choices = [
-        'expression=expr,title=title,description=descr', 'None',
-        'all conditions'
-    ]
-    self.assertEqual(choices_in_stderr, expected_choices)
-
   def testBindingWithoutConditionPolicyWithCondition_CannotPrompt(self):
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=False)
@@ -239,6 +117,13 @@ class ProjectsRemoveIamPolicyBindingTestAlpha(
       self.RunProjects('remove-iam-policy-binding', test_project.projectId,
                        '--role={0}'.format(remove_role),
                        '--member={0}'.format(remove_user))
+
+
+class ProjectsRemoveIamPolicyBindingTestAlpha(
+    ProjectsRemoveIamPolicyBindingTestBeta):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

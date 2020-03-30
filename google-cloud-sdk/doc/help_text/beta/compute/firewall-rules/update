@@ -5,7 +5,8 @@ SYNOPSIS
     gcloud beta compute firewall-rules update NAME
         [--allow=[PROTOCOL[:PORT[-PORT]],...]] [--description=DESCRIPTION]
         [--destination-ranges=[CIDR_RANGE,...]] [--disabled] [--enable-logging]
-        [--priority=PRIORITY] [--rules=[PROTOCOL[:PORT[-PORT]],...]]
+        [--logging-metadata=LOGGING_METADATA] [--priority=PRIORITY]
+        [--rules=[PROTOCOL[:PORT[-PORT]],...]]
         [--source-ranges=[CIDR_RANGE,...]]
         [--source-service-accounts=[EMAIL,...]] [--source-tags=[TAG,...]]
         [--target-service-accounts=[EMAIL,...]] [--target-tags=[TAG,...]]
@@ -82,7 +83,20 @@ FLAGS
 
      --enable-logging
         Enable logging for the firewall rule. Logs will be exported to
-        StackDriver. Firewall logging is disabled by default.
+        StackDriver. Firewall logging is disabled by default. To enable logging
+        for an existing rule, run:
+
+            $ gcloud beta compute firewall-rules update MY-RULE --enable-logging
+
+        To disable logging on an existing rule, run:
+
+            $ gcloud beta compute firewall-rules update MY-RULE \
+                --no-enable-logging
+
+     --logging-metadata=LOGGING_METADATA
+        Configures whether metadata fields should be added to the reported
+        firewall logs. Can only be specified if --enable-logging is true.
+        LOGGING_METADATA must be one of: exclude-all, include-all.
 
      --priority=PRIORITY
         This is an integer between 0 and 65535, both inclusive. When NOT
@@ -195,8 +209,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To update the firewall rule RULE to enable logging, run:

@@ -1,0 +1,134 @@
+
+.TH "GCLOUD_ALPHA_CODE_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha code export \- writes skaffold and kubernetes files for local development
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha code export\fR [\fB\-\-build\-context\-directory\fR=\fIBUILD_CONTEXT_DIRECTORY\fR] [\fB\-\-builder\fR=\fIBUILDER\fR] [\fB\-\-cloudsql\-instances\fR=[\fICLOUDSQL_INSTANCE\fR,...]] [\fB\-\-cpu\-limit\fR=\fICPU_LIMIT\fR] [\fB\-\-dockerfile\fR=\fIDOCKERFILE\fR;\ default="Dockerfile"] [\fB\-\-image\-name\fR=\fIIMAGE_NAME\fR] [\fB\-\-kubernetes\-file\fR=\fIKUBERNETES_FILE\fR;\ default="pods_and_services.yaml"] [\fB\-\-local\-port\fR=\fILOCAL_PORT\fR] [\fB\-\-memory\-limit\fR=\fIMEMORY_LIMIT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-service\-name\fR=\fISERVICE_NAME\fR] [\fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR] [\fB\-\-skaffold\-file\fR=\fISKAFFOLD_FILE\fR;\ default="skaffold.yaml"\ |\ \fB\-\-no\-skaffold\-file\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Writes skaffold and kubernetes yaml that builds a docker image and
+runs it locally. In order to build and run the image, run
+
+> skaffold dev
+
+This command should be used if there is a need to make customizations to the
+development environment. Otherwise, the gcloud local dev command should be used
+instead.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-build\-context\-directory\fR=\fIBUILD_CONTEXT_DIRECTORY\fR
+If set, use this as the context directory when building the container image.
+Otherwise, the directory of the Dockerfile will be used.
+
+.TP 2m
+\fB\-\-builder\fR=\fIBUILDER\fR
+Build with a given Cloud Native Computing Foundation Buildpack builder.
+
+.TP 2m
+\fB\-\-cloudsql\-instances\fR=[\fICLOUDSQL_INSTANCE\fR,...]
+Cloud SQL instance connection strings. Must be in the form
+<project>:<region>:<instance>.
+
+.TP 2m
+\fB\-\-cpu\-limit\fR=\fICPU_LIMIT\fR
+Container CPU limit. Limit is expressed as a number of CPUs. Fractional CPU
+limits are allowed (e.g. 1.5).
+
+.TP 2m
+\fB\-\-dockerfile\fR=\fIDOCKERFILE\fR; default="Dockerfile"
+Dockerfile for the service image.
+
+.TP 2m
+\fB\-\-image\-name\fR=\fIIMAGE_NAME\fR
+Name for the built docker image.
+
+.TP 2m
+\fB\-\-kubernetes\-file\fR=\fIKUBERNETES_FILE\fR; default="pods_and_services.yaml"
+File containing yaml specifications for kubernetes resources.
+
+.TP 2m
+\fB\-\-local\-port\fR=\fILOCAL_PORT\fR
+Local port to which the service connection is forwarded. If this flag is not
+set, then a random port is chosen.
+
+.TP 2m
+\fB\-\-memory\-limit\fR=\fIMEMORY_LIMIT\fR
+Container memory limit. Limit is expressed either as an integer representing the
+number of bytes or an integer followed by a unit suffix. Valid unit suffixes are
+"B", "KB", "MB", "GB", "TB", "KiB", "MiB", "GiB", "TiB", or "PiB".
+
+.TP 2m
+\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
+When connecting to Google Cloud Platform services, use a service account key.
+
+.TP 2m
+\fB\-\-service\-name\fR=\fISERVICE_NAME\fR
+Name of the service.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as environment variables.
+
+.TP 2m
+\fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR
+Path to a local YAML file with definitions for all environment variables.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-skaffold\-file\fR=\fISKAFFOLD_FILE\fR; default="skaffold.yaml"
+Location of the generated skaffold.yaml file.
+
+.TP 2m
+\fB\-\-no\-skaffold\-file\fR
+Do not produce a skaffold.yaml file.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

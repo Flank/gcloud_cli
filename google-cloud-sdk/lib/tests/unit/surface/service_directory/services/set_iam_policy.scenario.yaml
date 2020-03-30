@@ -1,0 +1,236 @@
+title: service directory services set iam policy test scenario
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      service-directory services set-iam-policy my-services --namespace my-namespace --location us-east1 policy.json
+  - stderr: |
+      Updated IAM policy for service [my-services].
+  - stdout: |
+      bindings:
+      - members:
+        - user:test-user@gmail.com
+        role: roles/owner
+      - members:
+        - allUsers
+        role: roles/viewer
+      version: 1
+- execute:
+  - command: |
+      service-directory services set-iam-policy my-service --namespace my-namespace --location us-east1 policy.yaml
+  - prompt:
+    - message: The specified policy does not contain an "etag" field identifying a
+        specific version to replace. Changing a policy without an "etag" can overwrite
+        concurrent policy changes.
+    - prompt_string: Replace existing policy
+    - input: y
+  - stderr: |
+      Updated IAM policy for service [my-service].
+  - stdout: |
+      bindings:
+      - members:
+        - user:test-user@gmail.com
+        role: roles/owner
+      - members:
+        - allUsers
+        role: roles/viewer
+      version: 1
+- execute:
+  - command: |
+      service-directory services set-iam-policy projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service policy.json
+  - stderr: |
+      Updated IAM policy for service [my-service].
+  - stdout: |
+      bindings:
+      - members:
+        - user:test-user@gmail.com
+        role: roles/owner
+      - members:
+        - allUsers
+        role: roles/viewer
+      version: 1
+actions:
+- write_file:
+    path: policy.json
+    contents: |
+      {
+        "version": 1,
+        "bindings": [
+          {
+            "role": "roles/owner",
+            "members": ["user:test-user@gmail.com"]
+          },
+          {
+            "role": "roles/viewer",
+            "members": ["allUsers"]
+          }],
+        "etag": "etag"
+      }
+- write_file:
+    path: policy.yaml
+    contents: |
+      version: 1
+      bindings:
+      - members:
+        - user:test-user@gmail.com
+        role: roles/owner
+      - members:
+        - allUsers
+        role: roles/viewer
+
+- execute_command:
+    command: |
+      service-directory services set-iam-policy my-services --namespace my-namespace --location us-east1 policy.json
+    events:
+    - expect_stderr: |
+        Updated IAM policy for service [my-services].
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-services:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:test-user@gmail.com
+                  role: roles/owner
+                - members:
+                  - allUsers
+                  role: roles/viewer
+                etag: etag
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "version": 1,
+              "bindings": [
+                {
+                  "role": "roles/owner",
+                  "members": ["user:test-user@gmail.com"]
+                },
+                {
+                  "role": "roles/viewer",
+                  "members": ["allUsers"]
+                }]
+            }
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:test-user@gmail.com
+          role: roles/owner
+        - members:
+          - allUsers
+          role: roles/viewer
+        version: 1
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      service-directory services set-iam-policy my-service --namespace my-namespace --location us-east1 policy.yaml
+    events:
+    - expect_prompt_continue:
+        message: The specified policy does not contain an "etag" field identifying
+          a specific version to replace. Changing a policy without an "etag" can overwrite
+          concurrent policy changes.
+        prompt_string: Replace existing policy
+        user_input: y
+    - expect_stderr: |
+        Updated IAM policy for service [my-service].
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:test-user@gmail.com
+                  role: roles/owner
+                - members:
+                  - allUsers
+                  role: roles/viewer
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "version": 1,
+              "bindings": [
+                {
+                  "role": "roles/owner",
+                  "members": ["user:test-user@gmail.com"]
+                },
+                {
+                  "role": "roles/viewer",
+                  "members": ["allUsers"]
+                }]
+            }
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:test-user@gmail.com
+          role: roles/owner
+        - members:
+          - allUsers
+          role: roles/viewer
+        version: 1
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      service-directory services set-iam-policy projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service policy.json
+    events:
+    - expect_stderr: |
+        Updated IAM policy for service [my-service].
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/v1beta1/projects/fake-project/locations/us-east1/namespaces/my-namespace/services/my-service:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:test-user@gmail.com
+                  role: roles/owner
+                - members:
+                  - allUsers
+                  role: roles/viewer
+                etag: etag
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "version": 1,
+              "bindings": [
+                {
+                  "role": "roles/owner",
+                  "members": ["user:test-user@gmail.com"]
+                },
+                {
+                  "role": "roles/viewer",
+                  "members": ["allUsers"]
+                }]
+            }
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:test-user@gmail.com
+          role: roles/owner
+        - members:
+          - allUsers
+          role: roles/viewer
+        version: 1
+    - expect_exit:
+        code: 0

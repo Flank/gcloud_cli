@@ -6,6 +6,7 @@ Creates and runs virtual machines on Google Cloud Platform.
 
 from apitools.base.protorpclite import messages as _messages
 from apitools.base.py import encoding
+from apitools.base.py import extra_types
 
 
 package = 'compute'
@@ -34,7 +35,7 @@ class AcceleratorType(_messages.Message):
   graphics processing units (accelerators) that you can add to VM instances to
   improve or accelerate performance when working with intensive workloads. For
   more information, read GPUs on Compute Engine. (== resource_for
-  beta.acceleratorTypes ==) (== resource_for v1.acceleratorTypes ==)
+  {$api_version}.acceleratorTypes ==)
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -536,20 +537,19 @@ class AccessConfig(_messages.Message):
 
 
 class Address(_messages.Message):
-  r"""Represents an IP Address resource.  An address resource represents a
-  regional internal IP address. Regional internal IP addresses are RFC 1918
-  addresses that come from either a primary or secondary IP range of a subnet
-  in a VPC network. Regional external IP addresses can be assigned to GCP VM
-  instances, Cloud VPN gateways, regional external forwarding rules for
-  network load balancers (in either Standard or Premium Tier), and regional
-  external forwarding rules for HTTP(S), SSL Proxy, and TCP Proxy load
-  balancers in Standard Tier. For more information, read IP addresses.  A
-  globalAddresses resource represent a global external IP address. Global
-  external IP addresses are IPv4 or IPv6 addresses. They can only be assigned
-  to global forwarding rules for HTTP(S), SSL Proxy, or TCP Proxy load
-  balancers in Premium Tier. For more information, read Global resources. (==
-  resource_for beta.addresses ==) (== resource_for v1.addresses ==) (==
-  resource_for beta.globalAddresses ==) (== resource_for v1.globalAddresses
+  r"""Use global external addresses for GFE-based external HTTP(S) load
+  balancers in Premium Tier.  Use global internal addresses for reserved
+  peering network range.  Use regional external addresses for the following
+  resources:  - External IP addresses for VM instances - Regional external
+  forwarding rules - Cloud NAT external IP addresses - GFE based LBs in
+  Standard Tier - Network LBs in Premium or Standard Tier - Cloud VPN gateways
+  (both Classic and HA)  Use regional internal IP addresses for subnet IP
+  ranges (primary and secondary). This includes:  - Internal IP addresses for
+  VM instances - Alias IP ranges of VM instances (/32 only) - Regional
+  internal forwarding rules - Internal TCP/UDP load balancer addresses -
+  Internal HTTP(S) load balancer addresses - Cloud DNS inbound forwarding IP
+  addresses  For more information, read reserved IP address.  (== resource_for
+  {$api_version}.addresses ==) (== resource_for {$api_version}.globalAddresses
   ==)
 
   Enums:
@@ -580,8 +580,8 @@ class Address(_messages.Message):
       being used by another resource and is not available.
 
   Messages:
-    LabelsValue: Labels to apply to this Address resource. These can be later
-      modified by the setLabels method. Each label key/value must comply with
+    LabelsValue: Labels for this resource. These can only be added or modified
+      by the setLabels method. Each label key/value pair must comply with
       RFC1035. Label values may be empty.
 
   Fields:
@@ -606,8 +606,8 @@ class Address(_messages.Message):
       change labels, otherwise the request will fail with error 412
       conditionNotMet.  To see the latest fingerprint, make a get() request to
       retrieve an Address.
-    labels: Labels to apply to this Address resource. These can be later
-      modified by the setLabels method. Each label key/value must comply with
+    labels: Labels for this resource. These can only be added or modified by
+      the setLabels method. Each label key/value pair must comply with
       RFC1035. Label values may be empty.
     name: Name of the resource. Provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
@@ -734,8 +734,8 @@ class Address(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Labels to apply to this Address resource. These can be later modified
-    by the setLabels method. Each label key/value must comply with RFC1035.
+    r"""Labels for this resource. These can only be added or modified by the
+    setLabels method. Each label key/value pair must comply with RFC1035.
     Label values may be empty.
 
     Messages:
@@ -1264,8 +1264,7 @@ class AttachedDisk(_messages.Message):
       Persistent disks must always use SCSI and the request will fail if you
       attempt to attach a persistent disk in any other format than SCSI. Local
       SSDs can use either NVME or SCSI. For performance characteristics of
-      SCSI over NVMe, see Local SSD performance. TODO(b/131765817): Update
-      documentation when NVME is supported.
+      SCSI over NVMe, see Local SSD performance.
     ModeValueValuesEnum: The mode in which to attach this disk, either
       READ_WRITE or READ_ONLY. If not specified, the default is to attach the
       disk in READ_WRITE mode.
@@ -1300,6 +1299,7 @@ class AttachedDisk(_messages.Message):
       the disk later.  Instance templates do not store customer-supplied
       encryption keys, so you cannot use your own keys to encrypt disks in a
       managed instance group.
+    diskSizeGb: The size of the disk in GB.
     guestOsFeatures: A list of features to enable on the guest operating
       system. Applicable only for bootable images. Read  Enabling guest
       operating system features to see a list of available options.
@@ -1316,14 +1316,15 @@ class AttachedDisk(_messages.Message):
       always use SCSI and the request will fail if you attempt to attach a
       persistent disk in any other format than SCSI. Local SSDs can use either
       NVME or SCSI. For performance characteristics of SCSI over NVMe, see
-      Local SSD performance. TODO(b/131765817): Update documentation when NVME
-      is supported.
+      Local SSD performance.
     kind: [Output Only] Type of the resource. Always compute#attachedDisk for
       attached disks.
     licenses: [Output Only] Any valid publicly visible licenses.
     mode: The mode in which to attach this disk, either READ_WRITE or
       READ_ONLY. If not specified, the default is to attach the disk in
       READ_WRITE mode.
+    shieldedInstanceInitialState: [Output Only] shielded vm initial state
+      stored on disk
     source: Specifies a valid partial or full URL to an existing Persistent
       Disk resource. When creating a new instance, one of
       initializeParams.sourceImage or initializeParams.sourceSnapshot or
@@ -1341,7 +1342,6 @@ class AttachedDisk(_messages.Message):
     SCSI and the request will fail if you attempt to attach a persistent disk
     in any other format than SCSI. Local SSDs can use either NVME or SCSI. For
     performance characteristics of SCSI over NVMe, see Local SSD performance.
-    TODO(b/131765817): Update documentation when NVME is supported.
 
     Values:
       NVME: <no description>
@@ -1376,15 +1376,17 @@ class AttachedDisk(_messages.Message):
   boot = _messages.BooleanField(2)
   deviceName = _messages.StringField(3)
   diskEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 4)
-  guestOsFeatures = _messages.MessageField('GuestOsFeature', 5, repeated=True)
-  index = _messages.IntegerField(6, variant=_messages.Variant.INT32)
-  initializeParams = _messages.MessageField('AttachedDiskInitializeParams', 7)
-  interface = _messages.EnumField('InterfaceValueValuesEnum', 8)
-  kind = _messages.StringField(9, default=u'compute#attachedDisk')
-  licenses = _messages.StringField(10, repeated=True)
-  mode = _messages.EnumField('ModeValueValuesEnum', 11)
-  source = _messages.StringField(12)
-  type = _messages.EnumField('TypeValueValuesEnum', 13)
+  diskSizeGb = _messages.IntegerField(5)
+  guestOsFeatures = _messages.MessageField('GuestOsFeature', 6, repeated=True)
+  index = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  initializeParams = _messages.MessageField('AttachedDiskInitializeParams', 8)
+  interface = _messages.EnumField('InterfaceValueValuesEnum', 9)
+  kind = _messages.StringField(10, default=u'compute#attachedDisk')
+  licenses = _messages.StringField(11, repeated=True)
+  mode = _messages.EnumField('ModeValueValuesEnum', 12)
+  shieldedInstanceInitialState = _messages.MessageField('InitialStateConfig', 13)
+  source = _messages.StringField(14)
+  type = _messages.EnumField('TypeValueValuesEnum', 15)
 
 
 class AttachedDiskInitializeParams(_messages.Message):
@@ -1393,6 +1395,10 @@ class AttachedDiskInitializeParams(_messages.Message):
   boot disks or local SSDs attached to the new instance.  This property is
   mutually exclusive with the source property; you can only define one or the
   other, but not both.
+
+  Enums:
+    OnUpdateActionValueValuesEnum: Specifies which action to take on instance
+      update with this disk. Default is to use the existing disk.
 
   Messages:
     LabelsValue: Labels to apply to this disk. These can be later modified by
@@ -1403,9 +1409,9 @@ class AttachedDiskInitializeParams(_messages.Message):
     description: An optional description. Provide this property when creating
       the disk.
     diskName: Specifies the disk name. If not specified, the default is to use
-      the name of the instance. If the disk with the instance name exists
-      already in the given zone/region, a new name will be automatically
-      generated.
+      the name of the instance. If a disk with the same name already exists in
+      the given region, the existing disk is attached to the new instance and
+      the new disk is not created.
     diskSizeGb: Specifies the size of the disk in base-2 GB. The size must be
       at least 10 GB. If you specify a sourceImage, which is required for boot
       disks, the default size is the size of the sourceImage. If you do not
@@ -1428,6 +1434,8 @@ class AttachedDiskInitializeParams(_messages.Message):
     labels: Labels to apply to this disk. These can be later modified by the
       disks.setLabels method. This field is only applicable for persistent
       disks.
+    onUpdateAction: Specifies which action to take on instance update with
+      this disk. Default is to use the existing disk.
     resourcePolicies: Resource policies applied to this disk for automatic
       snapshot creations. Specified using the full or partial URL. For
       instance template, specify only the resource policy name.
@@ -1462,6 +1470,19 @@ class AttachedDiskInitializeParams(_messages.Message):
       source snapshot.
   """
 
+  class OnUpdateActionValueValuesEnum(_messages.Enum):
+    r"""Specifies which action to take on instance update with this disk.
+    Default is to use the existing disk.
+
+    Values:
+      RECREATE_DISK: <no description>
+      RECREATE_DISK_IF_SOURCE_CHANGED: <no description>
+      USE_EXISTING_DISK: <no description>
+    """
+    RECREATE_DISK = 0
+    RECREATE_DISK_IF_SOURCE_CHANGED = 1
+    USE_EXISTING_DISK = 2
+
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
     r"""Labels to apply to this disk. These can be later modified by the
@@ -1494,11 +1515,12 @@ class AttachedDiskInitializeParams(_messages.Message):
   diskType = _messages.StringField(4)
   guestOsFeatures = _messages.MessageField('GuestOsFeature', 5, repeated=True)
   labels = _messages.MessageField('LabelsValue', 6)
-  resourcePolicies = _messages.StringField(7, repeated=True)
-  sourceImage = _messages.StringField(8)
-  sourceImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 9)
-  sourceSnapshot = _messages.StringField(10)
-  sourceSnapshotEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 11)
+  onUpdateAction = _messages.EnumField('OnUpdateActionValueValuesEnum', 7)
+  resourcePolicies = _messages.StringField(8, repeated=True)
+  sourceImage = _messages.StringField(9)
+  sourceImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 10)
+  sourceSnapshot = _messages.StringField(11)
+  sourceSnapshotEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 12)
 
 
 class AuditConfig(_messages.Message):
@@ -1599,14 +1621,17 @@ class AuthorizationLoggingOptions(_messages.Message):
 
 
 class Autoscaler(_messages.Message):
-  r"""Represents an Autoscaler resource.    Use autoscalers to automatically
-  add or delete instances from a managed instance group according to your
-  defined autoscaling policy. For more information, read Autoscaling Groups of
-  Instances.  For zonal managed instance groups resource, use the autoscaler
-  resource.  For regional managed instance groups, use the regionAutoscalers
-  resource. (== resource_for beta.autoscalers ==) (== resource_for
-  v1.autoscalers ==) (== resource_for beta.regionAutoscalers ==) (==
-  resource_for v1.regionAutoscalers ==)
+  r"""Represents an Autoscaler resource.  Google Compute Engine has two
+  Autoscaler resources:  *
+  [Global](/compute/docs/reference/rest/{$api_version}/autoscalers) *
+  [Regional](/compute/docs/reference/rest/{$api_version}/regionAutoscalers)
+  Use autoscalers to automatically add or delete instances from a managed
+  instance group according to your defined autoscaling policy. For more
+  information, read Autoscaling Groups of Instances.  For zonal managed
+  instance groups resource, use the autoscaler resource.  For regional managed
+  instance groups, use the regionAutoscalers resource. (== resource_for
+  {$api_version}.autoscalers ==) (== resource_for
+  {$api_version}.regionAutoscalers ==)
 
   Enums:
     StatusValueValuesEnum: [Output Only] The status of the autoscaler
@@ -2275,6 +2300,7 @@ class AutoscalingPolicy(_messages.Message):
       will choose a default value depending on maximum number of instances
       allowed.
     mode: Defines operating mode for this policy.
+    scaleDownControl: A AutoscalingPolicyScaleDownControl attribute.
   """
 
   class ModeValueValuesEnum(_messages.Enum):
@@ -2296,6 +2322,7 @@ class AutoscalingPolicy(_messages.Message):
   maxNumReplicas = _messages.IntegerField(5, variant=_messages.Variant.INT32)
   minNumReplicas = _messages.IntegerField(6, variant=_messages.Variant.INT32)
   mode = _messages.EnumField('ModeValueValuesEnum', 7)
+  scaleDownControl = _messages.MessageField('AutoscalingPolicyScaleDownControl', 8)
 
 
 class AutoscalingPolicyCpuUtilization(_messages.Message):
@@ -2408,6 +2435,26 @@ class AutoscalingPolicyLoadBalancingUtilization(_messages.Message):
   utilizationTarget = _messages.FloatField(1)
 
 
+class AutoscalingPolicyScaleDownControl(_messages.Message):
+  r"""Configuration that allows for slower scale down so that even if
+  Autoscaler recommends an abrupt scale down of a MIG, it will be throttled as
+  specified by the parameters below.
+
+  Fields:
+    maxScaledDownReplicas: Maximum allowed number (or %) of VMs that can be
+      deducted from the peak recommendation during the window autoscaler looks
+      at when computing recommendations. Possibly all these VMs can be deleted
+      at once so user service needs to be prepared to lose that many VMs in
+      one step.
+    timeWindowSec: How long back autoscaling should look when computing
+      recommendations to include directives regarding slower scale down, as
+      described above.
+  """
+
+  maxScaledDownReplicas = _messages.MessageField('FixedOrPercent', 1)
+  timeWindowSec = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+
+
 class Backend(_messages.Message):
   r"""Message containing information of one individual backend.
 
@@ -2421,20 +2468,22 @@ class Backend(_messages.Message):
       mode if the protocol for the backend service is SSL, TCP, or UDP.  If
       the loadBalancingScheme for the backend service is EXTERNAL (SSL Proxy
       and TCP Proxy load balancers), you must also specify exactly one of the
-      following parameters: maxConnections, maxConnectionsPerInstance, or
+      following parameters: maxConnections (except for regional managed
+      instance groups), maxConnectionsPerInstance, or
       maxConnectionsPerEndpoint.  If the loadBalancingScheme for the backend
       service is INTERNAL (internal TCP/UDP load balancers), you cannot
       specify any additional parameters.   - If the load balancing mode is
       RATE, the load is spread based on the rate of HTTP requests per second
       (RPS). You can use the RATE balancing mode if the protocol for the
       backend service is HTTP or HTTPS. You must specify exactly one of the
-      following parameters: maxRate, maxRatePerInstance, or
-      maxRatePerEndpoint.   - If the load balancing mode is UTILIZATION, the
-      load is spread based on the CPU utilization of instances in an instance
-      group. You can use the UTILIZATION balancing mode if the
-      loadBalancingScheme of the backend service is EXTERNAL,
-      INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED and the backends are instance
-      groups. There are no restrictions on the backend service protocol.
+      following parameters: maxRate (except for regional managed instance
+      groups), maxRatePerInstance, or maxRatePerEndpoint.   - If the load
+      balancing mode is UTILIZATION, the load is spread based on the backend
+      utilization of instances in an instance group. You can use the
+      UTILIZATION balancing mode if the loadBalancingScheme of the backend
+      service is EXTERNAL, INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED and the
+      backends are instance groups. There are no restrictions on the backend
+      service protocol.
 
   Fields:
     balancingMode: Specifies the balancing mode for the backend.  When
@@ -2446,20 +2495,22 @@ class Backend(_messages.Message):
       protocol for the backend service is SSL, TCP, or UDP.  If the
       loadBalancingScheme for the backend service is EXTERNAL (SSL Proxy and
       TCP Proxy load balancers), you must also specify exactly one of the
-      following parameters: maxConnections, maxConnectionsPerInstance, or
+      following parameters: maxConnections (except for regional managed
+      instance groups), maxConnectionsPerInstance, or
       maxConnectionsPerEndpoint.  If the loadBalancingScheme for the backend
       service is INTERNAL (internal TCP/UDP load balancers), you cannot
       specify any additional parameters.   - If the load balancing mode is
       RATE, the load is spread based on the rate of HTTP requests per second
       (RPS). You can use the RATE balancing mode if the protocol for the
       backend service is HTTP or HTTPS. You must specify exactly one of the
-      following parameters: maxRate, maxRatePerInstance, or
-      maxRatePerEndpoint.   - If the load balancing mode is UTILIZATION, the
-      load is spread based on the CPU utilization of instances in an instance
-      group. You can use the UTILIZATION balancing mode if the
-      loadBalancingScheme of the backend service is EXTERNAL,
-      INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED and the backends are instance
-      groups. There are no restrictions on the backend service protocol.
+      following parameters: maxRate (except for regional managed instance
+      groups), maxRatePerInstance, or maxRatePerEndpoint.   - If the load
+      balancing mode is UTILIZATION, the load is spread based on the backend
+      utilization of instances in an instance group. You can use the
+      UTILIZATION balancing mode if the loadBalancingScheme of the backend
+      service is EXTERNAL, INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED and the
+      backends are instance groups. There are no restrictions on the backend
+      service protocol.
     capacityScaler: A multiplier applied to the group's maximum servicing
       capacity (based on UTILIZATION, RATE or CONNECTION). Default value is 1,
       which means the group will serve up to 100% of its configured capacity
@@ -2483,17 +2534,18 @@ class Backend(_messages.Message):
       NEGs are not supported.    You must use the fully-qualified URL
       (starting with https://www.googleapis.com/) to specify the instance
       group or NEG. Partial URLs are not supported.
-    maxConnections: Defines a maximum target for simultaneous connections for
-      the entire backend (instance group or NEG). If the backend's
-      balancingMode is UTILIZATION, this is an optional parameter. If the
-      backend's balancingMode is CONNECTION, and backend is attached to a
-      backend service whose loadBalancingScheme is EXTERNAL, you must specify
-      either this parameter, maxConnectionsPerInstance, or
-      maxConnectionsPerEndpoint.  Not available if the backend's balancingMode
-      is RATE. If the loadBalancingScheme is INTERNAL, then maxConnections is
-      not supported, even though the backend requires a balancing mode of
-      CONNECTION.
-    maxConnectionsPerEndpoint: Defines a maximum target for simultaneous
+    maxConnections: Defines a target maximum number of simultaneous
+      connections that the backend can handle. Valid for network endpoint
+      group and instance group backends (except for regional managed instance
+      groups). If the backend's balancingMode is UTILIZATION, this is an
+      optional parameter. If the backend's balancingMode is CONNECTION, and
+      backend is attached to a backend service whose loadBalancingScheme is
+      EXTERNAL, you must specify either this parameter,
+      maxConnectionsPerInstance, or maxConnectionsPerEndpoint.  Not available
+      if the backend's balancingMode is RATE. If the loadBalancingScheme is
+      INTERNAL, then maxConnections is not supported, even though the backend
+      requires a balancing mode of CONNECTION.
+    maxConnectionsPerEndpoint: Defines a target maximum number of simultaneous
       connections for an endpoint of a NEG. This is multiplied by the number
       of endpoints in the NEG to implicitly calculate a maximum number of
       target maximum simultaneous connections for the NEG. If the backend's
@@ -2503,7 +2555,7 @@ class Backend(_messages.Message):
       available if the backend's balancingMode is RATE. Internal TCP/UDP load
       balancing does not support setting maxConnectionsPerEndpoint even though
       its backends require a balancing mode of CONNECTION.
-    maxConnectionsPerInstance: Defines a maximum target for simultaneous
+    maxConnectionsPerInstance: Defines a target maximum number of simultaneous
       connections for a single VM in a backend instance group. This is
       multiplied by the number of instances in the instance group to
       implicitly calculate a target maximum number of simultaneous connections
@@ -2515,29 +2567,37 @@ class Backend(_messages.Message):
       available if the backend's balancingMode is RATE. Internal TCP/UDP load
       balancing does not support setting maxConnectionsPerInstance even though
       its backends require a balancing mode of CONNECTION.
-    maxRate: The max requests per second (RPS) of the group. Can be used with
-      either RATE or UTILIZATION balancing modes, but required if RATE mode.
-      For RATE mode, either maxRate or maxRatePerInstance must be set.  This
-      cannot be used for internal load balancing.
+    maxRate: Defines a maximum number of HTTP requests per second (RPS) that
+      the backend can handle. Valid for network endpoint group and instance
+      group backends (except for regional managed instance groups). Must not
+      be defined if the backend is a managed instance group that uses
+      autoscaling based on load balancing.  If the backend's balancingMode is
+      UTILIZATION, this is an optional parameter. If the backend's
+      balancingMode is RATE, you must specify maxRate, maxRatePerInstance, or
+      maxRatePerEndpoint.  Not available if the backend's balancingMode is
+      CONNECTION.
     maxRatePerEndpoint: Defines a maximum target for requests per second (RPS)
       for an endpoint of a NEG. This is multiplied by the number of endpoints
       in the NEG to implicitly calculate a target maximum rate for the NEG.
       If the backend's balancingMode is RATE, you must specify either this
-      parameter, maxRate, or maxRatePerInstance.  Not available if the
-      backend's balancingMode is CONNECTION.
+      parameter, maxRate (except for regional managed instance groups), or
+      maxRatePerInstance.  Not available if the backend's balancingMode is
+      CONNECTION.
     maxRatePerInstance: Defines a maximum target for requests per second (RPS)
       for a single VM in a backend instance group. This is multiplied by the
       number of instances in the instance group to implicitly calculate a
       target maximum rate for the whole instance group.  If the backend's
       balancingMode is UTILIZATION, this is an optional parameter. If the
       backend's balancingMode is RATE, you must specify either this parameter,
-      maxRate, or maxRatePerEndpoint.  Not available if the backend's
-      balancingMode is CONNECTION.
-    maxUtilization: Defines the maximum average CPU utilization of a backend
-      VM in an instance group. The valid range is [0.0, 1.0]. This is an
-      optional parameter if the backend's balancingMode is UTILIZATION.  This
-      parameter can be used in conjunction with maxRate, maxRatePerInstance,
-      maxConnections, or maxConnectionsPerInstance.
+      maxRate (except for regional managed instance groups), or
+      maxRatePerEndpoint.  Not available if the backend's balancingMode is
+      CONNECTION.
+    maxUtilization: Defines the maximum average backend utilization of a
+      backend VM in an instance group. The valid range is [0.0, 1.0]. This is
+      an optional parameter if the backend's balancingMode is UTILIZATION.
+      This parameter can be used in conjunction with maxRate,
+      maxRatePerInstance, maxConnections (except for regional managed instance
+      groups), or maxConnectionsPerInstance.
   """
 
   class BalancingModeValueValuesEnum(_messages.Enum):
@@ -2549,17 +2609,18 @@ class Backend(_messages.Message):
     You can use the CONNECTION balancing mode if the protocol for the backend
     service is SSL, TCP, or UDP.  If the loadBalancingScheme for the backend
     service is EXTERNAL (SSL Proxy and TCP Proxy load balancers), you must
-    also specify exactly one of the following parameters: maxConnections,
-    maxConnectionsPerInstance, or maxConnectionsPerEndpoint.  If the
-    loadBalancingScheme for the backend service is INTERNAL (internal TCP/UDP
-    load balancers), you cannot specify any additional parameters.   - If the
-    load balancing mode is RATE, the load is spread based on the rate of HTTP
-    requests per second (RPS). You can use the RATE balancing mode if the
-    protocol for the backend service is HTTP or HTTPS. You must specify
-    exactly one of the following parameters: maxRate, maxRatePerInstance, or
-    maxRatePerEndpoint.   - If the load balancing mode is UTILIZATION, the
-    load is spread based on the CPU utilization of instances in an instance
-    group. You can use the UTILIZATION balancing mode if the
+    also specify exactly one of the following parameters: maxConnections
+    (except for regional managed instance groups), maxConnectionsPerInstance,
+    or maxConnectionsPerEndpoint.  If the loadBalancingScheme for the backend
+    service is INTERNAL (internal TCP/UDP load balancers), you cannot specify
+    any additional parameters.   - If the load balancing mode is RATE, the
+    load is spread based on the rate of HTTP requests per second (RPS). You
+    can use the RATE balancing mode if the protocol for the backend service is
+    HTTP or HTTPS. You must specify exactly one of the following parameters:
+    maxRate (except for regional managed instance groups), maxRatePerInstance,
+    or maxRatePerEndpoint.   - If the load balancing mode is UTILIZATION, the
+    load is spread based on the backend utilization of instances in an
+    instance group. You can use the UTILIZATION balancing mode if the
     loadBalancingScheme of the backend service is EXTERNAL,
     INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED and the backends are instance
     groups. There are no restrictions on the backend service protocol.
@@ -2770,9 +2831,13 @@ class BackendBucketList(_messages.Message):
 
 class BackendService(_messages.Message):
   r"""Represents a Backend Service resource.  A backend service contains
-  configuration values for Google Cloud Platform load balancing services.  For
-  more information, read Backend Services.  (== resource_for v1.backendService
-  ==) (== resource_for beta.backendService ==)
+  configuration values for Google Cloud Platform load balancing services.
+  Backend services in Google Compute Engine can be either regionally or
+  globally scoped.  *
+  [Global](/compute/docs/reference/rest/{$api_version}/backendServices) * [Reg
+  ional](/compute/docs/reference/rest/{$api_version}/regionBackendServices)
+  For more information, read Backend Services.  (== resource_for
+  {$api_version}.backendService ==)
 
   Enums:
     LoadBalancingSchemeValueValuesEnum: Specifies the load balancer type.
@@ -2807,7 +2872,7 @@ class BackendService(_messages.Message):
       RING_HASH, session affinity settings will not take effect.
     ProtocolValueValuesEnum: The protocol this BackendService uses to
       communicate with backends.  Possible values are HTTP, HTTPS, HTTP2, TCP,
-      SSL, or UDP, depending on the chosen load balancer or Traffic Director
+      SSL, or UDP. depending on the chosen load balancer or Traffic Director
       configuration. Refer to the documentation for the load balancer or for
       Traffic Director for more information.
     SessionAffinityValueValuesEnum: Type of session affinity to use. The
@@ -2863,12 +2928,13 @@ class BackendService(_messages.Message):
       otherwise the request will fail with error 412 conditionNotMet.  To see
       the latest fingerprint, make a get() request to retrieve a
       BackendService.
-    healthChecks: The list of URLs to the HttpHealthCheck or HttpsHealthCheck
-      resource for health checking this BackendService. Currently at most one
-      health check can be specified, and a health check is required for
-      Compute Engine backend services. A health check must not be specified
-      for App Engine backend and Cloud Function backend.  For internal load
-      balancing, a URL to a HealthCheck resource must be specified instead.
+    healthChecks: The list of URLs to the healthChecks, httpHealthChecks
+      (legacy), or httpsHealthChecks (legacy) resource for health checking
+      this backend service. Not all backend services support legacy health
+      checks. See  Load balancer guide. Currently at most one health check can
+      be specified. Backend services with instance group or zonal NEG backends
+      must have a health check. Backend services with internet NEG backends
+      must not have a health check. A health check must
     iap: A BackendServiceIAP attribute.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
@@ -2929,13 +2995,13 @@ class BackendService(_messages.Message):
       loadBalancingScheme is INTERNAL (Internal TCP/UDP Load Balancing).
     portName: A named port on a backend instance group representing the port
       for communication to the backend VMs in that group. Required when the
-      loadBalancingScheme is EXTERNAL and the backends are instance groups.
-      The named port must be defined on each backend instance group. This
-      parameter has no meaning if the backends are NEGs.    Must be omitted
-      when the loadBalancingScheme is INTERNAL (Internal TCP/UDP Load
-      Blaancing).
+      loadBalancingScheme is EXTERNAL, INTERNAL_MANAGED, or
+      INTERNAL_SELF_MANAGED and the backends are instance groups. The named
+      port must be defined on each backend instance group. This parameter has
+      no meaning if the backends are NEGs.    Must be omitted when the
+      loadBalancingScheme is INTERNAL (Internal TCP/UDP Load Blaancing).
     protocol: The protocol this BackendService uses to communicate with
-      backends.  Possible values are HTTP, HTTPS, HTTP2, TCP, SSL, or UDP,
+      backends.  Possible values are HTTP, HTTPS, HTTP2, TCP, SSL, or UDP.
       depending on the chosen load balancer or Traffic Director configuration.
       Refer to the documentation for the load balancer or for Traffic Director
       for more information.
@@ -2945,6 +3011,11 @@ class BackendService(_messages.Message):
       settable as a field in the request body.
     securityPolicy: [Output Only] The resource URL for the security policy
       associated with this backend service.
+    securitySettings: This field specifies the security policy that applies to
+      this backend service. This field is applicable to either:   - A regional
+      backend service with the service_protocol set to HTTP, HTTPS, or HTTP2,
+      and load_balancing_scheme set to INTERNAL_MANAGED.  - A global backend
+      service with the load_balancing_scheme set to INTERNAL_SELF_MANAGED.
     selfLink: [Output Only] Server-defined URL for the resource.
     sessionAffinity: Type of session affinity to use. The default is NONE.
       Session affinity is not applicable if the --protocol is UDP.  When the
@@ -3025,7 +3096,7 @@ class BackendService(_messages.Message):
 
   class ProtocolValueValuesEnum(_messages.Enum):
     r"""The protocol this BackendService uses to communicate with backends.
-    Possible values are HTTP, HTTPS, HTTP2, TCP, SSL, or UDP, depending on the
+    Possible values are HTTP, HTTPS, HTTP2, TCP, SSL, or UDP. depending on the
     chosen load balancer or Traffic Director configuration. Refer to the
     documentation for the load balancer or for Traffic Director for more
     information.
@@ -3099,9 +3170,10 @@ class BackendService(_messages.Message):
   protocol = _messages.EnumField('ProtocolValueValuesEnum', 25)
   region = _messages.StringField(26)
   securityPolicy = _messages.StringField(27)
-  selfLink = _messages.StringField(28)
-  sessionAffinity = _messages.EnumField('SessionAffinityValueValuesEnum', 29)
-  timeoutSec = _messages.IntegerField(30, variant=_messages.Variant.INT32)
+  securitySettings = _messages.MessageField('SecuritySettings', 28)
+  selfLink = _messages.StringField(29)
+  sessionAffinity = _messages.EnumField('SessionAffinityValueValuesEnum', 30)
+  timeoutSec = _messages.IntegerField(31, variant=_messages.Variant.INT32)
 
 
 class BackendServiceAggregatedList(_messages.Message):
@@ -3277,7 +3349,14 @@ class BackendServiceCdnPolicy(_messages.Message):
 
 
 class BackendServiceFailoverPolicy(_messages.Message):
-  r"""A BackendServiceFailoverPolicy object.
+  r"""Applicable only to Failover for Internal TCP/UDP Load Balancing. On
+  failover or failback, this field indicates whether connection draining will
+  be honored. GCP has a fixed connection draining timeout of 10 minutes. A
+  setting of true terminates existing TCP connections to the active pool
+  during failover and failback, immediately draining traffic. A setting of
+  false allows existing TCP connections to persist, even on VMs no longer in
+  the active pool, for up to the duration of the connection draining timeout
+  (10 minutes).
 
   Fields:
     disableConnectionDrainOnFailover: This can be set to true only if the
@@ -3303,7 +3382,13 @@ class BackendServiceFailoverPolicy(_messages.Message):
 class BackendServiceGroupHealth(_messages.Message):
   r"""A BackendServiceGroupHealth object.
 
+  Messages:
+    AnnotationsValue: Metadata defined as annotations on the network endpoint
+      group.
+
   Fields:
+    annotations: Metadata defined as annotations on the network endpoint
+      group.
     healthStatus: Health state of the backend instances or endpoints in
       requested instance or network endpoint group, determined based on
       configured health checks.
@@ -3311,8 +3396,34 @@ class BackendServiceGroupHealth(_messages.Message):
       compute#backendServiceGroupHealth for the health of backend services.
   """
 
-  healthStatus = _messages.MessageField('HealthStatus', 1, repeated=True)
-  kind = _messages.StringField(2, default=u'compute#backendServiceGroupHealth')
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class AnnotationsValue(_messages.Message):
+    r"""Metadata defined as annotations on the network endpoint group.
+
+    Messages:
+      AdditionalProperty: An additional property for a AnnotationsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type AnnotationsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a AnnotationsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  annotations = _messages.MessageField('AnnotationsValue', 1)
+  healthStatus = _messages.MessageField('HealthStatus', 2, repeated=True)
+  kind = _messages.StringField(3, default=u'compute#backendServiceGroupHealth')
 
 
 class BackendServiceIAP(_messages.Message):
@@ -3870,7 +3981,7 @@ class Binding(_messages.Message):
       example, `admins@example.com`.  *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
-      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
       recovered, this value reverts to `user:{emailid}` and the recovered user
       retains the role in the binding.  *
       `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
@@ -3971,8 +4082,8 @@ class Commitment(_messages.Message):
   resource means that you are purchasing a committed use contract with an
   explicit start and end time. You can create commitments based on vCPUs and
   memory usage and receive discounted rates. For full details, read Signing Up
-  for Committed Use Discounts. (== resource_for beta.regionCommitments ==) (==
-  resource_for v1.regionCommitments ==)
+  for Committed Use Discounts. (== resource_for
+  {$api_version}.regionCommitments ==)
 
   Enums:
     PlanValueValuesEnum: The plan for this commitment, which determines
@@ -4489,42 +4600,51 @@ class ComputeAcceleratorTypesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeAcceleratorTypesGetRequest(_messages.Message):
@@ -4549,33 +4669,34 @@ class ComputeAcceleratorTypesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone for this request.
@@ -4597,42 +4718,51 @@ class ComputeAddressesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeAddressesDeleteRequest(_messages.Message):
@@ -4707,33 +4837,34 @@ class ComputeAddressesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -4800,42 +4931,51 @@ class ComputeAutoscalersAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeAutoscalersDeleteRequest(_messages.Message):
@@ -4910,33 +5050,34 @@ class ComputeAutoscalersListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: Name of the zone for this request.
@@ -5141,33 +5282,34 @@ class ComputeBackendBucketsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -5265,42 +5407,51 @@ class ComputeBackendServicesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Name of the project scoping this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeBackendServicesDeleteRequest(_messages.Message):
@@ -5412,33 +5563,34 @@ class ComputeBackendServicesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -5552,42 +5704,51 @@ class ComputeDiskTypesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeDiskTypesGetRequest(_messages.Message):
@@ -5612,33 +5773,34 @@ class ComputeDiskTypesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone for this request.
@@ -5688,42 +5850,51 @@ class ComputeDisksAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeDisksCreateSnapshotRequest(_messages.Message):
@@ -5848,33 +6019,34 @@ class ComputeDisksListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone for this request.
@@ -6073,33 +6245,34 @@ class ComputeExternalVpnGatewaysListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -6207,33 +6380,34 @@ class ComputeFirewallsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -6318,42 +6492,51 @@ class ComputeForwardingRulesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeForwardingRulesDeleteRequest(_messages.Message):
@@ -6429,33 +6612,34 @@ class ComputeForwardingRulesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -6637,33 +6821,34 @@ class ComputeGlobalAddressesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -6772,33 +6957,34 @@ class ComputeGlobalForwardingRulesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -6893,41 +7079,212 @@ class ComputeGlobalForwardingRulesTestIamPermissionsRequest(_messages.Message):
   testPermissionsRequest = _messages.MessageField('TestPermissionsRequest', 3)
 
 
-class ComputeGlobalOperationsAggregatedListRequest(_messages.Message):
-  r"""A ComputeGlobalOperationsAggregatedListRequest object.
+class ComputeGlobalNetworkEndpointGroupsAttachNetworkEndpointsRequest(_messages.Message):
+  r"""A ComputeGlobalNetworkEndpointGroupsAttachNetworkEndpointsRequest
+  object.
+
+  Fields:
+    globalNetworkEndpointGroupsAttachEndpointsRequest: A
+      GlobalNetworkEndpointGroupsAttachEndpointsRequest resource to be passed
+      as the request body.
+    networkEndpointGroup: The name of the network endpoint group where you are
+      attaching network endpoints to. It should comply with RFC1035.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  globalNetworkEndpointGroupsAttachEndpointsRequest = _messages.MessageField('GlobalNetworkEndpointGroupsAttachEndpointsRequest', 1)
+  networkEndpointGroup = _messages.StringField(2, required=True)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+
+
+class ComputeGlobalNetworkEndpointGroupsDeleteRequest(_messages.Message):
+  r"""A ComputeGlobalNetworkEndpointGroupsDeleteRequest object.
+
+  Fields:
+    networkEndpointGroup: The name of the network endpoint group to delete. It
+      should comply with RFC1035.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  networkEndpointGroup = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+
+
+class ComputeGlobalNetworkEndpointGroupsDetachNetworkEndpointsRequest(_messages.Message):
+  r"""A ComputeGlobalNetworkEndpointGroupsDetachNetworkEndpointsRequest
+  object.
+
+  Fields:
+    globalNetworkEndpointGroupsDetachEndpointsRequest: A
+      GlobalNetworkEndpointGroupsDetachEndpointsRequest resource to be passed
+      as the request body.
+    networkEndpointGroup: The name of the network endpoint group where you are
+      removing network endpoints. It should comply with RFC1035.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  globalNetworkEndpointGroupsDetachEndpointsRequest = _messages.MessageField('GlobalNetworkEndpointGroupsDetachEndpointsRequest', 1)
+  networkEndpointGroup = _messages.StringField(2, required=True)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+
+
+class ComputeGlobalNetworkEndpointGroupsGetRequest(_messages.Message):
+  r"""A ComputeGlobalNetworkEndpointGroupsGetRequest object.
+
+  Fields:
+    networkEndpointGroup: The name of the network endpoint group. It should
+      comply with RFC1035.
+    project: Project ID for this request.
+  """
+
+  networkEndpointGroup = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+
+
+class ComputeGlobalNetworkEndpointGroupsInsertRequest(_messages.Message):
+  r"""A ComputeGlobalNetworkEndpointGroupsInsertRequest object.
+
+  Fields:
+    networkEndpointGroup: A NetworkEndpointGroup resource to be passed as the
+      request body.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  networkEndpointGroup = _messages.MessageField('NetworkEndpointGroup', 1)
+  project = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+
+
+class ComputeGlobalNetworkEndpointGroupsListNetworkEndpointsRequest(_messages.Message):
+  r"""A ComputeGlobalNetworkEndpointGroupsListNetworkEndpointsRequest object.
 
   Fields:
     filter: A filter expression that filters resources listed in the response.
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    networkEndpointGroup: The name of the network endpoint group from which
+      you want to generate a list of included network endpoints. It should
+      comply with RFC1035.
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  networkEndpointGroup = _messages.StringField(3, required=True)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
+
+
+class ComputeGlobalNetworkEndpointGroupsListRequest(_messages.Message):
+  r"""A ComputeGlobalNetworkEndpointGroupsListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -6937,6 +7294,61 @@ class ComputeGlobalOperationsAggregatedListRequest(_messages.Message):
   orderBy = _messages.StringField(3)
   pageToken = _messages.StringField(4)
   project = _messages.StringField(5, required=True)
+
+
+class ComputeGlobalOperationsAggregatedListRequest(_messages.Message):
+  r"""A ComputeGlobalOperationsAggregatedListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+  """
+
+  filter = _messages.StringField(1)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeGlobalOperationsDeleteRequest(_messages.Message):
@@ -6975,33 +7387,34 @@ class ComputeGlobalOperationsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -7013,6 +7426,93 @@ class ComputeGlobalOperationsListRequest(_messages.Message):
   project = _messages.StringField(5, required=True)
 
 
+class ComputeGlobalOperationsWaitRequest(_messages.Message):
+  r"""A ComputeGlobalOperationsWaitRequest object.
+
+  Fields:
+    operation: Name of the Operations resource to return.
+    project: Project ID for this request.
+  """
+
+  operation = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+
+
+class ComputeGlobalOrganizationOperationsDeleteRequest(_messages.Message):
+  r"""A ComputeGlobalOrganizationOperationsDeleteRequest object.
+
+  Fields:
+    operation: Name of the Operations resource to delete.
+    parentId: Parent ID for this request.
+  """
+
+  operation = _messages.StringField(1, required=True)
+  parentId = _messages.StringField(2)
+
+
+class ComputeGlobalOrganizationOperationsDeleteResponse(_messages.Message):
+  r"""An empty ComputeGlobalOrganizationOperationsDelete response."""
+
+
+class ComputeGlobalOrganizationOperationsGetRequest(_messages.Message):
+  r"""A ComputeGlobalOrganizationOperationsGetRequest object.
+
+  Fields:
+    operation: Name of the Operations resource to return.
+    parentId: Parent ID for this request.
+  """
+
+  operation = _messages.StringField(1, required=True)
+  parentId = _messages.StringField(2)
+
+
+class ComputeGlobalOrganizationOperationsListRequest(_messages.Message):
+  r"""A ComputeGlobalOrganizationOperationsListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
+      of results.
+    parentId: Parent ID for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  parentId = _messages.StringField(5)
+
+
 class ComputeHealthChecksAggregatedListRequest(_messages.Message):
   r"""A ComputeHealthChecksAggregatedListRequest object.
 
@@ -7021,42 +7521,51 @@ class ComputeHealthChecksAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Name of the project scoping this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeHealthChecksDeleteRequest(_messages.Message):
@@ -7125,33 +7634,34 @@ class ComputeHealthChecksListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -7297,33 +7807,34 @@ class ComputeHttpHealthChecksListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -7469,33 +7980,34 @@ class ComputeHttpsHealthChecksListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -7694,33 +8206,34 @@ class ComputeImagesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -7814,42 +8327,51 @@ class ComputeInstanceGroupManagersAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeInstanceGroupManagersApplyUpdatesToInstancesRequest(_messages.Message):
@@ -8025,37 +8547,38 @@ class ComputeInstanceGroupManagersListErrorsRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     instanceGroupManager: The name of the managed instance group. It must be a
       string that meets the requirements in RFC1035, or an unsigned long
       integer: must match regexp pattern:
       (?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)|[1-9][0-9]{0,19}.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone where the managed instance group is located. It
@@ -8079,34 +8602,35 @@ class ComputeInstanceGroupManagersListManagedInstancesRequest(_messages.Message)
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     instanceGroupManager: The name of the managed instance group.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
-    order_by: Sorts list results by a certain order. By default, results are
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone where the managed instance group is located.
@@ -8115,7 +8639,7 @@ class ComputeInstanceGroupManagersListManagedInstancesRequest(_messages.Message)
   filter = _messages.StringField(1)
   instanceGroupManager = _messages.StringField(2, required=True)
   maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
-  order_by = _messages.StringField(4)
+  orderBy = _messages.StringField(4)
   pageToken = _messages.StringField(5)
   project = _messages.StringField(6, required=True)
   zone = _messages.StringField(7, required=True)
@@ -8129,35 +8653,36 @@ class ComputeInstanceGroupManagersListPerInstanceConfigsRequest(_messages.Messag
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     instanceGroupManager: The name of the managed instance group. It should
       conform to RFC1035.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone where the managed instance group is located. It
@@ -8181,33 +8706,34 @@ class ComputeInstanceGroupManagersListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone where the managed instance group is located.
@@ -8570,42 +9096,51 @@ class ComputeInstanceGroupsAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeInstanceGroupsDeleteRequest(_messages.Message):
@@ -8680,37 +9215,38 @@ class ComputeInstanceGroupsListInstancesRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     instanceGroup: The name of the instance group from which you want to
       generate a list of included instances.
     instanceGroupsListInstancesRequest: A InstanceGroupsListInstancesRequest
       resource to be passed as the request body.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone where the instance group is located.
@@ -8734,33 +9270,34 @@ class ComputeInstanceGroupsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone where the instance group is located.
@@ -8931,33 +9468,34 @@ class ComputeInstanceTemplatesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -9029,6 +9567,34 @@ class ComputeInstancesAddAccessConfigRequest(_messages.Message):
   zone = _messages.StringField(6, required=True)
 
 
+class ComputeInstancesAddResourcePoliciesRequest(_messages.Message):
+  r"""A ComputeInstancesAddResourcePoliciesRequest object.
+
+  Fields:
+    instance: The instance name for this request.
+    instancesAddResourcePoliciesRequest: A InstancesAddResourcePoliciesRequest
+      resource to be passed as the request body.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: The name of the zone for this request.
+  """
+
+  instance = _messages.StringField(1, required=True)
+  instancesAddResourcePoliciesRequest = _messages.MessageField('InstancesAddResourcePoliciesRequest', 2)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  zone = _messages.StringField(5, required=True)
+
+
 class ComputeInstancesAggregatedListRequest(_messages.Message):
   r"""A ComputeInstancesAggregatedListRequest object.
 
@@ -9037,42 +9603,51 @@ class ComputeInstancesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeInstancesAttachDiskRequest(_messages.Message):
@@ -9187,6 +9762,23 @@ class ComputeInstancesDetachDiskRequest(_messages.Message):
   zone = _messages.StringField(5, required=True)
 
 
+class ComputeInstancesGetEffectiveFirewallsRequest(_messages.Message):
+  r"""A ComputeInstancesGetEffectiveFirewallsRequest object.
+
+  Fields:
+    instance: Name of the instance scoping this request.
+    networkInterface: The name of the network interface to get the effective
+      firewalls.
+    project: Project ID for this request.
+    zone: The name of the zone for this request.
+  """
+
+  instance = _messages.StringField(1, required=True)
+  networkInterface = _messages.StringField(2, required=True)
+  project = _messages.StringField(3, required=True)
+  zone = _messages.StringField(4, required=True)
+
+
 class ComputeInstancesGetGuestAttributesRequest(_messages.Message):
   r"""A ComputeInstancesGetGuestAttributesRequest object.
 
@@ -9226,6 +9818,20 @@ class ComputeInstancesGetRequest(_messages.Message):
 
   Fields:
     instance: Name of the instance resource to return.
+    project: Project ID for this request.
+    zone: The name of the zone for this request.
+  """
+
+  instance = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  zone = _messages.StringField(3, required=True)
+
+
+class ComputeInstancesGetScreenshotRequest(_messages.Message):
+  r"""A ComputeInstancesGetScreenshotRequest object.
+
+  Fields:
+    instance: Name of the instance scoping this request.
     project: Project ID for this request.
     zone: The name of the zone for this request.
   """
@@ -9334,35 +9940,36 @@ class ComputeInstancesListReferrersRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     instance: Name of the target instance scoping this request, or '-' if the
       request should span over all instances in the container.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone for this request.
@@ -9385,33 +9992,34 @@ class ComputeInstancesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone for this request.
@@ -9423,6 +10031,35 @@ class ComputeInstancesListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
   project = _messages.StringField(5, required=True)
   zone = _messages.StringField(6, required=True)
+
+
+class ComputeInstancesRemoveResourcePoliciesRequest(_messages.Message):
+  r"""A ComputeInstancesRemoveResourcePoliciesRequest object.
+
+  Fields:
+    instance: The instance name for this request.
+    instancesRemoveResourcePoliciesRequest: A
+      InstancesRemoveResourcePoliciesRequest resource to be passed as the
+      request body.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: The name of the zone for this request.
+  """
+
+  instance = _messages.StringField(1, required=True)
+  instancesRemoveResourcePoliciesRequest = _messages.MessageField('InstancesRemoveResourcePoliciesRequest', 2)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  zone = _messages.StringField(5, required=True)
 
 
 class ComputeInstancesResetRequest(_messages.Message):
@@ -10055,6 +10692,90 @@ class ComputeInstancesUpdateNetworkInterfaceRequest(_messages.Message):
   zone = _messages.StringField(6, required=True)
 
 
+class ComputeInstancesUpdateRequest(_messages.Message):
+  r"""A ComputeInstancesUpdateRequest object.
+
+  Enums:
+    MinimalActionValueValuesEnum: Specifies the action to take when updating
+      an instance even if the updated properties do not require it. If not
+      specified, then Compute Engine acts based on the minimum action that the
+      updated properties require.
+    MostDisruptiveAllowedActionValueValuesEnum: Specifies the most disruptive
+      action that can be taken on the instance as part of the update. Compute
+      Engine returns an error if the instance properties require a more
+      disruptive action as part of the instance update. Valid options from
+      lowest to highest are NO_EFFECT, REFRESH, and RESTART.
+
+  Fields:
+    instance: Name of the instance resource to update.
+    instanceResource: A Instance resource to be passed as the request body.
+    minimalAction: Specifies the action to take when updating an instance even
+      if the updated properties do not require it. If not specified, then
+      Compute Engine acts based on the minimum action that the updated
+      properties require.
+    mostDisruptiveAllowedAction: Specifies the most disruptive action that can
+      be taken on the instance as part of the update. Compute Engine returns
+      an error if the instance properties require a more disruptive action as
+      part of the instance update. Valid options from lowest to highest are
+      NO_EFFECT, REFRESH, and RESTART.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: The name of the zone for this request.
+  """
+
+  class MinimalActionValueValuesEnum(_messages.Enum):
+    r"""Specifies the action to take when updating an instance even if the
+    updated properties do not require it. If not specified, then Compute
+    Engine acts based on the minimum action that the updated properties
+    require.
+
+    Values:
+      INVALID: <no description>
+      NO_EFFECT: <no description>
+      REFRESH: <no description>
+      RESTART: <no description>
+    """
+    INVALID = 0
+    NO_EFFECT = 1
+    REFRESH = 2
+    RESTART = 3
+
+  class MostDisruptiveAllowedActionValueValuesEnum(_messages.Enum):
+    r"""Specifies the most disruptive action that can be taken on the instance
+    as part of the update. Compute Engine returns an error if the instance
+    properties require a more disruptive action as part of the instance
+    update. Valid options from lowest to highest are NO_EFFECT, REFRESH, and
+    RESTART.
+
+    Values:
+      INVALID: <no description>
+      NO_EFFECT: <no description>
+      REFRESH: <no description>
+      RESTART: <no description>
+    """
+    INVALID = 0
+    NO_EFFECT = 1
+    REFRESH = 2
+    RESTART = 3
+
+  instance = _messages.StringField(1, required=True)
+  instanceResource = _messages.MessageField('Instance', 2)
+  minimalAction = _messages.EnumField('MinimalActionValueValuesEnum', 3)
+  mostDisruptiveAllowedAction = _messages.EnumField('MostDisruptiveAllowedActionValueValuesEnum', 4)
+  project = _messages.StringField(5, required=True)
+  requestId = _messages.StringField(6)
+  zone = _messages.StringField(7, required=True)
+
+
 class ComputeInstancesUpdateShieldedInstanceConfigRequest(_messages.Message):
   r"""A ComputeInstancesUpdateShieldedInstanceConfigRequest object.
 
@@ -10119,42 +10840,51 @@ class ComputeInterconnectAttachmentsAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeInterconnectAttachmentsDeleteRequest(_messages.Message):
@@ -10214,12 +10944,14 @@ class ComputeInterconnectAttachmentsInsertRequest(_messages.Message):
       clients from accidentally creating duplicate commitments.  The request
       ID must be a valid UUID with the exception that zero UUID is not
       supported (00000000-0000-0000-0000-000000000000).
+    validateOnly: If true, the request will not be committed.
   """
 
   interconnectAttachment = _messages.MessageField('InterconnectAttachment', 1)
   project = _messages.StringField(2, required=True)
   region = _messages.StringField(3, required=True)
   requestId = _messages.StringField(4)
+  validateOnly = _messages.BooleanField(5)
 
 
 class ComputeInterconnectAttachmentsListRequest(_messages.Message):
@@ -10230,33 +10962,34 @@ class ComputeInterconnectAttachmentsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -10363,33 +11096,34 @@ class ComputeInterconnectLocationsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -10479,33 +11213,34 @@ class ComputeInterconnectsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -10665,33 +11400,34 @@ class ComputeLicensesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -10801,33 +11537,34 @@ class ComputeMachineImagesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -10877,42 +11614,51 @@ class ComputeMachineTypesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeMachineTypesGetRequest(_messages.Message):
@@ -10937,33 +11683,34 @@ class ComputeMachineTypesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone for this request.
@@ -10985,42 +11732,51 @@ class ComputeNetworkEndpointGroupsAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeNetworkEndpointGroupsAttachNetworkEndpointsRequest(_messages.Message):
@@ -11163,23 +11919,24 @@ class ComputeNetworkEndpointGroupsListNetworkEndpointsRequest(_messages.Message)
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     networkEndpointGroup: The name of the network endpoint group from which
       you want to generate a list of included network endpoints. It should
       comply with RFC1035.
@@ -11189,13 +11946,13 @@ class ComputeNetworkEndpointGroupsListNetworkEndpointsRequest(_messages.Message)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone where the network endpoint group is located. It
@@ -11220,33 +11977,34 @@ class ComputeNetworkEndpointGroupsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone where the network endpoint group is located. It
@@ -11327,6 +12085,18 @@ class ComputeNetworksDeleteRequest(_messages.Message):
   requestId = _messages.StringField(3)
 
 
+class ComputeNetworksGetEffectiveFirewallsRequest(_messages.Message):
+  r"""A ComputeNetworksGetEffectiveFirewallsRequest object.
+
+  Fields:
+    network: Name of the network for this request.
+    project: Project ID for this request.
+  """
+
+  network = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+
+
 class ComputeNetworksGetRequest(_messages.Message):
   r"""A ComputeNetworksGetRequest object.
 
@@ -11374,34 +12144,35 @@ class ComputeNetworksListPeeringRoutesRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     network: Name of the network for this request.
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     peeringName: The response will show routes exchanged over the given
       peering connection.
@@ -11439,33 +12210,34 @@ class ComputeNetworksListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -11629,42 +12401,51 @@ class ComputeNodeGroupsAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeNodeGroupsDeleteNodesRequest(_messages.Message):
@@ -11785,34 +12566,35 @@ class ComputeNodeGroupsListNodesRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     nodeGroup: Name of the NodeGroup resource whose nodes you want to list.
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone for this request.
@@ -11835,33 +12617,34 @@ class ComputeNodeGroupsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone for this request.
@@ -11873,6 +12656,33 @@ class ComputeNodeGroupsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
   project = _messages.StringField(5, required=True)
   zone = _messages.StringField(6, required=True)
+
+
+class ComputeNodeGroupsPatchRequest(_messages.Message):
+  r"""A ComputeNodeGroupsPatchRequest object.
+
+  Fields:
+    nodeGroup: Name of the NodeGroup resource to update.
+    nodeGroupResource: A NodeGroup resource to be passed as the request body.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    zone: The name of the zone for this request.
+  """
+
+  nodeGroup = _messages.StringField(1, required=True)
+  nodeGroupResource = _messages.MessageField('NodeGroup', 2)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  zone = _messages.StringField(5, required=True)
 
 
 class ComputeNodeGroupsSetIamPolicyRequest(_messages.Message):
@@ -11945,42 +12755,51 @@ class ComputeNodeTemplatesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeNodeTemplatesDeleteRequest(_messages.Message):
@@ -12071,33 +12890,34 @@ class ComputeNodeTemplatesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: The name of the region for this request.
@@ -12153,42 +12973,51 @@ class ComputeNodeTypesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeNodeTypesGetRequest(_messages.Message):
@@ -12213,33 +13042,34 @@ class ComputeNodeTypesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: The name of the zone for this request.
@@ -12253,6 +13083,339 @@ class ComputeNodeTypesListRequest(_messages.Message):
   zone = _messages.StringField(6, required=True)
 
 
+class ComputeOrganizationSecurityPoliciesAddAssociationRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesAddAssociationRequest object.
+
+  Fields:
+    replaceExistingAssociation: Indicates whether or not to replace it if an
+      association of the attachment already exists. This is false by default,
+      in which case an error will be returned if an assocation already exists.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: Name of the security policy to update.
+    securityPolicyAssociation: A SecurityPolicyAssociation resource to be
+      passed as the request body.
+  """
+
+  replaceExistingAssociation = _messages.BooleanField(1)
+  requestId = _messages.StringField(2)
+  securityPolicy = _messages.StringField(3, required=True)
+  securityPolicyAssociation = _messages.MessageField('SecurityPolicyAssociation', 4)
+
+
+class ComputeOrganizationSecurityPoliciesAddRuleRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesAddRuleRequest object.
+
+  Fields:
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: Name of the security policy to update.
+    securityPolicyRule: A SecurityPolicyRule resource to be passed as the
+      request body.
+  """
+
+  requestId = _messages.StringField(1)
+  securityPolicy = _messages.StringField(2, required=True)
+  securityPolicyRule = _messages.MessageField('SecurityPolicyRule', 3)
+
+
+class ComputeOrganizationSecurityPoliciesCopyRulesRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesCopyRulesRequest object.
+
+  Fields:
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: Name of the security policy to update.
+    sourceSecurityPolicy: The security policy from which to copy rules.
+  """
+
+  requestId = _messages.StringField(1)
+  securityPolicy = _messages.StringField(2, required=True)
+  sourceSecurityPolicy = _messages.StringField(3)
+
+
+class ComputeOrganizationSecurityPoliciesDeleteRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesDeleteRequest object.
+
+  Fields:
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: Name of the security policy to delete.
+  """
+
+  requestId = _messages.StringField(1)
+  securityPolicy = _messages.StringField(2, required=True)
+
+
+class ComputeOrganizationSecurityPoliciesGetAssociationRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesGetAssociationRequest object.
+
+  Fields:
+    name: The name of the association to get from the security policy.
+    securityPolicy: Name of the security policy to which the queried rule
+      belongs.
+  """
+
+  name = _messages.StringField(1)
+  securityPolicy = _messages.StringField(2, required=True)
+
+
+class ComputeOrganizationSecurityPoliciesGetRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesGetRequest object.
+
+  Fields:
+    securityPolicy: Name of the security policy to get.
+  """
+
+  securityPolicy = _messages.StringField(1, required=True)
+
+
+class ComputeOrganizationSecurityPoliciesGetRuleRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesGetRuleRequest object.
+
+  Fields:
+    priority: The priority of the rule to get from the security policy.
+    securityPolicy: Name of the security policy to which the queried rule
+      belongs.
+  """
+
+  priority = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  securityPolicy = _messages.StringField(2, required=True)
+
+
+class ComputeOrganizationSecurityPoliciesInsertRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesInsertRequest object.
+
+  Fields:
+    parentId: Parent ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: A SecurityPolicy resource to be passed as the request
+      body.
+  """
+
+  parentId = _messages.StringField(1)
+  requestId = _messages.StringField(2)
+  securityPolicy = _messages.MessageField('SecurityPolicy', 3)
+
+
+class ComputeOrganizationSecurityPoliciesListAssociationsRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesListAssociationsRequest object.
+
+  Fields:
+    targetResource: The target resource to list associations. It is an
+      organization, or a folder.
+  """
+
+  targetResource = _messages.StringField(1)
+
+
+class ComputeOrganizationSecurityPoliciesListRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
+      of results.
+    parentId: Parent ID for this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  parentId = _messages.StringField(5)
+
+
+class ComputeOrganizationSecurityPoliciesMoveRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesMoveRequest object.
+
+  Fields:
+    parentId: The new parent of the security policy.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: Name of the security policy to update.
+  """
+
+  parentId = _messages.StringField(1)
+  requestId = _messages.StringField(2)
+  securityPolicy = _messages.StringField(3, required=True)
+
+
+class ComputeOrganizationSecurityPoliciesPatchRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesPatchRequest object.
+
+  Fields:
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: Name of the security policy to update.
+    securityPolicyResource: A SecurityPolicy resource to be passed as the
+      request body.
+  """
+
+  requestId = _messages.StringField(1)
+  securityPolicy = _messages.StringField(2, required=True)
+  securityPolicyResource = _messages.MessageField('SecurityPolicy', 3)
+
+
+class ComputeOrganizationSecurityPoliciesPatchRuleRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesPatchRuleRequest object.
+
+  Fields:
+    priority: The priority of the rule to patch.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: Name of the security policy to update.
+    securityPolicyRule: A SecurityPolicyRule resource to be passed as the
+      request body.
+  """
+
+  priority = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  requestId = _messages.StringField(2)
+  securityPolicy = _messages.StringField(3, required=True)
+  securityPolicyRule = _messages.MessageField('SecurityPolicyRule', 4)
+
+
+class ComputeOrganizationSecurityPoliciesRemoveAssociationRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesRemoveAssociationRequest object.
+
+  Fields:
+    name: Name for the attachment that will be removed.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: Name of the security policy to update.
+  """
+
+  name = _messages.StringField(1)
+  requestId = _messages.StringField(2)
+  securityPolicy = _messages.StringField(3, required=True)
+
+
+class ComputeOrganizationSecurityPoliciesRemoveRuleRequest(_messages.Message):
+  r"""A ComputeOrganizationSecurityPoliciesRemoveRuleRequest object.
+
+  Fields:
+    priority: The priority of the rule to remove from the security policy.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    securityPolicy: Name of the security policy to update.
+  """
+
+  priority = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  requestId = _messages.StringField(2)
+  securityPolicy = _messages.StringField(3, required=True)
+
+
 class ComputePacketMirroringsAggregatedListRequest(_messages.Message):
   r"""A ComputePacketMirroringsAggregatedListRequest object.
 
@@ -12261,42 +13424,51 @@ class ComputePacketMirroringsAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputePacketMirroringsDeleteRequest(_messages.Message):
@@ -12372,33 +13544,34 @@ class ComputePacketMirroringsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -12575,40 +13748,41 @@ class ComputeProjectsGetXpnResourcesRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
-    order_by: Sorts list results by a certain order. By default, results are
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
   maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  order_by = _messages.StringField(3)
+  orderBy = _messages.StringField(3)
   pageToken = _messages.StringField(4)
   project = _messages.StringField(5, required=True)
 
@@ -12621,33 +13795,34 @@ class ComputeProjectsListXpnHostsRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
-    order_by: Sorts list results by a certain order. By default, results are
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     projectsListXpnHostsRequest: A ProjectsListXpnHostsRequest resource to be
@@ -12656,7 +13831,7 @@ class ComputeProjectsListXpnHostsRequest(_messages.Message):
 
   filter = _messages.StringField(1)
   maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  order_by = _messages.StringField(3)
+  orderBy = _messages.StringField(3)
   pageToken = _messages.StringField(4)
   project = _messages.StringField(5, required=True)
   projectsListXpnHostsRequest = _messages.MessageField('ProjectsListXpnHostsRequest', 6)
@@ -12854,33 +14029,34 @@ class ComputeRegionAutoscalersListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -13058,33 +14234,34 @@ class ComputeRegionBackendServicesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -13179,42 +14356,51 @@ class ComputeRegionCommitmentsAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeRegionCommitmentsGetRequest(_messages.Message):
@@ -13264,33 +14450,34 @@ class ComputeRegionCommitmentsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -13356,33 +14543,34 @@ class ComputeRegionDiskTypesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: The name of the region for this request.
@@ -13542,33 +14730,34 @@ class ComputeRegionDisksListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -13701,6 +14890,151 @@ class ComputeRegionDisksTestIamPermissionsRequest(_messages.Message):
   testPermissionsRequest = _messages.MessageField('TestPermissionsRequest', 4)
 
 
+class ComputeRegionHealthCheckServicesDeleteRequest(_messages.Message):
+  r"""A ComputeRegionHealthCheckServicesDeleteRequest object.
+
+  Fields:
+    healthCheckService: Name of the HealthCheckService to delete. The name
+      must be 1-63 characters long, and comply with RFC1035.
+    project: Project ID for this request.
+    region: Name of the region scoping this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  healthCheckService = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+
+
+class ComputeRegionHealthCheckServicesGetRequest(_messages.Message):
+  r"""A ComputeRegionHealthCheckServicesGetRequest object.
+
+  Fields:
+    healthCheckService: Name of the HealthCheckService to update. The name
+      must be 1-63 characters long, and comply with RFC1035.
+    project: Project ID for this request.
+    region: Name of the region scoping this request.
+  """
+
+  healthCheckService = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+
+
+class ComputeRegionHealthCheckServicesInsertRequest(_messages.Message):
+  r"""A ComputeRegionHealthCheckServicesInsertRequest object.
+
+  Fields:
+    healthCheckService: A HealthCheckService resource to be passed as the
+      request body.
+    project: Project ID for this request.
+    region: Name of the region scoping this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  healthCheckService = _messages.MessageField('HealthCheckService', 1)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+
+
+class ComputeRegionHealthCheckServicesListRequest(_messages.Message):
+  r"""A ComputeRegionHealthCheckServicesListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+    region: Name of the region scoping this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
+  region = _messages.StringField(6, required=True)
+
+
+class ComputeRegionHealthCheckServicesPatchRequest(_messages.Message):
+  r"""A ComputeRegionHealthCheckServicesPatchRequest object.
+
+  Fields:
+    healthCheckService: Name of the HealthCheckService to update. The name
+      must be 1-63 characters long, and comply with RFC1035.
+    healthCheckServiceResource: A HealthCheckService resource to be passed as
+      the request body.
+    project: Project ID for this request.
+    region: Name of the region scoping this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  healthCheckService = _messages.StringField(1, required=True)
+  healthCheckServiceResource = _messages.MessageField('HealthCheckService', 2)
+  project = _messages.StringField(3, required=True)
+  region = _messages.StringField(4, required=True)
+  requestId = _messages.StringField(5)
+
+
 class ComputeRegionHealthChecksDeleteRequest(_messages.Message):
   r"""A ComputeRegionHealthChecksDeleteRequest object.
 
@@ -13773,33 +15107,34 @@ class ComputeRegionHealthChecksListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -14072,37 +15407,38 @@ class ComputeRegionInstanceGroupManagersListErrorsRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     instanceGroupManager: The name of the managed instance group. It must be a
       string that meets the requirements in RFC1035, or an unsigned long
       integer: must match regexp pattern:
       (?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)|[1-9][0-9]{0,19}.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request. This should conform to
@@ -14126,34 +15462,35 @@ class ComputeRegionInstanceGroupManagersListManagedInstancesRequest(_messages.Me
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     instanceGroupManager: The name of the managed instance group.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
-    order_by: Sorts list results by a certain order. By default, results are
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -14162,7 +15499,7 @@ class ComputeRegionInstanceGroupManagersListManagedInstancesRequest(_messages.Me
   filter = _messages.StringField(1)
   instanceGroupManager = _messages.StringField(2, required=True)
   maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
-  order_by = _messages.StringField(4)
+  orderBy = _messages.StringField(4)
   pageToken = _messages.StringField(5)
   project = _messages.StringField(6, required=True)
   region = _messages.StringField(7, required=True)
@@ -14177,35 +15514,36 @@ class ComputeRegionInstanceGroupManagersListPerInstanceConfigsRequest(_messages.
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     instanceGroupManager: The name of the managed instance group. It should
       conform to RFC1035.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request, should conform to
@@ -14229,33 +15567,34 @@ class ComputeRegionInstanceGroupManagersListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -14573,35 +15912,36 @@ class ComputeRegionInstanceGroupsListInstancesRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     instanceGroup: Name of the regional instance group for which we want to
       list the instances.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -14628,33 +15968,34 @@ class ComputeRegionInstanceGroupsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -14715,6 +16056,120 @@ class ComputeRegionInstanceGroupsTestIamPermissionsRequest(_messages.Message):
   testPermissionsRequest = _messages.MessageField('TestPermissionsRequest', 4)
 
 
+class ComputeRegionNotificationEndpointsDeleteRequest(_messages.Message):
+  r"""A ComputeRegionNotificationEndpointsDeleteRequest object.
+
+  Fields:
+    notificationEndpoint: Name of the NotificationEndpoint resource to delete.
+    project: Project ID for this request.
+    region: Name of the region scoping this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  notificationEndpoint = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+
+
+class ComputeRegionNotificationEndpointsGetRequest(_messages.Message):
+  r"""A ComputeRegionNotificationEndpointsGetRequest object.
+
+  Fields:
+    notificationEndpoint: Name of the NotificationEndpoint resource to return.
+    project: Project ID for this request.
+    region: Name of the region scoping this request.
+  """
+
+  notificationEndpoint = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+
+
+class ComputeRegionNotificationEndpointsInsertRequest(_messages.Message):
+  r"""A ComputeRegionNotificationEndpointsInsertRequest object.
+
+  Fields:
+    notificationEndpoint: A NotificationEndpoint resource to be passed as the
+      request body.
+    project: Project ID for this request.
+    region: Name of the region scoping this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  notificationEndpoint = _messages.MessageField('NotificationEndpoint', 1)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+
+
+class ComputeRegionNotificationEndpointsListRequest(_messages.Message):
+  r"""A ComputeRegionNotificationEndpointsListRequest object.
+
+  Fields:
+    filter: A filter expression that filters resources listed in the response.
+      The expression must specify the field name, a comparison operator, and
+      the value that you want to use for filtering. The value must be a
+      string, a number, or a boolean. The comparison operator must be either
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    maxResults: The maximum number of results per page that should be
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
+    orderBy: Sorts list results by a certain order. By default, results are
+      returned in alphanumerical order based on the resource name.  You can
+      also sort results in descending order based on the creation timestamp
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
+      of results.
+    project: Project ID for this request.
+    region: Name of the region scoping this request.
+  """
+
+  filter = _messages.StringField(1)
+  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(3)
+  pageToken = _messages.StringField(4)
+  project = _messages.StringField(5, required=True)
+  region = _messages.StringField(6, required=True)
+
+
 class ComputeRegionOperationsDeleteRequest(_messages.Message):
   r"""A ComputeRegionOperationsDeleteRequest object.
 
@@ -14755,33 +16210,34 @@ class ComputeRegionOperationsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -14793,6 +16249,20 @@ class ComputeRegionOperationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
   project = _messages.StringField(5, required=True)
   region = _messages.StringField(6, required=True)
+
+
+class ComputeRegionOperationsWaitRequest(_messages.Message):
+  r"""A ComputeRegionOperationsWaitRequest object.
+
+  Fields:
+    operation: Name of the Operations resource to return.
+    project: Project ID for this request.
+    region: Name of the region for this request.
+  """
+
+  operation = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
 
 
 class ComputeRegionSslCertificatesDeleteRequest(_messages.Message):
@@ -14868,33 +16338,34 @@ class ComputeRegionSslCertificatesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -14981,33 +16452,34 @@ class ComputeRegionTargetHttpProxiesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -15122,33 +16594,34 @@ class ComputeRegionTargetHttpsProxiesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -15296,33 +16769,34 @@ class ComputeRegionUrlMapsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -15411,33 +16885,34 @@ class ComputeRegionsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -15457,42 +16932,51 @@ class ComputeReservationsAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeReservationsDeleteRequest(_messages.Message):
@@ -15583,33 +17067,34 @@ class ComputeReservationsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: Name of the zone for this request.
@@ -15693,42 +17178,51 @@ class ComputeResourcePoliciesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeResourcePoliciesDeleteRequest(_messages.Message):
@@ -15820,33 +17314,34 @@ class ComputeResourcePoliciesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -15902,42 +17397,51 @@ class ComputeRoutersAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeRoutersDeleteRequest(_messages.Message):
@@ -15973,36 +17477,37 @@ class ComputeRoutersGetNatMappingInfoRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     natName: Name of the nat service to filter the Nat Mapping information. If
       it is omitted, all nats for this router will be returned. Name should
       conform to RFC1035.
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -16081,33 +17586,34 @@ class ComputeRoutersListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -16274,33 +17780,34 @@ class ComputeRoutesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -16428,33 +17935,34 @@ class ComputeSecurityPoliciesListPreconfiguredExpressionSetsRequest(_messages.Me
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -16474,33 +17982,34 @@ class ComputeSecurityPoliciesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -16658,33 +18167,34 @@ class ComputeSnapshotsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -16749,42 +18259,51 @@ class ComputeSslCertificatesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Name of the project scoping this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeSslCertificatesDeleteRequest(_messages.Message):
@@ -16854,33 +18373,34 @@ class ComputeSslCertificatesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -16975,33 +18495,34 @@ class ComputeSslPoliciesListAvailableFeaturesRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -17021,33 +18542,34 @@ class ComputeSslPoliciesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -17108,42 +18630,51 @@ class ComputeSubnetworksAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeSubnetworksDeleteRequest(_messages.Message):
@@ -17262,33 +18793,34 @@ class ComputeSubnetworksListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -17310,33 +18842,34 @@ class ComputeSubnetworksListUsableRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -17456,42 +18989,51 @@ class ComputeTargetHttpProxiesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Name of the project scoping this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeTargetHttpProxiesDeleteRequest(_messages.Message):
@@ -17561,33 +19103,34 @@ class ComputeTargetHttpProxiesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -17648,42 +19191,51 @@ class ComputeTargetHttpsProxiesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Name of the project scoping this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeTargetHttpsProxiesDeleteRequest(_messages.Message):
@@ -17753,33 +19305,34 @@ class ComputeTargetHttpsProxiesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -17925,42 +19478,51 @@ class ComputeTargetInstancesAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeTargetInstancesDeleteRequest(_messages.Message):
@@ -18036,33 +19598,34 @@ class ComputeTargetInstancesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: Name of the zone scoping this request.
@@ -18157,42 +19720,51 @@ class ComputeTargetPoolsAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeTargetPoolsDeleteRequest(_messages.Message):
@@ -18285,33 +19857,34 @@ class ComputeTargetPoolsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region scoping this request.
@@ -18495,33 +20068,34 @@ class ComputeTargetSslProxiesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -18726,33 +20300,34 @@ class ComputeTargetTcpProxiesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -18828,42 +20403,51 @@ class ComputeTargetVpnGatewaysAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeTargetVpnGatewaysDeleteRequest(_messages.Message):
@@ -18939,33 +20523,34 @@ class ComputeTargetVpnGatewaysListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -19032,42 +20617,51 @@ class ComputeUrlMapsAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Name of the project scoping this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeUrlMapsDeleteRequest(_messages.Message):
@@ -19162,33 +20756,34 @@ class ComputeUrlMapsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -19288,42 +20883,51 @@ class ComputeVpnGatewaysAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeVpnGatewaysDeleteRequest(_messages.Message):
@@ -19412,33 +21016,34 @@ class ComputeVpnGatewaysListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -19488,42 +21093,51 @@ class ComputeVpnTunnelsAggregatedListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
+    includeAllScopes: Indicates whether every visible scope for each scope
+      type (zone, region, global) should be included in the response. For new
+      resource types added after this field, the flag has no effect as new
+      resource types will always include every visible scope for each scope
+      type in response. For resource types which predate this field, if this
+      flag is omitted or false, only scopes of the scope types where the
+      resource type is expected to be found will be included.
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
 
   filter = _messages.StringField(1)
-  maxResults = _messages.IntegerField(2, variant=_messages.Variant.UINT32, default=500)
-  orderBy = _messages.StringField(3)
-  pageToken = _messages.StringField(4)
-  project = _messages.StringField(5, required=True)
+  includeAllScopes = _messages.BooleanField(2)
+  maxResults = _messages.IntegerField(3, variant=_messages.Variant.UINT32, default=500)
+  orderBy = _messages.StringField(4)
+  pageToken = _messages.StringField(5)
+  project = _messages.StringField(6, required=True)
 
 
 class ComputeVpnTunnelsDeleteRequest(_messages.Message):
@@ -19598,33 +21212,34 @@ class ComputeVpnTunnelsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     region: Name of the region for this request.
@@ -19723,33 +21338,34 @@ class ComputeZoneOperationsListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
     zone: Name of the zone for request.
@@ -19761,6 +21377,20 @@ class ComputeZoneOperationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
   project = _messages.StringField(5, required=True)
   zone = _messages.StringField(6, required=True)
+
+
+class ComputeZoneOperationsWaitRequest(_messages.Message):
+  r"""A ComputeZoneOperationsWaitRequest object.
+
+  Fields:
+    operation: Name of the Operations resource to return.
+    project: Project ID for this request.
+    zone: Name of the zone for this request.
+  """
+
+  operation = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  zone = _messages.StringField(3, required=True)
 
 
 class ComputeZonesGetRequest(_messages.Message):
@@ -19783,33 +21413,34 @@ class ComputeZonesListRequest(_messages.Message):
       The expression must specify the field name, a comparison operator, and
       the value that you want to use for filtering. The value must be a
       string, a number, or a boolean. The comparison operator must be either
-      =, !=, >, or <.  For example, if you are filtering Compute Engine
-      instances, you can exclude instances named example-instance by
-      specifying name != example-instance.  You can also filter nested fields.
-      For example, you could specify scheduling.automaticRestart = false to
-      include instances only if they are not scheduled for automatic restarts.
-      You can use filtering on nested fields to filter based on resource
-      labels.  To filter on multiple expressions, provide each separate
-      expression within parentheses. For example, (scheduling.automaticRestart
-      = true) (cpuPlatform = "Intel Skylake"). By default, each expression is
-      an AND expression. However, you can include AND and OR expressions
-      explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform
-      = "Intel Broadwell") AND (scheduling.automaticRestart = true).
+      `=`, `!=`, `>`, or `<`.  For example, if you are filtering Compute
+      Engine instances, you can exclude instances named `example-instance` by
+      specifying `name != example-instance`.  You can also filter nested
+      fields. For example, you could specify `scheduling.automaticRestart =
+      false` to include instances only if they are not scheduled for automatic
+      restarts. You can use filtering on nested fields to filter based on
+      resource labels.  To filter on multiple expressions, provide each
+      separate expression within parentheses. For example: ```
+      (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake") ```
+      By default, each expression is an `AND` expression. However, you can
+      include `AND` and `OR` expressions explicitly. For example: ```
+      (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+      (scheduling.automaticRestart = true) ```
     maxResults: The maximum number of results per page that should be
-      returned. If the number of available results is larger than maxResults,
-      Compute Engine returns a nextPageToken that can be used to get the next
-      page of results in subsequent list requests. Acceptable values are 0 to
-      500, inclusive. (Default: 500)
+      returned. If the number of available results is larger than
+      `maxResults`, Compute Engine returns a `nextPageToken` that can be used
+      to get the next page of results in subsequent list requests. Acceptable
+      values are `0` to `500`, inclusive. (Default: `500`)
     orderBy: Sorts list results by a certain order. By default, results are
       returned in alphanumerical order based on the resource name.  You can
       also sort results in descending order based on the creation timestamp
-      using orderBy="creationTimestamp desc". This sorts results based on the
-      creationTimestamp field in reverse chronological order (newest result
-      first). Use this to sort resources like operations so that the newest
-      operation is returned first.  Currently, only sorting by name or
-      creationTimestamp desc is supported.
-    pageToken: Specifies a page token to use. Set pageToken to the
-      nextPageToken returned by a previous list request to get the next page
+      using `orderBy="creationTimestamp desc"`. This sorts results based on
+      the `creationTimestamp` field in reverse chronological order (newest
+      result first). Use this to sort resources like operations so that the
+      newest operation is returned first.  Currently, only sorting by `name`
+      or `creationTimestamp desc` is supported.
+    pageToken: Specifies a page token to use. Set `pageToken` to the
+      `nextPageToken` returned by a previous list request to get the next page
       of results.
     project: Project ID for this request.
   """
@@ -19974,9 +21605,8 @@ class CorsPolicy(_messages.Message):
       value of false, which indicates that the CORS policy is in effect.
     exposeHeaders: Specifies the content for the Access-Control-Expose-Headers
       header.
-    maxAge: Specifies how long the results of a preflight request can be
-      cached. This translates to the content for the Access-Control-Max-Age
-      header.
+    maxAge: Specifies how long results of a preflight request can be cached in
+      seconds. This translates to the Access-Control-Max-Age header.
   """
 
   allowCredentials = _messages.BooleanField(1)
@@ -20097,15 +21727,18 @@ class DeprecationStatus(_messages.Message):
 
 
 class Disk(_messages.Message):
-  r"""Represents a Persistent Disk resource.  Persistent disks are required
-  for running your VM instances. Create both boot and non-boot (data)
-  persistent disks. For more information, read Persistent Disks. For more
-  storage options, read Storage options.  The disks resource represents a
-  zonal persistent disk. For more information, read Zonal persistent disks.
-  The regionDisks resource represents a regional persistent disk. For more
-  information, read  Regional resources. (== resource_for beta.disks ==) (==
-  resource_for v1.disks ==) (== resource_for v1.regionDisks ==) (==
-  resource_for beta.regionDisks ==)
+  r"""Represents a Persistent Disk resource.  Google Compute Engine has two
+  Disk resources:  *
+  [Zonal](/compute/docs/reference/rest/{$api_version}/disks) *
+  [Regional](/compute/docs/reference/rest/{$api_version}/regionDisks)
+  Persistent disks are required for running your VM instances. Create both
+  boot and non-boot (data) persistent disks. For more information, read
+  Persistent Disks. For more storage options, read Storage options.  The disks
+  resource represents a zonal persistent disk. For more information, read
+  Zonal persistent disks.  The regionDisks resource represents a regional
+  persistent disk. For more information, read  Regional resources. (==
+  resource_for {$api_version}.disks ==) (== resource_for
+  {$api_version}.regionDisks ==)
 
   Enums:
     StatusValueValuesEnum: [Output Only] The status of disk creation.
@@ -20698,14 +22331,17 @@ class DiskMoveRequest(_messages.Message):
 
 
 class DiskType(_messages.Message):
-  r"""Represents a Disk Type resource.  You can choose from a variety of disk
-  types based on your needs. For more information, read Storage options.  The
-  diskTypes resource represents disk types for a zonal persistent disk. For
-  more information, read Zonal persistent disks.  The regionDiskTypes resource
-  represents disk types for a regional persistent disk. For more information,
-  read Regional persistent disks. (== resource_for beta.diskTypes ==) (==
-  resource_for v1.diskTypes ==) (== resource_for v1.regionDiskTypes ==) (==
-  resource_for beta.regionDiskTypes ==)
+  r"""Represents a Disk Type resource.  Google Compute Engine has two Disk
+  Type resources:  *
+  [Regional](/compute/docs/reference/rest/{$api_version}/regionDiskTypes) *
+  [Zonal](/compute/docs/reference/rest/{$api_version}/diskTypes)  You can
+  choose from a variety of disk types based on your needs. For more
+  information, read Storage options.  The diskTypes resource represents disk
+  types for a zonal persistent disk. For more information, read Zonal
+  persistent disks.  The regionDiskTypes resource represents disk types for a
+  regional persistent disk. For more information, read Regional persistent
+  disks. (== resource_for {$api_version}.diskTypes ==) (== resource_for
+  {$api_version}.regionDiskTypes ==)
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -21494,21 +23130,33 @@ class ExchangedPeeringRoutesList(_messages.Message):
 
 
 class Expr(_messages.Message):
-  r"""Represents an expression text. Example:  title: "User account presence"
-  description: "Determines whether the request has a user account" expression:
-  "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit" description: "Determines if a summary is less
+  than 100 chars" expression: "document.summary.size() < 100"  Example
+  (Equality):  title: "Requestor is owner" description: "Determines if
+  requestor is the document owner" expression: "document.owner ==
+  request.auth.claims.email"  Example (Logic):  title: "Public documents"
+  description: "Determine whether the document should be publicly visible"
+  expression: "document.type != 'private' && document.type != 'internal'"
+  Example (Data Manipulation):  title: "Notification string" description:
+  "Create a notification string with a timestamp." expression: "'New message
+  received at ' + string(document.create_time)"  The exact variables and
+  functions that may be referenced within an expression are determined by the
+  service that evaluates it. See the service documentation for additional
+  information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
@@ -21519,7 +23167,7 @@ class Expr(_messages.Message):
 
 class ExternalVpnGateway(_messages.Message):
   r"""External VPN gateway is the on-premises VPN gateway(s) or another cloud
-  provider?s VPN gateway that connects to your Google Cloud VPN gateway. To
+  provider's VPN gateway that connects to your Google Cloud VPN gateway. To
   create a highly available VPN from Google Cloud to your on-premises side or
   another Cloud provider's VPN gateway, you must create a external VPN gateway
   resource in GCP, which provides the information to GCP about your external
@@ -21530,9 +23178,9 @@ class ExternalVpnGateway(_messages.Message):
       of this external VPN gateway.
 
   Messages:
-    LabelsValue: Labels to apply to this ExternalVpnGateway resource. These
-      can be later modified by the setLabels method. Each label key/value must
-      comply with RFC1035. Label values may be empty.
+    LabelsValue: Labels for this resource. These can only be added or modified
+      by the setLabels method. Each label key/value pair must comply with
+      RFC1035. Label values may be empty.
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -21552,9 +23200,9 @@ class ExternalVpnGateway(_messages.Message):
       to update or change labels, otherwise the request will fail with error
       412 conditionNotMet.  To see the latest fingerprint, make a get()
       request to retrieve an ExternalVpnGateway.
-    labels: Labels to apply to this ExternalVpnGateway resource. These can be
-      later modified by the setLabels method. Each label key/value must comply
-      with RFC1035. Label values may be empty.
+    labels: Labels for this resource. These can only be added or modified by
+      the setLabels method. Each label key/value pair must comply with
+      RFC1035. Label values may be empty.
     name: Name of the resource. Provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
       Specifically, the name must be 1-63 characters long and match the
@@ -21582,9 +23230,9 @@ class ExternalVpnGateway(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Labels to apply to this ExternalVpnGateway resource. These can be
-    later modified by the setLabels method. Each label key/value must comply
-    with RFC1035. Label values may be empty.
+    r"""Labels for this resource. These can only be added or modified by the
+    setLabels method. Each label key/value pair must comply with RFC1035.
+    Label values may be empty.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -21628,7 +23276,7 @@ class ExternalVpnGatewayInterface(_messages.Message):
       FOUR_IPS_REDUNDANCY - 0, 1, 2, 3
     ipAddress: IP address of the interface in the external VPN gateway. Only
       IPv4 is supported. This IP address can be either from your on-premise
-      gateway or another Cloud provider?s VPN gateway, it cannot be an IP
+      gateway or another Cloud provider's VPN gateway, it cannot be an IP
       address from Google Compute Engine.
   """
 
@@ -21762,6 +23410,33 @@ class ExternalVpnGatewayList(_messages.Message):
   nextPageToken = _messages.StringField(5)
   selfLink = _messages.StringField(6)
   warning = _messages.MessageField('WarningValue', 7)
+
+
+class FileContentBuffer(_messages.Message):
+  r"""A FileContentBuffer object.
+
+  Enums:
+    FileTypeValueValuesEnum:
+
+  Fields:
+    content: The raw content in the secure keys file.
+    fileType: A FileTypeValueValuesEnum attribute.
+  """
+
+  class FileTypeValueValuesEnum(_messages.Enum):
+    r"""FileTypeValueValuesEnum enum type.
+
+    Values:
+      BIN: <no description>
+      UNDEFINED: <no description>
+      X509: <no description>
+    """
+    BIN = 0
+    UNDEFINED = 1
+    X509 = 2
+
+  content = _messages.BytesField(1)
+  fileType = _messages.EnumField('FileTypeValueValuesEnum', 2)
 
 
 class Firewall(_messages.Message):
@@ -22079,12 +23754,33 @@ class FirewallList(_messages.Message):
 class FirewallLogConfig(_messages.Message):
   r"""The available logging options for a firewall rule.
 
+  Enums:
+    MetadataValueValuesEnum: This field can only be specified for a particular
+      firewall rule if logging is enabled for that rule. This field denotes
+      whether to include or exclude metadata for firewall logs.
+
   Fields:
     enable: This field denotes whether to enable logging for a particular
       firewall rule.
+    metadata: This field can only be specified for a particular firewall rule
+      if logging is enabled for that rule. This field denotes whether to
+      include or exclude metadata for firewall logs.
   """
 
+  class MetadataValueValuesEnum(_messages.Enum):
+    r"""This field can only be specified for a particular firewall rule if
+    logging is enabled for that rule. This field denotes whether to include or
+    exclude metadata for firewall logs.
+
+    Values:
+      EXCLUDE_ALL_METADATA: <no description>
+      INCLUDE_ALL_METADATA: <no description>
+    """
+    EXCLUDE_ALL_METADATA = 0
+    INCLUDE_ALL_METADATA = 1
+
   enable = _messages.BooleanField(1)
+  metadata = _messages.EnumField('MetadataValueValuesEnum', 2)
 
 
 class FixedOrPercent(_messages.Message):
@@ -22110,49 +23806,51 @@ class FixedOrPercent(_messages.Message):
 
 
 class ForwardingRule(_messages.Message):
-  r"""Represents a Forwarding Rule resource.  A forwarding rule and its
-  corresponding IP address represent the frontend configuration of a Google
-  Cloud Platform load balancer. Forwarding rules can also reference target
-  instances and Cloud VPN Classic gateways (targetVpnGateway).  For more
-  information, read Forwarding rule concepts and Using protocol forwarding.
-  (== resource_for beta.forwardingRules ==) (== resource_for
-  v1.forwardingRules ==) (== resource_for beta.globalForwardingRules ==) (==
-  resource_for v1.globalForwardingRules ==) (== resource_for
-  beta.regionForwardingRules ==) (== resource_for v1.regionForwardingRules ==)
+  r"""Represents a Forwarding Rule resource.  Forwarding rule resources in GCP
+  can be either regional or global in scope:  *
+  [Global](/compute/docs/reference/rest/{$api_version}/globalForwardingRules)
+  * [Regional](/compute/docs/reference/rest/{$api_version}/forwardingRules)  A
+  forwarding rule and its corresponding IP address represent the frontend
+  configuration of a Google Cloud Platform load balancer. Forwarding rules can
+  also reference target instances and Cloud VPN Classic gateways
+  (targetVpnGateway).  For more information, read Forwarding rule concepts and
+  Using protocol forwarding.  (== resource_for {$api_version}.forwardingRules
+  ==) (== resource_for {$api_version}.globalForwardingRules ==) (==
+  resource_for {$api_version}.regionForwardingRules ==)
 
   Enums:
-    IPProtocolValueValuesEnum: The IP protocol to which this rule applies.
-      Valid options are TCP, UDP, ESP, AH, SCTP or ICMP.  For Internal TCP/UDP
-      Load Balancing, the load balancing scheme is INTERNAL, and one of TCP or
-      UDP are valid. For Traffic Director, the load balancing scheme is
-      INTERNAL_SELF_MANAGED, and only TCPis valid. For Internal HTTP(S) Load
-      Balancing, the load balancing scheme is INTERNAL_MANAGED, and only TCP
-      is valid. For HTTP(S), SSL Proxy, and TCP Proxy Load Balancing, the load
-      balancing scheme is EXTERNAL and only TCP is valid. For Network TCP/UDP
-      Load Balancing, the load balancing scheme is EXTERNAL, and one of TCP or
-      UDP is valid.
+    IPProtocolValueValuesEnum: The IP protocol to which this rule applies. For
+      protocol forwarding, valid options are TCP, UDP, ESP, AH, SCTP or ICMP.
+      For Internal TCP/UDP Load Balancing, the load balancing scheme is
+      INTERNAL, and one of TCP or UDP are valid. For Traffic Director, the
+      load balancing scheme is INTERNAL_SELF_MANAGED, and only TCPis valid.
+      For Internal HTTP(S) Load Balancing, the load balancing scheme is
+      INTERNAL_MANAGED, and only TCP is valid. For HTTP(S), SSL Proxy, and TCP
+      Proxy Load Balancing, the load balancing scheme is EXTERNAL and only TCP
+      is valid. For Network TCP/UDP Load Balancing, the load balancing scheme
+      is EXTERNAL, and one of TCP or UDP is valid.
     IpVersionValueValuesEnum: The IP Version that will be used by this
       forwarding rule. Valid options are IPV4 or IPV6. This can only be
       specified for an external global forwarding rule.
     LoadBalancingSchemeValueValuesEnum: Specifies the forwarding rule type.
-      EXTERNAL is used for: - Classic Cloud VPN gateways - Protocol forwarding
-      to VMs from an external IP address - The following load balancers:
-      HTTP(S), SSL Proxy, TCP Proxy, and Network TCP/UDP.  INTERNAL is used
-      for: - Protocol forwarding to VMs from an internal IP address - Internal
-      TCP/UDP load balancers  INTERNAL_MANAGED is used for: - Internal HTTP(S)
-      load balancers  INTERNAL_SELF_MANAGED is used for: - Traffic Director
-      For more information about forwarding rules, refer to Forwarding rule
-      concepts.
+      - EXTERNAL is used for:   - Classic Cloud VPN gateways  - Protocol
+      forwarding to VMs from an external IP address  - The following load
+      balancers: HTTP(S), SSL Proxy, TCP Proxy, and Network TCP/UDP     -
+      INTERNAL is used for:   - Protocol forwarding to VMs from an internal IP
+      address  - Internal TCP/UDP load balancers    - INTERNAL_MANAGED is used
+      for:   - Internal HTTP(S) load balancers    - INTERNAL_SELF_MANAGED is
+      used for:   - Traffic Director      For more information about
+      forwarding rules, refer to Forwarding rule concepts.
     NetworkTierValueValuesEnum: This signifies the networking tier used for
       configuring this load balancer and can only take the following values:
-      PREMIUM , STANDARD.  For regional ForwardingRule, the valid values are
+      PREMIUM, STANDARD.  For regional ForwardingRule, the valid values are
       PREMIUM and STANDARD. For GlobalForwardingRule, the valid value is
       PREMIUM.  If this field is not specified, it is assumed to be PREMIUM.
       If IPAddress is specified, this value must be equal to the networkTier
       of the Address.
 
   Messages:
-    LabelsValue: Labels to apply to this resource. These can be later modified
+    LabelsValue: Labels for this resource. These can only be added or modified
       by the setLabels method. Each label key/value pair must comply with
       RFC1035. Label values may be empty.
 
@@ -22171,16 +23869,16 @@ class ForwardingRule(_messages.Message):
       use. For detailed information, refer to [IP address specifications
       ](/load-balancing/docs/forwarding-rule-
       concepts#ip_address_specifications).
-    IPProtocol: The IP protocol to which this rule applies. Valid options are
-      TCP, UDP, ESP, AH, SCTP or ICMP.  For Internal TCP/UDP Load Balancing,
-      the load balancing scheme is INTERNAL, and one of TCP or UDP are valid.
-      For Traffic Director, the load balancing scheme is
-      INTERNAL_SELF_MANAGED, and only TCPis valid. For Internal HTTP(S) Load
-      Balancing, the load balancing scheme is INTERNAL_MANAGED, and only TCP
-      is valid. For HTTP(S), SSL Proxy, and TCP Proxy Load Balancing, the load
-      balancing scheme is EXTERNAL and only TCP is valid. For Network TCP/UDP
-      Load Balancing, the load balancing scheme is EXTERNAL, and one of TCP or
-      UDP is valid.
+    IPProtocol: The IP protocol to which this rule applies. For protocol
+      forwarding, valid options are TCP, UDP, ESP, AH, SCTP or ICMP.  For
+      Internal TCP/UDP Load Balancing, the load balancing scheme is INTERNAL,
+      and one of TCP or UDP are valid. For Traffic Director, the load
+      balancing scheme is INTERNAL_SELF_MANAGED, and only TCPis valid. For
+      Internal HTTP(S) Load Balancing, the load balancing scheme is
+      INTERNAL_MANAGED, and only TCP is valid. For HTTP(S), SSL Proxy, and TCP
+      Proxy Load Balancing, the load balancing scheme is EXTERNAL and only TCP
+      is valid. For Network TCP/UDP Load Balancing, the load balancing scheme
+      is EXTERNAL, and one of TCP or UDP is valid.
     allPorts: This field is used along with the backend_service field for
       internal load balancing or with the target field for internal
       TargetInstance. This field cannot be used with port or portRange fields.
@@ -22226,18 +23924,18 @@ class ForwardingRule(_messages.Message):
       change labels, otherwise the request will fail with error 412
       conditionNotMet.  To see the latest fingerprint, make a get() request to
       retrieve a ForwardingRule.
-    labels: Labels to apply to this resource. These can be later modified by
+    labels: Labels for this resource. These can only be added or modified by
       the setLabels method. Each label key/value pair must comply with
       RFC1035. Label values may be empty.
-    loadBalancingScheme: Specifies the forwarding rule type. EXTERNAL is used
-      for: - Classic Cloud VPN gateways - Protocol forwarding to VMs from an
-      external IP address - The following load balancers: HTTP(S), SSL Proxy,
-      TCP Proxy, and Network TCP/UDP.  INTERNAL is used for: - Protocol
-      forwarding to VMs from an internal IP address - Internal TCP/UDP load
-      balancers  INTERNAL_MANAGED is used for: - Internal HTTP(S) load
-      balancers  INTERNAL_SELF_MANAGED is used for: - Traffic Director  For
-      more information about forwarding rules, refer to Forwarding rule
-      concepts.
+    loadBalancingScheme: Specifies the forwarding rule type.    - EXTERNAL is
+      used for:   - Classic Cloud VPN gateways  - Protocol forwarding to VMs
+      from an external IP address  - The following load balancers: HTTP(S),
+      SSL Proxy, TCP Proxy, and Network TCP/UDP     - INTERNAL is used for:
+      - Protocol forwarding to VMs from an internal IP address  - Internal
+      TCP/UDP load balancers    - INTERNAL_MANAGED is used for:   - Internal
+      HTTP(S) load balancers    - INTERNAL_SELF_MANAGED is used for:   -
+      Traffic Director      For more information about forwarding rules, refer
+      to Forwarding rule concepts.
     metadataFilters: Opaque filter criteria used by Loadbalancer to restrict
       routing configuration to a limited set of xDS compliant clients. In
       their xDS requests to Loadbalancer, xDS clients present node metadata.
@@ -22265,11 +23963,11 @@ class ForwardingRule(_messages.Message):
       network that the load balanced IP should belong to for this Forwarding
       Rule. If this field is not specified, the default network will be used.
     networkTier: This signifies the networking tier used for configuring this
-      load balancer and can only take the following values: PREMIUM ,
-      STANDARD.  For regional ForwardingRule, the valid values are PREMIUM and
-      STANDARD. For GlobalForwardingRule, the valid value is PREMIUM.  If this
-      field is not specified, it is assumed to be PREMIUM. If IPAddress is
-      specified, this value must be equal to the networkTier of the Address.
+      load balancer and can only take the following values: PREMIUM, STANDARD.
+      For regional ForwardingRule, the valid values are PREMIUM and STANDARD.
+      For GlobalForwardingRule, the valid value is PREMIUM.  If this field is
+      not specified, it is assumed to be PREMIUM. If IPAddress is specified,
+      this value must be equal to the networkTier of the Address.
     portRange: When the load balancing scheme is EXTERNAL,
       INTERNAL_SELF_MANAGED and INTERNAL_MANAGED, you can specify a
       port_range. Use with a forwarding rule that points to a target proxy or
@@ -22322,19 +24020,20 @@ class ForwardingRule(_messages.Message):
       the forwarding rule. For global forwarding rules, this target must be a
       global load balancing resource. The forwarded traffic must be of a type
       appropriate to the target object. For INTERNAL_SELF_MANAGED load
-      balancing, only HTTP and HTTPS targets are valid.
+      balancing, only targetHttpProxy is valid, not targetHttpsProxy.
   """
 
   class IPProtocolValueValuesEnum(_messages.Enum):
-    r"""The IP protocol to which this rule applies. Valid options are TCP,
-    UDP, ESP, AH, SCTP or ICMP.  For Internal TCP/UDP Load Balancing, the load
-    balancing scheme is INTERNAL, and one of TCP or UDP are valid. For Traffic
-    Director, the load balancing scheme is INTERNAL_SELF_MANAGED, and only
-    TCPis valid. For Internal HTTP(S) Load Balancing, the load balancing
-    scheme is INTERNAL_MANAGED, and only TCP is valid. For HTTP(S), SSL Proxy,
-    and TCP Proxy Load Balancing, the load balancing scheme is EXTERNAL and
-    only TCP is valid. For Network TCP/UDP Load Balancing, the load balancing
-    scheme is EXTERNAL, and one of TCP or UDP is valid.
+    r"""The IP protocol to which this rule applies. For protocol forwarding,
+    valid options are TCP, UDP, ESP, AH, SCTP or ICMP.  For Internal TCP/UDP
+    Load Balancing, the load balancing scheme is INTERNAL, and one of TCP or
+    UDP are valid. For Traffic Director, the load balancing scheme is
+    INTERNAL_SELF_MANAGED, and only TCPis valid. For Internal HTTP(S) Load
+    Balancing, the load balancing scheme is INTERNAL_MANAGED, and only TCP is
+    valid. For HTTP(S), SSL Proxy, and TCP Proxy Load Balancing, the load
+    balancing scheme is EXTERNAL and only TCP is valid. For Network TCP/UDP
+    Load Balancing, the load balancing scheme is EXTERNAL, and one of TCP or
+    UDP is valid.
 
     Values:
       AH: <no description>
@@ -22366,14 +24065,14 @@ class ForwardingRule(_messages.Message):
     UNSPECIFIED_VERSION = 2
 
   class LoadBalancingSchemeValueValuesEnum(_messages.Enum):
-    r"""Specifies the forwarding rule type. EXTERNAL is used for: - Classic
-    Cloud VPN gateways - Protocol forwarding to VMs from an external IP
-    address - The following load balancers: HTTP(S), SSL Proxy, TCP Proxy, and
-    Network TCP/UDP.  INTERNAL is used for: - Protocol forwarding to VMs from
-    an internal IP address - Internal TCP/UDP load balancers  INTERNAL_MANAGED
-    is used for: - Internal HTTP(S) load balancers  INTERNAL_SELF_MANAGED is
-    used for: - Traffic Director  For more information about forwarding rules,
-    refer to Forwarding rule concepts.
+    r"""Specifies the forwarding rule type.    - EXTERNAL is used for:   -
+    Classic Cloud VPN gateways  - Protocol forwarding to VMs from an external
+    IP address  - The following load balancers: HTTP(S), SSL Proxy, TCP Proxy,
+    and Network TCP/UDP     - INTERNAL is used for:   - Protocol forwarding to
+    VMs from an internal IP address  - Internal TCP/UDP load balancers    -
+    INTERNAL_MANAGED is used for:   - Internal HTTP(S) load balancers    -
+    INTERNAL_SELF_MANAGED is used for:   - Traffic Director      For more
+    information about forwarding rules, refer to Forwarding rule concepts.
 
     Values:
       EXTERNAL: <no description>
@@ -22390,7 +24089,7 @@ class ForwardingRule(_messages.Message):
 
   class NetworkTierValueValuesEnum(_messages.Enum):
     r"""This signifies the networking tier used for configuring this load
-    balancer and can only take the following values: PREMIUM , STANDARD.  For
+    balancer and can only take the following values: PREMIUM, STANDARD.  For
     regional ForwardingRule, the valid values are PREMIUM and STANDARD. For
     GlobalForwardingRule, the valid value is PREMIUM.  If this field is not
     specified, it is assumed to be PREMIUM. If IPAddress is specified, this
@@ -22405,7 +24104,7 @@ class ForwardingRule(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Labels to apply to this resource. These can be later modified by the
+    r"""Labels for this resource. These can only be added or modified by the
     setLabels method. Each label key/value pair must comply with RFC1035.
     Label values may be empty.
 
@@ -22857,6 +24556,26 @@ class ForwardingRulesScopedList(_messages.Message):
   warning = _messages.MessageField('WarningValue', 2)
 
 
+class GlobalNetworkEndpointGroupsAttachEndpointsRequest(_messages.Message):
+  r"""A GlobalNetworkEndpointGroupsAttachEndpointsRequest object.
+
+  Fields:
+    networkEndpoints: The list of network endpoints to be attached.
+  """
+
+  networkEndpoints = _messages.MessageField('NetworkEndpoint', 1, repeated=True)
+
+
+class GlobalNetworkEndpointGroupsDetachEndpointsRequest(_messages.Message):
+  r"""A GlobalNetworkEndpointGroupsDetachEndpointsRequest object.
+
+  Fields:
+    networkEndpoints: The list of network endpoints to be detached.
+  """
+
+  networkEndpoints = _messages.MessageField('NetworkEndpoint', 1, repeated=True)
+
+
 class GlobalSetLabelsRequest(_messages.Message):
   r"""A GlobalSetLabelsRequest object.
 
@@ -23267,11 +24986,15 @@ class HTTPSHealthCheck(_messages.Message):
 
 
 class HealthCheck(_messages.Message):
-  r"""Represents a Health Check resource.  Health checks are used for most GCP
-  load balancers and managed instance group auto-healing. For more
-  information, read Health Check Concepts.  To perform health checks on
-  network load balancers, you must use either httpHealthChecks or
-  httpsHealthChecks.
+  r"""Represents a Health Check resource.  Google Compute Engine has two
+  Health Check resources:  *
+  [Global](/compute/docs/reference/rest/{$api_version}/healthChecks) *
+  [Regional](/compute/docs/reference/rest/{$api_version}/regionHealthChecks)
+  Internal HTTP(S) load balancers use regional health checks. All other types
+  of GCP load balancers and managed instance group auto-healing use global
+  health checks. For more information, read Health Check Concepts.  To perform
+  health checks on network load balancers, you must use either
+  httpHealthChecks or httpsHealthChecks.
 
   Enums:
     TypeValueValuesEnum: Specifies the type of the healthCheck, either TCP,
@@ -23293,6 +25016,7 @@ class HealthCheck(_messages.Message):
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
     kind: Type of the resource.
+    logConfig: Configure logging on this health check.
     name: Name of the resource. Provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
       Specifically, the name must be 1-63 characters long and match the
@@ -23346,14 +25070,15 @@ class HealthCheck(_messages.Message):
   httpsHealthCheck = _messages.MessageField('HTTPSHealthCheck', 7)
   id = _messages.IntegerField(8, variant=_messages.Variant.UINT64)
   kind = _messages.StringField(9, default=u'compute#healthCheck')
-  name = _messages.StringField(10)
-  region = _messages.StringField(11)
-  selfLink = _messages.StringField(12)
-  sslHealthCheck = _messages.MessageField('SSLHealthCheck', 13)
-  tcpHealthCheck = _messages.MessageField('TCPHealthCheck', 14)
-  timeoutSec = _messages.IntegerField(15, variant=_messages.Variant.INT32)
-  type = _messages.EnumField('TypeValueValuesEnum', 16)
-  unhealthyThreshold = _messages.IntegerField(17, variant=_messages.Variant.INT32)
+  logConfig = _messages.MessageField('HealthCheckLogConfig', 10)
+  name = _messages.StringField(11)
+  region = _messages.StringField(12)
+  selfLink = _messages.StringField(13)
+  sslHealthCheck = _messages.MessageField('SSLHealthCheck', 14)
+  tcpHealthCheck = _messages.MessageField('TCPHealthCheck', 15)
+  timeoutSec = _messages.IntegerField(16, variant=_messages.Variant.INT32)
+  type = _messages.EnumField('TypeValueValuesEnum', 17)
+  unhealthyThreshold = _messages.IntegerField(18, variant=_messages.Variant.INT32)
 
 
 class HealthCheckList(_messages.Message):
@@ -23480,6 +25205,18 @@ class HealthCheckList(_messages.Message):
   warning = _messages.MessageField('WarningValue', 6)
 
 
+class HealthCheckLogConfig(_messages.Message):
+  r"""Configuration of logging on a health check. If logging is enabled, logs
+  will be exported to Stackdriver.
+
+  Fields:
+    enable: Indicates whether or not to export logs. This is false by default,
+      which means no health check logging will be done.
+  """
+
+  enable = _messages.BooleanField(1)
+
+
 class HealthCheckReference(_messages.Message):
   r"""A full or valid partial URL to a health check. For example, the
   following are valid URLs:   -
@@ -23493,6 +25230,252 @@ class HealthCheckReference(_messages.Message):
   """
 
   healthCheck = _messages.StringField(1)
+
+
+class HealthCheckService(_messages.Message):
+  r"""A HealthCheckService defines a set of backends on which to perform
+  periodic health checks and an endpoint to which to send notification of
+  changes in the health status of the backends.
+
+  Enums:
+    HealthStatusAggregationPolicyValueValuesEnum: Optional. Policy for how the
+      results from multiple health checks for the same endpoint are
+      aggregated. Defaults to NO_AGGREGATION if unspecified.   -
+      NO_AGGREGATION. An EndpointHealth message is returned for each backend
+      in the health check service.  - AND. If any backend's health check
+      reports UNHEALTHY, then UNHEALTHY is the HealthState of the entire
+      health check service. If all backend's are healthy, the HealthState of
+      the health check service is HEALTHY. .
+
+  Fields:
+    creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+      format.
+    description: An optional description of this resource. Provide this
+      property when you create the resource.
+    fingerprint: Fingerprint of this resource. A hash of the contents stored
+      in this object. This field is used in optimistic locking. This field
+      will be ignored when inserting a HealthCheckService. An up-to-date
+      fingerprint must be provided in order to patch/update the
+      HealthCheckService; Otherwise, the request will fail with error 412
+      conditionNotMet. To see the latest fingerprint, make a get() request to
+      retrieve the HealthCheckService.
+    healthChecks: List of URLs to the HealthCheck resources. Must have at
+      least one HealthCheck, and not more than 10. HealthCheck resources must
+      have portSpecification=USE_SERVING_PORT. For regional
+      HealthCheckService, the HealthCheck must be regional and in the same
+      region. For global HealthCheckService, HealthCheck must be global. Mix
+      of regional and global HealthChecks is not supported. Multiple regional
+      HealthChecks must belong to the same region. Regional
+      HealthChecks</code? must belong to the same region as zones of NEGs.
+    healthStatusAggregationPolicy: Optional. Policy for how the results from
+      multiple health checks for the same endpoint are aggregated. Defaults to
+      NO_AGGREGATION if unspecified.   - NO_AGGREGATION. An EndpointHealth
+      message is returned for each backend in the health check service.  -
+      AND. If any backend's health check reports UNHEALTHY, then UNHEALTHY is
+      the HealthState of the entire health check service. If all backend's are
+      healthy, the HealthState of the health check service is HEALTHY. .
+    healthStatusAggregationStrategy: Policy for how the results from multiple
+      health checks for the same endpoint are aggregated.   - NO_AGGREGATION.
+      An EndpointHealth message is returned for each backend in the health
+      check service.  - AND. If any backend's health check reports UNHEALTHY,
+      then UNHEALTHY is the HealthState of the entire health check service. If
+      all backend's are healthy, the HealthState of the health check service
+      is HEALTHY. .
+    id: [Output Only] The unique identifier for the resource. This identifier
+      is defined by the server.
+    kind: [Output only] Type of the resource. Always
+      compute#healthCheckServicefor health check services.
+    name: Name of the resource. The name must be 1-63 characters long, and
+      comply with RFC1035. Specifically, the name must be 1-63 characters long
+      and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which
+      means the first character must be a lowercase letter, and all following
+      characters must be a dash, lowercase letter, or digit, except the last
+      character, which cannot be a dash.
+    networkEndpointGroups: List of URLs to the NetworkEndpointGroup resources.
+      Must not have more than 100. For regional HealthCheckService, NEGs must
+      be in zones in the region of the HealthCheckService.
+    notificationEndpoints: List of URLs to the NotificationEndpoint resources.
+      Must not have more than 10. A list of endpoints for receiving
+      notifications of change in health status. For regional
+      HealthCheckService, NotificationEndpoint must be regional and in the
+      same region. For global HealthCheckService, NotificationEndpoint must be
+      global.
+    region: [Output Only] URL of the region where the health check service
+      resides. This field is not applicable to global health check services.
+      You must specify this field as part of the HTTP request URL. It is not
+      settable as a field in the request body.
+    selfLink: [Output Only] Server-defined URL for the resource.
+  """
+
+  class HealthStatusAggregationPolicyValueValuesEnum(_messages.Enum):
+    r"""Optional. Policy for how the results from multiple health checks for
+    the same endpoint are aggregated. Defaults to NO_AGGREGATION if
+    unspecified.   - NO_AGGREGATION. An EndpointHealth message is returned for
+    each backend in the health check service.  - AND. If any backend's health
+    check reports UNHEALTHY, then UNHEALTHY is the HealthState of the entire
+    health check service. If all backend's are healthy, the HealthState of the
+    health check service is HEALTHY. .
+
+    Values:
+      AND: <no description>
+      NO_AGGREGATION: <no description>
+    """
+    AND = 0
+    NO_AGGREGATION = 1
+
+  creationTimestamp = _messages.StringField(1)
+  description = _messages.StringField(2)
+  fingerprint = _messages.BytesField(3)
+  healthChecks = _messages.StringField(4, repeated=True)
+  healthStatusAggregationPolicy = _messages.EnumField('HealthStatusAggregationPolicyValueValuesEnum', 5)
+  healthStatusAggregationStrategy = _messages.MessageField('extra_types.JsonValue', 6)
+  id = _messages.IntegerField(7, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(8, default=u'compute#healthCheckService')
+  name = _messages.StringField(9)
+  networkEndpointGroups = _messages.StringField(10, repeated=True)
+  notificationEndpoints = _messages.StringField(11, repeated=True)
+  region = _messages.StringField(12)
+  selfLink = _messages.StringField(13)
+
+
+class HealthCheckServiceReference(_messages.Message):
+  r"""A full or valid partial URL to a health check service. For example, the
+  following are valid URLs:   -
+  https://www.googleapis.com/compute/beta/projects/project-id/regions/us-
+  west1/healthCheckServices/health-check-service  - projects/project-
+  id/regions/us-west1/healthCheckServices/health-check-service  - regions/us-
+  west1/healthCheckServices/health-check-service
+
+  Fields:
+    healthCheckService: A string attribute.
+  """
+
+  healthCheckService = _messages.StringField(1)
+
+
+class HealthCheckServicesList(_messages.Message):
+  r"""A HealthCheckServicesList object.
+
+  Messages:
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] Unique identifier for the resource; defined by the
+      server.
+    items: A list of HealthCheckService resources.
+    kind: [Output Only] Type of the resource. Always
+      compute#healthCheckServicesList for lists of HealthCheckServices.
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    selfLink: [Output Only] Server-defined URL for this resource.
+    warning: [Output Only] Informational warning message.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('HealthCheckService', 2, repeated=True)
+  kind = _messages.StringField(3, default=u'compute#healthCheckServicesList')
+  nextPageToken = _messages.StringField(4)
+  selfLink = _messages.StringField(5)
+  warning = _messages.MessageField('WarningValue', 6)
 
 
 class HealthChecksAggregatedList(_messages.Message):
@@ -23765,11 +25748,16 @@ class HealthStatus(_messages.Message):
   Enums:
     HealthStateValueValuesEnum: Health state of the instance.
 
+  Messages:
+    AnnotationsValue: Metadata defined as annotations for network endpoint.
+
   Fields:
+    annotations: Metadata defined as annotations for network endpoint.
     healthState: Health state of the instance.
     instance: URL of the instance resource.
-    ipAddress: The IP address represented by this resource.
-    port: The port on the instance.
+    ipAddress: A forwarding rule IP address assigned to this instance.
+    port: The named port of the instance group, not necessarily the port that
+      is health-checked.
   """
 
   class HealthStateValueValuesEnum(_messages.Enum):
@@ -23782,10 +25770,36 @@ class HealthStatus(_messages.Message):
     HEALTHY = 0
     UNHEALTHY = 1
 
-  healthState = _messages.EnumField('HealthStateValueValuesEnum', 1)
-  instance = _messages.StringField(2)
-  ipAddress = _messages.StringField(3)
-  port = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class AnnotationsValue(_messages.Message):
+    r"""Metadata defined as annotations for network endpoint.
+
+    Messages:
+      AdditionalProperty: An additional property for a AnnotationsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type AnnotationsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a AnnotationsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  annotations = _messages.MessageField('AnnotationsValue', 1)
+  healthState = _messages.EnumField('HealthStateValueValuesEnum', 2)
+  instance = _messages.StringField(3)
+  ipAddress = _messages.StringField(4)
+  port = _messages.IntegerField(5, variant=_messages.Variant.INT32)
 
 
 class HealthStatusForNetworkEndpoint(_messages.Message):
@@ -23802,6 +25816,8 @@ class HealthStatusForNetworkEndpoint(_messages.Message):
       state of the network endpoint.
     healthCheck: URL of the health check associated with the health state of
       the network endpoint.
+    healthCheckService: URL of the health check service associated with the
+      health state of the network endpoint.
     healthState: Health state of the network endpoint determined based on the
       health checks configured.
   """
@@ -23824,7 +25840,8 @@ class HealthStatusForNetworkEndpoint(_messages.Message):
   backendService = _messages.MessageField('BackendServiceReference', 1)
   forwardingRule = _messages.MessageField('ForwardingRuleReference', 2)
   healthCheck = _messages.MessageField('HealthCheckReference', 3)
-  healthState = _messages.EnumField('HealthStateValueValuesEnum', 4)
+  healthCheckService = _messages.MessageField('HealthCheckServiceReference', 4)
+  healthState = _messages.EnumField('HealthStateValueValuesEnum', 5)
 
 
 class HostRule(_messages.Message):
@@ -23834,10 +25851,10 @@ class HostRule(_messages.Message):
   Fields:
     description: An optional description of this resource. Provide this
       property when you create the resource.
-    hosts: The list of host patterns to match. They must be valid hostnames,
-      except * will match any string of ([a-z0-9-.]*). In that case, * must be
-      the first character and must be followed in the pattern by either - or
-      ..
+    hosts: The list of host patterns to match. They must be valid hostnames
+      with optional port numbers in the format host:port. * matches any string
+      of ([a-z0-9-.]*). In that case, * must be the first character and must
+      be followed in the pattern by either - or ..
     pathMatcher: The name of the PathMatcher to use to match the path portion
       of the URL if the hostRule matches the URL's host portion.
   """
@@ -23946,14 +25963,18 @@ class HttpHeaderMatch(_messages.Message):
       integer, number or is empty, the match fails. For example for a range
       [-5, 0]   - -3 will match.  - 0 will not match.  - 0.25 will not match.
       - -3someString will not match.   Only one of exactMatch, prefixMatch,
-      suffixMatch, regexMatch, presentMatch or rangeMatch must be set.
-    regexMatch: The value of the header must match the regualar expression
+      suffixMatch, regexMatch, presentMatch or rangeMatch must be set. Note
+      that rangeMatch is not supported for Loadbalancers that have their
+      loadBalancingScheme set to EXTERNAL.
+    regexMatch: The value of the header must match the regular expression
       specified in regexMatch. For regular expression grammar, please see:
       en.cppreference.com/w/cpp/regex/ecmascript  For matching against a port
       specified in the HTTP request, use a headerMatch with headerName set to
       PORT and a regular expression that satisfies the RFC2616 Host header's
       port specifier. Only one of exactMatch, prefixMatch, suffixMatch,
-      regexMatch, presentMatch or rangeMatch must be set.
+      regexMatch, presentMatch or rangeMatch must be set. Note that regexMatch
+      only applies to Loadbalancers that have their loadBalancingScheme set to
+      INTERNAL_SELF_MANAGED.
     suffixMatch: The value of the header must end with the contents of
       suffixMatch. Only one of exactMatch, prefixMatch, suffixMatch,
       regexMatch, presentMatch or rangeMatch must be set.
@@ -24183,7 +26204,8 @@ class HttpQueryParameterMatch(_messages.Message):
       matches the regular expression specified by regexMatch. For the regular
       expression grammar, please see
       en.cppreference.com/w/cpp/regex/ecmascript  Only one of presentMatch,
-      exactMatch or regexMatch must be set.
+      exactMatch or regexMatch must be set. Note that regexMatch only applies
+      when the loadBalancingScheme is set to INTERNAL_SELF_MANAGED.
   """
 
   exactMatch = _messages.StringField(1)
@@ -24214,12 +26236,16 @@ class HttpRedirectAction(_messages.Message):
       UrlMaps used in TargetHttpProxys. Setting this true for TargetHttpsProxy
       is not permitted. The default is set to false.
     pathRedirect: The path that will be used in the redirect response instead
-      of the one that was supplied in the request. Only one of pathRedirect or
-      prefixRedirect must be specified. The value must be between 1 and 1024
-      characters.
+      of the one that was supplied in the request. pathRedirect cannot be
+      supplied together with prefixRedirect. Supply one alone or neither. If
+      neither is supplied, the path of the original request will be used for
+      the redirect. The value must be between 1 and 1024 characters.
     prefixRedirect: The prefix that replaces the prefixMatch specified in the
       HttpRouteRuleMatch, retaining the remaining portion of the URL before
-      redirecting the request.
+      redirecting the request. prefixRedirect cannot be supplied together with
+      pathRedirect. Supply one alone or neither. If neither is supplied, the
+      path of the original request will be used for the redirect. The value
+      must be between 1 and 1024 characters.
     redirectResponseCode: The HTTP Status code to use for this RedirectAction.
       Supported values are:   - MOVED_PERMANENTLY_DEFAULT, which is the
       default value and corresponds to 301.  - FOUND, which corresponds to
@@ -24442,7 +26468,9 @@ class HttpRouteRuleMatch(_messages.Message):
       after removing any query parameters and anchor supplied with the
       original URL. For regular expression grammar please see
       en.cppreference.com/w/cpp/regex/ecmascript  Only one of prefixMatch,
-      fullPathMatch or regexMatch must be specified.
+      fullPathMatch or regexMatch must be specified. Note that regexMatch only
+      applies to Loadbalancers that have their loadBalancingScheme set to
+      INTERNAL_SELF_MANAGED.
   """
 
   fullPathMatch = _messages.StringField(1)
@@ -24635,7 +26663,7 @@ class HttpsHealthCheckList(_messages.Message):
 class Image(_messages.Message):
   r"""Represents an Image resource.  You can use images to create boot disks
   for your VM instances. For more information, read Images. (== resource_for
-  beta.images ==) (== resource_for v1.images ==)
+  {$api_version}.images ==)
 
   Enums:
     SourceTypeValueValuesEnum: The type of the image used to create this disk.
@@ -24700,6 +26728,8 @@ class Image(_messages.Message):
       cannot be a dash.
     rawDisk: The parameters of the raw disk image.
     selfLink: [Output Only] Server-defined URL for the resource.
+    shieldedInstanceInitialState: Set the secure boot keys of shielded
+      instance.
     sourceDisk: URL of the source disk used to create this image. This can be
       a full or valid partial URL. You must provide either this property or
       the rawDisk.source property but not both to create an image. For
@@ -24848,18 +26878,19 @@ class Image(_messages.Message):
   name = _messages.StringField(15)
   rawDisk = _messages.MessageField('RawDiskValue', 16)
   selfLink = _messages.StringField(17)
-  sourceDisk = _messages.StringField(18)
-  sourceDiskEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 19)
-  sourceDiskId = _messages.StringField(20)
-  sourceImage = _messages.StringField(21)
-  sourceImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 22)
-  sourceImageId = _messages.StringField(23)
-  sourceSnapshot = _messages.StringField(24)
-  sourceSnapshotEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 25)
-  sourceSnapshotId = _messages.StringField(26)
-  sourceType = _messages.EnumField('SourceTypeValueValuesEnum', 27, default=u'RAW')
-  status = _messages.EnumField('StatusValueValuesEnum', 28)
-  storageLocations = _messages.StringField(29, repeated=True)
+  shieldedInstanceInitialState = _messages.MessageField('InitialStateConfig', 18)
+  sourceDisk = _messages.StringField(19)
+  sourceDiskEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 20)
+  sourceDiskId = _messages.StringField(21)
+  sourceImage = _messages.StringField(22)
+  sourceImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 23)
+  sourceImageId = _messages.StringField(24)
+  sourceSnapshot = _messages.StringField(25)
+  sourceSnapshotEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 26)
+  sourceSnapshotId = _messages.StringField(27)
+  sourceType = _messages.EnumField('SourceTypeValueValuesEnum', 28, default=u'RAW')
+  status = _messages.EnumField('StatusValueValuesEnum', 29)
+  storageLocations = _messages.StringField(30, repeated=True)
 
 
 class ImageList(_messages.Message):
@@ -24986,13 +27017,32 @@ class ImageList(_messages.Message):
   warning = _messages.MessageField('WarningValue', 6)
 
 
+class InitialStateConfig(_messages.Message):
+  r"""Initial State for shielded instance, these are public keys which are
+  safe to store in public
+
+  Fields:
+    dbs: The Key Database (db).
+    dbxs: The forbidden key database (dbx).
+    keks: The Key Exchange Key (KEK).
+    pk: The Platform Key (PK).
+  """
+
+  dbs = _messages.MessageField('FileContentBuffer', 1, repeated=True)
+  dbxs = _messages.MessageField('FileContentBuffer', 2, repeated=True)
+  keks = _messages.MessageField('FileContentBuffer', 3, repeated=True)
+  pk = _messages.MessageField('FileContentBuffer', 4)
+
+
 class Instance(_messages.Message):
   r"""Represents an Instance resource.  An instance is a virtual machine that
   is hosted on Google Cloud Platform. For more information, read Virtual
-  Machine Instances. (== resource_for beta.instances ==) (== resource_for
-  v1.instances ==)
+  Machine Instances. (== resource_for {$api_version}.instances ==)
 
   Enums:
+    PrivateIpv6GoogleAccessValueValuesEnum: The private IPv6 google access
+      type for the VM. If not specified, use  INHERIT_FROM_SUBNETWORK as
+      default.
     StatusValueValuesEnum: [Output Only] The status of the instance. One of
       the following values: PROVISIONING, STAGING, RUNNING, STOPPING, STOPPED,
       SUSPENDING, SUSPENDED, and TERMINATED.
@@ -25019,6 +27069,13 @@ class Instance(_messages.Message):
     eraseWindowsVssSignature: Specifies whether the disks restored from source
       snapshots or source machine image should erase Windows specific VSS
       signature.
+    fingerprint: Specifies a fingerprint for this resource, which is
+      essentially a hash of the instance's contents and used for optimistic
+      locking. The fingerprint is initially generated by Compute Engine and
+      changes after every request to modify or update the instance. You must
+      always provide an up-to-date fingerprint hash in order to update the
+      instance.  To see the latest fingerprint, make get() request to the
+      instance.
     guestAccelerators: A list of the type and count of accelerator cards
       attached to the instance.
     hostname: Specifies the hostname of the instance. The specified hostname
@@ -25066,8 +27123,11 @@ class Instance(_messages.Message):
       These specify how interfaces are configured to interact with other
       network services, such as connecting to the internet. Multiple
       interfaces are supported per instance.
+    privateIpv6GoogleAccess: The private IPv6 google access type for the VM.
+      If not specified, use  INHERIT_FROM_SUBNETWORK as default.
     reservationAffinity: Specifies the reservations that this instance can
       consume from.
+    resourcePolicies: Resource policies applied to this instance.
     scheduling: Sets the scheduling options for this instance.
     selfLink: [Output Only] Server-defined URL for this resource.
     serviceAccounts: A list of service accounts, with their specified scopes,
@@ -25100,12 +27160,26 @@ class Instance(_messages.Message):
       as a field in the request body.
   """
 
+  class PrivateIpv6GoogleAccessValueValuesEnum(_messages.Enum):
+    r"""The private IPv6 google access type for the VM. If not specified, use
+    INHERIT_FROM_SUBNETWORK as default.
+
+    Values:
+      ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE: <no description>
+      ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE: <no description>
+      INHERIT_FROM_SUBNETWORK: <no description>
+    """
+    ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE = 0
+    ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE = 1
+    INHERIT_FROM_SUBNETWORK = 2
+
   class StatusValueValuesEnum(_messages.Enum):
     r"""[Output Only] The status of the instance. One of the following values:
     PROVISIONING, STAGING, RUNNING, STOPPING, STOPPED, SUSPENDING, SUSPENDED,
     and TERMINATED.
 
     Values:
+      DEPROVISIONING: <no description>
       PROVISIONING: <no description>
       REPAIRING: <no description>
       RUNNING: <no description>
@@ -25116,15 +27190,16 @@ class Instance(_messages.Message):
       SUSPENDING: <no description>
       TERMINATED: <no description>
     """
-    PROVISIONING = 0
-    REPAIRING = 1
-    RUNNING = 2
-    STAGING = 3
-    STOPPED = 4
-    STOPPING = 5
-    SUSPENDED = 6
-    SUSPENDING = 7
-    TERMINATED = 8
+    DEPROVISIONING = 0
+    PROVISIONING = 1
+    REPAIRING = 2
+    RUNNING = 3
+    STAGING = 4
+    STOPPED = 5
+    STOPPING = 6
+    SUSPENDED = 7
+    SUSPENDING = 8
+    TERMINATED = 9
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -25159,32 +27234,35 @@ class Instance(_messages.Message):
   disks = _messages.MessageField('AttachedDisk', 6, repeated=True)
   displayDevice = _messages.MessageField('DisplayDevice', 7)
   eraseWindowsVssSignature = _messages.BooleanField(8)
-  guestAccelerators = _messages.MessageField('AcceleratorConfig', 9, repeated=True)
-  hostname = _messages.StringField(10)
-  id = _messages.IntegerField(11, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(12, default=u'compute#instance')
-  labelFingerprint = _messages.BytesField(13)
-  labels = _messages.MessageField('LabelsValue', 14)
-  machineType = _messages.StringField(15)
-  metadata = _messages.MessageField('Metadata', 16)
-  minCpuPlatform = _messages.StringField(17)
-  name = _messages.StringField(18)
-  networkInterfaces = _messages.MessageField('NetworkInterface', 19, repeated=True)
-  reservationAffinity = _messages.MessageField('ReservationAffinity', 20)
-  scheduling = _messages.MessageField('Scheduling', 21)
-  selfLink = _messages.StringField(22)
-  serviceAccounts = _messages.MessageField('ServiceAccount', 23, repeated=True)
-  shieldedInstanceConfig = _messages.MessageField('ShieldedInstanceConfig', 24)
-  shieldedInstanceIntegrityPolicy = _messages.MessageField('ShieldedInstanceIntegrityPolicy', 25)
-  shieldedVmConfig = _messages.MessageField('ShieldedVmConfig', 26)
-  shieldedVmIntegrityPolicy = _messages.MessageField('ShieldedVmIntegrityPolicy', 27)
-  sourceMachineImage = _messages.StringField(28)
-  sourceMachineImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 29)
-  startRestricted = _messages.BooleanField(30)
-  status = _messages.EnumField('StatusValueValuesEnum', 31)
-  statusMessage = _messages.StringField(32)
-  tags = _messages.MessageField('Tags', 33)
-  zone = _messages.StringField(34)
+  fingerprint = _messages.BytesField(9)
+  guestAccelerators = _messages.MessageField('AcceleratorConfig', 10, repeated=True)
+  hostname = _messages.StringField(11)
+  id = _messages.IntegerField(12, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(13, default=u'compute#instance')
+  labelFingerprint = _messages.BytesField(14)
+  labels = _messages.MessageField('LabelsValue', 15)
+  machineType = _messages.StringField(16)
+  metadata = _messages.MessageField('Metadata', 17)
+  minCpuPlatform = _messages.StringField(18)
+  name = _messages.StringField(19)
+  networkInterfaces = _messages.MessageField('NetworkInterface', 20, repeated=True)
+  privateIpv6GoogleAccess = _messages.EnumField('PrivateIpv6GoogleAccessValueValuesEnum', 21)
+  reservationAffinity = _messages.MessageField('ReservationAffinity', 22)
+  resourcePolicies = _messages.StringField(23, repeated=True)
+  scheduling = _messages.MessageField('Scheduling', 24)
+  selfLink = _messages.StringField(25)
+  serviceAccounts = _messages.MessageField('ServiceAccount', 26, repeated=True)
+  shieldedInstanceConfig = _messages.MessageField('ShieldedInstanceConfig', 27)
+  shieldedInstanceIntegrityPolicy = _messages.MessageField('ShieldedInstanceIntegrityPolicy', 28)
+  shieldedVmConfig = _messages.MessageField('ShieldedVmConfig', 29)
+  shieldedVmIntegrityPolicy = _messages.MessageField('ShieldedVmIntegrityPolicy', 30)
+  sourceMachineImage = _messages.StringField(31)
+  sourceMachineImageEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 32)
+  startRestricted = _messages.BooleanField(33)
+  status = _messages.EnumField('StatusValueValuesEnum', 34)
+  statusMessage = _messages.StringField(35)
+  tags = _messages.MessageField('Tags', 36)
+  zone = _messages.StringField(37)
 
 
 class InstanceAggregatedList(_messages.Message):
@@ -25340,14 +27418,16 @@ class InstanceAggregatedList(_messages.Message):
 
 
 class InstanceGroup(_messages.Message):
-  r"""Represents an unmanaged Instance Group resource.  Use unmanaged instance
-  groups if you need to apply load balancing to groups of heterogeneous
-  instances or if you need to manage the instances yourself. For more
-  information, read  Instance groups.  For zonal unmanaged Instance Group, use
-  instanceGroups resource.  For regional unmanaged Instance Group, use
-  regionInstanceGroups resource. (== resource_for beta.instanceGroups ==) (==
-  resource_for v1.instanceGroups ==) (== resource_for
-  beta.regionInstanceGroups ==) (== resource_for v1.regionInstanceGroups ==)
+  r"""Represents an Instance Group resource.  Instance Groups can be used to
+  configure a target for load balancing.  Instance groups can either be
+  managed or unmanaged.  To create  managed instance groups, use the
+  instanceGroupManager or regionInstanceGroupManager resource instead.  Use
+  zonal unmanaged instance groups if you need to apply load balancing to
+  groups of heterogeneous instances or if you need to manage the instances
+  yourself. You cannot create regional unmanaged instance groups.  For more
+  information, read Instance groups.  (== resource_for
+  {$api_version}.instanceGroups ==) (== resource_for
+  {$api_version}.regionInstanceGroups ==)
 
   Fields:
     creationTimestamp: [Output Only] The creation timestamp for this instance
@@ -25679,9 +27759,8 @@ class InstanceGroupManager(_messages.Message):
   information, read Instance groups.  For zonal Managed Instance Group, use
   the instanceGroupManagers resource.  For regional Managed Instance Group,
   use the regionInstanceGroupManagers resource. (== resource_for
-  beta.instanceGroupManagers ==) (== resource_for v1.instanceGroupManagers ==)
-  (== resource_for beta.regionInstanceGroupManagers ==) (== resource_for
-  v1.regionInstanceGroupManagers ==)
+  {$api_version}.instanceGroupManagers ==) (== resource_for
+  {$api_version}.regionInstanceGroupManagers ==)
 
   Enums:
     FailoverActionValueValuesEnum: The action to perform in case of zone
@@ -25745,8 +27824,9 @@ class InstanceGroupManager(_messages.Message):
       the instanceGroup field are added. The target pools automatically apply
       to all of the instances in the managed instance group.
     targetSize: The target number of running instances for this managed
-      instance group. Deleting or abandoning instances reduces this number.
-      Resizing the group changes this number.
+      instance group. You can reduce this number by using the
+      instanceGroupManager deleteInstances or abandonInstances methods.
+      Resizing the group also changes this number.
     updatePolicy: The update policy for this managed instance group.
     versions: Specifies the instance templates used by this managed instance
       group to create instances.  Each version is defined by an
@@ -26178,6 +28258,8 @@ class InstanceGroupManagerStatus(_messages.Message):
   r"""A InstanceGroupManagerStatus object.
 
   Fields:
+    autoscaler: [Output Only] The URL of the Autoscaler that targets this
+      instance group manager.
     isStable: [Output Only] A bit indicating whether the managed instance
       group is in a stable state. A stable state means that: none of the
       instances in the managed instance group is currently undergoing any type
@@ -26191,23 +28273,33 @@ class InstanceGroupManagerStatus(_messages.Message):
       Instance Group Manager.
   """
 
-  isStable = _messages.BooleanField(1)
-  stateful = _messages.MessageField('InstanceGroupManagerStatusStateful', 2)
-  versionTarget = _messages.MessageField('InstanceGroupManagerStatusVersionTarget', 3)
+  autoscaler = _messages.StringField(1)
+  isStable = _messages.BooleanField(2)
+  stateful = _messages.MessageField('InstanceGroupManagerStatusStateful', 3)
+  versionTarget = _messages.MessageField('InstanceGroupManagerStatusVersionTarget', 4)
 
 
 class InstanceGroupManagerStatusStateful(_messages.Message):
   r"""A InstanceGroupManagerStatusStateful object.
 
   Fields:
+    hasStatefulConfig: [Output Only] A bit indicating whether the managed
+      instance group has stateful configuration, that is, if you have
+      configured any items in a stateful policy or in per-instance configs.
+      The group might report that it has no stateful config even when there is
+      still some preserved state on a managed instance, for example, if you
+      have deleted all PICs but not yet applied those deletions.
     isStateful: [Output Only] A bit indicating whether the managed instance
-      group is stateful, i.e. has any disks in Stateful Policy or at least one
-      per-instance config. This is determined based on the user intent, the
-      group may be reported as not stateful even when there is still some
-      preserved state on managed instances.
+      group has stateful configuration, that is, if you have configured any
+      items in a stateful policy or in per-instance configs. The group might
+      report that it has no stateful config even when there is still some
+      preserved state on a managed instance, for example, if you have deleted
+      all PICs but not yet applied those deletions. This field is deprecated
+      in favor of has_stateful_config.
   """
 
-  isStateful = _messages.BooleanField(1)
+  hasStatefulConfig = _messages.BooleanField(1)
+  isStateful = _messages.BooleanField(2)
 
 
 class InstanceGroupManagerStatusVersionTarget(_messages.Message):
@@ -27541,6 +29633,11 @@ class InstanceMoveRequest(_messages.Message):
 class InstanceProperties(_messages.Message):
   r"""InstanceProperties message type.
 
+  Enums:
+    PrivateIpv6GoogleAccessValueValuesEnum: The private IPv6 google access
+      type for the VM. If not specified, use  INHERIT_FROM_SUBNETWORK as
+      default.
+
   Messages:
     LabelsValue: Labels to apply to instances that are created from this
       template.
@@ -27574,8 +29671,12 @@ class InstanceProperties(_messages.Message):
       For more information, read Specifying a Minimum CPU Platform.
     networkInterfaces: An array of network access configurations for this
       interface.
+    privateIpv6GoogleAccess: The private IPv6 google access type for the VM.
+      If not specified, use  INHERIT_FROM_SUBNETWORK as default.
     reservationAffinity: Specifies the reservations that this instance can
       consume from.
+    resourcePolicies: Resource policies (names, not ULRs) applied to instances
+      created from this template.
     scheduling: Specifies the scheduling options for the instances that are
       created from this template.
     serviceAccounts: A list of service accounts with specified scopes. Access
@@ -27590,6 +29691,19 @@ class InstanceProperties(_messages.Message):
       firewalls. The setTags method can modify this list of tags. Each tag
       within the list must comply with RFC1035.
   """
+
+  class PrivateIpv6GoogleAccessValueValuesEnum(_messages.Enum):
+    r"""The private IPv6 google access type for the VM. If not specified, use
+    INHERIT_FROM_SUBNETWORK as default.
+
+    Values:
+      ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE: <no description>
+      ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE: <no description>
+      INHERIT_FROM_SUBNETWORK: <no description>
+    """
+    ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE = 0
+    ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE = 1
+    INHERIT_FROM_SUBNETWORK = 2
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -27625,12 +29739,14 @@ class InstanceProperties(_messages.Message):
   metadata = _messages.MessageField('Metadata', 8)
   minCpuPlatform = _messages.StringField(9)
   networkInterfaces = _messages.MessageField('NetworkInterface', 10, repeated=True)
-  reservationAffinity = _messages.MessageField('ReservationAffinity', 11)
-  scheduling = _messages.MessageField('Scheduling', 12)
-  serviceAccounts = _messages.MessageField('ServiceAccount', 13, repeated=True)
-  shieldedInstanceConfig = _messages.MessageField('ShieldedInstanceConfig', 14)
-  shieldedVmConfig = _messages.MessageField('ShieldedVmConfig', 15)
-  tags = _messages.MessageField('Tags', 16)
+  privateIpv6GoogleAccess = _messages.EnumField('PrivateIpv6GoogleAccessValueValuesEnum', 11)
+  reservationAffinity = _messages.MessageField('ReservationAffinity', 12)
+  resourcePolicies = _messages.StringField(13, repeated=True)
+  scheduling = _messages.MessageField('Scheduling', 14)
+  serviceAccounts = _messages.MessageField('ServiceAccount', 15, repeated=True)
+  shieldedInstanceConfig = _messages.MessageField('ShieldedInstanceConfig', 16)
+  shieldedVmConfig = _messages.MessageField('ShieldedVmConfig', 17)
+  tags = _messages.MessageField('Tags', 18)
 
 
 class InstanceReference(_messages.Message):
@@ -27647,7 +29763,7 @@ class InstanceTemplate(_messages.Message):
   r"""Represents an Instance Template resource.  You can use instance
   templates to create VM instances and managed instance groups. For more
   information, read Instance Templates. (== resource_for
-  beta.instanceTemplates ==) (== resource_for v1.instanceTemplates ==)
+  {$api_version}.instanceTemplates ==)
 
   Fields:
     creationTimestamp: [Output Only] The creation timestamp for this instance
@@ -27830,6 +29946,7 @@ class InstanceWithNamedPorts(_messages.Message):
     r"""[Output Only] The status of the instance.
 
     Values:
+      DEPROVISIONING: <no description>
       PROVISIONING: <no description>
       REPAIRING: <no description>
       RUNNING: <no description>
@@ -27840,19 +29957,65 @@ class InstanceWithNamedPorts(_messages.Message):
       SUSPENDING: <no description>
       TERMINATED: <no description>
     """
-    PROVISIONING = 0
-    REPAIRING = 1
-    RUNNING = 2
-    STAGING = 3
-    STOPPED = 4
-    STOPPING = 5
-    SUSPENDED = 6
-    SUSPENDING = 7
-    TERMINATED = 8
+    DEPROVISIONING = 0
+    PROVISIONING = 1
+    REPAIRING = 2
+    RUNNING = 3
+    STAGING = 4
+    STOPPED = 5
+    STOPPING = 6
+    SUSPENDED = 7
+    SUSPENDING = 8
+    TERMINATED = 9
 
   instance = _messages.StringField(1)
   namedPorts = _messages.MessageField('NamedPort', 2, repeated=True)
   status = _messages.EnumField('StatusValueValuesEnum', 3)
+
+
+class InstancesAddResourcePoliciesRequest(_messages.Message):
+  r"""A InstancesAddResourcePoliciesRequest object.
+
+  Fields:
+    resourcePolicies: Resource policies to be added to this instance.
+  """
+
+  resourcePolicies = _messages.StringField(1, repeated=True)
+
+
+class InstancesGetEffectiveFirewallsResponse(_messages.Message):
+  r"""A InstancesGetEffectiveFirewallsResponse object.
+
+  Fields:
+    firewalls: Effective firewalls on the instance.
+    organizationFirewalls: Effective firewalls from organization policies.
+  """
+
+  firewalls = _messages.MessageField('Firewall', 1, repeated=True)
+  organizationFirewalls = _messages.MessageField('InstancesGetEffectiveFirewallsResponseOrganizationFirewallPolicy', 2, repeated=True)
+
+
+class InstancesGetEffectiveFirewallsResponseOrganizationFirewallPolicy(_messages.Message):
+  r"""A pruned SecurityPolicy containing ID and any applicable firewall rules.
+
+  Fields:
+    id: The unique identifier for the security policy. This identifier is
+      defined by the server.
+    rules: The rules that apply to the network.
+  """
+
+  id = _messages.IntegerField(1, variant=_messages.Variant.UINT64)
+  rules = _messages.MessageField('SecurityPolicyRule', 2, repeated=True)
+
+
+class InstancesRemoveResourcePoliciesRequest(_messages.Message):
+  r"""A InstancesRemoveResourcePoliciesRequest object.
+
+  Fields:
+    resourcePolicies: Resource policies to be removed from this instance.
+  """
+
+  resourcePolicies = _messages.StringField(1, repeated=True)
 
 
 class InstancesResumeRequest(_messages.Message):
@@ -28107,7 +30270,7 @@ class Interconnect(_messages.Message):
   r"""Represents an Interconnect resource.  An Interconnect resource is a
   dedicated connection between the GCP network and your on-premises network.
   For more information, read the  Dedicated Interconnect Overview. (==
-  resource_for v1.interconnects ==) (== resource_for beta.interconnects ==)
+  resource_for {$api_version}.interconnects ==)
 
   Enums:
     InterconnectTypeValueValuesEnum: Type of interconnect, which can take one
@@ -28139,9 +30302,9 @@ class Interconnect(_messages.Message):
       this Interconnect.
 
   Messages:
-    LabelsValue: Labels to apply to this Interconnect resource. These can be
-      later modified by the setLabels method. Each label key/value must comply
-      with RFC1035. Label values may be empty.
+    LabelsValue: Labels for this resource. These can only be added or modified
+      by the setLabels method. Each label key/value pair must comply with
+      RFC1035. Label values may be empty.
 
   Fields:
     adminEnabled: Administrative status of the interconnect. When this is set
@@ -28182,8 +30345,8 @@ class Interconnect(_messages.Message):
       change labels, otherwise the request will fail with error 412
       conditionNotMet.  To see the latest fingerprint, make a get() request to
       retrieve an Interconnect.
-    labels: Labels to apply to this Interconnect resource. These can be later
-      modified by the setLabels method. Each label key/value must comply with
+    labels: Labels for this resource. These can only be added or modified by
+      the setLabels method. Each label key/value pair must comply with
       RFC1035. Label values may be empty.
     linkType: Type of link requested, which can take one of the following
       values:  - LINK_TYPE_ETHERNET_10G_LR: A 10G Ethernet with LR optics  -
@@ -28295,9 +30458,9 @@ class Interconnect(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Labels to apply to this Interconnect resource. These can be later
-    modified by the setLabels method. Each label key/value must comply with
-    RFC1035. Label values may be empty.
+    r"""Labels for this resource. These can only be added or modified by the
+    setLabels method. Each label key/value pair must comply with RFC1035.
+    Label values may be empty.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -28350,8 +30513,7 @@ class InterconnectAttachment(_messages.Message):
   Interconnect attachments (VLANS) to connect your Virtual Private Cloud
   networks to your on-premises networks through an Interconnect. For more
   information, read  Creating VLAN Attachments. (== resource_for
-  beta.interconnectAttachments ==) (== resource_for v1.interconnectAttachments
-  ==)
+  {$api_version}.interconnectAttachments ==)
 
   Enums:
     BandwidthValueValuesEnum: Provisioned bandwidth capacity for the
@@ -28402,9 +30564,9 @@ class InterconnectAttachment(_messages.Message):
       attachment to a Partner Interconnect, created by the partner.
 
   Messages:
-    LabelsValue: Labels to apply to this InterconnectAttachment resource.
-      These can be later modified by the setLabels method. Each label
-      key/value must comply with RFC1035. Label values may be empty.
+    LabelsValue: Labels for this resource. These can only be added or modified
+      by the setLabels method. Each label key/value pair must comply with
+      RFC1035. Label values may be empty.
 
   Fields:
     adminEnabled: Determines whether this Attachment will carry packets. Not
@@ -28424,7 +30586,7 @@ class InterconnectAttachment(_messages.Message):
       this attachment. All prefixes must be within link-local address space
       (169.254.0.0/16) and must be /29 or shorter (/28, /27, etc). Google will
       attempt to select an unused /29 from the supplied candidate prefix(es).
-      The request will fail if all possible /29s are in use on Google?s edge.
+      The request will fail if all possible /29s are in use on Google's edge.
       If not supplied, Google will randomly select an unused /29 from all of
       link-local space.
     cloudRouterIpAddress: [Output Only] IPv4 address + prefix length to be
@@ -28461,9 +30623,9 @@ class InterconnectAttachment(_messages.Message):
       to update or change labels, otherwise the request will fail with error
       412 conditionNotMet.  To see the latest fingerprint, make a get()
       request to retrieve an InterconnectAttachment.
-    labels: Labels to apply to this InterconnectAttachment resource. These can
-      be later modified by the setLabels method. Each label key/value must
-      comply with RFC1035. Label values may be empty.
+    labels: Labels for this resource. These can only be added or modified by
+      the setLabels method. Each label key/value pair must comply with
+      RFC1035. Label values may be empty.
     name: Name of the resource. Provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
       Specifically, the name must be 1-63 characters long and match the
@@ -28648,9 +30810,9 @@ class InterconnectAttachment(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Labels to apply to this InterconnectAttachment resource. These can be
-    later modified by the setLabels method. Each label key/value must comply
-    with RFC1035. Label values may be empty.
+    r"""Labels for this resource. These can only be added or modified by the
+    setLabels method. Each label key/value pair must comply with RFC1035.
+    Label values may be empty.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -28986,12 +31148,12 @@ class InterconnectAttachmentPartnerMetadata(_messages.Message):
 
   Fields:
     interconnectName: Plain text name of the Interconnect this attachment is
-      connected to, as displayed in the Partner?s portal. For instance
+      connected to, as displayed in the Partner's portal. For instance
       "Chicago 1". This value may be validated to match approved Partner
       values.
     partnerName: Plain text name of the Partner providing this attachment.
       This value may be validated to match approved Partner values.
-    portalUrl: URL of the Partner?s portal for this Attachment. Partners may
+    portalUrl: URL of the Partner's portal for this Attachment. Partners may
       customise this to be a deep link to the specific resource on the Partner
       portal. This value may be validated to match approved Partner values.
   """
@@ -29149,7 +31311,7 @@ class InterconnectCircuitInfo(_messages.Message):
 
 class InterconnectDiagnostics(_messages.Message):
   r"""Diagnostics information about interconnect, contains detailed and
-  current technical information about Google?s side of the connection.
+  current technical information about Google's side of the connection.
 
   Fields:
     arpCaches: A list of InterconnectDiagnostics.ARPEntry objects, describing
@@ -29188,9 +31350,9 @@ class InterconnectDiagnosticsLinkLACPStatus(_messages.Message):
       This means that the rest of the object should be empty.
 
   Fields:
-    googleSystemId: System ID of the port on Google?s side of the LACP
+    googleSystemId: System ID of the port on Google's side of the LACP
       exchange.
-    neighborSystemId: System ID of the port on the neighbor?s side of the LACP
+    neighborSystemId: System ID of the port on the neighbor's side of the LACP
       exchange.
     state: The state of a LACP link, which can take one of the following
       values:  - ACTIVE: The link is configured and active within the bundle.
@@ -29818,7 +31980,10 @@ class InterconnectsGetDiagnosticsResponse(_messages.Message):
 
 
 class License(_messages.Message):
-  r"""A license resource.
+  r"""Represents a License resource.  A License represents billing and
+  aggregate usage data for public and marketplace images.  Caution This
+  resource is intended for use only by third-party partners who are creating
+  Cloud Marketplace images. (== resource_for {$api_version}.licenses ==)
 
   Fields:
     chargesUseFee: [Output Only] Deprecated. This field no longer reflects
@@ -29854,7 +32019,10 @@ class License(_messages.Message):
 
 
 class LicenseCode(_messages.Message):
-  r"""A LicenseCode object.
+  r"""Represents a License Code resource.  A License Code is a unique
+  identifier used to represent a license resource.  Caution This resource is
+  intended for use only by third-party partners who are creating Cloud
+  Marketplace images. (== resource_for {$api_version}.licenseCodes ==)
 
   Enums:
     StateValueValuesEnum: [Output Only] Current state of this License Code.
@@ -30110,8 +32278,7 @@ class LogConfigCounterOptions(_messages.Message):
   "" (empty string), resulting in a counter with no fields.  Examples: counter
   { metric: "/debug_access_count" field: "iam_principal" } ==> increment
   counter /iam/policy/debug_access_count {iam_principal=[value of
-  IAMContext.principal]}  TODO(b/141846426): Consider supporting "authority"
-  and "iam_principal" fields in the same counter.
+  IAMContext.principal]}
 
   Fields:
     customFields: Custom fields.
@@ -30144,17 +32311,25 @@ class LogConfigDataAccessOptions(_messages.Message):
 
   Enums:
     LogModeValueValuesEnum: Whether Gin logging should happen in a fail-closed
-      manner at the caller. This is relevant only in the LocalIAM
-      implementation, for now.
+      manner at the caller. This is currently supported in the LocalIAM
+      implementation, Stubby C++, and Stubby Java. For Apps Framework, see go
+      /af-audit-logging#failclosed. TODO(b/77591626): Add support for Stubby
+      Go. TODO(b/129671387): Add support for Scaffolding.
 
   Fields:
     logMode: Whether Gin logging should happen in a fail-closed manner at the
-      caller. This is relevant only in the LocalIAM implementation, for now.
+      caller. This is currently supported in the LocalIAM implementation,
+      Stubby C++, and Stubby Java. For Apps Framework, see go/af-audit-
+      logging#failclosed. TODO(b/77591626): Add support for Stubby Go.
+      TODO(b/129671387): Add support for Scaffolding.
   """
 
   class LogModeValueValuesEnum(_messages.Enum):
     r"""Whether Gin logging should happen in a fail-closed manner at the
-    caller. This is relevant only in the LocalIAM implementation, for now.
+    caller. This is currently supported in the LocalIAM implementation, Stubby
+    C++, and Stubby Java. For Apps Framework, see go/af-audit-
+    logging#failclosed. TODO(b/77591626): Add support for Stubby Go.
+    TODO(b/129671387): Add support for Scaffolding.
 
     Values:
       LOG_FAIL_CLOSED: <no description>
@@ -30167,7 +32342,11 @@ class LogConfigDataAccessOptions(_messages.Message):
 
 
 class MachineImage(_messages.Message):
-  r"""Machine image resource.
+  r"""Represents a machine image resource.  A machine image is a Compute
+  Engine resource that stores all the configuration, metadata, permissions,
+  and data from one or more disks required to create a Virtual machine (VM)
+  instance. For more information, see Machine images. (== resource_for
+  {$api_version}.machineImages ==)
 
   Enums:
     StatusValueValuesEnum: [Output Only] The status of the machine image. One
@@ -30384,8 +32563,8 @@ class MachineImageList(_messages.Message):
 class MachineType(_messages.Message):
   r"""Represents a Machine Type resource.  You can use specific machine types
   for your VM instances based on performance and pricing requirements. For
-  more information, read Machine Types. (== resource_for v1.machineTypes ==)
-  (== resource_for beta.machineTypes ==)
+  more information, read Machine Types. (== resource_for
+  {$api_version}.machineTypes ==)
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -30931,6 +33110,7 @@ class ManagedInstance(_messages.Message):
     instance does not exist.
 
     Values:
+      DEPROVISIONING: <no description>
       PROVISIONING: <no description>
       REPAIRING: <no description>
       RUNNING: <no description>
@@ -30941,15 +33121,16 @@ class ManagedInstance(_messages.Message):
       SUSPENDING: <no description>
       TERMINATED: <no description>
     """
-    PROVISIONING = 0
-    REPAIRING = 1
-    RUNNING = 2
-    STAGING = 3
-    STOPPED = 4
-    STOPPING = 5
-    SUSPENDED = 6
-    SUSPENDING = 7
-    TERMINATED = 8
+    DEPROVISIONING = 0
+    PROVISIONING = 1
+    REPAIRING = 2
+    RUNNING = 3
+    STAGING = 4
+    STOPPED = 5
+    STOPPING = 6
+    SUSPENDED = 7
+    SUSPENDING = 8
+    TERMINATED = 9
 
   currentAction = _messages.EnumField('CurrentActionValueValuesEnum', 1)
   id = _messages.IntegerField(2, variant=_messages.Variant.UINT64)
@@ -31184,8 +33365,7 @@ class NamedPort(_messages.Message):
 class Network(_messages.Message):
   r"""Represents a VPC Network resource.  Networks connect resources to each
   other and to the internet. For more information, read Virtual Private Cloud
-  (VPC) Network. (== resource_for v1.networks ==) (== resource_for
-  beta.networks ==)
+  (VPC) Network. (== resource_for {$api_version}.networks ==)
 
   Fields:
     IPv4Range: Deprecated in favor of subnet mode networks. The range of
@@ -31210,9 +33390,9 @@ class Network(_messages.Message):
     name: Name of the resource. Provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
       Specifically, the name must be 1-63 characters long and match the
-      regular expression `[a-z]([-a-z0-9]*[a-z0-9])?. The first character must
-      be a lowercase letter, and all following characters (except for the last
-      character) must be a dash, lowercase letter, or digit. The last
+      regular expression `[a-z]([-a-z0-9]*[a-z0-9])?`. The first character
+      must be a lowercase letter, and all following characters (except for the
+      last character) must be a dash, lowercase letter, or digit. The last
       character must be a lowercase letter or digit.
     peerings: [Output Only] A list of network peerings for the resource.
     routingConfig: The network-level routing configuration for this network.
@@ -31238,9 +33418,16 @@ class Network(_messages.Message):
 
 
 class NetworkEndpoint(_messages.Message):
-  r"""The network endpoint.
+  r"""The network endpoint. Next ID: 7
+
+  Messages:
+    AnnotationsValue: Metadata defined as annotations on the network endpoint.
 
   Fields:
+    annotations: Metadata defined as annotations on the network endpoint.
+    fqdn: Optional fully qualified domain name of network endpoint. This can
+      only be specified when NetworkEndpointGroup.network_endpoint_type is
+      NON_GCP_FQDN_PORT.
     instance: The name for a specific VM instance that the IP address belongs
       to. This is required for network endpoints of type GCE_VM_IP_PORT. The
       instance must be in the same zone of network endpoint group.  The name
@@ -31255,22 +33442,54 @@ class NetworkEndpoint(_messages.Message):
       defaultPort for the network endpoint group will be used.
   """
 
-  instance = _messages.StringField(1)
-  ipAddress = _messages.StringField(2)
-  port = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class AnnotationsValue(_messages.Message):
+    r"""Metadata defined as annotations on the network endpoint.
+
+    Messages:
+      AdditionalProperty: An additional property for a AnnotationsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type AnnotationsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a AnnotationsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  annotations = _messages.MessageField('AnnotationsValue', 1)
+  fqdn = _messages.StringField(2)
+  instance = _messages.StringField(3)
+  ipAddress = _messages.StringField(4)
+  port = _messages.IntegerField(5, variant=_messages.Variant.INT32)
 
 
 class NetworkEndpointGroup(_messages.Message):
   r"""Represents a collection of network endpoints.  For more information read
-  Setting up network endpoint groups in load balancing. (== resource_for
-  v1.networkEndpointGroups ==) (== resource_for beta.networkEndpointGroups ==)
+  Network endpoint groups overview. (== resource_for
+  {$api_version}.networkEndpointGroups ==) Next ID: 21
 
   Enums:
     NetworkEndpointTypeValueValuesEnum: Type of network endpoints in this
-      network endpoint group. Currently the only supported value is
-      GCE_VM_IP_PORT.
+      network endpoint group.
+
+  Messages:
+    AnnotationsValue: Metadata defined as annotations on the network endpoint
+      group.
 
   Fields:
+    annotations: Metadata defined as annotations on the network endpoint
+      group.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     defaultPort: The default port used if the port number is not specified in
@@ -31293,7 +33512,7 @@ class NetworkEndpointGroup(_messages.Message):
     network: The URL of the network to which all network endpoints in the NEG
       belong. Uses "default" project network if unspecified.
     networkEndpointType: Type of network endpoints in this network endpoint
-      group. Currently the only supported value is GCE_VM_IP_PORT.
+      group.
     selfLink: [Output Only] Server-defined URL for the resource.
     size: [Output only] Number of network endpoints in the network endpoint
       group.
@@ -31304,27 +33523,56 @@ class NetworkEndpointGroup(_messages.Message):
   """
 
   class NetworkEndpointTypeValueValuesEnum(_messages.Enum):
-    r"""Type of network endpoints in this network endpoint group. Currently
-    the only supported value is GCE_VM_IP_PORT.
+    r"""Type of network endpoints in this network endpoint group.
 
     Values:
       GCE_VM_IP_PORT: <no description>
+      INTERNET_FQDN_PORT: <no description>
+      INTERNET_IP_PORT: <no description>
     """
     GCE_VM_IP_PORT = 0
+    INTERNET_FQDN_PORT = 1
+    INTERNET_IP_PORT = 2
 
-  creationTimestamp = _messages.StringField(1)
-  defaultPort = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  description = _messages.StringField(3)
-  id = _messages.IntegerField(4, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(5, default=u'compute#networkEndpointGroup')
-  loadBalancer = _messages.MessageField('NetworkEndpointGroupLbNetworkEndpointGroup', 6)
-  name = _messages.StringField(7)
-  network = _messages.StringField(8)
-  networkEndpointType = _messages.EnumField('NetworkEndpointTypeValueValuesEnum', 9)
-  selfLink = _messages.StringField(10)
-  size = _messages.IntegerField(11, variant=_messages.Variant.INT32)
-  subnetwork = _messages.StringField(12)
-  zone = _messages.StringField(13)
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class AnnotationsValue(_messages.Message):
+    r"""Metadata defined as annotations on the network endpoint group.
+
+    Messages:
+      AdditionalProperty: An additional property for a AnnotationsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type AnnotationsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a AnnotationsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  annotations = _messages.MessageField('AnnotationsValue', 1)
+  creationTimestamp = _messages.StringField(2)
+  defaultPort = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  description = _messages.StringField(4)
+  id = _messages.IntegerField(5, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(6, default=u'compute#networkEndpointGroup')
+  loadBalancer = _messages.MessageField('NetworkEndpointGroupLbNetworkEndpointGroup', 7)
+  name = _messages.StringField(8)
+  network = _messages.StringField(9)
+  networkEndpointType = _messages.EnumField('NetworkEndpointTypeValueValuesEnum', 10)
+  selfLink = _messages.StringField(11)
+  size = _messages.IntegerField(12, variant=_messages.Variant.INT32)
+  subnetwork = _messages.StringField(13)
+  zone = _messages.StringField(14)
 
 
 class NetworkEndpointGroupAggregatedList(_messages.Message):
@@ -32128,7 +34376,16 @@ class NetworkPeering(_messages.Message):
       create and manage subnetwork routes between two networks when peering
       state is ACTIVE.
     exportCustomRoutes: Whether to export the custom routes to peer network.
+    exportSubnetRoutesWithPublicIp: Whether subnet routes with public IP range
+      are exported. The default value is true, all subnet routes are exported.
+      The IPv4 special-use ranges
+      (https://en.wikipedia.org/wiki/IPv4#Special_addresses) are always
+      exported to peers and are not controlled by this field.
     importCustomRoutes: Whether to import the custom routes from peer network.
+    importSubnetRoutesWithPublicIp: Whether subnet routes with public IP range
+      are imported. The default value is false. The IPv4 special-use ranges
+      (https://en.wikipedia.org/wiki/IPv4#Special_addresses) are always
+      imported from peers and are not controlled by this field.
     name: Name of this peering. Provided by the client when the peering is
       created. The name must comply with RFC1035. Specifically, the name must
       be 1-63 characters long and match regular expression
@@ -32161,11 +34418,13 @@ class NetworkPeering(_messages.Message):
   autoCreateRoutes = _messages.BooleanField(1)
   exchangeSubnetRoutes = _messages.BooleanField(2)
   exportCustomRoutes = _messages.BooleanField(3)
-  importCustomRoutes = _messages.BooleanField(4)
-  name = _messages.StringField(5)
-  network = _messages.StringField(6)
-  state = _messages.EnumField('StateValueValuesEnum', 7)
-  stateDetails = _messages.StringField(8)
+  exportSubnetRoutesWithPublicIp = _messages.BooleanField(4)
+  importCustomRoutes = _messages.BooleanField(5)
+  importSubnetRoutesWithPublicIp = _messages.BooleanField(6)
+  name = _messages.StringField(7)
+  network = _messages.StringField(8)
+  state = _messages.EnumField('StateValueValuesEnum', 9)
+  stateDetails = _messages.StringField(10)
 
 
 class NetworkRoutingConfig(_messages.Message):
@@ -32233,6 +34492,31 @@ class NetworksAddPeeringRequest(_messages.Message):
   peerNetwork = _messages.StringField(4)
 
 
+class NetworksGetEffectiveFirewallsResponse(_messages.Message):
+  r"""A NetworksGetEffectiveFirewallsResponse object.
+
+  Fields:
+    firewalls: Effective firewalls on the network.
+    organizationFirewalls: Effective firewalls from organization policies.
+  """
+
+  firewalls = _messages.MessageField('Firewall', 1, repeated=True)
+  organizationFirewalls = _messages.MessageField('NetworksGetEffectiveFirewallsResponseOrganizationFirewallPolicy', 2, repeated=True)
+
+
+class NetworksGetEffectiveFirewallsResponseOrganizationFirewallPolicy(_messages.Message):
+  r"""A pruned SecurityPolicy containing ID and any applicable firewall rules.
+
+  Fields:
+    id: [Output Only] The unique identifier for the security policy. This
+      identifier is defined by the server.
+    rules: The rules that apply to the network.
+  """
+
+  id = _messages.IntegerField(1, variant=_messages.Variant.UINT64)
+  rules = _messages.MessageField('SecurityPolicyRule', 2, repeated=True)
+
+
 class NetworksRemovePeeringRequest(_messages.Message):
   r"""A NetworksRemovePeeringRequest object.
 
@@ -32259,21 +34543,26 @@ class NodeGroup(_messages.Message):
   specific project. Use sole-tenant nodes to keep your instances physically
   separated from instances in other projects, or to group your instances
   together on the same host hardware. For more information, read Sole-tenant
-  nodes. (== resource_for beta.nodeGroups ==) (== resource_for v1.nodeGroups
-  ==) NextID: 16
+  nodes. (== resource_for {$api_version}.nodeGroups ==)
 
   Enums:
+    MaintenancePolicyValueValuesEnum: Specifies how to handle instances when a
+      node in the group undergoes maintenance.
     StatusValueValuesEnum:
 
   Fields:
+    autoscalingPolicy: Specifies how autoscaling should behave.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     description: An optional description of this resource. Provide this
       property when you create the resource.
+    fingerprint: A byte attribute.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
     kind: [Output Only] The type of the resource. Always compute#nodeGroup for
       node group.
+    maintenancePolicy: Specifies how to handle instances when a node in the
+      group undergoes maintenance.
     name: The name of the resource, provided by the client when initially
       creating the resource. The resource name must be 1-63 characters long,
       and comply with RFC1035. Specifically, the name must be 1-63 characters
@@ -32290,6 +34579,21 @@ class NodeGroup(_messages.Message):
       such as us-central1-a.
   """
 
+  class MaintenancePolicyValueValuesEnum(_messages.Enum):
+    r"""Specifies how to handle instances when a node in the group undergoes
+    maintenance.
+
+    Values:
+      DEFAULT: <no description>
+      MAINTENANCE_POLICY_UNSPECIFIED: <no description>
+      MIGRATE_WITHIN_NODE_GROUP: <no description>
+      RESTART_IN_PLACE: <no description>
+    """
+    DEFAULT = 0
+    MAINTENANCE_POLICY_UNSPECIFIED = 1
+    MIGRATE_WITHIN_NODE_GROUP = 2
+    RESTART_IN_PLACE = 3
+
   class StatusValueValuesEnum(_messages.Enum):
     r"""StatusValueValuesEnum enum type.
 
@@ -32304,16 +34608,19 @@ class NodeGroup(_messages.Message):
     INVALID = 2
     READY = 3
 
-  creationTimestamp = _messages.StringField(1)
-  description = _messages.StringField(2)
-  id = _messages.IntegerField(3, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(4, default=u'compute#nodeGroup')
-  name = _messages.StringField(5)
-  nodeTemplate = _messages.StringField(6)
-  selfLink = _messages.StringField(7)
-  size = _messages.IntegerField(8, variant=_messages.Variant.INT32)
-  status = _messages.EnumField('StatusValueValuesEnum', 9)
-  zone = _messages.StringField(10)
+  autoscalingPolicy = _messages.MessageField('NodeGroupAutoscalingPolicy', 1)
+  creationTimestamp = _messages.StringField(2)
+  description = _messages.StringField(3)
+  fingerprint = _messages.BytesField(4)
+  id = _messages.IntegerField(5, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(6, default=u'compute#nodeGroup')
+  maintenancePolicy = _messages.EnumField('MaintenancePolicyValueValuesEnum', 7)
+  name = _messages.StringField(8)
+  nodeTemplate = _messages.StringField(9)
+  selfLink = _messages.StringField(10)
+  size = _messages.IntegerField(11, variant=_messages.Variant.INT32)
+  status = _messages.EnumField('StatusValueValuesEnum', 12)
+  zone = _messages.StringField(13)
 
 
 class NodeGroupAggregatedList(_messages.Message):
@@ -32467,6 +34774,37 @@ class NodeGroupAggregatedList(_messages.Message):
   warning = _messages.MessageField('WarningValue', 6)
 
 
+class NodeGroupAutoscalingPolicy(_messages.Message):
+  r"""A NodeGroupAutoscalingPolicy object.
+
+  Enums:
+    ModeValueValuesEnum: The autoscaling mode.
+
+  Fields:
+    maxNodes: The maximum number of nodes that the group should have.
+    minNodes: The minimum number of nodes that the group should have.
+    mode: The autoscaling mode.
+  """
+
+  class ModeValueValuesEnum(_messages.Enum):
+    r"""The autoscaling mode.
+
+    Values:
+      MODE_UNSPECIFIED: <no description>
+      OFF: <no description>
+      ON: <no description>
+      ONLY_SCALE_OUT: <no description>
+    """
+    MODE_UNSPECIFIED = 0
+    OFF = 1
+    ON = 2
+    ONLY_SCALE_OUT = 3
+
+  maxNodes = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  minNodes = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  mode = _messages.EnumField('ModeValueValuesEnum', 3)
+
+
 class NodeGroupList(_messages.Message):
   r"""Contains a list of nodeGroups.
 
@@ -32596,15 +34934,30 @@ class NodeGroupNode(_messages.Message):
   r"""A NodeGroupNode object.
 
   Enums:
+    CpuOvercommitTypeValueValuesEnum: CPU overcommit.
     StatusValueValuesEnum:
 
   Fields:
+    cpuOvercommitType: CPU overcommit.
     instances: Instances scheduled on this node.
     name: The name of the node.
     nodeType: The type of this node.
     serverBinding: Binding properties for the physical server.
+    serverId: Server ID associated with this node.
     status: A StatusValueValuesEnum attribute.
   """
+
+  class CpuOvercommitTypeValueValuesEnum(_messages.Enum):
+    r"""CPU overcommit.
+
+    Values:
+      CPU_OVERCOMMIT_TYPE_UNSPECIFIED: <no description>
+      ENABLED: <no description>
+      NONE: <no description>
+    """
+    CPU_OVERCOMMIT_TYPE_UNSPECIFIED = 0
+    ENABLED = 1
+    NONE = 2
 
   class StatusValueValuesEnum(_messages.Enum):
     r"""StatusValueValuesEnum enum type.
@@ -32622,11 +34975,13 @@ class NodeGroupNode(_messages.Message):
     READY = 3
     REPAIRING = 4
 
-  instances = _messages.StringField(1, repeated=True)
-  name = _messages.StringField(2)
-  nodeType = _messages.StringField(3)
-  serverBinding = _messages.MessageField('ServerBinding', 4)
-  status = _messages.EnumField('StatusValueValuesEnum', 5)
+  cpuOvercommitType = _messages.EnumField('CpuOvercommitTypeValueValuesEnum', 1)
+  instances = _messages.StringField(2, repeated=True)
+  name = _messages.StringField(3)
+  nodeType = _messages.StringField(4)
+  serverBinding = _messages.MessageField('ServerBinding', 5)
+  serverId = _messages.StringField(6)
+  status = _messages.EnumField('StatusValueValuesEnum', 7)
 
 
 class NodeGroupsAddNodesRequest(_messages.Message):
@@ -32904,10 +35259,11 @@ class NodeGroupsSetNodeTemplateRequest(_messages.Message):
 class NodeTemplate(_messages.Message):
   r"""Represent a sole-tenant Node Template resource.  You can use a template
   to define properties for nodes in a node group. For more information, read
-  Creating node groups and instances. (== resource_for beta.nodeTemplates ==)
-  (== resource_for v1.nodeTemplates ==) (== NextID: 16 ==)
+  Creating node groups and instances. (== resource_for
+  {$api_version}.nodeTemplates ==) (== NextID: 19 ==)
 
   Enums:
+    CpuOvercommitTypeValueValuesEnum: CPU overcommit.
     StatusValueValuesEnum: [Output Only] The status of the node template. One
       of the following values: CREATING, READY, and DELETING.
 
@@ -32916,6 +35272,7 @@ class NodeTemplate(_messages.Message):
       used in instance scheduling.
 
   Fields:
+    cpuOvercommitType: CPU overcommit.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     description: An optional description of this resource. Provide this
@@ -32952,6 +35309,18 @@ class NodeTemplate(_messages.Message):
     statusMessage: [Output Only] An optional, human-readable explanation of
       the status.
   """
+
+  class CpuOvercommitTypeValueValuesEnum(_messages.Enum):
+    r"""CPU overcommit.
+
+    Values:
+      CPU_OVERCOMMIT_TYPE_UNSPECIFIED: <no description>
+      ENABLED: <no description>
+      NONE: <no description>
+    """
+    CPU_OVERCOMMIT_TYPE_UNSPECIFIED = 0
+    ENABLED = 1
+    NONE = 2
 
   class StatusValueValuesEnum(_messages.Enum):
     r"""[Output Only] The status of the node template. One of the following
@@ -32995,19 +35364,20 @@ class NodeTemplate(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  creationTimestamp = _messages.StringField(1)
-  description = _messages.StringField(2)
-  id = _messages.IntegerField(3, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(4, default=u'compute#nodeTemplate')
-  name = _messages.StringField(5)
-  nodeAffinityLabels = _messages.MessageField('NodeAffinityLabelsValue', 6)
-  nodeType = _messages.StringField(7)
-  nodeTypeFlexibility = _messages.MessageField('NodeTemplateNodeTypeFlexibility', 8)
-  region = _messages.StringField(9)
-  selfLink = _messages.StringField(10)
-  serverBinding = _messages.MessageField('ServerBinding', 11)
-  status = _messages.EnumField('StatusValueValuesEnum', 12)
-  statusMessage = _messages.StringField(13)
+  cpuOvercommitType = _messages.EnumField('CpuOvercommitTypeValueValuesEnum', 1)
+  creationTimestamp = _messages.StringField(2)
+  description = _messages.StringField(3)
+  id = _messages.IntegerField(4, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(5, default=u'compute#nodeTemplate')
+  name = _messages.StringField(6)
+  nodeAffinityLabels = _messages.MessageField('NodeAffinityLabelsValue', 7)
+  nodeType = _messages.StringField(8)
+  nodeTypeFlexibility = _messages.MessageField('NodeTemplateNodeTypeFlexibility', 9)
+  region = _messages.StringField(10)
+  selfLink = _messages.StringField(11)
+  serverBinding = _messages.MessageField('ServerBinding', 12)
+  status = _messages.EnumField('StatusValueValuesEnum', 13)
+  statusMessage = _messages.StringField(14)
 
 
 class NodeTemplateAggregatedList(_messages.Message):
@@ -33422,7 +35792,7 @@ class NodeType(_messages.Message):
   and memory for that node. Currently, the only available node type is
   n1-node-96-624 node type that has 96 vCPUs and 624 GB of memory, available
   in multiple zones. For more information read Node types. (== resource_for
-  beta.nodeTypes ==) (== resource_for v1.nodeTypes ==)
+  {$api_version}.nodeTypes ==)
 
   Fields:
     cpuPlatform: [Output Only] The CPU platform used by this node type.
@@ -33852,21 +36222,218 @@ class NodeTypesScopedList(_messages.Message):
   warning = _messages.MessageField('WarningValue', 2)
 
 
+class NotificationEndpoint(_messages.Message):
+  r"""A notification endpoint resource defines an endpoint to receive
+  notifications when there are status changes detected by the associated
+  health check service.
+
+  Fields:
+    creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+      format.
+    description: An optional description of this resource. Provide this
+      property when you create the resource.
+    grpcSettings: Settings of the gRPC notification endpoint including the
+      endpoint URL and the retry duration.
+    id: [Output Only] A unique identifier for this resource type. The server
+      generates this identifier.
+    kind: [Output Only] Type of the resource. Always
+      compute#notificationEndpoint for notification endpoints.
+    name: Name of the resource. Provided by the client when the resource is
+      created. The name must be 1-63 characters long, and comply with RFC1035.
+      Specifically, the name must be 1-63 characters long and match the
+      regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first
+      character must be a lowercase letter, and all following characters must
+      be a dash, lowercase letter, or digit, except the last character, which
+      cannot be a dash.
+    region: [Output Only] URL of the region where the notification endpoint
+      resides. This field applies only to the regional resource. You must
+      specify this field as part of the HTTP request URL. It is not settable
+      as a field in the request body.
+    selfLink: [Output Only] Server-defined URL for the resource.
+  """
+
+  creationTimestamp = _messages.StringField(1)
+  description = _messages.StringField(2)
+  grpcSettings = _messages.MessageField('NotificationEndpointGrpcSettings', 3)
+  id = _messages.IntegerField(4, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(5, default=u'compute#notificationEndpoint')
+  name = _messages.StringField(6)
+  region = _messages.StringField(7)
+  selfLink = _messages.StringField(8)
+
+
+class NotificationEndpointGrpcSettings(_messages.Message):
+  r"""Represents a gRPC setting that describes one gRPC notification endpoint
+  and the retry duration attempting to send notification to this endpoint.
+
+  Fields:
+    authority: Optional. If specified, this field is used to set the authority
+      header by the sender of notifications. See
+      https://tools.ietf.org/html/rfc7540#section-8.1.2.3
+    endpoint: Endpoint to which gRPC notifications are sent. This must be a
+      valid gRPCLB DNS name.
+    payloadName: Optional. If specified, this field is used to populate the
+      "name" field in gRPC requests.
+    resendInterval: Optional. This field is used to configure how often to
+      send a full update of all non-healthy backends. If unspecified, full
+      updates are not sent. If specified, must be in the range between 600
+      seconds to 3600 seconds. Nanos are disallowed.
+    retryDurationSec: How much time (in seconds) is spent attempting
+      notification retries until a successful response is received. Default is
+      30s. Limit is 20m (1200s). Must be a positive number.
+  """
+
+  authority = _messages.StringField(1)
+  endpoint = _messages.StringField(2)
+  payloadName = _messages.StringField(3)
+  resendInterval = _messages.MessageField('Duration', 4)
+  retryDurationSec = _messages.IntegerField(5, variant=_messages.Variant.UINT32)
+
+
+class NotificationEndpointList(_messages.Message):
+  r"""A NotificationEndpointList object.
+
+  Messages:
+    WarningValue: [Output Only] Informational warning message.
+
+  Fields:
+    id: [Output Only] Unique identifier for the resource; defined by the
+      server.
+    items: A list of NotificationEndpoint resources.
+    kind: [Output Only] Type of the resource. Always
+      compute#notificationEndpoint for notification endpoints.
+    nextPageToken: [Output Only] This token allows you to get the next page of
+      results for list requests. If the number of results is larger than
+      maxResults, use the nextPageToken as a value for the query parameter
+      pageToken in the next list request. Subsequent list requests will have
+      their own nextPageToken to continue paging through the results.
+    selfLink: [Output Only] Server-defined URL for this resource.
+    warning: [Output Only] Informational warning message.
+  """
+
+  class WarningValue(_messages.Message):
+    r"""[Output Only] Informational warning message.
+
+    Enums:
+      CodeValueValuesEnum: [Output Only] A warning code, if applicable. For
+        example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no
+        results in the response.
+
+    Messages:
+      DataValueListEntry: A DataValueListEntry object.
+
+    Fields:
+      code: [Output Only] A warning code, if applicable. For example, Compute
+        Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+        response.
+      data: [Output Only] Metadata about this warning in key: value format.
+        For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" }
+      message: [Output Only] A human-readable description of the warning code.
+    """
+
+    class CodeValueValuesEnum(_messages.Enum):
+      r"""[Output Only] A warning code, if applicable. For example, Compute
+      Engine returns NO_RESULTS_ON_PAGE if there are no results in the
+      response.
+
+      Values:
+        CLEANUP_FAILED: <no description>
+        DEPRECATED_RESOURCE_USED: <no description>
+        DEPRECATED_TYPE_USED: <no description>
+        DISK_SIZE_LARGER_THAN_IMAGE_SIZE: <no description>
+        EXPERIMENTAL_TYPE_USED: <no description>
+        EXTERNAL_API_WARNING: <no description>
+        FIELD_VALUE_OVERRIDEN: <no description>
+        INJECTED_KERNELS_DEPRECATED: <no description>
+        MISSING_TYPE_DEPENDENCY: <no description>
+        NEXT_HOP_ADDRESS_NOT_ASSIGNED: <no description>
+        NEXT_HOP_CANNOT_IP_FORWARD: <no description>
+        NEXT_HOP_INSTANCE_NOT_FOUND: <no description>
+        NEXT_HOP_INSTANCE_NOT_ON_NETWORK: <no description>
+        NEXT_HOP_NOT_RUNNING: <no description>
+        NOT_CRITICAL_ERROR: <no description>
+        NO_RESULTS_ON_PAGE: <no description>
+        REQUIRED_TOS_AGREEMENT: <no description>
+        RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING: <no description>
+        RESOURCE_NOT_DELETED: <no description>
+        SCHEMA_VALIDATION_IGNORED: <no description>
+        SINGLE_INSTANCE_PROPERTY_TEMPLATE: <no description>
+        UNDECLARED_PROPERTIES: <no description>
+        UNREACHABLE: <no description>
+      """
+      CLEANUP_FAILED = 0
+      DEPRECATED_RESOURCE_USED = 1
+      DEPRECATED_TYPE_USED = 2
+      DISK_SIZE_LARGER_THAN_IMAGE_SIZE = 3
+      EXPERIMENTAL_TYPE_USED = 4
+      EXTERNAL_API_WARNING = 5
+      FIELD_VALUE_OVERRIDEN = 6
+      INJECTED_KERNELS_DEPRECATED = 7
+      MISSING_TYPE_DEPENDENCY = 8
+      NEXT_HOP_ADDRESS_NOT_ASSIGNED = 9
+      NEXT_HOP_CANNOT_IP_FORWARD = 10
+      NEXT_HOP_INSTANCE_NOT_FOUND = 11
+      NEXT_HOP_INSTANCE_NOT_ON_NETWORK = 12
+      NEXT_HOP_NOT_RUNNING = 13
+      NOT_CRITICAL_ERROR = 14
+      NO_RESULTS_ON_PAGE = 15
+      REQUIRED_TOS_AGREEMENT = 16
+      RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING = 17
+      RESOURCE_NOT_DELETED = 18
+      SCHEMA_VALIDATION_IGNORED = 19
+      SINGLE_INSTANCE_PROPERTY_TEMPLATE = 20
+      UNDECLARED_PROPERTIES = 21
+      UNREACHABLE = 22
+
+    class DataValueListEntry(_messages.Message):
+      r"""A DataValueListEntry object.
+
+      Fields:
+        key: [Output Only] A key that provides more detail on the warning
+          being returned. For example, for warnings where there are no results
+          in a list request for a particular zone, this key might be scope and
+          the key value might be the zone name. Other examples might be a key
+          indicating a deprecated resource and a suggested replacement, or a
+          warning about invalid network settings (for example, if an instance
+          attempts to perform IP forwarding but is not enabled for IP
+          forwarding).
+        value: [Output Only] A warning data value corresponding to the key.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    code = _messages.EnumField('CodeValueValuesEnum', 1)
+    data = _messages.MessageField('DataValueListEntry', 2, repeated=True)
+    message = _messages.StringField(3)
+
+  id = _messages.StringField(1)
+  items = _messages.MessageField('NotificationEndpoint', 2, repeated=True)
+  kind = _messages.StringField(3, default=u'compute#notificationEndpointList')
+  nextPageToken = _messages.StringField(4)
+  selfLink = _messages.StringField(5)
+  warning = _messages.MessageField('WarningValue', 6)
+
+
 class Operation(_messages.Message):
-  r"""Represents an Operation resource.  You can use an operation resource to
-  manage asynchronous API requests. For more information, read Handling API
-  responses.  Operations can be global, regional or zonal.   - For global
-  operations, use the globalOperations resource.  - For regional operations,
-  use the regionOperations resource.  - For zonal operations, use the
-  zonalOperations resource.    For more information, read  Global, Regional,
-  and Zonal Resources. (== resource_for v1.globalOperations ==) (==
-  resource_for beta.globalOperations ==) (== resource_for v1.regionOperations
-  ==) (== resource_for beta.regionOperations ==) (== resource_for
-  v1.zoneOperations ==) (== resource_for beta.zoneOperations ==)
+  r"""Represents an Operation resource.  Google Compute Engine has three
+  Operation resources:  *
+  [Global](/compute/docs/reference/rest/{$api_version}/globalOperations) *
+  [Regional](/compute/docs/reference/rest/{$api_version}/regionOperations) *
+  [Zonal](/compute/docs/reference/rest/{$api_version}/zoneOperations)  You can
+  use an operation resource to manage asynchronous API requests. For more
+  information, read Handling API responses.  Operations can be global,
+  regional or zonal.   - For global operations, use the `globalOperations`
+  resource.  - For regional operations, use the `regionOperations` resource.
+  - For zonal operations, use the `zonalOperations` resource.    For more
+  information, read  Global, Regional, and Zonal Resources. (== resource_for
+  {$api_version}.globalOperations ==) (== resource_for
+  {$api_version}.regionOperations ==) (== resource_for
+  {$api_version}.zoneOperations ==)
 
   Enums:
     StatusValueValuesEnum: [Output Only] The status of the operation, which
-      can be one of the following: PENDING, RUNNING, or DONE.
+      can be one of the following: `PENDING`, `RUNNING`, or `DONE`.
 
   Messages:
     ErrorValue: [Output Only] If errors are generated during processing of the
@@ -33884,19 +36451,19 @@ class Operation(_messages.Message):
     error: [Output Only] If errors are generated during processing of the
       operation, this field will be populated.
     httpErrorMessage: [Output Only] If the operation fails, this field
-      contains the HTTP error message that was returned, such as NOT FOUND.
+      contains the HTTP error message that was returned, such as `NOT FOUND`.
     httpErrorStatusCode: [Output Only] If the operation fails, this field
       contains the HTTP error status code that was returned. For example, a
-      404 means the resource was not found.
+      `404` means the resource was not found.
     id: [Output Only] The unique identifier for the operation. This identifier
       is defined by the server.
     insertTime: [Output Only] The time that this operation was requested. This
       value is in RFC3339 text format.
-    kind: [Output Only] Type of the resource. Always compute#operation for
+    kind: [Output Only] Type of the resource. Always `compute#operation` for
       Operation resources.
     name: [Output Only] Name of the operation.
-    operationType: [Output Only] The type of operation, such as insert,
-      update, or delete, and so on.
+    operationType: [Output Only] The type of operation, such as `insert`,
+      `update`, or `delete`, and so on.
     progress: [Output Only] An optional progress indicator that ranges from 0
       to 100. There is no requirement that this be linear or support any
       granularity of operations. This should not be used to guess when the
@@ -33908,7 +36475,7 @@ class Operation(_messages.Message):
     startTime: [Output Only] The time that this operation was started by the
       server. This value is in RFC3339 text format.
     status: [Output Only] The status of the operation, which can be one of the
-      following: PENDING, RUNNING, or DONE.
+      following: `PENDING`, `RUNNING`, or `DONE`.
     statusMessage: [Output Only] An optional textual description of the
       current status of the operation.
     targetId: [Output Only] The unique target ID, which identifies a specific
@@ -33917,7 +36484,7 @@ class Operation(_messages.Message):
       modifies. For operations related to creating a snapshot, this points to
       the persistent disk that the snapshot was created from.
     user: [Output Only] User who requested the operation, for example:
-      user@example.com.
+      `user@example.com`.
     warnings: [Output Only] If warning messages are generated during
       processing of the operation, this field will be populated.
     zone: [Output Only] The URL of the zone where the operation resides. Only
@@ -33926,7 +36493,7 @@ class Operation(_messages.Message):
 
   class StatusValueValuesEnum(_messages.Enum):
     r"""[Output Only] The status of the operation, which can be one of the
-    following: PENDING, RUNNING, or DONE.
+    following: `PENDING`, `RUNNING`, or `DONE`.
 
     Values:
       DONE: <no description>
@@ -34098,12 +36665,12 @@ class OperationAggregatedList(_messages.Message):
       is defined by the server.
     items: [Output Only] A map of scoped operation lists.
     kind: [Output Only] Type of resource. Always
-      compute#operationAggregatedList for aggregated lists of operations.
+      `compute#operationAggregatedList` for aggregated lists of operations.
     nextPageToken: [Output Only] This token allows you to get the next page of
       results for list requests. If the number of results is larger than
-      maxResults, use the nextPageToken as a value for the query parameter
-      pageToken in the next list request. Subsequent list requests will have
-      their own nextPageToken to continue paging through the results.
+      `maxResults`, use the `nextPageToken` as a value for the query parameter
+      `pageToken` in the next list request. Subsequent list requests will have
+      their own `nextPageToken` to continue paging through the results.
     selfLink: [Output Only] Server-defined URL for this resource.
     warning: [Output Only] Informational warning message.
   """
@@ -34247,13 +36814,13 @@ class OperationList(_messages.Message):
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
     items: [Output Only] A list of Operation resources.
-    kind: [Output Only] Type of resource. Always compute#operations for
+    kind: [Output Only] Type of resource. Always `compute#operations` for
       Operations resource.
     nextPageToken: [Output Only] This token allows you to get the next page of
       results for list requests. If the number of results is larger than
-      maxResults, use the nextPageToken as a value for the query parameter
-      pageToken in the next list request. Subsequent list requests will have
-      their own nextPageToken to continue paging through the results.
+      `maxResults`, use the `nextPageToken` as a value for the query parameter
+      `pageToken` in the next list request. Subsequent list requests will have
+      their own `nextPageToken` to continue paging through the results.
     selfLink: [Output Only] Server-defined URL for this resource.
     warning: [Output Only] Informational warning message.
   """
@@ -34474,6 +37041,20 @@ class OperationsScopedList(_messages.Message):
 
   operations = _messages.MessageField('Operation', 1, repeated=True)
   warning = _messages.MessageField('WarningValue', 2)
+
+
+class OrganizationSecurityPoliciesListAssociationsResponse(_messages.Message):
+  r"""A OrganizationSecurityPoliciesListAssociationsResponse object.
+
+  Fields:
+    associations: A list of associations.
+    kind: [Output Only] Type of securityPolicy associations. Always
+      compute#organizationSecurityPoliciesListAssociations for lists of
+      securityPolicy associations.
+  """
+
+  associations = _messages.MessageField('SecurityPolicyAssociation', 1, repeated=True)
+  kind = _messages.StringField(2, default=u'compute#organizationSecurityPoliciesListAssociationsResponse')
 
 
 class OutlierDetection(_messages.Message):
@@ -35205,9 +37786,8 @@ class PathMatcher(_messages.Message):
     routeRules: The list of HTTP route rules. Use this list instead of
       pathRules when advanced route matching and routing actions are desired.
       routeRules are evaluated in order of priority, from the lowest to
-      highest number. Within a given pathMatcher, only one of pathRules or
-      routeRules must be set. routeRules are not supported in UrlMaps intended
-      for External Load balancers.
+      highest number. Within a given pathMatcher, you can set only one of
+      pathRules or routeRules.
   """
 
   defaultRouteAction = _messages.MessageField('HttpRouteAction', 1)
@@ -35259,19 +37839,19 @@ class PerInstanceConfig(_messages.Message):
   r"""A PerInstanceConfig object.
 
   Fields:
-    fingerprint: Fingerprint of this per-instance config. This field may be
-      used in optimistic locking. It will be ignored when inserting a per-
-      instance config. An up-to-date fingerprint must be provided in order to
-      update an existing per-instance config or the field needs to be unset.
-    name: The name of the per-instance config and the corresponding instance.
-      Serves as a merge key during UpdatePerInstanceConfigs operation, i.e. if
-      per-instance config with the same name exists then it will be updated,
-      otherwise a new one will be created for the VM instance with the same
-      name. An attempt to create a per-instance config for a VM instance that
-      either doesn't exist or is not part of the group will result in a
-      failure.
-    preservedState: Intended preserved state for the given instance. Does not
-      contain state generated based on Stateful Policy.
+    fingerprint: Fingerprint of this per-instance config. This field can be
+      used in optimistic locking. It is ignored when inserting a per-instance
+      config. An up-to-date fingerprint must be provided in order to update an
+      existing per-instance config or the field needs to be unset.
+    name: The name of a per-instance config and its corresponding instance.
+      Serves as a merge key during UpdatePerInstanceConfigs operations, that
+      is, if a per-instance config with the same name exists then it will be
+      updated, otherwise a new one will be created for the VM instance with
+      the same name. An attempt to create a per-instance config for a VM
+      instance that either doesn't exist or is not part of the group will
+      result in an error.
+    preservedState: The intended preserved state for the given instance. Does
+      not contain preserved state generated from a stateful policy.
   """
 
   fingerprint = _messages.BytesField(1)
@@ -35280,37 +37860,38 @@ class PerInstanceConfig(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.    A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**  { "bindings": [ { "role":
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.    A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**  { "bindings": [ { "role":
   "roles/resourcemanager.organizationAdmin", "members": [
   "user:mike@example.com", "group:admins@example.com", "domain:google.com",
   "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role":
   "roles/resourcemanager.organizationViewer", "members":
   ["user:eve@example.com"], "condition": { "title": "expirable access",
   "description": "Does not grant access after Sep 2020", "expression":
-  "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ] }  **YAML
-  Example**  bindings: - members: - user:mike@example.com -
-  group:admins@example.com - domain:google.com - serviceAccount:my-project-
-  id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin
-  - members: - user:eve@example.com role:
-  roles/resourcemanager.organizationViewer condition: title: expirable access
-  description: Does not grant access after Sep 2020 expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ], "etag":
+  "BwWWja0YfJA=", "version": 3 }  **YAML example:**  bindings: - members: -
+  user:mike@example.com - group:admins@example.com - domain:google.com -
+  serviceAccount:my-project-id@appspot.gserviceaccount.com role:
+  roles/resourcemanager.organizationAdmin - members: - user:eve@example.com
+  role: roles/resourcemanager.organizationViewer condition: title: expirable
+  access description: Does not grant access after Sep 2020 expression:
+  request.time < timestamp('2020-10-01T00:00:00.000Z') - etag: BwWWja0YfJA= -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
     auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -35318,10 +37899,10 @@ class Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
     iamOwned:
     rules: If more than one rule is specified, the rules are applied in the
       following manner: - All matching LOG rules are always applied. - If any
@@ -35330,15 +37911,20 @@ class Policy(_messages.Message):
       any ALLOW/ALLOW_WITH_LOG rule matches, permission is granted. Logging
       will be applied if one or more matching rule requires logging. -
       Otherwise, if no rule applies, permission is denied.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
   auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
@@ -35486,8 +38072,7 @@ class PreservedStatePreservedDisk(_messages.Message):
 class Project(_messages.Message):
   r"""Represents a Project resource.  A project is used to organize resources
   in a Google Cloud Platform environment. For more information, read about the
-  Resource Hierarchy. (== resource_for v1.projects ==) (== resource_for
-  beta.projects ==)
+  Resource Hierarchy. (== resource_for {$api_version}.projects ==)
 
   Enums:
     DefaultNetworkTierValueValuesEnum: This signifies the default network tier
@@ -35659,6 +38244,7 @@ class Quota(_messages.Message):
     r"""[Output Only] Name of the quota metric.
 
     Values:
+      AFFINITY_GROUPS: <no description>
       AUTOSCALERS: <no description>
       BACKEND_BUCKETS: <no description>
       BACKEND_SERVICES: <no description>
@@ -35666,7 +38252,9 @@ class Quota(_messages.Message):
       COMMITMENTS: <no description>
       COMMITTED_C2_CPUS: <no description>
       COMMITTED_CPUS: <no description>
+      COMMITTED_LICENSES: <no description>
       COMMITTED_LOCAL_SSD_TOTAL_GB: <no description>
+      COMMITTED_N2D_CPUS: <no description>
       COMMITTED_N2_CPUS: <no description>
       COMMITTED_NVIDIA_K80_GPUS: <no description>
       COMMITTED_NVIDIA_P100_GPUS: <no description>
@@ -35692,14 +38280,18 @@ class Quota(_messages.Message):
       INTERCONNECT_ATTACHMENTS_TOTAL_MBPS: <no description>
       INTERCONNECT_TOTAL_GBPS: <no description>
       INTERNAL_ADDRESSES: <no description>
+      IN_PLACE_SNAPSHOTS: <no description>
       IN_USE_ADDRESSES: <no description>
       IN_USE_BACKUP_SCHEDULES: <no description>
       IN_USE_SNAPSHOT_SCHEDULES: <no description>
       LOCAL_SSD_TOTAL_GB: <no description>
       MACHINE_IMAGES: <no description>
+      N2D_CPUS: <no description>
       N2_CPUS: <no description>
       NETWORKS: <no description>
       NETWORK_ENDPOINT_GROUPS: <no description>
+      NODE_GROUPS: <no description>
+      NODE_TEMPLATES: <no description>
       NVIDIA_K80_GPUS: <no description>
       NVIDIA_P100_GPUS: <no description>
       NVIDIA_P100_VWS_GPUS: <no description>
@@ -35708,6 +38300,7 @@ class Quota(_messages.Message):
       NVIDIA_T4_GPUS: <no description>
       NVIDIA_T4_VWS_GPUS: <no description>
       NVIDIA_V100_GPUS: <no description>
+      PACKET_MIRRORINGS: <no description>
       PREEMPTIBLE_CPUS: <no description>
       PREEMPTIBLE_LOCAL_SSD_GB: <no description>
       PREEMPTIBLE_NVIDIA_K80_GPUS: <no description>
@@ -35719,6 +38312,8 @@ class Quota(_messages.Message):
       PREEMPTIBLE_NVIDIA_T4_VWS_GPUS: <no description>
       PREEMPTIBLE_NVIDIA_V100_GPUS: <no description>
       PRIVATE_V6_ACCESS_SUBNETWORKS: <no description>
+      PUBLIC_ADVERTISED_PREFIXES: <no description>
+      PUBLIC_DELEGATED_PREFIXES: <no description>
       REGIONAL_AUTOSCALERS: <no description>
       REGIONAL_INSTANCE_GROUP_MANAGERS: <no description>
       RESERVATIONS: <no description>
@@ -35732,6 +38327,7 @@ class Quota(_messages.Message):
       SSD_TOTAL_GB: <no description>
       SSL_CERTIFICATES: <no description>
       STATIC_ADDRESSES: <no description>
+      STATIC_BYOIP_ADDRESSES: <no description>
       SUBNETWORKS: <no description>
       TARGET_HTTPS_PROXIES: <no description>
       TARGET_HTTP_PROXIES: <no description>
@@ -35744,90 +38340,101 @@ class Quota(_messages.Message):
       VPN_GATEWAYS: <no description>
       VPN_TUNNELS: <no description>
     """
-    AUTOSCALERS = 0
-    BACKEND_BUCKETS = 1
-    BACKEND_SERVICES = 2
-    C2_CPUS = 3
-    COMMITMENTS = 4
-    COMMITTED_C2_CPUS = 5
-    COMMITTED_CPUS = 6
-    COMMITTED_LOCAL_SSD_TOTAL_GB = 7
-    COMMITTED_N2_CPUS = 8
-    COMMITTED_NVIDIA_K80_GPUS = 9
-    COMMITTED_NVIDIA_P100_GPUS = 10
-    COMMITTED_NVIDIA_P4_GPUS = 11
-    COMMITTED_NVIDIA_T4_GPUS = 12
-    COMMITTED_NVIDIA_V100_GPUS = 13
-    CPUS = 14
-    CPUS_ALL_REGIONS = 15
-    DISKS_TOTAL_GB = 16
-    EXTERNAL_VPN_GATEWAYS = 17
-    FIREWALLS = 18
-    FORWARDING_RULES = 19
-    GLOBAL_INTERNAL_ADDRESSES = 20
-    GPUS_ALL_REGIONS = 21
-    HEALTH_CHECKS = 22
-    IMAGES = 23
-    INSTANCES = 24
-    INSTANCE_GROUPS = 25
-    INSTANCE_GROUP_MANAGERS = 26
-    INSTANCE_TEMPLATES = 27
-    INTERCONNECTS = 28
-    INTERCONNECT_ATTACHMENTS_PER_REGION = 29
-    INTERCONNECT_ATTACHMENTS_TOTAL_MBPS = 30
-    INTERCONNECT_TOTAL_GBPS = 31
-    INTERNAL_ADDRESSES = 32
-    IN_USE_ADDRESSES = 33
-    IN_USE_BACKUP_SCHEDULES = 34
-    IN_USE_SNAPSHOT_SCHEDULES = 35
-    LOCAL_SSD_TOTAL_GB = 36
-    MACHINE_IMAGES = 37
-    N2_CPUS = 38
-    NETWORKS = 39
-    NETWORK_ENDPOINT_GROUPS = 40
-    NVIDIA_K80_GPUS = 41
-    NVIDIA_P100_GPUS = 42
-    NVIDIA_P100_VWS_GPUS = 43
-    NVIDIA_P4_GPUS = 44
-    NVIDIA_P4_VWS_GPUS = 45
-    NVIDIA_T4_GPUS = 46
-    NVIDIA_T4_VWS_GPUS = 47
-    NVIDIA_V100_GPUS = 48
-    PREEMPTIBLE_CPUS = 49
-    PREEMPTIBLE_LOCAL_SSD_GB = 50
-    PREEMPTIBLE_NVIDIA_K80_GPUS = 51
-    PREEMPTIBLE_NVIDIA_P100_GPUS = 52
-    PREEMPTIBLE_NVIDIA_P100_VWS_GPUS = 53
-    PREEMPTIBLE_NVIDIA_P4_GPUS = 54
-    PREEMPTIBLE_NVIDIA_P4_VWS_GPUS = 55
-    PREEMPTIBLE_NVIDIA_T4_GPUS = 56
-    PREEMPTIBLE_NVIDIA_T4_VWS_GPUS = 57
-    PREEMPTIBLE_NVIDIA_V100_GPUS = 58
-    PRIVATE_V6_ACCESS_SUBNETWORKS = 59
-    REGIONAL_AUTOSCALERS = 60
-    REGIONAL_INSTANCE_GROUP_MANAGERS = 61
-    RESERVATIONS = 62
-    RESOURCE_POLICIES = 63
-    ROUTERS = 64
-    ROUTES = 65
-    SECURITY_POLICIES = 66
-    SECURITY_POLICY_CEVAL_RULES = 67
-    SECURITY_POLICY_RULES = 68
-    SNAPSHOTS = 69
-    SSD_TOTAL_GB = 70
-    SSL_CERTIFICATES = 71
-    STATIC_ADDRESSES = 72
-    SUBNETWORKS = 73
-    TARGET_HTTPS_PROXIES = 74
-    TARGET_HTTP_PROXIES = 75
-    TARGET_INSTANCES = 76
-    TARGET_POOLS = 77
-    TARGET_SSL_PROXIES = 78
-    TARGET_TCP_PROXIES = 79
-    TARGET_VPN_GATEWAYS = 80
-    URL_MAPS = 81
-    VPN_GATEWAYS = 82
-    VPN_TUNNELS = 83
+    AFFINITY_GROUPS = 0
+    AUTOSCALERS = 1
+    BACKEND_BUCKETS = 2
+    BACKEND_SERVICES = 3
+    C2_CPUS = 4
+    COMMITMENTS = 5
+    COMMITTED_C2_CPUS = 6
+    COMMITTED_CPUS = 7
+    COMMITTED_LICENSES = 8
+    COMMITTED_LOCAL_SSD_TOTAL_GB = 9
+    COMMITTED_N2D_CPUS = 10
+    COMMITTED_N2_CPUS = 11
+    COMMITTED_NVIDIA_K80_GPUS = 12
+    COMMITTED_NVIDIA_P100_GPUS = 13
+    COMMITTED_NVIDIA_P4_GPUS = 14
+    COMMITTED_NVIDIA_T4_GPUS = 15
+    COMMITTED_NVIDIA_V100_GPUS = 16
+    CPUS = 17
+    CPUS_ALL_REGIONS = 18
+    DISKS_TOTAL_GB = 19
+    EXTERNAL_VPN_GATEWAYS = 20
+    FIREWALLS = 21
+    FORWARDING_RULES = 22
+    GLOBAL_INTERNAL_ADDRESSES = 23
+    GPUS_ALL_REGIONS = 24
+    HEALTH_CHECKS = 25
+    IMAGES = 26
+    INSTANCES = 27
+    INSTANCE_GROUPS = 28
+    INSTANCE_GROUP_MANAGERS = 29
+    INSTANCE_TEMPLATES = 30
+    INTERCONNECTS = 31
+    INTERCONNECT_ATTACHMENTS_PER_REGION = 32
+    INTERCONNECT_ATTACHMENTS_TOTAL_MBPS = 33
+    INTERCONNECT_TOTAL_GBPS = 34
+    INTERNAL_ADDRESSES = 35
+    IN_PLACE_SNAPSHOTS = 36
+    IN_USE_ADDRESSES = 37
+    IN_USE_BACKUP_SCHEDULES = 38
+    IN_USE_SNAPSHOT_SCHEDULES = 39
+    LOCAL_SSD_TOTAL_GB = 40
+    MACHINE_IMAGES = 41
+    N2D_CPUS = 42
+    N2_CPUS = 43
+    NETWORKS = 44
+    NETWORK_ENDPOINT_GROUPS = 45
+    NODE_GROUPS = 46
+    NODE_TEMPLATES = 47
+    NVIDIA_K80_GPUS = 48
+    NVIDIA_P100_GPUS = 49
+    NVIDIA_P100_VWS_GPUS = 50
+    NVIDIA_P4_GPUS = 51
+    NVIDIA_P4_VWS_GPUS = 52
+    NVIDIA_T4_GPUS = 53
+    NVIDIA_T4_VWS_GPUS = 54
+    NVIDIA_V100_GPUS = 55
+    PACKET_MIRRORINGS = 56
+    PREEMPTIBLE_CPUS = 57
+    PREEMPTIBLE_LOCAL_SSD_GB = 58
+    PREEMPTIBLE_NVIDIA_K80_GPUS = 59
+    PREEMPTIBLE_NVIDIA_P100_GPUS = 60
+    PREEMPTIBLE_NVIDIA_P100_VWS_GPUS = 61
+    PREEMPTIBLE_NVIDIA_P4_GPUS = 62
+    PREEMPTIBLE_NVIDIA_P4_VWS_GPUS = 63
+    PREEMPTIBLE_NVIDIA_T4_GPUS = 64
+    PREEMPTIBLE_NVIDIA_T4_VWS_GPUS = 65
+    PREEMPTIBLE_NVIDIA_V100_GPUS = 66
+    PRIVATE_V6_ACCESS_SUBNETWORKS = 67
+    PUBLIC_ADVERTISED_PREFIXES = 68
+    PUBLIC_DELEGATED_PREFIXES = 69
+    REGIONAL_AUTOSCALERS = 70
+    REGIONAL_INSTANCE_GROUP_MANAGERS = 71
+    RESERVATIONS = 72
+    RESOURCE_POLICIES = 73
+    ROUTERS = 74
+    ROUTES = 75
+    SECURITY_POLICIES = 76
+    SECURITY_POLICY_CEVAL_RULES = 77
+    SECURITY_POLICY_RULES = 78
+    SNAPSHOTS = 79
+    SSD_TOTAL_GB = 80
+    SSL_CERTIFICATES = 81
+    STATIC_ADDRESSES = 82
+    STATIC_BYOIP_ADDRESSES = 83
+    SUBNETWORKS = 84
+    TARGET_HTTPS_PROXIES = 85
+    TARGET_HTTP_PROXIES = 86
+    TARGET_INSTANCES = 87
+    TARGET_POOLS = 88
+    TARGET_SSL_PROXIES = 89
+    TARGET_TCP_PROXIES = 90
+    TARGET_VPN_GATEWAYS = 91
+    URL_MAPS = 92
+    VPN_GATEWAYS = 93
+    VPN_TUNNELS = 94
 
   limit = _messages.FloatField(1)
   metric = _messages.EnumField('MetricValueValuesEnum', 2)
@@ -35856,7 +38463,7 @@ class Reference(_messages.Message):
 class Region(_messages.Message):
   r"""Represents a Region resource.  A region is a geographical area where a
   resource is located. For more information, read Regions and Zones. (==
-  resource_for beta.regions ==) (== resource_for v1.regions ==)
+  resource_for {$api_version}.regions ==)
 
   Enums:
     StatusValueValuesEnum: [Output Only] Status of the region, either UP or
@@ -36030,7 +38637,7 @@ class RegionCommitmentsUpdateReservationsRequest(_messages.Message):
   r"""A RegionCommitmentsUpdateReservationsRequest object.
 
   Fields:
-    reservations: List of two reservations to transfer GPUs and local SSD
+    reservations: A list of two reservations to transfer GPUs and local SSD
       between.
   """
 
@@ -37191,7 +39798,7 @@ class Reservation(_messages.Message):
   r"""Represents a reservation resource. A reservation ensures that capacity
   is held in a specific zone even if the reserved VMs are not running. For
   more information, read  Reserving zonal resources. (== resource_for
-  beta.reservations ==) (== resource_for v1.reservations ==)
+  {$api_version}.reservations ==)
 
   Enums:
     StatusValueValuesEnum: [Output Only] The status of the reservation.
@@ -37285,12 +39892,14 @@ class ReservationAffinity(_messages.Message):
       ANY_RESERVATION: <no description>
       NO_RESERVATION: <no description>
       SPECIFIC_RESERVATION: <no description>
+      SPECIFIC_THEN_ANY_RESERVATION: <no description>
       UNSPECIFIED: <no description>
     """
     ANY_RESERVATION = 0
     NO_RESERVATION = 1
     SPECIFIC_RESERVATION = 2
-    UNSPECIFIED = 3
+    SPECIFIC_THEN_ANY_RESERVATION = 3
+    UNSPECIFIED = 4
 
   consumeReservationType = _messages.EnumField('ConsumeReservationTypeValueValuesEnum', 1)
   key = _messages.StringField(2)
@@ -37864,7 +40473,10 @@ class ResourcePoliciesScopedList(_messages.Message):
 
 
 class ResourcePolicy(_messages.Message):
-  r"""A ResourcePolicy object.
+  r"""Represents a Resource Policy resource. You can use resource policies to
+  schedule actions for some Compute Engine resources. For example, you can use
+  them to schedule persistent disk snapshots.  (== resource_for
+  {$api_version}.resourcePolicies ==)
 
   Enums:
     StatusValueValuesEnum: [Output Only] The status of resource policy
@@ -37874,6 +40486,8 @@ class ResourcePolicy(_messages.Message):
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     description: A string attribute.
+    groupPlacementPolicy: Resource policy for instacnes for placement
+      configuration.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
     kind: [Output Only] Type of the resource. Always compute#resource_policies
@@ -37909,13 +40523,14 @@ class ResourcePolicy(_messages.Message):
 
   creationTimestamp = _messages.StringField(1)
   description = _messages.StringField(2)
-  id = _messages.IntegerField(3, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(4, default=u'compute#resourcePolicy')
-  name = _messages.StringField(5)
-  region = _messages.StringField(6)
-  selfLink = _messages.StringField(7)
-  snapshotSchedulePolicy = _messages.MessageField('ResourcePolicySnapshotSchedulePolicy', 8)
-  status = _messages.EnumField('StatusValueValuesEnum', 9)
+  groupPlacementPolicy = _messages.MessageField('ResourcePolicyGroupPlacementPolicy', 3)
+  id = _messages.IntegerField(4, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(5, default=u'compute#resourcePolicy')
+  name = _messages.StringField(6)
+  region = _messages.StringField(7)
+  selfLink = _messages.StringField(8)
+  snapshotSchedulePolicy = _messages.MessageField('ResourcePolicySnapshotSchedulePolicy', 9)
+  status = _messages.EnumField('StatusValueValuesEnum', 10)
 
 
 class ResourcePolicyAggregatedList(_messages.Message):
@@ -38074,7 +40689,8 @@ class ResourcePolicyDailyCycle(_messages.Message):
   r"""Time window specified for daily operations.
 
   Fields:
-    daysInCycle: Defines a schedule that runs every nth day of the month.
+    daysInCycle: Defines a schedule with units measured in months. The value
+      determines how many months pass between the start of each cycle.
     duration: [Output only] A predetermined duration for the window,
       automatically chosen to be the smallest possible in the given scenario.
     startTime: Start time of the window. This must be in UTC format that
@@ -38087,13 +40703,44 @@ class ResourcePolicyDailyCycle(_messages.Message):
   startTime = _messages.StringField(3)
 
 
+class ResourcePolicyGroupPlacementPolicy(_messages.Message):
+  r"""A GroupPlacementPolicy specifies resource placement configuration. It
+  specifies the failure bucket separation as well as network locality
+
+  Enums:
+    CollocationValueValuesEnum: Specifies network collocation
+
+  Fields:
+    availabilityDomainCount: The number of availability domains instances will
+      be spread across. If two instances are in different availability domain,
+      they will not be put in the same low latency network
+    collocation: Specifies network collocation
+    vmCount: Number of vms in this placement group
+  """
+
+  class CollocationValueValuesEnum(_messages.Enum):
+    r"""Specifies network collocation
+
+    Values:
+      COLLOCATED: <no description>
+      UNSPECIFIED_COLLOCATION: <no description>
+    """
+    COLLOCATED = 0
+    UNSPECIFIED_COLLOCATION = 1
+
+  availabilityDomainCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  collocation = _messages.EnumField('CollocationValueValuesEnum', 2)
+  vmCount = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+
+
 class ResourcePolicyHourlyCycle(_messages.Message):
   r"""Time window specified for hourly operations.
 
   Fields:
     duration: [Output only] Duration of the time window, automatically chosen
       to be smallest possible in the given scenario.
-    hoursInCycle: Allows to define schedule that runs every nth hour.
+    hoursInCycle: Defines a schedule with units measured in hours. The value
+      determines how many hours pass between the start of each cycle.
     startTime: Time within the window to start the operations. It must be in
       format "HH:MM", where HH : [00-23] and MM : [00-00] GMT.
   """
@@ -38303,7 +40950,7 @@ class ResourcePolicySnapshotSchedulePolicySnapshotProperties(_messages.Message):
       modified by the setLabels method. Label values may be empty.
 
   Fields:
-    guestFlush: Indication to perform a ?guest aware? snapshot.
+    guestFlush: Indication to perform a 'guest aware' snapshot.
     labels: Labels to apply to scheduled snapshots. These can be later
       modified by the setLabels method. Label values may be empty.
     storageLocations: Cloud Storage bucket storage location of the auto
@@ -38354,11 +41001,14 @@ class ResourcePolicyWeeklyCycleDayOfWeek(_messages.Message):
   r"""A ResourcePolicyWeeklyCycleDayOfWeek object.
 
   Enums:
-    DayValueValuesEnum: Allows to define schedule that runs specified day of
-      the week.
+    DayValueValuesEnum: Defines a schedule that runs on specific days of the
+      week. Specify one or more days. The following options are available:
+      MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY.
 
   Fields:
-    day: Allows to define schedule that runs specified day of the week.
+    day: Defines a schedule that runs on specific days of the week. Specify
+      one or more days. The following options are available: MONDAY, TUESDAY,
+      WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY.
     duration: [Output only] Duration of the time window, automatically chosen
       to be smallest possible in the given scenario.
     startTime: Time within the window to start the operations. It must be in
@@ -38366,7 +41016,9 @@ class ResourcePolicyWeeklyCycleDayOfWeek(_messages.Message):
   """
 
   class DayValueValuesEnum(_messages.Enum):
-    r"""Allows to define schedule that runs specified day of the week.
+    r"""Defines a schedule that runs on specific days of the week. Specify one
+    or more days. The following options are available: MONDAY, TUESDAY,
+    WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY.
 
     Values:
       FRIDAY: <no description>
@@ -38396,7 +41048,7 @@ class Route(_messages.Message):
   r"""Represents a Route resource.  A route defines a path from VM instances
   in the VPC network to a specific destination. This destination can be inside
   or outside the VPC network. For more information, read the Routes overview.
-  (== resource_for beta.routes ==) (== resource_for v1.routes ==)
+  (== resource_for {$api_version}.routes ==)
 
   Messages:
     WarningsValueListEntry: A WarningsValueListEntry object.
@@ -38939,7 +41591,7 @@ class RouterBgp(_messages.Message):
       which keepalive messages are sent, and the hold time is the maximum
       number of seconds allowed to elapse between successive keepalive
       messages that BGP receives from a peer. BGP will use the smaller of
-      either the local hold time value or the peer?s hold time value as the
+      either the local hold time value or the peer's hold time value as the
       hold time for the BGP connection between the two peers. If set, this
       value must be between 1 and 120. The default is 20.
   """
@@ -39172,11 +41824,12 @@ class RouterInterface(_messages.Message):
       address as it represents the IP address of the interface.
     linkedInterconnectAttachment: URI of the linked Interconnect attachment.
       It must be in the same region as the router. Each interface can have one
-      linked resource, which can be either be a VPN tunnel or an Interconnect
-      attachment.
+      linked resource, which can be a VPN tunnel, an Interconnect attachment,
+      or a virtual machine instance.
     linkedVpnTunnel: URI of the linked VPN tunnel, which must be in the same
       region as the router. Each interface can have one linked resource, which
-      can be either a VPN tunnel or an Interconnect attachment.
+      can be a VPN tunnel, an Interconnect attachment, or a virtual machine
+      instance.
     managementType: [Output Only] The resource that configures and manages
       this interface.  - MANAGED_BY_USER is the default value and can be
       managed directly by users.  - MANAGED_BY_ATTACHMENT is an interface that
@@ -39923,6 +42576,8 @@ class SavedAttachedDisk(_messages.Message):
       instance.
     diskEncryptionKey: The encryption key for the disk.
     diskSizeGb: The size of the disk in base-2 GB.
+    diskType: [Output Only] URL of the disk type resource. For example:
+      projects/project/zones/zone/diskTypes/pd-standard or pd-ssd
     guestOsFeatures: A list of features to enable on the guest operating
       system. Applicable only for bootable images. Read  Enabling guest
       operating system features to see a list of available options.
@@ -39997,20 +42652,21 @@ class SavedAttachedDisk(_messages.Message):
   deviceName = _messages.StringField(3)
   diskEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 4)
   diskSizeGb = _messages.IntegerField(5)
-  guestOsFeatures = _messages.MessageField('GuestOsFeature', 6, repeated=True)
-  index = _messages.IntegerField(7, variant=_messages.Variant.INT32)
-  interface = _messages.EnumField('InterfaceValueValuesEnum', 8)
-  kind = _messages.StringField(9, default=u'compute#savedAttachedDisk')
-  licenses = _messages.StringField(10, repeated=True)
-  mode = _messages.EnumField('ModeValueValuesEnum', 11)
-  source = _messages.StringField(12)
-  storageBytes = _messages.IntegerField(13)
-  storageBytesStatus = _messages.EnumField('StorageBytesStatusValueValuesEnum', 14)
-  type = _messages.EnumField('TypeValueValuesEnum', 15)
+  diskType = _messages.StringField(6)
+  guestOsFeatures = _messages.MessageField('GuestOsFeature', 7, repeated=True)
+  index = _messages.IntegerField(8, variant=_messages.Variant.INT32)
+  interface = _messages.EnumField('InterfaceValueValuesEnum', 9)
+  kind = _messages.StringField(10, default=u'compute#savedAttachedDisk')
+  licenses = _messages.StringField(11, repeated=True)
+  mode = _messages.EnumField('ModeValueValuesEnum', 12)
+  source = _messages.StringField(13)
+  storageBytes = _messages.IntegerField(14)
+  storageBytesStatus = _messages.EnumField('StorageBytesStatusValueValuesEnum', 15)
+  type = _messages.EnumField('TypeValueValuesEnum', 16)
 
 
 class Scheduling(_messages.Message):
-  r"""Sets the scheduling options for an Instance. NextID: 9
+  r"""Sets the scheduling options for an Instance. NextID: 10
 
   Enums:
     OnHostMaintenanceValueValuesEnum: Defines the maintenance behavior for
@@ -40029,7 +42685,8 @@ class Scheduling(_messages.Message):
     minNodeCpus: The minimum number of virtual CPUs this instance will consume
       when running on a sole-tenant node.
     nodeAffinities: A set of node affinity and anti-affinity configurations.
-      Refer to Configuring node affinity for more information.
+      Refer to Configuring node affinity for more information. Overrides
+      reservationAffinity.
     onHostMaintenance: Defines the maintenance behavior for this instance. For
       standard instances, the default behavior is MIGRATE. For preemptible
       instances, the default and only possible behavior is TERMINATE. For more
@@ -40092,6 +42749,19 @@ class SchedulingNodeAffinity(_messages.Message):
   values = _messages.StringField(3, repeated=True)
 
 
+class Screenshot(_messages.Message):
+  r"""An instance's screenshot.
+
+  Fields:
+    contents: [Output Only] The Base64-encoded screenshot data.
+    kind: [Output Only] Type of the resource. Always compute#screenshot for
+      the screenshots.
+  """
+
+  contents = _messages.StringField(1)
+  kind = _messages.StringField(2, default=u'compute#screenshot')
+
+
 class SecurityPoliciesListPreconfiguredExpressionSetsResponse(_messages.Message):
   r"""A SecurityPoliciesListPreconfiguredExpressionSetsResponse object.
 
@@ -40116,19 +42786,33 @@ class SecurityPolicy(_messages.Message):
   r"""Represents a Cloud Armor Security Policy resource.  Only external
   backend services that use load balancers can reference a Security Policy.
   For more information, read  Cloud Armor Security Policy Concepts. (==
-  resource_for v1.securityPolicies ==) (== resource_for beta.securityPolicies
-  ==)
+  resource_for {$api_version}.securityPolicies ==)
+
+  Enums:
+    TypeValueValuesEnum: The type indicates the intended use of the security
+      policy. CLOUD_ARMOR policies apply to backend services. FIREWALL
+      policies apply to organizations.
 
   Messages:
-    LabelsValue: Labels to apply to this security policy resource. These can
-      be later modified by the setLabels method. Each label key/value must
-      comply with RFC1035. Label values may be empty.
+    LabelsValue: Labels for this resource. These can only be added or modified
+      by the setLabels method. Each label key/value pair must comply with
+      RFC1035. Label values may be empty.
 
   Fields:
+    associations: A list of associations that belong to this policy.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     description: An optional description of this resource. Provide this
       property when you create the resource.
+    displayName: User-provided name of the Organization security plicy. The
+      name should be unique in the organization in which the security policy
+      is created. This should only be used when SecurityPolicyType is
+      FIREWALL. The name must be 1-63 characters long, and comply with
+      RFC1035. Specifically, the name must be 1-63 characters long and match
+      the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the
+      first character must be a lowercase letter, and all following characters
+      must be a dash, lowercase letter, or digit, except the last character,
+      which cannot be a dash.
     fingerprint: Specifies a fingerprint for this resource, which is
       essentially a hash of the metadata's contents and used for optimistic
       locking. The fingerprint is initially generated by Compute Engine and
@@ -40148,9 +42832,9 @@ class SecurityPolicy(_messages.Message):
       must always provide an up-to-date fingerprint hash in order to update or
       change labels.  To see the latest fingerprint, make get() request to the
       security policy.
-    labels: Labels to apply to this security policy resource. These can be
-      later modified by the setLabels method. Each label key/value must comply
-      with RFC1035. Label values may be empty.
+    labels: Labels for this resource. These can only be added or modified by
+      the setLabels method. Each label key/value pair must comply with
+      RFC1035. Label values may be empty.
     name: Name of the resource. Provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
       Specifically, the name must be 1-63 characters long and match the
@@ -40158,18 +42842,38 @@ class SecurityPolicy(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
+    parent: [Output Only] The parent of the security policy.
+    ruleTupleCount: [Output Only] Total count of all security policy rule
+      tuples. A security policy can not exceed a set number of tuples.
     rules: A list of rules that belong to this policy. There must always be a
       default rule (rule with priority 2147483647 and match "*"). If no rules
       are provided when creating a security policy, a default rule with action
       "allow" will be added.
     selfLink: [Output Only] Server-defined URL for the resource.
+    selfLinkWithId: [Output Only] Server-defined URL for this resource with
+      the resource id.
+    type: The type indicates the intended use of the security policy.
+      CLOUD_ARMOR policies apply to backend services. FIREWALL policies apply
+      to organizations.
   """
+
+  class TypeValueValuesEnum(_messages.Enum):
+    r"""The type indicates the intended use of the security policy.
+    CLOUD_ARMOR policies apply to backend services. FIREWALL policies apply to
+    organizations.
+
+    Values:
+      CLOUD_ARMOR: <no description>
+      FIREWALL: <no description>
+    """
+    CLOUD_ARMOR = 0
+    FIREWALL = 1
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Labels to apply to this security policy resource. These can be later
-    modified by the setLabels method. Each label key/value must comply with
-    RFC1035. Label values may be empty.
+    r"""Labels for this resource. These can only be added or modified by the
+    setLabels method. Each label key/value pair must comply with RFC1035.
+    Label values may be empty.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -40191,16 +42895,39 @@ class SecurityPolicy(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  creationTimestamp = _messages.StringField(1)
-  description = _messages.StringField(2)
-  fingerprint = _messages.BytesField(3)
-  id = _messages.IntegerField(4, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(5, default=u'compute#securityPolicy')
-  labelFingerprint = _messages.BytesField(6)
-  labels = _messages.MessageField('LabelsValue', 7)
-  name = _messages.StringField(8)
-  rules = _messages.MessageField('SecurityPolicyRule', 9, repeated=True)
-  selfLink = _messages.StringField(10)
+  associations = _messages.MessageField('SecurityPolicyAssociation', 1, repeated=True)
+  creationTimestamp = _messages.StringField(2)
+  description = _messages.StringField(3)
+  displayName = _messages.StringField(4)
+  fingerprint = _messages.BytesField(5)
+  id = _messages.IntegerField(6, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(7, default=u'compute#securityPolicy')
+  labelFingerprint = _messages.BytesField(8)
+  labels = _messages.MessageField('LabelsValue', 9)
+  name = _messages.StringField(10)
+  parent = _messages.StringField(11)
+  ruleTupleCount = _messages.IntegerField(12, variant=_messages.Variant.INT32)
+  rules = _messages.MessageField('SecurityPolicyRule', 13, repeated=True)
+  selfLink = _messages.StringField(14)
+  selfLinkWithId = _messages.StringField(15)
+  type = _messages.EnumField('TypeValueValuesEnum', 16)
+
+
+class SecurityPolicyAssociation(_messages.Message):
+  r"""A SecurityPolicyAssociation object.
+
+  Fields:
+    attachmentId: The resource that the security policy is attached to.
+    displayName: [Output Only] The display name of the security policy of the
+      association.
+    name: The name for an association.
+    securityPolicyId: [Output Only] The security policy ID of the association.
+  """
+
+  attachmentId = _messages.StringField(1)
+  displayName = _messages.StringField(2)
+  name = _messages.StringField(3)
+  securityPolicyId = _messages.StringField(4)
 
 
 class SecurityPolicyList(_messages.Message):
@@ -40340,29 +43067,65 @@ class SecurityPolicyRule(_messages.Message):
   r"""Represents a rule that describes one or more match conditions along with
   the action to be taken when traffic matches this condition (allow or deny).
 
+  Enums:
+    DirectionValueValuesEnum: The direction in which this rule applies. This
+      field may only be specified when versioned_expr is set to FIREWALL.
+
   Fields:
     action: The Action to preform when the client connection triggers the
       rule. Can currently be either "allow" or "deny()" where valid values for
       status are 403, 404, and 502.
     description: An optional description of this resource. Provide this
       property when you create the resource.
+    direction: The direction in which this rule applies. This field may only
+      be specified when versioned_expr is set to FIREWALL.
+    enableLogging: Denotes whether to enable logging for a particular rule. If
+      logging is enabled, logs will be exported to the configured export
+      destination in Stackdriver. Logs may be exported to BigQuery or Pub/Sub.
+      Note: you cannot enable logging on "goto_next" rules.  This field may
+      only be specified when the versioned_expr is set to FIREWALL.
     kind: [Output only] Type of the resource. Always
       compute#securityPolicyRule for security policy rules
     match: A match condition that incoming traffic is evaluated against. If it
-      evaluates to true, the corresponding ?action? is enforced.
+      evaluates to true, the corresponding 'action' is enforced.
     preview: If set to true, the specified action is not enforced.
     priority: An integer indicating the priority of a rule in the list. The
       priority must be a positive value between 0 and 2147483647. Rules are
       evaluated from highest to lowest priority where 0 is the highest
       priority and 2147483647 is the lowest prority.
+    ruleTupleCount: [Output Only] Calculation of the complexity of a single
+      firewall security policy rule.
+    targetResources: A list of network resource URLs to which this rule
+      applies. This field allows you to control which network's VMs get this
+      rule. If this field is left blank, all VMs within the organization will
+      receive the rule.  This field may only be specified when versioned_expr
+      is set to FIREWALL.
+    targetServiceAccounts: A list of service accounts indicating the sets of
+      instances that are applied with this rule.
   """
+
+  class DirectionValueValuesEnum(_messages.Enum):
+    r"""The direction in which this rule applies. This field may only be
+    specified when versioned_expr is set to FIREWALL.
+
+    Values:
+      EGRESS: <no description>
+      INGRESS: <no description>
+    """
+    EGRESS = 0
+    INGRESS = 1
 
   action = _messages.StringField(1)
   description = _messages.StringField(2)
-  kind = _messages.StringField(3, default=u'compute#securityPolicyRule')
-  match = _messages.MessageField('SecurityPolicyRuleMatcher', 4)
-  preview = _messages.BooleanField(5)
-  priority = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  direction = _messages.EnumField('DirectionValueValuesEnum', 3)
+  enableLogging = _messages.BooleanField(4)
+  kind = _messages.StringField(5, default=u'compute#securityPolicyRule')
+  match = _messages.MessageField('SecurityPolicyRuleMatcher', 6)
+  preview = _messages.BooleanField(7)
+  priority = _messages.IntegerField(8, variant=_messages.Variant.INT32)
+  ruleTupleCount = _messages.IntegerField(9, variant=_messages.Variant.INT32)
+  targetResources = _messages.StringField(10, repeated=True)
+  targetServiceAccounts = _messages.StringField(11, repeated=True)
 
 
 class SecurityPolicyRuleMatcher(_messages.Message):
@@ -40395,9 +43158,11 @@ class SecurityPolicyRuleMatcher(_messages.Message):
     src_ip_range field in config.
 
     Values:
+      FIREWALL: <no description>
       SRC_IPS_V1: <no description>
     """
-    SRC_IPS_V1 = 0
+    FIREWALL = 0
+    SRC_IPS_V1 = 1
 
   config = _messages.MessageField('SecurityPolicyRuleMatcherConfig', 1)
   expr = _messages.MessageField('Expr', 2)
@@ -40408,10 +43173,63 @@ class SecurityPolicyRuleMatcherConfig(_messages.Message):
   r"""A SecurityPolicyRuleMatcherConfig object.
 
   Fields:
+    destIpRanges: CIDR IP address range.  This field may only be specified
+      when versioned_expr is set to FIREWALL.
+    layer4Configs: Pairs of IP protocols and ports that the rule should match.
+      This field may only be specified when versioned_expr is set to FIREWALL.
     srcIpRanges: CIDR IP address range.
   """
 
-  srcIpRanges = _messages.StringField(1, repeated=True)
+  destIpRanges = _messages.StringField(1, repeated=True)
+  layer4Configs = _messages.MessageField('SecurityPolicyRuleMatcherConfigLayer4Config', 2, repeated=True)
+  srcIpRanges = _messages.StringField(3, repeated=True)
+
+
+class SecurityPolicyRuleMatcherConfigLayer4Config(_messages.Message):
+  r"""A SecurityPolicyRuleMatcherConfigLayer4Config object.
+
+  Fields:
+    ipProtocol: The IP protocol to which this rule applies. The protocol type
+      is required when creating a firewall rule. This value can either be one
+      of the following well known protocol strings (tcp, udp, icmp, esp, ah,
+      ipip, sctp), or the IP protocol number.
+    ports: An optional list of ports to which this rule applies. This field is
+      only applicable for UDP or TCP protocol. Each entry must be either an
+      integer or a range. If not specified, this rule applies to connections
+      through any port.  Example inputs include: ["22"], ["80","443"], and
+      ["12345-12349"].  This field may only be specified when versioned_expr
+      is set to FIREWALL.
+  """
+
+  ipProtocol = _messages.StringField(1)
+  ports = _messages.StringField(2, repeated=True)
+
+
+class SecuritySettings(_messages.Message):
+  r"""The authentication and authorization settings for a BackendService.
+
+  Fields:
+    authentication: A URL referring to a networksecurity.Authentication
+      resource that describes how clients should authenticate with this
+      service's backends. If left blank, communications between services are
+      not encrypted (i.e., the TLS policy is set to OPEN). When sending
+      traffic to this service's backends, the OriginationTls setting of
+      Authentication.TransportAuthentication is applied. Refer to the
+      Authentication and Authentication.TransportAuthentication.OriginationTls
+      resources for additional details. authentication only applies to a
+      global BackendService with the loadBalancingScheme set to
+      INTERNAL_SELF_MANAGED.
+    subjectAltNames: Optional. A list of subject alternate names to verify the
+      subject identity (SAN) in the certificate presented by the server, to
+      authorize the SAN list as identities to run the service represented by
+      this BackendService. If specified, the client will verify that the
+      server certificate's subject alt name matches one of the specified
+      values. Only applies to a global BackendService with the
+      loadBalancingScheme set to INTERNAL_SELF_MANAGED.
+  """
+
+  authentication = _messages.StringField(1)
+  subjectAltNames = _messages.StringField(2, repeated=True)
 
 
 class SerialPortOutput(_messages.Message):
@@ -40606,8 +43424,7 @@ class SignedUrlKey(_messages.Message):
 class Snapshot(_messages.Message):
   r"""Represents a Persistent Disk Snapshot resource.  You can use snapshots
   to back up data on a regular interval. For more information, read  Creating
-  persistent disk snapshots. (== resource_for beta.snapshots ==) (==
-  resource_for v1.snapshots ==)
+  persistent disk snapshots. (== resource_for {$api_version}.snapshots ==)
 
   Enums:
     StatusValueValuesEnum: [Output Only] The status of the snapshot. This can
@@ -40630,6 +43447,8 @@ class Snapshot(_messages.Message):
     description: An optional description of this resource. Provide this
       property when you create the resource.
     diskSizeGb: [Output Only] Size of the source disk, specified in GB.
+    downloadBytes: [Output Only] Number of bytes downloaded to restore a
+      snapshot to a disk.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
     kind: [Output Only] Type of the resource. Always compute#snapshot for
@@ -40746,22 +43565,23 @@ class Snapshot(_messages.Message):
   creationTimestamp = _messages.StringField(2)
   description = _messages.StringField(3)
   diskSizeGb = _messages.IntegerField(4)
-  id = _messages.IntegerField(5, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(6, default=u'compute#snapshot')
-  labelFingerprint = _messages.BytesField(7)
-  labels = _messages.MessageField('LabelsValue', 8)
-  licenseCodes = _messages.IntegerField(9, repeated=True)
-  licenses = _messages.StringField(10, repeated=True)
-  name = _messages.StringField(11)
-  selfLink = _messages.StringField(12)
-  snapshotEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 13)
-  sourceDisk = _messages.StringField(14)
-  sourceDiskEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 15)
-  sourceDiskId = _messages.StringField(16)
-  status = _messages.EnumField('StatusValueValuesEnum', 17)
-  storageBytes = _messages.IntegerField(18)
-  storageBytesStatus = _messages.EnumField('StorageBytesStatusValueValuesEnum', 19)
-  storageLocations = _messages.StringField(20, repeated=True)
+  downloadBytes = _messages.IntegerField(5)
+  id = _messages.IntegerField(6, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(7, default=u'compute#snapshot')
+  labelFingerprint = _messages.BytesField(8)
+  labels = _messages.MessageField('LabelsValue', 9)
+  licenseCodes = _messages.IntegerField(10, repeated=True)
+  licenses = _messages.StringField(11, repeated=True)
+  name = _messages.StringField(12)
+  selfLink = _messages.StringField(13)
+  snapshotEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 14)
+  sourceDisk = _messages.StringField(15)
+  sourceDiskEncryptionKey = _messages.MessageField('CustomerEncryptionKey', 16)
+  sourceDiskId = _messages.StringField(17)
+  status = _messages.EnumField('StatusValueValuesEnum', 18)
+  storageBytes = _messages.IntegerField(19)
+  storageBytesStatus = _messages.EnumField('StorageBytesStatusValueValuesEnum', 20)
+  storageLocations = _messages.StringField(21, repeated=True)
 
 
 class SnapshotList(_messages.Message):
@@ -41010,13 +43830,19 @@ class SourceInstanceProperties(_messages.Message):
 
 
 class SslCertificate(_messages.Message):
-  r"""Represents an SSL Certificate resource.  This SSL certificate resource
-  also contains a private key. You can use SSL keys and certificates to secure
-  connections to a load balancer. For more information, read  Creating and
-  Using SSL Certificates. (== resource_for beta.sslCertificates ==) (==
-  resource_for v1.sslCertificates ==) (== resource_for
-  beta.regionSslCertificates ==) (== resource_for v1.regionSslCertificates ==)
-  Next ID: 17
+  r"""Represents an SSL Certificate resource.  Google Compute Engine has two
+  SSL Certificate resources:  *
+  [Global](/compute/docs/reference/rest/{$api_version}/sslCertificates) * [Reg
+  ional](/compute/docs/reference/rest/{$api_version}/regionSslCertificates)
+  The sslCertificates are used by:   - external HTTPS load balancers  - SSL
+  proxy load balancers    The regionSslCertificates are used by internal HTTPS
+  load balancers.  Optionally, certificate file contents that you upload can
+  contain a set of up to five PEM-encoded certificates. The API call creates
+  an object (sslCertificate) that holds this data. You can use SSL keys and
+  certificates to secure connections to a load balancer. For more information,
+  read  Creating and using SSL certificates and SSL certificates quotas and
+  limits. (== resource_for {$api_version}.sslCertificates ==) (== resource_for
+  {$api_version}.regionSslCertificates ==)
 
   Enums:
     TypeValueValuesEnum: (Optional) Specifies the type of SSL certificate,
@@ -41721,8 +44547,7 @@ class SslPolicy(_messages.Message):
   r"""Represents a Cloud Armor Security Policy resource.  Only external
   backend services used by HTTP or HTTPS load balancers can reference a
   Security Policy. For more information, read read  Cloud Armor Security
-  Policy Concepts. (== resource_for beta.sslPolicies ==) (== resource_for
-  v1.sslPolicies ==)
+  Policy Concepts. (== resource_for {$api_version}.sslPolicies ==)
 
   Enums:
     MinTlsVersionValueValuesEnum: The minimum version of SSL protocol that can
@@ -42057,8 +44882,8 @@ class Subnetwork(_messages.Message):
   r"""Represents a Subnetwork resource.  A subnetwork (also known as a subnet)
   is a logical partition of a Virtual Private Cloud network with one primary
   IP range and zero or more secondary IP ranges. For more information, read
-  Virtual Private Cloud (VPC) Network. (== resource_for beta.subnetworks ==)
-  (== resource_for v1.subnetworks ==)
+  Virtual Private Cloud (VPC) Network. (== resource_for
+  {$api_version}.subnetworks ==)
 
   Enums:
     PrivateIpv6GoogleAccessValueValuesEnum: The private IPv6 google access
@@ -42071,7 +44896,7 @@ class Subnetwork(_messages.Message):
       with purpose set to INTERNAL_HTTPS_LOAD_BALANCER is a user-created
       subnetwork that is reserved for Internal HTTP(S) Load Balancing. If
       unspecified, the purpose defaults to PRIVATE_RFC_1918.
-    RoleValueValuesEnum: The role of subnetwork. Currenly, this field is only
+    RoleValueValuesEnum: The role of subnetwork. Currently, this field is only
       used when purpose = INTERNAL_HTTPS_LOAD_BALANCER. The value can be set
       to ACTIVE or BACKUP. An ACTIVE subnetwork is one that is currently being
       used for Internal HTTP(S) Load Balancing. A BACKUP subnetwork is one
@@ -42144,10 +44969,11 @@ class Subnetwork(_messages.Message):
       in this subnet. This is an expanded field of enablePrivateV6Access. If
       both fields are set, privateIpv6GoogleAccess will take priority.  This
       field can be both set at resource creation time and updated using patch.
-    privateIpv6GoogleAccessServiceAccounts: The service accounts can be used
-      to selectively turn on Private IPv6 Google Access only on the VMs
-      primary service account matching the value. This value only takes effect
-      when PrivateIpv6GoogleAccess is
+    privateIpv6GoogleAccessServiceAccounts: Deprecated in favor of enable
+      PrivateIpv6GoogleAccess on instance directly. The service accounts can
+      be used to selectively turn on Private IPv6 Google Access only on the
+      VMs primary service account matching the value. This value only takes
+      effect when PrivateIpv6GoogleAccess is
       ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE_FOR_SERVICE_ACCOUNTS or
       ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE_FOR_SERVICE_ACCOUNTS.
     purpose: The purpose of the resource. This field can be either
@@ -42157,7 +44983,7 @@ class Subnetwork(_messages.Message):
       the purpose defaults to PRIVATE_RFC_1918.
     region: URL of the region where the Subnetwork resides. This field can be
       set only at resource creation time.
-    role: The role of subnetwork. Currenly, this field is only used when
+    role: The role of subnetwork. Currently, this field is only used when
       purpose = INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE
       or BACKUP. An ACTIVE subnetwork is one that is currently being used for
       Internal HTTP(S) Load Balancing. A BACKUP subnetwork is one that is
@@ -42212,12 +45038,12 @@ class Subnetwork(_messages.Message):
     PRIVATE_RFC_1918 = 2
 
   class RoleValueValuesEnum(_messages.Enum):
-    r"""The role of subnetwork. Currenly, this field is only used when purpose
-    = INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE or BACKUP.
-    An ACTIVE subnetwork is one that is currently being used for Internal
-    HTTP(S) Load Balancing. A BACKUP subnetwork is one that is ready to be
-    promoted to ACTIVE or is currently draining. This field can be updated
-    with a patch request.
+    r"""The role of subnetwork. Currently, this field is only used when
+    purpose = INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE or
+    BACKUP. An ACTIVE subnetwork is one that is currently being used for
+    Internal HTTP(S) Load Balancing. A BACKUP subnetwork is one that is ready
+    to be promoted to ACTIVE or is currently draining. This field can be
+    updated with a patch request.
 
     Values:
       ACTIVE: <no description>
@@ -42564,6 +45390,9 @@ class SubnetworkLogConfig(_messages.Message):
     enable: Whether to enable flow logging for this subnetwork. If this field
       is not explicitly set, it will not appear in get listings. If not set
       the default behavior is to disable flow logging.
+    filterExpr: Can only be specified if VPC flow logs for this subnetwork is
+      enabled. Export filter used to define which VPC flow logs should be
+      logged.
     flowSampling: Can only be specified if VPC flow logging for this
       subnetwork is enabled. The value of the field must be in [0, 1]. Set the
       sampling rate of VPC flow logs within the subnetwork where 1.0 means all
@@ -42573,6 +45402,8 @@ class SubnetworkLogConfig(_messages.Message):
       enabled. Configures whether all, none or a subset of metadata fields
       should be added to the reported VPC flow logs. Default is
       INCLUDE_ALL_METADATA.
+    metadataFields: Can only be specified if VPC flow logs for this subnetwork
+      is enabled and "metadata" was set to CUSTOM_METADATA.
   """
 
   class AggregationIntervalValueValuesEnum(_messages.Enum):
@@ -42603,16 +45434,20 @@ class SubnetworkLogConfig(_messages.Message):
     added to the reported VPC flow logs. Default is INCLUDE_ALL_METADATA.
 
     Values:
+      CUSTOM_METADATA: <no description>
       EXCLUDE_ALL_METADATA: <no description>
       INCLUDE_ALL_METADATA: <no description>
     """
-    EXCLUDE_ALL_METADATA = 0
-    INCLUDE_ALL_METADATA = 1
+    CUSTOM_METADATA = 0
+    EXCLUDE_ALL_METADATA = 1
+    INCLUDE_ALL_METADATA = 2
 
   aggregationInterval = _messages.EnumField('AggregationIntervalValueValuesEnum', 1)
   enable = _messages.BooleanField(2)
-  flowSampling = _messages.FloatField(3, variant=_messages.Variant.FLOAT)
-  metadata = _messages.EnumField('MetadataValueValuesEnum', 4)
+  filterExpr = _messages.StringField(3)
+  flowSampling = _messages.FloatField(4, variant=_messages.Variant.FLOAT)
+  metadata = _messages.EnumField('MetadataValueValuesEnum', 5)
+  metadataFields = _messages.StringField(6, repeated=True)
 
 
 class SubnetworkSecondaryRange(_messages.Message):
@@ -42983,13 +45818,18 @@ class TargetHttpProxiesScopedList(_messages.Message):
 
 
 class TargetHttpProxy(_messages.Message):
-  r"""Represents a Target HTTP Proxy resource.  A target HTTP proxy is a
-  component of GCP HTTP load balancers. Forwarding rules reference a target
-  HTTP proxy, and the target proxy then references a URL map. For more
-  information, read Using Target Proxies and  Forwarding rule concepts. (==
-  resource_for beta.targetHttpProxies ==) (== resource_for
-  v1.targetHttpProxies ==) (== resource_for beta.regionTargetHttpProxies ==)
-  (== resource_for v1.regionTargetHttpProxies ==)
+  r"""Represents a Target HTTP Proxy resource.  Google Compute Engine has two
+  Target HTTP Proxy resources:  *
+  [Global](/compute/docs/reference/rest/{$api_version}/targetHttpProxies) * [R
+  egional](/compute/docs/reference/rest/{$api_version}/regionTargetHttpProxies
+  )  A target HTTP proxy is a component of GCP HTTP load balancers.  *
+  targetHttpProxies are used by external HTTP load balancers and Traffic
+  Director. * regionTargetHttpProxies are used by internal HTTP load
+  balancers.  Forwarding rules reference a target HTTP proxy, and the target
+  proxy then references a URL map. For more information, read Using Target
+  Proxies and  Forwarding rule concepts. (== resource_for
+  {$api_version}.targetHttpProxies ==) (== resource_for
+  {$api_version}.regionTargetHttpProxies ==)
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -43007,6 +45847,9 @@ class TargetHttpProxy(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
+    proxyBind: This field only applies when the loadBalancingScheme is
+      INTERNAL_SELF_MANAGED. When set to true the Envoy binds on the IP
+      address specified by the forwarding rule. Default is false.
     region: [Output Only] URL of the region where the regional Target HTTP
       Proxy resides. This field is not applicable to global Target HTTP
       Proxies.
@@ -43020,9 +45863,10 @@ class TargetHttpProxy(_messages.Message):
   id = _messages.IntegerField(3, variant=_messages.Variant.UINT64)
   kind = _messages.StringField(4, default=u'compute#targetHttpProxy')
   name = _messages.StringField(5)
-  region = _messages.StringField(6)
-  selfLink = _messages.StringField(7)
-  urlMap = _messages.StringField(8)
+  proxyBind = _messages.BooleanField(6)
+  region = _messages.StringField(7)
+  selfLink = _messages.StringField(8)
+  urlMap = _messages.StringField(9)
 
 
 class TargetHttpProxyAggregatedList(_messages.Message):
@@ -43454,13 +46298,17 @@ class TargetHttpsProxiesSetSslCertificatesRequest(_messages.Message):
 
 
 class TargetHttpsProxy(_messages.Message):
-  r"""Represents a Target HTTPS Proxy resource.  A target HTTPS proxy is a
-  component of GCP HTTPS load balancers. Forwarding rules reference a target
-  HTTPS proxy, and the target proxy then references a URL map. For more
-  information, read Using Target Proxies and  Forwarding rule concepts. (==
-  resource_for beta.targetHttpsProxies ==) (== resource_for
-  v1.targetHttpsProxies ==) (== resource_for beta.regionTargetHttpsProxies ==)
-  (== resource_for v1.regionTargetHttpsProxies ==)
+  r"""Represents a Target HTTPS Proxy resource.  Google Compute Engine has two
+  Target HTTPS Proxy resources:  *
+  [Global](/compute/docs/reference/rest/{$api_version}/targetHttpsProxies) * [
+  Regional](/compute/docs/reference/rest/{$api_version}/regionTargetHttpsProxi
+  es)  A target HTTPS proxy is a component of GCP HTTPS load balancers.  *
+  targetHttpsProxies are used by external HTTPS load balancers. *
+  regionTargetHttpsProxies are used by internal HTTPS load balancers.
+  Forwarding rules reference a target HTTPS proxy, and the target proxy then
+  references a URL map. For more information, read Using Target Proxies and
+  Forwarding rule concepts. (== resource_for {$api_version}.targetHttpsProxies
+  ==) (== resource_for {$api_version}.regionTargetHttpsProxies ==)
 
   Enums:
     QuicOverrideValueValuesEnum: Specifies the QUIC override policy for this
@@ -43473,6 +46321,22 @@ class TargetHttpsProxy(_messages.Message):
       flag is not specified, NONE is implied. -
 
   Fields:
+    authentication: A URL referring to a networksecurity.Authentication
+      resource that describes how the proxy should authenticate inbound
+      traffic. If left blank, communications between services are not
+      encrypted (i.e., the TLS policy is set to OPEN). When terminating
+      inbound traffic to this proxy, the TerminationTls setting of
+      Authentication.TransportAuthentication is applied. Refer to the
+      Authentication and Authentication.TransportAuthentication.TerminationTls
+      resources for additional details. authentication only applies to a
+      global TargetHttpsProxy attached to globalForwardingRules with the
+      loadBalancingScheme set to INTERNAL_SELF_MANAGED.
+    authorization: A URL referring to a networksecurity.Authorization resource
+      that describes how the proxy should authorize inbound traffic. If left
+      blank, access will not be restricted by an authorization policy. Refer
+      to the Authorization resource for additional details. authorization only
+      applies to a global TargetHttpsProxy attached to globalForwardingRules
+      with the loadBalancingScheme set to INTERNAL_SELF_MANAGED.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     description: An optional description of this resource. Provide this
@@ -43488,6 +46352,9 @@ class TargetHttpsProxy(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
+    proxyBind: This field only applies when the loadBalancingScheme is
+      INTERNAL_SELF_MANAGED. When set to true the Envoy binds on the IP
+      address specified by the forwarding rule. Default is false.
     quicOverride: Specifies the QUIC override policy for this TargetHttpsProxy
       resource. This setting determines whether the load balancer attempts to
       negotiate QUIC with clients. You can specify NONE, ENABLE, or DISABLE.
@@ -43532,17 +46399,20 @@ class TargetHttpsProxy(_messages.Message):
     ENABLE = 1
     NONE = 2
 
-  creationTimestamp = _messages.StringField(1)
-  description = _messages.StringField(2)
-  id = _messages.IntegerField(3, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(4, default=u'compute#targetHttpsProxy')
-  name = _messages.StringField(5)
-  quicOverride = _messages.EnumField('QuicOverrideValueValuesEnum', 6)
-  region = _messages.StringField(7)
-  selfLink = _messages.StringField(8)
-  sslCertificates = _messages.StringField(9, repeated=True)
-  sslPolicy = _messages.StringField(10)
-  urlMap = _messages.StringField(11)
+  authentication = _messages.StringField(1)
+  authorization = _messages.StringField(2)
+  creationTimestamp = _messages.StringField(3)
+  description = _messages.StringField(4)
+  id = _messages.IntegerField(5, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(6, default=u'compute#targetHttpsProxy')
+  name = _messages.StringField(7)
+  proxyBind = _messages.BooleanField(8)
+  quicOverride = _messages.EnumField('QuicOverrideValueValuesEnum', 9)
+  region = _messages.StringField(10)
+  selfLink = _messages.StringField(11)
+  sslCertificates = _messages.StringField(12, repeated=True)
+  sslPolicy = _messages.StringField(13)
+  urlMap = _messages.StringField(14)
 
 
 class TargetHttpsProxyAggregatedList(_messages.Message):
@@ -43826,8 +46696,7 @@ class TargetInstance(_messages.Message):
   handle traffic for one or more forwarding rules, which is ideal for
   forwarding protocol traffic that is managed by a single source. For example,
   ESP, AH, TCP, or UDP. For more information, read Target instances. (==
-  resource_for beta.targetInstances ==) (== resource_for v1.targetInstances
-  ==)
+  resource_for {$api_version}.targetInstances ==)
 
   Enums:
     NatPolicyValueValuesEnum: NAT option controlling how IPs are NAT'ed to the
@@ -44277,7 +47146,7 @@ class TargetPool(_messages.Message):
   TCP/UDP load balancing. A target pool references member instances, an
   associated legacy HttpHealthCheck resource, and, optionally, a backup target
   pool. For more information, read Using target pools. (== resource_for
-  beta.targetPools ==) (== resource_for v1.targetPools ==)
+  {$api_version}.targetPools ==)
 
   Enums:
     SessionAffinityValueValuesEnum: Session affinity option, must be one of
@@ -44902,7 +47771,7 @@ class TargetSslProxy(_messages.Message):
   component of a SSL Proxy load balancer. Global forwarding rules reference a
   target SSL proxy, and the target proxy then references an external backend
   service. For more information, read Using Target Proxies. (== resource_for
-  beta.targetSslProxies ==) (== resource_for v1.targetSslProxies ==)
+  {$api_version}.targetSslProxies ==)
 
   Enums:
     ProxyHeaderValueValuesEnum: Specifies the type of proxy header to append
@@ -45125,9 +47994,8 @@ class TargetTcpProxy(_messages.Message):
   r"""Represents a Target TCP Proxy resource.  A target TCP proxy is a
   component of a TCP Proxy load balancer. Global forwarding rules reference
   target TCP proxy, and the target proxy then references an external backend
-  service. For more information, read TCP Proxy Load Balancing Concepts. (==
-  resource_for beta.targetTcpProxies ==) (== resource_for v1.targetTcpProxies
-  ==)
+  service. For more information, read TCP Proxy Load Balancing overview. (==
+  resource_for {$api_version}.targetTcpProxies ==)
 
   Enums:
     ProxyHeaderValueValuesEnum: Specifies the type of proxy header to append
@@ -45304,17 +48172,17 @@ class TargetTcpProxyList(_messages.Message):
 class TargetVpnGateway(_messages.Message):
   r"""Represents a Target VPN Gateway resource.  The target VPN gateway
   resource represents a Classic Cloud VPN gateway. For more information, read
-  the the Cloud VPN Overview. (== resource_for beta.targetVpnGateways ==) (==
-  resource_for v1.targetVpnGateways ==)
+  the the Cloud VPN Overview. (== resource_for
+  {$api_version}.targetVpnGateways ==)
 
   Enums:
     StatusValueValuesEnum: [Output Only] The status of the VPN gateway, which
       can be one of the following: CREATING, READY, FAILED, or DELETING.
 
   Messages:
-    LabelsValue: Labels to apply to this TargetVpnGateway resource. These can
-      be later modified by the setLabels method. Each label key/value must
-      comply with RFC1035. Label values may be empty.
+    LabelsValue: Labels for this resource. These can only be added or modified
+      by the setLabels method. Each label key/value pair must comply with
+      RFC1035. Label values may be empty.
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -45336,9 +48204,9 @@ class TargetVpnGateway(_messages.Message):
       change labels, otherwise the request will fail with error 412
       conditionNotMet.  To see the latest fingerprint, make a get() request to
       retrieve a TargetVpnGateway.
-    labels: Labels to apply to this TargetVpnGateway resource. These can be
-      later modified by the setLabels method. Each label key/value must comply
-      with RFC1035. Label values may be empty.
+    labels: Labels for this resource. These can only be added or modified by
+      the setLabels method. Each label key/value pair must comply with
+      RFC1035. Label values may be empty.
     name: Name of the resource. Provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
       Specifically, the name must be 1-63 characters long and match the
@@ -45376,9 +48244,9 @@ class TargetVpnGateway(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Labels to apply to this TargetVpnGateway resource. These can be later
-    modified by the setLabels method. Each label key/value must comply with
-    RFC1035. Label values may be empty.
+    r"""Labels for this resource. These can only be added or modified by the
+    setLabels method. Each label key/value pair must comply with RFC1035.
+    Label values may be empty.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -45845,12 +48713,18 @@ class TestPermissionsResponse(_messages.Message):
 
 
 class UrlMap(_messages.Message):
-  r"""Represents a URL Map resource.  A URL map resource is a component of
-  certain types of load balancers. This resource defines mappings from host
-  names and URL paths to either a backend service or a backend bucket.  To use
-  this resource, the backend service must have a loadBalancingScheme of either
-  EXTERNAL, INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED For more information,
-  read URL Map Concepts.
+  r"""Represents a URL Map resource.  Google Compute Engine has two URL Map
+  resources:  * [Global](/compute/docs/reference/rest/{$api_version}/urlMaps)
+  * [Regional](/compute/docs/reference/rest/{$api_version}/regionUrlMaps)  A
+  URL map resource is a component of certain types of GCP load balancers and
+  Traffic Director.  * urlMaps are used by external HTTP(S) load balancers and
+  Traffic Director. * regionUrlMaps are used by internal HTTP(S) load
+  balancers.  This resource defines mappings from host names and URL paths to
+  either a backend service or a backend bucket.  To use the global urlMaps
+  resource, the backend service must have a loadBalancingScheme of either
+  EXTERNAL or INTERNAL_SELF_MANAGED. To use the regionUrlMaps resource, the
+  backend service must have a loadBalancingScheme of INTERNAL_MANAGED. For
+  more information, read URL Map Concepts.
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -46755,9 +49629,9 @@ class VpnGateway(_messages.Message):
   r"""Represents a VPN gateway resource. Next ID: 13
 
   Messages:
-    LabelsValue: Labels to apply to this VpnGateway resource. These can be
-      later modified by the setLabels method. Each label key/value must comply
-      with RFC1035. Label values may be empty.
+    LabelsValue: Labels for this resource. These can only be added or modified
+      by the setLabels method. Each label key/value pair must comply with
+      RFC1035. Label values may be empty.
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -46776,8 +49650,8 @@ class VpnGateway(_messages.Message):
       change labels, otherwise the request will fail with error 412
       conditionNotMet.  To see the latest fingerprint, make a get() request to
       retrieve an VpnGateway.
-    labels: Labels to apply to this VpnGateway resource. These can be later
-      modified by the setLabels method. Each label key/value must comply with
+    labels: Labels for this resource. These can only be added or modified by
+      the setLabels method. Each label key/value pair must comply with
       RFC1035. Label values may be empty.
     name: Name of the resource. Provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
@@ -46790,14 +49664,14 @@ class VpnGateway(_messages.Message):
       Provided by the client when the VPN gateway is created.
     region: [Output Only] URL of the region where the VPN gateway resides.
     selfLink: [Output Only] Server-defined URL for the resource.
-    vpnInterfaces: [Output Only] A list of interfaces on this VPN gateway.
+    vpnInterfaces: A list of interfaces on this VPN gateway.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Labels to apply to this VpnGateway resource. These can be later
-    modified by the setLabels method. Each label key/value must comply with
-    RFC1035. Label values may be empty.
+    r"""Labels for this resource. These can only be added or modified by the
+    setLabels method. Each label key/value pair must comply with RFC1035.
+    Label values may be empty.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -47209,7 +50083,8 @@ class VpnGatewayVpnGatewayInterface(_messages.Message):
 
   Fields:
     id: The numeric ID of this VPN gateway interface.
-    ipAddress: The external IP address for this VPN gateway interface.
+    ipAddress: [Output Only] The external IP address for this VPN gateway
+      interface.
   """
 
   id = _messages.IntegerField(1, variant=_messages.Variant.UINT32)
@@ -47342,8 +50217,8 @@ class VpnGatewaysScopedList(_messages.Message):
 
 class VpnTunnel(_messages.Message):
   r"""Represents a Cloud VPN Tunnel resource.  For more information about VPN,
-  read the the Cloud VPN Overview. (== resource_for beta.vpnTunnels ==) (==
-  resource_for v1.vpnTunnels ==)
+  read the the Cloud VPN Overview. (== resource_for {$api_version}.vpnTunnels
+  ==)
 
   Enums:
     StatusValueValuesEnum: [Output Only] The status of the VPN tunnel, which
@@ -47369,9 +50244,9 @@ class VpnTunnel(_messages.Message):
       HA-VPN tunnel.
 
   Messages:
-    LabelsValue: Labels to apply to this VpnTunnel. These can be later
-      modified by the setLabels method. Each label key/value pair must comply
-      with RFC1035. Label values may be empty.
+    LabelsValue: Labels for this resource. These can only be added or modified
+      by the setLabels method. Each label key/value pair must comply with
+      RFC1035. Label values may be empty.
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -47394,7 +50269,7 @@ class VpnTunnel(_messages.Message):
       change labels, otherwise the request will fail with error 412
       conditionNotMet.  To see the latest fingerprint, make a get() request to
       retrieve a VpnTunnel.
-    labels: Labels to apply to this VpnTunnel. These can be later modified by
+    labels: Labels for this resource. These can only be added or modified by
       the setLabels method. Each label key/value pair must comply with
       RFC1035. Label values may be empty.
     localTrafficSelector: Local traffic selector to use when establishing the
@@ -47516,7 +50391,7 @@ class VpnTunnel(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Labels to apply to this VpnTunnel. These can be later modified by the
+    r"""Labels for this resource. These can only be added or modified by the
     setLabels method. Each label key/value pair must comply with RFC1035.
     Label values may be empty.
 
@@ -48174,7 +51049,7 @@ class Zone(_messages.Message):
   r"""Represents a Zone resource.  A zone is a deployment area. These
   deployment areas are subsets of a region. For example the zone us-east1-a is
   located in the us-east1 region. For more information, read Regions and
-  Zones. (== resource_for beta.zones ==) (== resource_for v1.zones ==)
+  Zones. (== resource_for {$api_version}.zones ==)
 
   Enums:
     StatusValueValuesEnum: [Output Only] Status of the zone, either UP or

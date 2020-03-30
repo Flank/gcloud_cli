@@ -313,7 +313,7 @@ be used.
 \fBauto\-delete\fR
 If \f5\fIyes\fR\fR, this persistent disk will be automatically deleted when the
 instance is deleted. However, if the disk is later detached from the instance,
-this option won't apply. The default value for this is \f5\fIno\fR\fR.
+this option won't apply. The default value for this is \f5\fIyes\fR\fR.
 
 .RE
 .sp
@@ -428,10 +428,11 @@ default type is n1\-standard\-1.
 \fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
 Metadata to be made available to the guest operating system running on the
 instances. Each metadata entry is a key/value pair separated by an equals sign.
-Metadata keys must be unique and less than 128 bytes in length. Values must be
-less than or equal to 32,768 bytes in length. Multiple arguments can be passed
-to this flag, e.g., \f5\fI\-\-metadata
-key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR.
+Each metadata key must be unique and have a max of 128 bytes in length. Each
+value must have a max of 256 KB in length. Multiple arguments can be passed to
+this flag, e.g., \f5\fI\-\-metadata
+key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR. The combined total size
+for all metadata entries is 512 KB.
 
 In images that have Compute Engine tools installed on them, such as the official
 images (https://cloud.google.com/compute/docs/images), the following metadata
@@ -631,10 +632,21 @@ option can only be used when creating a single instance.
 
 .TP 2m
 \fB\-\-no\-address\fR
-If provided, the instances will not be assigned external IP addresses.
-
+If provided, the instances are not assigned external IP addresses. To pull
+container images, you must configure private Google access if using Container
+Registry or configure Cloud NAT for instances to access container images
+directly. For more information, see:
+.RS 2m
+.IP "\(bu" 2m
+https://cloud.google.com/vpc/docs/configure\-private\-google\-access
+.IP "\(bu" 2m
+https://cloud.google.com/nat/docs/using\-nat
+.RE
+.RE
 .RE
 .sp
+
+.RS 2m
 .TP 2m
 
 Custom machine type extensions.
@@ -857,8 +869,9 @@ Create instance without service account
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

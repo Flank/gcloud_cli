@@ -138,7 +138,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -156,7 +156,7 @@ actions:
           body:
             kind: storage#bucket
             id: $$bucket$$
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$
             projectNumber: '601677740'
             name: $$bucket$$
             metageneration: '1'
@@ -182,6 +182,11 @@ actions:
           headers: {}
           body:
             json:
+              artifacts:
+                objects:
+                  location: gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded
+                  paths:
+                  - output/expanded/*
               options:
                 substitutionOption: ALLOW_LOOSE
               steps:
@@ -203,14 +208,18 @@ actions:
 
                   set -e
 
-                  gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested
-                  echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested"
-                  echo "View suggested base configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested/"
-                  gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded
-                  echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded"
-                  echo "View expanded configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded/"
-                entrypoint: sh
-                id: Save configs
+                  if [[ "$_OUTPUT_BUCKET_PATH" ]]; then
+                    gsutil -m cp output/expanded/* gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded
+                    echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded"
+                    echo "View expanded configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded/"
+                    if [[ ! "$_K8S_YAML_PATH" ]]; then
+                      gsutil -m cp output/suggested/* gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested
+                      echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested"
+                      echo "View suggested base configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested/"
+                    fi
+                  fi
+                entrypoint: bash
+                id: Save generated Kubernetes configs
                 name: gcr.io/cloud-builders/gsutil
               - args:
                 - apply
@@ -247,6 +256,11 @@ actions:
             metadata:
               '@type': type.googleapis.com/google.devtools.cloudbuild.v1.BuildOperationMetadata
               build:
+                artifacts:
+                  objects:
+                    location: gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded
+                    paths:
+                    - output/expanded/*
                 id: a186b89c-53b7-47ad-940a-cc28cb3b4b00
                 status: QUEUED
                 createTime: '2019-10-30T16:30:16.833560851Z'
@@ -270,14 +284,18 @@ actions:
 
                     set -e
 
-                    gsutil cp -r output/suggested gs://$$bucket$$/deploy/config/a186b89c-53b7-47ad-940a-cc28cb3b4b00/suggested
-                    echo "Copied suggested base configs to gs://$$bucket$$/deploy/config/a186b89c-53b7-47ad-940a-cc28cb3b4b00/suggested"
-                    echo "View suggested base configs at https://console.cloud.google.com/storage/browser/$$bucket$$/deploy/config/a186b89c-53b7-47ad-940a-cc28cb3b4b00/suggested/"
-                    gsutil cp -r output/expanded gs://$$bucket$$/deploy/config/a186b89c-53b7-47ad-940a-cc28cb3b4b00/expanded
-                    echo "Copied expanded configs to gs://$$bucket$$/deploy/config/a186b89c-53b7-47ad-940a-cc28cb3b4b00/expanded"
-                    echo "View expanded configs at https://console.cloud.google.com/storage/browser/$$bucket$$/deploy/config/a186b89c-53b7-47ad-940a-cc28cb3b4b00/expanded/"
-                  id: Save configs
-                  entrypoint: sh
+                    if [[ "$_OUTPUT_BUCKET_PATH" ]]; then
+                      gsutil -m cp output/expanded/* gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded
+                      echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded"
+                      echo "View expanded configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded/"
+                      if [[ ! "$_K8S_YAML_PATH" ]]; then
+                        gsutil -m cp output/suggested/* gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested
+                        echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested"
+                        echo "View suggested base configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested/"
+                      fi
+                    fi
+                  id: Save generated Kubernetes configs
+                  entrypoint: bash
                 - name: gcr.io/cloud-builders/gke-deploy
                   args:
                   - apply
@@ -313,8 +331,8 @@ actions:
         matches: |
           Starting Cloud Build to build and deploy to the target Google Kubernetes Engine cluster...
 
-          Created \[https://cloudbuild.googleapis.com/v1/projects/$$project$$/builds/.*\].
-          Logs are available at \[https://console.cloud.google.com/gcr/builds/.*?project=.*\].
+          Created \[https://cloudbuild.googleapis.com/.*$$project$$/.+\].
+          Logs are available at \[https://console.cloud.google.com/.+\].
 
     - api_call:
         expect_request:
@@ -326,6 +344,11 @@ actions:
           headers:
             status: '200'
           body:
+            artifacts:
+              objects:
+                location: gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded
+                paths:
+                - output/expanded/*
             createTime: '2019-10-30T16:30:16.833560851Z'
             substitutions:
               _DOCKERFILE_PATH: Dockerfile
@@ -355,12 +378,18 @@ actions:
 
                 set -e
 
-                gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested
-                echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested"
-                gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded
-                echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded"
-              entrypoint: sh
-              id: Save configs
+                if [[ "$_OUTPUT_BUCKET_PATH" ]]; then
+                  gsutil -m cp output/expanded/* gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded
+                  echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded"
+                  echo "View expanded configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded/"
+                  if [[ ! "$_K8S_YAML_PATH" ]]; then
+                    gsutil -m cp output/suggested/* gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested
+                    echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested"
+                    echo "View suggested base configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested/"
+                  fi
+                fi
+              entrypoint: bash
+              id: Save generated Kubernetes configs
               name: gcr.io/cloud-builders/gsutil
             - args:
               - apply

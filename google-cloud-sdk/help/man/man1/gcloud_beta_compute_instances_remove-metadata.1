@@ -90,8 +90,22 @@ The keys of the entries to remove.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To remove metadata keys \f5\fIimportant\-data\fR\fR and
+\f5\fIuseless\-data\fR\fR along with their data from an instance named
+\f5\fItest\-instance\fR\fR, run:
+
+.RS 2m
+$ gcloud beta compute instances remove\-metadata test\-instance \e
+    \-\-keys=important\-data,useless\-data
+.RE
 
 
 

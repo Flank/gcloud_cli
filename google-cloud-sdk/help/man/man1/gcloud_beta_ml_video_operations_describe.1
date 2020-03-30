@@ -54,8 +54,9 @@ Location of the operation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -63,6 +64,19 @@ help\fR for details.
 
 This command uses the \fBvideointelligence/v1\fR API. The full documentation for
 this API can be found at: https://cloud.google.com/video\-intelligence/docs/
+
+
+
+.SH "EXAMPLES"
+
+To get information about a long\-running operation with name
+\'projects/my\-project/locations/us\-east1/operations/123', run the following
+command:
+
+.RS 2m
+$ gcloud beta ml video operations describe \e
+    projects/my\-project/locations/us\-east1/operations/123
+.RE
 
 
 

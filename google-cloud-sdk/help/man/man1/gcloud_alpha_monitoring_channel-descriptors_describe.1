@@ -17,7 +17,21 @@ gcloud alpha monitoring channel\-descriptors describe \- describe a notification
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Describe a notification channel descriptor.
+\fB(ALPHA)\fR Describes a notification channel type by fetching its descriptor.
+
+
+.SH "EXAMPLES"
+The following command obtains the descriptor for the \f5email\fR channel type:
+
+.RS 2m
+$ gcloud alpha monitoring channel\-descriptors describe email
+.RE
+
+The following command obtains the descriptor for the \f5sms\fR channel type:
+
+.RS 2m
+$ gcloud alpha monitoring channel\-descriptors describe sms
+.RE
 
 
 
@@ -49,8 +63,9 @@ channel_descriptor.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -66,5 +81,9 @@ API can be found at: https://cloud.google.com/monitoring/api/
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta monitoring channel\-descriptors describe
+.RE
 

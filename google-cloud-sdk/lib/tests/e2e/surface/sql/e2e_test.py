@@ -30,7 +30,7 @@ class MysqlE2ETest(base.MysqlIntegrationTestBase):
 
   @test_case.Filters.skip('network auth issues', 'b/144013563')
   def testSQLCommands(self):
-    self.CreateInstance('D1')
+    self.CreateInstance('db-n1-standard-1')
     self.DoTestBackupList()
     self.DoTestInstanceOperations()
     self.DoTestConnect()
@@ -53,7 +53,8 @@ class MysqlE2ETest(base.MysqlIntegrationTestBase):
 
     self.Run('sql instances reset-ssl-config {0}'.format(self.test_instance))
     self.Run('sql instances restart {0}'.format(self.test_instance))
-    self.Run('sql instances patch {0} --tier=D0'.format(self.test_instance))
+    self.Run('sql instances patch {0} --tier=db-n1-standard-2'.format(
+        self.test_instance))
 
   @sdk_test_base.Retry(why=('Because sql backend service is flaky.'))
   def DoTestConnect(self):

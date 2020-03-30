@@ -18,14 +18,7 @@ gcloud compute instances add\-tags \- add tags to Google Compute Engine virtual 
 .SH "DESCRIPTION"
 
 \fBgcloud compute instances add\-tags\fR is used to add tags to Google Compute
-Engine virtual machine instances. For example, running:
-
-.RS 2m
-$ gcloud compute instances add\-tags example\-instance \e
-    \-\-tags tag\-1,tag\-2
-.RE
-
-will add tags \f5\fItag\-1\fR\fR and \f5\fItag\-2\fR\fR to 'example\-instance'.
+Engine virtual machine instances.
 
 Tags can be used to identify the instances when adding network firewall rules.
 Tags can also be used to get firewall rules that already exist to be applied to
@@ -114,8 +107,20 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To add tags \f5\fItag\-1\fR\fR and \f5\fItag\-2\fR\fR to an instance named
+\f5\fItest\-instance\fR\fR, run:
+
+.RS 2m
+$ gcloud compute instances add\-tags test\-instance \-\-tags=tag\-1,tag\-2
+.RE
 
 
 

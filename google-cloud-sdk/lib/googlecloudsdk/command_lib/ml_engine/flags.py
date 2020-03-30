@@ -140,6 +140,11 @@ WORKERS = base.Argument(
     type=int,
     help=('Number of workers with which to run. '
           'Ignored if --distributed is not specified. Default: 2'))
+EVALUATORS = base.Argument(
+    '--evaluator-count',
+    type=int,
+    help=('Number of evaluators with which to run. '
+          'Ignored if --distributed is not specified. Default: 0'))
 START_PORT = base.Argument(
     '--start-port',
     type=int,
@@ -218,6 +223,16 @@ Path to Python archives used for training. These can be local paths
 Storage bucket given by `--staging-bucket`, or Cloud Storage URLs
 ('gs://bucket-name/path/to/package.tar.gz').
 """)
+
+
+# TODO(b/150109532) Find a better description.
+# TODO(b/150923506) Add autocompletion.
+def GetRegionArg(noun):
+  """Adds --region flag to determine endpoint for models and versions."""
+  return base.Argument(
+      '--region',
+      hidden=True,
+      help='Google Cloud Region to use for {0}.'.format(noun))
 
 
 SERVICE_ACCOUNT = base.Argument(
@@ -467,6 +482,38 @@ def AddVersionResourceArg(parser, verb):
       required=True).AddToParser(parser)
 
 
+def GetModelResourceSpec(resource_name='model'):
+  return concepts.ResourceSpec(
+      'ml.projects.models',
+      resource_name=resource_name,
+      projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
+      disable_auto_completers=True)
+
+
+def GetModelResourceArg(positional=True, required=False, verb=''):
+  """Add a resource argument for AI Platform model.
+
+  NOTE: Must be used only if it's the only resource arg in the command.
+
+  Args:
+    positional: bool, if True, means that the model is a positional rather
+    required: bool, if True means that argument is required.
+    verb: str, the verb to describe the resource, such as 'to update'.
+
+  Returns:
+    An argparse.ArgumentParse object.
+  """
+  if positional:
+    name = 'model'
+  else:
+    name = '--model'
+  return concept_parsers.ConceptParser.ForResource(
+      name,
+      GetModelResourceSpec(),
+      'The AI Platform model {}.'.format(verb),
+      required=required)
+
+
 def AddUserCodeArgs(parser):
   """Add args that configure user prediction code."""
   user_code_group = base.ArgumentGroup(help="""\
@@ -543,7 +590,7 @@ def AddExplainabilityFlags(parser):
   """Add args that configure explainability."""
   base.ChoiceArgument(
       '--explanation-method',
-      choices=['integrated-gradients', 'sampled-shapley'],
+      choices=['integrated-gradients', 'sampled-shapley', 'xrai'],
       required=False,
       help_str="""\
           Enable explanations and select the explanation method to use.
@@ -551,6 +598,7 @@ def AddExplainabilityFlags(parser):
           The valid options are:
             integrated-gradients: Use Integrated Gradients.
             sampled-shapley: Use Sampled Shapley.
+            xrai: Use XRAI.
       """
   ).AddToParser(parser)
   base.Argument(
@@ -560,7 +608,8 @@ def AddExplainabilityFlags(parser):
       required=False,
       help="""\
           Number of integral steps for Integrated Gradients. Only valid when
-          `--explanation-method=integrated-gradients` is specified.
+          `--explanation-method=integrated-gradients` or
+          `--explanation-method=xrai` is specified.
       """
   ).AddToParser(parser)
   base.Argument(
@@ -586,6 +635,7 @@ def AddCustomContainerFlags(parser, support_tpu_tf_version=False):
   GetWorkerMachineConfig().AddToParser(parser)
   GetWorkerAccelerator().AddToParser(parser)
   GetWorkerImageUri().AddToParser(parser)
+  GetUseChiefInTfConfig().AddToParser(parser)
   if support_tpu_tf_version:
     GetTpuTfVersion().AddToParser(parser)
 
@@ -768,6 +818,17 @@ def GetTpuTfVersion():
       help=('Runtime version of TensorFlow used by the container. This field '
             'must be specified if a custom container on the TPU worker is '
             'being used.'))
+
+
+def GetUseChiefInTfConfig():
+  """Build use-chief-in-tf-config flag."""
+  return base.Argument(
+      '--use-chief-in-tf-config',
+      required=False,
+      type=arg_parsers.ArgBoolean(),
+      help=('Use "chief" role in the cluster instead of "master". This is '
+            'required for TensorFlow 2.0 and newer versions. Unlike "master" '
+            'node, "chief" node does not run evaluation.'))
 
 
 def AddMachineTypeFlagToParser(parser):

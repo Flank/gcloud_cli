@@ -8,6 +8,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
+    List all network profiles available for testing.
+
     Run $ gcloud firebase test network-profiles --help for descriptions of the
     network profile parameters.
 
@@ -41,8 +43,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To list all network profiles, run:
+
+        gcloud firebase test network-profiles list
+
+    To list all GSM network profiles, run:
+
+        gcloud firebase test network-profiles list --filter="id:GSM"
 
 NOTES
     These variants are also available:

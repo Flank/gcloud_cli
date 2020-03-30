@@ -8,6 +8,22 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) Delete a notification channel.
 
+EXAMPLES
+    The following command will delete channel
+    projects/12345/notificationChannels/67890, but only if the channel is not
+    actively referenced by existing alerting policies:
+
+        $ gcloud alpha monitoring channels delete \
+            "projects/12345/notificationChannels/67890"
+
+    The following command will delete channel
+    projects/12345/notificationChannels/67890, even if the channel is still
+    actively referenced by alerting policies; if an existing policy references
+    the channel, it will be modified as a side-effect to remove the channel.
+
+        $ gcloud alpha monitoring channels delete \
+            "projects/12345/notificationChannels/67890" --force
+
 POSITIONAL ARGUMENTS
      Notification channel resource - The notification channel to delete. This
      represents a Cloud resource. (NOTE) Some attributes are not given
@@ -30,8 +46,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the monitoring/v3 API. The full documentation for this
@@ -41,5 +58,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta monitoring channels delete
 

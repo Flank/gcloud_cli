@@ -1,5 +1,6 @@
 NAME
-    gcloud beta debug logpoints create - create debug logpoints
+    gcloud beta debug logpoints create - add debug logpoints to a Cloud
+        Debugger debug target (debuggee)
 
 SYNOPSIS
     gcloud beta debug logpoints create LOCATION LOG_FORMAT_STRING
@@ -8,11 +9,11 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) This command adds a debug logpoint to a debug target. Logpoints add
-    logging to your running service without changing your code or restarting
-    your application. When you create a logpoint, the message you specify will
-    be added to your logs whenever any instance of your service executes the
-    specified line of code.
+    (BETA) gcloud beta debug logpoints create is used to add a debug logpoint
+    to a debug target (debuggee). Logpoints add logging to your running service
+    without changing your code or restarting your application. When you create
+    a logpoint, the message you specify will be added to your logs whenever any
+    instance of your service executes the specified line of code.
 
     The default lifetime of a logpoint is 24 hours from creation, and the
     output will go to the standard log for the programming language of the
@@ -66,8 +67,31 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To add a logpoint with no conditions that will print the value of the
+    variable 'name' at line 41 of file main.py of a debug target (debuggee),
+    run:
+
+        $ gcloud beta debug logpoints create main.py:41 \
+            "Variable name={name}" --target=<debuggee_id>
+
+    To add a logpoint that will print the value of the variable 'name' at line
+    41 of file main.py on a debug target (debuggee) that will only trigger if
+    the length of 'name' is greater than 3, run:
+
+        $ gcloud beta debug logpoints create main.py:41 \
+            "Variable name={name}" --target=<debuggee_id> \
+            --condition="len(name) > 3"
+
+    To add a logpoint with a log level of error at line 35 of file main.py on a
+    debug target (debuggee), run:
+
+        $ gcloud beta debug logpoints create main.py:35 "Unexpected path" \
+            --target=<debuggee_id> --log-level=error
 
 NOTES
     This command is currently in BETA and may change without notice. This

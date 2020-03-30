@@ -17,8 +17,8 @@ gcloud alpha compute resource\-policies create vm\-maintenance maintenance\-wind
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Create a Google Compute Engine VM Maintenance Resource Policy
-that, contains time window in which maintenance should start.
+\fB(ALPHA)\fR Create a Google Compute Engine VM Maintenance Resource Policy that
+contains time window in which maintenance should start.
 
 
 
@@ -49,10 +49,9 @@ specified if any of the other arguments in this group are specified.
 .TP 2m
 \fB\-\-start\-time\fR=\fISTART_TIME\fR
 Start time of a four\-hour window in which maintenance should start in daily
-cadence. Valid choices are 00:00, 04:00, 08:00,12:00, 16:00 and 20:00 UTC. For
-example, \f5\-\-start\-time="03:00\-05"\fR (which gets converted to 08:00 UTC).
-This flag must be specified if any of the other arguments in this group are
-specified.
+cadence. Valid choices are 00:00, 04:00, 08:00, 12:00, 16:00 and 20:00 UTC. For
+example, \f5\-\-start\-time="08:00"\fR. This flag must be specified if any of
+the other arguments in this group are specified.
 
 
 .RE
@@ -102,8 +101,9 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -115,7 +115,7 @@ Policy with a daily maintenance activity window that starts at 04:00Z.
 .RS 2m
 $ gcloud alpha compute resource\-policies create vm\-maintenance \e
     maintenance\-window my\-resource\-policy \-\-region=REGION \e
-    \-\-start\-time=04:00Z \-\-daily\-window
+    \-\-start\-time=04:00 \-\-daily\-window
 .RE
 
 

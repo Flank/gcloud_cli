@@ -1,5 +1,5 @@
 title: surface unit tests for asset feed update
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -28,7 +28,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p2beta1/projects/cai-playground/feeds?alt=json
+          uri: https://cloudasset.googleapis.com/v1/projects/cai-playground/feeds?alt=json
           method: POST
           headers: {}
           body: |-

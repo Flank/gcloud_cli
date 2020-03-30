@@ -33,11 +33,11 @@ class DescribeTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
   def SetUp(self):
     self.StartPatch('time.sleep')  # To speed up tests with polling
 
-    self.mocked_cloudbuild_v1alpha1 = mock.Client(
-        core_apis.GetClientClass('cloudbuild', 'v1alpha1'))
-    self.mocked_cloudbuild_v1alpha1.Mock()
-    self.addCleanup(self.mocked_cloudbuild_v1alpha1.Unmock)
-    self.msg = core_apis.GetMessagesModule('cloudbuild', 'v1alpha1')
+    self.mocked_cloudbuild_v1alpha2 = mock.Client(
+        core_apis.GetClientClass('cloudbuild', 'v1alpha2'))
+    self.mocked_cloudbuild_v1alpha2.Mock()
+    self.addCleanup(self.mocked_cloudbuild_v1alpha2.Unmock)
+    self.msg = core_apis.GetMessagesModule('cloudbuild', 'v1alpha2')
 
     self.project_id = 'my-project'
     properties.VALUES.core.project.Set(self.project_id)
@@ -49,26 +49,19 @@ class DescribeTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
 
   def testDescribe(self):
     wp_in = self.msg.WorkerPool()
-    wp_in.workerConfig = self.msg.WorkerConfig()
     wp_in.name = 'fake_name'
-    wp_in.workerCount = 3
-    wp_in.regions = [
-        self.msg.WorkerPool.RegionsValueListEntryValuesEnum.us_central1,
-        self.msg.WorkerPool.RegionsValueListEntryValuesEnum.us_east1
-    ]
+    wp_in.networkConfig = self.msg.NetworkConfig()
+    wp_in.networkConfig.peeredNetwork = 'fake_network'
+    wp_in.region = 'fake_region'
+    wp_in.workerConfig = self.msg.WorkerConfig()
     wp_in.workerConfig.machineType = 'fakemachine'
     wp_in.workerConfig.diskSizeGb = 123
-    wp_in.workerConfig.network = self.msg.Network()
-    wp_in.workerConfig.network.network = 'networkname'
-    wp_in.workerConfig.network.subnetwork = 'subnetname'
-    wp_in.workerConfig.network.projectId = 'project'
-    wp_in.workerConfig.tag = 'faketag'
 
     wp_out = copy.deepcopy(wp_in)
     wp_out.createTime = self.frozen_time_str
-    wp_out.status = self.msg.WorkerPool.StatusValueValuesEnum.RUNNING
+    wp_out.state = self.msg.WorkerPool.StateValueValuesEnum.RUNNING
 
-    self.mocked_cloudbuild_v1alpha1.projects_workerPools.Get.Expect(
+    self.mocked_cloudbuild_v1alpha2.projects_workerPools.Get.Expect(
         self.msg.CloudbuildProjectsWorkerPoolsGetRequest(
             name=u'projects/{}/workerPools/{}'.format(self.project_id,
                                                       wp_in.name)),
@@ -79,19 +72,13 @@ class DescribeTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
         """\
 createTime: '{}'
 name: fake_name
-regions:
-- us-central1
-- us-east1
-status: RUNNING
+networkConfig:
+peeredNetwork: fake_network
+region: fake_region
+state: RUNNING
 workerConfig:
 diskSizeGb: '123'
 machineType: fakemachine
-network:
-network: networkname
-projectId: project
-subnetwork: subnetname
-tag: faketag
-workerCount: '3'
 """.format(self.frozen_time_str),
         normalize_space=True)
 

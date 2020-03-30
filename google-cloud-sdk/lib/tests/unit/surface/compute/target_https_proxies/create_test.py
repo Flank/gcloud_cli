@@ -30,6 +30,7 @@ class TargetHTTPSProxiesCreateGATest(test_base.BaseTest):
     self.track = track
 
   def SetUp(self):
+    self._api = 'v1'
     self._SetUpReleaseTrack('v1', calliope_base.ReleaseTrack.GA)
 
   def testSimpleCaseWithoutQuic(self):
@@ -43,7 +44,7 @@ class TargetHTTPSProxiesCreateGATest(test_base.BaseTest):
     ]]
 
     results = self.Run("""
-        compute target-https-proxies create my-proxy
+        compute target-https-proxies create my-proxy --global
           --description "My target HTTPS proxy"
           --ssl-certificates my-cert
           --url-map my-map
@@ -88,7 +89,7 @@ class TargetHTTPSProxiesCreateGATest(test_base.BaseTest):
     ]]
 
     results = self.Run("""
-        compute target-https-proxies create my-proxy
+        compute target-https-proxies create my-proxy --global
           --description "My target HTTPS proxy"
           --ssl-certificates my-cert,my-cert2
           --url-map my-map
@@ -125,7 +126,7 @@ class TargetHTTPSProxiesCreateGATest(test_base.BaseTest):
     messages = self.messages
 
     self.Run("""
-        compute target-https-proxies create
+        compute target-https-proxies create --global
           {uri}/projects/my-project/global/targetHttpsProxies/my-proxy
           --ssl-certificates {uri}/projects/my-project/global/sslCertificates/my-cert
           --url-map {uri}/projects/my-project/global/urlMaps/my-map
@@ -151,7 +152,7 @@ class TargetHTTPSProxiesCreateGATest(test_base.BaseTest):
       with self.AssertRaisesArgumentErrorMatches(
           'argument --ssl-certificates: Must be specified.'):
         self.Run("""
-            compute target-https-proxies create my-proxy
+            compute target-https-proxies create my-proxy --global
               --url-map my-map
             """)
 
@@ -161,20 +162,55 @@ class TargetHTTPSProxiesCreateGATest(test_base.BaseTest):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --url-map: Must be specified.'):
       self.Run("""
-          compute target-https-proxies create my-proxy
+          compute target-https-proxies create my-proxy --global
             --ssl-certificates my-cert
           """)
 
     self.CheckRequests()
 
+  def testSimpleCaseDefaultScope(self):
+    messages = self.messages
+    self.make_requests.side_effect = [[
+        messages.TargetHttpsProxy(
+            name='my-proxy',
+            sslCertificates=['my-cert'],
+            urlMap='my-map',
+            sslPolicy='my-ssl-policy')
+    ]]
 
-class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
+    results = self.Run("""
+        compute target-https-proxies create my-proxy
+          --description "My target HTTPS proxy with default scope"
+          --ssl-certificates my-cert
+          --url-map my-map
+          --ssl-policy my-ssl-policy
+          --format=disable
+        """)
+    target_https_proxy = list(results)[0]
+    self.AssertEqual(target_https_proxy.name, 'my-proxy')
+    self.AssertEqual(target_https_proxy.sslCertificates, ['my-cert'])
+    self.AssertEqual(target_https_proxy.urlMap, 'my-map')
+    self.AssertEqual(target_https_proxy.sslPolicy, 'my-ssl-policy')
 
-  def SetUp(self):
-    self._api = 'beta'
-    self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
+    self.CheckRequests([
+        (self.compute.targetHttpsProxies, 'Insert',
+         messages.ComputeTargetHttpsProxiesInsertRequest(
+             project='my-project',
+             targetHttpsProxy=messages.TargetHttpsProxy(
+                 description='My target HTTPS proxy with default scope',
+                 name='my-proxy',
+                 sslCertificates=[
+                     (self.compute_uri + '/projects/my-project/global/'
+                      'sslCertificates/my-cert')
+                 ],
+                 urlMap=(self.compute_uri +
+                         '/projects/my-project/global/urlMaps/my-map'),
+                 sslPolicy=(
+                     self.compute_uri +
+                     '/projects/my-project/global/sslPolicies/my-ssl-policy'))))
+    ],)
 
-  def testSimpleCaseWithoutQuic(self):
+  def testRegionSimpleCaseWithoutQuic(self):
     messages = self.messages
     self.make_requests.side_effect = [[
         messages.TargetHttpsProxy(
@@ -231,7 +267,7 @@ class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
                      '/projects/my-project/global/sslPolicies/my-ssl-policy'))))
     ],)
 
-  def testSimpleCaseWithQuicEnabled(self):
+  def testRegionSimpleCaseWithQuicEnabled(self):
     messages = self.messages
     quic_enum = messages.TargetHttpsProxy.QuicOverrideValueValuesEnum
 
@@ -240,10 +276,10 @@ class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
             name='my-proxy',
             sslCertificates=[
                 'https://compute.googleapis.com/compute/{0}/'
-                'projects/my-project/global/'
+                'projects/my-project/regions/us-west-1/'
                 'sslCertificates/my-cert',
                 'https://compute.googleapis.com/compute/{0}/'
-                'projects/my-project/global/'
+                'projects/my-project/regions/us-west-1/'
                 'sslCertificates/my-cert2'.format(self._api)
             ],
             urlMap='my-map',
@@ -252,10 +288,12 @@ class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
     ]]
 
     results = self.Run("""
-        compute target-https-proxies create --global my-proxy
+        compute target-https-proxies create --region us-west-1 my-proxy
           --description "My target HTTPS proxy"
           --ssl-certificates my-cert,my-cert2
+          --ssl-certificates-region us-west-1
           --url-map my-map
+          --url-map-region us-west-1
           --quic-override ENABLE
           --ssl-policy my-ssl-policy
           --format=disable
@@ -264,33 +302,35 @@ class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
     self.AssertEqual(target_https_proxy.name, 'my-proxy')
     self.AssertEqual(target_https_proxy.sslCertificates, [
         'https://compute.googleapis.com/compute/{0}/'
-        'projects/my-project/global/'
+        'projects/my-project/regions/us-west-1/'
         'sslCertificates/my-cert', 'https://compute.googleapis.com/compute/{0}/'
-        'projects/my-project/global/'
+        'projects/my-project/regions/us-west-1/'
         'sslCertificates/my-cert2'.format(self._api)
     ])
     self.AssertEqual(target_https_proxy.urlMap, 'my-map')
     self.AssertEqual(target_https_proxy.sslPolicy, 'my-ssl-policy')
 
-    cert_uri = self.compute_uri + '/projects/my-project/global/sslCertificates/'
+    cert_uri = self.compute_uri + '/projects/my-project/regions/us-west-1/sslCertificates/'
     self.CheckRequests([
-        (self.compute.targetHttpsProxies, 'Insert',
-         messages.ComputeTargetHttpsProxiesInsertRequest(
+        (self.compute.regionTargetHttpsProxies, 'Insert',
+         messages.ComputeRegionTargetHttpsProxiesInsertRequest(
              project='my-project',
+             region='us-west-1',
              targetHttpsProxy=messages.TargetHttpsProxy(
                  description='My target HTTPS proxy',
                  name='my-proxy',
                  sslCertificates=[(cert_uri + 'my-cert'),
                                   (cert_uri + 'my-cert2')],
-                 urlMap=(self.compute_uri +
-                         '/projects/my-project/global/urlMaps/my-map'),
+                 urlMap=(
+                     self.compute_uri +
+                     '/projects/my-project/regions/us-west-1/urlMaps/my-map'),
                  quicOverride=quic_enum.ENABLE,
                  sslPolicy=(
                      self.compute_uri +
                      '/projects/my-project/global/sslPolicies/my-ssl-policy'))))
     ],)
 
-  def testUriSupport(self):
+  def testRegionUriSupport(self):
     messages = self.messages
 
     self.Run("""
@@ -315,6 +355,13 @@ class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
                           'urlMaps/my-map'))))],)
 
     self.CheckRequests()
+
+
+class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
 
 
 class TargetHTTPSProxiesCreateAlphaTest(TargetHTTPSProxiesCreateBetaTest):

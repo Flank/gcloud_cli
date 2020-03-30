@@ -9,6 +9,7 @@ class BillingbudgetsV1alpha1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://billingbudgets.googleapis.com/'
+  MTLS_BASE_URL = u'https://billingbudgets.mtls.googleapis.com/'
 
   _PACKAGE = u'billingbudgets'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
@@ -51,7 +52,7 @@ class BillingbudgetsV1alpha1(base_api.BaseApiClient):
     def Create(self, request, global_params=None):
       r"""Creates a new budget. See.
 <a href="https://cloud.google.com/billing/quotas">Quotas and limits</a>
-for more information.
+for more information on the limits of the number of budgets you can create.
 
       Args:
         request: (BillingbudgetsBillingAccountsBudgetsCreateRequest) input message
@@ -107,6 +108,11 @@ for more information.
     def Get(self, request, global_params=None):
       r"""Returns a budget.
 
+WARNING: There are some fields exposed on the Google Cloud Console that
+aren't available on this API. When reading from the API, you will not
+see these fields in the return value, though they may have been set
+in the Cloud Console.
+
       Args:
         request: (BillingbudgetsBillingAccountsBudgetsGetRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -134,6 +140,11 @@ for more information.
     def List(self, request, global_params=None):
       r"""Returns a list of budgets for a billing account.
 
+WARNING: There are some fields exposed on the Google Cloud Console that
+aren't available on this API. When reading from the API, you will not
+see these fields in the return value, though they may have been set
+in the Cloud Console.
+
       Args:
         request: (BillingbudgetsBillingAccountsBudgetsListRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -160,6 +171,10 @@ for more information.
 
     def Patch(self, request, global_params=None):
       r"""Updates a budget and returns the updated budget.
+
+WARNING: There are some fields exposed on the Google Cloud Console that
+aren't available on this API. Budget fields that are not exposed in
+this API will not be changed by this method.
 
       Args:
         request: (BillingbudgetsBillingAccountsBudgetsPatchRequest) input message

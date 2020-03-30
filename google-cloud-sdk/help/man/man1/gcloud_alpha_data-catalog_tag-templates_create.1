@@ -11,7 +11,7 @@ gcloud alpha data\-catalog tag\-templates create \- create a Cloud Data Catalog 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha data\-catalog tag\-templates create\fR (\fITAG_TEMPLATE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-field\fR=[\fIid\fR=\fIID\fR,\fItype\fR=\fITYPE\fR,\fIdisplay_name\fR=\fIDISPLAY_NAME\fR,...] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha data\-catalog tag\-templates create\fR (\fITAG_TEMPLATE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-field\fR=[\fIid\fR=\fIID\fR,\fItype\fR=\fITYPE\fR,\fIdisplay\-name\fR=\fIDISPLAY_NAME\fR,\fIrequired\fR=\fIREQUIRED\fR,...] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,7 +53,7 @@ Location of the tag template.
 
 .RS 2m
 .TP 2m
-\fB\-\-field\fR=[\fIid\fR=\fIID\fR,\fItype\fR=\fITYPE\fR,\fIdisplay_name\fR=\fIDISPLAY_NAME\fR,...]
+\fB\-\-field\fR=[\fIid\fR=\fIID\fR,\fItype\fR=\fITYPE\fR,\fIdisplay\-name\fR=\fIDISPLAY_NAME\fR,\fIrequired\fR=\fIREQUIRED\fR,...]
 Specification for a tag template field. This flag can be repeated to specify
 multiple fields. The following keys are allowed:
 
@@ -77,7 +77,12 @@ To specify an enum field with values 'A' and 'B':
 .RE
 
 .RS 2m
-*display_name*::: Display name of the tag template field.
+*display\-name*::: Display name of the tag template field.
+.RE
+
+.RS 2m
+*required*::: Indicates if the tag template field is required.
+    Defaults to FALSE.
 .RE
 
 
@@ -100,8 +105,9 @@ Human\-readable name for the tag template.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -114,27 +120,27 @@ this API can be found at: https://cloud.google.com/data\-catalog/docs/
 
 .SH "EXAMPLES"
 
-Create a string tag template with a string field:
+Create a string tag template with a required string field:
 
 .RS 2m
 $ gcloud alpha data\-catalog tag\-templates create TEMPLATE \e
-    \-\-field=id=ID,display_name=DISPLAY,type=string
+    \-\-field=id=ID,display\-name=DISPLAY,type=string,required=TRUE
 .RE
 
-Create an enum tag template with a enum field with values 'A' and 'B':
+Create an enum tag template with an optional enum field with values 'A' and 'B':
 
 .RS 2m
 $ gcloud alpha data\-catalog tag\-templates create TEMPLATE \e
-    \-\-field=id=ID,display_name=DISPLAY,type=enum(A|B)
+    \-\-field=id=ID,display\-name=DISPLAY,type='enum(A|B)'
 .RE
 
-Create a tag template with a string field and an enum field with values 'A' and
-\'B':
+Create a tag template with a optional string field and a required enum field
+with values 'A' and 'B':
 
 .RS 2m
 $ gcloud alpha data\-catalog tag\-templates create TEMPLATE \e
-    \-\-field=id=ID1,display_name=DISPLAY1,type=string \e
-    \-\-field=id=ID2,display_name=DISPLAY2,type=enum(A|B)
+    \-\-field=id=ID1,display\-name=DISPLAY1,type=string \e
+    \-\-field=id=ID2,display\-name=DISPLAY2,type='enum(A|B)',required=TRUE
 .RE
 
 
@@ -144,9 +150,10 @@ $ gcloud alpha data\-catalog tag\-templates create TEMPLATE \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud data\-catalog tag\-templates create
 $ gcloud beta data\-catalog tag\-templates create
 .RE
 

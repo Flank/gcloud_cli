@@ -25,8 +25,6 @@ from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.core.util import retry
 from tests.lib import e2e_utils
-from tests.lib import sdk_test_base
-from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 _UPLOAD_TIMEOUT = 300
@@ -47,8 +45,7 @@ _GS_UTIL_REGEX = r'gs://.*?/.*?\.zip'
 _PROJECT_NAME = r'cloud-sdk-integration-testing'
 
 
-@sdk_test_base.Filters.RunOnlyOnWindows
-class WindowsDiagnostcisTest(e2e_test_base.BaseTest):
+class WindowsDiagnosticsTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
     self.instance_names_used = []
@@ -58,19 +55,16 @@ class WindowsDiagnostcisTest(e2e_test_base.BaseTest):
     logging.info('Starting TearDown (will delete resources if test fails).')
     for name in self.instance_names_used:
       self.CleanUpResource(name, 'instances')
-    if self.bucket_ref:
-      storage_api.StorageClient().DeleteBucket(self.bucket_ref)
 
-  def GetInstanceName(self):
+  def _GetInstanceName(self):
     # Make sure the name used is different on each retry, and make sure all
     # names used are cleaned up.
     self.instance_name = next(e2e_utils.GetResourceNameGenerator(
         prefix='gcloud-compute-test-windows'))
     self.instance_names_used.append(self.instance_name)
 
-  @test_case.Filters.skip('Failing', 'b/138801142')
   def testInstances(self):
-    self.GetInstanceName()
+    self._GetInstanceName()
     self._CreateInstance()
     self._ResetWindowsPassword()
     self._DownloadDiagnosticsTool()
@@ -85,7 +79,8 @@ class WindowsDiagnostcisTest(e2e_test_base.BaseTest):
              '--format json'.format(self.instance_name, self.zone, user))
 
   def _CreateInstance(self):
-    self.Run('compute instances create {0} --zone {1} --image {2} '
+    self.Run('compute instances create {0} --zone {1} '
+             '--image-project=windows-cloud --image-family={2} '
              '--metadata windows-startup-script-ps1=\"{3}\"'
              .format(self.instance_name, self.zone,
                      _WINDOWS_IMAGE_ALIAS, _START_SCRIPT))
@@ -116,7 +111,7 @@ class WindowsDiagnostcisTest(e2e_test_base.BaseTest):
              '/iam.serviceAccountTokenCreator'.format(
                  _PROJECT_NAME,
                  _SERVICE_ACCOUNT))
-    self.Run('alpha compute diagnose export-logs {0} '
+    self.Run('beta compute diagnose export-logs {0} '
              '--zone {1}'.format(self.instance_name, self.zone))
 
     connection_info = self.GetNewOutput()

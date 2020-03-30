@@ -1,0 +1,226 @@
+title: billing budgets create test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      billing budgets create --billing-account=fake-account --display-name=new-budget --budget-amount=123.45
+  - stderr: |
+      Created.
+- execute:
+  - command: |
+      billing budgets create --billing-account=fake-account --display-name=new-budget --budget-amount=123.45 --threshold-rule=percent=50 --threshold-rule=basis=forecasted-spend,percent=70
+  - stderr: |
+      Created.
+- execute:
+  - command: |
+      billing budgets create --billing-account=fake-account --display-name=new-budget --budget-amount=123.45 --all-updates-rule-pubsub-topic=projects/fake-project/topics/fake-topic
+  - stderr: |
+      Created.
+- execute:
+  - command: |
+      billing budgets create --billing-account=fake-account --budget-amount=111.11USD
+      --display-name=my-budget --filter-projects='projects/fake-project' --filter-services='services/fake-service'
+  - stderr: |
+      Created.
+- execute:
+  - command: |
+      billing budgets create --billing-account=fake-account --display-name=new-budget --budget-amount=123.45 --credit-types-treatment=include-all-credits
+  - stderr: |
+      Created.
+- execute:
+  - command: |
+      billing budgets create --billing-account=fake-account --last-period-amount --display-name=new-budget --credit-types-treatment=exclude-all-credits
+  - stderr: |
+      Created.
+actions:
+- execute_command:
+    command: |
+      billing budgets create --billing-account=fake-account --display-name=new-budget --budget-amount=123.45
+    events:
+    - api_call:
+        expect_request:
+          uri: https://billingbudgets.googleapis.com/v1beta1/billingAccounts/fake-account/budgets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              budget:
+                amount:
+                  specifiedAmount:
+                    currencyCode: ''
+                    nanos: 45
+                    units: '123'
+                displayName: new-budget
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Created.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      billing budgets create --billing-account=fake-account --display-name=new-budget --budget-amount=123.45 --threshold-rule=percent=50 --threshold-rule=basis=forecasted-spend,percent=70
+    events:
+    - api_call:
+        expect_request:
+          uri: https://billingbudgets.googleapis.com/v1beta1/billingAccounts/fake-account/budgets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              budget:
+                amount:
+                  specifiedAmount:
+                    currencyCode: ''
+                    nanos: 45
+                    units: '123'
+                displayName: new-budget
+                thresholdRules:
+                - thresholdPercent: 50.0
+                - spendBasis: FORECASTED_SPEND
+                  thresholdPercent: 70.0
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Created.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      billing budgets create --billing-account=fake-account --display-name=new-budget --budget-amount=123.45 --all-updates-rule-pubsub-topic=projects/fake-project/topics/fake-topic
+    events:
+    - api_call:
+        expect_request:
+          uri: https://billingbudgets.googleapis.com/v1beta1/billingAccounts/fake-account/budgets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              budget:
+                allUpdatesRule:
+                  pubsubTopic: projects/fake-project/topics/fake-topic
+                  schemaVersion: '1.0'
+                amount:
+                  specifiedAmount:
+                    currencyCode: ''
+                    nanos: 45
+                    units: '123'
+                displayName: new-budget
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Created.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      billing budgets create --billing-account=fake-account --budget-amount=111.11USD
+      --display-name=my-budget --filter-projects='projects/fake-project' --filter-services='services/fake-service'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://billingbudgets.googleapis.com/v1beta1/billingAccounts/fake-account/budgets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              budget:
+                amount:
+                  specifiedAmount:
+                    currencyCode: USD
+                    nanos: 11
+                    units: '111'
+                budgetFilter:
+                  projects:
+                    [projects/fake-project]
+                  services:
+                    [services/fake-service]
+                displayName: my-budget
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              budget:
+                amount:
+                  specifiedAmount:
+                    currencyCode: USD
+                    nanos: 11
+                    units: '111'
+                budgetFilter:
+                  projects:
+                    [projects/fake-project]
+                  services:
+                    [services/fake-service]
+                displayName: my-budget
+    - expect_stderr: |
+        Created.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      billing budgets create --billing-account=fake-account --display-name=new-budget --budget-amount=123.45 --credit-types-treatment=include-all-credits
+    events:
+    - api_call:
+        expect_request:
+          uri: https://billingbudgets.googleapis.com/v1beta1/billingAccounts/fake-account/budgets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              budget:
+                amount:
+                  specifiedAmount:
+                    currencyCode: ''
+                    nanos: 45
+                    units: '123'
+                budgetFilter:
+                  creditTypesTreatment: INCLUDE_ALL_CREDITS
+                displayName: new-budget
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Created.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      billing budgets create --billing-account=fake-account --last-period-amount --display-name=new-budget --credit-types-treatment=exclude-all-credits
+    events:
+    - api_call:
+        expect_request:
+          uri: https://billingbudgets.googleapis.com/v1beta1/billingAccounts/fake-account/budgets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              budget:
+                amount:
+                  lastPeriodAmount: {}
+                budgetFilter:
+                  creditTypesTreatment: EXCLUDE_ALL_CREDITS
+                displayName: new-budget
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              budget:
+                amount:
+                  lastPeriodAmount: {}
+                budgetFilter:
+                  creditTypesTreatment: EXCLUDE_ALL_CREDITS
+                displayName: new-budget
+    - expect_stderr: |
+        Created.
+    - expect_exit:
+        code: 0

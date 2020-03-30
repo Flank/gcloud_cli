@@ -1,0 +1,132 @@
+
+.TH "GCLOUD_COMPUTE_INSTANCE\-GROUPS_MANAGED_WAIT\-UNTIL" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute instance\-groups managed wait\-until \- wait until the managed instance group reaches the desired state
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute instance\-groups managed wait\-until\fR \fINAME\fR (\fB\-\-stable\fR\ |\ \fB\-\-version\-target\-reached\fR) [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Wait until the managed instance group reaches the desired state.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the managed instance group to operate on.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-stable\fR
+Wait until the group is stable.
+
+.TP 2m
+\fB\-\-version\-target\-reached\fR
+Wait until version target is reached.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-timeout\fR=\fITIMEOUT\fR
+Waiting time in seconds for the group to reach the desired state.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the managed instance group to operate on. If not specified, you may be
+prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the managed instance group to operate on. If not specified, you may be
+prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To wait until the managed instance group \f5\fIinstance\-group\-1\fR\fR is
+stable, run:
+
+.RS 2m
+$ gcloud compute instance\-groups managed wait\-until \e
+    \-\-stable instance\-group\-1
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed wait\-until
+$ gcloud beta compute instance\-groups managed wait\-until
+.RE
+

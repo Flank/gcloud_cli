@@ -81,7 +81,8 @@ def CreatePerInstanceConfigMessage(holder,
                                    instance_ref,
                                    stateful_disks,
                                    stateful_metadata,
-                                   disk_getter=None):
+                                   disk_getter=None,
+                                   set_preserved_state=True):
   """Create per-instance config message from the given stateful disks and metadata."""
   if not disk_getter:
     disk_getter = instance_disk_getter.InstanceDiskGetter(
@@ -97,13 +98,15 @@ def CreatePerInstanceConfigMessage(holder,
     preserved_state_metadata.append(
         MakePreservedStateMetadataEntry(
             messages, key=metadata_key, value=metadata_value))
-  return messages.PerInstanceConfig(
-      name=path_simplifier.Name(six.text_type(instance_ref)),
-      preservedState=messages.PreservedState(
-          disks=messages.PreservedState.DisksValue(
-              additionalProperties=preserved_state_disks),
-          metadata=messages.PreservedState.MetadataValue(
-              additionalProperties=preserved_state_metadata)))
+  per_instance_config = messages.PerInstanceConfig(
+      name=path_simplifier.Name(six.text_type(instance_ref)))
+  if set_preserved_state:
+    per_instance_config.preservedState = messages.PreservedState(
+        disks=messages.PreservedState.DisksValue(
+            additionalProperties=preserved_state_disks),
+        metadata=messages.PreservedState.MetadataValue(
+            additionalProperties=preserved_state_metadata))
+  return per_instance_config
 
 
 def CallPerInstanceConfigUpdate(holder, igm_ref, per_instance_config_message):
@@ -181,10 +184,11 @@ def GetApplyUpdatesToInstancesRequestsZonal(holder, igm_ref, instances):
   messages = holder.client.messages
   request = messages.InstanceGroupManagersApplyUpdatesRequest(
       instances=instances,
-      minimalAction=messages.InstanceGroupManagersApplyUpdatesRequest.
-      MinimalActionValueValuesEnum.NONE,
-      maximalAction=messages.InstanceGroupManagersApplyUpdatesRequest.
-      MaximalActionValueValuesEnum.RESTART)
+      minimalAction=messages.InstanceGroupManagersApplyUpdatesRequest
+      .MinimalActionValueValuesEnum.NONE,
+      mostDisruptiveAllowedAction=messages
+      .InstanceGroupManagersApplyUpdatesRequest
+      .MostDisruptiveAllowedActionValueValuesEnum.RESTART)
   return messages.ComputeInstanceGroupManagersApplyUpdatesToInstancesRequest(
       instanceGroupManager=igm_ref.Name(),
       instanceGroupManagersApplyUpdatesRequest=request,
@@ -198,10 +202,11 @@ def GetApplyUpdatesToInstancesRequestsRegional(holder, igm_ref, instances):
   messages = holder.client.messages
   request = messages.RegionInstanceGroupManagersApplyUpdatesRequest(
       instances=instances,
-      minimalAction=messages.RegionInstanceGroupManagersApplyUpdatesRequest.
-      MinimalActionValueValuesEnum.NONE,
-      maximalAction=messages.RegionInstanceGroupManagersApplyUpdatesRequest.
-      MaximalActionValueValuesEnum.RESTART)
+      minimalAction=messages.RegionInstanceGroupManagersApplyUpdatesRequest
+      .MinimalActionValueValuesEnum.NONE,
+      mostDisruptiveAllowedAction=messages
+      .RegionInstanceGroupManagersApplyUpdatesRequest
+      .MostDisruptiveAllowedActionValueValuesEnum.RESTART)
   return (
       messages.ComputeRegionInstanceGroupManagersApplyUpdatesToInstancesRequest
   )(

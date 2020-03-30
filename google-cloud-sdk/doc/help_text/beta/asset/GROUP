@@ -11,8 +11,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -26,11 +27,24 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
+     analyze-iam-policy
+        (BETA) Analyzes accessible IAM policies that match a request.
+
      export
         (BETA) Export the cloud assets to Google Cloud Storage.
 
      get-history
         (BETA) Get the update history of assets that overlaps a time window.
+
+     search-all-iam-policies
+        (BETA) Searches all IAM policies under a given scope (i.e., an
+        organization, a folder, or a project) with
+        cloudasset.assets.searchAllIamPolicies permission.
+
+     search-all-resources
+        (BETA) Searches all the resources under a given scope (i.e., an
+        organization, a folder, or a project) with
+        cloudasset.assets.searchAllResources permission.
 
 NOTES
     This command is currently in BETA and may change without notice. These

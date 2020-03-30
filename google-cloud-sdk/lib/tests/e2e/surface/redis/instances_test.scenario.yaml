@@ -146,7 +146,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: redis instances list --region="us-central1" --format="text(name,state)"
+    command: redis instances list --region="us-central1" --format="text(name,redisVersion,state)"
       --filter="name=projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$"
     events:
     - api_call:
@@ -166,7 +166,7 @@ actions:
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/redis-instance-20190313-181925-6q5a
               displayName: a_fancy_redis_instance
               locationId: us-central1-b
-              redisVersion: REDIS_3_2
+              redisVersion: REDIS_4_0
               reservedIpRange: 10.0.0.48/29
               host: 10.0.0.51
               port: 6379
@@ -180,7 +180,7 @@ actions:
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
               locationId: us-central1-a
               alternativeLocationId: us-central1-b
-              redisVersion: REDIS_3_2
+              redisVersion: REDIS_4_0
               reservedIpRange: 10.0.0.32/29
               host: 10.0.0.36
               port: 6379
@@ -275,7 +275,7 @@ actions:
               persistenceIamIdentity: serviceAccount:139285888481-compute@developer.gserviceaccount.com
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/bsc-456
               locationId: us-central1-b
-              redisVersion: REDIS_3_2
+              redisVersion: REDIS_4_0
               reservedIpRange: 10.0.0.0/29
               host: 10.0.0.3
               port: 6379
@@ -288,8 +288,9 @@ actions:
               persistenceIamIdentity: serviceAccount:139285888481-compute@developer.gserviceaccount.com
     - expect_stdout: |
         ---
-        name:  projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
-        state: READY
+        name:         projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
+        redisVersion: REDIS_4_0
+        state:        READY
     - expect_exit:
         code: 0
 - execute_command:
@@ -312,7 +313,7 @@ actions:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
             locationId: us-central1-a
             alternativeLocationId: us-central1-b
-            redisVersion: REDIS_3_2
+            redisVersion: REDIS_4_0
             reservedIpRange: 10.0.0.32/29
             host: 10.0.0.36
             port: 6379
@@ -373,14 +374,14 @@ actions:
             displayName: a_fancy_redis_instance
             locationId: us-central1-a
             alternativeLocationId: us-central1-b
-            redisVersion: REDIS_3_2
+            redisVersion: REDIS_4_0
             reservedIpRange: 10.0.0.32/29
             host: 10.0.0.36
             port: 6379
             currentLocationId: us-central1-a
             createTime: '2019-03-13T18:15:18.415444661Z'
             state: READY
-            tier: STANDARD_HA
+            tier: BASIC
             memorySizeGb: 1
             authorizedNetwork: projects/cloud-sdk-integration-testing/global/networks/do-not-delete-redis-network
             persistenceIamIdentity: serviceAccount:139285888481-compute@developer.gserviceaccount.com
@@ -410,10 +411,12 @@ actions:
             displayName: a_fancy_redis_instance
             locationId: us-central1-a
             alternativeLocationId: us-central1-b
-            redisVersion: REDIS_3_2
+            redisVersion: REDIS_4_0
             reservedIpRange: 10.0.0.32/29
             host: 10.0.0.36
             port: 6379
+            redisConfigs:
+              activedefrag: 'yes'
             currentLocationId: us-central1-a
             createTime: '2019-03-13T18:15:18.415444661Z'
             state: READY

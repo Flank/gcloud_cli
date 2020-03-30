@@ -22,9 +22,10 @@ from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute.org_security_policies import client
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.org_security_policies import flags
+import six
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Create(base.CreateCommand):
   """Create a Google Compute Engine organization security policy.
 
@@ -41,7 +42,10 @@ class Create(base.CreateCommand):
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    org_security_policy = client.OrgSecurityPolicy(compute_client=holder.client)
+    org_security_policy = client.OrgSecurityPolicy(
+        compute_client=holder.client,
+        resources=holder.resources,
+        version=six.text_type(self.ReleaseTrack()).lower())
 
     if args.IsSpecified('organization'):
       parent_id = 'organizations/' + args.organization
@@ -49,8 +53,20 @@ class Create(base.CreateCommand):
       parent_id = 'folders/' + args.folder
     security_policy = holder.client.messages.SecurityPolicy(
         description=args.description,
+        displayName=args.display_name,
         type=holder.client.messages.SecurityPolicy.TypeValueValuesEnum.FIREWALL)
     return org_security_policy.Create(
         security_policy=security_policy,
         parent_id=parent_id,
         only_generate_request=False)
+
+
+Create.detailed_help = {
+    'EXAMPLES':
+        """\
+    To create an organization security policy under folder with ID ``123456789",
+    run:
+
+      $ {command} create --folder=123456789
+    """,
+}

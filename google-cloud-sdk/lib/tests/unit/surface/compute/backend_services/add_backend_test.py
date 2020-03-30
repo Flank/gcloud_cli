@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
@@ -1073,7 +1074,8 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
     with self.AssertRaisesArgumentErrorMatches(
         'Exactly one of ([--instance-group : --instance-group-region | '
         '--instance-group-zone] | [--network-endpoint-group : '
-        '--network-endpoint-group-zone]) must be specified.'):
+        '--global-network-endpoint-group | --network-endpoint-group-zone]) '
+        'must be specified.'):
       self.Run("""
           compute backend-services add-backend my-backend-service
             --network-endpoint-group my-group
@@ -1114,6 +1116,48 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
             {2} 100
             --global
           """.format(group_flag, balancing_mode, incompatible_flag))
+
+  def testWithFailover(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [messages.BackendService(
+            name='my-backend-service',
+            port=80,
+            fingerprint=b'my-fingerprint',
+            timeoutSec=120)],
+        [],
+    ])
+
+    self.Run("""
+        compute backend-services add-backend my-backend-service
+          --instance-group my-group
+          --instance-group-zone us-central1-a
+          --failover
+          --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='my-backend-service', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='my-backend-service',
+              backendServiceResource=messages.BackendService(
+                  name='my-backend-service',
+                  port=80,
+                  fingerprint=b'my-fingerprint',
+                  backends=[
+                      messages.Backend(
+                          failover=True,
+                          group=(self.compute_uri +
+                                 '/projects/my-project/zones/'
+                                 'us-central1-a/instanceGroups/my-group'),
+                      ),
+                  ],
+                  timeoutSec=120),
+              project='my-project'))],
+    )
 
 
 class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
@@ -1325,6 +1369,57 @@ class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
               project='my-project',
               region='alaska'))],
     )
+
+
+class BackendServiceAddBackendGlobalNetworkEndpointGroupTest(
+    test_base.BaseTest):
+
+  def SetUp(self):
+    SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testAddGlobalNetworkEndpointGroup(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.BackendService(
+                name='my-backend-service',
+                fingerprint=b'my-fingerprint',
+                port=80,
+                timeoutSec=120)
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute backend-services add-backend my-backend-service
+          --global-network-endpoint-group
+          --network-endpoint-group my-group
+          --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='my-backend-service', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='my-backend-service',
+              backendServiceResource=messages.BackendService(
+                  name='my-backend-service',
+                  port=80,
+                  fingerprint=b'my-fingerprint',
+                  backends=[
+                      messages.Backend(
+                          group=(self.compute_uri +
+                                 '/projects/my-project/global'
+                                 '/networkEndpointGroups/my-group')),
+                  ],
+                  healthChecks=[],
+                  timeoutSec=120),
+              project='my-project'))],
+    )
+
 
 if __name__ == '__main__':
   test_case.main()

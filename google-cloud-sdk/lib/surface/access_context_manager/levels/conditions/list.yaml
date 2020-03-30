@@ -9,9 +9,9 @@
     collection: accesscontextmanager.accessPolicies.accessLevels
     api_version: v1
     BETA:
-      api_version: v1beta
+      api_version: v1
     ALPHA:
-      api_version: v1beta
+      api_version: v1alpha
     static_fields:
       accessLevelFormat: AS_DEFINED
 

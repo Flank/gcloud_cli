@@ -24,6 +24,7 @@ from apitools.base.py.testing import mock as api_mock
 
 from googlecloudsdk.api_lib.composer import util as api_util
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.composer import storage_util as composer_storage_util
 from googlecloudsdk.command_lib.composer import util as command_util
 from googlecloudsdk.core import properties
@@ -63,7 +64,7 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
   TEST_IMAGE_VERSION = 'composer-1.2.3-airflow-4.5.6'
   TEST_UPGRADEABLE_IMAGE_VERSION = 'composer-1.3.2-airflow-1.9.0'
   TEST_PYTHON_VERSION = '2'
-  TEST_MASTER_IPV4_CIDR_BLOCK = '192.168.0.0/26'
+  TEST_MASTER_IPV4_CIDR_BLOCK = '192.168.0.0/28'
   TEST_CLUSTER_IPV4_CIDR_BLOCK = '192.168.35.0/28'
   TEST_CLUSTER_SECONDARY_RANGE_NAME = 'test-secondary-range-cluster'
   TEST_SERVICES_IPV4_CIDR_BLOCK = '192.168.36.0/28'
@@ -255,6 +256,19 @@ class EnvironmentsUnitTest(ComposerUnitTestBase):
                               exception=None):
     if response is None and exception is None:
       response = self.messages.Empty()
+    if (self.track == calliope_base.ReleaseTrack.BETA and config is not None and
+        config.webServerNetworkAccessControl is None):
+      config.webServerNetworkAccessControl = (
+          self.messages.WebServerNetworkAccessControl(allowedIpRanges=[
+              self.messages.AllowedIpRange(
+                  value='0.0.0.0/0',
+                  description='Allows access from all IPv4 addresses (default value)'
+              ),
+              self.messages.AllowedIpRange(
+                  value='::0/0',
+                  description='Allows access from all IPv6 addresses (default value)'
+              )
+          ]))
     self.mock_client.projects_locations_environments.Create.Expect(
         self.messages.ComposerProjectsLocationsEnvironmentsCreateRequest(
             environment=self.MakeEnvironment(
@@ -374,6 +388,9 @@ class EnvironmentsUnitTest(ComposerUnitTestBase):
 
 class OperationsUnitTest(ComposerUnitTestBase):
   """Base class for Composer Operations unit tests."""
+
+  def SetUp(self):
+    properties.VALUES.core.color_theme.Set('off')
 
   def ExpectOperationDelete(self,
                             project,

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta debug logpoints delete \- delete debug logpoints
+gcloud beta debug logpoints delete \- delete debug logpoints for a Cloud Debugger debug target (debuggee)
 
 
 
@@ -17,9 +17,10 @@ gcloud beta debug logpoints delete \- delete debug logpoints
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR This command deletes logpoints from a Cloud Debugger debug target.
-It will ask for confirmation before deleting any logpoints. To suppress
-confirmation, use the global \-\-quiet option.
+\fB(BETA)\fR \fBgcloud beta debug logpoints delete\fR is used to delete
+logpoints from a Cloud Debugger debug target (debuggee). It will ask for
+confirmation before deleting any logpoints. To suppress confirmation, use the
+global \-\-quiet option.
 
 
 
@@ -78,8 +79,36 @@ target is the most recent deployment of the default module and version.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete all active debug logpoints created by the current user of the debug
+target (debuggee), without being prompted for confirmation, run:
+
+.RS 2m
+$ gcloud beta debug logpoints delete \-\-target=<debuggee_id> \-\-quiet
+.RE
+
+To delete all active and inactive debug logpoints created by all users of the
+debug target (debuggee), run:
+
+.RS 2m
+$ gcloud beta debug logpoints delete \-\-target=<debuggee_id> \e
+    \-\-include\-inactive \-\-all\-users
+.RE
+
+To delete the debug logpoints with IDs 'ID1' and 'ID2' (where ID1 and ID2 were
+each created by different users) of the debug target (debuggee), run:
+
+.RS 2m
+$ gcloud beta debug logpoints delete ID1 ID2 \e
+    \-\-target=<debuggee_id> \-\-all\-users
+.RE
 
 
 

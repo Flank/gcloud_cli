@@ -246,8 +246,9 @@ class ConfigTest(cli_test_base.CliTestBase):
            'disable_usage_reporting'])
 
       # Complete both sections and properties.
-      self.RunCompletion('config {0} a'.format(verb),
-                         ['app/', 'auth/', 'account', 'accessibility/'])
+      self.RunCompletion(
+          'config {0} a'.format(verb),
+          ['app/', 'auth/', 'account', 'accessibility/', 'artifacts/'])
 
       # Complete only sections.
       self.RunCompletion('config {0} co'.format(verb), [

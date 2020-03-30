@@ -42,6 +42,7 @@ class CloudPubsubTestBase(sdk_test_base.WithFakeAuth,
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     properties.VALUES.core.user_output_enabled.Set(False)
+    properties.VALUES.core.color_theme.Set('off')
 
     self.client = mock.Client(client_class=apis.GetClientClass('pubsub', 'v1'))
     self.client.Mock()

@@ -1,9 +1,42 @@
+filters:
+  skipAlways:
+    reason: API change
+    bug: b/147828581
 title: LabelManager - LabelBindings - Create test
 release_tracks: [ALPHA]
-
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: labelmanager bindings create test --label-key="env" --label-parent="organizations/999"
+      --resource="//cloudresourcemanager.googleapis.com/projects/12345"
+  - error: '1: Invalid display_name for LabelKey [env] in parent [organizations/999]'
+- execute:
+  - command: labelmanager bindings create test --label-key="env" --label-parent="organizations/999"
+      --resource="//cloudresourcemanager.googleapis.com/projects/12345"
+  - error: '1: Invalid display_name for LabelValue [test] in parent [labelKeys/123]'
+- execute:
+  - command: labelmanager bindings create test --label-key="env" --label-parent="organizations/999"
+      --resource="//cloudresourcemanager.googleapis.com/projects/12345"
+  - stdout: |
+      label_value: labelValues/789
+      name: labelBindings/somename
+      resource: //cloudresourcemanager.googleapis.com/projects/12345
+- execute:
+  - command: labelmanager bindings create test --label-key="labelKeys/123" --resource="//cloudresourcemanager.googleapis.com/projects/12345"
+  - stdout: |
+      label_value: labelValues/789
+      name: labelBindings/somename
+      resource: //cloudresourcemanager.googleapis.com/projects/12345
+- execute:
+  - command: labelmanager bindings create labelValues/789 --resource="//cloudresourcemanager.googleapis.com/projects/12345"
+  - stdout: |
+      label_value: labelValues/789
+      name: labelBindings/somename
+      resource: //cloudresourcemanager.googleapis.com/projects/12345
 actions:
 - execute_command:
-    command: labelmanager bindings create test --label-key="env" --label-parent="organizations/999" --resource="//cloudresourcemanager.googleapis.com/projects/12345"
+    command: labelmanager bindings create test --label-key="env" --label-parent="organizations/999"
+      --resource="//cloudresourcemanager.googleapis.com/projects/12345"
     events:
     - api_call:
         expect_request:
@@ -21,9 +54,10 @@ actions:
               name: labelKeys/456
     - expect_exit:
         code: 1
-        message: 'Invalid display_name for label key [env] in parent [organizations/999]'
+        message: Invalid display_name for LabelKey [env] in parent [organizations/999]
 - execute_command:
-    command: labelmanager bindings create test --label-key="env" --label-parent="organizations/999" --resource="//cloudresourcemanager.googleapis.com/projects/12345"
+    command: labelmanager bindings create test --label-key="env" --label-parent="organizations/999"
+      --resource="//cloudresourcemanager.googleapis.com/projects/12345"
     events:
     - api_call:
         expect_request:
@@ -52,12 +86,13 @@ actions:
             - displayName: value1
               name: labelValues/789
             - displayName: prod
-              name: labelKeys/111
+              name: labelValues/111
     - expect_exit:
         code: 1
-        message: 'Invalid display_name for label value [test] in parent [labelKeys/123]'
+        message: Invalid display_name for LabelValue [test] in parent [labelKeys/123]
 - execute_command:
-    command: labelmanager bindings create test --label-key="env" --label-parent="organizations/999" --resource="//cloudresourcemanager.googleapis.com/projects/12345"
+    command: labelmanager bindings create test --label-key="env" --label-parent="organizations/999"
+      --resource="//cloudresourcemanager.googleapis.com/projects/12345"
     events:
     - api_call:
         expect_request:
@@ -86,20 +121,25 @@ actions:
             - displayName: test
               name: labelValues/789
             - displayName: prod
-              name: labelKeys/111
+              name: labelValues/111
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues/labelValues%2F789/labelBindings?alt=json
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelBindings?alt=json
           method: POST
-          body: None
+          body:
+            json:
+              label_value: labelValues/789
+              resource: //cloudresourcemanager.googleapis.com/projects/12345
         return_response:
           headers:
             status: '200'
           body:
-            label_binding: labelValues/789
+            label_value: labelValues/789
+            name: labelBindings/somename
             resource: //cloudresourcemanager.googleapis.com/projects/12345
     - expect_stdout: |
-        label_binding: labelValues/789
+        label_value: labelValues/789
+        name: labelBindings/somename
         resource: //cloudresourcemanager.googleapis.com/projects/12345
     - expect_exit:
         code: 0
@@ -119,20 +159,25 @@ actions:
             - displayName: test
               name: labelValues/789
             - displayName: prod
-              name: labelKeys/111
+              name: labelValues/111
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues/labelValues%2F789/labelBindings?alt=json
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelBindings?alt=json
           method: POST
-          body: None
+          body:
+            json:
+              label_value: labelValues/789
+              resource: //cloudresourcemanager.googleapis.com/projects/12345
         return_response:
           headers:
             status: '200'
           body:
-            label_binding: labelValues/789
+            label_value: labelValues/789
+            name: labelBindings/somename
             resource: //cloudresourcemanager.googleapis.com/projects/12345
     - expect_stdout: |
-        label_binding: labelValues/789
+        label_value: labelValues/789
+        name: labelBindings/somename
         resource: //cloudresourcemanager.googleapis.com/projects/12345
     - expect_exit:
         code: 0
@@ -141,17 +186,22 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues/labelValues%2F789/labelBindings?alt=json
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelBindings?alt=json
           method: POST
-          body: None
+          body:
+            json:
+              label_value: labelValues/789
+              resource: //cloudresourcemanager.googleapis.com/projects/12345
         return_response:
           headers:
             status: '200'
           body:
-            label_binding: labelValues/789
+            label_value: labelValues/789
+            name: labelBindings/somename
             resource: //cloudresourcemanager.googleapis.com/projects/12345
     - expect_stdout: |
-        label_binding: labelValues/789
+        label_value: labelValues/789
+        name: labelBindings/somename
         resource: //cloudresourcemanager.googleapis.com/projects/12345
     - expect_exit:
         code: 0

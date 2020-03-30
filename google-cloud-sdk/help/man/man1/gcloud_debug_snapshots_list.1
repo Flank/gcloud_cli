@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud debug snapshots list \- list debug snapshots
+gcloud debug snapshots list \- list the debug snapshots for a Cloud Debugger debug target (debuggee)
 
 
 
@@ -17,8 +17,10 @@ gcloud debug snapshots list \- list debug snapshots
 
 .SH "DESCRIPTION"
 
-This command displays a list of the active debug snapshots for a Cloud Debugger
-debug target.
+\fBgcloud debug snapshots list\fR is used to display the debug snapshots for a
+Cloud Debugger debug target (debuggee). By default all active snapshots as well
+as any recently completed snapshots are returned. To obtain older completed
+snapshots specify the \-\-include\-inactive option.
 
 
 
@@ -102,8 +104,34 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list the active and recently completed debug snapshots of the debug target
+(debuggee), run:
+
+.RS 2m
+$ gcloud debug snapshots list \-\-target=<debuggee_id>
+.RE
+
+To list all (both active and inactive) snapshots of the debug target (debuggee),
+run:
+
+.RS 2m
+$ gcloud debug snapshots list \-\-include\-inactive=unlimited \e
+    \-\-target=<debuggee_id>
+.RE
+
+To list snapshots created by all users of the debug target (debuggee), run:
+
+.RS 2m
+$ gcloud debug snapshots list \-\-all\-users \-\-target=<debuggee_id>
+.RE
 
 
 

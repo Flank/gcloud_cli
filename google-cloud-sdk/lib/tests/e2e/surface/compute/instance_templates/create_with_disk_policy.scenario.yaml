@@ -256,8 +256,8 @@ actions:
             json: {}
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/operations/$$operation$$?alt=json
-          method: GET
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/operations/$$operation$$/wait?alt=json
+          method: POST
           headers: {}
           body: null
         return_response:

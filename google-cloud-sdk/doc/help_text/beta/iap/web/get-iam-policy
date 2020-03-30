@@ -57,8 +57,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To get the IAM policy for the web accesses to the IAP protected resources
@@ -101,8 +102,9 @@ EXAMPLES
             --resource-type=backend-services --service=SERVICE_ID
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud iap web get-iam-policy
         $ gcloud alpha iap web get-iam-policy
 

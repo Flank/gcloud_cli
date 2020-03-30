@@ -1,5 +1,5 @@
 title: Basic test of L7ILB forwarding rule.
-release_tracks: [BETA]
+release_tracks: [BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -9,20 +9,20 @@ summary:
   - stdout: |
       $$network-1$$
 - execute:
-  - command: compute networks subnets create $$subnet-1$$ --purpose INTERNAL_HTTPS_LOAD_BALANCER
-      --role ACTIVE --region $$my-region$$ --network $$network-1$$ --range 10.126.0.0/22
+  - command: compute networks subnets create $$subnet-1$$ $$subnet-purpose-and-role$$
+      --region $$my-region$$ --network $$network-1$$ --range 10.126.0.0/22
       --format "value(name)"
   - stderr: |
       Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/subnetworks/$$subnet-1$$\].
   - stdout: |
       $$subnet-1$$
 - execute:
-  - command: compute health-checks create http $$hc-1$$ --format none --region $$my-region$$
+  - command: compute health-checks create http $$hc-1$$ --format none $$health-check-region$$
   - stderr: |
       Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/healthChecks/$$hc-1$$\].
 - execute:
   - command: compute backend-services create $$bs-1$$ --protocol HTTP --health-checks
-      $$hc-1$$ --region $$my-region$$ --health-checks-region $$my-region$$ --load-balancing-scheme
+      $$hc-1$$ --region $$my-region$$ $$backend-service-health-check-region$$ --load-balancing-scheme
       INTERNAL_MANAGED
   - stderr: |
       Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/backendServices/$$bs-1$$\].
@@ -68,7 +68,7 @@ summary:
   - stderr: |
       Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/backendServices/$$bs-1$$\].
 - execute:
-  - command: compute health-checks delete $$hc-1$$ --region $$my-region$$ --quiet
+  - command: compute health-checks delete $$hc-1$$ $$health-check-region$$ --quiet
   - stderr: |
       Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/healthChecks/$$hc-1$$\].
 - execute:
@@ -85,11 +85,30 @@ actions:
 - define_reference:
     reference: api-version
     track_values:
+      GA: v1
       BETA: beta
       ALPHA: alpha
 - define_reference:
     reference: my-region
     value: us-central1
+- define_reference:
+    reference: subnet-purpose-and-role
+    track_values:
+      GA: --purpose INTERNAL_HTTPS_LOAD_BALANCER --role ACTIVE
+      BETA: --purpose INTERNAL_HTTPS_LOAD_BALANCER --role ACTIVE
+      ALPHA: --purpose INTERNAL_HTTPS_LOAD_BALANCER --role ACTIVE
+- define_reference:
+    reference: health-check-region
+    track_values:
+      GA: --region us-central1
+      BETA: --region us-central1
+      ALPHA: --region us-central1
+- define_reference:
+    reference: backend-service-health-check-region
+    track_values:
+      GA: --health-checks-region us-central1
+      BETA: --health-checks-region us-central1
+      ALPHA: --health-checks-region us-central1
 
 
 - generate_resource_id:
@@ -110,8 +129,8 @@ actions:
     reference: subnet-1
     prefix: gcloud-compute-test-l7ilb
 - execute_command:
-    command: compute networks subnets create $$subnet-1$$ --purpose INTERNAL_HTTPS_LOAD_BALANCER
-      --role ACTIVE --region $$my-region$$ --network $$network-1$$ --range 10.126.0.0/22
+    command: compute networks subnets create $$subnet-1$$ $$subnet-purpose-and-role$$
+      --region $$my-region$$ --network $$network-1$$ --range 10.126.0.0/22
       --format "value(name)"
     validation_only: true
     events:
@@ -126,7 +145,7 @@ actions:
     reference: hc-1
     prefix: gcloud-compute-test-l7ilb
 - execute_command:
-    command: compute health-checks create http $$hc-1$$ --format none --region $$my-region$$
+    command: compute health-checks create http $$hc-1$$ --format none $$health-check-region$$
     validation_only: true
     events:
     - expect_stderr:
@@ -141,7 +160,7 @@ actions:
     prefix: gcloud-compute-test-l7ilb
 - execute_command:
     command: compute backend-services create $$bs-1$$ --protocol HTTP --health-checks
-      $$hc-1$$ --region $$my-region$$ --health-checks-region $$my-region$$ --load-balancing-scheme
+      $$hc-1$$ --region $$my-region$$ $$backend-service-health-check-region$$ --load-balancing-scheme
       INTERNAL_MANAGED
     validation_only: true
     events:
@@ -246,13 +265,13 @@ actions:
 
 
 - execute_command:
-    command: compute health-checks delete $$hc-1$$ --region $$my-region$$ --quiet
+    command: compute health-checks delete $$hc-1$$ $$health-check-region$$ --quiet
     cleanup_for: hc-1
     validation_only: true
     events:
     - expect_stderr:
         matches: |
-          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/healthChecks/$$hc-1$$\].
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/.*/healthChecks/$$hc-1$$\].
     - expect_exit:
         code: 0
 

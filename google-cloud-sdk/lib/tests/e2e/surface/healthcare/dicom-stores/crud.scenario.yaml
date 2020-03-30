@@ -1,7 +1,3 @@
-filters:
-  skip:
-    reason: Error - invalid pubsub topic format
-    bug: b/143880426
 title: cloud healthcare dicom-stores crud scenario
 release_tracks: [ALPHA, BETA]
 summary:
@@ -35,14 +31,14 @@ summary:
       ID                                            LOCATION     TOPIC
       $$test-dicom-store$$  us-central1
 - execute:
-  - command: healthcare dicom-stores update $$test-dicom-store$$ --pubsub-topic $$test-pubsub-topic$$  --dataset
+  - command: healthcare dicom-stores update $$test-dicom-store$$ --pubsub-topic projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$  --dataset
       $$test-dataset$$ --location us-central1
   - stderr: |
       Updated dicomStore [$$test-dicom-store$$].
   - stdout: |
       name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/dicomStores/$$test-dicom-store$$
       notificationConfig:
-        pubsubTopic: $$test-pubsub-topic$$
+        pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
 - execute:
   - command: healthcare dicom-stores delete $$test-dicom-store$$ --dataset $$test-dataset$$
       --location us-central1
@@ -194,7 +190,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: healthcare dicom-stores update $$test-dicom-store$$ --pubsub-topic $$test-pubsub-topic$$  --dataset
+    command: healthcare dicom-stores update $$test-dicom-store$$ --pubsub-topic projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$  --dataset
       $$test-dataset$$ --location us-central1
     events:
     - api_call:
@@ -205,23 +201,23 @@ actions:
           body:
             json:
               notificationConfig:
-                pubsubTopic: $$test-pubsub-topic$$
+                pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
         return_response:
           headers:
             cache-control: private
-            content-length: '282'
+            content-length: '328'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/dicomStores/$$test-dicom-store$$
             notificationConfig:
-              pubsubTopic: $$test-pubsub-topic$$
+              pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
     - expect_stderr: |
         Updated dicomStore [$$test-dicom-store$$].
     - expect_stdout: |
         name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$/dicomStores/$$test-dicom-store$$
         notificationConfig:
-          pubsubTopic: $$test-pubsub-topic$$
+          pubsubTopic: projects/cloud-sdk-integration-testing/topics/$$test-pubsub-topic$$
     - expect_exit:
         code: 0
 - execute_command:

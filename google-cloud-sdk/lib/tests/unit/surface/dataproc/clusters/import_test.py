@@ -25,6 +25,7 @@ import os
 from googlecloudsdk import calliope
 
 from googlecloudsdk.api_lib.dataproc import exceptions
+from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
@@ -77,12 +78,12 @@ class ClustersImportUnitTest(unit_base.DataprocUnitTestBase,
       self.ExpectGetCluster(cluster=response_cluster, region=region)
 
 
-class ClustersImportUnitTestBeta(ClustersImportUnitTest):
+class ClustersImportUnitTestGA(ClustersImportUnitTest):
 
   def PreSetUp(self):
-    self.track = calliope.base.ReleaseTrack.BETA
+    self.track = calliope.base.ReleaseTrack.GA
 
-  def testImportClustersFromStdIn(self):
+  def _testImportClustersFromStdIn(self, region=None, region_flag=''):
     # Cluster with only configuration-related information.
     provided_cluster = self.messages.Cluster()
 
@@ -96,9 +97,39 @@ class ClustersImportUnitTestBeta(ClustersImportUnitTest):
     response_cluster = self.MakeRunningCluster()
 
     self.WriteInput(export_util.Export(provided_cluster))
-    self.ExpectCreateCalls(expected_request, response_cluster)
-    result = self.RunDataproc('clusters import {0}'.format(self.CLUSTER_NAME))
+    self.ExpectCreateCalls(expected_request, response_cluster, region=region)
+    result = self.RunDataproc('clusters import {0} {1}'.format(
+        self.CLUSTER_NAME, region_flag))
     self.AssertMessagesEqual(response_cluster, result)
+
+  def testImportClustersFromStdIn(self):
+    self._testImportClustersFromStdIn()
+
+  def testImportClustersRegionProperty(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self._testImportClustersFromStdIn(region='us-central1')
+
+  def testImportClustersRegionFlag(self):
+    properties.VALUES.dataproc.region.Set('us-central1')
+    self._testImportClustersFromStdIn(
+        region='us-east1', region_flag='--region=us-east1')
+
+  def testImportClustersNoRegionFlag(self):
+    provided_cluster = self.messages.Cluster()
+
+    # The cluster name and project id are populated before
+    # we make the create request.
+    expected_request = copy.deepcopy(provided_cluster)
+    expected_request.clusterName = self.CLUSTER_NAME
+    expected_request.projectId = self.Project()
+
+    self.WriteInput(export_util.Export(provided_cluster))
+
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc(
+          'clusters import {0}'.format(self.CLUSTER_NAME), set_region=False)
 
   def testImportClustersInvalid(self):
     self.WriteInput('foo: bar')
@@ -147,31 +178,6 @@ class ClustersImportUnitTestBeta(ClustersImportUnitTest):
         self.CLUSTER_NAME, file_name))
     self.AssertMessagesEqual(response_cluster, result)
 
-  def testImportClustersWithRegion(self):
-    # Set region property.
-    properties.VALUES.dataproc.region.Set('us-test1')
-
-    # Cluster with a zone specified.
-    provided_cluster = self.messages.Cluster(
-        config=self.messages.ClusterConfig(
-            gceClusterConfig=self.messages.GceClusterConfig(
-                zoneUri='us-test1-a')))
-
-    # The cluster name and project id are populated before
-    # we make the create request.
-    expected_request = copy.deepcopy(provided_cluster)
-    expected_request.clusterName = self.CLUSTER_NAME
-    expected_request.projectId = self.Project()
-
-    # The response has a lot more fields populated.
-    response_cluster = self.MakeRunningCluster()
-
-    self.WriteInput(export_util.Export(provided_cluster))
-    self.ExpectCreateCalls(
-        expected_request, response_cluster, region='us-test1')
-    result = self.RunDataproc('clusters import {0}'.format(self.CLUSTER_NAME))
-    self.AssertMessagesEqual(response_cluster, result)
-
   def testImportClustersWithRegionNoZone(self):
     # Set region property.
     properties.VALUES.dataproc.region.Set('us-test1')
@@ -193,6 +199,12 @@ class ClustersImportUnitTestBeta(ClustersImportUnitTest):
         expected_request, response_cluster, region='us-test1')
     result = self.RunDataproc('clusters import {0}'.format(self.CLUSTER_NAME))
     self.AssertMessagesEqual(response_cluster, result)
+
+
+class ClustersImportUnitTestBeta(ClustersImportUnitTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
 
 
 class ClustersImportUnitTestAlpha(ClustersImportUnitTestBeta):

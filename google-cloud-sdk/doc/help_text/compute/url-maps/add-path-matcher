@@ -11,7 +11,7 @@ SYNOPSIS
         [--delete-orphaned-path-matcher] [--description=DESCRIPTION]
         [--path-rules=PATH=SERVICE,[...]]
         [--existing-host=EXISTING_HOST | --new-hosts=NEW_HOST,[NEW_HOST,...]]
-        [GCLOUD_WIDE_FLAG ...]
+        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute url-maps add-path-matcher is used to add a path matcher to a
@@ -71,12 +71,38 @@ OPTIONAL FLAGS
           If specified, a new host rule with the given hosts is created and the
           path matcher is tied to the new host rule.
 
+     At most one of these may be specified:
+
+       --global
+          If set, the URL map is global.
+
+       --region=REGION
+          Region of the URL map to operate on. If not specified, you may be
+          prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create a rule for mapping the path /search/* to the hypothetical
@@ -84,12 +110,12 @@ EXAMPLES
     to the images-service under the hosts example.com and *.example.com, run:
 
         $ gcloud compute url-maps add-path-matcher MY-URL-MAP \
-            --path-matcher-name MY-MATCHER \
-            --default-service MY-DEFAULT-SERVICE \
-            --backend-service-path-rules \
-            '/search/*=search_service,/images/*=images-service' \
-            --backend-bucket-path-rules '/static/*=static-bucket' \
-            --new-hosts example.com '*.example.com'
+            --path-matcher-name=MY-MATCHER \
+            --default-service=MY-DEFAULT-SERVICE \
+            --backend-service-path-rules='/search/*=search_service,/images/*\
+        =images-service' \
+            --backend-bucket-path-rules='/static/*=static-bucket' \
+            --new-hosts=example.com '*.example.com'
 
     Note that a default service or default backend bucket must be provided to
     handle paths for which there is no mapping.

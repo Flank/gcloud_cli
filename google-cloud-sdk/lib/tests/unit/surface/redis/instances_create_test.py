@@ -58,6 +58,7 @@ class CreateTestGA(redis_test_base.InstancesUnitTestBase):
         ' --reserved-ip-range 10.0.0.0/29'
         ' --size 4'
         ' --tier standard'
+        ' --connect-mode direct_peering'
         ' --zone zone1'.format(self.instance_id, self.region_id))
 
     self.assertEqual(actual_instance, expected_instance)
@@ -79,6 +80,30 @@ class CreateTestGA(redis_test_base.InstancesUnitTestBase):
         ' --reserved-ip-range 10.0.0.0/29'
         ' --size 4'
         ' --tier standard'
+        ' --connect-mode direct_peering'
+        ' --zone zone1'.format(self.instance_id, self.region_id))
+
+    self.assertEqual(actual_instance, expected_instance)
+
+  def testCreate_AllOptionsPrivateServiceAccess(self):
+    instance_to_create = self.MakeAllOptionsInstance(
+        redis_version='REDIS_4_0', connect_mode='PRIVATE_SERVICE_ACCESS')
+    expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
+                                           self.instance_relative_name)
+
+    actual_instance = self.Run(
+        'redis instances create {} --region {}'
+        ' --alternative-zone zone2'
+        ' --display-name my-display-name'
+        ' --labels a=1,b=2'
+        ' --connect-mode "PRIVATE_SERVICE_ACCESS"'
+        ' --network my-network'
+        ' --redis-config maxmemory-policy=allkeys-lfu,notify-keyspace-events=El'
+        ',activedefrag=yes,lfu-log-factor=2,lfu-decay-time=10'
+        ' --redis-version redis_4_0'
+        ' --size 4'
+        ' --tier standard'
+        ' --connect-mode private_service_access'
         ' --zone zone1'.format(self.instance_id, self.region_id))
 
     self.assertEqual(actual_instance, expected_instance)
@@ -161,6 +186,29 @@ class CreateTestBeta(CreateTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def testCreate_AllOptions50(self):
+    instance_to_create = self.MakeAllOptionsInstance(redis_version='REDIS_5_0')
+    expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
+                                           self.instance_relative_name)
+
+    actual_instance = self.Run(
+        'redis instances create {} --region {}'
+        ' --alternative-zone zone2'
+        ' --display-name my-display-name'
+        ' --labels a=1,b=2'
+        ' --network my-network'
+        ' --redis-config maxmemory-policy=allkeys-lfu,notify-keyspace-events=El'
+        ',activedefrag=yes,lfu-log-factor=2,lfu-decay-time=10'
+        ',stream-node-max-entries=100,stream-node-max-bytes=4096'
+        ' --redis-version redis_5_0'
+        ' --reserved-ip-range 10.0.0.0/29'
+        ' --size 4'
+        ' --tier standard'
+        ' --connect-mode direct_peering'
+        ' --zone zone1'.format(self.instance_id, self.region_id))
+
+    self.assertEqual(actual_instance, expected_instance)
 
 
 class CreateTestAlpha(CreateTestBeta):

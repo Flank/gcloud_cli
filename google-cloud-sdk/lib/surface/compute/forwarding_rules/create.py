@@ -33,12 +33,13 @@ from six.moves import range  # pylint: disable=redefined-builtin
 
 
 def _Args(parser, support_global_access, support_l7_internal_load_balancing,
-          support_mirroring_collector):
+          support_target_grpc_proxy):
   """Add the flags to create a forwarding rule."""
 
   flags.AddUpdateArgs(
       parser,
-      include_l7_internal_load_balancing=support_l7_internal_load_balancing)
+      include_l7_internal_load_balancing=support_l7_internal_load_balancing,
+      include_target_grpc_proxy=support_target_grpc_proxy)
   flags.AddIPProtocols(parser)
   flags.AddDescription(parser)
   flags.AddPortsAndPortRange(parser)
@@ -48,13 +49,12 @@ def _Args(parser, support_global_access, support_l7_internal_load_balancing,
   if support_global_access:
     flags.AddAllowGlobalAccess(parser)
 
-  if support_mirroring_collector:
-    flags.AddIsMirroringCollector(parser)
+  flags.AddIsMirroringCollector(parser)
 
   parser.add_argument(
       '--service-label',
       help='(Only for Internal Load Balancing): '
-           'https://cloud.google.com/compute/docs/load-balancing/internal/\n'
+           'https://cloud.google.com/load-balancing/docs/dns-names/\n'
            'The DNS label to use as the prefix of the fully qualified domain '
            'name for this forwarding rule. The full name will be internally '
            'generated and output as dnsName. If this field is not specified, '
@@ -75,20 +75,18 @@ class CreateHelper(object):
   FORWARDING_RULE_ARG = None
 
   def __init__(self, holder, support_global_access,
-               support_l7_internal_load_balancing,
-               support_mirroring_collector):
+               support_l7_internal_load_balancing, support_target_grpc_proxy):
     self._holder = holder
     self._support_global_access = support_global_access
     self._support_l7_internal_load_balancing = support_l7_internal_load_balancing
-    self._support_mirroring_collector = support_mirroring_collector
+    self._support_target_grpc_proxy = support_target_grpc_proxy
 
   @classmethod
   def Args(cls, parser, support_global_access,
-           support_l7_internal_load_balancing,
-           support_mirroring_collector):
+           support_l7_internal_load_balancing, support_target_grpc_proxy):
     cls.FORWARDING_RULE_ARG = _Args(parser, support_global_access,
                                     support_l7_internal_load_balancing,
-                                    support_mirroring_collector)
+                                    support_target_grpc_proxy)
 
   def ConstructProtocol(self, messages, args):
     if args.ip_protocol:
@@ -125,7 +123,8 @@ class CreateHelper(object):
     if not port_range:
       raise exceptions.ToolException(
           '[--ports] is required for global forwarding rules.')
-    target_ref = utils.GetGlobalTarget(resources, args)
+    target_ref = utils.GetGlobalTarget(resources, args,
+                                       self._support_target_grpc_proxy)
     protocol = self.ConstructProtocol(client.messages, args)
 
     if args.address is None or args.ip_version:
@@ -298,21 +297,21 @@ class CreateHelper(object):
 class Create(base.CreateCommand):
   """Create a forwarding rule to direct network traffic to a load balancer."""
 
-  _support_global_access = False
-  _support_l7_internal_load_balancing = False
-  _support_mirroring_collector = False
+  _support_global_access = True
+  _support_l7_internal_load_balancing = True
+  _support_target_grpc_proxy = False
 
   @classmethod
   def Args(cls, parser):
     CreateHelper.Args(parser, cls._support_global_access,
                       cls._support_l7_internal_load_balancing,
-                      cls._support_mirroring_collector)
+                      cls._support_target_grpc_proxy)
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     return CreateHelper(holder, self._support_global_access,
                         self._support_l7_internal_load_balancing,
-                        self._support_mirroring_collector).Run(args)
+                        self._support_target_grpc_proxy).Run(args)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -320,7 +319,7 @@ class CreateBeta(Create):
   """Create a forwarding rule to direct network traffic to a load balancer."""
   _support_global_access = True
   _support_l7_internal_load_balancing = True
-  _support_mirroring_collector = True
+  _support_target_grpc_proxy = False
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -328,30 +327,30 @@ class CreateAlpha(CreateBeta):
   """Create a forwarding rule to direct network traffic to a load balancer."""
   _support_global_access = True
   _support_l7_internal_load_balancing = True
-  _support_mirroring_collector = True
+  _support_target_grpc_proxy = True
 
 
 Create.detailed_help = {
-    'DESCRIPTION': ("""\
-        *{{command}}* is used to create a forwarding rule. {overview}
+    'DESCRIPTION': ("""
+*{{command}}* is used to create a forwarding rule. {overview}
 
-        When creating a forwarding rule, exactly one of  ``--target-instance'',
-        ``--target-pool'', ``--target-http-proxy'', ``--target-https-proxy'',
-        ``--target-ssl-proxy'', ``--target-tcp-proxy'', ``--target-vpn-gateway''
-        or ``--backend-service'' must be specified."""
+When creating a forwarding rule, exactly one of  ``--target-instance'',
+``--target-pool'', ``--target-http-proxy'', ``--target-https-proxy'',
+``--target-ssl-proxy'', ``--target-tcp-proxy'', ``--target-vpn-gateway''
+or ``--backend-service'' must be specified."""
                     .format(overview=flags.FORWARDING_RULES_OVERVIEW)),
-    'EXAMPLES': """\
-        To create a global forwarding rule that will forward all traffic on port
-        8080 for IP address ADDRESS to a target http proxy PROXY, run:
+    'EXAMPLES': """
+    To create a global forwarding rule that will forward all traffic on port
+    8080 for IP address ADDRESS to a target http proxy PROXY, run:
 
-          $ {command} RULE_NAME --global --target-http-proxy PROXY --ports 8080 --address ADDRESS
+      $ {command} RULE_NAME --global --target-http-proxy=PROXY --ports=8080 --address=ADDRESS
 
-        To create a regional forwarding rule for the subnet SUBNET_NAME on the
-        default network that will forward all traffic on ports 80-82 to a
-        backend service SERVICE_NAME, run:
+    To create a regional forwarding rule for the subnet SUBNET_NAME on the
+    default network that will forward all traffic on ports 80-82 to a
+    backend service SERVICE_NAME, run:
 
-          $ {command} RULE_NAME --load-balancing-scheme INTERNAL --backend-service SERVICE_NAME --subnet SUBNET_NAME --network default --region REGION --ports 80-82
-    """
+      $ {command} RULE_NAME --load-balancing-scheme=INTERNAL --backend-service=SERVICE_NAME --subnet=SUBNET_NAME --network=default --region=REGION --ports=80-82
+"""
 }
 
 

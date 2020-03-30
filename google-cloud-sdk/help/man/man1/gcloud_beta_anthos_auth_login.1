@@ -1,0 +1,104 @@
+
+.TH "GCLOUD_BETA_ANTHOS_AUTH_LOGIN" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta anthos auth login \- authenticate clusters using the Anthos client
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta anthos auth login\fR [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-dry\-run\fR] [\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-login\-config\fR=\fILOGIN_CONFIG\fR] [\fB\-\-login\-config\-cert\fR=\fILOGIN_CONFIG_CERT\fR] [\fB\-\-user\fR=\fIUSER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Authenticate clusters using the Anthos client.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-cluster\fR=\fICLUSTER\fR
+Cluster to authenticate against. If no cluster is specified, the command will
+print a list of available options.
+
+.TP 2m
+\fB\-\-dry\-run\fR
+Print out the generated kubectl commands but do not execute them.
+
+.TP 2m
+\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR
+Specifies the destination kubeconfig file where credentials will be stored.
+
+.TP 2m
+\fB\-\-login\-config\fR=\fILOGIN_CONFIG\fR
+Specifies the configuration yaml file for login. Can be a file path or a URL.
+
+.TP 2m
+\fB\-\-login\-config\-cert\fR=\fILOGIN_CONFIG_CERT\fR
+Specifies the CA certificate file to be added to trusted pool for making HTTPS
+connections to a \f5\-\-login\-config\fR URL.
+
+.TP 2m
+\fB\-\-user\fR=\fIUSER\fR
+If configuring multiple user accounts in the same kubecconfig file, you can
+specify a user to differentiate between them.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To add credentials to default kubeconfig file:
+
+.RS 2m
+$ gcloud beta anthos auth login \-\-cluster=testcluster \e
+  \-\-login\-config=kubectl\-anthos\-config.yaml
+.RE
+
+To add credentials to custom kubeconfig file:
+
+.RS 2m
+$ gcloud beta anthos auth login  \-\-cluster=testcluster \e
+  \-\-login\-config=kubectl\-anthos\-config.yaml \e
+  \-\-kubeconfig=my.kubeconfig
+.RE
+
+To generate the commands without executing them:
+
+.RS 2m
+$ gcloud beta anthos auth login \-\-cluster=testcluster \e
+  \-\-login\-config=kubectl\-anthos\-config.yaml \-\-dry\-run
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud anthos auth login
+$ gcloud alpha anthos auth login
+.RE
+

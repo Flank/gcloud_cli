@@ -1,5 +1,5 @@
 title: Get recommendation
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -65,12 +65,18 @@ summary:
         state: ACTIVE
       userLastUpdateTime: '2019-03-14T22:57:56.781035Z'
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
+      GA: v1
 - execute_command:
     command: recommender recommendations describe my-recommendation --project=my-project --location=my-location --recommender=my-recommender
     events:
     - api_call:
         expect_request:
-          uri: https://recommender.googleapis.com/v1beta1/projects/my-project/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation?alt=json
+          uri: https://recommender.googleapis.com/$$api-version$$/projects/my-project/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation?alt=json
           method: GET
           headers: {}
           body: null

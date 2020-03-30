@@ -44,9 +44,10 @@ Name of the target HTTPS proxy to create.
 .RS 2m
 .TP 2m
 \fB\-\-url\-map\fR=\fIURL_MAP\fR
-A reference to a URL map resource that defines the mapping of URLs to backend
-services. The URL map must exist and cannot be deleted while referenced by a
-target HTTPS proxy.
+A reference to a URL map resource. A URL map defines the mapping of URLs to
+backend services. Before you can refer to a URL map, you must create the URL
+map. To delete a URL map that a target proxy is referring to, you must first
+delete the target HTTPS proxy.
 
 
 .RE
@@ -61,9 +62,9 @@ An optional, textual description for the target HTTPS proxy.
 
 .TP 2m
 \fB\-\-proxy\-bind\fR
-This flag only applies when the load_balancing_scheme of the associated backend
-service is INTERNAL_SELF_MANAGED. When specified, the envoy binds to the IP
-address and port specified by the forwarding rule. By default this flag is off.
+This flag applies when the load_balancing_scheme of the associated backend
+service is INTERNAL_SELF_MANAGED. When specified, the envoy binds to the
+forwarding rule's IP address and port. By default, this flag is off.
 
 .TP 2m
 \fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR; default="NONE"
@@ -201,8 +202,30 @@ property value for this command invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+If there is an already\-created URL map with the name URL_MAP and a SSL
+certificate named SSL_CERTIFICATE, create a global target HTTPS proxy pointing
+to this map by running:
+
+.RS 2m
+$ gcloud alpha compute target\-https\-proxies create PROXY_NAME \e
+    \-\-url\-map=URL_MAP \-\-ssl\-certificates=SSL_CERTIFIFCATE
+.RE
+
+Create a regional target HTTPS proxy by running:
+
+.RS 2m
+$ gcloud alpha compute target\-https\-proxies create PROXY_NAME \e
+    \-\-url\-map=URL_MAP \-\-ssl\-certificates=SSL_CERTIFIFCATE \e
+    \-\-region=REGION_NAME
+.RE
 
 
 

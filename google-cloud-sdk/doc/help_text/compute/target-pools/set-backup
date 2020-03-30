@@ -57,21 +57,22 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To cause TARGET-POOL (in region us-central1) to fail over to BACKUP-POOL
     when more than half of the TARGET-POOL instances are unhealthy, run:
 
         $ gcloud compute target-pools set-backup TARGET-POOL \
-            --backup-pool BACKUP-POOL --failover-ratio 0.5 \
-            --region us-central1
+            --backup-pool=BACKUP-POOL --failover-ratio=0.5 \
+            --region=us-central1
 
     To remove BACKUP-POOL as a backup to TARGET-POOL, run:
 
         $ gcloud compute target-pools set-backup TARGET-POOL \
-            --backup-pool '' --region us-central1
+            --backup-pool='' --region=us-central1
 
 NOTES
     These variants are also available:

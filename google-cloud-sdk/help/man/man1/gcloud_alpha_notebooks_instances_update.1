@@ -1,0 +1,150 @@
+
+.TH "GCLOUD_ALPHA_NOTEBOOKS_INSTANCES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha notebooks instances update \- request for updating instances
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha notebooks instances update\fR (\fIINSTANCE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) (\fB\-\-accelerator\-core\-count\fR=\fIACCELERATOR_CORE_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Request for updating notbook instance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Instance resource \- User\-defined unique name of this instance. The instance
+name must be 1 to 63 characters long and contain only lowercase letters, numeric
+characters, and dashes. The first character must be a lowercase letter and the
+last character cannot be a dash. The arguments in this group can be used to
+specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [instance] on the command line with a fully
+specified name; provide the argument [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance or fully qualified identifier for the instance. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Google Cloud location of this environment
+https://cloud.google.com/compute/docs/regions\-zones/#locations.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+At least one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-accelerator\-core\-count\fR=\fIACCELERATOR_CORE_COUNT\fR
+Count of cores of this accelerator.
+
+.TP 2m
+\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR
+Type of this accelerator. \fIACCELERATOR_TYPE\fR must be one of:
+\fBNVIDIA_TESLA_K80\fR, \fBNVIDIA_TESLA_P100\fR, \fBNVIDIA_TESLA_V100\fR,
+\fBNVIDIA_TESLA_P4\fR, \fBNVIDIA_TESLA_T4\fR, \fBNVIDIA_TESLA_T4_VWS\fR,
+\fBNVIDIA_TESLA_P100_VWS\fR, \fBNVIDIA_TESLA_P4_VWS\fR, \fBTPU_V2\fR,
+\fBTPU_V3\fR.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+Labels to apply to this instance. These can be later modified by the setLabels
+method.
+
+.TP 2m
+\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
+The Compute Engine machine type.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update machine type for an instance, run:
+
+.RS 2m
+$ gcloud alpha notebooks instances update \e
+  /projects/example\-project/locations/us\-central1\-b/instances/\e
+example\-instance \-\-machine\-type=n1\-standard\-8
+.RE
+
+To update labels for an instance, run:
+
+.RS 2m
+$ gcloud alpha notebooks instances update \e
+  /projects/example\-project/locations/us\-central1\-b/instances/\e
+example\-instance \-\-labels=k1=v1,k2=v2
+.RE
+
+To update labels and accelerator cores, run:
+
+.RS 2m
+$ gcloud alpha notebooks instances update \e
+  /projects/example\-project/locations/us\-central1\-b/instances/\e
+example\-instance \-\-labels=k1=v1,k2=v2 \-\-accelerator\-core\-count=2
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta notebooks instances update
+.RE
+

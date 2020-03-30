@@ -1,0 +1,53 @@
+NAME
+    gcloud beta access-context-manager perimeters dry-run commit - commit the
+        dry-run mode configuration for all Service Perimeters
+
+SYNOPSIS
+    gcloud beta access-context-manager perimeters dry-run commit [--etag=etag]
+        [--policy=policy] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) A commit operation on a Service Perimeter involves copying its
+    dry-run mode configuration (spec) to that Service Perimeter's enforcement
+    mode configration (status). This command performs this operation for all
+    Service Perimeters in the user's Access Policy.
+
+    Note: Only Service Perimeters with an explicit dry-run mode configuration
+    are affected by this operation. The overall commit operation succeeds once
+    the dry-run configurations of all such Service Perimeters have been
+    committed. If a commit fails for any given Service Perimeter, it will cause
+    the entire commit operation to be aborted.
+
+FLAGS
+     --etag=etag
+        The etag for the version of the Access Policy that this commit
+        operation is to be performed on. If, at the time of commit, the etag
+        for the Access Policy stored in Access Context Manager is different
+        from the specified etag, then the commit operation will not be
+        performed and the call will fail. If etag is not provided, the
+        operation will be performed as if a valid etag is provided.
+
+     --policy=policy
+        The parent Access Policy which owns all Service Perimeters in scope for
+        the commit operation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To commit the dry-run mode configurations for all Service Perimeter in an
+    Access Policy, run the following command:
+
+        $ gcloud beta access-context-manager perimeters dry-run commit
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha access-context-manager perimeters dry-run commit
+

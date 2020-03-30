@@ -140,11 +140,10 @@ class Import(base.CreateCommand):
     workflow.add_argument(
         '--custom-workflow',
         help=("""\
-              Specifies a custom workflow to use for image translation.
-              Workflow should be relative to the image_import directory here:
-              []({0}). For example: ``{1}''""".format(
-                  _WORKFLOWS_URL,
-                  os_choices.OS_CHOICES_MAP[sorted(cls._OS_CHOICES)[0]])),
+              Specifies a custom workflow to use for image translation. Workflow
+              should be relative to the image_import directory here: []({0}).
+              For example: `debian/translate_debian_9.wf.json'""".format(
+                  _WORKFLOWS_URL)),
         hidden=True
     )
 
@@ -224,7 +223,7 @@ class Import(base.CreateCommand):
           self.storage_client, args)
 
     try:
-      gcs_uri = daisy_utils.MakeGcsObjectOrPathUri(args.source_file)
+      gcs_uri = daisy_utils.MakeGcsObjectUri(args.source_file)
     except storage_util.InvalidObjectNameError:
       raise exceptions.InvalidArgumentException(
           'source-file',
@@ -434,7 +433,7 @@ class ImportAlpha(ImportBeta):
 
 Import.detailed_help = {
     'brief': 'Import an image into Compute Engine',
-    'DESCRIPTION': """\
+    'DESCRIPTION': """
         *{command}* imports Virtual Disk images, such as VMWare VMDK files
         and VHD files, into Compute Engine.
 
@@ -456,7 +455,7 @@ Import.detailed_help = {
         charges. See [](https://cloud.google.com/compute/docs/images/importing-virtual-disks#resource_cleanup).
         """,
 
-    'EXAMPLES': """\
+    'EXAMPLES': """
         To import a centos-7 VMDK file, run:
 
           $ {command} myimage-name --os=centos-7 --source-file=mysourcefile

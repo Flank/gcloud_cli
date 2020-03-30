@@ -20,11 +20,9 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
 
 MESSAGES = apis.GetMessagesModule('compute', 'v1')
 
@@ -33,11 +31,11 @@ class UrlMapsDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
 
   def SetUp(self):
     self.SelectApi('v1')
-    self._api = 'v1'
+    self._api = ''
     self._url_maps_api = self.compute_v1.urlMaps
 
   def RunDelete(self, command):
-    self.Run('compute url-maps delete ' + command)
+    self.Run(self._api + ' compute url-maps delete ' + command)
 
   def ExpectCompletion(self, expected_completion):
     self.RunCompletion('compute url-maps delete ', expected_completion)
@@ -85,19 +83,6 @@ class UrlMapsDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
 
     self.CheckRequests()
 
-  def testDeleteCompletion(self):
-    lister_mock = self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        autospec=True)
-    lister_mock.return_value = resource_projector.MakeSerializable(
-        test_resources.URL_MAPS)
-    self.ExpectCompletion([
-        'url-map-3',
-        'url-map-4',
-        'url-map-1',
-        'url-map-2',
-    ])
-
 
 class UrlMapsDeleteTestBeta(UrlMapsDeleteTest):
 
@@ -106,9 +91,6 @@ class UrlMapsDeleteTestBeta(UrlMapsDeleteTest):
     self._api = 'beta'
     self._url_maps_api = self.compute_beta.urlMaps
 
-  def RunDelete(self, command):
-    self.Run('beta compute url-maps delete --global ' + command)
-
 
 class UrlMapsDeleteTestAlpha(UrlMapsDeleteTestBeta):
 
@@ -116,13 +98,6 @@ class UrlMapsDeleteTestAlpha(UrlMapsDeleteTestBeta):
     self.SelectApi('alpha')
     self._api = 'alpha'
     self._url_maps_api = self.compute_alpha.urlMaps
-
-  def RunDelete(self, command):
-    self.Run('alpha compute url-maps delete --global ' + command)
-
-  def testDeleteCompletion(self):
-    # Completion test handled in misc_completion_test.py
-    pass
 
 
 if __name__ == '__main__':

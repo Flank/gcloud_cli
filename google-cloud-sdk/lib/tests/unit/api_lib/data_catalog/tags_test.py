@@ -94,8 +94,7 @@ class TagsTest(sdk_test_base.WithFakeAuth):
   def test_MakeTagField_Timestamp_Invalid(self):
     with self.assertRaisesRegex(
         tags.InvalidTagError,
-        r"Invalid timestamp value: \(u?'Unknown string format:', "
-        r"u?'asdf'\) \[asdf\]"
+        r'Invalid timestamp value:.+'
     ):
       self.client._MakeTagField('timestamp', 'asdf')
 

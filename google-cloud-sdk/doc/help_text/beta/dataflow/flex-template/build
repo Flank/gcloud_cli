@@ -1,0 +1,53 @@
+NAME
+    gcloud beta dataflow flex-template build - builds a flex template file from
+        the specified parameters
+
+SYNOPSIS
+    gcloud beta dataflow flex-template build TEMPLATE_FILE_GCS_PATH
+        --image=IMAGE --sdk-language=SDK_LANGUAGE
+        [--metadata-file=METADATA_FILE] [--print-only] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Builds a flex template file from the specified parameters.
+
+POSITIONAL ARGUMENTS
+     TEMPLATE_FILE_GCS_PATH
+        The Google Cloud Storage location of the flex template file.Overrides
+        if file already exists.
+
+REQUIRED FLAGS
+     --image=IMAGE
+        Path to the any image registry location of the flex template image.
+
+     --sdk-language=SDK_LANGUAGE
+        SDK language of the flex template job. SDK_LANGUAGE must be one of:
+        JAVA, PYTHON.
+
+OPTIONAL FLAGS
+     --metadata-file=METADATA_FILE
+        Local path to the metadata json file for the flex template.
+
+     --print-only
+        Prints the container spec to stdout. Does not save in Google Cloud
+        Storage. Overrides the default dataflow/print_only property value for
+        this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To build and store a the flex template json file, run:
+
+        $ gcloud beta dataflow flex-template build \
+            gs://template-file-gcs-path --image=gcr://image-path           \
+                --metadata-file=/local/path/to/metadata.json \
+            --sdk-language=JAVA
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

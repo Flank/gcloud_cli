@@ -14,7 +14,6 @@
 # limitations under the License.
 
 """Tests for the resources module."""
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -174,15 +173,14 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     core_apis.AddToApisMap('container', 'v1')
     core_apis.AddToApisMap('dataflow', 'v1b3', True)
     core_apis.AddToApisMap('dataproc', 'v1', True)
-    core_apis.AddToApisMap('sqladmin', 'v1beta3', True)
-    core_apis.AddToApisMap('sqladmin', 'v1beta4', False)
+    core_apis.AddToApisMap('sql', 'v1beta4', True)
     core_apis.AddToApisMap('storage', 'v1', True)
 
   def testStorageGsUri(self):
     ref = self.registry.Parse(
         'gs://my_bucket/my_folder/my_file.txt')
     self.assertEqual(
-        'https://www.googleapis.com/storage/v1/b/'
+        'https://storage.googleapis.com/storage/v1/b/'
         'my_bucket/o/my_folder/my_file.txt', ref.SelfLink())
     self.assertEqual('my_bucket', ref.bucket)
     self.assertEqual('my_folder/my_file.txt', ref.object)
@@ -202,7 +200,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
         object='my_folder/my_file.txt',
     )
     self.assertEqual(
-        'https://www.googleapis.com/storage/v1/b/'
+        'https://storage.googleapis.com/storage/v1/b/'
         'my_bucket/o/my_folder/my_file.txt', ref.SelfLink())
     self.assertEqual('my_bucket', ref.bucket)
     self.assertEqual('my_folder/my_file.txt', ref.object)
@@ -247,13 +245,13 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
         'gs://my_bucket/my_folder/my_file.txt',
         collection='storage.objects')
     self.assertEqual(
-        'https://www.googleapis.com/storage/v1/b/'
+        'https://storage.googleapis.com/storage/v1/b/'
         'my_bucket/o/my_folder/my_file.txt', ref.SelfLink())
 
   def testStorageJustBucket(self):
     ref = self.registry.Parse('gs://my_bucket')
     self.assertEqual(
-        'https://www.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
+        'https://storage.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
     self.assertEqual('my_bucket', ref.bucket)
     self.assertEqual('my_bucket', ref.Name())
     self.assertEqual('b/my_bucket', ref.RelativeName())
@@ -266,7 +264,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
         '/b/my_bucket/o/my_folder/my_file.txt')
     self.assertEqual('storage.objects', ref.Collection())
     self.assertEqual(
-        'https://www.googleapis.com/storage/v1/b/'
+        'https://storage.googleapis.com/storage/v1/b/'
         'my_bucket/o/my_folder/my_file.txt', ref.SelfLink())
 
   def testStorageAlternativeUri_Fails(self):
@@ -284,7 +282,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
         '/my_bucket/my_folder/my_file.txt')
     self.assertEqual('storage.objects', ref.Collection())
     self.assertEqual(
-        'https://www.googleapis.com/storage/v1/b/'
+        'https://storage.googleapis.com/storage/v1/b/'
         'my_bucket/o/my_folder/my_file.txt', ref.SelfLink())
 
   def testStorageBucketUri(self):
@@ -298,24 +296,25 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     ref = self.registry.Parse('my_bucket', collection='storage.buckets')
     self.assertEqual('storage.buckets', ref.Collection())
     self.assertEqual(
-        'https://www.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
+        'https://storage.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
 
   def testStorageBucketPath_MockedClient(self):
     with api_mock.Client(core_apis.GetClientClass('storage', 'v1')) as client:
-      self.assertEqual('https://www.googleapis.com/storage/v1/', client.url)
+      self.assertEqual('https://storage.googleapis.com/storage/v1/', client.url)
       self.registry.RegisterApiByName('storage', 'v1')
 
       ref = self.registry.Parse('my_bucket', collection='storage.buckets')
       self.assertEqual('storage.buckets', ref.Collection())
       self.assertEqual(
-          'https://www.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
+          'https://storage.googleapis.com/storage/v1/b/my_bucket',
+          ref.SelfLink())
 
   def testStorageAlternativeBucketUri(self):
     ref = self.registry.Parse(
         'https://storage.googleapis.com/my_bucket')
     self.assertEqual('storage.buckets', ref.Collection())
     self.assertEqual(
-        'https://www.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
+        'https://storage.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
 
   def testStorageBadUri(self):
     with self.assertRaisesRegex(resources.InvalidResourceException,
@@ -740,9 +739,9 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
 
   def testCloneAndSwitchTwice(self):
     cloned_registry1 = self.registry.Clone()
-    cloned_registry1.RegisterApiByName('sqladmin', 'v1beta3')
+    cloned_registry1.RegisterApiByName('sql', 'v1beta4')
     cloned_registry2 = cloned_registry1.Clone()
-    cloned_registry2.RegisterApiByName('sqladmin', 'v1beta3')
+    cloned_registry2.RegisterApiByName('sql', 'v1beta4')
 
   def testCloneAndSwitch_ParseAsDifferentVersion(self):
     params = {'project': self.Project(), 'zone': 'us-central1-a'}
@@ -791,39 +790,23 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     tc2v1 = cloned_registry.Parse(tcv1_url)
     self.assertIsTC1(tc2v1)
 
-  def testCloneAndSwitchSQL_ParseAsOldVersionUrl(self):
-    # for sql api, package name (sqladmin) does not equal url api name (sql)
-    url = ('https://www.googleapis.com/sql/v1beta3/projects/p/instances/i')
-
-    ref = self.registry.Parse(url)
-    self.assertEqual(url, ref.SelfLink())
-
-    cloned_registry = self.registry.Clone()
-    cloned_registry.RegisterApiByName('sql', 'v1beta4')
-    ref = cloned_registry.Parse(url)
-    self.assertEqual(url, ref.SelfLink())
-
-    url4 = ('https://www.googleapis.com/sql/v1beta4/projects/p/instances/i')
-    ref = cloned_registry.Parse(url4)
-    self.assertEqual(url4, ref.SelfLink())
-
   def testAPIMethodOrder(self):
-    base_url = 'https://www.googleapis.com/sql/v1beta3/'
+    base_url = 'https://sqladmin.googleapis.com/sql/v1beta4/'
     instances_collection = resource_util.CollectionInfo(
-        'sql', 'v1beta3', base_url, 'https://cloud.google.com/docs',
+        'sql', 'v1beta4', base_url, 'https://cloud.google.com/docs',
         name='instances',
         path='projects/{project}/instances/{instance}',
         flat_paths=[],
         params=['project', 'instance'])
     operations_collection = resource_util.CollectionInfo(
-        'sql', 'v1beta3', base_url, 'https://cloud.google.com/docs',
+        'sql', 'v1beta4', base_url, 'https://cloud.google.com/docs',
         name='operations',
         path='projects/{project}/instances/{instance}/operations/{operation}',
         flat_paths=[],
         params=['project', 'instance', 'operation'])
 
     reg1 = resources.Registry()
-    reg1.registered_apis['sql'].append('v1beta3')
+    reg1.registered_apis['sql'].append('v1beta4')
 
     reg1._RegisterCollection(instances_collection)
     reg1._RegisterCollection(operations_collection)
@@ -831,15 +814,15 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     # bug whose regression is blocked by this test caused one of the services
     # to silently fail to register: only the first one registered would be
     # able to parse URLs.
-    reg1.Parse('https://www.googleapis.com/sql/v1beta3/projects/p/instances/i')
+    reg1.Parse('https://sqladmin.googleapis.com/sql/v1beta4/projects/p/instances/i')
 
     reg2 = resources.Registry()
-    reg2.registered_apis['sql'].append('v1beta3')
+    reg2.registered_apis['sql'].append('v1beta4')
 
     reg2._RegisterCollection(operations_collection)
     reg2._RegisterCollection(instances_collection)
     # Same URL, but the services are registered in the opposite order.
-    reg2.Parse('https://www.googleapis.com/sql/v1beta3/projects/p/instances/i')
+    reg2.Parse('https://sqladmin.googleapis.com/sql/v1beta4/projects/p/instances/i')
 
   def testNestedCollectionNames(self):
     registry = resources.Registry()
@@ -862,8 +845,10 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
   def testStr(self):
     uri = ('https://www.googleapis.com/storage/v1/'
            'b/my_bucket/o/my_folder/my_file.txt')
+    uri_domain_split = ('https://storage.googleapis.com/storage/v1/'
+                        'b/my_bucket/o/my_folder/my_file.txt')
     ref = self.registry.Parse(uri)
-    self.assertEqual(uri, str(ref))
+    self.assertEqual(uri_domain_split, str(ref))
 
   def testParseUri_LiteralOrParam(self):
     api_name, api_version = 'cloudfunctions', 'v1beta2'
@@ -901,8 +886,10 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
   def testRepr(self):
     uri = ('https://www.googleapis.com/storage/v1/'
            'b/my_bucket/o/my_folder/my_file.txt')
+    uri_domain_split = ('https://storage.googleapis.com/storage/v1/'
+                        'b/my_bucket/o/my_folder/my_file.txt')
     ref = self.registry.Parse(uri)
-    self.assertEqual(uri, repr(ref))
+    self.assertEqual(uri_domain_split, repr(ref))
 
   def testHash(self):
     uri1 = ('https://www.googleapis.com/storage/v1/'

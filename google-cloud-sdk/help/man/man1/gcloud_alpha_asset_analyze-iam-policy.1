@@ -119,8 +119,9 @@ The roles to appear in the result.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -130,7 +131,7 @@ To find out who has iam.serviceAccounts.actAs permission permission on a
 specified service account, run:
 
 $ gcloud alpha asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID
-\-\-full\-resource\-name='//iam.googleapis.com/projects/YOUR_PROJ_ID/serviceAccounts/YOUR_SERVICE_ACCOUNT'
+\-\-full\-resource\-name='//iam.googleapis.com/projects/YOUR_PROJ_ID/serviceAccounts/YOUR_SERVICE_ACCOUNT_UNIQUE_ID'
 \-\-permissions='iam.serviceAccounts.actAs'
 \-\-output\-partial\-result\-before\-timeout
 
@@ -153,5 +154,9 @@ $ gcloud alpha asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta asset analyze\-iam\-policy
+.RE
 

@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.calliope.exceptions import ToolException
+from googlecloudsdk.calliope import exceptions
 from tests.lib.surface.compute import e2e_managers_stateful_test_base
 from tests.lib.surface.compute import e2e_test_base
 
@@ -32,7 +32,7 @@ class ManagedInstanceGroupsUpdateInstancesBetaZonalTest(
   def SetUp(self):
     self.prefix = 'mig-update-instances-zonal'
     self.scope = e2e_test_base.ZONAL
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _SetInstanceTemplate(self, igm_name, template_name):
     """Update instance template for group to template_name."""
@@ -49,7 +49,7 @@ class ManagedInstanceGroupsUpdateInstancesBetaZonalTest(
   def _DescribeInstance(self, instance_uri):
     instance_name = self._ExtractInstanceNameFromUri(instance_uri)
     zone_flag = '--zone {zone_name}'.format(
-        zone_name=self._ExtractZoneFromUri(instance_uri))
+        zone_name=self.ExtractZoneFromUri(instance_uri))
     self.Run('compute instances describe {instance} {zone_flag}'
              .format(instance=instance_name, zone_flag=zone_flag))
 
@@ -67,7 +67,7 @@ class ManagedInstanceGroupsUpdateInstancesBetaZonalTest(
     """.format(group_name=group_name, scope_flag=self.GetScopeFlag()))
 
   @staticmethod
-  def _ExtractZoneFromUri(uri):
+  def ExtractZoneFromUri(uri):
     return re.search(r'/zones/([^/]+)/', uri).group(1)
 
   @staticmethod
@@ -106,7 +106,7 @@ class ManagedInstanceGroupsUpdateInstancesBetaZonalTest(
     old_instance_id = self._GetInstanceId(instance_uri)
     self._SetInstanceTemplate(igm_name, template2_name)
     with self.AssertRaisesExceptionRegexp(
-        ToolException,
+        exceptions.ToolException,
         r"""Effective update action .* is REPLACE, which is """
         r"""greater than the most disruptive allowed action REFRESH .*"""):
       self.Run("""\
@@ -152,22 +152,7 @@ class ManagedInstanceGroupsUpdateInstancesBetaRegionalTest(
     ManagedInstanceGroupsUpdateInstancesBetaZonalTest):
 
   def SetUp(self):
-    self.prefix = 'mig-instance-configs-regional'
-    self.scope = e2e_test_base.REGIONAL
-
-
-class ManagedInstanceGroupsUpdateInstancesAlphaZonalTest(
-    ManagedInstanceGroupsUpdateInstancesBetaZonalTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-
-class ManagedInstanceGroupsUpdateInstancesAlphaRegionalTest(
-    ManagedInstanceGroupsUpdateInstancesAlphaZonalTest):
-
-  def SetUp(self):
-    self.prefix = 'mig-instance-configs-regional'
+    self.prefix = 'mig-update-instances-regional'
     self.scope = e2e_test_base.REGIONAL
 
 

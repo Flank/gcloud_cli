@@ -18,8 +18,44 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import re
+
 from googlecloudsdk.calliope import exceptions as gcloud_exceptions
 from googlecloudsdk.command_lib.projects import util as project_util
+from googlecloudsdk.core import properties
+
+
+def SetDefaultScopeIfEmpty(unused_ref, args, request):
+  """Update the request scope to fall back to core project if not specified.
+
+  Used by Asset Search gcloud `modify_request_hooks`. When --scope flag is not
+  specified, it will modify the request.scope to fallback to the core properties
+  project.
+
+  Args:
+    unused_ref: unused.
+    args: The argument namespace.
+    request: The request to modify.
+
+  Returns:
+    The modified request.
+  """
+  if args.IsSpecified('scope'):
+    VerifyScopeForSearch(request.scope)
+  else:
+    project_id = properties.VALUES.core.project.GetOrFail()
+    request.scope = 'projects/{0}'.format(
+        project_util.GetProjectNumber(project_id))
+  return request
+
+
+def VerifyScopeForSearch(scope):
+  """Verify the scope is a project number, folder number or org number."""
+  if not re.match('^(projects|folders|organizations)/[1-9][0-9]{0,18}$', scope):
+    raise gcloud_exceptions.InvalidArgumentException(
+        '--scope',
+        'A valid scope should be: projects/<number>, organizations/<number> or '
+        'folders/<number>.')
 
 
 def VerifyParentForExport(organization,
@@ -88,16 +124,25 @@ def GetParentNameForGetHistory(organization,
   return 'projects/{0}'.format(project)
 
 
-def VerifyParentForAnalyzeIamPolicy(organization, attribute='root cloud asset'):
+def VerifyParentForAnalyzeIamPolicy(organization,
+                                    folder,
+                                    attribute='root cloud asset'):
   """Verify the parent name."""
-  if organization is None:
+  if organization is None and folder is None:
     raise gcloud_exceptions.RequiredArgumentException(
-        '--organization',
-        'Should specify the organization for {0}.'.format(attribute))
+        '--organization or --folder',
+        'Should specify the organization, or the folder for '
+        '{0}.'.format(attribute))
+  if organization and folder:
+    raise gcloud_exceptions.ConflictingArgumentsException(
+        'organization', 'folder')
 
 
 def GetParentNameForAnalyzeIamPolicy(organization,
+                                     folder,
                                      attribute='root cloud asset'):
-  """Gets the parent name from organization Id."""
-  VerifyParentForAnalyzeIamPolicy(organization, attribute)
-  return 'organizations/{0}'.format(organization)
+  """Gets the parent name from organization Id or folder Id."""
+  VerifyParentForAnalyzeIamPolicy(organization, folder, attribute)
+  if organization:
+    return 'organizations/{0}'.format(organization)
+  return 'folders/{0}'.format(folder)

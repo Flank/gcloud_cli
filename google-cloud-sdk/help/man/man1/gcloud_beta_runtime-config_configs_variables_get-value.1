@@ -50,8 +50,9 @@ The name of the configuration resource to use.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -61,7 +62,7 @@ To print the value of a variable named "my\-var", run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs variables get\-value \e
-    \-\-config\-name my\-config my\-var
+    \-\-config\-name=my\-config my\-var
 .RE
 
 Values will be automatically base64\-decoded.

@@ -105,6 +105,36 @@ class LinterRendererTests(test_base.Markdown, parameterized.TestCase):
     meta_data = render_document.CommandMetaData(is_group=False)
     self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
 
+  def testExampleCheckNotAlphaMultilineCommandName(self):
+    markdown = textwrap.dedent("""\
+      # NAME
+
+      gcloud long fake command with-subcommands subcommand-one subcommand-2 -
+      fake command to test throwing examples error
+
+      # EXAMPLES
+
+      Example where the name of the command does not fit in one line and is
+      thus broken down into many lines:
+
+          $ gcloud long fake command with-subcommands subcommand-one \\
+            subcommand-2 \\
+                command-arg --command-flag=flag-value
+    """)
+    expected = textwrap.dedent("""\
+      # NAME_PRONOUN_CHECK SUCCESS
+      # NAME_DESCRIPTION_CHECK SUCCESS
+      # NAME_LENGTH_CHECK SUCCESS
+      There are no errors for the NAME section.
+      # EXAMPLE_PRESENT_CHECK SUCCESS
+      # EXAMPLES_PRONOUN_CHECK SUCCESS
+      # EXAMPLE_FLAG_EQUALS_CHECK SUCCESS
+      # EXAMPLE_NONEXISTENT_FLAG_CHECK SUCCESS
+      There are no errors for the EXAMPLES section.
+    """)
+    meta_data = render_document.CommandMetaData(is_group=False)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
+
   def testNameTooLong(self):
     test_linter_renderer = linter_renderer.LinterRenderer()
     markdown = textwrap.dedent("""\

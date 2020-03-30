@@ -29,13 +29,17 @@ from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class List(commands.List):
-  """Lists domain mappings."""
+  """Lists domain mappings for Cloud Run for Anthos."""
 
   detailed_help = {
       'DESCRIPTION':
-          '{description}',
+          """\
+          {description}
+
+          For domain mapping support with fully managed Cloud Run, use
+          `gcloud beta run domain-mappings list`.""",
       'EXAMPLES':
           """\
           To list all Cloud Run domain mappings, run:
@@ -71,20 +75,44 @@ class List(commands.List):
 
   def Run(self, args):
     """List available domain mappings."""
+    # domains.cloudrun.com api group only supports v1alpha1 on clusters.
     conn_context = connection_context.GetConnectionContext(
-        args, self.ReleaseTrack())
+        args,
+        flags.Product.RUN,
+        self.ReleaseTrack(),
+        version_override=('v1alpha1'
+                          if flags.GetPlatform() != flags.PLATFORM_MANAGED else
+                          None))
     namespace_ref = args.CONCEPTS.namespace.Parse()
     with serverless_operations.Connect(conn_context) as client:
       self.SetCompleteApiEndpoint(conn_context.endpoint)
       return commands.SortByName(client.ListDomainMappings(namespace_ref))
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class AlphaList(List):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class BetaList(List):
   """Lists domain mappings."""
+
+  detailed_help = {
+      'DESCRIPTION':
+          '{description}',
+      'EXAMPLES':
+          """\
+          To list all Cloud Run domain mappings, run:
+
+              $ {command}
+          """,
+  }
 
   @classmethod
   def Args(cls, parser):
     cls.CommonArgs(parser)
 
-AlphaList.__doc__ = List.__doc__
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class AlphaList(BetaList):
+  """Lists domain mappings."""
+
+  @classmethod
+  def Args(cls, parser):
+    cls.CommonArgs(parser)

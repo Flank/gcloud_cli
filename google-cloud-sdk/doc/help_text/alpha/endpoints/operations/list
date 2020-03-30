@@ -22,7 +22,7 @@ FLAGS
         operators. The datetime value must be wrapped in quotation marks. For
         example:
 
-            --filter 'startTime < "2017-03-20T16:02:32"'
+            --filter='startTime < "2017-03-20T16:02:32"'
 
         done is a boolean value and supports = and != operators.
 
@@ -55,28 +55,29 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To list all operations for a service named api.endpoints.proj.cloud.goog,
     run:
 
         $ gcloud alpha endpoints operations list \
-            --service api.endpoints.proj.cloud.goog
+            --service=api.endpoints.proj.cloud.goog
 
     To list only operations which are complete, add the --filter argument with
     a status filter:
 
         $ gcloud alpha endpoints operations list \
-            --service api.endpoints.proj.cloud.goog --filter 'done = true'
+            --service=api.endpoints.proj.cloud.goog --filter='done = true'
 
     To list only operations begun after a certain point in time, add the
     --filter argument with an ISO 8601 datetime startTime filter:
 
         $ gcloud alpha endpoints operations list \
-            --service api.endpoints.proj.cloud.goog \
-            --filter 'startTime >= "2017-02-01"'
+            --service=api.endpoints.proj.cloud.goog \
+            --filter='startTime >= "2017-02-01"'
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

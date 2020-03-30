@@ -21,8 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
-@base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class CloudSecrets(base.Group):
   """Manage secrets on Google Cloud.
 
@@ -33,11 +32,11 @@ class CloudSecrets(base.Group):
 
   To learn more about Google Secret Manager, visit:
 
-      https://cloud.google.com/secrets/
+      https://cloud.google.com/secret-manager/
 
   To read API and usage documentation, visit:
 
-      https://cloud.google.com/secrets/docs/
+      https://cloud.google.com/secret-manager/docs/
 
   """
 

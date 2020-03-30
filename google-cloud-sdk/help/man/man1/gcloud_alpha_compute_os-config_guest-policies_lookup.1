@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute os\-config guest\-policies lookup \- display the combination of guest policies that apply to a given instance
+gcloud alpha compute os\-config guest\-policies lookup \- display the guest policies that are applied to an instance
 
 
 
@@ -69,14 +69,16 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To display all effective guest policies of an instance named my\-instance, run:
+To view all guest policies that are applied to an instance named
+\f5my\-instance\fR, run:
 
 .RS 2m
 $ gcloud alpha compute os\-config guest\-policies lookup my\-instance
@@ -89,5 +91,9 @@ $ gcloud alpha compute os\-config guest\-policies lookup my\-instance
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute os\-config guest\-policies lookup
+.RE
 

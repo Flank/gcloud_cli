@@ -1,0 +1,458 @@
+title: Cloud Game Servers realms CRUD test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers realms create $$realm-id-global$$ --time-zone EST --labels c=x,d=y
+  - stderr: |
+      Create request issued for: [$$realm-id-global$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created realm [$$realm-id-global$$].
+- execute:
+  - command: |
+      game servers realms create $$realm-id-1$$ --description description --time-zone UTC --location $$location$$ --labels a=x,b=y
+  - stderr: |
+      Create request issued for: [$$realm-id-1$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created realm [$$realm-id-1$$].
+- execute:
+  - command: |
+      game servers realms describe $$realm-id-1$$ --location $$location$$
+  - stdout: |-
+      createTime: '$$time-regex$$'
+      description: description
+      etag: .+
+      labels:
+        a: x
+        b: y
+      name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+      timeZone: UTC
+      updateTime: '$$time-regex$$'
+      $
+- execute:
+  - command: |
+      game servers realms update $$realm-id-1$$ --location $$location$$ --time-zone EST --no-dry-run
+  - stderr: |
+      Update request issued for: [$$realm-id-1$$]
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated realm: [$$realm-id-1$$]
+  - stdout: |-
+      createTime: '$$time-regex$$'
+      description: description
+      etag: .+
+      labels:
+        a: x
+        b: y
+      name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+      timeZone: EST
+      updateTime: '$$time-regex$$'
+      $
+- execute:
+  - command: |
+      game servers realms list --location $$location$$
+  - stdout: |
+      NAME                          LOCATION      DESCRIPTION  CREATE_TIME                     UPDATE_TIME                     TIME_ZONE  LABELS
+      $$realm-id-1$$  $$location$$  description  2020-03-02T21:00:01.317945106Z  2020-03-02T21:00:01.591014262Z  EST        {u'a': u'x', u'b': u'y'}
+- execute:
+  - command: |
+      game servers realms delete $$realm-id-1$$ --location $$location$$
+  - prompt:
+    - message: You are about to delete realm [$$realm-id-1$$]
+    - input: y
+  - stderr: |
+      Delete request issued for: [$$realm-id-1$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted realm [$$realm-id-1$$].
+- execute:
+  - command: |
+      game servers realms delete $$realm-id-global$$
+  - prompt:
+    - message: You are about to delete realm [$$realm-id-global$$]
+    - input: y
+  - stderr: |
+      Delete request issued for: [$$realm-id-global$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted realm [$$realm-id-global$$].
+actions:
+- generate_resource_id:
+    reference: realm-id-global
+    prefix: global
+- generate_resource_id:
+    reference: realm-id-1
+    prefix: realm-1
+
+- define_reference:
+    reference: location
+    value: us-east1
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha
+      BETA: v1beta
+
+- execute_command:
+    command: |
+      game servers realms create $$realm-id-global$$ --time-zone EST --labels c=x,d=y
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/realms?alt=json&realmId=$$realm-id-global$$
+          method: POST
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '503'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1583182798711-59fe57854e929-a5137a87-a16d02cb
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-02T20:59:58.798775062Z'
+              target: projects/cloud-sdk-integration-testing/locations/global/realms/$$realm-id-global$$
+              verb: create
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Create request issued for: [$$realm-id-global$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/realms/$$realm-id-global$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '331'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/realms/$$realm-id-global$$
+            createTime: '2020-03-02T20:59:58.745532296Z'
+            updateTime: '2020-03-02T20:59:59.044892061Z'
+            labels:
+              c: x
+              d: y
+            timeZone: EST
+            etag: jWWihMxOHDvw6Tbza9drnoFpDhKz1h0Mf7YL23bwevM
+    - expect_stderr: |
+        Created realm [$$realm-id-global$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers realms create $$realm-id-1$$ --description description --time-zone UTC --location $$location$$ --labels a=x,b=y
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms?alt=json&realmId=$$realm-id-1$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              timeZone: UTC
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '516'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1583182801267-59fe5787be96b-f0749f89-47a7891c
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-02T21:00:01.321399619Z'
+              target: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+              verb: create
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Create request issued for: [$$realm-id-1$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '370'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+            createTime: '2020-03-02T21:00:01.317945106Z'
+            updateTime: '2020-03-02T21:00:01.591014262Z'
+            labels:
+              a: x
+              b: y
+            timeZone: UTC
+            etag: D4PjQ14LscO6MDsOxq3OCO1ORZjzvUdw1xZexlsdu4o
+            description: description
+    - expect_stderr: |
+        Created realm [$$realm-id-1$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers realms describe $$realm-id-1$$ --location $$location$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '370'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+            createTime: '2020-03-02T21:00:01.317945106Z'
+            updateTime: '2020-03-02T21:00:01.591014262Z'
+            labels:
+              a: x
+              b: y
+            timeZone: UTC
+            etag: D4PjQ14LscO6MDsOxq3OCO1ORZjzvUdw1xZexlsdu4o
+            description: description
+    - expect_stdout:
+        matches: |
+          .*projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers realms update $$realm-id-1$$ --location $$location$$ --time-zone EST --no-dry-run
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '370'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+            createTime: '2020-03-02T21:00:01.317945106Z'
+            updateTime: '2020-03-02T21:00:01.591014262Z'
+            labels:
+              a: x
+              b: y
+            timeZone: UTC
+            etag: D4PjQ14LscO6MDsOxq3OCO1ORZjzvUdw1xZexlsdu4o
+            description: description
+    - expect_stderr: |
+        Update request issued for: [$$realm-id-1$$]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$?alt=json&updateMask=timeZone
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              description: description
+              labels:
+                a: x
+                b: y
+              name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+              timeZone: EST
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '516'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1583182805028-59fe578b54d0a-a8194226-504f356b
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-02T21:00:05.040684719Z'
+              target: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+              verb: update
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated realm: [$$realm-id-1$$]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '370'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+            createTime: '2020-03-02T21:00:01.317945106Z'
+            updateTime: '2020-03-02T21:00:01.591014262Z'
+            labels:
+              a: x
+              b: y
+            timeZone: EST
+            etag: 7IpbZD0ToZwKJRk48d_4fQnEnfhMQHenOqB5-7zZeNQ
+            description: description
+    - expect_stdout:
+        matches: |
+          .*projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers realms list --location $$location$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '440'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            realms:
+            - name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+              createTime: '2020-03-02T21:00:01.317945106Z'
+              updateTime: '2020-03-02T21:00:01.591014262Z'
+              labels:
+                b: y
+                a: x
+              timeZone: EST
+              etag: 7IpbZD0ToZwKJRk48d_4fQnEnfhMQHenOqB5-7zZeNQ
+              description: description
+    - expect_stdout:
+        matches: .*$$realm-id-1$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers realms delete $$realm-id-1$$ --location $$location$$
+    cleanup_for: realm-id-1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete realm [$$realm-id-1$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '516'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1583182808190-59fe578e58e7d-2fd24bbb-99f023df
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-02T21:00:08.244869694Z'
+              target: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id-1$$
+              verb: delete
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Delete request issued for: [$$realm-id-1$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted realm [$$realm-id-1$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers realms delete $$realm-id-global$$
+    cleanup_for: realm-id-global
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete realm [$$realm-id-global$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/realms/$$realm-id-global$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '503'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1583182810211-59fe579046638-de40df78-76a342cb
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-02T21:00:10.322630508Z'
+              target: projects/cloud-sdk-integration-testing/locations/global/realms/$$realm-id-global$$
+              verb: delete
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Delete request issued for: [$$realm-id-global$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted realm [$$realm-id-global$$].
+    - expect_exit:
+        code: 0

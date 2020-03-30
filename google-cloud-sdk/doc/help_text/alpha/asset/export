@@ -91,10 +91,12 @@ OPTIONAL FLAGS
      --content-type=CONTENT_TYPE
         Asset content type. If specified, only content matching the specified
         type will be returned. Otherwise, no content but the asset name will be
-        returned. Choices are resource, iam-policy. Specifying resource will
-        export resource metadata, and specifying iam-policy will export IAM
-        policy set on assets. CONTENT_TYPE must be one of: resource,
-        iam-policy, org-policy, access-policy.
+        returned. Specifying resource will export resource metadata, specifying
+        iam-policy will export the IAM policy for each child asset, specifying
+        org-policy will export the Org Policy set on child assets, and
+        specifying access-policy will export the Access Policy set on child
+        assets. CONTENT_TYPE must be one of: resource, iam-policy, org-policy,
+        access-policy.
 
      --snapshot-time=SNAPSHOT_TIME
         Timestamp to take a snapshot on assets. This can only be a current or
@@ -108,8 +110,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To export a snapshot of assets of type 'compute.googleapis.com/Disk' in

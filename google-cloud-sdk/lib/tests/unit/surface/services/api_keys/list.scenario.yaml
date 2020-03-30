@@ -1,0 +1,103 @@
+title: api-keys list test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      services api-keys list
+  - stdout: |
+      NAME                                                             DISPLAY_NAME  LAST_UPDATE
+      projects/fake-project/keys/a94bc2bf-a99b-4597-a620-9c396f5b9677  gcurl key     2019-06-05T21:48:18.021039Z
+      projects/fake-project/keys/7f1ce96e-7fb5-4d13-afc0-5b9d3bd5be14  API key 1     2019-01-12T01:13:41.743154Z
+- execute:
+  - command: |
+      services api-keys list --deleted
+  - stdout: |
+      NAME                                                             DISPLAY_NAME       LAST_UPDATE
+      projects/fake-project/keys/da8a1aef-8a11-4947-b414-f40dd8172107  prober key update  2020-01-27T19:31:58.170143Z
+      projects/fake-project/keys/4f6b8cbf-4d33-45b4-8234-1e565773d60f  prober key update  2020-01-27T19:31:58.170143Z
+      projects/fake-project/keys/c4dc1028-0ba8-4f0f-8e91-c91826359ac8  prober key update  2020-01-27T19:31:58.170143Z
+- execute:
+  - command: |
+      services api-keys list --uri
+  - stdout: |
+      https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys/a94bc2bf-a99b-4597-a620-9c396f5b9677
+      https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys/7f1ce96e-7fb5-4d13-afc0-5b9d3bd5be14
+actions:
+- execute_command:
+    command: |
+      services api-keys list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {keys: [{name: projects/fake-project/keys/a94bc2bf-a99b-4597-a620-9c396f5b9677,
+                displayName: gcurl key, createTime: '2019-02-21T20:22:04.571Z', updateTime: '2019-06-05T21:48:18.021039Z',
+                restrictions: {apiTargets: [service: apikeys.googleapis.com]}, state: ACTIVE},
+              {name: projects/fake-project/keys/7f1ce96e-7fb5-4d13-afc0-5b9d3bd5be14,
+                displayName: API key 1, createTime: '2019-01-12T01:13:41.635Z', updateTime: '2019-01-12T01:13:41.743154Z',
+                restrictions: {androidKeyRestrictions: {}}, state: ACTIVE}]}
+    - expect_stdout: |
+        NAME                                                             DISPLAY_NAME  LAST_UPDATE
+        projects/fake-project/keys/a94bc2bf-a99b-4597-a620-9c396f5b9677  gcurl key     2019-06-05T21:48:18.021039Z
+        projects/fake-project/keys/7f1ce96e-7fb5-4d13-afc0-5b9d3bd5be14  API key 1     2019-01-12T01:13:41.743154Z
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      services api-keys list --deleted
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys?alt=json&filter=state%3ADELETED
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {keys: [{name: projects/fake-project/keys/da8a1aef-8a11-4947-b414-f40dd8172107,
+                displayName: prober key update, createTime: '2019-10-13T20:27:15.614Z',
+                updateTime: '2020-01-27T19:31:58.170143Z', state: DELETED}, {name: projects/fake-project/keys/4f6b8cbf-4d33-45b4-8234-1e565773d60f,
+                displayName: prober key update, createTime: '2019-10-13T05:47:20.188Z',
+                updateTime: '2020-01-27T19:31:58.170143Z', state: DELETED}, {name: projects/fake-project/keys/c4dc1028-0ba8-4f0f-8e91-c91826359ac8,
+                displayName: prober key update, createTime: '2019-10-10T00:17:15.852Z',
+                updateTime: '2020-01-27T19:31:58.170143Z', state: DELETED}]}
+    - expect_stdout: |
+        NAME                                                             DISPLAY_NAME       LAST_UPDATE
+        projects/fake-project/keys/da8a1aef-8a11-4947-b414-f40dd8172107  prober key update  2020-01-27T19:31:58.170143Z
+        projects/fake-project/keys/4f6b8cbf-4d33-45b4-8234-1e565773d60f  prober key update  2020-01-27T19:31:58.170143Z
+        projects/fake-project/keys/c4dc1028-0ba8-4f0f-8e91-c91826359ac8  prober key update  2020-01-27T19:31:58.170143Z
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      services api-keys list --uri
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {keys: [{name: projects/fake-project/keys/a94bc2bf-a99b-4597-a620-9c396f5b9677,
+                displayName: gcurl key, createTime: '2019-02-21T20:22:04.571Z', updateTime: '2019-06-05T21:48:18.021039Z',
+                restrictions: {apiTargets: [service: apikeys.googleapis.com]}, state: ACTIVE},
+              {name: projects/fake-project/keys/7f1ce96e-7fb5-4d13-afc0-5b9d3bd5be14,
+                displayName: API key 1, createTime: '2019-01-12T01:13:41.635Z', updateTime: '2019-01-12T01:13:41.743154Z',
+                restrictions: {androidKeyRestrictions: {}}, state: ACTIVE}]}
+    - expect_stdout: |
+        https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys/a94bc2bf-a99b-4597-a620-9c396f5b9677
+        https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys/7f1ce96e-7fb5-4d13-afc0-5b9d3bd5be14
+    - expect_exit:
+        code: 0

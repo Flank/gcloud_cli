@@ -59,8 +59,34 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To export all kinds in the exampleNs namespace in the exampleProject
+    project to the exampleBucket, run:
+
+        $ gcloud alpha datastore export gs://exampleBucket \
+            --namespaces='exampleNs' --project='exampleProject'
+
+    To export the exampleKind and otherKind kinds in the exampleNs namespace in
+    the exampleProject project to the exampleBucket, run:
+
+        $ gcloud alpha datastore export gs://exampleBucket \
+            --kinds='exampleKind','otherKind' --namespaces='exampleNs' \
+            --project='exampleProject'
+
+    To export all namespaces and kinds in the currently set project to the
+    exampleBucket without waiting for the operation to complete, run:
+
+        $ gcloud alpha datastore export gs://exampleBucket --async
+
+    To export the exampleKind in all namespaces in the currently set project to
+    the exampleBucket, and output the result in JSON, run:
+
+        $ gcloud alpha datastore export gs://exampleBucket \
+            --kinds='exampleKind' --format=json
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

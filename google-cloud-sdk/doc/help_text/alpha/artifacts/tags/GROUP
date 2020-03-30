@@ -1,0 +1,59 @@
+NAME
+    gcloud alpha artifacts tags - manage Artifact Registry tags
+
+SYNOPSIS
+    gcloud alpha artifacts tags COMMAND [GCLOUD_WIDE_FLAG ...]
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create an Artifact Registry tag.
+
+     delete
+        (ALPHA) Delete an Artifact Registry tag.
+
+     list
+        (ALPHA) List Artifact Registry tags.
+
+     update
+        (ALPHA) Update an Artifact Registry tag.
+
+EXAMPLES
+    To create tag with the name my-tag for version 1.0.0 of package my-pkg in
+    the current project with artifacts/repository and artifacts/location
+    properties are set, run:
+
+        $ gcloud alpha artifacts tags create my-tag --package=my-pkg \
+            --version=1.0.0
+
+    To list all tags under package my-pkg, run:
+
+        $ gcloud alpha artifacts tags list --package=my-pkg
+
+    To update tag my-tag from a different version to version 1.0.0 of package
+    my-pkg, run:
+
+        $ gcloud alpha artifacts tags update my-tag --version=1.0.0 \
+            --package=my-pkg
+
+    To delete tag my-tag of package my-pkg, run:
+
+        $ gcloud alpha artifacts tags delete my-tag --package=my-pkg
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta artifacts tags
+

@@ -1,0 +1,130 @@
+
+.TH "GCLOUD_ALPHA_FILESTORE_SNAPSHOTS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha filestore snapshots create \- create a Cloud Filestore snapshot
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha filestore snapshots create\fR \fISNAPSHOT\fR \fB\-\-file\-share\fR=\fIFILE_SHARE\fR \fB\-\-instance\fR=\fIINSTANCE\fR \fB\-\-instance\-zone\fR=\fIINSTANCE_ZONE\fR [\fB\-\-async\fR] [\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Take a Cloud Filestore snapshot of an instance file share.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+An instance with the same name already exists.
+.IP "\(bu" 2m
+The active account does not have permission to create snapshots.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISNAPSHOT\fR
+Arguments and flags that specify the Filestore snapshot you want to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-file\-share\fR=\fIFILE_SHARE\fR
+File share name on the Filestore instance to snapshot.
+
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+Share name of the Filestore instance you want to snapshot.
+
+.TP 2m
+\fB\-\-instance\-zone\fR=\fIINSTANCE_ZONE\fR
+Zone of the Filestore instance.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR
+List of label KEY=VALUE pairs to add.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region (e.g. us\-central1) for the regional snapshot.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBfile/v1p1alpha1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/filestore/
+
+
+
+.SH "EXAMPLES"
+
+To create a snapshot with the name 'my\-snapshot' from an instance called
+\'my\-instance' in 'us\-central1\-c' and the source file share called 'my\-fs',
+run:
+
+.RS 2m
+$ gcloud alpha filestore snapshots create my\-snapshot \e
+    \-\-instance=my\-instance \-\-file\-share=my\-fs
+    \-\-instance\-zone=us\-central1\-c
+.RE
+
+To create a snapshot with the name 'my\-snapshot' in a particular region like
+\'us\-central1' from an instance called 'my\-instance' in 'us\-central1\-c' and
+the source file share called 'my\-fs', run:
+
+.RS 2m
+$ gcloud alpha filestore snapshots create my\-snapshot \e
+    \-\-instance=my\-instance \-\-file\-share=my\-fs
+    \-\-instance\-zone=us\-central1\-c \-\-region=us\-central1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

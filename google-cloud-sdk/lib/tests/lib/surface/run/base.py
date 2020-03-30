@@ -63,6 +63,10 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
     ret = self._registry.Parse(project, collection='run.namespaces')
     return ret
 
+  def _CoreNamespaceRef(self, name='fake-project'):
+    return self._registry.Parse(
+        name, collection='run.api.v1.namespaces', api_version='v1')
+
   def _RevisionRef(self, name, project='fake-project'):
     return self._registry.Parse(
         name,
@@ -86,6 +90,13 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
         name,
         params={'namespacesId': project},
         collection='run.namespaces.{}'.format(plural_kind))
+
+  def _SecretRef(self, name, project='fake-project'):
+    return self._registry.Parse(
+        name,
+        params={'namespacesId': project},
+        collection='run.api.v1.namespaces.secrets',
+        api_version='v1')
 
   def _MockConnectionContext(self, is_gke_context=False):
     self.connection_context = mock.Mock()
@@ -169,6 +180,12 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
     self.mock_crd_client._VERSION = 'v1beta1'  # pylint: disable=protected-access
     self.mock_crd_client.MESSAGES_MODULE = self.crd_messages
 
+    self.mock_core_client = mock.Mock()
+    self.core_messages = core_apis.GetMessagesModule(
+        _API_NAME, 'v1')
+    self.mock_core_client._VERSION = 'v1'  # pylint: disable=protected-access
+    self.mock_core_client.MESSAGES_MODULE = self.core_messages
+
     self.operations.GetActiveRevisions.return_value = {'rev.1': 100}
     self.operations.messages = self.serverless_messages
     self.operations.client = self.mock_serverless_client
@@ -190,13 +207,29 @@ class ServerlessBase(ServerlessSurfaceBase):
     self.mock_serverless_client.Mock()
     self.addCleanup(self.mock_serverless_client.Unmock)
 
-    self.v1beta1_client_class = core_apis.GetClientClass(_API_NAME, 'v1beta1')
-    self.v1beta1_real_client = core_apis.GetClientInstance(
-        _API_NAME, 'v1beta1', no_http=True)
-    self.mock_crd_client = apitools_mock.Client(
-        self.v1beta1_client_class, self.v1beta1_real_client)
-    self.mock_crd_client.Mock()
-    self.addCleanup(self.mock_crd_client.Unmock)
+    # If mock_serverless_client is already a v1beta1 client, trying to create
+    # another will cause problems, so we can just reuse it
+    self.mock_crd_client = self.mock_serverless_client
+    if self.API_VERSION != 'v1beta1':
+      self.v1beta1_client_class = core_apis.GetClientClass(_API_NAME, 'v1beta1')
+      self.v1beta1_real_client = core_apis.GetClientInstance(
+          _API_NAME, 'v1beta1', no_http=True)
+      self.mock_crd_client = apitools_mock.Client(
+          self.v1beta1_client_class, self.v1beta1_real_client)
+      self.mock_crd_client.Mock()
+      self.addCleanup(self.mock_crd_client.Unmock)
+
+    # If mock_serverless_client is already a v1 client, trying to create
+    # another will cause problems, so we can just reuse it
+    self.mock_core_client = self.mock_serverless_client
+    if self.API_VERSION != 'v1':
+      self.v1_client_class = core_apis.GetClientClass(_API_NAME, 'v1')
+      self.v1_real_client = core_apis.GetClientInstance(
+          _API_NAME, 'v1', no_http=True)
+      self.mock_core_client = apitools_mock.Client(
+          self.v1_client_class, self.v1_real_client)
+      self.mock_core_client.Mock()
+      self.addCleanup(self.mock_core_client.Unmock)
 
     # apitools_mock has trouble mocking the same API client twice, so
     # mock_serverless_client must be used for both `client` and `op_client`.
@@ -215,7 +248,8 @@ class ServerlessBase(ServerlessSurfaceBase):
             client=self.mock_serverless_client,
             region='us-central1',
             op_client=self.mock_serverless_client,
-            crd_client=self.mock_crd_client))
+            crd_client=self.mock_crd_client,
+            core_client=self.mock_core_client))
 
     # Convenience attributes for IAM policy testing.
     self.etag = b'my-etag'

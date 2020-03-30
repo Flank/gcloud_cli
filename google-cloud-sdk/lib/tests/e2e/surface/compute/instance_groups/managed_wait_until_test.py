@@ -29,7 +29,7 @@ class ManagedInstanceGroupsWaitUntilZonalTest(
   def SetUp(self):
     self.prefix = 'mig-wait-until'
     self.scope = e2e_test_base.ZONAL
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testWaitUntilStable(self):
     instance_template_name = self.CreateInstanceTemplate()

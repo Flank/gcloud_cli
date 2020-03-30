@@ -1,7 +1,3 @@
-filters:
-  skip:
-    reason: test fails intermittently, possibly due to interaction with other tests.
-    bug: b/143944925
 title: Test import
 release_tracks: [GA]
 summary:

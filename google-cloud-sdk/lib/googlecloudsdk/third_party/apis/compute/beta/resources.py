@@ -108,11 +108,25 @@ class Collections(enum.Enum):
       [u'project', u'forwardingRule'],
       True
   )
+  GLOBALNETWORKENDPOINTGROUPS = (
+      'globalNetworkEndpointGroups',
+      'projects/{project}/global/networkEndpointGroups/{networkEndpointGroup}',
+      {},
+      [u'project', u'networkEndpointGroup'],
+      True
+  )
   GLOBALOPERATIONS = (
       'globalOperations',
       'projects/{project}/global/operations/{operation}',
       {},
       [u'project', u'operation'],
+      True
+  )
+  GLOBALORGANIZATIONOPERATIONS = (
+      'globalOrganizationOperations',
+      'projects/locations/global/operations/{operation}',
+      {},
+      [u'operation'],
       True
   )
   HEALTHCHECKS = (
@@ -265,6 +279,13 @@ class Collections(enum.Enum):
       [u'project', u'zone', u'nodeType'],
       True
   )
+  ORGANIZATIONSECURITYPOLICIES = (
+      'organizationSecurityPolicies',
+      'projects/locations/global/securityPolicies/{securityPolicy}',
+      {},
+      [u'securityPolicy'],
+      True
+  )
   PACKETMIRRORINGS = (
       'packetMirrorings',
       'projects/{project}/regions/{region}/packetMirrorings/{packetMirroring}',
@@ -314,6 +335,14 @@ class Collections(enum.Enum):
       [u'project', u'region', u'disk'],
       True
   )
+  REGIONHEALTHCHECKSERVICES = (
+      'regionHealthCheckServices',
+      'projects/{project}/regions/{region}/healthCheckServices/'
+      '{healthCheckService}',
+      {},
+      [u'project', u'region', u'healthCheckService'],
+      True
+  )
   REGIONHEALTHCHECKS = (
       'regionHealthChecks',
       'projects/{project}/regions/{region}/healthChecks/{healthCheck}',
@@ -334,6 +363,14 @@ class Collections(enum.Enum):
       'projects/{project}/regions/{region}/instanceGroups/{instanceGroup}',
       {},
       [u'project', u'region', u'instanceGroup'],
+      True
+  )
+  REGIONNOTIFICATIONENDPOINTS = (
+      'regionNotificationEndpoints',
+      'projects/{project}/regions/{region}/notificationEndpoints/'
+      '{notificationEndpoint}',
+      {},
+      [u'project', u'region', u'notificationEndpoint'],
       True
   )
   REGIONOPERATIONS = (

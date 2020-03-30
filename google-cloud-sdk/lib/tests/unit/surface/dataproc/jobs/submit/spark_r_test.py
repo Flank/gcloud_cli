@@ -27,16 +27,6 @@ from tests.lib.surface.dataproc import jobs_unit_base
 
 class JobsSubmitSparkRUnitTest(jobs_unit_base.JobsUnitTestBase):
   """Tests for dataproc jobs submit spark-r."""
-  pass
-
-
-class JobsSubmitSparkRUnitTestBeta(JobsSubmitSparkRUnitTest,
-                                   base.DataprocTestBaseBeta):
-  """Tests for dataproc jobs submit spark-r."""
-
-  def testBeta(self):
-    self.assertEqual(self.messages, self._beta_messages)
-    self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
 
   def testSubmitSparkRJob(self):
     job = self.MakeJob(sparkRJob=self.SPARK_R_JOB)
@@ -117,8 +107,18 @@ class JobsSubmitSparkRUnitTestBeta(JobsSubmitSparkRUnitTest,
                            self.CLUSTER_NAME, self.JOB_ID, self.R_SCRIPT_URI))
 
 
+class JobsSubmitSparkRUnitTestBeta(JobsSubmitSparkRUnitTest,
+                                   base.DataprocTestBaseBeta):
+  """Tests for beta track of dataproc jobs submit spark-r."""
+
+  def testBeta(self):
+    self.assertEqual(self.messages, self._beta_messages)
+    self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
+
+
 class JobsSubmitSparkRUnitTestAlpha(
     JobsSubmitSparkRUnitTestBeta, base.DataprocTestBaseAlpha):
+  """Tests for alpha track of dataproc jobs submit spark-r."""
   pass
 
 

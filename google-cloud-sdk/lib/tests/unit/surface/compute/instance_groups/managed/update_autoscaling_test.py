@@ -30,14 +30,13 @@ from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
 @parameterized.parameters(scope_util.ScopeEnum.REGION,
                           scope_util.ScopeEnum.ZONE)
-class InstanceGroupManagersSetAutoscalingZonalTestBeta(test_base.BaseTest,
-                                                       parameterized.TestCase):
+class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
+                                                   parameterized.TestCase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _SetUpForScope(self, scope):
     self.scope = scope
@@ -128,7 +127,7 @@ class InstanceGroupManagersSetAutoscalingZonalTestBeta(test_base.BaseTest,
     self._ExpectRequest(request, [])
 
   def SetUp(self):
-    self.SelectApi(self.track.prefix)
+    self.SelectApi(self.track.prefix if self.track.prefix else 'v1')
     self.expected_requests = []
     self.expected_responses = []
 
@@ -199,13 +198,22 @@ class InstanceGroupManagersSetAutoscalingZonalTestBeta(test_base.BaseTest,
 
 @parameterized.parameters(scope_util.ScopeEnum.REGION,
                           scope_util.ScopeEnum.ZONE)
+class InstanceGroupManagersSetAutoscalingZonalTestBeta(
+    InstanceGroupManagersSetAutoscalingZonalTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+@parameterized.parameters(scope_util.ScopeEnum.REGION,
+                          scope_util.ScopeEnum.ZONE)
 class InstanceGroupManagersSetAutoscalingZonalTestAlpha(
     InstanceGroupManagersSetAutoscalingZonalTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def testUpdateScaleDownNumbers(self, scope):
+  def testUpdateScaleInNumbers(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
     self._ExpectListAutoscalers()
@@ -223,12 +231,12 @@ class InstanceGroupManagersSetAutoscalingZonalTestAlpha(
     self.make_requests.side_effect = iter(self.expected_responses)
 
     self.Run('compute instance-groups managed update-autoscaling group-1 '
-             '--scale-down-control max-scaled-down-replicas=5,time-window=30 '
+             '--scale-in-control max-scaled-in-replicas=5,time-window=30 '
              '{} {}'.format(self.location_flag, self.location))
 
     self.CheckRequests(*self.expected_requests)
 
-  def testUpdateScaleDownPercents(self, scope):
+  def testUpdateScaleInPercents(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
     self._ExpectListAutoscalers()
@@ -246,12 +254,12 @@ class InstanceGroupManagersSetAutoscalingZonalTestAlpha(
     self.make_requests.side_effect = iter(self.expected_responses)
 
     self.Run('compute instance-groups managed update-autoscaling group-1 '
-             '--scale-down-control max-scaled-down-replicas-percent=5,'
+             '--scale-in-control max-scaled-in-replicas-percent=5,'
              'time-window=30 {} {}'.format(self.location_flag, self.location))
 
     self.CheckRequests(*self.expected_requests)
 
-  def testScaleDownErrorBothSpecified(self, scope):
+  def testScaleInErrorBothSpecified(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
     self._ExpectListAutoscalers()
@@ -272,10 +280,51 @@ class InstanceGroupManagersSetAutoscalingZonalTestAlpha(
         expected_message='mutually exclusive, you can\'t specify both',
         expected_exception=managed_instance_groups_utils.InvalidArgumentError):
       self.Run('compute instance-groups managed update-autoscaling group-1 '
-               '--scale-down-control max-scaled-down-replicas-percent=5,'
-               'max-scaled-down-replicas=5,'
+               '--scale-in-control max-scaled-in-replicas-percent=5,'
+               'max-scaled-in-replicas=5,'
                'time-window=30 {} {}'.format(self.location_flag, self.location))
 
+  def testClearScaleIn(self, scope):
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    self._ExpectPatchAutoscalers(
+        self.messages.Autoscaler(
+            name='autoscaler-1',
+            autoscalingPolicy=self.messages.AutoscalingPolicy(
+                scaleDownControl=None)))
+
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run(
+        'compute instance-groups managed update-autoscaling group-1 '
+        '--clear-scale-in-control {} {}'
+        .format(self.location_flag, self.location))
+
+    self.CheckRequests(*self.expected_requests)
+
+  def testPredictiveAutoscaling(self, scope):
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+
+    autoscaler = self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            cpuUtilization=self.messages.AutoscalingPolicyCpuUtilization(
+                predictiveMethod=self.messages.AutoscalingPolicyCpuUtilization
+                .PredictiveMethodValueValuesEnum.STANDARD,)
+        )
+    )
+
+    self._ExpectPatchAutoscalers(autoscaler)
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run('compute instance-groups managed update-autoscaling group-1 '
+             '--cpu-utilization-predictive-method=standard '
+             '{} {}'.format(self.location_flag, self.location))
+
+    self.CheckRequests(*self.expected_requests)
 
 if __name__ == '__main__':
   test_case.main()

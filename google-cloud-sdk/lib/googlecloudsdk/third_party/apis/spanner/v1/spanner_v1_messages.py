@@ -13,6 +13,84 @@ from apitools.base.py import extra_types
 package = 'spanner'
 
 
+class Backup(_messages.Message):
+  r"""A backup of a Cloud Spanner database.
+
+  Enums:
+    StateValueValuesEnum: Output only. The current state of the backup.
+
+  Fields:
+    createTime: Output only. The backup will contain an externally consistent
+      copy of the database at the timestamp specified by `create_time`.
+      `create_time` is approximately the time the CreateBackup request is
+      received.
+    database: Required for the CreateBackup operation. Name of the database
+      from which this backup was created. This needs to be in the same
+      instance as the backup. Values are of the form
+      `projects/<project>/instances/<instance>/databases/<database>`.
+    expireTime: Required for the CreateBackup operation. The expiration time
+      of the backup, with microseconds granularity that must be at least 6
+      hours and at most 366 days from the time the CreateBackup request is
+      processed. Once the `expire_time` has passed, the backup is eligible to
+      be automatically deleted by Cloud Spanner to free the resources used by
+      the backup.
+    name: Output only for the CreateBackup operation. Required for the
+      UpdateBackup operation.  A globally unique identifier for the backup
+      which cannot be changed. Values are of the form
+      `projects/<project>/instances/<instance>/backups/a-z*[a-z0-9]` The final
+      segment of the name must be between 2 and 60 characters in length.  The
+      backup is stored in the location(s) specified in the instance
+      configuration of the instance containing the backup, identified by the
+      prefix of the backup name of the form
+      `projects/<project>/instances/<instance>`.
+    referencingDatabases: Output only. The names of the restored databases
+      that reference the backup. The database names are of the form
+      `projects/<project>/instances/<instance>/databases/<database>`.
+      Referencing databases may exist in different instances. The existence of
+      any referencing database prevents the backup from being deleted. When a
+      restored database from the backup enters the `READY` state, the
+      reference to the backup is removed.
+    sizeBytes: Output only. Size of the backup in bytes.
+    state: Output only. The current state of the backup.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Output only. The current state of the backup.
+
+    Values:
+      STATE_UNSPECIFIED: Not specified.
+      CREATING: The pending backup is still being created. Operations on the
+        backup may fail with `FAILED_PRECONDITION` in this state.
+      READY: The backup is complete and ready for use.
+    """
+    STATE_UNSPECIFIED = 0
+    CREATING = 1
+    READY = 2
+
+  createTime = _messages.StringField(1)
+  database = _messages.StringField(2)
+  expireTime = _messages.StringField(3)
+  name = _messages.StringField(4)
+  referencingDatabases = _messages.StringField(5, repeated=True)
+  sizeBytes = _messages.IntegerField(6)
+  state = _messages.EnumField('StateValueValuesEnum', 7)
+
+
+class BackupInfo(_messages.Message):
+  r"""Information about a backup.
+
+  Fields:
+    backup: Name of the backup.
+    createTime: The backup contains an externally consistent copy of
+      `source_database` at the timestamp specified by `create_time`.
+    sourceDatabase: Name of the database the backup was created from.
+  """
+
+  backup = _messages.StringField(1)
+  createTime = _messages.StringField(2)
+  sourceDatabase = _messages.StringField(3)
+
+
 class BatchCreateSessionsRequest(_messages.Message):
   r"""The request for BatchCreateSessions.
 
@@ -70,7 +148,7 @@ class Binding(_messages.Message):
       that represents a Google group.    For example, `admins@example.com`.  *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
-      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
       recovered, this value reverts to `user:{emailid}` and the recovered user
       retains the role in the binding.  *
       `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
@@ -152,6 +230,30 @@ class CommitResponse(_messages.Message):
   commitTimestamp = _messages.StringField(1)
 
 
+class CreateBackupMetadata(_messages.Message):
+  r"""Metadata type for the operation returned by CreateBackup.
+
+  Fields:
+    cancelTime: The time at which cancellation of this operation was received.
+      Operations.CancelOperation starts asynchronous cancellation on a long-
+      running operation. The server makes a best effort to cancel the
+      operation, but success is not guaranteed. Clients can use
+      Operations.GetOperation or other methods to check whether the
+      cancellation succeeded or whether the operation completed despite
+      cancellation. On successful cancellation, the operation is not deleted;
+      instead, it becomes an operation with an Operation.error value with a
+      google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    database: The name of the database the backup is created from.
+    name: The name of the backup being created.
+    progress: The progress of the CreateBackup operation.
+  """
+
+  cancelTime = _messages.StringField(1)
+  database = _messages.StringField(2)
+  name = _messages.StringField(3)
+  progress = _messages.MessageField('OperationProgress', 4)
+
+
 class CreateDatabaseMetadata(_messages.Message):
   r"""Metadata type for the operation returned by CreateDatabase.
 
@@ -171,7 +273,7 @@ class CreateDatabaseRequest(_messages.Message):
       expression `a-z*[a-z0-9]` and be between 2 and 30 characters in length.
       If the database ID is a reserved word or if it contains a hyphen, the
       database ID must be enclosed in backticks (`` ` ``).
-    extraStatements: An optional list of DDL statements to run inside the
+    extraStatements: Optional. A list of DDL statements to run inside the
       newly created database. Statements can create tables, indexes, etc.
       These statements execute atomically with the creation of the database:
       if there is an error in any statement, the database is not created.
@@ -232,10 +334,14 @@ class Database(_messages.Message):
     StateValueValuesEnum: Output only. The current database state.
 
   Fields:
+    createTime: Output only. If exists, the time at which the database
+      creation started.
     name: Required. The name of the database. Values are of the form
       `projects/<project>/instances/<instance>/databases/<database>`, where
       `<database>` is as specified in the `CREATE DATABASE` statement. This
       name can be passed to other API methods to identify the database.
+    restoreInfo: Output only. Applicable only for restored databases. Contains
+      information about the restore source.
     state: Output only. The current database state.
   """
 
@@ -247,13 +353,22 @@ class Database(_messages.Message):
       CREATING: The database is still being created. Operations on the
         database may fail with `FAILED_PRECONDITION` in this state.
       READY: The database is fully created and ready for use.
+      READY_OPTIMIZING: The database is fully created and ready for use, but
+        is still being optimized for performance and cannot handle full load.
+        In this state, the database still references the backup it was restore
+        from, preventing the backup from being deleted. When optimizations are
+        complete, the full performance of the database will be restored, and
+        the database will transition to `READY` state.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
     READY = 2
+    READY_OPTIMIZING = 3
 
-  name = _messages.StringField(1)
-  state = _messages.EnumField('StateValueValuesEnum', 2)
+  createTime = _messages.StringField(1)
+  name = _messages.StringField(2)
+  restoreInfo = _messages.MessageField('RestoreInfo', 3)
+  state = _messages.EnumField('StateValueValuesEnum', 4)
 
 
 class Delete(_messages.Message):
@@ -261,8 +376,10 @@ class Delete(_messages.Message):
 
   Fields:
     keySet: Required. The primary keys of the rows within table to delete.
-      Delete is idempotent. The transaction will succeed even if some or all
-      rows do not exist.
+      The primary keys must be specified in the order in which they appear in
+      the `PRIMARY KEY()` clause of the table's equivalent DDL statement (the
+      DDL statement used to create the table). Delete is idempotent. The
+      transaction will succeed even if some or all rows do not exist.
     table: Required. The table whose rows will be deleted.
   """
 
@@ -384,6 +501,7 @@ class ExecuteSqlRequest(_messages.Message):
     queryMode: Used to control the amount of debugging information returned in
       ResultSetStats. If partition_token is set, query_mode can only be set to
       QueryMode.NORMAL.
+    queryOptions: Query optimizer configuration to use for the given query.
     resumeToken: If this request is resuming a previously interrupted SQL
       statement execution, `resume_token` should be copied from the last
       PartialResultSet yielded before the interruption. Doing this enables the
@@ -487,28 +605,41 @@ class ExecuteSqlRequest(_messages.Message):
   params = _messages.MessageField('ParamsValue', 2)
   partitionToken = _messages.BytesField(3)
   queryMode = _messages.EnumField('QueryModeValueValuesEnum', 4)
-  resumeToken = _messages.BytesField(5)
-  seqno = _messages.IntegerField(6)
-  sql = _messages.StringField(7)
-  transaction = _messages.MessageField('TransactionSelector', 8)
+  queryOptions = _messages.MessageField('QueryOptions', 5)
+  resumeToken = _messages.BytesField(6)
+  seqno = _messages.IntegerField(7)
+  sql = _messages.StringField(8)
+  transaction = _messages.MessageField('TransactionSelector', 9)
 
 
 class Expr(_messages.Message):
-  r"""Represents an expression text. Example:      title: "User account
-  presence"     description: "Determines whether the request has a user
-  account"     expression: "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit"     description: "Determines if a summary is
+  less than 100 chars"     expression: "document.summary.size() < 100"
+  Example (Equality):      title: "Requestor is owner"     description:
+  "Determines if requestor is the document owner"     expression:
+  "document.owner == request.auth.claims.email"  Example (Logic):      title:
+  "Public documents"     description: "Determine whether the document should
+  be publicly visible"     expression: "document.type != 'private' &&
+  document.type != 'internal'"  Example (Data Manipulation):      title:
+  "Notification string"     description: "Create a notification string with a
+  timestamp."     expression: "'New message received at ' +
+  string(document.create_time)"  The exact variables and functions that may be
+  referenced within an expression are determined by the service that evaluates
+  it. See the service documentation for additional information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
@@ -606,13 +737,7 @@ class Instance(_messages.Message):
     displayName: Required. The descriptive name for this instance as it
       appears in UIs. Must be unique per project and between 4 and 30
       characters in length.
-    endpointUrls: Output only. The endpoint URLs based on the instance config.
-      For example, instances located in a specific cloud region (or multi
-      region) such as nam3, would have a nam3 specific endpoint URL. This URL
-      is to be used implictly by SDK clients, with fallback to default URL.
-      These endpoints are intended to optimize the network routing between the
-      client and the instance's serving resources. If multiple endpoints are
-      present, client may establish connections using any of the given URLs.
+    endpointUris: Deprecated. This field is not populated.
     labels: Cloud Labels are a flexible and lightweight mechanism for
       organizing cloud resources into groups that reflect a customer's
       organizational needs and deployment strategies. Cloud Labels can be used
@@ -703,7 +828,7 @@ class Instance(_messages.Message):
 
   config = _messages.StringField(1)
   displayName = _messages.StringField(2)
-  endpointUrls = _messages.StringField(3, repeated=True)
+  endpointUris = _messages.StringField(3, repeated=True)
   labels = _messages.MessageField('LabelsValue', 4)
   name = _messages.StringField(5)
   nodeCount = _messages.IntegerField(6, variant=_messages.Variant.INT32)
@@ -819,6 +944,56 @@ class KeySet(_messages.Message):
   ranges = _messages.MessageField('KeyRange', 3, repeated=True)
 
 
+class ListBackupOperationsResponse(_messages.Message):
+  r"""The response for ListBackupOperations.
+
+  Fields:
+    nextPageToken: `next_page_token` can be sent in a subsequent
+      ListBackupOperations call to fetch more of the matching metadata.
+    operations: The list of matching backup long-running operations. Each
+      operation's name will be prefixed by the backup's name and the
+      operation's metadata will be of type CreateBackupMetadata. Operations
+      returned include those that are pending or have
+      completed/failed/canceled within the last 7 days. Operations returned
+      are ordered by `operation.metadata.value.progress.start_time` in
+      descending order starting from the most recently started operation.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  operations = _messages.MessageField('Operation', 2, repeated=True)
+
+
+class ListBackupsResponse(_messages.Message):
+  r"""The response for ListBackups.
+
+  Fields:
+    backups: The list of matching backups. Backups returned are ordered by
+      `create_time` in descending order, starting from the most recent
+      `create_time`.
+    nextPageToken: `next_page_token` can be sent in a subsequent ListBackups
+      call to fetch more of the matching backups.
+  """
+
+  backups = _messages.MessageField('Backup', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class ListDatabaseOperationsResponse(_messages.Message):
+  r"""The response for ListDatabaseOperations.
+
+  Fields:
+    nextPageToken: `next_page_token` can be sent in a subsequent
+      ListDatabaseOperations call to fetch more of the matching metadata.
+    operations: The list of matching database long-running operations. Each
+      operation's name will be prefixed by the database's name. The
+      operation's metadata field type `metadata.type_url` describes the type
+      of the metadata.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  operations = _messages.MessageField('Operation', 2, repeated=True)
+
+
 class ListDatabasesResponse(_messages.Message):
   r"""The response for ListDatabases.
 
@@ -896,7 +1071,10 @@ class Mutation(_messages.Message):
       write or transaction fails with error `ALREADY_EXISTS`.
     insertOrUpdate: Like insert, except that if the row already exists, then
       its column values are overwritten with the ones provided. Any column
-      values not explicitly written are preserved.
+      values not explicitly written are preserved.  When using
+      insert_or_update, just as when using insert, all `NOT NULL` columns in
+      the table must be given a value. This holds true even when the row
+      already exists and will therefore actually be updated.
     replace: Like insert, except that if the row already exists, it is
       deleted, and the column values provided are inserted instead. Unlike
       insert_or_update, this means any values not explicitly written become
@@ -1021,6 +1199,38 @@ class Operation(_messages.Message):
   metadata = _messages.MessageField('MetadataValue', 3)
   name = _messages.StringField(4)
   response = _messages.MessageField('ResponseValue', 5)
+
+
+class OperationProgress(_messages.Message):
+  r"""Encapsulates progress related information for a Cloud Spanner long
+  running operation.
+
+  Fields:
+    endTime: If set, the time at which this operation failed or was completed
+      successfully.
+    progressPercent: Percent completion of the operation. Values are between 0
+      and 100 inclusive.
+    startTime: Time the request was received.
+  """
+
+  endTime = _messages.StringField(1)
+  progressPercent = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  startTime = _messages.StringField(3)
+
+
+class OptimizeRestoredDatabaseMetadata(_messages.Message):
+  r"""Metadata type for the long-running operation used to track the progress
+  of optimizations performed on a newly restored database. This long-running
+  operation is automatically created by the system after the successful
+  completion of a database restore, and cannot be cancelled.
+
+  Fields:
+    name: Name of the restored database being optimized.
+    progress: The progress of the post-restore optimizations.
+  """
+
+  name = _messages.StringField(1)
+  progress = _messages.MessageField('OperationProgress', 2)
 
 
 class PartialResultSet(_messages.Message):
@@ -1408,15 +1618,16 @@ class PlanNode(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.   A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**      {       "bindings": [         {
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.   A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**      {       "bindings": [         {
   "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-project-
@@ -1425,22 +1636,23 @@ class Policy(_messages.Message):
   ["user:eve@example.com"],           "condition": {             "title":
   "expirable access",             "description": "Does not grant access after
   Sep 2020",             "expression": "request.time <
-  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
-  **YAML Example**      bindings:     - members:       - user:mike@example.com
-  - group:admins@example.com       - domain:google.com       - serviceAccount
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
+  "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
+  bindings:     - members:       - user:mike@example.com       -
+  group:admins@example.com       - domain:google.com       - serviceAccount
   :my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
   grant access after Sep 2020         expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  timestamp('2020-10-01T00:00:00.000Z')     - etag: BwWWja0YfJA=     -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1448,24 +1660,50 @@ class Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy   that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
   bindings = _messages.MessageField('Binding', 1, repeated=True)
   etag = _messages.BytesField(2)
   version = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+
+
+class QueryOptions(_messages.Message):
+  r"""Query optimizer configuration.
+
+  Fields:
+    optimizerVersion: An option to control the selection of optimizer version.
+      This parameter allows individual queries to pick different query
+      optimizer versions.  Specifying "latest" as a value instructs Cloud
+      Spanner to use the latest supported query optimizer version. If not
+      specified, Cloud Spanner uses optimizer version set at the database
+      level options. Any other positive integer (from the list of supported
+      optimizer versions) overrides the default optimizer version for query
+      execution. The list of supported optimizer versions can be queried from
+      SPANNER_SYS.SUPPORTED_OPTIMIZER_VERSIONS. Executing a SQL statement with
+      an invalid optimizer version will fail with a syntax error
+      (`INVALID_ARGUMENT`) status.  The `optimizer_version` statement hint has
+      precedence over this setting.
+  """
+
+  optimizerVersion = _messages.StringField(1)
 
 
 class QueryPlan(_messages.Message):
@@ -1622,6 +1860,100 @@ class ReplicaInfo(_messages.Message):
   defaultLeaderLocation = _messages.BooleanField(1)
   location = _messages.StringField(2)
   type = _messages.EnumField('TypeValueValuesEnum', 3)
+
+
+class RestoreDatabaseMetadata(_messages.Message):
+  r"""Metadata type for the long-running operation returned by
+  RestoreDatabase.
+
+  Enums:
+    SourceTypeValueValuesEnum: The type of the restore source.
+
+  Fields:
+    backupInfo: Information about the backup used to restore the database.
+    cancelTime: The time at which cancellation of this operation was received.
+      Operations.CancelOperation starts asynchronous cancellation on a long-
+      running operation. The server makes a best effort to cancel the
+      operation, but success is not guaranteed. Clients can use
+      Operations.GetOperation or other methods to check whether the
+      cancellation succeeded or whether the operation completed despite
+      cancellation. On successful cancellation, the operation is not deleted;
+      instead, it becomes an operation with an Operation.error value with a
+      google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    name: Name of the database being created and restored to.
+    optimizeDatabaseOperationName: If exists, the name of the long-running
+      operation that will be used to track the post-restore optimization
+      process to optimize the performance of the restored database, and remove
+      the dependency on the restore source. The name is of the form `projects/
+      <project>/instances/<instance>/databases/<database>/operations/<operatio
+      n>` where the <database> is the name of database being created and
+      restored to. The metadata type of the  long-running operation is
+      OptimizeRestoredDatabaseMetadata. This long-running operation will be
+      automatically created by the system after the RestoreDatabase long-
+      running operation completes successfully. This operation will not be
+      created if the restore was not successful.
+    progress: The progress of the RestoreDatabase operation.
+    sourceType: The type of the restore source.
+  """
+
+  class SourceTypeValueValuesEnum(_messages.Enum):
+    r"""The type of the restore source.
+
+    Values:
+      TYPE_UNSPECIFIED: No restore associated.
+      BACKUP: A backup was used as the source of the restore.
+    """
+    TYPE_UNSPECIFIED = 0
+    BACKUP = 1
+
+  backupInfo = _messages.MessageField('BackupInfo', 1)
+  cancelTime = _messages.StringField(2)
+  name = _messages.StringField(3)
+  optimizeDatabaseOperationName = _messages.StringField(4)
+  progress = _messages.MessageField('OperationProgress', 5)
+  sourceType = _messages.EnumField('SourceTypeValueValuesEnum', 6)
+
+
+class RestoreDatabaseRequest(_messages.Message):
+  r"""The request for RestoreDatabase.
+
+  Fields:
+    backup: Name of the backup from which to restore.  Values are of the form
+      `projects/<project>/instances/<instance>/backups/<backup>`.
+    databaseId: Required. The id of the database to create and restore to.
+      This database must not already exist. The `database_id` appended to
+      `parent` forms the full database name of the form
+      `projects/<project>/instances/<instance>/databases/<database_id>`.
+  """
+
+  backup = _messages.StringField(1)
+  databaseId = _messages.StringField(2)
+
+
+class RestoreInfo(_messages.Message):
+  r"""Information about the database restore.
+
+  Enums:
+    SourceTypeValueValuesEnum: The type of the restore source.
+
+  Fields:
+    backupInfo: Information about the backup used to restore the database. The
+      backup may no longer exist.
+    sourceType: The type of the restore source.
+  """
+
+  class SourceTypeValueValuesEnum(_messages.Enum):
+    r"""The type of the restore source.
+
+    Values:
+      TYPE_UNSPECIFIED: No restore associated.
+      BACKUP: A backup was used as the source of the restore.
+    """
+    TYPE_UNSPECIFIED = 0
+    BACKUP = 1
+
+  backupInfo = _messages.MessageField('BackupInfo', 1)
+  sourceType = _messages.EnumField('SourceTypeValueValuesEnum', 2)
 
 
 class ResultSet(_messages.Message):
@@ -1898,6 +2230,83 @@ class SpannerProjectsInstanceConfigsListRequest(_messages.Message):
   parent = _messages.StringField(3, required=True)
 
 
+class SpannerProjectsInstancesBackupOperationsListRequest(_messages.Message):
+  r"""A SpannerProjectsInstancesBackupOperationsListRequest object.
+
+  Fields:
+    filter: An expression that filters the list of returned backup operations.
+      A filter expression consists of a field name, a comparison operator, and
+      a value for filtering. The value must be a string, a number, or a
+      boolean. The comparison operator must be one of: `<`, `>`, `<=`, `>=`,
+      `!=`, `=`, or `:`. Colon `:` is the contains operator. Filter rules are
+      not case sensitive.  The following fields in the operation are eligible
+      for filtering:    * `name` - The name of the long-running operation   *
+      `done` - False if the operation is in progress, else true.   *
+      `metadata.@type` - the type of metadata. For example, the type string
+      for CreateBackupMetadata is      `type.googleapis.com/google.spanner.adm
+      in.database.v1.CreateBackupMetadata`.   * `metadata.<field_name>` - any
+      field in metadata.value.   * `error` - Error associated with the long-
+      running operation.   * `response.@type` - the type of response.   *
+      `response.<field_name>` - any field in response.value.  You can combine
+      multiple expressions by enclosing each expression in parentheses. By
+      default, expressions are combined with AND logic, but you can specify
+      AND, OR, and NOT logic explicitly.  Here are a few examples:    *
+      `done:true` - The operation is complete.   * `metadata.database:prod` -
+      The database the backup was taken from has      a name containing the
+      string "prod".   * `(metadata.@type=type.googleapis.com/google.spanner.a
+      dmin.database.v1.CreateBackupMetadata) AND` <br/>
+      `(metadata.name:howl) AND` <br/>     `(metadata.progress.start_time <
+      \"2018-03-28T14:50:00Z\") AND` <br/>     `(error:*)` - Returns
+      operations where:     * The operation's metadata type is
+      CreateBackupMetadata.     * The backup name contains the string "howl".
+      * The operation started before 2018-03-28T14:50:00Z.     * The operation
+      resulted in an error.
+    pageSize: Number of operations to be returned in the response. If 0 or
+      less, defaults to the server's maximum allowed page size.
+    pageToken: If non-empty, `page_token` should contain a next_page_token
+      from a previous ListBackupOperationsResponse to the same `parent` and
+      with the same `filter`.
+    parent: Required. The instance of the backup operations. Values are of the
+      form `projects/<project>/instances/<instance>`.
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
+
+
+class SpannerProjectsInstancesBackupsCreateRequest(_messages.Message):
+  r"""A SpannerProjectsInstancesBackupsCreateRequest object.
+
+  Fields:
+    backup: A Backup resource to be passed as the request body.
+    backupId: Required. The id of the backup to be created. The `backup_id`
+      appended to `parent` forms the full backup name of the form
+      `projects/<project>/instances/<instance>/backups/<backup_id>`.
+    parent: Required. The name of the instance in which the backup will be
+      created. This must be the same instance that contains the database the
+      backup will be created from. The backup will be stored in the
+      location(s) specified in the instance configuration of this instance.
+      Values are of the form `projects/<project>/instances/<instance>`.
+  """
+
+  backup = _messages.MessageField('Backup', 1)
+  backupId = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class SpannerProjectsInstancesBackupsDeleteRequest(_messages.Message):
+  r"""A SpannerProjectsInstancesBackupsDeleteRequest object.
+
+  Fields:
+    name: Required. Name of the backup to delete. Values are of the form
+      `projects/<project>/instances/<instance>/backups/<backup>`.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
 class SpannerProjectsInstancesBackupsGetIamPolicyRequest(_messages.Message):
   r"""A SpannerProjectsInstancesBackupsGetIamPolicyRequest object.
 
@@ -1913,6 +2322,58 @@ class SpannerProjectsInstancesBackupsGetIamPolicyRequest(_messages.Message):
 
   getIamPolicyRequest = _messages.MessageField('GetIamPolicyRequest', 1)
   resource = _messages.StringField(2, required=True)
+
+
+class SpannerProjectsInstancesBackupsGetRequest(_messages.Message):
+  r"""A SpannerProjectsInstancesBackupsGetRequest object.
+
+  Fields:
+    name: Required. Name of the backup. Values are of the form
+      `projects/<project>/instances/<instance>/backups/<backup>`.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class SpannerProjectsInstancesBackupsListRequest(_messages.Message):
+  r"""A SpannerProjectsInstancesBackupsListRequest object.
+
+  Fields:
+    filter: An expression that filters the list of returned backups.  A filter
+      expression consists of a field name, a comparison operator, and a value
+      for filtering. The value must be a string, a number, or a boolean. The
+      comparison operator must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`, or
+      `:`. Colon `:` is the contains operator. Filter rules are not case
+      sensitive.  The following fields in the Backup are eligible for
+      filtering:    * `name`   * `database`   * `state`   * `create_time` (and
+      values are of the format YYYY-MM-DDTHH:MM:SSZ)   * `expire_time` (and
+      values are of the format YYYY-MM-DDTHH:MM:SSZ)   * `size_bytes`  You can
+      combine multiple expressions by enclosing each expression in
+      parentheses. By default, expressions are combined with AND logic, but
+      you can specify AND, OR, and NOT logic explicitly.  Here are a few
+      examples:    * `name:Howl` - The backup's name contains the string
+      "howl".   * `database:prod`          - The database's name contains the
+      string "prod".   * `state:CREATING` - The backup is pending creation.
+      * `state:READY` - The backup is fully created and ready for use.   *
+      `(name:howl) AND (create_time < \"2018-03-28T14:50:00Z\")`          -
+      The backup name contains the string "howl" and `create_time`
+      of the backup is before 2018-03-28T14:50:00Z.   * `expire_time <
+      \"2018-03-28T14:50:00Z\"`          - The backup `expire_time` is before
+      2018-03-28T14:50:00Z.   * `size_bytes > 10000000000` - The backup's size
+      is greater than 10GB
+    pageSize: Number of backups to be returned in the response. If 0 or less,
+      defaults to the server's maximum allowed page size.
+    pageToken: If non-empty, `page_token` should contain a next_page_token
+      from a previous ListBackupsResponse to the same `parent` and with the
+      same `filter`.
+    parent: Required. The instance to list backups from.  Values are of the
+      form `projects/<project>/instances/<instance>`.
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class SpannerProjectsInstancesBackupsOperationsCancelRequest(_messages.Message):
@@ -1961,6 +2422,32 @@ class SpannerProjectsInstancesBackupsOperationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
 
 
+class SpannerProjectsInstancesBackupsPatchRequest(_messages.Message):
+  r"""A SpannerProjectsInstancesBackupsPatchRequest object.
+
+  Fields:
+    backup: A Backup resource to be passed as the request body.
+    name: Output only for the CreateBackup operation. Required for the
+      UpdateBackup operation.  A globally unique identifier for the backup
+      which cannot be changed. Values are of the form
+      `projects/<project>/instances/<instance>/backups/a-z*[a-z0-9]` The final
+      segment of the name must be between 2 and 60 characters in length.  The
+      backup is stored in the location(s) specified in the instance
+      configuration of the instance containing the backup, identified by the
+      prefix of the backup name of the form
+      `projects/<project>/instances/<instance>`.
+    updateMask: Required. A mask specifying which fields (e.g. `expire_time`)
+      in the Backup resource should be updated. This mask is relative to the
+      Backup resource, not to the request message. The field mask must always
+      be specified; this prevents any future fields from being erased
+      accidentally by clients that do not know about them.
+  """
+
+  backup = _messages.MessageField('Backup', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
+
+
 class SpannerProjectsInstancesBackupsSetIamPolicyRequest(_messages.Message):
   r"""A SpannerProjectsInstancesBackupsSetIamPolicyRequest object.
 
@@ -2006,6 +2493,53 @@ class SpannerProjectsInstancesCreateRequest(_messages.Message):
 
   createInstanceRequest = _messages.MessageField('CreateInstanceRequest', 1)
   parent = _messages.StringField(2, required=True)
+
+
+class SpannerProjectsInstancesDatabaseOperationsListRequest(_messages.Message):
+  r"""A SpannerProjectsInstancesDatabaseOperationsListRequest object.
+
+  Fields:
+    filter: An expression that filters the list of returned operations.  A
+      filter expression consists of a field name, a comparison operator, and a
+      value for filtering. The value must be a string, a number, or a boolean.
+      The comparison operator must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`,
+      or `:`. Colon `:` is the contains operator. Filter rules are not case
+      sensitive.  The following fields in the Operation are eligible for
+      filtering:    * `name` - The name of the long-running operation   *
+      `done` - False if the operation is in progress, else true.   *
+      `metadata.@type` - the type of metadata. For example, the type string
+      for RestoreDatabaseMetadata is      `type.googleapis.com/google.spanner.
+      admin.database.v1.RestoreDatabaseMetadata`.   * `metadata.<field_name>`
+      - any field in metadata.value.   * `error` - Error associated with the
+      long-running operation.   * `response.@type` - the type of response.   *
+      `response.<field_name>` - any field in response.value.  You can combine
+      multiple expressions by enclosing each expression in parentheses. By
+      default, expressions are combined with AND logic. However, you can
+      specify AND, OR, and NOT logic explicitly.  Here are a few examples:
+      * `done:true` - The operation is complete.   * `(metadata.@type=type.goo
+      gleapis.com/google.spanner.admin.database.v1.RestoreDatabaseMetadata)
+      AND` <br/>     `(metadata.source_type:BACKUP) AND` <br/>
+      `(metadata.backup_info.backup:backup_howl) AND` <br/>
+      `(metadata.name:restored_howl) AND` <br/>
+      `(metadata.progress.start_time < \"2018-03-28T14:50:00Z\") AND` <br/>
+      `(error:*)` - Return operations where:     * The operation's metadata
+      type is RestoreDatabaseMetadata.     * The database is restored from a
+      backup.     * The backup name contains "backup_howl".     * The restored
+      database's name contains "restored_howl".     * The operation started
+      before 2018-03-28T14:50:00Z.     * The operation resulted in an error.
+    pageSize: Number of operations to be returned in the response. If 0 or
+      less, defaults to the server's maximum allowed page size.
+    pageToken: If non-empty, `page_token` should contain a next_page_token
+      from a previous ListDatabaseOperationsResponse to the same `parent` and
+      with the same `filter`.
+    parent: Required. The instance of the database operations. Values are of
+      the form `projects/<project>/instances/<instance>`.
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class SpannerProjectsInstancesDatabasesCreateRequest(_messages.Message):
@@ -2132,6 +2666,22 @@ class SpannerProjectsInstancesDatabasesOperationsListRequest(_messages.Message):
   name = _messages.StringField(2, required=True)
   pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(4)
+
+
+class SpannerProjectsInstancesDatabasesRestoreRequest(_messages.Message):
+  r"""A SpannerProjectsInstancesDatabasesRestoreRequest object.
+
+  Fields:
+    parent: Required. The name of the instance in which to create the restored
+      database. This instance must be in the same project and have the same
+      instance configuration as the instance containing the source backup.
+      Values are of the form `projects/<project>/instances/<instance>`.
+    restoreDatabaseRequest: A RestoreDatabaseRequest resource to be passed as
+      the request body.
+  """
+
+  parent = _messages.StringField(1, required=True)
+  restoreDatabaseRequest = _messages.MessageField('RestoreDatabaseRequest', 2)
 
 
 class SpannerProjectsInstancesDatabasesSessionsBatchCreateRequest(_messages.Message):
@@ -2414,11 +2964,15 @@ class SpannerProjectsInstancesGetRequest(_messages.Message):
   r"""A SpannerProjectsInstancesGetRequest object.
 
   Fields:
+    fieldMask: If field_mask is present, specifies the subset of Instance
+      fields that should be returned. If absent, all Instance fields are
+      returned.
     name: Required. The name of the requested instance. Values are of the form
       `projects/<project>/instances/<instance>`.
   """
 
-  name = _messages.StringField(1, required=True)
+  fieldMask = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
 
 
 class SpannerProjectsInstancesListRequest(_messages.Message):
@@ -3152,16 +3706,13 @@ class UpdateInstanceRequest(_messages.Message):
   r"""The request for UpdateInstance.
 
   Fields:
-    fieldMask: Required. A mask specifying which fields in
-      [][google.spanner.admin.instance.v1.UpdateInstanceRequest.instance]
-      should be updated. The field mask must always be specified; this
-      prevents any future fields in
-      [][google.spanner.admin.instance.v1.Instance] from being erased
-      accidentally by clients that do not know about them.
+    fieldMask: Required. A mask specifying which fields in Instance should be
+      updated. The field mask must always be specified; this prevents any
+      future fields in Instance from being erased accidentally by clients that
+      do not know about them.
     instance: Required. The instance to update, which must always include the
-      instance name.  Otherwise, only fields mentioned in
-      [][google.spanner.admin.instance.v1.UpdateInstanceRequest.field_mask]
-      need be included.
+      instance name.  Otherwise, only fields mentioned in field_mask need be
+      included.
   """
 
   fieldMask = _messages.StringField(1)

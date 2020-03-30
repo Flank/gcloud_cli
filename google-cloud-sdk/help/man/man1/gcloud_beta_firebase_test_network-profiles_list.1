@@ -17,8 +17,10 @@ gcloud beta firebase test network\-profiles list \- list all network profiles av
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Run \f5$ gcloud beta firebase test network\-profiles \-\-help\fR
-for descriptions of the network profile parameters.
+\fB(BETA)\fR List all network profiles available for testing.
+
+Run \f5$ gcloud beta firebase test network\-profiles \-\-help\fR for
+descriptions of the network profile parameters.
 
 
 
@@ -63,8 +65,25 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list all network profiles, run:
+
+.RS 2m
+gcloud beta firebase test network\-profiles list
+.RE
+
+To list all GSM network profiles, run:
+
+.RS 2m
+gcloud beta firebase test network\-profiles list \-\-filter="id:GSM"
+.RE
 
 
 

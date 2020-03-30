@@ -162,6 +162,26 @@ class InstanceGroupManagersUpdateInstancesZonalTest(test_base.BaseTest):
     ) = self.MinimalActionValueValuesEnum.REPLACE
     self.checkUpdateRequest(get_request, update_request)
 
+  def testReplacementMethod(self):
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
+    self.Run('compute instance-groups managed rolling-action replace {0} '
+             '--zone {1} --replacement-method recreate'.format(
+                 self.IGM_NAME_A, self.ZONE))
+
+    get_request = self.generateGetRequestStub(self.IGM_NAME_A)
+    update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
+    (update_request.instanceGroupManagerResource.updatePolicy.minimalAction
+    ) = self.MinimalActionValueValuesEnum.REPLACE
+    (update_request.instanceGroupManagerResource.updatePolicy.replacementMethod
+    ) = (
+        self.messages.InstanceGroupManagerUpdatePolicy
+        .ReplacementMethodValueValuesEnum.RECREATE)
+    (update_request.instanceGroupManagerResource.versions[0].instanceTemplate
+    ) = self.TEMPLATE_A_NAME
+    (update_request.instanceGroupManagerResource.versions[0].name
+    ) = '0/' + TIME_NOW_STR
+    self.checkUpdateRequest(get_request, update_request)
+
   def testReplaceInstanceTemplateDefault(self):
     self.make_requests.side_effect = iter([[self.igms[2]], [], []])
     self.Run('compute instance-groups managed rolling-action replace {0} '
@@ -314,25 +334,6 @@ class InstanceGroupManagersUpdateInstancesAlphaZonalTest(
     self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.should_list_per_instance_configs = True
-
-  def testReplacementMethod(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
-    self.Run('compute instance-groups managed rolling-action replace {0} '
-             '--zone {1} --replacement-method recreate'
-             .format(self.IGM_NAME_A, self.ZONE))
-
-    get_request = self.generateGetRequestStub(self.IGM_NAME_A)
-    update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
-    (update_request.instanceGroupManagerResource.updatePolicy.minimalAction
-    ) = self.MinimalActionValueValuesEnum.REPLACE
-    (update_request.instanceGroupManagerResource.updatePolicy.replacementMethod
-    ) = (self.messages.InstanceGroupManagerUpdatePolicy.
-         ReplacementMethodValueValuesEnum.RECREATE)
-    (update_request.instanceGroupManagerResource.versions[0].instanceTemplate
-    ) = self.TEMPLATE_A_NAME
-    (update_request.instanceGroupManagerResource.versions[0].name
-    ) = '0/' + TIME_NOW_STR
-    self.checkUpdateRequest(get_request, update_request)
 
   def testReplaceIgmWithStatefulPolicy(self):
     igm = test_resources.MakeStatefulInstanceGroupManager(

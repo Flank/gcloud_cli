@@ -27,6 +27,7 @@ from tests.lib import test_case
 from tests.lib.surface.firebase.test.android import commands
 from tests.lib.surface.firebase.test.android import fake_catalogs
 from tests.lib.surface.firebase.test.android import unit_base
+import six
 
 PROJECT_ID = 'superbowl'
 MATRIX_ID = 'matrix-123'
@@ -41,6 +42,9 @@ APP_PATH = 'path/to/' + APP_APK
 TEST_PATH = 'path/to/' + TEST_APK
 APK_SIZE = 999
 OBB_FILE = 'patch.123.foo.com.obb'
+OTHER_FILE_PATH = 'path/to/other-file.txt'
+OTHER_FILE_DEVICE_PATH = '/sdcard/dir1/file.txt'
+OTHER_FILES_PARSED_LIST = {OTHER_FILE_DEVICE_PATH: OTHER_FILE_PATH}
 
 TESTING_V1 = apis.GetMessagesModule('testing', 'v1')
 M_PENDING = TESTING_V1.TestMatrix.StateValueValuesEnum.PENDING
@@ -93,7 +97,8 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
                                    video=False,
                                    metrics=False,
                                    auto_login=False,
-                                   obb_file=None):
+                                   obb_file=None,
+                                   other_files=None):
     """Build a TestSpecification for an AndroidInstrumentationTest."""
     spec = self.testing_msgs.TestSpecification(
         androidInstrumentationTest=self.testing_msgs.AndroidInstrumentationTest(
@@ -115,12 +120,21 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
     if obb_file:
       device_file = self.testing_msgs.DeviceFile(
           obbFile=self.testing_msgs.ObbFile(
-              obbFileName=obb_file,
-              obb=self.testing_msgs
-              .FileReference(gcsPath='gs://{rb}/{uo}/{o}'.format(
-                  rb=self.results_bucket, uo=self.results_dir, o=obb_file))))
+              obbFileName=obb_file, obb=self._BuildFileReference(obb_file)))
       spec.testSetup.filesToPush = [device_file]
+    if other_files:
+      for device_path in other_files.keys():
+        spec.testSetup.filesToPush.append(
+            self.testing_msgs.DeviceFile(
+                regularFile=self.testing_msgs.RegularFile(
+                    content=self._BuildFileReference(device_path[1:]),
+                    devicePath=device_path)))
     return spec
+
+  def _BuildFileReference(self, file_to_upload):
+    """Build a FileReference pointing to the GCS copy of a file."""
+    return self.testing_msgs.FileReference(gcsPath='gs://{rb}/{uo}/{f}'.format(
+        rb=self.results_bucket, uo=self.results_dir, f=file_to_upload))
 
   def BuildTestLoopSpec(self, scenarios, labels):
     """Build a TestSpecification for an AndroidTestLoop test."""
@@ -136,7 +150,7 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
         disablePerformanceMetrics=False,
         testTimeout='900s')
 
-  def BuildRequestMatrix(self, project, devices, spec):
+  def BuildRequestMatrix(self, project, devices, spec, track='GA'):
     """Build a client-side version of a TestMatrix proto."""
     return self.testing_msgs.TestMatrix(
         clientInfo=self.testing_msgs.ClientInfo(
@@ -145,7 +159,7 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
                 self.testing_msgs.ClientInfoDetail(
                     key='Cloud SDK Version', value=config.CLOUD_SDK_VERSION),
                 self.testing_msgs.ClientInfoDetail(
-                    key='Release Track', value=str('GA')),
+                    key='Release Track', value=six.text_type(track)),
             ]),
         environmentMatrix=self.testing_msgs.EnvironmentMatrix(
             androidDeviceList=self.testing_msgs.AndroidDeviceList(
@@ -200,9 +214,10 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
                          spec,
                          devices,
                          project=PROJECT_ID,
-                         matrix_state=M_FINISHED):
+                         matrix_state=M_FINISHED,
+                         track='GA'):
     """Set expectations for testMatrices.Create; return the response matrix."""
-    req_matrix = self.BuildRequestMatrix(project, devices, spec)
+    req_matrix = self.BuildRequestMatrix(project, devices, spec, track)
     res_matrix = self.BuildResponseMatrix(req_matrix, MATRIX_ID, matrix_state)
 
     self.testing_client.projects_testMatrices.Create.Expect(
@@ -225,6 +240,14 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
             outcome=self.toolresults_msgs.Outcome(
                 summary=self.toolresults_msgs.Outcome.SummaryValueValuesEnum
                 .success)))
+    self.tr_client.projects_histories_executions_environments.List.Expect(
+        request=self.toolresults_msgs
+        .ToolresultsProjectsHistoriesExecutionsEnvironmentsListRequest(
+            projectId=PROJECT_ID,
+            historyId=history_id,
+            executionId=execution_id,
+            pageSize=100),
+        response=self.toolresults_msgs.ListEnvironmentsResponse())
     self.tr_client.projects_histories_executions_steps.List.Expect(
         request=self.toolresults_msgs
         .ToolresultsProjectsHistoriesExecutionsStepsListRequest(
@@ -341,32 +364,42 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
 
     self.AssertErrMatches(r'bucket.*/storage/browser/pail/dir9/]')
 
-  def testInstrumentationTest_OneDevice_MostArgsReadFromYamlFile(self):
+  def testInstrumentationTest_OneDevice_MostArgsReadFromYamlFile_InBeta(self):
     self.results_bucket = 'bucket-list'
     self.results_dir = 'duh'
     self.ExpectBucketGet('bucket-list')
     self.ExpectFileUpload(APP_APK)
     self.ExpectFileUpload(TEST_APK)
-    spec = self.BuildInstrumentationTestSpec(timeout='600s')
-    self.ExpectMatrixCreate(spec, [DEFAULT_DEVICE])
+    self.ExpectFileUpload(OTHER_FILE_DEVICE_PATH[1:])
+    spec = self.BuildInstrumentationTestSpec(
+        timeout='600s', other_files=OTHER_FILES_PARSED_LIST)
+    self.ExpectMatrixCreate(spec, [DEFAULT_DEVICE], track='BETA')
 
     self.Run('{run} {argfile}:android-instr --app={aa}'.format(
-        run=commands.ANDROID_TEST_RUN, argfile=GOOD_ARGS, aa=APP_PATH))
+        run=commands.ANDROID_BETA_TEST_RUN, argfile=GOOD_ARGS, aa=APP_PATH))
 
     self.AssertErrContains('[matrix-123] has been created')
     self.AssertErrMatches(r'Upload.*path/to/app.apk')
     self.AssertErrMatches(r'Upload.*path/to/test.apk')
+    self.AssertErrMatches(r'Upload.*' + OTHER_FILE_PATH)
     self.AssertErrMatches(r'--app .*app.apk" overrides.* other-app.apk')
     self.AssertErrNotContains('Instrumentation testing complete')
 
-  def testInstrumentationTest_ThreeDevices_MatrixNotFinishedImmediately(self):
+  def testInstrumentationTest_ThreeDevices_MatrixNotFinishedImmediately_InBeta(
+      self):
     self.ExpectInitializeSettings()
     self.ExpectFileUpload(APP_APK)
     self.ExpectFileUpload(TEST_APK)
     self.ExpectFileUpload(OBB_FILE)
+    self.ExpectFileUpload(OTHER_FILE_DEVICE_PATH[1:])
     spec = self.BuildInstrumentationTestSpec(
-        video=True, metrics=True, auto_login=True, obb_file=OBB_FILE)
-    matrix = self.ExpectMatrixCreate(spec, [DEVICE_2, DEVICE_1, DEFAULT_DEVICE])
+        video=True,
+        metrics=True,
+        auto_login=True,
+        obb_file=OBB_FILE,
+        other_files=OTHER_FILES_PARSED_LIST)
+    matrix = self.ExpectMatrixCreate(
+        spec, [DEVICE_2, DEVICE_1, DEFAULT_DEVICE], track='BETA')
     self.ExpectMatrixGet(matrix, M_PENDING, [VALIDATING])
     self.ExpectMatrixGet(matrix, M_PENDING, [PENDING])
     self.ExpectMatrixGet(matrix, M_PENDING, [RUNNING])
@@ -374,13 +407,20 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
     self.ExpectMatrixGet(matrix, M_FINISHED, [FINISHED])
     self.ExpectToolResults()
 
-    self.Run(commands.ANDROID_TEST_RUN +
-             '--type instrumentation  --app {aa} --test {ta} --obb-files={ob} '
+    self.Run(commands.ANDROID_BETA_TEST_RUN +
+             '--type instrumentation  --app {aa} --test {ta} '
+             '--obb-files={ob} '
+             '--other-files={ofdp}={of} '
              '--device model=EsperiaXYZ,version=C,locale=kl,orientation=wonky '
              '--device model=Nexus2099,version=P,locale=ro '
              '--device orientation=askew '
              '--no-record-video --no-performance-metrics --no-use-orchestrator'
-             .format(aa=APP_PATH, ta=TEST_PATH, ob=OBB_FILE))
+             .format(
+                 aa=APP_PATH,
+                 ta=TEST_PATH,
+                 ob=OBB_FILE,
+                 ofdp=OTHER_FILE_DEVICE_PATH,
+                 of=OTHER_FILE_PATH))
 
     self.AssertErrContains('instrumentation test on 3 device(s)')
     self.AssertErrContains('Instrumentation testing complete')

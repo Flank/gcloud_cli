@@ -11,7 +11,7 @@ gcloud compute instance\-groups managed create \- create a Compute Engine manage
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instance\-groups managed create\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR \fB\-\-template\fR=\fITEMPLATE\fR [\fB\-\-base\-instance\-name\fR=\fIBASE_INSTANCE_NAME\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR] [\fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]] [\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instance\-groups managed create\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR \fB\-\-template\fR=\fITEMPLATE\fR [\fB\-\-base\-instance\-name\fR=\fIBASE_INSTANCE_NAME\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR] [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]] [\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -79,6 +79,33 @@ initializing and should not be autohealed even if unhealthy. This value cannot
 be greater than 1 hour. See $ gcloud topic datetimes for information on duration
 formats.
 
+.TP 2m
+\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR
+Specifies the type of the instance redistribution policy. An instance
+redistribution type lets you enable or disable automatic instance redistribution
+across zones to meet the target distribution. The target distribution is a state
+of a regional managed instance group where all instances are spread out evenly
+across all target zones.
+
+An instance redistribution type can be specified only for a non\-autoscaled
+regional managed instance group. By default it is set to PROACTIVE.
+
+The following types are available:
+
+.RS 2m
+.IP "\(em" 2m
+NONE \- The managed instance group does not redistribute instances across zones.
+
+.IP "\(em" 2m
+PROACTIVE \- The managed instance group proactively redistributes instances to
+meet its target distribution.
+
+.RE
+.RE
+.sp
+\fITYPE\fR must be one of: \fBNONE\fR, \fBPROACTIVE\fR.
+
+.RS 2m
 .TP 2m
 \fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]
 Specifies any target pools you want the instances of this managed instance group
@@ -169,8 +196,9 @@ invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

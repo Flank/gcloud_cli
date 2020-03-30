@@ -22,18 +22,19 @@ from googlecloudsdk.command_lib.container.hub.features import base
 
 
 class Disable(base.DisableCommand):
-  r"""Disable MultiClusterIngress Feature.
+  """Disable MultiClusterIngress Feature.
 
   This command disables MultiClusterIngress Feature in Hub.
 
   ## Examples
 
-  Disable MultiClusterIngress Feature
+  Disable MultiClusterIngress Feature:
 
-      $ {command}
+    $ {command}
   """
 
   FEATURE_NAME = 'multiclusteringress'
+  FEATURE_DISPLAY_NAME = 'MultiClusterIngress'
 
   def Run(self, args):
     self.RunCommand(args)

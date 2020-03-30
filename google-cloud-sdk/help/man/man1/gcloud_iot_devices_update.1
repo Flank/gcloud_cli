@@ -119,8 +119,23 @@ specified by path.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command updates the device 'my\-device' in device registry
+\'my\-registry' in region 'us\-central1'. It blocks the device and sets metadata
+values.
+
+.RS 2m
+$ gcloud iot devices update my\-device \-\-region=us\-central1 \e
+    \-\-registry=my\-registry \-\-blocked \e
+    \-\-metadata=key1=value1,key2=value2
+.RE
 
 
 

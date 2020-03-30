@@ -10,8 +10,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 FLAGS
-     The scope of the guest policies which defaults to project if unspecified.
-     At most one of these may be specified:
+     The scope of the guest policies. If a scope is not specified, the current
+     project is used as the default. At most one of these may be specified:
 
        --folder=FOLDER_ID
           The folder of the guest policies to list.
@@ -20,18 +20,16 @@ FLAGS
           The organization of the guest policies to list.
 
        --project=PROJECT_ID
-          The project of the guest policies to list.
+          The project name to use. If a project name is not specified, then the
+          current project is used. The current project can be listed using
+          gcloud config list --format='text(core.project)' and can be set using
+          gcloud config set project PROJECTID.
 
-          The Google Cloud Platform project name to use for this invocation. If
-          omitted, then the current project is assumed; the current project can
-          be listed using gcloud config list --format='text(core.project)' and
-          can be set using gcloud config set project PROJECTID.
-
-          --project and its fallback core/project property play two roles in
-          the invocation. It specifies the project of the resource to operate
-          on. It also specifies the project for API enablement check, quota,
-          and billing. To specify a different project for quota and billing,
-          use --billing-project or billing/quota_project property.
+          --project and its fallback core/project property play two roles. It
+          specifies the project of the resource to operate on, and also
+          specifies the project for API enablement check, quota, and billing.
+          To specify a different project for quota and billing, use
+          --billing-project or billing/quota_project property.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -66,15 +64,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To list guest policies in the current project, run:
 
         $ gcloud alpha compute os-config guest-policies list
 
-    To list guest policies in the organization '12345', run:
+    To list guest policies in the organization 12345, run:
 
         $ gcloud alpha compute os-config guest-policies list \
         --organization=12345
@@ -83,5 +82,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute os-config guest-policies list
 

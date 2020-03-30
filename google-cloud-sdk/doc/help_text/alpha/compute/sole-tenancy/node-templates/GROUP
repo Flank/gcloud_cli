@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute sole-tenancy node-templates - read and manage Google
-        Compute Engine sole-tenancy node templates
+    gcloud alpha compute sole-tenancy node-templates - read and manage Compute
+        Engine sole-tenancy node templates
 
 SYNOPSIS
     gcloud alpha compute sole-tenancy node-templates COMMAND
@@ -16,37 +16,36 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        (ALPHA) Add IAM policy binding to a Google Compute Engine node
-        template.
+        (ALPHA) Add IAM policy binding to a Compute Engine node template.
 
      create
-        (ALPHA) Creates a Google Compute Engine node template.
+        (ALPHA) Create a Compute Engine node template.
 
      delete
-        (ALPHA) Deletes a Google Compute Engine node template.
+        (ALPHA) Delete a Google Compute Engine node template.
 
      describe
-        (ALPHA) Describes a Google Compute Engine node template.
+        (ALPHA) Describe a Compute Engine node template.
 
      get-iam-policy
-        (ALPHA) Get the IAM Policy for a Google Compute Engine node template.
+        (ALPHA) Get the IAM Policy for a Compute Engine node template.
 
      list
         (ALPHA) List Google Compute Engine node templates.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding from a Google Compute Engine node
-        template.
+        (ALPHA) Remove IAM policy binding from a Compute Engine node template.
 
      set-iam-policy
-        (ALPHA) Set the IAM policy for a Google Compute Engine node template.
+        (ALPHA) Set the IAM policy for a Compute Engine node template.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

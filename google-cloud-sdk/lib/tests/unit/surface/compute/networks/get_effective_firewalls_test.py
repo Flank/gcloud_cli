@@ -19,30 +19,68 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import textwrap
+from googlecloudsdk.api_lib.util import apis as core_apis
 
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class GetEffectiveFirewallsTest(test_base.BaseTest):
+class GetEffectiveFirewallsAlphaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
+    self.api_version = 'alpha'
+    self.SelectApi(self.api_version)
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
 
   def testGetEffectiveFirewalls(self):
+    self.make_requests.side_effect = iter([[
+        self.messages.NetworksGetEffectiveFirewallsResponse(firewalls=[
+            self.messages.Firewall(
+                direction=self.messages.Firewall.DirectionValueValuesEnum
+                .INGRESS,
+                priority=10,
+                name='rule10'),
+            self.messages.Firewall(
+                direction=self.messages.Firewall.DirectionValueValuesEnum
+                .EGRESS,
+                priority=8,
+                name='rule8'),
+            self.messages.Firewall(
+                direction=self.messages.Firewall.DirectionValueValuesEnum
+                .INGRESS,
+                priority=9,
+                name='rule9')
+        ])
+    ]])
 
-    self.make_requests.side_effect = iter([
-        ['firewalls'],
-    ])
-
-    self.Run('alpha compute networks get-effective-firewalls my-network')
+    self.Run(self.api_version +
+             ' compute networks get-effective-firewalls my-network')
 
     self.CheckRequests(
         [(self.compute.networks, 'GetEffectiveFirewalls',
           self.messages.ComputeNetworksGetEffectiveFirewallsRequest(
               network='my-network', project=self.Project()))],)
-    self.assertMultiLineEqual(self.GetOutput().strip(),
-                              textwrap.dedent('firewalls'))
+
+    self.assertMultiLineEqual(
+        self.GetOutput().strip(),
+        textwrap.dedent('firewalls:\n'
+                        '- direction: INGRESS\n'
+                        '  name: rule9\n'
+                        '  priority: 9\n'
+                        '- direction: INGRESS\n'
+                        '  name: rule10\n'
+                        '  priority: 10\n'
+                        '- direction: EGRESS\n'
+                        '  name: rule8\n'
+                        '  priority: 8'))
+
+
+class GetEffectiveFirewallsBetaTest(GetEffectiveFirewallsAlphaTest):
+
+  def SetUp(self):
+    self.api_version = 'beta'
+    self.SelectApi(self.api_version)
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
 
 
 if __name__ == '__main__':

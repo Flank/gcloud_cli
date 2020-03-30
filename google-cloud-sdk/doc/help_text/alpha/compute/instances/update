@@ -12,22 +12,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instances update updates labels and requested
-    CPU Platform for a Google Compute Engine virtual machine. For example:
-
-        $ gcloud alpha compute instances update example-instance \
-            --zone us-central1-a --update-labels=k0=value1,k1=value2 \
-            --remove-labels=k3
-
-    will add/update labels k0 and k1 and remove labels with key k3.
-
-    Labels can be used to identify the instance and to filter them as in
-
-        $ gcloud alpha compute instances list --filter='labels.k1:value2'
-
-    To list existing labels
-
-        $ gcloud alpha compute instances describe example-instance \
-            --format='default(labels)'
+    CPU Platform for a Google Compute Engine virtual machine.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
@@ -139,14 +124,36 @@ FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To modify the instance 'example-instance' in 'us-central1-a' by adding
+    labels 'k0', with value 'value1' and label 'k1' with value 'value2' and
+    removing labels with key 'k3', run:
+
+        $ gcloud alpha compute instances update example-instance \
+            --zone=us-central1-a --update-labels=k0=value1,k1=value2 \
+            --remove-labels=k3
+
+    Labels can be used to identify the disk. To list disks with the 'k1:value2'
+    label, run:
+
+        $ gcloud alpha compute instances list --filter='labels.k1:value2'
+
+    To list only the labels when describing a resource, use --format to filter
+    the result:
+
+        $ gcloud alpha compute instances describe example-disk \
+            --format='default(labels)'
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

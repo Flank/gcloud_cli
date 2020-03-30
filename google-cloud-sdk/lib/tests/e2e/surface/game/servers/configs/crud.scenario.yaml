@@ -1,0 +1,438 @@
+filters:
+  skipAlways:
+    reason: To mitgate request latency spike for now
+    bug: b/151745946
+    locally: true
+title: Cloud Game Services configs CRUD test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers deployments create -q --no-user-output-enabled $$deployment-id-1$$ --location global --description description --labels a=x,b=y
+- execute:
+  - command: |
+      game servers configs create $$config-id-1$$ --deployment $$deployment-id-1$$ --location global --labels a=x,b=y --fleet-configs-file fleet_configs.json --scaling-configs-file scaling_configs.json
+  - stderr: |
+      Create request issued for: [$$config-id-1$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [$$config-id-1$$].
+- execute:
+  - command: |
+      game servers configs describe $$config-id-1$$ --deployment $$deployment-id-1$$ --location global
+  - stdout: |-
+      .+name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$.+
+      $
+- execute:
+  - command: |
+      game servers configs list --deployment $$deployment-id-1$$ --location global
+  - stdout: |-
+      .+$$config-id-1$$.+$$deployment-id-1$$.+
+      $
+- execute:
+  - command: |
+      game servers configs delete $$config-id-1$$ --deployment $$deployment-id-1$$ --location global
+  - prompt:
+    - message: You are about to delete game server config [$$config-id-1$$]
+    - input: y
+  - stderr: |
+      Delete request issued for: [$$config-id-1$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted game server config [$$config-id-1$$].
+- execute:
+  - command: |
+      game servers deployments delete -q --no-user-output-enabled $$deployment-id-1$$ --location global
+actions:
+- generate_resource_id:
+    reference: deployment-id-1
+    prefix: deployment
+- generate_resource_id:
+    reference: config-id-1
+    prefix: config
+
+- define_reference:
+    reference: label-regex
+    # the order may change and 'u' does not exist in python 3+ by default
+    value: "({u?'a': u?'x', u?'b': u?'y'}|{u?'b': u?'y', u?'a': u?'x'})"
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha
+      BETA: v1beta
+- write_file:
+    path: fleet_configs.json
+    contents: |
+      [{
+        "name": "test",
+        "fleetSpec": {
+          "replicas": 2,
+          "scheduling": "Packed",
+          "strategy": {
+            "type": "RollingUpdate",
+            "rollingUpdate": {
+              "maxSurge": "25%",
+              "maxUnavailable": "25%"
+            }
+          },
+          "template": {
+            "metadata": {
+              "labels": {
+                "foo": "bar"
+              }
+            },
+            "spec": {
+              "ports": [{
+                "name": "default",
+                "portPolicy": "Dynamic",
+                "containerPort": 26000
+              }],
+              "health": {
+                "initialDelaySeconds": 30,
+                "periodSeconds": 60
+              },
+              "sdkServer": {
+                "logLevel": "Info",
+                "grpcPort": 9357,
+                "httpPort": 9358
+              },
+              "template": {
+                "spec": {
+                  "containers": [{
+                    "name": "simple-udp",
+                    "image": "gcr.io/agones-images/udp-server:0.18"
+                  }]
+                }
+              }
+            }
+          }
+        }
+      }]
+
+- write_file:
+    path: scaling_configs.json
+    contents: |
+      [
+        {
+          "name": "sc1",
+          "fleetAutoscalerSpec": {"replicas": 100},
+          "schedules":[
+            {
+              "cronJobDuration": "3600s",
+              "cronSpec": "10 0 1-7 5,12 *"
+            }
+          ]
+        },
+        {
+          "name": "sc2",
+          "fleetAutoscalerSpec": {"replicas": 200}
+        }
+      ]
+
+- execute_command:
+    command: |
+      game servers deployments create -q --no-user-output-enabled $$deployment-id-1$$ --location global --description description --labels a=x,b=y
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create $$config-id-1$$ --deployment $$deployment-id-1$$ --location global --labels a=x,b=y --fleet-configs-file fleet_configs.json --scaling-configs-file scaling_configs.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs?alt=json&configId=$$config-id-1$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              labels:
+                a: x
+                b: y
+              scalingConfigs:
+              - fleetAutoscalerSpec: '{"replicas": 100}'
+                name: sc1
+                schedules:
+                - cronJobDuration: 3600s
+                  cronSpec: 10 0 1-7 5,12 *
+                selectors:
+                - {}
+              - fleetAutoscalerSpec: '{"replicas": 200}'
+                name: sc2
+                selectors:
+                - {}
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '558'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1584435007384-5a10905c8ec82-32cc04f0-0f128e89
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-17T08:50:07.531047436Z'
+              target: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+              verb: create
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Create request issued for: [$$config-id-1$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1401'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+            createTime: '2020-03-17T08:50:07.422945836Z'
+            updateTime: '2020-03-17T08:50:08.075110460Z'
+            labels:
+              a: x
+              b: y
+            fleetConfigs:
+            - fleetSpec: '{"template": {"spec": {"health": {"initialDelaySeconds":
+                30, "periodSeconds": 60}, "template": {"spec": {"containers": [{"image":
+                "gcr.io/agones-images/udp-server:0.18", "name": "simple-udp"}]}},
+                "ports": [{"portPolicy": "Dynamic", "name": "default", "containerPort":
+                26000}], "sdkServer": {"logLevel": "Info", "grpcPort": 9357, "httpPort":
+                9358}}, "metadata": {"labels": {"foo": "bar"}}}, "replicas": 2, "scheduling":
+                "Packed", "strategy": {"rollingUpdate": {"maxUnavailable": "25%",
+                "maxSurge": "25%"}, "type": "RollingUpdate"}}'
+              name: test
+            scalingConfigs:
+            - name: sc1
+              fleetAutoscalerSpec: '{"replicas": 100}'
+              selectors:
+              - {}
+              schedules:
+              - cronJobDuration: 3600s
+                cronSpec: 10 0 1-7 5,12 *
+            - name: sc2
+              fleetAutoscalerSpec: '{"replicas": 200}'
+              selectors:
+              - {}
+    - expect_stderr: |
+        Created game server config [$$config-id-1$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs describe $$config-id-1$$ --deployment $$deployment-id-1$$ --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1401'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+            createTime: '2020-03-17T08:50:07.422945836Z'
+            updateTime: '2020-03-17T08:50:08.075110460Z'
+            labels:
+              a: x
+              b: y
+            fleetConfigs:
+            - fleetSpec: '{"template": {"spec": {"health": {"initialDelaySeconds":
+                30, "periodSeconds": 60}, "template": {"spec": {"containers": [{"image":
+                "gcr.io/agones-images/udp-server:0.18", "name": "simple-udp"}]}},
+                "ports": [{"portPolicy": "Dynamic", "name": "default", "containerPort":
+                26000}], "sdkServer": {"logLevel": "Info", "grpcPort": 9357, "httpPort":
+                9358}}, "metadata": {"labels": {"foo": "bar"}}}, "replicas": 2, "scheduling":
+                "Packed", "strategy": {"rollingUpdate": {"maxUnavailable": "25%",
+                "maxSurge": "25%"}, "type": "RollingUpdate"}}'
+              name: test
+            scalingConfigs:
+            - name: sc1
+              fleetAutoscalerSpec: '{"replicas": 100}'
+              selectors:
+              - {}
+              schedules:
+              - cronJobDuration: 3600s
+                cronSpec: 10 0 1-7 5,12 *
+            - name: sc2
+              fleetAutoscalerSpec: '{"replicas": 200}'
+              selectors:
+              - {}
+    - expect_stdout:
+        matches: |
+          .+name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$.+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs list --deployment $$deployment-id-1$$ --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1582'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            gameServerConfigs:
+            - name: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+              createTime: '2020-03-17T08:50:07.422945836Z'
+              updateTime: '2020-03-17T08:50:08.075110460Z'
+              labels:
+                a: x
+                b: y
+              fleetConfigs:
+              - fleetSpec: '{"template": {"spec": {"health": {"initialDelaySeconds":
+                  30, "periodSeconds": 60}, "template": {"spec": {"containers": [{"image":
+                  "gcr.io/agones-images/udp-server:0.18", "name": "simple-udp"}]}},
+                  "ports": [{"portPolicy": "Dynamic", "name": "default", "containerPort":
+                  26000}], "sdkServer": {"logLevel": "Info", "grpcPort": 9357, "httpPort":
+                  9358}}, "metadata": {"labels": {"foo": "bar"}}}, "replicas": 2,
+                  "scheduling": "Packed", "strategy": {"rollingUpdate": {"maxUnavailable":
+                  "25%", "maxSurge": "25%"}, "type": "RollingUpdate"}}'
+                name: test
+              scalingConfigs:
+              - name: sc1
+                fleetAutoscalerSpec: '{"replicas": 100}'
+                selectors:
+                - {}
+                schedules:
+                - cronJobDuration: 3600s
+                  cronSpec: 10 0 1-7 5,12 *
+              - name: sc2
+                fleetAutoscalerSpec: '{"replicas": 200}'
+                selectors:
+                - {}
+    - expect_stdout:
+        matches: |
+          .+$$config-id-1$$.+$$deployment-id-1$$.+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs delete $$config-id-1$$ --deployment $$deployment-id-1$$ --location global
+    cleanup_for: config-id-1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete game server config [$$config-id-1$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$?alt=json
+          method: DELETE
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '558'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1584435010885-5a10905fe5619-58f13910-1277a256
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-17T08:50:10.973638103Z'
+              target: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+              verb: delete
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: false
+        expect_response:
+          extract_references:
+          - field: name
+            reference: operation
+          body:
+            json: {}
+    - expect_stderr: |
+        Delete request issued for: [$$config-id-1$$]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/$$operation$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '684'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1584435010885-5a10905fe5619-58f13910-1277a256
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-17T08:50:10.973638103Z'
+              endTime: '2020-03-17T08:50:11.461872917Z'
+              target: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$/configs/$$config-id-1$$
+              verb: delete
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: true
+            response:
+              '@type': type.googleapis.com/google.protobuf.Empty
+        repeatable: true
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted game server config [$$config-id-1$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments delete -q --no-user-output-enabled $$deployment-id-1$$ --location global
+    cleanup_for: deployment-id-1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '522'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/operations/operation-1584435012857-5a109061c6eec-1b5630da-0eebda12
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-17T08:50:13.017621411Z'
+              target: projects/cloud-sdk-integration-testing/locations/global/gameServerDeployments/$$deployment-id-1$$
+              verb: delete
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_exit:
+        code: 0

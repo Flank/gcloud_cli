@@ -7,8 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) This command waits for a specified Cloud Domains operation to
-    complete.
+    (ALPHA) Wait for a specified Cloud Domains operation to complete.
 
 POSITIONAL ARGUMENTS
      Operation resource - The operation to wait for. This represents a Cloud
@@ -27,14 +26,14 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To wait for an operation, run:
+    To wait for an operation operation-id, run:
 
-        $ gcloud alpha domains registrations operations wait \
-            operation-1549382742802-58127c801803a-67763ca9-86a28c16
+        $ gcloud alpha domains registrations operations wait operation-id
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

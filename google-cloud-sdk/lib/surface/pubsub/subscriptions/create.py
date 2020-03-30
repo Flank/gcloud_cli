@@ -34,17 +34,26 @@ from googlecloudsdk.core import properties
 
 def _Run(args, enable_labels=False, legacy_output=False):
   """Creates one or more subscriptions."""
+  flags.ValidateDeadLetterPolicy(args)
+
   client = subscriptions.SubscriptionsClient()
 
   topic_ref = args.CONCEPTS.topic.Parse()
   push_config = util.ParsePushConfig(args)
   enable_message_ordering = getattr(args, 'enable_message_ordering', None)
+  filter_string = getattr(args, 'filter', None)
   dead_letter_topic = getattr(args, 'dead_letter_topic', None)
   max_delivery_attempts = getattr(args, 'max_delivery_attempts', None)
   retain_acked_messages = getattr(args, 'retain_acked_messages', None)
   retention_duration = getattr(args, 'message_retention_duration', None)
   if retention_duration:
     retention_duration = util.FormatDuration(retention_duration)
+  min_retry_delay = getattr(args, 'min_retry_delay', None)
+  if min_retry_delay:
+    min_retry_delay = util.FormatDuration(min_retry_delay)
+  max_retry_delay = getattr(args, 'max_retry_delay', None)
+  if max_retry_delay:
+    max_retry_delay = util.FormatDuration(max_retry_delay)
 
   no_expiration = False
   expiration_period = getattr(args, 'expiration_period', None)
@@ -76,8 +85,11 @@ def _Run(args, enable_labels=False, legacy_output=False):
           no_expiration=no_expiration,
           expiration_period=expiration_period,
           enable_message_ordering=enable_message_ordering,
+          filter_string=filter_string,
           dead_letter_topic=dead_letter_topic,
-          max_delivery_attempts=max_delivery_attempts)
+          max_delivery_attempts=max_delivery_attempts,
+          min_retry_delay=min_retry_delay,
+          max_retry_delay=max_retry_delay)
     except api_ex.HttpError as error:
       exc = exceptions.HttpException(error)
       log.CreatedResource(subscription_ref.RelativeName(),
@@ -160,9 +172,13 @@ class CreateAlpha(CreateBeta):
         'to create.', plural=True)
     resource_args.AddResourceArgs(parser, [topic, subscription])
     flags.AddSubscriptionSettingsFlags(
-        parser, support_message_ordering=True, support_dead_letter_queues=True)
+        parser,
+        support_message_ordering=True,
+        support_filtering=True,
+        support_retry_policy=True)
     labels_util.AddCreateLabelsFlags(parser)
 
+  @exceptions.CatchHTTPErrorRaiseHTTPException()
   def Run(self, args):
-    flags.ValidateDeadLetterPolicy(args)
+    flags.ValidateFilterString(args)
     return super(CreateAlpha, self).Run(args)

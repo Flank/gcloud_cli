@@ -68,7 +68,12 @@ FLAGS
             gcloud compute disks snapshot my-disk-1 my-disk-2 my-disk-3 --snapshot-names snapshot-1,snapshot-2,snapshot-3
 
         will result in my-disk-1 being snapshotted as snapshot-1, my-disk-2 as
-        snapshot-2, and so on.
+        snapshot-2, and so on. The name must match the
+        (?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?) regular expression, which means
+        it must start with an alphabetic character followed by one or more
+        alphanumeric characters or dashes. The name must not exceed 63
+        characters and must not contain special symbols. All characters must be
+        lowercase.
 
      --storage-location=LOCATION
         Google Cloud Storage location, either regional or multi-regional, where
@@ -122,8 +127,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create a snapshot named snapshot-test of a persistent disk named test in

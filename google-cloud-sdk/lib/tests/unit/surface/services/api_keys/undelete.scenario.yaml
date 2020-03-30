@@ -1,0 +1,106 @@
+title: api-keys undelete test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Base case
+  - command: |
+      services api-keys undelete projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5
+  - stderr: |
+      Operation [operations/akmf.f171cc97-5b03-4c5f-957b-98708eaacae6] complete. Result: {
+          "@type":"type.googleapis.com/google.api.apikeys.v2alpha1.ApiKey",
+          "createTime":"2020-02-02T22:47:11.575Z",
+          "displayName":"prober key update",
+          "keyString":"fake-key-string",
+          "name":"projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5",
+          "state":"ACTIVE",
+          "updateTime":"2020-02-10T19:37:29.297638Z"
+      }
+- execute:
+  - label: Undelete a key that is already in ACTIVE state.
+  - command: |
+      services api-keys undelete projects/fake-project/keys/already-deleted
+  - stderr: |
+      Operation [operations/noop.DONE_OPERATION] complete. Result: {
+          "@type":"type.googleapis.com/google.api.apikeys.v2alpha1.ApiKey",
+          "createTime":"2020-02-02T22:47:11.575Z",
+          "displayName":"prober key update",
+          "keyString":"fake-key-string",
+          "name":"projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5",
+          "state":"ACTIVE",
+          "updateTime":"2020-02-10T19:37:29.297638Z"
+      }
+actions:
+- execute_command:
+    label: Base case
+    command: |
+      services api-keys undelete projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5:undelete?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {name: operations/akmf.f171cc97-5b03-4c5f-957b-98708eaacae6}
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/operations/akmf.f171cc97-5b03-4c5f-957b-98708eaacae6?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {name: operations/akmf.f171cc97-5b03-4c5f-957b-98708eaacae6, done: true,
+            response: {'@type': type.googleapis.com/google.api.apikeys.v2alpha1.ApiKey,
+              name: projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5,
+              displayName: prober key update, keyString: fake-key-string,
+              createTime: '2020-02-02T22:47:11.575Z', updateTime: '2020-02-10T19:37:29.297638Z',
+              state: ACTIVE}}
+    - expect_stderr: |
+        Operation [operations/akmf.f171cc97-5b03-4c5f-957b-98708eaacae6] complete. Result: {
+            "@type":"type.googleapis.com/google.api.apikeys.v2alpha1.ApiKey",
+            "createTime":"2020-02-02T22:47:11.575Z",
+            "displayName":"prober key update",
+            "keyString":"fake-key-string",
+            "name":"projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5",
+            "state":"ACTIVE",
+            "updateTime":"2020-02-10T19:37:29.297638Z"
+        }
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Undelete a key that is already in ACTIVE state.
+    command: |
+      services api-keys undelete projects/fake-project/keys/already-deleted
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apikeys.googleapis.com/v2alpha1/projects/fake-project/keys/already-deleted:undelete?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {name: operations/noop.DONE_OPERATION, done: true, response: {'@type': type.googleapis.com/google.api.apikeys.v2alpha1.ApiKey,
+              name: projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5,
+              displayName: prober key update, keyString: fake-key-string,
+              createTime: '2020-02-02T22:47:11.575Z', updateTime: '2020-02-10T19:37:29.297638Z',
+              state: ACTIVE}}
+    - expect_stderr: |
+        Operation [operations/noop.DONE_OPERATION] complete. Result: {
+            "@type":"type.googleapis.com/google.api.apikeys.v2alpha1.ApiKey",
+            "createTime":"2020-02-02T22:47:11.575Z",
+            "displayName":"prober key update",
+            "keyString":"fake-key-string",
+            "name":"projects/fake-project/keys/67eabaf6-20e6-4b13-aa12-9d47938664e5",
+            "state":"ACTIVE",
+            "updateTime":"2020-02-10T19:37:29.297638Z"
+        }
+    - expect_exit:
+        code: 0

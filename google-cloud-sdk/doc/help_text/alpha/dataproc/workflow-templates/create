@@ -25,14 +25,10 @@ POSITIONAL ARGUMENTS
           this group are specified.
 
        --region=REGION
-          Cloud Dataproc region for the template. Each Cloud Dataproc region
-          constitutes an independent resource namespace constrained to
-          deploying instances into Google Compute Engine zones inside the
-          region. The default value of global is a special multi-region
-          namespace which is capable of deploying instances into all Google
-          Compute Engine zones globally, and is disjoint from other Cloud
-          Dataproc regions. Overrides the default dataproc/region property
-          value for this command invocation.
+          Dataproc region for the template. Each Dataproc region constitutes an
+          independent resource namespace constrained to deploying instances
+          into Compute Engine zones inside the region. Overrides the default
+          dataproc/region property value for this command invocation.
 
 FLAGS
      --labels=[KEY=VALUE,...]
@@ -47,8 +43,17 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a workflow template named 'my-workflow-template' in region
+    'us-central1' with label params 'key1'='value1' and 'key2'='value2', run:
+
+        $ gcloud alpha dataproc workflow-templates create \
+            my-workflow-template --region=us-central1 \
+            --labels="key1=value1,key2=value2"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

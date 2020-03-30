@@ -42,25 +42,33 @@ REQUIRED FLAGS
           WORKLOAD_METADATA_FROM_NODE must be one of:
 
            EXPOSED
+              [DEPRECATED] Pods running in this node pool have access to the
+              node's underlying Compute Engine Metadata Server.
+           GCE_METADATA
               Pods running in this node pool have access to the node's
               underlying Compute Engine Metadata Server.
-           GKE_METADATA_SERVER
+           GKE_METADATA
               Run the Kubernetes Engine Metadata Server on this node. The
               Kubernetes Engine Metadata Server exposes a metadata API to
               workloads that is compatible with the V1 Compute Metadata APIs
               exposed by the Compute Engine and App Engine Metadata Servers.
               This feature can only be enabled if Workload Identity is enabled
               at the cluster level.
+           GKE_METADATA_SERVER
+              [DEPRECATED] Run the Kubernetes Engine Metadata Server on this
+              node. The Kubernetes Engine Metadata Server exposes a metadata
+              API to workloads that is compatible with the V1 Compute Metadata
+              APIs exposed by the Compute Engine and App Engine Metadata
+              Servers. This feature can only be enabled if Workload Identity is
+              enabled at the cluster level.
            SECURE
-              Prevents pods not in hostNetwork from accessing certain VM
-              metadata, specifically kube-env, which contains Kubelet
-              credentials, and the instance identity token. This is a temporary
-              security solution available while the bootstrapping process for
-              cluster nodes is being redesigned with significant security
-              improvements. This feature is scheduled to be deprecated in the
-              future and later removed.
-           UNSPECIFIED
-              Chooses the default.
+              [DPRECATED] Prevents pods not in hostNetwork from accessing
+              certain VM metadata, specifically kube-env, which contains
+              Kubelet credentials, and the instance identity token. This is a
+              temporary security solution available while the bootstrapping
+              process for cluster nodes is being redesigned with significant
+              security improvements. This feature is scheduled to be deprecated
+              in the future and later removed.
 
        Cluster autoscaling
 
@@ -165,15 +173,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To turn on node auto repair in "node-pool-1" in the cluster
     "sample-cluster", run:
 
         $ gcloud beta container node-pools update node-pool-1 \
-            --cluster=example-cluster --enable-autoupgrade
+            --cluster=sample-cluster --enable-autoupgrade
 
 NOTES
     This command is currently in BETA and may change without notice. These

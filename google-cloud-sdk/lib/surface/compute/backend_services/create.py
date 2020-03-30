@@ -51,6 +51,10 @@ def _ResolvePortName(args):
 
 # TODO(b/73642225): Determine whether 'HTTPS' should be default
 def _ResolveProtocol(messages, args, default='HTTP'):
+  valid_options = messages.BackendService.ProtocolValueValuesEnum.names()
+  if args.protocol and args.protocol not in valid_options:
+    raise ValueError('{} is not a supported option. See the help text of '
+                     '--protocol for supported options.'.format(args.protocol))
   return messages.BackendService.ProtocolValueValuesEnum(
       args.protocol or default)
 
@@ -79,7 +83,8 @@ class CreateHelper(object):
 
   @classmethod
   def Args(cls, parser, support_l7_internal_load_balancer, support_failover,
-           support_logging, support_multinic):
+           support_logging, support_multinic, support_client_only,
+           support_grpc_protocol):
     """Add flags to create a backend service to the parser."""
 
     parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
@@ -97,9 +102,10 @@ class CreateHelper(object):
         parser, cust_metavar='HTTPS_HEALTH_CHECK')
     flags.AddTimeout(parser)
     flags.AddPortName(parser)
-    flags.AddProtocol(parser, default=None)
+    flags.AddProtocol(
+        parser, default=None, support_grpc_protocol=support_grpc_protocol)
     flags.AddEnableCdn(parser)
-    flags.AddSessionAffinity(parser)
+    flags.AddSessionAffinity(parser, support_client_only=support_client_only)
     flags.AddAffinityCookieTtl(parser)
     flags.AddConnectionDrainingTimeout(parser)
     flags.AddLoadBalancingScheme(
@@ -241,9 +247,6 @@ class CreateHelper(object):
 
   def _CreateBackendService(self, holder, args, backend_services_ref):
     health_checks = flags.GetHealthCheckUris(args, self, holder.resources)
-    if not health_checks:
-      raise exceptions.ToolException('At least one health check required.')
-
     enable_cdn = True if args.enable_cdn else None
 
     return holder.client.messages.BackendService(
@@ -259,9 +262,6 @@ class CreateHelper(object):
     """Creates a regional backend service."""
 
     health_checks = flags.GetHealthCheckUris(args, self, holder.resources)
-    if not health_checks:
-      raise exceptions.ToolException('At least one health check required.')
-
     messages = holder.client.messages
 
     return messages.BackendService(
@@ -316,10 +316,12 @@ class CreateGA(base.CreateCommand):
   backend-services edit'.
   """
 
-  _support_l7_internal_load_balancer = False
-  _support_failover = False
-  _support_logging = False
-  _support_multinic = False
+  _support_l7_internal_load_balancer = True
+  _support_failover = True
+  _support_logging = True
+  _support_multinic = True
+  _support_client_only = False
+  _support_grpc_protocol = False
 
   @classmethod
   def Args(cls, parser):
@@ -329,7 +331,9 @@ class CreateGA(base.CreateCommand):
         ._support_l7_internal_load_balancer,
         support_failover=cls._support_failover,
         support_logging=cls._support_logging,
-        support_multinic=cls._support_multinic)
+        support_multinic=cls._support_multinic,
+        support_client_only=cls._support_client_only,
+        support_grpc_protocol=cls._support_grpc_protocol)
 
   def Run(self, args):
     """Issues request necessary to create Backend Service."""
@@ -359,10 +363,9 @@ class CreateBeta(CreateGA):
   compute backend-services add-backend' or 'gcloud compute
   backend-services edit'.
   """
-  _support_failover = True
-  _support_logging = True
-  _support_l7_internal_load_balancer = True
   _support_multinic = True
+  _support_client_only = False
+  _support_grpc_protocol = False
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -381,4 +384,5 @@ class CreateAlpha(CreateBeta):
   compute backend-services add-backend' or 'gcloud compute
   backend-services edit'.
   """
-  pass
+  _support_client_only = True
+  _support_grpc_protocol = True

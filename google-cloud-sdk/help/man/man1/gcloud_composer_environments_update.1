@@ -177,6 +177,8 @@ $ gcloud composer environments update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 .RE
 .RE
@@ -257,8 +259,21 @@ Return immediately, without waiting for the operation in progress to complete.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update the Cloud Composer environment named \f5\fIenv\-1\fR\fR to have 8
+Airflow workers, and not have the \f5\fIproduction\fR\fR label, run:
+
+.RS 2m
+$ gcloud composer environments update env\-1 \-\-node\-count=8 \e
+    \-\-remove\-labels=production
+.RE
 
 
 

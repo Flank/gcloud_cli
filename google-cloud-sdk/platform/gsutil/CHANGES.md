@@ -1,3 +1,25 @@
+Release 4.48 (release date: 2020-02-28)
+======================================
+Bug Fixes
+------------------
+- Fixed special character handling in filenames on Windows with Python3.
+- Fixed issue while transferring binary files from S3 with Python3.
+- Fixed KMS tests, so that keys are created in the same region as their buckets.
+
+Other Changes
+------------------
+- Several documentation updates and clarifications.
+
+Release 4.47 (release date: 2020-01-10)
+======================================
+New Features
+------------------
+- Added support for the new archive storage class.
+
+Other Changes
+------------------
+- Several documentation updates and clarifications.
+
 Release 4.46 (release date: 2019-10-31)
 =======================================
 Bug Fixes

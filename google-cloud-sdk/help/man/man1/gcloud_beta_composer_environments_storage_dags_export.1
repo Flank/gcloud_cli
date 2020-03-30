@@ -76,8 +76,9 @@ subdirectory in the environment's Cloud Storage bucket.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -117,7 +118,7 @@ And the local directory '/foo' has the following structure:
 The following command:
 
 .RS 2m
-gcloud beta composer environments storage dags export myenv \-\-destination /foo
+gcloud beta composer environments storage dags export myenv \-\-destination=/foo
 .RE
 
 would result in the following structure in the local '/foo' directory:
@@ -142,7 +143,7 @@ with the contents of the corresponding files in the Cloud Storage bucket.
 If instead we had run
 
 .RS 2m
-gcloud beta composer environments storage dags export myenv \-\-source subdir1/file3.py \-\-destination /foo
+gcloud beta composer environments storage dags export myenv \-\-source=subdir1/file3.py \-\-destination=/foo
 .RE
 
 the resulting local directory structure would be the following:

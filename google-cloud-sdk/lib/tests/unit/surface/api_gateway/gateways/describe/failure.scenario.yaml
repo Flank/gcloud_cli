@@ -1,0 +1,25 @@
+title: Cloud API Gateway Gateway Describe with Success
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway gateways describe test-name --location us-central1
+  - error: '1: HTTPError 404'
+actions:
+- execute_command:
+    command: |
+      api-gateway gateways describe test-name --location us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/gateways/test-name?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+    - expect_exit:
+        code: 1
+        message: HTTPError 404

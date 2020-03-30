@@ -1,0 +1,1954 @@
+title: Cloud Game Services deployments crud test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --description description --location global --labels a=x,b=y --fleet-configs-file fleet_configs.json
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --labels a=x,b=y --fleet-configs-file fleet_configs.json
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.json --scaling-configs-file scaling_configs.json
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs.yaml
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file invalid_fleet_configs.txt
+  - error: '1: Invalid schema: expected proper fleet configs'
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_scaling_configs.txt
+  - error: '1: Invalid schema: expected proper scaling configs'
+- execute:
+  - command: |
+      game servers configs describe my-config --deployment my-deployment --location global
+  - stdout: |
+      createTime: '2019-06-04T06:00:22.223629990Z'
+      fleetConfigs:
+      - fleetSpec: '"replicas": 2'
+      labels:
+        a: x
+        b: y
+      name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config
+      updateTime: '2019-06-04T06:00:24.189364972Z'
+- execute:
+  - command: |
+      game servers configs list --deployment my-deployment --location global
+  - stdout: |
+      NAME         LOCATION  DEPLOYMENT     DESCRIPTION  CREATE_TIME                     UPDATE_TIME                     LABELS
+      my-config-1  global    my-deployment  My config 1  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-2  global    my-deployment  My config 2  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-3  global    my-deployment  My config 3  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-4  global    my-deployment  My config 4  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-5  global    my-deployment  My config 5  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+- execute:
+  - command: |
+      game servers configs list --deployment my-deployment
+  - stdout: |
+      NAME         LOCATION  DEPLOYMENT     DESCRIPTION  CREATE_TIME                     UPDATE_TIME                     LABELS
+      my-config-1  global    my-deployment  My config 1  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-2  global    my-deployment  My config 2  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-3  global    my-deployment  My config 3  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-4  global    my-deployment  My config 4  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-5  global    my-deployment  My config 5  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+- execute:
+  - command: |
+      game servers configs list
+  - stdout: |
+      NAME         LOCATION  DEPLOYMENT       DESCRIPTION  CREATE_TIME                     UPDATE_TIME                     LABELS
+      my-config-1  global    my-deployment-1  My config 1  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-2  global    my-deployment-1  My config 2  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-3  global    my-deployment-2  My config 3  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-4  global    my-deployment-3  My config 4  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-5  global    my-deployment-4  My config 5  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+- execute:
+  - command: |
+      game servers configs list --location global
+  - stdout: |
+      NAME         LOCATION  DEPLOYMENT       DESCRIPTION  CREATE_TIME                     UPDATE_TIME                     LABELS
+      my-config-1  global    my-deployment-1  My config 1  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-2  global    my-deployment-1  My config 2  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-3  global    my-deployment-2  My config 3  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-4  global    my-deployment-3  My config 4  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+      my-config-5  global    my-deployment-4  My config 5  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+- execute:
+  - command: |
+      game servers configs delete my-config --deployment my-deployment --location global
+  - prompt:
+    - message: You are about to delete game server config [my-config]
+    - input: y
+  - stderr: |
+      Delete request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794370352-58b88c203245f-78b8623b-e26181ce]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --description description --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.json
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.yaml
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_with_name.yaml
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.json --scaling-configs-file scaling_configs_str.json
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.yaml --scaling-configs-file scaling_configs_str.yaml
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_without_name.yaml
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_complex.yaml
+  - stderr: |
+      Create request issued for: [my-config]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created game server config [my-config].
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_schedules.yaml
+  - error: '1: Invalid schema: schedules must be a list'
+- execute:
+  - command: |
+      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_selectors.yaml
+  - error: '1: Invalid schema: selectors must be a list'
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha
+      BETA: v1beta
+
+- write_file:
+    path: fleet_configs.json
+    contents: |
+      [
+       {
+         "fleetSpec": {"replicas": 2}
+       }
+      ]
+- write_file:
+    path: fleet_configs_str.json
+    contents: |
+      [
+       {
+         "fleetSpec": "\"replicas\": 2"
+       }
+      ]
+- write_file:
+    path: fleet_configs.yaml
+    contents: |
+      - fleetSpec:
+          replicas: 2
+- write_file:
+    path: fleet_configs_str.yaml
+    contents: |
+      - fleetSpec: |
+          replicas: 2
+- write_file:
+    path: fleet_configs_with_name.yaml
+    contents: |
+      - fleetSpec:
+          replicas: 2
+        name: TestFleetSpec
+- write_file:
+    path: invalid_fleet_configs.txt
+    contents: |
+      blah
+- write_file:
+    path: scaling_configs.json
+    contents: |
+      [
+        {
+          "name": "sc1",
+          "fleetAutoscalerSpec": {"replicas": 100},
+          "schedules":[
+            {
+              "cronJobDuration": "3600s",
+              "cronSpec": "10 0 1-7 5,12 *"
+            }
+          ]
+        },
+        {
+          "name": "sc2",
+          "fleetAutoscalerSpec": {"replicas": 200}
+        }
+      ]
+- write_file:
+    path: scaling_configs_str.json
+    contents: |
+      [
+        {
+          "name": "sc1",
+          "fleetAutoscalerSpec": "{\"replicas\": 100}",
+          "schedules":[
+            {
+              "cronJobDuration": "3600s",
+              "cronSpec": "10 0 1-7 5,12 *"
+            }
+          ]
+        },
+        {
+          "name": "sc2",
+          "fleetAutoscalerSpec": "{\"replicas\": 200}"
+        }
+      ]
+- write_file:
+    path: scaling_configs.yaml
+    contents: |
+      - fleetAutoscalerSpec:
+          policy:
+            buffer:
+              bufferSize: 2
+        name:
+          sc2
+- write_file:
+    path: scaling_configs_without_name.yaml
+    contents: |
+      - fleetAutoscalerSpec:
+          policy:
+            buffer:
+              bufferSize: 2
+- write_file:
+    path: scaling_configs_str.yaml
+    contents: |
+      - fleetAutoscalerSpec: |
+          policy:
+            buffer:
+              bufferSize: 2
+        name:
+          sc2
+- write_file:
+    path: invalid_scaling_configs.txt
+    contents: |
+      blah
+- write_file:
+    path: scaling_configs_complex.yaml
+    contents: |
+      - fleetAutoscalerSpec:
+          policy:
+            buffer:
+              bufferSize: 1
+        name:
+          scaling-config-3
+        selectors:
+        - labels:
+            "x": '1'
+            "y": '2'
+        - labels:
+            "w": '4'
+            "z": '5'
+        schedules:
+        - cronJobDuration:
+            340s
+          cronSpec:
+            "10/6 23 * * *"
+      - fleetAutoscalerSpec:
+          policy:
+            buffer:
+              bufferSize: 2
+        name:
+          scaling-config-4
+        selectors:
+        - labels:
+            "k": '8'
+            "m": '9'
+        schedules:
+        - cronJobDuration:
+            300s
+          cronSpec:
+            "10/6 19 * * *"
+          startTime:
+            '2020-02-07T01:00:00Z'
+          endTime:
+            '2020-02-08T01:00:00Z'
+        - startTime:
+            '2021-02-07T01:00:00Z'
+          endTime:
+            '2021-02-08T01:00:00Z'
+- write_file:
+    path: scaling_configs_invalid_schedules.yaml
+    contents: |
+      - fleetAutoscalerSpec:
+          policy:
+            buffer:
+              bufferSize: 1
+        name:
+          scaling-config-3
+        selectors:
+        - labels:
+            "x": '1'
+            "y": '2'
+        - labels:
+            "w": '4'
+            "z": '5'
+        schedules:
+          cronJobDuration:
+            340s
+          cronSpec:
+            "10/6 23 * * *"
+      - fleetAutoscalerSpec:
+          policy:
+            buffer:
+              bufferSize: 2
+        name:
+          scaling-config-4
+        selectors:
+        - labels:
+            "k": '8'
+            "m": '9'
+        schedules:
+        - cronJobDuration:
+            300s
+          cronSpec:
+            "10/6 19 * * *"
+        - cronJobDuration:
+            315s
+          cronSpec:
+            "10/6 11 * * 1"
+- write_file:
+    path: scaling_configs_invalid_selectors.yaml
+    contents: |
+      - fleetAutoscalerSpec:
+          policy:
+            buffer:
+              bufferSize: 1
+        name:
+          scaling-config-3
+        selectors:
+        - labels:
+            "x": '1'
+            "y": '2'
+        - labels:
+            "w": '4'
+            "z": '5'
+        schedules:
+        - cronJobDuration:
+            340s
+          cronSpec:
+            "10/6 23 * * *"
+      - fleetAutoscalerSpec:
+          policy:
+            buffer:
+              bufferSize: 2
+        name:
+          scaling-config-4
+        selectors:
+          labels:
+            "k": '8'
+            "m": '9'
+        schedules:
+        - cronJobDuration:
+            300s
+          cronSpec:
+            "10/6 19 * * *"
+        - cronJobDuration:
+            315s
+          cronSpec:
+            "10/6 11 * * 1"
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --description description --location global --labels a=x,b=y --fleet-configs-file fleet_configs.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body: |
+            {
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                 {"fleetSpec": "\"replicas\": 2"}
+              ]
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                 {"fleetSpec": "\"replicas\": 2"}
+              ]
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --labels a=x,b=y --fleet-configs-file fleet_configs.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body: |
+            {
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                 {"fleetSpec": "\"replicas\": 2"}
+              ]
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "description": "description",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                 {"fleetSpec": "\"replicas\": 2"}
+              ]
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body:
+            json:
+              fleetConfigs:
+              - fleetSpec: '{"replicas": 2}'
+              labels:
+                a: x
+                b: y
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                 {"fleetSpec": "\"replicas\": 2"}
+              ]
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.json --scaling-configs-file scaling_configs.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body:
+            json:
+              fleetConfigs:
+              - fleetSpec: '{"replicas": 2}'
+              labels:
+                a: x
+                b: y
+              scalingConfigs:
+              - fleetAutoscalerSpec: '{"replicas": 100}'
+                name: sc1
+                schedules:
+                - cronJobDuration: 3600s
+                  cronSpec: 10 0 1-7 5,12 *
+                selectors:
+                - {}
+              - fleetAutoscalerSpec: '{"replicas": 200}'
+                name: sc2
+                selectors:
+                - {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                {"fleetSpec": "fleet-spec-0"}
+              ],
+              "scalingConfigs": [
+                {
+                  "fleetAutoScalerSpec": "fleet-autoscaler-spec-1",
+                  "schedules":[
+                    {
+                      "cronJobDuration": "3600s",
+                      "cronSpec": "10 0 1-7 5,12 *"
+                    }
+                  ]
+                },
+                {
+                  "fleetAutoScalerSpec": "fleet-autoscaler-spec-0"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body:
+            json:
+              fleetConfigs:
+              - fleetSpec: '{"replicas": 2}'
+              labels:
+                a: x
+                b: y
+              scalingConfigs:
+              - fleetAutoscalerSpec: '{"policy": {"buffer": {"bufferSize": 2}}}'
+                name: sc2
+                selectors:
+                - {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                {"fleetSpec": "fleet-spec-0"}
+              ],
+              "scalingConfigs": [
+                {
+                  "fleetAutoScalerSpec": "fleet-autoscaler-spec-1",
+                  "schedules":[
+                    {
+                      "cronJobDuration": "3600s",
+                      "cronSpec": "10 0 1-7 5,12 *"
+                    }
+                  ]
+                },
+                {
+                  "fleetAutoScalerSpec": "fleet-autoscaler-spec-0"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file invalid_fleet_configs.txt
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid schema: expected proper fleet configs'
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.json --scaling-configs-file invalid_scaling_configs.txt
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid schema: expected proper scaling configs'
+- execute_command:
+    command: |
+      game servers configs describe my-config --deployment my-deployment --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-04T06:00:22.223629990Z",
+              "updateTime": "2019-06-04T06:00:24.189364972Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                {"fleetSpec": "\"replicas\": 2"}
+              ]
+            }
+    - expect_stdout: |
+        createTime: '2019-06-04T06:00:22.223629990Z'
+        fleetConfigs:
+        - fleetSpec: '"replicas": 2'
+        labels:
+          a: x
+          b: y
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config
+        updateTime: '2019-06-04T06:00:24.189364972Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs list --deployment my-deployment --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            gameServerConfigs:
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config-1
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 1
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config-2
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 2
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config-3
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 3
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config-4
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 4
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config-5
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 5
+    - expect_stdout: |
+        NAME         LOCATION  DEPLOYMENT     DESCRIPTION  CREATE_TIME                     UPDATE_TIME                     LABELS
+        my-config-1  global    my-deployment  My config 1  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-2  global    my-deployment  My config 2  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-3  global    my-deployment  My config 3  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-4  global    my-deployment  My config 4  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-5  global    my-deployment  My config 5  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs list --deployment my-deployment
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            gameServerConfigs:
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config-1
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 1
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config-2
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 2
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config-3
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 3
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config-4
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 4
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config-5
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 5
+    - expect_stdout: |
+        NAME         LOCATION  DEPLOYMENT     DESCRIPTION  CREATE_TIME                     UPDATE_TIME                     LABELS
+        my-config-1  global    my-deployment  My config 1  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-2  global    my-deployment  My config 2  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-3  global    my-deployment  My config 3  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-4  global    my-deployment  My config 4  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-5  global    my-deployment  My config 5  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/-/gameServerDeployments/-/configs?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            gameServerConfigs:
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment-1/gameServerConfigs/my-config-1
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 1
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment-1/gameServerConfigs/my-config-2
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 2
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment-2/gameServerConfigs/my-config-3
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 3
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment-3/gameServerConfigs/my-config-4
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 4
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment-4/gameServerConfigs/my-config-5
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 5
+    - expect_stdout: |
+        NAME         LOCATION  DEPLOYMENT       DESCRIPTION  CREATE_TIME                     UPDATE_TIME                     LABELS
+        my-config-1  global    my-deployment-1  My config 1  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-2  global    my-deployment-1  My config 2  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-3  global    my-deployment-2  My config 3  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-4  global    my-deployment-3  My config 4  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-5  global    my-deployment-4  My config 5  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs list --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/-/configs?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            gameServerConfigs:
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment-1/gameServerConfigs/my-config-1
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 1
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment-1/gameServerConfigs/my-config-2
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 2
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment-2/gameServerConfigs/my-config-3
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 3
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment-3/gameServerConfigs/my-config-4
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 4
+            - name: projects/fake-project/locations/global/gameServerDeployments/my-deployment-4/gameServerConfigs/my-config-5
+              createTime: '2019-05-30T22:28:00.326007110Z'
+              updateTime: '2019-05-30T22:28:00.585350183Z'
+              description: My config 5
+    - expect_stdout: |
+        NAME         LOCATION  DEPLOYMENT       DESCRIPTION  CREATE_TIME                     UPDATE_TIME                     LABELS
+        my-config-1  global    my-deployment-1  My config 1  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-2  global    my-deployment-1  My config 2  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-3  global    my-deployment-2  My config 3  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-4  global    my-deployment-3  My config 4  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+        my-config-5  global    my-deployment-4  My config 5  2019-05-30T22:28:00.326007110Z  2019-05-30T22:28:00.585350183Z
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs delete my-config --deployment my-deployment --location global
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete game server config [my-config]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: DELETE
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794370352-58b88c203245f-78b8623b-e26181ce",
+              "done": true
+            }
+    - expect_stderr: |
+        Delete request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794370352-58b88c203245f-78b8623b-e26181ce?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794370352-58b88c203245f-78b8623b-e26181ce",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:59:30.383331409Z",
+                "endTime": "2019-06-17T17:59:30.994963067Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794370352-58b88c203245f-78b8623b-e26181ce]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --description description --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body: |
+            {
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                 {"fleetSpec": "\"replicas\": 2"}
+              ]
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                 {"fleetSpec": "\"replicas\": 2"}
+              ]
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body:
+            json:
+              fleetConfigs:
+              - fleetSpec: '{"replicas": 2}'
+              labels:
+                a: x
+                b: y
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                 {"fleetSpec": "\"replicas\": 2"}
+              ]
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_with_name.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body:
+            json:
+              fleetConfigs:
+              - fleetSpec: '{"replicas": 2}'
+                name: TestFleetSpec
+              labels:
+                a: x
+                b: y
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                 {"fleetSpec": "\"replicas\": 2", "name": "TestFleetSpec"}
+              ]
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.json --scaling-configs-file scaling_configs_str.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body:
+            json:
+              fleetConfigs:
+              - fleetSpec: '{"replicas": 2}'
+              labels:
+                a: x
+                b: y
+              scalingConfigs:
+              - fleetAutoscalerSpec: '{"replicas": 100}'
+                name: sc1
+                schedules:
+                - cronJobDuration: 3600s
+                  cronSpec: 10 0 1-7 5,12 *
+                selectors:
+                - {}
+              - fleetAutoscalerSpec: '{"replicas": 200}'
+                name: sc2
+                selectors:
+                - {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                {"fleetSpec": "fleet-spec-0"}
+              ],
+              "scalingConfigs": [
+                {
+                  "fleetAutoScalerSpec": "{\"replicas\": 200}",
+                  "schedules":[
+                    {
+                      "cronJobDuration": "3600s",
+                      "cronSpec": "10 0 1-7 5,12 *"
+                    }
+                  ]
+                },
+                {
+                  "fleetAutoScalerSpec": "fleet-autoscaler-spec-0"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs_str.yaml --scaling-configs-file scaling_configs_str.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body:
+            json:
+              fleetConfigs:
+              - fleetSpec: '{"replicas": 2}'
+              labels:
+                a: x
+                b: y
+              scalingConfigs:
+              - fleetAutoscalerSpec: '{"policy": {"buffer": {"bufferSize": 2}}}'
+                name: sc2
+                selectors:
+                - {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                {"fleetSpec": "{\"replicas\": 2}"}
+              ],
+              "scalingConfigs": [
+                {
+                  "fleetAutoScalerSpec": "{\"policy\": {\"buffer\": {\"bufferSize\": 2}}}",
+                  "schedules":[
+                    {
+                      "cronJobDuration": "3600s",
+                      "cronSpec": "10 0 1-7 5,12 *"
+                    }
+                  ]
+                },
+                {
+                  "fleetAutoScalerSpec": "fleet-autoscaler-spec-0"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_without_name.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body:
+            json:
+              fleetConfigs:
+              - fleetSpec: '{"replicas": 2}'
+              labels:
+                a: x
+                b: y
+              scalingConfigs:
+              - fleetAutoscalerSpec: '{"policy": {"buffer": {"bufferSize": 2}}}'
+                selectors:
+                - {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                {"fleetSpec": "{\"replicas\": 2}"}
+              ],
+              "scalingConfigs": [
+                {
+                  "fleetAutoScalerSpec": "{\"policy\": {\"buffer\": {\"bufferSize\": 2}}}"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --labels a=x,b=y --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_complex.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs?alt=json&configId=my-config
+          method: POST
+          headers: {}
+          body:
+            json:
+              fleetConfigs:
+              - fleetSpec: '{"replicas": 2}'
+              labels:
+                a: x
+                b: y
+              scalingConfigs:
+              - fleetAutoscalerSpec: '{"policy": {"buffer": {"bufferSize": 1}}}'
+                name: scaling-config-3
+                schedules:
+                - cronJobDuration: 340s
+                  cronSpec: 10/6 23 * * *
+                selectors:
+                - labels:
+                    x: '1'
+                    y: '2'
+                - labels:
+                    w: '4'
+                    z: '5'
+              - fleetAutoscalerSpec: '{"policy": {"buffer": {"bufferSize": 2}}}'
+                name: scaling-config-4
+                schedules:
+                - cronJobDuration: 300s
+                  cronSpec: 10/6 19 * * *
+                  startTime: '2020-02-07T01:00:00Z'
+                  endTime: '2020-02-08T01:00:00Z'
+                - startTime: '2021-02-07T01:00:00Z'
+                  endTime: '2021-02-08T01:00:00Z'
+                selectors:
+                - labels:
+                    k: '8'
+                    m: '9'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+            }
+    - expect_stderr: |
+        Create request issued for: [my-config]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "$$api-version$$"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.$$api-version$$.GameServerConfig",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/fake-project/locations/global/gameServerDeployments/my-deployment/configs/my-config?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment/gameServerConfigs/my-config",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "fleetConfigs": [
+                {"fleetSpec": "fleet-spec-0"}
+              ],
+              "scalingConfigs": [
+                {
+                  "name": "scaling-config-3",
+                  "fleetAutoscalerSpec": "{\"policy\": {\"buffer\": {\"bufferSize\": 1}}}",
+                  "selectors": [
+                    {
+                      "labels": {
+                        "y": "2",
+                        "x": "1"
+                      }
+                    },
+                    {
+                      "labels": {
+                        "w": "4",
+                        "z": "5"
+                      }
+                    }
+                  ],
+                  "schedules": [
+                    {
+                      "cronJobDuration": "340s",
+                      "cronSpec": "10/6 23 * * *"
+                    }
+                  ]
+                },
+                {
+                  "name": "scaling-config-4",
+                  "fleetAutoscalerSpec": "{\"policy\": {\"buffer\": {\"bufferSize\": 2}}}",
+                  "selectors": [
+                    {
+                      "labels": {
+                        "k": "8",
+                        "m": "9"
+                      }
+                    }
+                  ],
+                  "schedules": [
+                    {
+                      "cronJobDuration": "300s",
+                      "cronSpec": "10/6 19 * * *"
+                    },
+                    {
+                      "cronJobDuration": "315s",
+                      "cronSpec": "10/6 11 * * 1"
+                    }
+                  ]
+                }
+              ]
+
+            }
+    - expect_stderr: |
+        Created game server config [my-config].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_schedules.yaml
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid schema: schedules must be a list'
+- execute_command:
+    command: |
+      game servers configs create my-config --deployment my-deployment --location global --fleet-configs-file fleet_configs.yaml --scaling-configs-file scaling_configs_invalid_selectors.yaml
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid schema: selectors must be a list'

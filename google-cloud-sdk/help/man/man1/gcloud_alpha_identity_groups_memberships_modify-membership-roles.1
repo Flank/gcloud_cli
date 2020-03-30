@@ -1,0 +1,110 @@
+
+.TH "GCLOUD_ALPHA_IDENTITY_GROUPS_MEMBERSHIPS_MODIFY\-MEMBERSHIP\-ROLES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha identity groups memberships modify\-membership\-roles \- add/remove/modify membership roles of a membership in a group
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha identity groups memberships modify\-membership\-roles\fR \fB\-\-group\-email\fR=\fIGROUP_EMAIL\fR \fB\-\-member\-email\fR=\fIMEMBER_EMAIL\fR [\fB\-\-update\-roles\-params\fR=[\fIUPDATE_ROLES_PARAMS\fR,...]\ |\ \fB\-\-add\-roles\fR=\fIADD_ROLES\fR\ \fB\-\-remove\-roles\fR=[\fIREMOVE_ROLES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Add/remove/modify membership roles OR update expiry details of
+membership in a group.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-group\-email\fR=\fIGROUP_EMAIL\fR
+The email address of the group that member\-email belongs to.
+
+.TP 2m
+\fB\-\-member\-email\fR=\fIMEMBER_EMAIL\fR
+The email address of the group or user that is being updated
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-update\-roles\-params\fR=[\fIUPDATE_ROLES_PARAMS\fR,...]
+Resource representing the parameters to update membership roles. An example
+whould be \-\-update\-roles\-params MEMBER=expiry_detail.expire_time
+
+.TP 2m
+\fB\-\-add\-roles\fR=\fIADD_ROLES\fR
+Membership roles to be added. Currently supported MembershipRole: 'MEMBER',
+\'OWNER', 'MANAGER'.
+
+.TP 2m
+\fB\-\-remove\-roles\fR=[\fIREMOVE_ROLES\fR,...]
+Membership role names to be removed. Currently supported MembershipRole:
+\'OWNER', 'MANAGER'. MEMBER\-less owner is not supported so removing just MEMBER
+role won't be possible.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudidentity/v1alpha1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/identity/
+
+
+
+.SH "EXAMPLES"
+
+To add a new membership role to an existing group\-member pair.
+
+.RS 2m
+$ gcloud alpha identity groups memberships modify\-membership\-roles \e
+    \-\-group\-email="eng\-discuss@foo.com"  \e
+    \-\-member\-email="user@foo.com"  \e
+    \-\-add\-roles=OWNER
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta identity groups memberships modify\-membership\-roles
+.RE
+

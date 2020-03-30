@@ -1,11 +1,23 @@
-- release_tracks: [ALPHA]
+- release_tracks: [ALPHA, BETA]
 
   help_text:
     brief: Create a Realm.
-    description: Create a Cloud Game Server Realm.
+    description: |
+      Create a Cloud Game Server Realm.
+
+      ## EXAMPLES
+
+      To create Realm 'my-realm' in project 'my-project' and location in 'my-location' run:
+
+        $ {command} my-realm --project=my-project --location=my-location --time-zone=UTC --labels=a=x,b=y
+
 
   request:
     collection: gameservices.projects.locations.realms
+    ALPHA:
+      api_version: v1alpha
+    BETA:
+      api_version: v1beta
 
   arguments:
     resource:
@@ -13,6 +25,10 @@
       spec: !REF googlecloudsdk.command_lib.game.resources:realm
 
     params:
+    - arg_name: description
+      api_field: realm.description
+      help_text: |
+        Game server realm description.
     - arg_name: time-zone
       api_field: realm.timeZone
       help_text: |

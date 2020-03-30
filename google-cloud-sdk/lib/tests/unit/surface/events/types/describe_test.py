@@ -69,15 +69,34 @@ class TypesDescribeTestAlpha(base.ServerlessSurfaceBase):
     self.operations.ListSourceCustomResourceDefinitions.return_value = (
         self.source_crds)
 
-  def testEventTypesFailFailNonGKE(self):
-    """Event Types are not yet supported on managed Cloud Run."""
-    with self.assertRaises(exceptions.UnsupportedArgumentError):
-      self.Run('events types describe google.source.0.et.0 '
-               '--platform=managed --region=us-central1')
-    self.AssertErrContains(
-        'Events are only available with Cloud Run for Anthos.')
+  def testDescribeManaged(self):
+    """Tests successful describe with default output format."""
+    self._MakeSourceCrds(
+        num_sources=2,
+        num_event_types_per_source=3,
+        num_properties_per_source=3)
+    self.Run('events types describe google.source.0.et.0 '
+             '--platform=managed --region=us-central1')
 
-  def testDescribe(self):
+    self.AssertOutputEquals(
+        """description: desc00
+        schema: https://somewhere.over.the.rainbow.json
+        source: SourceKind0
+        type: google.source.0.et.0
+
+        Parameter(s) to create a trigger for this event type:
+        REQUIRED PARAMETER DESCRIPTION
+        Yes p0-1 pdesc01
+            p0-0 pdesc00
+            p0-2 pdesc02
+
+        Secret parameter(s) to create a trigger for this event type:
+        REQUIRED PARAMETER DESCRIPTION
+         pSecret pSecretdesc
+        """,
+        normalize_space=True)
+
+  def testDescribeGke(self):
     """Tests successful describe with default output format."""
     self._MakeSourceCrds(
         num_sources=2,
@@ -85,10 +104,11 @@ class TypesDescribeTestAlpha(base.ServerlessSurfaceBase):
         num_properties_per_source=3)
     self.Run('events types describe google.source.0.et.0 --platform=gke '
              '--cluster=cluster-1 --cluster-location=us-central1-a')
+
     self.AssertOutputEquals(
-        """category: SourceKind0
-        description: desc00
+        """description: desc00
         schema: https://somewhere.over.the.rainbow.json
+        source: SourceKind0
         type: google.source.0.et.0
 
         Parameter(s) to create a trigger for this event type:

@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud compute networks vpc-access connectors create
         (CONNECTOR : --region=REGION) [--async]
-        [--max-throughput=MAX_THROUGHPUT; default=1000]
+        [--max-throughput=MAX_THROUGHPUT; default=300]
         [--min-throughput=MIN_THROUGHPUT; default=200]
         [--network=NETWORK; default="default"] [--range=RANGE]
         [GCLOUD_WIDE_FLAG ...]
@@ -39,13 +39,15 @@ FLAGS
         Return immediately, without waiting for the operation in progress to
         complete.
 
-     --max-throughput=MAX_THROUGHPUT; default=1000
+     --max-throughput=MAX_THROUGHPUT; default=300
         Maximum throughput in Mbps. Value must be a multiple of 100 between 200
-        and 1000.
+        and 1000. Must be higher than the value specified by --min-throughput;
+        the set value, if applicable, or the default minimum throughput value.
 
      --min-throughput=MIN_THROUGHPUT; default=200
         Minimum throughput in Mbps. Value must be a multiple of 100 between 200
-        and 1000.
+        and 1000. Must be lower than the value specified by --max-throughput;
+        the set value, if applicable, or the default maximum throughput value.
 
      --network=NETWORK; default="default"
         Name of the Google Compute Engine network to which the connector will
@@ -60,8 +62,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the vpcaccess/v1 API. The full documentation for this API

@@ -29,13 +29,11 @@ from tests.lib import e2e_base
 from tests.lib import e2e_utils
 from tests.lib import exec_utils
 from tests.lib import sdk_test_base
-from tests.lib import test_case
 
 from six.moves import urllib
 
 
 @sdk_test_base.Filters.RunOnlyIfLongrunning
-@test_case.Filters.skip('Failing', 'b/143140234')
 class DeployCustomTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth,
                         sdk_test_base.WithTempCWD):
   """Test we can deploy an app."""
@@ -135,18 +133,10 @@ class DeployCustomTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth,
     test_app = self._Resource('app_engine_php_flex_data', 'app.yaml')
     self.deployApp(test_app)
 
-  # Even though the test metrics say that the test is not flaky, it actually is.
-  # This test is only run once a day and our reporting is not correct.
-  @test_case.Filters.skip('DO NOT UNSKIP: test is flaky', 'b/117423915')
-  def testDeployOpenJDK8(self):
-    test_app = self._Resource('app_engine_java_vm_openjdk8_data', 'app.yaml')
-    self.deployApp(test_app)
-
   def testDeployPureJetty9(self):
     test_app = self._Resource('app_engine_java_vm_jetty9_data', 'app.yaml')
     self.deployApp(test_app)
 
-  @test_case.Filters.skip('Timing out', 'b/142811733')
   def testDeployJavaFlex(self):
     test_app = self._Resource('app_engine_java_flex', 'app.yaml')
     self.deployApp(test_app)

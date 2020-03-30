@@ -1,12 +1,68 @@
 title: Data Catalog entry group IAM tests.
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: data-catalog entry-groups get-iam-policy group1 --location=us-central1
+  - stdout: |
+      bindings:
+      - members:
+        - user:user@example.com
+        role: roles/datacatalog.entryGroupOwner
+      etag: BwWD6ItLwF0=
+      version: 1
+- execute:
+  - command: data-catalog entry-groups add-iam-policy-binding group1 --location=us-central1
+      --member='user:otheruser@example.com' --role='roles/editor'
+  - stderr: |
+      Updated IAM policy for entry group [group1].
+  - stdout: |
+      bindings:
+      - members:
+        - user:user@example.com
+        role: roles/datacatalog.entryGroupOwner
+      - members:
+        - user:otheruser@example.com
+        role: roles/editor
+      etag: BwWD6ItLwF0=
+      version: 1
+- execute:
+  - command: data-catalog entry-groups remove-iam-policy-binding group1 --location=us-central1
+      --member='user:otheruser@example.com' --role='roles/editor'
+  - stderr: |
+      Updated IAM policy for entry group [group1].
+  - stdout: |
+      bindings:
+      - members:
+        - user:user@example.com
+        role: roles/datacatalog.entryGroupOwner
+      etag: BwWD6ItLwF0=
+      version: 1
+- execute:
+  - command: data-catalog entry-groups set-iam-policy group1 --location=us-central1
+      policy.json
+  - stderr: |
+      Updated IAM policy for entry group [group1].
+  - stdout: |
+      bindings:
+      - members:
+        - user:otheruser@example.com
+        role: roles/datacatalog.entryGroupOwner
+      etag: BwWD6ItLwF0=
+      version: 1
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta1
+      ALPHA: v1beta1
 - execute_command:
     command: data-catalog entry-groups get-iam-policy group1 --location=us-central1
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups/group1:getIamPolicy?alt=json
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1:getIamPolicy?alt=json
           method: POST
           headers: {}
           body: null
@@ -41,7 +97,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups/group1:getIamPolicy?alt=json
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1:getIamPolicy?alt=json
           method: POST
           headers: {}
           body: null
@@ -63,7 +119,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups/group1:setIamPolicy?alt=json
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1:setIamPolicy?alt=json
           method: POST
           headers: {}
           body:
@@ -120,7 +176,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups/group1:getIamPolicy?alt=json
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1:getIamPolicy?alt=json
           method: POST
           headers: {}
           body: null
@@ -148,7 +204,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups/group1:setIamPolicy?alt=json
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1:setIamPolicy?alt=json
           method: POST
           headers: {}
           body:
@@ -203,11 +259,12 @@ actions:
         ]
       }
 - execute_command:
-    command: data-catalog entry-groups set-iam-policy group1 --location=us-central1 policy.json
+    command: data-catalog entry-groups set-iam-policy group1 --location=us-central1
+      policy.json
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups/group1:setIamPolicy?alt=json
+          uri: https://datacatalog.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/entryGroups/group1:setIamPolicy?alt=json
           method: POST
           headers: {}
           body:

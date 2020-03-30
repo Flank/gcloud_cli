@@ -63,7 +63,7 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
                      self.CloseCallback)
     self.assertListEqual(sorted(self.helper._sslopt.keys()),
                          ['ca_certs', 'cert_reqs', 'check_hostname'])
-    self.assertTrue(self.helper._sslopt['ca_certs'].endswith('cacerts.txt'))
+    self.AssertFileExists(self.helper._sslopt['ca_certs'])
     self.assertEqual(self.helper._sslopt['cert_reqs'], ssl.CERT_NONE)
     self.assertFalse(self.helper._sslopt['check_hostname'])
     self.assertFalse(self.helper._is_closed)
@@ -73,7 +73,7 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
         self.CloseCallback)
     self.assertListEqual(sorted(second_helper._sslopt.keys()),
                          ['ca_certs', 'cert_reqs'])
-    self.assertTrue(second_helper._sslopt['ca_certs'].endswith('cacerts.txt'))
+    self.AssertFileExists(second_helper._sslopt['ca_certs'])
     self.assertEqual(second_helper._sslopt['cert_reqs'], ssl.CERT_REQUIRED)
 
   def testClose(self):

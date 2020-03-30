@@ -25,15 +25,15 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class DescribeTestBeta(test_base.BaseTest, test_case.WithOutputCapture):
+class DescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
 
   def SetUp(self):
-    self.SelectApi('beta')
+    self.SelectApi('v1')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.messages = core_apis.GetMessagesModule('compute', 'beta')
-    self.compute = self.compute_beta
+    self.resources.RegisterApiByName('compute', 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
+    self.messages = core_apis.GetMessagesModule('compute', 'v1')
+    self.compute = self.compute_v1
 
   def testDescribe(self):
     name = 'pm-1'
@@ -49,7 +49,6 @@ class DescribeTestBeta(test_base.BaseTest, test_case.WithOutputCapture):
     packet_mirroring = self.messages.PacketMirroring(
         name=name,
         region=region,
-        priority=999,
         network=self.messages.PacketMirroringNetworkInfo(
             url=network_ref.SelfLink()),
         collectorIlb=self.messages.PacketMirroringForwardingRuleInfo(
@@ -70,6 +69,17 @@ class DescribeTestBeta(test_base.BaseTest, test_case.WithOutputCapture):
                              project='my-project',
                              region=region))])
     self.AssertOutputContains('name: {}'.format(name))
+
+
+class DescribeTestBeta(DescribeTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.messages = core_apis.GetMessagesModule('compute', 'beta')
+    self.compute = self.compute_beta
 
 
 class DescribeTestAlpha(DescribeTestBeta):

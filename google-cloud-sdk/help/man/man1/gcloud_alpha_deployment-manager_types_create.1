@@ -82,8 +82,9 @@ Optional status for a composite type. \fISTATUS\fR must be one of:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -93,8 +94,8 @@ To create a new composite type, run:
 
 .RS 2m
 $ gcloud alpha deployment\-manager types create my\-composite\-type \e
-    \-\-template=my\-template.jinja \-\-status EXPERIMENTAL \e
-    \-\-description "My type."
+    \-\-template=my\-template.jinja \-\-status=EXPERIMENTAL \e
+    \-\-description="My type."
 .RE
 
 

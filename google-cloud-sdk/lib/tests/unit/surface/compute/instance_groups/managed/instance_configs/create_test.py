@@ -35,18 +35,25 @@ import httplib2
 from mock import patch
 
 
-class _InstanceGroupManagerInstanceConfigsCreateTestBase(
+class _InstanceGroupManagerInstanceConfigsCreateBetaTestBase(
     sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
+    self.client = mock.Client(
+        core_apis.GetClientClass('compute', self.API_VERSION))
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
+    self.resources.RegisterApiByName('compute', self.API_VERSION)
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE
-    self.endpoint_uri = 'https://compute.googleapis.com/compute/alpha/'
+    self.endpoint_uri = (
+        'https://compute.googleapis.com/compute/{api_version}/'.format(
+            api_version=self.API_VERSION))
     self.project_uri = '{endpoint_uri}projects/fake-project'.format(
         endpoint_uri=self.endpoint_uri)
 
@@ -126,8 +133,8 @@ class _InstanceGroupManagerInstanceConfigsCreateTestBase(
     return exceptions.HttpNotFoundError(response, body, url)
 
 
-class InstanceGroupManagerInstanceConfigsCreateZonalTest(
-    _InstanceGroupManagerInstanceConfigsCreateTestBase):
+class InstanceGroupManagerInstanceConfigsCreateBetaZonalTest(
+    _InstanceGroupManagerInstanceConfigsCreateBetaTestBase):
 
   def _ExpectListPerInstanceConfigs(self,
                                     instance_name='foo',
@@ -215,6 +222,26 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
         response=response,
     )
 
+  def _ExpectWaitOperation(self, name='foo'):
+    request = self.messages.ComputeZoneOperationsWaitRequest(
+        operation=name,
+        project='fake-project',
+        zone='us-central2-a',
+    )
+    response = self.messages.Operation(
+        status=self.messages.Operation.StatusValueValuesEnum.DONE,
+        selfLink=self.project_uri + '/zones/us-central2-a/operations/' + name,
+        targetLink=(self.project_uri +
+                    '/zones/us-central2-a/instanceGroupManagers/group-1'),
+    )
+    self.client.zoneOperations.Wait.Expect(
+        request,
+        response=response,
+    )
+
+  def _ExpectPollingOperation(self, name='foo'):
+    self._ExpectWaitOperation(name)
+
   def _ExpectGetInstanceGroupManager(self):
     request = self.messages.ComputeInstanceGroupManagersGetRequest(
         instanceGroupManager='group-1',
@@ -234,10 +261,11 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
         )(instances=[
             self.project_uri + '/zones/us-central2-a/instances/foo',
         ],
-          minimalAction=self.messages.InstanceGroupManagersApplyUpdatesRequest.
-          MinimalActionValueValuesEnum.NONE,
-          maximalAction=self.messages.InstanceGroupManagersApplyUpdatesRequest.
-          MaximalActionValueValuesEnum.RESTART),
+          minimalAction=self.messages.InstanceGroupManagersApplyUpdatesRequest
+          .MinimalActionValueValuesEnum.NONE,
+          mostDisruptiveAllowedAction=self.messages
+          .InstanceGroupManagersApplyUpdatesRequest
+          .MostDisruptiveAllowedActionValueValuesEnum.RESTART),
         project='fake-project',
         zone='us-central2-a',
     )
@@ -268,7 +296,10 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
     self._ExpectUpdatePerInstanceConfigs(
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=preserved_state_metadata)
-    self._ExpectGetOperation()
+    self._ExpectPollingOperation()
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyUpdatesToInstances()
+    self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -291,7 +322,10 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
     self._ExpectUpdatePerInstanceConfigs(
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=[])
-    self._ExpectGetOperation()
+    self._ExpectPollingOperation()
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyUpdatesToInstances()
+    self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -311,7 +345,10 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
     self._ExpectUpdatePerInstanceConfigs(
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=[])
-    self._ExpectGetOperation()
+    self._ExpectPollingOperation()
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyUpdatesToInstances()
+    self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -333,7 +370,10 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
     self._ExpectUpdatePerInstanceConfigs(
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=[])
-    self._ExpectGetOperation()
+    self._ExpectPollingOperation()
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyUpdatesToInstances()
+    self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -347,7 +387,10 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
     self._ExpectListPerInstanceConfigs()
     self._ExpectUpdatePerInstanceConfigs(
         preserved_state_disks=[], preserved_state_metadata=[])
-    self._ExpectGetOperation()
+    self._ExpectPollingOperation()
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyUpdatesToInstances()
+    self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -356,29 +399,7 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
           --instance foo
         """)
 
-  def testCreateForNonExistingInstance(self):
-    disk_source = self.project_uri + '/zones/us-central2-a/disks/abc123'
-    preserved_state_disks = [
-        self._MakePreservedStateDiskMapEntry('qwerty', disk_source,
-                                             'READ_WRITE',
-                                             'on-permanent-instance-deletion')
-    ]
-    self._ExpectListPerInstanceConfigs(instance_name='abc')
-    self._ExpectUpdatePerInstanceConfigs(
-        preserved_state_disks=preserved_state_disks,
-        preserved_state_metadata=[],
-        instance_name='abc')
-    self._ExpectGetOperation()
-    self._ExpectGetInstanceGroupManager()
-
-    self.Run("""
-        compute instance-groups managed instance-configs create group-1
-          --zone us-central2-a
-          --instance abc
-          --stateful-disk device-name=qwerty,source={project_uri}/zones/us-central2-a/disks/abc123,mode=rw,auto-delete=on-permanent-instance-deletion
-        """.format(project_uri=self.project_uri))
-
-  def testCreateWithForceInstanceUpdate(self):
+  def testCreateWithoutUpdateInstance(self):
     preserved_state_disks = [
         self._MakePreservedStateDiskMapEntry(
             'foo',
@@ -389,10 +410,7 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
     self._ExpectUpdatePerInstanceConfigs(
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=[])
-    self._ExpectGetOperation()
-    self._ExpectGetInstanceGroupManager()
-    self._ExpectApplyUpdatesToInstances()
-    self._ExpectGetOperation('apply')
+    self._ExpectPollingOperation()
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -400,7 +418,7 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
           --zone us-central2-a
           --instance foo
           --stateful-disk device-name=foo,source={project_uri}/zones/us-central2-a/disks/foo,mode=rw
-          --force-instance-update
+          --no-update-instance
         """.format(project_uri=self.project_uri))
 
   def testUnsuccessfulCreateForAlreadyExistingConfig(self):
@@ -513,8 +531,8 @@ class InstanceGroupManagerInstanceConfigsCreateZonalTest(
           """)
 
 
-class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
-    _InstanceGroupManagerInstanceConfigsCreateTestBase):
+class InstanceGroupManagerInstanceConfigsCreateBetaRegionalTest(
+    _InstanceGroupManagerInstanceConfigsCreateBetaTestBase):
 
   def _ExpectListManagedInstances(self):
     request = (self.messages.
@@ -624,6 +642,26 @@ class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
         response=response,
     )
 
+  def _ExpectWaitOperation(self, name='foo'):
+    request = self.messages.ComputeRegionOperationsWaitRequest(
+        operation=name,
+        project='fake-project',
+        region='us-central2',
+    )
+    response = self.messages.Operation(
+        status=self.messages.Operation.StatusValueValuesEnum.DONE,
+        selfLink=self.project_uri + '/regions/us-central2/operations/' + name,
+        targetLink=(self.project_uri +
+                    '/regions/us-central2/instanceGroupManagers/group-1'),
+    )
+    self.client.regionOperations.Wait.Expect(
+        request,
+        response=response,
+    )
+
+  def _ExpectPollingOperation(self, name='foo'):
+    self._ExpectWaitOperation(name)
+
   def _ExpectGetInstanceGroupManager(self):
     request = self.messages.ComputeRegionInstanceGroupManagersGetRequest(
         instanceGroupManager='group-1',
@@ -636,20 +674,20 @@ class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
 
   def _ExpectApplyUpdatesToInstances(self):
     request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersApplyUpdatesToInstancesRequest)(
+        self.messages
+        .ComputeRegionInstanceGroupManagersApplyUpdatesToInstancesRequest)(
             instanceGroupManager='group-1',
             regionInstanceGroupManagersApplyUpdatesRequest=(
                 self.messages.RegionInstanceGroupManagersApplyUpdatesRequest)(
                     instances=[
                         self.project_uri + '/zones/us-central2-a/instances/foo',
                     ],
-                    minimalAction=self.messages.
-                    RegionInstanceGroupManagersApplyUpdatesRequest.
-                    MinimalActionValueValuesEnum.NONE,
-                    maximalAction=self.messages.
-                    RegionInstanceGroupManagersApplyUpdatesRequest.
-                    MaximalActionValueValuesEnum.RESTART),
+                    minimalAction=self.messages
+                    .RegionInstanceGroupManagersApplyUpdatesRequest
+                    .MinimalActionValueValuesEnum.NONE,
+                    mostDisruptiveAllowedAction=self.messages
+                    .RegionInstanceGroupManagersApplyUpdatesRequest
+                    .MostDisruptiveAllowedActionValueValuesEnum.RESTART),
             project='fake-project',
             region='us-central2',
         )
@@ -681,7 +719,10 @@ class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
     self._ExpectUpdatePerInstanceConfigs(
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=preserved_state_metadata)
-    self._ExpectGetOperation()
+    self._ExpectPollingOperation()
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyUpdatesToInstances()
+    self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -693,7 +734,7 @@ class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
           --stateful-metadata "key-BAR=value BAR,key-foo=value foo"
         """.format(project_uri=self.project_uri))
 
-  def testCreateWithForceInstanceUpdate(self):
+  def testCreateWithoutUpdateInstance(self):
     disk_source = self.project_uri + '/zones/us-central2-a/disks/foo'
     preserved_state_disks = [
         self._MakePreservedStateDiskMapEntry(
@@ -703,10 +744,7 @@ class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
     self._ExpectUpdatePerInstanceConfigs(
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=[])
-    self._ExpectGetOperation()
-    self._ExpectGetInstanceGroupManager()
-    self._ExpectApplyUpdatesToInstances()
-    self._ExpectGetOperation('apply')
+    self._ExpectPollingOperation()
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -714,7 +752,7 @@ class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
           --region us-central2
           --instance {project_uri}/zones/us-central2-a/instances/foo
           --stateful-disk device-name=foo,source={project_uri}/zones/us-central2-a/disks/foo,mode=rw
-          --force-instance-update
+          --no-update-instance
         """.format(project_uri=self.project_uri))
 
   def testCreateForExistingInstanceUsingOnlyInstanceName(self):
@@ -722,7 +760,10 @@ class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
     self._ExpectListPerInstanceConfigs()
     self._ExpectUpdatePerInstanceConfigs(
         preserved_state_disks=[], preserved_state_metadata=[])
-    self._ExpectGetOperation()
+    self._ExpectPollingOperation()
+    self._ExpectGetInstanceGroupManager()
+    self._ExpectApplyUpdatesToInstances()
+    self._ExpectPollingOperation('apply')
     self._ExpectGetInstanceGroupManager()
 
     self.Run("""
@@ -754,6 +795,27 @@ class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
             --instance foo
             --stateful-metadata "key-BAR=value BAR,key-foo=value foo"
           """.format(project_uri=self.project_uri))
+
+
+class _InstanceGroupManagerInstanceConfigsCreateAlphaTestBase(
+    _InstanceGroupManagerInstanceConfigsCreateBetaTestBase):
+
+  API_VERSION = 'alpha'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class InstanceGroupManagerInstanceConfigsCreateAlphaZonalTest(
+    _InstanceGroupManagerInstanceConfigsCreateAlphaTestBase,
+    InstanceGroupManagerInstanceConfigsCreateBetaZonalTest):
+  pass
+
+
+class _InstanceGroupManagerInstanceConfigsCreateAlphaRegionalTest(
+    _InstanceGroupManagerInstanceConfigsCreateAlphaTestBase,
+    InstanceGroupManagerInstanceConfigsCreateBetaRegionalTest):
+  pass
 
 
 if __name__ == '__main__':

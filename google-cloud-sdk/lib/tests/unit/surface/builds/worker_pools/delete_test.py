@@ -32,11 +32,11 @@ class DeleteTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
   def SetUp(self):
     self.StartPatch('time.sleep')  # To speed up tests with polling
 
-    self.mocked_cloudbuild_v1alpha1 = mock.Client(
-        core_apis.GetClientClass('cloudbuild', 'v1alpha1'))
-    self.mocked_cloudbuild_v1alpha1.Mock()
-    self.addCleanup(self.mocked_cloudbuild_v1alpha1.Unmock)
-    self.msg = core_apis.GetMessagesModule('cloudbuild', 'v1alpha1')
+    self.mocked_cloudbuild_v1alpha2 = mock.Client(
+        core_apis.GetClientClass('cloudbuild', 'v1alpha2'))
+    self.mocked_cloudbuild_v1alpha2.Mock()
+    self.addCleanup(self.mocked_cloudbuild_v1alpha2.Unmock)
+    self.msg = core_apis.GetMessagesModule('cloudbuild', 'v1alpha2')
 
     self.project_id = 'my-project'
     properties.VALUES.core.project.Set(self.project_id)
@@ -51,7 +51,7 @@ class DeleteTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     wp_in.workerConfig = self.msg.WorkerConfig()
     wp_in.name = 'fake_name'
 
-    self.mocked_cloudbuild_v1alpha1.projects_workerPools.Delete.Expect(
+    self.mocked_cloudbuild_v1alpha2.projects_workerPools.Delete.Expect(
         self.msg.CloudbuildProjectsWorkerPoolsDeleteRequest(
             name=u'projects/{}/workerPools/{}'.format(self.project_id,
                                                       wp_in.name)),

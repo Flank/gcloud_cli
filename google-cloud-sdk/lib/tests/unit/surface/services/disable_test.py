@@ -20,23 +20,22 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.services import exceptions
+from googlecloudsdk.api_lib.services import serviceusage
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
+from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class DisableTest(unit_test_base.SUUnitTestBase):
+class DisableTestGA(unit_test_base.SUUnitTestBase):
   """Unit tests for services disable command."""
   OPERATION_NAME = 'operations/abc.0000000000'
 
-  def testDisable(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testDisable(self):
     self.ExpectDisableApiCall(self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
@@ -44,8 +43,7 @@ class DisableTest(unit_test_base.SUUnitTestBase):
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
-  def testDisableForce(self, track):
-    self.track = track
+  def testDisableForce(self):
     self.ExpectDisableApiCall(self.OPERATION_NAME, force=True)
     self.ExpectOperation(self.OPERATION_NAME, 3)
 
@@ -53,22 +51,61 @@ class DisableTest(unit_test_base.SUUnitTestBase):
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
-  def testDisableAsync(self, track):
-    self.track = track
+  def testDisableAsync(self):
     self.ExpectDisableApiCall(self.OPERATION_NAME)
 
     self.Run('services disable %s --async' % self.DEFAULT_SERVICE_NAME)
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('operation is in progress')
 
-  def testDisablePermissionDenied(self, track):
-    self.track = track
+  def testDisablePermissionDenied(self):
     server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
     self.ExpectDisableApiCall(None, error=server_error)
 
     with self.assertRaisesRegex(
         exceptions.EnableServicePermissionDeniedException, r'Error.'):
       self.Run('services disable %s' % self.DEFAULT_SERVICE_NAME)
+
+  def testDisableProtected(self):
+    warning = 'Do not disable {}'.format(self.DEFAULT_SERVICE_NAME)
+    self.StartObjectPatch(serviceusage,
+                          'GetProtectedServiceWarning',
+                          return_value=warning)
+    self.ExpectDisableApiCall(self.OPERATION_NAME)
+    self.WriteInput('Y')
+    self.Run('services disable %s --async' % self.DEFAULT_SERVICE_NAME)
+    self.AssertErrContains(self.OPERATION_NAME)
+    self.AssertErrContains('operation is in progress')
+
+  def testDisableProtectedCancel(self):
+    warning = 'Do not disable {}'.format(self.DEFAULT_SERVICE_NAME)
+    self.StartObjectPatch(serviceusage,
+                          'GetProtectedServiceWarning',
+                          return_value=warning)
+    self.WriteInput('N')
+    self.Run('services disable %s --async' % self.DEFAULT_SERVICE_NAME)
+    self.AssertErrNotContains(self.OPERATION_NAME)
+    self.AssertErrContains(warning)
+
+  def testDisableProtectedQuiet(self):
+    warning = 'Do not disable {}'.format(self.DEFAULT_SERVICE_NAME)
+    self.StartObjectPatch(serviceusage,
+                          'GetProtectedServiceWarning',
+                          return_value=warning)
+    with self.assertRaises(console_io.RequiredPromptError):
+      self.Run('services disable %s --quiet' % self.DEFAULT_SERVICE_NAME)
+
+
+class DisableTestBeta(DisableTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DisableTestAlpha(DisableTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

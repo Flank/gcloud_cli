@@ -11,13 +11,36 @@ gcloud alpha game servers clusters create \- create a Game Server Cluster
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha game servers clusters create\fR (\fICLUSTER\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-realm\fR=\fIREALM\fR) \fB\-\-gke\-cluster\fR=\fIGKE_CLUSTER\fR \fB\-\-namespace\fR=\fINAMESPACE\fR [\fB\-\-async\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha game servers clusters create\fR (\fICLUSTER\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-realm\fR=\fIREALM\fR) \fB\-\-dry\-run\fR \fB\-\-namespace\fR=\fINAMESPACE\fR (\fB\-\-gke\-cluster\fR=\fIGKE_CLUSTER\fR\ |\ \fB\-\-hub\-membership\fR=\fIHUB_MEMBERSHIP\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-preview\-time\fR=\fIPREVIEW_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR Create a Cloud Game Server Cluster.
+
+
+.SH "EXAMPLES"
+
+To create Game Server Cluster 'my\-cluster' in project 'my\-project', realm
+\'my\-realm', and location in 'my\-location' run:
+
+.RS 2m
+$ gcloud alpha game servers clusters create my\-cluster \e
+    \-\-project=my\-project \-\-realm=my\-realm \-\-location=my\-location \e
+    \-\-gke\-cluster=projects/my\-project/locations/my\-location/clusters/my\-gke\-cluster \e
+    \-\-namespace=default \-\-labels=a=x,b=y \-\-no\-dry\-run
+.RE
+
+To preview Game Server Cluster creation for 'my\-cluster' in project
+\'my\-project', realm 'my\-realm', and location in 'my\-location' run:
+
+.RS 2m
+$ gcloud alpha game servers clusters create my\-cluster \e
+    \-\-project=my\-project \-\-realm=my\-realm \-\-location=my\-location \e
+    \-\-gke\-cluster=projects/my\-project/locations/my\-location/clusters/my\-gke\-cluster \e
+    \-\-namespace=default \-\-labels=a=x,b=y \-\-dry\-run
+.RE
 
 
 
@@ -57,6 +80,19 @@ Cloud Game Servers Realm.
 
 .RS 2m
 .TP 2m
+\fB\-\-dry\-run\fR
+Validate the creation, but do not execute it.
+
+.TP 2m
+\fB\-\-namespace\fR=\fINAMESPACE\fR
+Namespace for Kubernetes API server endpoint.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-gke\-cluster\fR=\fIGKE_CLUSTER\fR
 Full or partial name of a cluster in Google Kubernetes Engine (GKE) where the
 game server cluster is installed, using the format:
@@ -67,11 +103,16 @@ location are not specified, the project and location of the Game Server Cluster
 resource are used to generate the full name of the GKE cluster.
 
 .TP 2m
-\fR\-\-namespace\fB=\fINAMESPACE\fR
-Namespace for Kubernetes API server endpoint.
+\fR\-\-hub\-membership\fB=\fIHUB_MEMBERSHIP\fR
+Full or partial name of a GKE Hub membership where the game server cluster is
+registered, using the format:
+\'projects/{project_id}/locations/global/memberships/{membership_id}' or
+{membership_id}. If project is not specified, the project of the Game Server
+Cluster resource is used to generate the full name of the GKE Hub membership.
 
 
 \fR
+.RE
 .RE
 .sp
 
@@ -79,8 +120,8 @@ Namespace for Kubernetes API server endpoint.
 
 .RS 2m
 .TP 2m
-\fB\-\-async\fR
-Return immediately, without waiting for the operation in progress to complete.
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Game server cluster description.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -91,6 +132,11 @@ underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
 only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
 
+.TP 2m
+\fB\-\-preview\-time\fR=\fIPREVIEW_TIME\fR
+This attribute is only relevant for preview (\-\-dry\-run). It is used to
+validate the state for a future time.
+
 
 .RE
 .sp
@@ -100,8 +146,9 @@ numbers.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -117,5 +164,9 @@ this API can be found at: https://cloud.google.com/solutions/gaming/
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta game servers clusters create
+.RE
 

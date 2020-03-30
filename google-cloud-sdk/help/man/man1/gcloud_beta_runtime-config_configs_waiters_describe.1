@@ -49,8 +49,9 @@ The name of the configuration resource to use.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -61,7 +62,7 @@ To describe a waiter named "my\-waiter" within a configuration named
 
 .RS 2m
 $ gcloud beta runtime\-config configs waiters describe my\-waiter \e
-    \-\-config\-name my\-config
+    \-\-config\-name=my\-config
 .RE
 
 

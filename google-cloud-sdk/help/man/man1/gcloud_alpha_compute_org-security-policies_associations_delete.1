@@ -11,7 +11,7 @@ gcloud alpha compute org\-security\-policies associations delete \- delete a Goo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute org\-security\-policies associations delete\fR \fINAME\fR \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute org\-security\-policies associations delete\fR \fINAME\fR \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -38,7 +38,19 @@ Name of the association to delete.
 .RS 2m
 .TP 2m
 \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR
-Security policy ID of the association.
+Display name or ID of the security policy ID of the association.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+ID of the organization in which the security policy is to be detached. Must be
+set if SECURITY_POLICY is display name.
 
 
 .RE
@@ -49,8 +61,21 @@ Security policy ID of the association.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete an association with name ``example\-association" of an organization
+security policy with ID ``123456789", run:
+
+.RS 2m
+$ gcloud alpha compute org\-security\-policies associations delete \e
+    delete example\-association \-\-security\-policy=123456789
+.RE
 
 
 
@@ -59,5 +84,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute org\-security\-policies associations delete
+.RE
 

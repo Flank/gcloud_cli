@@ -213,6 +213,24 @@ class ConfigSSHTest(test_base.BaseSSHTest, test_case.WithInput):
               project='my-project'))],
     )
 
+  def testWithNoPublicIPInstances(self):
+    self.mock_get_zonal_resources.return_value = [
+        messages.Instance(
+            id=11111,
+            name='instance-1',
+            status=messages.Instance.StatusValueValuesEnum.RUNNING,
+            selfLink=(
+                'https://compute.googleapis.com/compute/v1/projects/my-project/'
+                'zones/zone-1/instances/instance-1'),
+            zone=(
+                'https://compute.googleapis.com/compute/v1/projects/my-project/'
+                'zones/zone-1')),]
+    self.Run("""
+        compute config-ssh
+        """)
+    self.AssertErrContains('No host aliases were added to your SSH configs'
+                           ' because instances have no public IP.')
+
   def testWithNoInstancesAndExistingConfigFileWithoutComputeSection(self):
     self.mock_get_zonal_resources.return_value = []
     with open(self.config_path, 'w') as f:

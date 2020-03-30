@@ -26,8 +26,9 @@ gcloud alpha compute machine\-images \- read and manage Google Compute Engine ma
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -43,28 +44,33 @@ Engine machine image.
 
 .TP 2m
 \fBcreate\fR
-\fB(ALPHA)\fR Create Google Compute Engine machine images.
+\fB(ALPHA)\fR Create a Compute Engine machine image.
 
 .TP 2m
 \fBdelete\fR
-\fB(ALPHA)\fR Delete Google Compute Engine machine images.
+\fB(ALPHA)\fR Delete a Compute Engine machine image.
 
 .TP 2m
 \fBdescribe\fR
-\fB(ALPHA)\fR Display detailed information about a machine images.
+\fB(ALPHA)\fR Describe a Compute Engine machine image.
 
 .TP 2m
 \fBget\-iam\-policy\fR
 \fB(ALPHA)\fR Get the IAM policy for a Google Compute Engine machine image.
 
 .TP 2m
+\fBimport\fR
+\fB(ALPHA)\fR Create a Compute Engine machine image from virtual appliance in
+OVA/OVF format.
+
+.TP 2m
 \fBlist\fR
-\fB(ALPHA)\fR List Google Compute Engine machine_images.
+\fB(ALPHA)\fR List Google Compute Engine machine images.
 
 .TP 2m
 \fBremove\-iam\-policy\-binding\fR
-\fB(ALPHA)\fR Remove IAM policy binding from the IAM policy of a Google Compute
-Engine machine image.
+\fB(ALPHA)\fR Remove IAM policy binding from the IAM policy of a Compute Engine
+machine image.
 
 .TP 2m
 \fBset\-iam\-policy\fR
@@ -79,5 +85,9 @@ Engine machine image.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute machine\-images
+.RE
 

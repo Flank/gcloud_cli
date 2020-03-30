@@ -58,14 +58,17 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(r.collection, 'foo.instances')
     self.assertEqual(r.api_version, None)
     self.assertEqual(r.method, 'get')
+    self.assertFalse(r.use_google_auth)
 
-    r = yaml_command_schema.Request(
-        yaml_command_schema.CommandType.LIST,
-        {'collection': 'foo.instances',
-         'api_version': 'v1'})
+    r = yaml_command_schema.Request(yaml_command_schema.CommandType.LIST, {
+        'collection': 'foo.instances',
+        'api_version': 'v1',
+        'use_google_auth': True
+    })
     self.assertEqual(r.collection, 'foo.instances')
     self.assertEqual(r.api_version, 'v1')
     self.assertEqual(r.method, 'list')
+    self.assertTrue(r.use_google_auth)
 
   def testRequestGeneric(self):
     with self.assertRaisesRegex(
@@ -82,6 +85,7 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(r.collection, 'foo.instances')
     self.assertEqual(r.api_version, None)
     self.assertEqual(r.method, 'custom')
+    self.assertFalse(r.use_google_auth)
 
   def testResponse(self):
     r = yaml_command_schema.Response({})

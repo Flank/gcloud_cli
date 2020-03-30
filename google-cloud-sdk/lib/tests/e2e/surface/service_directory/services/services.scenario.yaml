@@ -1,0 +1,163 @@
+title: End to end tests for Service Directory services.
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      service-directory namespaces create $$my-namespace$$ --location us-east1
+  - stderr: |
+      Created namespace [$$my-namespace$$].
+- execute:
+  - command: |
+      service-directory services create $$my-service$$ --location us-east1 --namespace $$my-namespace$$
+  - stderr: |
+      Created service [$$my-service$$].
+- execute:
+  - command: |
+      service-directory services describe $$my-service$$ --location us-east1 --namespace $$my-namespace$$ --format 'yaml'
+  - stdout: |
+      name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$
+- execute:
+  - command: |
+      service-directory services list --location us-east1 --namespace $$my-namespace$$
+  - stdout: |
+      ---
+      name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$
+- execute:
+  - command: |
+      service-directory services delete $$my-service$$ --location us-east1 --namespace $$my-namespace$$
+  - stderr: |
+      Deleted service [$$my-service$$].
+- execute:
+  - command: |
+      service-directory namespaces delete $$my-namespace$$ --location us-east1
+  - stderr: |
+      Deleted namespace [$$my-namespace$$].
+actions:
+- define_reference:
+    reference: api-version
+    value: v1beta1
+
+- generate_resource_id:
+    reference: my-namespace
+    prefix: servicedirectory-namespace
+
+- generate_resource_id:
+    reference: my-service
+    prefix: servicedirectory-service
+
+- execute_command:
+    command: |
+      service-directory namespaces create $$my-namespace$$ --location us-east1
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created namespace [$$my-namespace$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      service-directory services create $$my-service$$ --location us-east1 --namespace $$my-namespace$$
+    events:
+    - expect_stderr: |
+        Created service [$$my-service$$].
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services?alt=json&serviceId=$$my-service$$
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '188'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      service-directory services describe $$my-service$$ --location us-east1 --namespace $$my-namespace$$ --format 'yaml'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '188'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$
+    - expect_stdout: |
+        name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      service-directory services list --location us-east1 --namespace $$my-namespace$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '224'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            services:
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$
+    - expect_stdout: |
+        ---
+        name: projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      service-directory services delete $$my-service$$ --location us-east1 --namespace $$my-namespace$$
+    cleanup_for: my-service
+    events:
+    - expect_stderr: |
+        Deleted service [$$my-service$$].
+    - api_call:
+        expect_request:
+          uri: https://servicedirectory.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/namespaces/$$my-namespace$$/services/$$my-service$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      service-directory namespaces delete $$my-namespace$$ --location us-east1
+    cleanup_for: my-namespace
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted namespace [$$my-namespace$$].
+    - expect_exit:
+        code: 0

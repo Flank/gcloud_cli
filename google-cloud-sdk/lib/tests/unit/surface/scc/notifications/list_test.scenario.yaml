@@ -1,0 +1,61 @@
+title: scc notifications list scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      scc notifications list 702114178617
+  - stderr: |
+      Listed 0 items.
+- execute:
+  - command: |
+      scc notifications list organizations/702114178617
+  - stderr: |
+      Listed 0 items.
+actions:
+- execute_command:
+    command: |
+      scc notifications list 702114178617
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/notificationConfigs?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              name: organizations/702114178617/notificationConfigs/testconfig
+              pubsubTopic: projects/gcloudtestproject1/topics/notification-test
+              serviceAccount: service-1096071605089@gcp-sa-scc-notification.iam.gserviceaccount.com
+              streamingConfig: {}
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      scc notifications list organizations/702114178617
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/702114178617/notificationConfigs?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            json:
+              name: organizations/702114178617/notificationConfigs/testconfig
+              pubsubTopic: projects/gcloudtestproject1/topics/notification-test
+              serviceAccount: service-1096071605089@gcp-sa-scc-notification.iam.gserviceaccount.com
+              streamingConfig: {}
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0

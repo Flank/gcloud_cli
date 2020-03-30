@@ -20,14 +20,14 @@ from __future__ import unicode_literals
 
 import base64
 import datetime
-import urllib
 
 from apitools.base.py.exceptions import HttpError
-
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.compute import test_base
 
 import mock
+import six
 
 # The import string for the DiagnoseClient class, used for mocking its methods.
 _DIAGNOSE_CLIENT_IMPORT = ('googlecloudsdk.api_lib.compute.diagnose.'
@@ -39,7 +39,10 @@ _PROJECTS_API_IMPORT = ('googlecloudsdk.api_lib.cloudresourcemanager.'
 _PROJECT_NUM = 12345
 
 
-class ExportLogsTest(test_base.BaseTest):
+class ExportLogsTestBeta(test_base.BaseTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     """Called by base class's SetUp() method, which does additional mocking."""
@@ -117,12 +120,9 @@ class ExportLogsTest(test_base.BaseTest):
 
     encoded_signature = ''
     signature_b64 = base64.b64encode(signature.encode('utf-8'))
-    if hasattr(urllib, 'quote_plus'):
-      encoded_signature = urllib.quote_plus(signature_b64)
-    else:
-      encoded_signature = urllib.parse.quote_plus(signature_b64)
+    encoded_signature = six.moves.urllib.parse.quote_plus(signature_b64)
 
-    result = self.Run('alpha compute diagnose export-logs '
+    result = self.Run('compute diagnose export-logs '
                       '--zone us-west1-a instance-1')
 
     self.assertEquals('test-bucket', result['bucket'])
@@ -133,7 +133,7 @@ class ExportLogsTest(test_base.BaseTest):
     self.assertIn('"trace": false', str(self._mock_update_metadata.call_args))
 
   def testTraceFlag(self):
-    self.Run('alpha compute diagnose export-logs --zone us-west1-a instance-1 '
+    self.Run('compute diagnose export-logs --zone us-west1-a instance-1 '
              '--collect-process-traces')
 
     self.assertIn('"trace": true', str(self._mock_update_metadata.call_args))
@@ -141,14 +141,14 @@ class ExportLogsTest(test_base.BaseTest):
   def testServiceAccountNotCreated(self):
     self._mock_list_accounts.return_value = []
 
-    self.Run('alpha compute diagnose export-logs --zone us-west1-a instance-1')
+    self.Run('compute diagnose export-logs --zone us-west1-a instance-1')
 
     self.assertTrue(self._mock_create_account.called)
 
   def testBucketNotCreated(self):
     self._mock_find_bucket.return_value = None
 
-    results = self.Run('alpha compute diagnose export-logs '
+    results = self.Run('compute diagnose export-logs '
                        '--zone us-west1-a instance-1')
 
     self.assertTrue(results['bucket'].endswith(str(_PROJECT_NUM)))
@@ -161,7 +161,7 @@ class ExportLogsTest(test_base.BaseTest):
     error409 = HttpError({'status': 409}, None, None)
     self._mock_insert_bucket.side_effect = [error409, error409, error409, None]
 
-    results = self.Run('alpha compute diagnose export-logs '
+    results = self.Run('compute diagnose export-logs '
                        '--zone us-west1-a instance-1')
 
     # The _# suffix is added after the first failure, and counts up until the
@@ -169,3 +169,9 @@ class ExportLogsTest(test_base.BaseTest):
     suffix = '{}_2'.format(_PROJECT_NUM)
     self.assertTrue(results['bucket'].endswith(suffix))
     self.assertEqual(4, self._mock_insert_bucket.call_count)
+
+
+class ExportLogsTestAlpha(ExportLogsTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

@@ -25,6 +25,7 @@ from googlecloudsdk.command_lib.resource_manager import completers as resource_m
 from googlecloudsdk.command_lib.util import completers
 from googlecloudsdk.command_lib.util import parameter_info_lib
 from googlecloudsdk.core import exceptions
+from googlecloudsdk.core.util import encoding
 
 
 class Error(exceptions.Error):
@@ -300,8 +301,8 @@ class MachineImagesCompleter(ListCommandCompleter):
   def __init__(self, **kwargs):
     super(MachineImagesCompleter, self).__init__(
         collection='compute.machineImages',
-        list_command='alpha compute machine-images list --uri',
-        api_version='alpha',
+        list_command='beta compute machine-images list --uri',
+        api_version='beta',
         **kwargs)
 
 
@@ -348,7 +349,8 @@ class TestCompleter(ListCommandCompleter):
   """
 
   def __init__(self, **kwargs):
-    test_parameters = os.environ.get('_ARGCOMPLETE_TEST', 'parameters=bad')
+    test_parameters = encoding.GetEncodedValue(os.environ, '_ARGCOMPLETE_TEST',
+                                               'parameters=bad')
     kwargs = dict(kwargs)
     for pair in test_parameters.split(','):
       name, value = pair.split('=')

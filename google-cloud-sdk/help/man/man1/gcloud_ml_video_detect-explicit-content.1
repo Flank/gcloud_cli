@@ -91,8 +91,9 @@ Examples:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -100,6 +101,18 @@ help\fR for details.
 
 This command uses the \fBvideointelligence/v1\fR API. The full documentation for
 this API can be found at: https://cloud.google.com/video\-intelligence/docs/
+
+
+
+.SH "EXAMPLES"
+
+To detect explicit content in a video file named
+\'gs://my_bucket/input_file.mp4', run the following command.:
+
+.RS 2m
+$ gcloud ml video detect\-explicit\-content \e
+    gs://my_bucket/input_file.mp4
+.RE
 
 
 

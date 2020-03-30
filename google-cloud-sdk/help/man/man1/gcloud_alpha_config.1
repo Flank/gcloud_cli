@@ -46,8 +46,9 @@ For more information on configurations, see \f5gcloud topic configurations\fR.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -255,6 +256,27 @@ not set, the default path for each runtime is used.
 .RE
 .sp
 .TP 2m
+\fIartifacts\fR
+
+.RS 2m
+.TP 2m
+\fBlocation\fR
+Default location to use when working with Artifact Registry resources. When a
+\f5location\fR value is required but not provided, the command will fall back to
+this value, if set. If this value is unset, the default location is \f5global\fR
+when \f5location\fR value is optional.
+
+
+.TP 2m
+\fBrepository\fR
+Default repository to use when working with Artifact Registry resources. When a
+\f5repository\fR value is required but not provided, the command will fall back
+to this value, if set.
+
+
+.RE
+.sp
+.TP 2m
 \fIauth\fR
 
 .RS 2m
@@ -263,6 +285,17 @@ not set, the default path for each runtime is used.
 If True, \f5gcloud\fR will not attempt to load any credentials or authenticate
 any requests. This is useful when behind a proxy that adds authentication to
 requests.
+
+
+.TP 2m
+\fBimpersonate_service_account\fR
+After setting this property, all API requests will be made as the given service
+account instead of the currently selected account. This is done without needing
+to create, download, and activate a key for the account. In order to perform
+operations as the service account, your currently selected account must have an
+IAM role that includes the iam.serviceAccounts.getAccessToken permission for the
+service account. The roles/iam.serviceAccountTokenCreator role has this
+permission or you may create a custom role.
 
 
 .RE
@@ -415,8 +448,11 @@ server.
 .RS 2m
 .TP 2m
 \fBuse_client_certificate\fR
-If True, use client certificate to authorize user device using context aware
-access.
+If True, use client certificate to authorize user device using Context\-aware
+access. Some services may not support client certificate authorization. If a
+command sends requests to such services, the client certificate will not be
+validated. Run \f5gcloud topic client\-certificate\fR for list of services
+supporting this feature.
 
 
 .RE
@@ -428,6 +464,11 @@ access.
 .TP 2m
 \fBdisable_public_ips\fR
 Specifies that Cloud Dataflow workers must not use public IP addresses.
+
+
+.TP 2m
+\fBprint_only\fR
+Prints the container spec to stdout. Does not save in Google Cloud Storage.
 
 
 .RE
@@ -508,6 +549,21 @@ regions list\fR.
 \fIgame_services\fR
 
 .RS 2m
+.TP 2m
+\fBdefault_deployment\fR
+Default deployment to use when working with Cloud Game Services list configs.
+When a \-\-deployment flag is required in a list command but not provided, the
+command will fall back to this value which envokes aggregated list from the
+backend.
+
+
+.TP 2m
+\fBdefault_realm\fR
+Default realm to use when working with Cloud Game Services list clusters. When a
+\-\-realm flag is required in a list command but not provided, the command will
+fall back to this value which envokes aggregated list from the backend.
+
+
 .TP 2m
 \fBlocation\fR
 Default location to use when working with Cloud Game Services resources. When a
@@ -655,6 +711,19 @@ quota.
 .RE
 .sp
 .TP 2m
+\fInotebooks\fR
+
+.RS 2m
+.TP 2m
+\fBlocation\fR
+Default location to use when working with Notebook resources. When a
+\f5location\fR value is required but not provided, the command will fall back to
+this value, if set.
+
+
+.RE
+.sp
+.TP 2m
 \fIproxy\fR
 
 .RS 2m
@@ -740,6 +809,25 @@ to this value, if set.
 .TP 2m
 \fBorganization\fR
 Default organization \f5gcloud\fR should use for scc surface.
+
+
+.RE
+.sp
+.TP 2m
+\fIsecrets\fR
+
+.RS 2m
+.TP 2m
+\fBlocations\fR
+A comma separated list of the locations to replicate secrets to. Only applies to
+secrets with a user\-managed policy.
+
+
+.TP 2m
+\fBreplication\-policy\fR
+The type of replication policy to apply to secrets. Allowed values are
+"automatic" and "user\-managed". If user\-managed then locations must also be
+provided.
 
 
 .RE

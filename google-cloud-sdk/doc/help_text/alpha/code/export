@@ -1,0 +1,100 @@
+NAME
+    gcloud alpha code export - writes skaffold and kubernetes files for local
+        development
+
+SYNOPSIS
+    gcloud alpha code export
+        [--build-context-directory=BUILD_CONTEXT_DIRECTORY] [--builder=BUILDER]
+        [--cloudsql-instances=[CLOUDSQL_INSTANCE,...]] [--cpu-limit=CPU_LIMIT]
+        [--dockerfile=DOCKERFILE; default="Dockerfile"]
+        [--image-name=IMAGE_NAME]
+        [--kubernetes-file=KUBERNETES_FILE; default="pods_and_services.yaml"]
+        [--local-port=LOCAL_PORT] [--memory-limit=MEMORY_LIMIT]
+        [--service-account=SERVICE_ACCOUNT] [--service-name=SERVICE_NAME]
+        [--env-vars=[KEY=VALUE,...] | --env-vars-file=FILE_PATH]
+        [--skaffold-file=SKAFFOLD_FILE; default="skaffold.yaml"
+          | --no-skaffold-file] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Writes skaffold and kubernetes yaml that builds a docker image and
+    runs it locally. In order to build and run the image, run
+
+    > skaffold dev
+
+    This command should be used if there is a need to make customizations to
+    the development environment. Otherwise, the gcloud local dev command should
+    be used instead.
+
+FLAGS
+     --build-context-directory=BUILD_CONTEXT_DIRECTORY
+        If set, use this as the context directory when building the container
+        image. Otherwise, the directory of the Dockerfile will be used.
+
+     --builder=BUILDER
+        Build with a given Cloud Native Computing Foundation Buildpack builder.
+
+     --cloudsql-instances=[CLOUDSQL_INSTANCE,...]
+        Cloud SQL instance connection strings. Must be in the form
+        <project>:<region>:<instance>.
+
+     --cpu-limit=CPU_LIMIT
+        Container CPU limit. Limit is expressed as a number of CPUs. Fractional
+        CPU limits are allowed (e.g. 1.5).
+
+     --dockerfile=DOCKERFILE; default="Dockerfile"
+        Dockerfile for the service image.
+
+     --image-name=IMAGE_NAME
+        Name for the built docker image.
+
+     --kubernetes-file=KUBERNETES_FILE; default="pods_and_services.yaml"
+        File containing yaml specifications for kubernetes resources.
+
+     --local-port=LOCAL_PORT
+        Local port to which the service connection is forwarded. If this flag
+        is not set, then a random port is chosen.
+
+     --memory-limit=MEMORY_LIMIT
+        Container memory limit. Limit is expressed either as an integer
+        representing the number of bytes or an integer followed by a unit
+        suffix. Valid unit suffixes are "B", "KB", "MB", "GB", "TB", "KiB",
+        "MiB", "GiB", "TiB", or "PiB".
+
+     --service-account=SERVICE_ACCOUNT
+        When connecting to Google Cloud Platform services, use a service
+        account key.
+
+     --service-name=SERVICE_NAME
+        Name of the service.
+
+     At most one of these may be specified:
+
+       --env-vars=[KEY=VALUE,...]
+          List of key-value pairs to set as environment variables.
+
+       --env-vars-file=FILE_PATH
+          Path to a local YAML file with definitions for all environment
+          variables.
+
+     At most one of these may be specified:
+
+       --skaffold-file=SKAFFOLD_FILE; default="skaffold.yaml"
+          Location of the generated skaffold.yaml file.
+
+       --no-skaffold-file
+          Do not produce a skaffold.yaml file.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

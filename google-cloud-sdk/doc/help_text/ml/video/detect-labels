@@ -66,12 +66,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the videointelligence/v1 API. The full documentation for
     this API can be found at: https://cloud.google.com/video-intelligence/docs/
+
+EXAMPLES
+    To detect labels in video file 'gs://my_bucket/input_file.mp4':
+
+        $ gcloud ml video detect-labels gs://my_bucket/input_file.mp4
 
 NOTES
     These variants are also available:

@@ -26,12 +26,12 @@ from tests.lib.surface.compute import test_base
 class TargetHttpsProxiesDeleteTest(test_base.BaseTest):
 
   def SetUp(self):
-    self._api = 'v1'
-    self.SelectApi(self._api)
+    self._api = ''
+    self.SelectApi('v1')
     self._target_https_proxies_api = self.compute.targetHttpsProxies
 
   def RunDelete(self, command):
-    self.Run('compute target-https-proxies delete ' + command)
+    self.Run('compute target-https-proxies delete %s' % command)
 
   def testWithSingleTargetHttpsProxy(self):
     messages = self.messages
@@ -82,17 +82,6 @@ class TargetHttpsProxiesDeleteTest(test_base.BaseTest):
 
     self.CheckRequests()
 
-
-class TargetHttpsProxiesDeleteBetaTest(TargetHttpsProxiesDeleteTest):
-
-  def SetUp(self):
-    self._api = 'beta'
-    self.SelectApi(self._api)
-    self._target_https_proxies_api = self.compute.targetHttpsProxies
-
-  def RunDelete(self, command):
-    self.Run('beta compute target-https-proxies delete --global ' + command)
-
   def testWithManyRegionTargetHttpsProxies(self):
     messages = self.messages
     properties.VALUES.core.disable_prompts.Set(True)
@@ -118,6 +107,17 @@ class TargetHttpsProxiesDeleteBetaTest(TargetHttpsProxiesDeleteTest):
                              region='us-west-1'))],)
 
 
+class TargetHttpsProxiesDeleteBetaTest(TargetHttpsProxiesDeleteTest):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_https_proxies_api = self.compute.targetHttpsProxies
+
+  def RunDelete(self, command):
+    self.Run('beta compute target-https-proxies delete %s' % command)
+
+
 class TargetHttpsProxiesDeleteAlphaTest(TargetHttpsProxiesDeleteBetaTest):
 
   def SetUp(self):
@@ -126,7 +126,7 @@ class TargetHttpsProxiesDeleteAlphaTest(TargetHttpsProxiesDeleteBetaTest):
     self._target_https_proxies_api = self.compute.targetHttpsProxies
 
   def RunDelete(self, command):
-    self.Run('alpha compute target-https-proxies delete --global ' + command)
+    self.Run('alpha compute target-https-proxies delete %s' % command)
 
 
 if __name__ == '__main__':

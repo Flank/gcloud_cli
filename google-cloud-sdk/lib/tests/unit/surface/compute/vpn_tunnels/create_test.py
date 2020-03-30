@@ -60,7 +60,7 @@ class ClassicVpnTunnelsCreateGATest(vpn_tunnels_test_base.VpnTunnelsTestBase):
         operation_ref, resource_ref=vpn_tunnel_ref)
 
     self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
 
     response = self.Run('compute vpn-tunnels create {} '
@@ -97,7 +97,7 @@ class ClassicVpnTunnelsCreateGATest(vpn_tunnels_test_base.VpnTunnelsTestBase):
         operation_ref, resource_ref=vpn_tunnel_ref)
 
     self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
 
     response = self.Run(
@@ -138,7 +138,7 @@ class ClassicVpnTunnelsCreateGATest(vpn_tunnels_test_base.VpnTunnelsTestBase):
         operation_ref, resource_ref=vpn_tunnel_ref)
 
     self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
 
     response = self.Run(
@@ -224,7 +224,7 @@ class ClassicVpnTunnelsCreateGATest(vpn_tunnels_test_base.VpnTunnelsTestBase):
         operation_ref, resource_ref=vpn_tunnel_ref)
 
     self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
 
     response = self.Run('compute vpn-tunnels create {} '
@@ -266,7 +266,7 @@ class ClassicVpnTunnelsCreateGATest(vpn_tunnels_test_base.VpnTunnelsTestBase):
         operation_ref, resource_ref=vpn_tunnel_ref)
 
     self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
 
     response = self.Run('compute vpn-tunnels create {} '
@@ -330,7 +330,7 @@ class HighAvailabilityVpnTunnelsCreateGaTest(
         operation_ref, resource_ref=vpn_tunnel_ref)
 
     self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
 
     response = self.Run(
@@ -380,7 +380,7 @@ class HighAvailabilityVpnTunnelsCreateGaTest(
         operation_ref, resource_ref=vpn_tunnel_ref)
 
     self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
 
     response = self.Run('compute vpn-tunnels create {} '
@@ -425,7 +425,7 @@ class HighAvailabilityVpnTunnelsCreateGaTest(
         operation_ref, resource_ref=vpn_tunnel_ref)
 
     self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
 
     response = self.Run(
@@ -474,7 +474,7 @@ class HighAvailabilityVpnTunnelsCreateGaTest(
         operation_ref, resource_ref=vpn_tunnel_ref)
 
     self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
 
     response = self.Run(

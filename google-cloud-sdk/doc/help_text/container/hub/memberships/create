@@ -1,0 +1,86 @@
+NAME
+    gcloud container hub memberships create - create a new membership for a
+        cluster
+
+SYNOPSIS
+    gcloud container hub memberships create (MEMBERSHIP : --location=LOCATION)
+        [--async] [--external-id=EXTERNAL_ID]
+        [--gke-cluster-self-link=GKE_CLUSTER_SELF_LINK]
+        [--labels=[KEY=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Create a Hub membership resource corresponding to the cluster.
+
+    This command does not install the Connect Agent or in-cluster Kubernetes
+    Resources that are required to connect the cluster with Google. For
+    complete cluster registration, consider using the command: gcloud container
+    hub memberships register --help.
+
+POSITIONAL ARGUMENTS
+     Membership resource - The cluster membership to create. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: provide the argument
+     [membership] on the command line with a fully specified name; set the
+     property [core/project]; provide the argument [--project] on the command
+     line. This must be specified.
+
+       MEMBERSHIP
+          ID of the membership or fully qualified identifier for the
+          membership. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --location=LOCATION
+          The location name.
+
+FLAGS
+     --async
+        Return immediately, without waiting for the operation in progress to
+        complete.
+
+     --external-id=EXTERNAL_ID
+        External-id of the membership resource.
+
+     --gke-cluster-self-link=GKE_CLUSTER_SELF_LINK
+        GKE cluster self-link of the cluster represented by this membership;
+        for example,
+        '//container.googleapis.com/projects/my-project/locations/us-central1-a/clusters/my-cluster.'
+        This is only valid if the represented cluster is a GKE cluster. The
+        provided self-link will be validated to confirm that it maps to the
+        cluster represented by this membership.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the gkehub/v1 API. The full documentation for this API
+    can be found at:
+    https://cloud.google.com/anthos/multicluster-management/connect/registering-a-cluster
+
+EXAMPLES
+    Create a new membership for a cluster in Hub:
+
+        $ gcloud container hub memberships create a-membership
+
+    Create a new membership for a GKE cluster:
+
+        $ gcloud container hub memberships create a-membership \
+            --gke-cluster-self-link=my-gke-cluster-self-link
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

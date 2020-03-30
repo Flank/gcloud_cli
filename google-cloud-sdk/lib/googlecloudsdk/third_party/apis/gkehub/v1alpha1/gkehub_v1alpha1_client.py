@@ -9,6 +9,7 @@ class GkehubV1alpha1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://gkehub.googleapis.com/'
+  MTLS_BASE_URL = u'https://gkehub.mtls.googleapis.com/'
 
   _PACKAGE = u'gkehub'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
@@ -238,7 +239,7 @@ may "fail open" without warning.
         method_id=u'gkehub.projects.locations.global.features.delete',
         ordered_params=[u'name'],
         path_params=[u'name'],
-        query_params=[],
+        query_params=[u'force'],
         relative_path=u'v1alpha1/{+name}',
         request_field='',
         request_type_name=u'GkehubProjectsLocationsGlobalFeaturesDeleteRequest',
@@ -534,7 +535,7 @@ is the parent resource, without the operations collection id.
         method_id=u'gkehub.projects.locations.list',
         ordered_params=[u'name'],
         path_params=[u'name'],
-        query_params=[u'filter', u'pageSize', u'pageToken'],
+        query_params=[u'filter', u'includeUnrevealedLocations', u'pageSize', u'pageToken'],
         relative_path=u'v1alpha1/{+name}/locations',
         request_field='',
         request_type_name=u'GkehubProjectsLocationsListRequest',

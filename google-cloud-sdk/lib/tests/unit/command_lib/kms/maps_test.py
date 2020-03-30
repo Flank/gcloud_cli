@@ -47,7 +47,8 @@ class MapsTest(base.KmsMockTest):
 
     for algorithm in self.valid_algorithms_map_values:
       assert algorithm in maps.ALL_ALGORITHMS
-
+      if not algorithm.startswith('external'):
+        assert algorithm in maps.ALGORITHMS_FOR_IMPORT
 
 if __name__ == '__main__':
   test_case.main()

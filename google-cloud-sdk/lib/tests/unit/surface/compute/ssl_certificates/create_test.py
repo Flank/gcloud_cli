@@ -169,6 +169,100 @@ class SslCertificatesCreateTest(test_base.BaseTest):
 
     self.CheckRequests()
 
+  def testSimpleCaseRegion(self):
+    messages = self.messages
+
+    self.RunVersioned("""
+        compute ssl-certificates create my-cert
+          --region us-west1
+          --certificate {certificate_file}
+          --private-key {key_file}
+          --description 'Certificate one.'
+        """.format(
+            certificate_file=self.certificate_file,
+            key_file=self.private_key_file))
+
+    self.CheckRequests([(self.compute.regionSslCertificates, 'Insert',
+                         messages.ComputeRegionSslCertificatesInsertRequest(
+                             sslCertificate=messages.SslCertificate(
+                                 name='my-cert',
+                                 description='Certificate one.',
+                                 certificate=CERTIFICATE,
+                                 privateKey=PRIVATE_KEY),
+                             project='my-project',
+                             region='us-west1'))],)
+
+  def testUriSupportRegion(self):
+    messages = self.messages
+
+    self.RunVersioned("""
+        compute ssl-certificates create
+            {base_uri}/projects/my-project/regions/us-west1/sslCertificates/my-cert
+          --region us-west1
+          --certificate {certificate_file}
+          --private-key {key_file}
+        """.format(
+            base_uri=self.compute_uri,
+            certificate_file=self.certificate_file,
+            key_file=self.private_key_file))
+
+    self.CheckRequests([(self.compute.regionSslCertificates, 'Insert',
+                         messages.ComputeRegionSslCertificatesInsertRequest(
+                             sslCertificate=messages.SslCertificate(
+                                 name='my-cert',
+                                 certificate=CERTIFICATE,
+                                 privateKey=PRIVATE_KEY),
+                             project='my-project',
+                             region='us-west1'))],)
+
+  def testWithoutCertificateRegion(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --certificate: Must be specified.'):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --region us-west1
+            --private-key {key_file}
+          """.format(key_file=self.private_key_file))
+
+    self.CheckRequests()
+
+  def testWithoutPrivateKeyRegion(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --private-key: Must be specified.'):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --region us-west1
+            --certificate {certificate_file}
+          """.format(certificate_file=self.certificate_file))
+
+    self.CheckRequests()
+
+  def testWithoutCertificateFileRegion(self):
+    with self.assertRaisesRegex(
+        files.Error, r'Unable to read file \[not-certificate.crt\]: '
+        r'.*No such file or directory'):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --region us-west1
+            --certificate not-certificate.crt
+            --private-key {key_file}
+          """.format(key_file=self.private_key_file))
+
+    self.CheckRequests()
+
+  def testWithoutPrivateKeyFileRegion(self):
+    with self.assertRaisesRegex(
+        files.Error, r'Unable to read file \[non-existent.key\]: '
+        r'.*No such file or directory'):
+      self.RunVersioned("""
+          compute ssl-certificates create my-cert
+            --region us-west1
+            --certificate {certificate_file}
+            --private-key non-existent.key
+          """.format(certificate_file=self.certificate_file))
+
+    self.CheckRequests()
+
 
 class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
                                     parameterized.TestCase):
@@ -183,7 +277,6 @@ class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
 
     self.RunVersioned("""
         compute ssl-certificates create my-cert
-          --global
           --certificate {certificate_file}
           --private-key {key_file}
           --description 'Certificate one.'
@@ -205,6 +298,34 @@ class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
               ),
               project='my-project'))],)
 
+  def testSimpleCaseRegion(self):
+    messages = self.messages
+
+    self.RunVersioned("""
+        compute ssl-certificates create my-cert
+          --region us-west1
+          --certificate {certificate_file}
+          --private-key {key_file}
+          --description 'Certificate one.'
+        """.format(
+            certificate_file=self.certificate_file,
+            key_file=self.private_key_file))
+
+    self.CheckRequests(
+        [(self.compute.regionSslCertificates, 'Insert',
+          messages.ComputeRegionSslCertificatesInsertRequest(
+              sslCertificate=messages.SslCertificate(
+                  type=messages.SslCertificate.TypeValueValuesEnum.SELF_MANAGED,
+                  name='my-cert',
+                  description='Certificate one.',
+                  selfManaged=messages.SslCertificateSelfManagedSslCertificate(
+                      certificate=CERTIFICATE,
+                      privateKey=PRIVATE_KEY,
+                  ),
+              ),
+              project='my-project',
+              region='us-west1'))],)
+
   @parameterized.parameters((['example.com'],),
                             (['one.example.com', 'two.example.com'],),
                             (['Ṳᾔḯ¢◎ⅾℯ.certsbridge.com'],),
@@ -216,7 +337,6 @@ class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
         compute ssl-certificates create my-cert-managed
           --domains {domains}
           --description 'Managed certificate one.'
-          --global
         """.format(domains=','.join(domains)))
 
     self.CheckRequests(
@@ -264,7 +384,6 @@ class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
     self.RunVersioned("""
         compute ssl-certificates create
             {base_uri}/projects/my-project/global/sslCertificates/my-cert
-          --global
           --certificate {certificate_file}
           --private-key {key_file}
         """.format(
@@ -327,7 +446,6 @@ class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
         'argument --certificate: Must be specified.'):
       self.RunVersioned("""
           compute ssl-certificates create my-cert
-            --global
             --private-key {key_file}
           """.format(key_file=self.private_key_file))
 
@@ -349,7 +467,6 @@ class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
         'argument --private-key: Must be specified.'):
       self.RunVersioned("""
           compute ssl-certificates create my-cert
-            --global
             --certificate {certificate_file}
           """.format(certificate_file=self.certificate_file))
 
@@ -372,7 +489,6 @@ class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
         r'.*No such file or directory'):
       self.RunVersioned("""
           compute ssl-certificates create my-cert
-            --global
             --certificate not-certificate.crt
             --private-key {key_file}
           """.format(key_file=self.private_key_file))
@@ -398,7 +514,6 @@ class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
         r'.*No such file or directory'):
       self.RunVersioned("""
           compute ssl-certificates create my-cert
-            --global
             --certificate {certificate_file}
             --private-key non-existent.key
           """.format(certificate_file=self.certificate_file))
@@ -418,7 +533,6 @@ class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.RunVersioned("""
           compute ssl-certificates create my-cert
-            --global
             --certificate {certificate_file}
             --domains example.com
           """.format(certificate_file=self.certificate_file))
@@ -440,7 +554,6 @@ class SslCertificatesCreateBetaTest(SslCertificatesCreateTest,
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.RunVersioned("""
           compute ssl-certificates create my-cert
-            --global
             --domains example.com
             --private-key {key_file}
           """.format(key_file=self.private_key_file))

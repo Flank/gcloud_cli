@@ -42,13 +42,10 @@ must be specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-Cloud Dataproc region for the cluster. Each Cloud Dataproc region constitutes an
-independent resource namespace constrained to deploying instances into Google
-Compute Engine zones inside the region. The default value of \f5global\fR is a
-special multi\-region namespace which is capable of deploying instances into all
-Google Compute Engine zones globally, and is disjoint from other Cloud Dataproc
-regions. Overrides the default \f5dataproc/region\fR property value for this
-command invocation.
+Dataproc region for the cluster. Each Dataproc region constitutes an independent
+resource namespace constrained to deploying instances into Compute Engine zones
+inside the region. Overrides the default \f5dataproc/region\fR property value
+for this command invocation.
 
 
 .RE
@@ -67,7 +64,8 @@ Return immediately, without waiting for the operation in progress to complete.
 Path to a YAML file containing cluster configuration export data. The YAML file
 must not contain any output\-only fields. Alternatively, you may omit this flag
 to read from standard input. A schema describing the export/import format can be
-found in: $CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1/Cluster.yaml.
+found in:
+$CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1beta2/Cluster.yaml.
 
 
 .RE
@@ -78,8 +76,27 @@ found in: $CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1/Cluster.yaml.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To import a cluster from a YAML file, run:
+
+.RS 2m
+$ gcloud alpha dataproc clusters import my_cluster \e
+    \-\-region=us\-central1 \-\-source=cluster.yaml
+.RE
+
+To import a cluster from standard output, run:
+
+.RS 2m
+$ gcloud alpha dataproc clusters import my_cluster \e
+    \-\-region=us\-central1
+.RE
 
 
 
@@ -88,9 +105,10 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud dataproc clusters import
 $ gcloud beta dataproc clusters import
 .RE
 

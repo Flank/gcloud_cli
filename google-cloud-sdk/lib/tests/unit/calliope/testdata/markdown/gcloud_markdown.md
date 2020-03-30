@@ -84,7 +84,7 @@ outer.
 
 And this should be back to normal text.
 
-  $ link:gcloud/markdown[gcloud markdown] instance
+  $ gcloud markdown instance
   $ link:gcloud/markdown/markdown-command[gcloud markdown markdown-command] instance
 
 and more prose
@@ -112,6 +112,7 @@ Optional flag.
 ## GCLOUD WIDE FLAGS
 
 These flags are available to all commands: --configuration, --flags-file, --flatten, --format, --help, --log-http, --top-group-flag, --user-output-enabled, --verbosity.
+
 Run *$ link:gcloud[gcloud] help* for details.
 
 

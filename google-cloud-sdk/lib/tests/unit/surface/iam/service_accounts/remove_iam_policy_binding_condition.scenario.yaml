@@ -1,5 +1,5 @@
 title: iam service-account remove-iam-policy-binding-condition scenario test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 
 actions:
 # remove binding with condition to a policy with condition

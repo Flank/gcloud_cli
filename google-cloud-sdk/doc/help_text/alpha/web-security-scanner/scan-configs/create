@@ -25,7 +25,7 @@ REQUIRED FLAGS
      --starting-urls=[STARTING_URLS,...]
         URLs the scan starts scanning from. These URLs must be 'owned' by the
         project in some way (resolve to a reserved IP address, or be the
-        default *.appspot.com).
+        default https://<PROJECT-ID>.<REGION-ID>.r.appspot.com).
 
 OPTIONAL FLAGS
      --blacklist-patterns=[BLACKLIST_PATTERNS,...]
@@ -90,8 +90,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the websecurityscanner/v1beta API. The full documentation

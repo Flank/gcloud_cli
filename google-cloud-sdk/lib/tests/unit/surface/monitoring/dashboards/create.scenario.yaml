@@ -1,0 +1,144 @@
+title: dashboards create test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Create a dashboard
+  - command: monitoring dashboards create --config='{"displayName":"Test Dashboard","gridLayout":{"widgets":{"text":{"content":"Hello
+      World"}}}}'
+  - stderr: |
+      Created [8dc3b43c-7686-4341-b70a-3be22e191ab8].
+- execute:
+  - label: Create an invalid dashboard
+  - command: monitoring dashboards create --config='{"gridLayout":{"widgets":{"text":{"content":"Hello
+      World"}}}}'
+  - error: '1: INVALID_ARGUMENT: Dashboard is missing required field display_name.'
+- execute:
+  - label: Create a dashboard from a JSON file
+  - command: monitoring dashboards create --config-from-file=dashboard.json
+  - stderr: |
+      Created [8dc3b43c-7686-4341-b70a-3be22e191ab8].
+actions:
+- execute_command:
+    label: Create a dashboard
+    command: monitoring dashboards create --config='{"displayName":"Test Dashboard","gridLayout":{"widgets":{"text":{"content":"Hello
+      World"}}}}'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://monitoring.googleapis.com/v1/projects/fake-project/dashboards?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              displayName: Test Dashboard
+              gridLayout:
+                widgets:
+                - text:
+                    content: Hello World
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/277699962164/dashboards/8dc3b43c-7686-4341-b70a-3be22e191ab8",
+              "displayName": "Test Dashboard",
+              "etag": "360e2b2dfa4735b5ec80982fa7838402",
+              "gridLayout": {
+                "widgets": [
+                  {
+                    "text": {
+                      "content": "Hello World",
+                      "format": "MARKDOWN"
+                    }
+                  }
+                ]
+              }
+            }
+    - expect_stderr: |
+        Created [8dc3b43c-7686-4341-b70a-3be22e191ab8].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: Create an invalid dashboard
+    command: monitoring dashboards create --config='{"gridLayout":{"widgets":{"text":{"content":"Hello
+      World"}}}}'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://monitoring.googleapis.com/v1/projects/fake-project/dashboards?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              gridLayout:
+                widgets:
+                - text:
+                    content: Hello World
+        return_response:
+          headers:
+            status: '400'
+          body: |
+            {
+              "error": {
+                "code": 400,
+                "message": "Dashboard is missing required field display_name.",
+                "status": "INVALID_ARGUMENT"
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: 'INVALID_ARGUMENT: Dashboard is missing required field display_name.'
+- write_file:
+    path: dashboard.json
+    contents: |
+      {
+        "displayName": "Test Dashboard",
+        "gridLayout": {
+          "widgets": {
+            "text": {
+              "content": "Hello World"
+            }
+          }
+        }
+      }
+- execute_command:
+    label: Create a dashboard from a JSON file
+    command: monitoring dashboards create --config-from-file=dashboard.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://monitoring.googleapis.com/v1/projects/fake-project/dashboards?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              displayName: Test Dashboard
+              gridLayout:
+                widgets:
+                - text:
+                    content: Hello World
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/277699962164/dashboards/8dc3b43c-7686-4341-b70a-3be22e191ab8",
+              "displayName": "Test Dashboard",
+              "etag": "360e2b2dfa4735b5ec80982fa7838402",
+              "gridLayout": {
+                "widgets": [
+                  {
+                    "text": {
+                      "content": "Hello World",
+                      "format": "MARKDOWN"
+                    }
+                  }
+                ]
+              }
+            }
+    - expect_stderr: |
+        Created [8dc3b43c-7686-4341-b70a-3be22e191ab8].
+    - expect_exit:
+        code: 0

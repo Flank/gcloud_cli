@@ -1,0 +1,38 @@
+title: Cloud API Gateway API Describe with Success
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway apis describe api-name
+  - stdout: |
+      apiController:
+        managedService: api-name.endpoints.fake-project.cloud.goog
+      displayName: Test API Name
+      name: projects/fake-project/locations/global/apis/api-name
+actions:
+- execute_command:
+    command: |
+      api-gateway apis describe api-name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://apigateway.googleapis.com/v1alpha1/projects/fake-project/locations/global/apis/api-name?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            apiController:
+              managedService: api-name.endpoints.fake-project.cloud.goog
+            name: projects/fake-project/locations/global/apis/api-name
+            displayName: Test API Name
+    - expect_stdout: |
+        apiController:
+          managedService: api-name.endpoints.fake-project.cloud.goog
+        displayName: Test API Name
+        name: projects/fake-project/locations/global/apis/api-name
+    - expect_exit:
+        code: 0

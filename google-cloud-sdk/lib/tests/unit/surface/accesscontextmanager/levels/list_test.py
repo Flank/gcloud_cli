@@ -30,6 +30,7 @@ from six.moves import range
 class LevelsListTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -43,8 +44,21 @@ class LevelsListTestGA(accesscontextmanager.Base):
         description='My level #{} is very complicated.'.format(idx),
         title='My level #{}'.format(idx))
 
-  def _MakeLevels(self, num=3):
-    return list(map(self._MakeBasicLevelNum, list(range(num))))
+  def _MakeCustomLevelNum(self, idx):
+    return self._MakeCustomLevel(
+        'customlevel{}'.format(idx),
+        expression='1 < {}'.format(idx),
+        description='My custom level #{} is very complicated.'.format(idx),
+        title='My custom level #{}'.format(idx))
+
+  def _MakeLevels(self, basic_num=3, custom_num=3):
+    combined_list = list(map(self._MakeBasicLevelNum, list(range(basic_num))))
+    combined_list.extend(
+        list(map(self._MakeCustomLevelNum, list(range(custom_num)))))
+    return combined_list
+
+  def _MakeLevelsPerTrack(self):
+    return self._MakeLevels(basic_num=3, custom_num=0)
 
   def _ExpectList(self, levels, policy):
     policy_name = 'accessPolicies/{}'.format(policy)
@@ -55,8 +69,8 @@ class LevelsListTestGA(accesscontextmanager.Base):
         self.messages.ListAccessLevelsResponse(accessLevels=levels))
 
   def testList(self):
-    self.SetUpForTrack(self.track)
-    levels = self._MakeLevels()
+    self.SetUpForAPI(self.api_version)
+    levels = self._MakeLevelsPerTrack()
     self._ExpectList(levels, '123')
 
     results = self.Run('access-context-manager levels list --policy 123')
@@ -64,8 +78,8 @@ class LevelsListTestGA(accesscontextmanager.Base):
     self.assertEqual(results, levels)
 
   def testList_PolicyFromProperty(self):
-    self.SetUpForTrack(self.track)
-    levels = self._MakeLevels()
+    self.SetUpForAPI(self.api_version)
+    levels = self._MakeLevelsPerTrack()
     policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
     self._ExpectList(levels, policy)
@@ -75,9 +89,9 @@ class LevelsListTestGA(accesscontextmanager.Base):
     self.assertEqual(results, levels)
 
   def testList_Format(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     properties.VALUES.core.user_output_enabled.Set(True)
-    levels = self._MakeLevels()
+    levels = self._MakeLevelsPerTrack()
     self._ExpectList(levels, '123')
 
     self.Run('access-context-manager levels list --policy 123')
@@ -92,7 +106,7 @@ class LevelsListTestGA(accesscontextmanager.Base):
         normalize_space=True)
 
   def testList_InvalidPolicyArg(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.assertRaises(properties.InvalidValueError) as ex:
       # Common error is to specify --policy arg as 'accessPolicies/<num>'
       self.Run('access-context-manager levels list'
@@ -103,13 +117,61 @@ class LevelsListTestGA(accesscontextmanager.Base):
 class LevelsListTestBeta(LevelsListTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def _MakeLevelsPerTrack(self):
+    return self._MakeLevels(basic_num=3, custom_num=3)
+
+  def testList_Format(self):
+    self.SetUpForAPI(self.api_version)
+    properties.VALUES.core.user_output_enabled.Set(True)
+    levels = self._MakeLevelsPerTrack()
+    self._ExpectList(levels, '123')
+
+    self.Run('access-context-manager levels list --policy 123')
+
+    self.AssertOutputEquals(
+        """\
+        NAME    TITLE        LEVEL_TYPE
+        level0  My level #0  Basic
+        level1  My level #1  Basic
+        level2  My level #2  Basic
+        customlevel0  My custom level #0  Custom
+        customlevel1  My custom level #1  Custom
+        customlevel2  My custom level #2  Custom
+        """,
+        normalize_space=True)
 
 
 class LevelsListTestAlpha(LevelsListTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def _MakeLevelsPerTrack(self):
+    return self._MakeLevels(basic_num=3, custom_num=3)
+
+  def testList_Format(self):
+    self.SetUpForAPI(self.api_version)
+    properties.VALUES.core.user_output_enabled.Set(True)
+    levels = self._MakeLevelsPerTrack()
+    self._ExpectList(levels, '123')
+
+    self.Run('access-context-manager levels list --policy 123')
+
+    self.AssertOutputEquals(
+        """\
+        NAME    TITLE        LEVEL_TYPE
+        level0  My level #0  Basic
+        level1  My level #1  Basic
+        level2  My level #2  Basic
+        customlevel0  My custom level #0  Custom
+        customlevel1  My custom level #1  Custom
+        customlevel2  My custom level #2  Custom
+        """,
+        normalize_space=True)
 
 
 if __name__ == '__main__':

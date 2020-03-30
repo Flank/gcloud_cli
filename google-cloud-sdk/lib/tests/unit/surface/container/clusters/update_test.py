@@ -23,6 +23,7 @@ import os
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import util as c_util
+from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.container import constants
 from googlecloudsdk.core import properties
@@ -173,6 +174,16 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
                 kubernetesDashboard=self.msgs.KubernetesDashboard(
                     disabled=True))),
         flags='--update-addons KubernetesDashboard=DISABLED')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(disabled=False))),
+        flags='--update-addons CloudRun=ENABLED')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudRunConfig=self.msgs.CloudRunConfig(disabled=True))),
+        flags='--update-addons CloudRun=DISABLED')
 
   def testEnableClusterAutoscaler(self):
     self._TestUpdate(
@@ -693,9 +704,27 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         cluster_name=name,
         update=update,
         response=self._MakeOperation(operationType=self.op_update_cluster))
+    if 'NodeLocalDNS' in flags:
+      self.WriteInput('y')
     self.Run(
         self.clusters_command_base.format(self.ZONE) +
         ' update {0} {1} --async'.format(name, flags))
+
+  def _TestUpdateAbort(self, update, flags):
+    name = 'tobeaborted'
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    self.WriteInput('n')
+    with self.assertRaises(console_io.OperationCancelledError):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1}'.format(name, flags))
+    self.AssertErrContains('Aborted by user.')
+    self.AssertErrContains(
+        'Enabling/Disabling NodeLocal DNSCache causes '
+        'a re-creation of all cluster nodes at versions 1.15 or above.'
+        ' This operation is long-running and will block other '
+        'operations on the cluster (including delete) until it has run'
+        ' to completion.')
 
   def _TestUpdateMasterAuth(self, action, update, password, flags):
     name = 'tosetmasterauth'
@@ -1732,22 +1761,18 @@ resourceLimits:
         '--autoprovisioning-config-file {}'.format(
             autoprovisioning_config_file))
 
-  def _TestUpdateClusteAutoscalingWithError(self, flags, error_message):
+  def testEnableAutoprovisioningAcceleratorTypeMismatch(self):
+    flags = (' --enable-autoprovisioning --max-cpu 10 --max-memory 64'
+             ' --max-accelerator type=nvidia-tesla-p100,count=2'
+             ' --min-accelerator type=nvidia-tesla-k80,count=1')
+    error_message = ('Maximum and minimum accelerator limits must be set'
+                     ' on the same accelerator type.')
     name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
-    with self.assertRaises(c_util.Error):
+    with self.assertRaisesRegex(c_util.Error, error_message):
       self.Run(
           self.clusters_command_base.format(self.ZONE) + ' update ' + name +
           flags)
-    self.AssertErrContains(error_message)
-
-  def testEnableAutoprovisioningAcceleratorTypeMismatch(self):
-    self._TestUpdateClusteAutoscalingWithError(
-        ' --enable-autoprovisioning --max-cpu 10 --max-memory 64'
-        ' --max-accelerator type=nvidia-tesla-p100,count=2'
-        ' --min-accelerator type=nvidia-tesla-k80,count=1',
-        'Maximum and minimum accelerator limits must be set'
-        ' on the same accelerator type.')
 
   def testEnableAutoprovisioningWithMultipleAcceleratorLimits(self):
     autoprovisioning_config_file = self.Touch(
@@ -1784,6 +1809,44 @@ resourceLimits:
         '--autoprovisioning-config-file {}'.format(
             autoprovisioning_config_file))
 
+  def testDisableWorkloadIdentity(self):
+    update = self.msgs.ClusterUpdate(
+        desiredWorkloadIdentityConfig=self.msgs.WorkloadIdentityConfig(
+            workloadPool=''))
+    self._TestUpdate(update=update, flags='--disable-workload-identity ')
+
+  def testUpdateWorkloadIdentity(self):
+    update = self.msgs.ClusterUpdate(
+        desiredWorkloadIdentityConfig=self.msgs.WorkloadIdentityConfig(
+            workloadPool='new-workload-pool'))
+    self._TestUpdate(update=update, flags='--workload-pool=new-workload-pool ')
+
+  @parameterized.parameters(
+      ('--no-enable-shielded-nodes', False),
+      ('--enable-shielded-nodes', True),
+  )
+  def testEnableShieldedNodes(self, flags, enabled):
+    cluster_name = 'abc'
+    update = self.msgs.ClusterUpdate(
+        desiredShieldedNodes=self.msgs.ShieldedNodes(enabled=enabled))
+    self.ExpectGetCluster(self._RunningCluster(name=cluster_name))
+    self.ExpectUpdateCluster(
+        cluster_name=cluster_name,
+        update=update,
+        response=self._MakeOperation(operationType=self.op_update_cluster))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(cluster_name, flags))
+
+  def testUpdateMonitoringAndLogging(self):
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(
+            desiredMonitoringService='some.monitoring.service',
+            desiredLoggingService='some.logging.service'),
+        flags='--monitoring-service=some.monitoring.service '
+        '--logging-service=some.logging.service')
+
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -1799,7 +1862,7 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
   def testRegionalUpdateLabels(self):
     self._TestUpdateLabels(self.REGION)
 
-  def testUpdateAddons(self):
+  def testUpdateAddonsNetworkPolicy(self):
     self._TestUpdate(
         self.msgs.ClusterUpdate(
             desiredAddonsConfig=self.msgs.AddonsConfig(
@@ -1813,6 +1876,48 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
                 networkPolicyConfig=self.msgs.NetworkPolicyConfig(
                     disabled=True))),
         flags='--update-addons NetworkPolicy=DISABLED')
+
+  def testUpdateAddonsNodeLocalDNS(self):
+    self.WriteInput('y')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                dnsCacheConfig=self.msgs.DnsCacheConfig(enabled=False))),
+        flags='--update-addons NodeLocalDNS=DISABLED')
+
+    self.WriteInput('y')
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                dnsCacheConfig=self.msgs.DnsCacheConfig(enabled=True))),
+        flags='--update-addons NodeLocalDNS=ENABLED')
+
+    self._TestUpdateAbort(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                dnsCacheConfig=self.msgs.DnsCacheConfig(enabled=False))),
+        flags='--update-addons NodeLocalDNS=DISABLED')
+
+    self._TestUpdateAbort(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                dnsCacheConfig=self.msgs.DnsCacheConfig(enabled=True))),
+        flags='--update-addons NodeLocalDNS=ENABLED')
+
+  def testUpdateAddonsGcePersistentDiskCsiDriver(self):
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                gcePersistentDiskCsiDriverConfig=self.msgs
+                .GcePersistentDiskCsiDriverConfig(enabled=True))),
+        flags='--update-addons GcePersistentDiskCsiDriver=ENABLED')
+
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                gcePersistentDiskCsiDriverConfig=self.msgs
+                .GcePersistentDiskCsiDriverConfig(enabled=False))),
+        flags='--update-addons GcePersistentDiskCsiDriver=DISABLED')
 
   def testUpdateLocations(self):
     self._TestUpdate(
@@ -1835,13 +1940,231 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
     update = self.msgs.ClusterUpdate(desiredBinaryAuthorization=binauthz)
     self._TestUpdate(update=update, flags=flags)
 
-  def testUpdateMonitoringAndLogging(self):
-    self._TestUpdate(
-        update=self.msgs.ClusterUpdate(
-            desiredMonitoringService='some.monitoring.service',
-            desiredLoggingService='some.logging.service'),
-        flags='--monitoring-service=some.monitoring.service '
-        '--logging-service=some.logging.service')
+  def testEnableAutoprovisioningWithUpgradeSettings(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            upgradeSettings=self.msgs.UpgradeSettings(
+                maxSurge=1, maxUnavailable=2),
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning --max-memory 128 '
+        '--max-cpu 100 --min-cpu 8 '
+        '--autoprovisioning-max-surge-upgrade=1 '
+        '--autoprovisioning-max-unavailable-upgrade=2 ')
+
+  def testEnableAutoprovisioningWithNodeManagement(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            management=self.msgs.NodeManagement(
+                autoRepair=False, autoUpgrade=True),
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning --max-memory 128 '
+        '--max-cpu 100 --min-cpu 8 '
+        '--no-enable-autoprovisioning-autorepair '
+        '--enable-autoprovisioning-autoupgrade')
+
+  def testEnableAutoprovisioningWithNodeManagementAndUpgradeSettings(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            management=self.msgs.NodeManagement(
+                autoRepair=False, autoUpgrade=True),
+            upgradeSettings=self.msgs.UpgradeSettings(
+                maxSurge=1, maxUnavailable=2),
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning --max-memory 128 '
+        '--max-cpu 100 --min-cpu 8 '
+        '--autoprovisioning-max-surge-upgrade=1 '
+        '--autoprovisioning-max-unavailable-upgrade=2 '
+        '--no-enable-autoprovisioning-autorepair '
+        '--enable-autoprovisioning-autoupgrade ')
+
+  def testEnableAutoprovisioningWithManagementFromFile(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+management:
+  autoRepair: false
+  autoUpgrade: true
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            management=self.msgs.NodeManagement(
+                autoRepair=False, autoUpgrade=True),
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(
+            autoprovisioning_config_file))
+
+  def testEnableAutoprovisioningWithUpgradeSettingsFromFile(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+upgradeSettings:
+  maxSurgeUpgrade: 1
+  maxUnavailableUpgrade: 2
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            upgradeSettings=self.msgs.UpgradeSettings(
+                maxSurge=1, maxUnavailable=2),
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(
+            autoprovisioning_config_file))
+
+  def testEnableAutoprovisioningWithMinCpuPlatformFromFile(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+minCpuPlatform: 'Skylake'
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            minCpuPlatform='Skylake',
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(
+            autoprovisioning_config_file))
+
+  def testEnableAutoprovisioningWithMinCpuPlatform(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            minCpuPlatform='Skylake',
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning --max-memory 128 '
+        '--max-cpu 100 --min-cpu 8 '
+        '--autoprovisioning-min-cpu-platform Skylake ')
+
+  def testUpdateAutoscalingProfile(self):
+    autoscaling = self.msgs.ClusterAutoscaling(
+        autoscalingProfile=(
+            self.messages.ClusterAutoscaling.AutoscalingProfileValueValuesEnum
+            .OPTIMIZE_UTILIZATION))
+    self._TestUpdateClusterAutoscaling(
+        autoscaling, '--autoscaling-profile optimize-utilization')
+
+  def testUpdateAutoscalingProfileInvalid(self):
+    name = 'tobeupdated'
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    with self.assertRaises(arg_parsers.ArgumentTypeError):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
+          ' --autoscaling-profile invalid-profile')
+
+  def _TestUpdateClusterAutoscaling(self, autoscaling, flags):
+    name = 'tobeupdated'
+    update = self.msgs.ClusterUpdate(desiredClusterAutoscaling=autoscaling)
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    self.ExpectUpdateCluster(
+        cluster_name=name,
+        update=update,
+        response=self._MakeOperation(operationType=self.op_update_cluster))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, flags))
+
+    self.AssertErrContains('Updating {cluster}'.format(cluster=name))
+    self.AssertErrContains(
+        ('go to: https://console.cloud.google.com/kubernetes/'
+         'workload_/gcloud/{zone}/{cluster}?project={project}').format(
+             cluster=name, zone=self.ZONE, project=self.PROJECT_ID))
+
+  def _TestUpdateAutoprovisioning(self, enabled, resource_limits,
+                                  autoprovisioning_defaults,
+                                  autoprovisioning_locations, flags):
+    autoscaling = self.msgs.ClusterAutoscaling(
+        enableNodeAutoprovisioning=enabled,
+        autoprovisioningNodePoolDefaults=autoprovisioning_defaults,
+        resourceLimits=resource_limits,
+        autoprovisioningLocations=autoprovisioning_locations)
+    self._TestUpdateClusterAutoscaling(autoscaling, flags)
+
+  def testEnableAutoprovisioningAcceleratorTypeMismatch(self):
+    flags = (' --enable-autoprovisioning --max-cpu 10 --max-memory 64'
+             ' --max-accelerator type=nvidia-tesla-p100,count=2'
+             ' --min-accelerator type=nvidia-tesla-k80,count=1')
+    error_message = ('Maximum and minimum accelerator limits must be set'
+                     ' on the same accelerator type.')
+    name = 'tobeupdated'
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    with self.assertRaisesRegex(c_util.Error, error_message):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
+          flags)
 
   def testUpdateMonitoring(self):
     self._TestUpdate(
@@ -1910,55 +2233,11 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
     self.AssertErrContains('auth must be one of MTLS_PERMISSIVE or '
                            'MTLS_STRICT')
 
-  def testDisableWorkloadIdentity(self):
-    cluster_name = 'abc'
+  def testUpdateWorkloadIdentityLegacy(self):
     update = self.msgs.ClusterUpdate(
         desiredWorkloadIdentityConfig=self.msgs.WorkloadIdentityConfig(
-            identityNamespace=''))
-    self.ExpectGetCluster(self._RunningCluster(name=cluster_name))
-    self.ExpectUpdateCluster(
-        cluster_name=cluster_name,
-        update=update,
-        response=self._MakeOperation(operationType=self.op_update_cluster))
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' update {0} --disable-workload-identity'.format(cluster_name))
-
-  def testModifyIdentityNamespace(self):
-    cluster_name = 'abc'
-    new_idns = 'new-idns'
-    update = self.msgs.ClusterUpdate(
-        desiredWorkloadIdentityConfig=self.msgs.WorkloadIdentityConfig(
-            identityNamespace=new_idns))
-    self.ExpectGetCluster(self._RunningCluster(name=cluster_name))
-    self.ExpectUpdateCluster(
-        cluster_name=cluster_name,
-        update=update,
-        response=self._MakeOperation(operationType=self.op_update_cluster))
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' update {cluster} --identity-namespace={idns}'.format(
-            cluster=cluster_name, idns=new_idns))
-
-  @parameterized.parameters(
-      ('--no-enable-shielded-nodes', False),
-      ('--enable-shielded-nodes', True),
-  )
-  def testEnableShieldedNodes(self, flags, enabled):
-    cluster_name = 'abc'
-    update = self.msgs.ClusterUpdate(
-        desiredShieldedNodes=self.msgs.ShieldedNodes(enabled=enabled))
-    self.ExpectGetCluster(self._RunningCluster(name=cluster_name))
-    self.ExpectUpdateCluster(
-        cluster_name=cluster_name,
-        update=update,
-        response=self._MakeOperation(operationType=self.op_update_cluster))
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' update {0} {1}'.format(cluster_name, flags))
+            identityNamespace='new-idns'))
+    self._TestUpdate(update=update, flags='--identity-namespace=new-idns ')
 
   def testEnableDatabaseEncryption(self):
     update = self.msgs.ClusterUpdate(
@@ -1990,6 +2269,55 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
                 kalmConfig=self.msgs.KalmConfig(enabled=True))),
         flags='--update-addons ApplicationManager=ENABLED')
 
+  @parameterized.parameters(True, False)
+  def testTpuUpdate(self, enabled):
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredTpuConfig=self.msgs.TpuConfig(enabled=enabled)),
+        flags='--enable-tpu' if enabled else '--no-enable-tpu')
+
+  @parameterized.parameters('', '/20')
+  def testTpuEnableWithIpv4Cidr(self, tpu_ipv4_cidr):
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredTpuConfig=self.msgs.TpuConfig(
+                enabled=True, ipv4CidrBlock=tpu_ipv4_cidr)),
+        flags='--enable-tpu --tpu-ipv4-cidr=' + tpu_ipv4_cidr)
+
+  def testEnableStackdriverKubernetesOnly(self):
+    desired = self.msgs.ClusterTelemetry(
+        type=self.msgs.ClusterTelemetry.TypeValueValuesEnum.ENABLED)
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(desiredClusterTelemetry=desired),
+        flags='--enable-stackdriver-kubernetes')
+
+  def testEnableLoggingMonitoringSystemOnly(self):
+    desired = self.msgs.ClusterTelemetry(
+        type=self.msgs.ClusterTelemetry.TypeValueValuesEnum.SYSTEM_ONLY)
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(desiredClusterTelemetry=desired),
+        flags='--enable-logging-monitoring-system-only')
+
+  def testDisableClusterTelemetry(self):
+    desired = self.msgs.ClusterTelemetry(
+        type=self.msgs.ClusterTelemetry.TypeValueValuesEnum.DISABLED)
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(desiredClusterTelemetry=desired),
+        flags='--no-enable-stackdriver-kubernetes')
+
+  @parameterized.parameters(
+      ('--enable-master-global-access ', True),
+      ('--no-enable-master-global-access ', False),
+  )
+  def testMasterGlobalAccess(self, flags, enabled):
+    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
+        enabled=enabled)
+    desired = self.msgs.PrivateClusterConfig(
+        masterGlobalAccessConfig=master_global_access_config)
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredPrivateClusterConfig=desired),
+        flags=flags)
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
@@ -2008,12 +2336,6 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
     update = self.msgs.ClusterUpdate(securityProfile=profile)
     self._TestUpdate(update=update, flags='--security-profile=test-profile-1')
 
-  def testEnablePeeringRouteSharing(self):
-    desired = self.msgs.PrivateClusterConfig(enablePeeringRouteSharing=True)
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(desiredPrivateClusterConfig=desired),
-        flags='--enable-peering-route-sharing ')
-
   def _TestUpdateAutoprovisioning(self, enabled, resource_limits,
                                   autoprovisioning_defaults,
                                   autoprovisioning_locations, flags):
@@ -2023,16 +2345,6 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
         resourceLimits=resource_limits,
         autoprovisioningLocations=autoprovisioning_locations)
     self._TestUpdateClusterAutoscaling(autoscaling, flags)
-
-  def _TestUpdateClusteAutoscalingWithError(self, flags, error_message):
-    name = 'tobeupdated'
-    self.ExpectGetCluster(self._RunningCluster(name=name))
-    self.ExpectGetCluster(self._RunningCluster(name=name))
-    with self.assertRaises(c_util.Error):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
-          flags)
-    self.AssertErrContains(error_message)
 
   def _TestUpdateClusterAutoscaling(self, autoscaling, flags):
     name = 'tobeupdated'
@@ -2053,28 +2365,11 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
          'workload_/gcloud/{zone}/{cluster}?project={project}').format(
              cluster=name, zone=self.ZONE, project=self.PROJECT_ID))
 
-  def testUpdateAutoscalingProfile(self):
-    autoscaling = self.msgs.ClusterAutoscaling(
-        autoscalingProfile=self.messages.ClusterAutoscaling \
-          .AutoscalingProfileValueValuesEnum.OPTIMIZE_UTILIZATION)
-    self._TestUpdateClusterAutoscaling(
-        autoscaling, '--autoscaling-profile optimize-utilization')
-
-  def testUpdateAutoscalingProfileInvalid(self):
-    name = 'tobeupdated'
-    self.ExpectGetCluster(self._RunningCluster(name=name))
-    self.ExpectGetCluster(self._RunningCluster(name=name))
-    with self.assertRaises(c_util.Error):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
-          ' --autoscaling-profile invalid-profile')
-    self.AssertErrContains('Unknown autoscaling profile')
-
   @parameterized.parameters(
       ('--no-disable-default-snat ', False),
       ('--disable-default-snat ', True),
   )
-  def testEnableShieldedNodes(self, flags, disabled):
+  def testEnableSnat(self, flags, disabled):
     update = self.msgs.ClusterUpdate(
         desiredDefaultSnatStatus=self.msgs.DefaultSnatStatus(disabled=disabled))
     self._TestUpdate(update=update, flags=flags)
@@ -2103,6 +2398,36 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
                 kalmConfig=self.msgs.KalmConfig(enabled=True))),
         flags='--update-addons ApplicationManager=ENABLED')
 
+  def testUpdateAddonsConfigConnector(self):
+    # test disabling ConfigConnector
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                configConnectorConfig=self.msgs.ConfigConnectorConfig(
+                    enabled=False))),
+        flags='--update-addons ConfigConnector=DISABLED')
+    # test enabling ConfigConnector
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                configConnectorConfig=self.msgs.ConfigConnectorConfig(
+                    enabled=True))),
+        flags='--update-addons ConfigConnector=ENABLED')
+
+  def testUpdateAddonsCloudBuild(self):
+    # test disabling CloudBuild
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudBuildConfig=self.msgs.CloudBuildConfig(enabled=False))),
+        flags='--update-addons CloudBuild=DISABLED')
+    # test enabling CloudBuild
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                cloudBuildConfig=self.msgs.CloudBuildConfig(enabled=True))),
+        flags='--update-addons CloudBuild=ENABLED')
+
   @parameterized.parameters('rapid', 'regular', 'stable', 'None')
   def testUpdateReleaseChannel(self, channel):
     channels = {
@@ -2125,6 +2450,19 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
       self.Run(
           self.clusters_command_base.format(self.ZONE) +
           ' update test-cluster --release-channel={0}'.format(channel_name))
+
+  @parameterized.parameters(
+      ('--enable-master-global-access ', True),
+      ('--no-enable-master-global-access ', False),
+  )
+  def testMasterGlobalAccess(self, flags, enabled):
+    master_global_access_config = self.msgs.PrivateClusterMasterGlobalAccessConfig(
+        enabled=enabled)
+    desired = self.msgs.PrivateClusterConfig(
+        masterGlobalAccessConfig=master_global_access_config)
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredPrivateClusterConfig=desired),
+        flags=flags)
 
 
 if __name__ == '__main__':

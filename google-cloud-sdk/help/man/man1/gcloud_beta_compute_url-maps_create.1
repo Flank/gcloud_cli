@@ -127,8 +127,34 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a global URL map with a default service, run:
+
+$ gcloud beta compute url\-maps create URL_MAP_NAME \e.RS 2m
+\-\-default\-service=BACKEND_SERVICE_NAME
+
+.RE
+
+To create a regional URL map with a default service, run:
+
+$ gcloud beta compute url\-maps create URL_MAP_NAME \e.RS 2m
+\-\-default\-service=BACKEND_SERVICE_NAME \-\-region=REGION_NAME
+
+.RE
+
+To create a global URL map with a default backend bucket, run:
+
+$ gcloud beta compute url\-maps create URL_MAP_NAME \e.RS 2m
+\-\-default\-backend\-bucket=BACKEND_BUCKET_NAME
+
+.RE
 
 
 

@@ -157,6 +157,14 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
             outcome=self.toolresults_msgs.Outcome(
                 summary=self.toolresults_msgs.Outcome.SummaryValueValuesEnum.
                 success)))
+    self.tr_client.projects_histories_executions_environments.List.Expect(
+        request=self.toolresults_msgs
+        .ToolresultsProjectsHistoriesExecutionsEnvironmentsListRequest(
+            projectId=PROJECT_ID,
+            historyId=history_id,
+            executionId=execution_id,
+            pageSize=100),
+        response=self.toolresults_msgs.ListEnvironmentsResponse())
     self.tr_client.projects_histories_executions_steps.List.Expect(
         request=self.toolresults_msgs.
         ToolresultsProjectsHistoriesExecutionsStepsListRequest(

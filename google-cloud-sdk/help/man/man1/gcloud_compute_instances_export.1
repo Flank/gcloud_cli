@@ -1,0 +1,106 @@
+
+.TH "GCLOUD_COMPUTE_INSTANCES_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute instances export \- export a Compute Engine virtual machine instance's configuration to a file
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute instances export\fR (\fIINSTANCE\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) [\fB\-\-destination\fR=\fIDESTINATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Export a Compute Engine virtual machine instance's configuration to a file.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Instance resource \- Name of the instance to export. For details on valid
+instance names, refer to the criteria documented under the field 'name' at:
+https://cloud.google.com/compute/docs/reference/rest/v1/instances The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [instance] on the
+command line with a fully specified name; set the property [core/project];
+provide the argument [\-\-project] on the command line. This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance or fully qualified identifier for the instance. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The name of the Google Compute Engine zone.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+Path to a YAML file where the configuration will be exported. The exported data
+will not contain any output\-only fields. Alternatively, you may omit this flag
+to write to standard output. A schema describing the export/import format can be
+found in $CLOUDSDKROOT/lib/googlecloudsdk/schemas/...
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcompute/v1\fR API. The full documentation for this API
+can be found at: https://developers.google.com/compute/docs/reference/latest/
+
+
+
+.SH "EXAMPLES"
+
+A virtual machine can be exported by running:
+
+.RS 2m
+$ gcloud compute instances export my\-instance \e
+    \-\-destination=<path\-to\-file>
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute instances export
+$ gcloud beta compute instances export
+.RE
+

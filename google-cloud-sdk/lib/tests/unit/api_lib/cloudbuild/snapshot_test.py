@@ -58,7 +58,10 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         archive_path = os.path.join(tmp, 'file.tgz')
         tf = snapshot.Snapshot(proj)._MakeTarball(archive_path)
         self.assertEqual(len(tf.getmembers()), 1)
-        self.assertEqual(tf.getmember('Dockerfile').size, 5)
+        tinfo = tf.getmember('Dockerfile')
+        self.assertEqual(tinfo.size, 5)
+        self.assertEqual(tinfo.uid, 0)
+        self.assertEqual(tinfo.gid, 0)
         tf.close()
 
   def testMakeTarball_EmptyDir(self):

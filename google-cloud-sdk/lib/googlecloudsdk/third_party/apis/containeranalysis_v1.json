@@ -17,6 +17,7 @@
   "documentationLink": "https://cloud.google.com/container-analysis/api/reference/rest/",
   "protocol": "rest",
   "rootUrl": "https://containeranalysis.googleapis.com/",
+  "mtlsRootUrl": "https://containeranalysis.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://containeranalysis.googleapis.com/",
   "batchPath": "batch",
@@ -257,7 +258,7 @@
           }
         },
         "effectiveSeverity": {
-          "description": "The distro assigned severity for this vulnerability when it is available,\nand note provider assigned severity when distro has not yet assigned a\nseverity for this vulnerability.",
+          "description": "The distro assigned severity for this vulnerability when it is available,\notherwise this is the note provider assigned severity.",
           "enumDescriptions": [
             "Unknown.",
             "Minimal severity.",
@@ -918,6 +919,11 @@
         "cpe": {
           "description": "The CPE of the resource being scanned.",
           "type": "string"
+        },
+        "lastScanTime": {
+          "description": "The last time this resource was scanned.",
+          "type": "string",
+          "format": "google-datetime"
         }
       }
     },
@@ -985,20 +991,24 @@
     },
     "UpgradeOccurrence": {
       "id": "UpgradeOccurrence",
-      "description": "A Upgrade Occurrence represents that a specific resource_url could install a\nspecific upgrade. This presence is supplied via local sources (i.e. it is\npresent in the mirror and the running system has noticed its availability).",
+      "description": "An Upgrade Occurrence represents that a specific resource_url could install a\nspecific upgrade. This presence is supplied via local sources (i.e. it is\npresent in the mirror and the running system has noticed its availability).\nFor Windows, both distribution and windows_update contain information for the\nWindows update.",
       "type": "object",
       "properties": {
         "package": {
-          "description": "Required - The package this Upgrade is for.",
+          "description": "Required for non-Windows OS. The package this Upgrade is for.",
           "type": "string"
         },
         "parsedVersion": {
-          "description": "Required - The version of the package in a machine + human readable form.",
+          "description": "Required for non-Windows OS. The version of the package in a machine +\nhuman readable form.",
           "$ref": "Version"
         },
         "distribution": {
-          "description": "Metadata about the upgrade for avaiable for the specific operating system\nfor the resource_url. This allows efficient filtering, as well as\nmaking it easier to use the occurrence.",
+          "description": "Metadata about the upgrade for available for the specific operating system\nfor the resource_url. This allows efficient filtering, as well as\nmaking it easier to use the occurrence.",
           "$ref": "UpgradeDistribution"
+        },
+        "windowsUpdate": {
+          "description": "Required for Windows OS. Represents the metadata about the Windows update.",
+          "$ref": "WindowsUpdate"
         }
       }
     },
@@ -1012,7 +1022,7 @@
           "type": "string"
         },
         "classification": {
-          "description": "The operating system classification of this Upgrade, as specified by the\nupstream operating system upgrade feed.",
+          "description": "The operating system classification of this Upgrade, as specified by the\nupstream operating system upgrade feed. For Windows the classification is\none of the category_ids listed at\nhttps:\/\/docs.microsoft.com\/en-us\/previous-versions\/windows\/desktop\/ff357803(v=vs.85)",
           "type": "string"
         },
         "severity": {
@@ -1025,6 +1035,79 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "WindowsUpdate": {
+      "id": "WindowsUpdate",
+      "description": "Windows Update represents the metadata about the update for the Windows\noperating system. The fields in this message come from the Windows Update API\ndocumented at\nhttps:\/\/docs.microsoft.com\/en-us\/windows\/win32\/api\/wuapi\/nn-wuapi-iupdate.",
+      "type": "object",
+      "properties": {
+        "identity": {
+          "description": "Required - The unique identifier for the update.",
+          "$ref": "Identity"
+        },
+        "title": {
+          "description": "The localized title of the update.",
+          "type": "string"
+        },
+        "description": {
+          "description": "The localized description of the update.",
+          "type": "string"
+        },
+        "categories": {
+          "description": "The list of categories to which the update belongs.",
+          "type": "array",
+          "items": {
+            "$ref": "Category"
+          }
+        },
+        "kbArticleIds": {
+          "description": "The Microsoft Knowledge Base article IDs that are associated with the\nupdate.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "supportUrl": {
+          "description": "The hyperlink to the support information for the update.",
+          "type": "string"
+        },
+        "lastPublishedTimestamp": {
+          "description": "The last published timestamp of the update.",
+          "type": "string",
+          "format": "google-datetime"
+        }
+      }
+    },
+    "Identity": {
+      "id": "Identity",
+      "description": "The unique identifier of the update.",
+      "type": "object",
+      "properties": {
+        "updateId": {
+          "description": "The revision independent identifier of the update.",
+          "type": "string"
+        },
+        "revision": {
+          "description": "The revision number of the update.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "Category": {
+      "id": "Category",
+      "description": "The category to which the update belongs.",
+      "type": "object",
+      "properties": {
+        "categoryId": {
+          "description": "The identifier of the category.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The localized name of the category.",
+          "type": "string"
         }
       }
     },
@@ -1059,7 +1142,7 @@
       "type": "object",
       "properties": {
         "occurrences": {
-          "description": "The occurrences to create. Max allowed length is 1000.",
+          "description": "Required. The occurrences to create. Max allowed length is 1000.",
           "type": "array",
           "items": {
             "$ref": "Occurrence"
@@ -1630,15 +1713,15 @@
     },
     "UpgradeNote": {
       "id": "UpgradeNote",
-      "description": "A Upgrade Note represents a potential upgrade of a package to a given\nversion. For each package version combination (i.e. bash 4.0, bash 4.1,\nbash 4.1.2), there will be a Upgrade Note.",
+      "description": "An Upgrade Note represents a potential upgrade of a package to a given\nversion. For each package version combination (i.e. bash 4.0, bash 4.1,\nbash 4.1.2), there will be an Upgrade Note. For Windows, windows_update field\nrepresents the information related to the update.",
       "type": "object",
       "properties": {
         "package": {
-          "description": "Required - The package this Upgrade is for.",
+          "description": "Required for non-Windows OS. The package this Upgrade is for.",
           "type": "string"
         },
         "version": {
-          "description": "Required - The version of the package in machine + human readable form.",
+          "description": "Required for non-Windows OS. The version of the package in machine + human\nreadable form.",
           "$ref": "Version"
         },
         "distributions": {
@@ -1647,6 +1730,10 @@
           "items": {
             "$ref": "UpgradeDistribution"
           }
+        },
+        "windowsUpdate": {
+          "description": "Required for Windows OS. Represents the metadata about the Windows update.",
+          "$ref": "WindowsUpdate"
         }
       }
     },
@@ -1674,7 +1761,7 @@
       "type": "object",
       "properties": {
         "notes": {
-          "description": "The notes to create. Max allowed length is 1000.",
+          "description": "Required. The notes to create. Max allowed length is 1000.",
           "type": "object",
           "additionalProperties": {
             "$ref": "Note"
@@ -1727,23 +1814,23 @@
     },
     "Policy": {
       "id": "Policy",
-      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions (defined by IAM or configured by users). A `binding` can\noptionally specify a `condition`, which is a logic expression that further\nconstrains the role binding based on attributes about the request and\/or\ntarget resource.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time <\n            timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles\/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles\/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
+      "description": "An Identity and Access Management (IAM) policy, which specifies access\ncontrols for Google Cloud resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions; each `role` can be an IAM predefined role or a user-created\ncustom role.\n\nOptionally, a `binding` can specify a `condition`, which is a logical\nexpression that allows access to a resource only if the expression evaluates\nto `true`. A condition can add constraints based on attributes of the\nrequest, the resource, or both.\n\n**JSON example:**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ],\n      \"etag\": \"BwWWja0YfJA=\",\n      \"version\": 3\n    }\n\n**YAML example:**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles\/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles\/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n    - etag: BwWWja0YfJA=\n    - version: 3\n\nFor a description of IAM and its features, see the\n[IAM documentation](https:\/\/cloud.google.com\/iam\/docs\/).",
       "type": "object",
       "properties": {
         "version": {
-          "description": "Specifies the format of the policy.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nOperations affecting conditional bindings must specify version 3. This can\nbe either setting a conditional policy, modifying a conditional binding,\nor removing a conditional binding from the stored conditional policy.\nOperations on non-conditional policies may specify any valid value or\nleave the field unset.\n\nIf no etag is provided in the call to `setIamPolicy`, any version\ncompliance checks on the incoming and\/or stored policy is skipped.",
+          "description": "Specifies the format of the policy.\n\nValid values are `0`, `1`, and `3`. Requests that specify an invalid value\nare rejected.\n\nAny operation that affects conditional role bindings must specify version\n`3`. This requirement applies to the following operations:\n\n* Getting a policy that includes a conditional role binding\n* Adding a conditional role binding to a policy\n* Changing a conditional role binding in a policy\n* Removing any role binding, with or without a condition, from a policy\n  that includes conditions\n\n**Important:** If you use IAM Conditions, you must include the `etag` field\nwhenever you call `setIamPolicy`. If you omit this field, then IAM allows\nyou to overwrite a version `3` policy with a version `1` policy, and all of\nthe conditions in the version `3` policy are lost.\n\nIf a policy does not include any conditions, operations on that policy may\nspecify any valid version or leave the field unset.",
           "type": "integer",
           "format": "int32"
         },
         "bindings": {
-          "description": "Associates a list of `members` to a `role`. Optionally may specify a\n`condition` that determines when binding is in effect.\n`bindings` with no members will result in an error.",
+          "description": "Associates a list of `members` to a `role`. Optionally, may specify a\n`condition` that determines how and when the `bindings` are applied. Each\nof the `bindings` must contain at least one member.",
           "type": "array",
           "items": {
             "$ref": "Binding"
           }
         },
         "etag": {
-          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten. Due to blind-set semantics of an etag-less policy,\n'setIamPolicy' will not fail even if either of incoming or stored policy\ndoes not meet the version requirements.",
+          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\n**Important:** If you use IAM Conditions, you must include the `etag` field\nwhenever you call `setIamPolicy`. If you omit this field, then IAM allows\nyou to overwrite a version `3` policy with a version `1` policy, and all of\nthe conditions in the version `3` policy are lost.",
           "type": "string",
           "format": "byte"
         }
@@ -1759,7 +1846,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n* `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a user that has been recently deleted. For\n   example,`alice@example.com?uid=123456789012345678901`. If the user is\n   recovered, this value reverts to `user:{emailid}` and the recovered user\n   retains the role in the binding.\n\n* `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus\n   unique identifier) representing a service account that has been recently\n   deleted. For example,\n   `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.\n   If the service account is undeleted, this value reverts to\n   `serviceAccount:{emailid}` and the undeleted service account retains the\n   role in the binding.\n\n* `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a Google group that has been recently\n   deleted. For example, `admins@example.com?uid=123456789012345678901`. If\n   the group is recovered, this value reverts to `group:{emailid}` and the\n   recovered group retains the role in the binding.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
+          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n* `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a user that has been recently deleted. For\n   example, `alice@example.com?uid=123456789012345678901`. If the user is\n   recovered, this value reverts to `user:{emailid}` and the recovered user\n   retains the role in the binding.\n\n* `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus\n   unique identifier) representing a service account that has been recently\n   deleted. For example,\n   `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.\n   If the service account is undeleted, this value reverts to\n   `serviceAccount:{emailid}` and the undeleted service account retains the\n   role in the binding.\n\n* `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a Google group that has been recently\n   deleted. For example, `admins@example.com?uid=123456789012345678901`. If\n   the group is recovered, this value reverts to `group:{emailid}` and the\n   recovered group retains the role in the binding.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
           "type": "array",
           "items": {
             "type": "string"
@@ -1773,23 +1860,23 @@
     },
     "Expr": {
       "id": "Expr",
-      "description": "Represents an expression text. Example:\n\n    title: \"User account presence\"\n    description: \"Determines whether the request has a user account\"\n    expression: \"size(request.user) > 0\"",
+      "description": "Represents a textual expression in the Common Expression Language (CEL)\nsyntax. CEL is a C-like expression language. The syntax and semantics of CEL\nare documented at https:\/\/github.com\/google\/cel-spec.\n\nExample (Comparison):\n\n    title: \"Summary size limit\"\n    description: \"Determines if a summary is less than 100 chars\"\n    expression: \"document.summary.size() < 100\"\n\nExample (Equality):\n\n    title: \"Requestor is owner\"\n    description: \"Determines if requestor is the document owner\"\n    expression: \"document.owner == request.auth.claims.email\"\n\nExample (Logic):\n\n    title: \"Public documents\"\n    description: \"Determine whether the document should be publicly visible\"\n    expression: \"document.type != 'private' && document.type != 'internal'\"\n\nExample (Data Manipulation):\n\n    title: \"Notification string\"\n    description: \"Create a notification string with a timestamp.\"\n    expression: \"'New message received at ' + string(document.create_time)\"\n\nThe exact variables and functions that may be referenced within an expression\nare determined by the service that evaluates it. See the service\ndocumentation for additional information.",
       "type": "object",
       "properties": {
         "expression": {
-          "description": "Textual representation of an expression in\nCommon Expression Language syntax.\n\nThe application context of the containing message determines which\nwell-known feature set of CEL is supported.",
+          "description": "Textual representation of an expression in Common Expression Language\nsyntax.",
           "type": "string"
         },
         "title": {
-          "description": "An optional title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
+          "description": "Optional. Title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
           "type": "string"
         },
         "description": {
-          "description": "An optional description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
+          "description": "Optional. Description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
           "type": "string"
         },
         "location": {
-          "description": "An optional string indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
+          "description": "Optional. String indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
           "type": "string"
         }
       }
@@ -1935,7 +2022,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "The name of the occurrence in the form of\n`projects\/[PROJECT_ID]\/occurrences\/[OCCURRENCE_ID]`.",
+                  "description": "Required. The name of the occurrence in the form of\n`projects\/[PROJECT_ID]\/occurrences\/[OCCURRENCE_ID]`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/occurrences\/[^\/]+$",
@@ -1960,7 +2047,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The name of the project to list occurrences for in the form of\n`projects\/[PROJECT_ID]`.",
+                  "description": "Required. The name of the project to list occurrences for in the form of\n`projects\/[PROJECT_ID]`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -2001,7 +2088,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "The name of the occurrence in the form of\n`projects\/[PROJECT_ID]\/occurrences\/[OCCURRENCE_ID]`.",
+                  "description": "Required. The name of the occurrence in the form of\n`projects\/[PROJECT_ID]\/occurrences\/[OCCURRENCE_ID]`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/occurrences\/[^\/]+$",
@@ -2026,7 +2113,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The name of the project in the form of `projects\/[PROJECT_ID]`, under which\nthe occurrence is to be created.",
+                  "description": "Required. The name of the project in the form of `projects\/[PROJECT_ID]`, under which\nthe occurrence is to be created.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -2054,7 +2141,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The name of the project in the form of `projects\/[PROJECT_ID]`, under which\nthe occurrences are to be created.",
+                  "description": "Required. The name of the project in the form of `projects\/[PROJECT_ID]`, under which\nthe occurrences are to be created.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -2082,7 +2169,7 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "The name of the occurrence in the form of\n`projects\/[PROJECT_ID]\/occurrences\/[OCCURRENCE_ID]`.",
+                  "description": "Required. The name of the occurrence in the form of\n`projects\/[PROJECT_ID]\/occurrences\/[OCCURRENCE_ID]`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/occurrences\/[^\/]+$",
@@ -2116,7 +2203,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "The name of the occurrence in the form of\n`projects\/[PROJECT_ID]\/occurrences\/[OCCURRENCE_ID]`.",
+                  "description": "Required. The name of the occurrence in the form of\n`projects\/[PROJECT_ID]\/occurrences\/[OCCURRENCE_ID]`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/occurrences\/[^\/]+$",
@@ -2229,7 +2316,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "The name of the note in the form of\n`projects\/[PROVIDER_ID]\/notes\/[NOTE_ID]`.",
+                  "description": "Required. The name of the note in the form of\n`projects\/[PROVIDER_ID]\/notes\/[NOTE_ID]`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/notes\/[^\/]+$",
@@ -2254,7 +2341,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The name of the project to list notes for in the form of\n`projects\/[PROJECT_ID]`.",
+                  "description": "Required. The name of the project to list notes for in the form of\n`projects\/[PROJECT_ID]`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -2295,7 +2382,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "The name of the note in the form of\n`projects\/[PROVIDER_ID]\/notes\/[NOTE_ID]`.",
+                  "description": "Required. The name of the note in the form of\n`projects\/[PROVIDER_ID]\/notes\/[NOTE_ID]`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/notes\/[^\/]+$",
@@ -2320,14 +2407,14 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The name of the project in the form of `projects\/[PROJECT_ID]`, under which\nthe note is to be created.",
+                  "description": "Required. The name of the project in the form of `projects\/[PROJECT_ID]`, under which\nthe note is to be created.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
                   "type": "string"
                 },
                 "noteId": {
-                  "description": "The ID to use for this note.",
+                  "description": "Required. The ID to use for this note.",
                   "location": "query",
                   "type": "string"
                 }
@@ -2353,7 +2440,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The name of the project in the form of `projects\/[PROJECT_ID]`, under which\nthe notes are to be created.",
+                  "description": "Required. The name of the project in the form of `projects\/[PROJECT_ID]`, under which\nthe notes are to be created.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -2381,7 +2468,7 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "The name of the note in the form of\n`projects\/[PROVIDER_ID]\/notes\/[NOTE_ID]`.",
+                  "description": "Required. The name of the note in the form of\n`projects\/[PROVIDER_ID]\/notes\/[NOTE_ID]`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/notes\/[^\/]+$",
@@ -2504,7 +2591,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "The name of the note to list occurrences for in the form of\n`projects\/[PROVIDER_ID]\/notes\/[NOTE_ID]`.",
+                      "description": "Required. The name of the note to list occurrences for in the form of\n`projects\/[PROVIDER_ID]\/notes\/[NOTE_ID]`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/notes\/[^\/]+$",
@@ -2597,7 +2684,7 @@
               "description": "The name of the operation resource.",
               "location": "path",
               "required": true,
-              "pattern": "^operations\/.+$",
+              "pattern": "^operations\/.*$",
               "type": "string"
             }
           },
@@ -2622,7 +2709,7 @@
               "description": "The name of the operation resource to be deleted.",
               "location": "path",
               "required": true,
-              "pattern": "^operations\/.+$",
+              "pattern": "^operations\/.*$",
               "type": "string"
             }
           },
@@ -2647,7 +2734,7 @@
               "description": "The name of the operation resource to be cancelled.",
               "location": "path",
               "required": true,
-              "pattern": "^operations\/.+$",
+              "pattern": "^operations\/.*$",
               "type": "string"
             }
           },

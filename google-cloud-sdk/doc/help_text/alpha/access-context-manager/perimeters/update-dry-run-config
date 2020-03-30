@@ -10,7 +10,7 @@ SYNOPSIS
           | --clear-resources | --remove-resources=[RESOURCES,...]
           --add-restricted-services=[SERVICE,...] | --clear-restricted-services
           | --remove-restricted-services=[SERVICE,...]
-          --enable-vpc-service-restriction
+          --enable-vpc-accessible-services
           --add-vpc-allowed-services=[VPC_SERVICE,...]
           | --clear-vpc-allowed-services
           | --remove-vpc-allowed-services=[VPC_SERVICE,...]]
@@ -26,7 +26,7 @@ DESCRIPTION
     specified, in which case all dry run config values will be removed.
 
     For more information, see:
-    https://cloud.google.com/access-context-manager/docs/reference/rest/v1beta/accessPolicies.servicePerimeters
+    https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
 
 POSITIONAL ARGUMENTS
      Perimeter resource - The service perimeter to update. The arguments in
@@ -88,14 +88,14 @@ FLAGS
          --remove-restricted-services=[SERVICE,...]
             Remove the given values from the current restricted services.
 
-       --enable-vpc-service-restriction
+       --enable-vpc-accessible-services
           When specified restrict API calls within the Service Perimeter to the
           set of vpc allowed services. To disable use
-          '--no-enable-vpc-service-restriction'.
+          '--no-enable-vpc-accessible-services'.
 
        These flags modify the member vpc allowed services of this perimeter.
-       Services allowed to be called within the Perimeter when VPC Service
-       Restriction is enabled At most one of these may be specified:
+       Services allowed to be called within the Perimeter when VPC Accessible
+       Services is enabled At most one of these may be specified:
 
          --add-vpc-allowed-services=[VPC_SERVICE,...]
             Append the given values to the current vpc allowed services.
@@ -110,8 +110,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

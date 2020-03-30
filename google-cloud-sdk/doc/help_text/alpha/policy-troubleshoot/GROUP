@@ -1,24 +1,22 @@
 NAME
     gcloud alpha policy-troubleshoot - troubleshoot Google Cloud Platform
-        Policies
+        policies
 
 SYNOPSIS
     gcloud alpha policy-troubleshoot COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Policy Troubleshooter troubleshoots cloud policies running on
-    Google Cloud Platform. Policy Troubleshooter works by evaluating the
-    current access a user has on a cloud resource.
-
-    More information on Policy Troubleshooter can be found here:
-    https://cloud.google.com/iam
+    (ALPHA) Policy Troubleshooter troubleshoots policies for Google Cloud
+    Platform resources. Policy Troubleshooter works by evaluating the user's
+    current access to a resource.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -30,7 +28,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud policy-troubleshoot
         $ gcloud beta policy-troubleshoot
 

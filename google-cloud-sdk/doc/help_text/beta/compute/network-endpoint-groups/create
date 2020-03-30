@@ -4,8 +4,13 @@ NAME
 
 SYNOPSIS
     gcloud beta compute network-endpoint-groups create NAME
-        [--default-port=DEFAULT_PORT] [--network=NETWORK] [--subnet=SUBNET]
-        [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--default-port=DEFAULT_PORT] [--network=NETWORK]
+        [--network-endpoint-type=NETWORK_ENDPOINT_TYPE;
+          default="gce-vm-ip-port"] [--subnet=SUBNET] [--global | --zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Create a Google Compute Engine network endpoint group.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -16,12 +21,46 @@ FLAGS
         The default port to use if the port number is not specified in the
         network endpoint.
 
-        If this flag isn't specified, then every network endpoint in the
-        network endpoint group must have a port specified.
+        If this flag isn't specified for a NEG with endpoint type
+        GCE_VM_IP_PORT, then every network endpoint in the network endpoint
+        group must have a port specified. For a NEG with endpoint type
+        INTERNET_IP_PORT and INTERNET_FQDN_PORT. If the default port is not
+        specified the well known port for your backend protocol will be used
+        (80 for http, 443 for https).
 
      --network=NETWORK
         Name of the network in which the NEG is created. default project
         network is used if unspecified.
+
+        This is only supported for NEGs with endpoint type GCE_VM_IP_PORT.
+
+     --network-endpoint-type=NETWORK_ENDPOINT_TYPE; default="gce-vm-ip-port"
+        Determines the spec of endpoints attached to this group.
+
+        * GCE_VM_IP_PORT
+
+              Endpoint IP address must belong to a VM in Google Compute Engine
+              (either the primary IP or as part of an aliased IP range).
+              The `--default-port` must be specified or every network endpoint
+              in the network endpoint group must have a port specified.
+
+        * INTERNET_IP_PORT
+
+              Endpoint IP address must be publicly routable address. The default
+              port will be used if specified. If the default port is not
+              specified, the well known port for your backend protocol will be
+              used as the default port (80 for http,  443 for https).
+
+        * INTERNET_FQDN_PORT
+
+              Endpoint FQDN must be resolvable to a public IP address via public
+              DNS. The default port will be used if specified. If the default
+              port is not specified, the well known port for your backend
+              protocol will be used as the default port (80 for http, 443 for
+              https).
+
+    NETWORK_ENDPOINT_TYPE must be one of: gce-vm-ip-port, internet-ip-port,
+    internet-fqdn-port.
 
      --subnet=SUBNET
         Name of the subnet to which all network endpoints belong.
@@ -29,40 +68,47 @@ FLAGS
         If not specified, network endpoints may belong to any subnetwork in the
         region where the network endpoint group is created.
 
-     --zone=ZONE
-        Zone of the network endpoint group to operate on. If not specified and
-        the compute/zone property isn't set, you may be prompted to select a
-        zone.
+        This is only supported for NEGs with endpoint type GCE_VM_IP_PORT.
 
-        To avoid prompting when this flag is omitted, you can set the
-        compute/zone property:
+     At most one of these may be specified:
 
-            $ gcloud config set compute/zone ZONE
+       --global
+          If set, the network endpoint group is global.
 
-        A list of zones can be fetched by running:
+       --zone=ZONE
+          Zone of the network endpoint group to operate on. If not specified
+          and the compute/zone property isn't set, you may be prompted to
+          select a zone.
 
-            $ gcloud compute zones list
+          To avoid prompting when this flag is omitted, you can set the
+          compute/zone property:
 
-        To unset the property, run:
+              $ gcloud config set compute/zone ZONE
 
-            $ gcloud config unset compute/zone
+          A list of zones can be fetched by running:
 
-        Alternatively, the zone can be stored in the environment variable
-        CLOUDSDK_COMPUTE_ZONE.
+              $ gcloud compute zones list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/zone
+
+          Alternatively, the zone can be stored in the environment variable
+          CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To create a network endpoint group:
 
         $ gcloud beta compute network-endpoint-groups create my-neg \
-            --zone=us-central1-a --network=my-network \
-        --subnet=my-subnetwork
+            --zone=us-central1-a --network=my-network --subnet=my-subnetwork
 
 NOTES
     This command is currently in BETA and may change without notice. These

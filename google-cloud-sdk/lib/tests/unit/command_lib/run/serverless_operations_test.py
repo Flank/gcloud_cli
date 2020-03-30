@@ -673,6 +673,18 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         self._ServiceRef('foo'),
         [fake_deployable])
 
+  def testReleaseServiceFreshPrefetch(self):
+    """Test the release flow for a new service."""
+    fake_deployable = config_changes.ImageChange('gcr.io/fakething')
+    self._ExpectCreate(
+        image='gcr.io/fakething',
+        annotations={
+            revision.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
+    ref = self._ServiceRef('foo')
+    self.serverless_client.ReleaseService(
+        ref,
+        [fake_deployable], prefetch=self.serverless_client.GetService(ref))
+
   def testReleaseServiceAllowUnauthenticatedNew(self):
     """Test the release flow for a new service with unauthenticated access."""
     fake_deployable = config_changes.ImageChange('gcr.io/fakething')
@@ -841,6 +853,31 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         self._ServiceRef('foo'),
         [env_changes])
 
+  def testUpdateEnvVarsPrefetch(self):
+    """Test updating existing and create new env vars on an existing service."""
+    self._ExpectExisting(
+        image='gcr.io/oldthing',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        **{'template.env_vars.literals': {'key1': 'value1'}})
+    self._ExpectBaseRevision(
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+
+    self._ExpectUpdate(
+        image='gcr.io/newthing@sha256:abcdef',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        **{'template.env_vars.literals': collections.OrderedDict(
+            [('key1', 'value1.2'), ('key2', 'value2')])})
+
+    env_changes = config_changes.EnvVarLiteralChanges(
+        env_vars_to_update=collections.OrderedDict([('key1', 'value1.2'),
+                                                    ('key2', 'value2')]))
+    ref = self._ServiceRef('foo')
+    self.serverless_client.ReleaseService(
+        ref,
+        [env_changes], prefetch=self.serverless_client.GetService(ref))
+
   def testRemoveEnvVars(self):
     """Test removing env vars from an existing service.
 
@@ -995,11 +1032,13 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         self.mock_serverless_client, self.namespace.namespacesId)
     new_domain_mapping.name = 'foo'
     new_domain_mapping.route_name = 'myapp'
+    new_domain_mapping.force_override = False
 
     gotten_domain_mapping = domain_mapping.DomainMapping.New(
         self.mock_serverless_client, self.namespace.namespacesId)
     gotten_domain_mapping.name = 'foo'
     gotten_domain_mapping.route_name = 'myapp'
+    gotten_domain_mapping.force_override = False
     gotten_domain_mapping.status.resourceRecords.append(
         self.serverless_messages.ResourceRecord(
             rrdata='216.239.32.21',
@@ -1659,7 +1698,7 @@ class ServerlessOperationsTestV1(ServerlessOperationsTest):
         **kwargs)
 
   def _DeleteResponse(self):
-    return self.serverless_messages.K8sIoApimachineryPkgApisMetaV1Status()
+    return self.serverless_messages.Status()
 
   def testUpdateNoNonce(self):
     pass

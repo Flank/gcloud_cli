@@ -21,17 +21,16 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute.os_config import utils as osconfig_api_utils
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.os_config import resource_args
-from googlecloudsdk.command_lib.compute.os_config import utils as osconfig_command_utils
-from googlecloudsdk.core import properties
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA,
+                    base.ReleaseTrack.GA)
 class Describe(base.DescribeCommand):
-  """Describe the given OS patch job.
+  """Describe a specified OS patch job.
 
   ## EXAMPLES
 
-  To check the status of the patch job 'job1', run:
+  To check the status of the patch job `job1`, run:
 
         $ {command} job1
 
@@ -42,7 +41,6 @@ class Describe(base.DescribeCommand):
     resource_args.AddPatchJobResourceArg(parser, 'to describe.')
 
   def Run(self, args):
-    project = properties.VALUES.core.project.GetOrFail()
     patch_job_ref = args.CONCEPTS.patch_job.Parse()
 
     release_track = self.ReleaseTrack()
@@ -50,6 +48,5 @@ class Describe(base.DescribeCommand):
     messages = osconfig_api_utils.GetClientMessages(release_track)
 
     request = messages.OsconfigProjectsPatchJobsGetRequest(
-        name=osconfig_command_utils.GetPatchJobUriPath(project,
-                                                       patch_job_ref.Name()))
+        name=patch_job_ref.RelativeName())
     return client.projects_patchJobs.Get(request)

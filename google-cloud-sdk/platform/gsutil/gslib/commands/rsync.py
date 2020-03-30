@@ -116,17 +116,12 @@ _DETAILED_HELP_TEXT = ("""
   contents under src_url, by copying any missing files/objects (or those whose
   data has changed), and (if the -d option is specified) deleting any extra
   files/objects. src_url must specify a directory, bucket, or bucket
-  subdirectory. For example, to make gs://mybucket/data match the contents of
-  the local directory "data" you could do:
+  subdirectory. For example, to sync the contents of the local directory "data"
+  to the bucket gs://mybucket/data, you could do:
 
-    gsutil rsync -d data gs://mybucket/data
+    gsutil rsync data gs://mybucket/data
 
   To recurse into directories use the -r option:
-
-    gsutil rsync -d -r data gs://mybucket/data
-
-  To copy only new/changed files without deleting extra files from
-  gs://mybucket/data leave off the -d option:
 
     gsutil rsync -r data gs://mybucket/data
 
@@ -134,29 +129,12 @@ _DETAILED_HELP_TEXT = ("""
   gsutil -m option, to perform parallel (multi-threaded/multi-processing)
   synchronization:
 
-    gsutil -m rsync -d -r data gs://mybucket/data
+    gsutil -m rsync -r data gs://mybucket/data
 
   The -m option typically will provide a large performance boost if either the
   source or destination (or both) is a cloud URL. If both source and
   destination are file URLs the -m option will typically thrash the disk and
   slow synchronization down.
-
-  To make the local directory "data" the same as the contents of
-  gs://mybucket/data:
-
-    gsutil rsync -d -r gs://mybucket/data data
-
-  To make the contents of gs://mybucket2 the same as gs://mybucket1:
-
-    gsutil rsync -d -r gs://mybucket1 gs://mybucket2
-
-  You can also mirror data across local directories:
-
-    gsutil rsync -d -r dir1 dir2
-
-  To mirror your content across clouds:
-
-    gsutil rsync -d -r gs://my-gs-bucket s3://my-s3-bucket
 
   Note 1: Shells (like bash, zsh) sometimes attempt to expand wildcards in ways
   that can be surprising. Also, attempting to copy files whose names contain
@@ -173,14 +151,38 @@ _DETAILED_HELP_TEXT = ("""
   workstation.
 
 
-<B>BE CAREFUL WHEN USING -d OPTION!</B>
+<B>Using ``-d`` Option (with caution!) to mirror source and destination.</B>
   The rsync -d option is very useful and commonly used, because it provides a
   means of making the contents of a destination bucket or directory match those
-  of a source bucket or directory. However, please exercise caution when you
+  of a source bucket or directory. This is done by copying all data from the
+  source to the destination and deleting all other data in the destination that
+  is not in the source. Please exercise caution when you
   use this option: It's possible to delete large amounts of data accidentally
-  if, for example, you erroneously reverse source and destination. For example,
-  if you meant to synchronize a local directory from a bucket in the cloud but
-  instead run the command:
+  if, for example, you erroneously reverse source and destination.
+
+  To make the local directory my-data the same as the contents of
+  gs://mybucket/data and delete objects in the local directory that are not in
+  gs://mybucket/data:
+
+    gsutil rsync -d -r gs://mybucket/data my-data
+
+  To make the contents of gs://mybucket2 the same as gs://mybucket1 and delete
+  objects in gs://mybucket2 that are not in gs://mybucket1:
+
+    gsutil rsync -d -r gs://mybucket1 gs://mybucket2
+
+  You can also mirror data across local directories. This example will copy all
+  objects from dir1 into dir2 and delete all objects in dir2 which are not in dir1:
+
+    gsutil rsync -d -r dir1 dir2
+
+  To mirror your content across clouds:
+
+    gsutil rsync -d -r gs://my-gs-bucket s3://my-s3-bucket
+
+  As mentioned above, using -d can be dangerous because of how quickly data can
+  be deleted. For example, if you meant to synchronize a local directory from
+  a bucket in the cloud but instead run the command:
 
     gsutil -m rsync -r -d ./your-dir gs://your-bucket
 
@@ -352,11 +354,11 @@ _DETAILED_HELP_TEXT = ("""
      times to be used in its comparisons. This means gsutil rsync will resort to
      using checksums for any file with a timestamp before 1970-01-01 UTC.
 
-  2. The gsutil rsync command considers only the current object generations in
+  2. The gsutil rsync command considers only the live object version in
      the source and destination buckets when deciding what to copy / delete. If
      versioning is enabled in the destination bucket then gsutil rsync's
      overwriting or deleting objects will end up creating versions, but the
-     command doesn't try to make the archived generations match in the source
+     command doesn't try to make any noncurrent versions match in the source
      and destination buckets.
 
   3. The gsutil rsync command does not support copying special file types
@@ -390,17 +392,19 @@ _DETAILED_HELP_TEXT = ("""
   -C             If an error occurs, continue to attempt to copy the remaining
                  files. If errors occurred, gsutil's exit status will be
                  non-zero even if this flag is set. This option is implicitly
-                 set when running "gsutil -m rsync...".  Note: -C only applies
-                 to the actual copying operation. If an error occurs while
-                 iterating over the files in the local directory (e.g., invalid
-                 Unicode file name) gsutil will print an error message and
-                 abort.
+                 set when running "gsutil -m rsync...".
+                 
+                 NOTE: -C only applies to the actual copying operation. If an
+                 error occurs while iterating over the files in the local
+                 directory (e.g., invalid Unicode file name) gsutil will print
+                 an error message and abort.
 
   -d             Delete extra files under dst_url not found under src_url. By
-                 default extra files are not deleted. Note: this option can
-                 delete data quickly if you specify the wrong source/destination
-                 combination. See the help section above,
-                 "BE CAREFUL WHEN USING -d OPTION!".
+                 default extra files are not deleted.
+                 
+                 NOTE: this option can delete data quickly if you specify the
+                 wrong source/destination combination. See the help section
+                 above, "BE CAREFUL WHEN USING -d OPTION!".
 
   -e             Exclude symlinks. When specified, symbolic links will be
                  ignored. Note that gsutil does not follow directory symlinks,
@@ -434,7 +438,7 @@ _DETAILED_HELP_TEXT = ("""
                  works like the -j option described above, but it applies to
                  all uploaded files, regardless of extension.
 
-                 Warning: If you use this option and some of the source files
+                 CAUTION: If you use this option and some of the source files
                  don't compress well (e.g., that's often true of binary data),
                  this option may result in longer uploads.
 
@@ -485,7 +489,7 @@ _DETAILED_HELP_TEXT = ("""
   -u             When a file/object is present in both the source and
                  destination, if mtime is available for both, do not perform
                  the copy if the destination mtime is newer.
-                 
+
   -U             Skip objects with unsupported object types instead of failing.
                  Unsupported object types are Amazon S3 Objects in the GLACIER
                  storage class.
@@ -506,6 +510,8 @@ _DETAILED_HELP_TEXT = ("""
                  for example:
 
                    gsutil rsync -x ".*\.txt$|.*\.jpg$" dir gs://my-bucket
+
+                 will skip all .txt and .jpg files in dir.
 
                  NOTE: When using this on the Windows command line, use ^ as an
                  escape character instead of \ and escape the | character.

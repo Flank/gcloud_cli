@@ -32,18 +32,23 @@ def BackupConfiguration(sql_messages,
                         instance=None,
                         backup=None,
                         no_backup=None,
+                        backup_location=None,
                         backup_start_time=None,
-                        enable_bin_log=None):
+                        enable_bin_log=None,
+                        enable_point_in_time_recovery=None):
   """Generates the backup configuration for the instance.
 
   Args:
     sql_messages: module, The messages module that should be used.
     instance: sql_messages.DatabaseInstance, the original instance, if the
-        previous state is needed.
+      previous state is needed.
     backup: boolean, True if backup should be enabled.
     no_backup: boolean, True if backup should be disabled.
+    backup_location: string, location where to store backups by default.
     backup_start_time: string, start time of backup specified in 24-hour format.
     enable_bin_log: boolean, True if binary logging should be enabled.
+    enable_point_in_time_recovery: boolean, True if point-in-time recovery
+      (using write-ahead log archiving) should be enabled.
 
   Returns:
     sql_messages.BackupConfiguration object, or None
@@ -52,34 +57,42 @@ def BackupConfiguration(sql_messages,
     ToolException: Bad combination of arguments.
   """
   backup_enabled = no_backup is False or backup
-  should_generate_config = any(
-      [backup_start_time, enable_bin_log is not None, not backup_enabled])
+  should_generate_config = any([
+      backup_location is not None,
+      backup_start_time,
+      enable_bin_log is not None,
+      enable_point_in_time_recovery is not None,
+      not backup_enabled,
+  ])
 
-  # TODO(b/63139210): Remove v1beta3-related logic -- isinstance(..., list).
   if not should_generate_config:
     return None
   elif not instance or not instance.settings.backupConfiguration:
     backup_config = sql_messages.BackupConfiguration(
-        startTime='00:00', enabled=backup_enabled)
-  elif isinstance(instance.settings.backupConfiguration, list):
-    # Only one backup configuration was ever allowed.
-    # Field switched from list to single object in v1beta4.
-    backup_config = instance.settings.backupConfiguration[0]
+        kind='sql#backupConfiguration',
+        startTime='00:00',
+        enabled=backup_enabled)
   else:
     backup_config = instance.settings.backupConfiguration
 
+  if backup_location is not None:
+    backup_config.location = backup_location
+    backup_config.enabled = True
   if backup_start_time:
     backup_config.startTime = backup_start_time
     backup_config.enabled = True
   if no_backup:
-    if backup_start_time or enable_bin_log is not None:
+    if backup_location is not None or backup_start_time or enable_bin_log is not None:
       raise exceptions.ToolException(
           ('Argument --no-backup not allowed with'
-           ' --backup-start-time or --enable-bin-log'))
+           ' --backup_location, --backup-start-time, or --enable-bin-log'))
     backup_config.enabled = False
 
   if enable_bin_log is not None:
     backup_config.binaryLogEnabled = enable_bin_log
+
+  if enable_point_in_time_recovery is not None:
+    backup_config.pointInTimeRecoveryEnabled = enable_point_in_time_recovery
 
   return backup_config
 
@@ -93,7 +106,7 @@ def DatabaseFlags(sql_messages,
   Args:
     sql_messages: module, The messages module that should be used.
     settings: sql_messages.Settings, the original settings, if the previous
-        state is needed.
+      state is needed.
     database_flags: dict of flags.
     clear_database_flags: boolean, True if flags should be cleared.
 
@@ -121,8 +134,8 @@ def MaintenanceWindow(sql_messages,
 
   Args:
     sql_messages: module, The messages module that should be used.
-    instance: sql_messages.DatabaseInstance, The original instance, if
-        it might be needed to generate the maintenance window.
+    instance: sql_messages.DatabaseInstance, The original instance, if it might
+      be needed to generate the maintenance window.
     maintenance_release_channel: string, which channel's updates to apply.
     maintenance_window_day: string, maintenance window day of week.
     maintenance_window_hour: int, maintenance window hour of day.
@@ -139,7 +152,8 @@ def MaintenanceWindow(sql_messages,
   if not any([channel, day, hour]):
     return None
 
-  maintenance_window = sql_messages.MaintenanceWindow()
+  maintenance_window = sql_messages.MaintenanceWindow(
+      kind='sql#maintenanceWindow')
 
   # If there's no existing maintenance window,
   # both or neither of day and hour must be set.
@@ -153,7 +167,12 @@ def MaintenanceWindow(sql_messages,
 
   if channel:
     # Map UI name to API name.
-    names = {'production': 'stable', 'preview': 'canary'}
+    names = {
+        'production':
+            sql_messages.MaintenanceWindow.UpdateTrackValueValuesEnum.stable,
+        'preview':
+            sql_messages.MaintenanceWindow.UpdateTrackValueValuesEnum.canary
+    }
     maintenance_window.updateTrack = names[channel]
   if day:
     # Map day name to number.
@@ -171,8 +190,8 @@ def _CustomMachineTypeString(cpu, memory_mib):
 
   Args:
     cpu: the number of cpu desired for the custom machine type
-    memory_mib: the amount of ram desired in MiB for the custom machine
-        type instance
+    memory_mib: the amount of ram desired in MiB for the custom machine type
+      instance
 
   Returns:
     The custom machine type name for the 'instance create' call
@@ -182,11 +201,13 @@ def _CustomMachineTypeString(cpu, memory_mib):
 
 
 def MachineType(instance=None, tier=None, memory=None, cpu=None):
-  """Generates the machine type for the instance.  Adapted from compute.
+  """Generates the machine type for the instance.
+
+  Adapted from compute.
 
   Args:
-    instance: sql_messages.DatabaseInstance, The original instance, if
-        it might be needed to generate the machine type.
+    instance: sql_messages.DatabaseInstance, The original instance, if it might
+      be needed to generate the machine type.
     tier: string, the v1 or v2 tier.
     memory: string, the amount of memory.
     cpu: int, the number of CPUs.
@@ -247,6 +268,7 @@ def OnPremisesConfiguration(sql_messages, source_ip_address, source_port):
     sql_messages.OnPremisesConfiguration object.
   """
   return sql_messages.OnPremisesConfiguration(
+      kind='sql#onPremisesConfiguration',
       hostPort='{0}:{1}'.format(source_ip_address, source_port))
 
 
@@ -283,7 +305,7 @@ def ReplicaConfiguration(sql_messages,
     master_username: The username for connecting to the external instance.
     master_password: The password for connecting to the external instance.
     master_dump_file_path: ObjectReference, a wrapper for the URI of the Cloud
-        Storage path containing the dumpfile to seed the replica with.
+      Storage path containing the dumpfile to seed the replica with.
     master_ca_certificate_path: The path to the CA certificate PEM file.
     client_certificate_path: The path to the client certificate PEM file.
     client_key_path: The path to the client private key PEM file.
@@ -292,6 +314,7 @@ def ReplicaConfiguration(sql_messages,
     sql_messages.MySqlReplicaConfiguration object.
   """
   mysql_replica_configuration = sql_messages.MySqlReplicaConfiguration(
+      kind='sql#mysqlReplicaConfiguration',
       username=master_username,
       password=master_password,
       dumpFilePath=master_dump_file_path.ToUrl())
@@ -305,6 +328,7 @@ def ReplicaConfiguration(sql_messages,
     mysql_replica_configuration.clientKey = files.ReadFileContents(
         client_key_path)
   return sql_messages.ReplicaConfiguration(
+      kind='sql#demoteMasterMysqlReplicaConfiguration',
       mysqlReplicaConfiguration=mysql_replica_configuration)
 
 

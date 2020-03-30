@@ -48,7 +48,7 @@ class VpnGatewaysCreateGaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
         operation_ref, resource_ref=vpn_gateway_ref)
 
     self.ExpectInsertRequest(vpn_gateway_ref, vpn_gateway_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_gateway_ref, created_vpn_gateway)
 
     response = self.Run('compute vpn-gateways create {} '
@@ -75,7 +75,7 @@ class VpnGatewaysCreateGaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
         operation_ref, resource_ref=vpn_gateway_ref)
 
     self.ExpectInsertRequest(vpn_gateway_ref, vpn_gateway_to_insert, operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(vpn_gateway_ref, created_vpn_gateway)
 
     response = self.Run('compute vpn-gateways create {} '

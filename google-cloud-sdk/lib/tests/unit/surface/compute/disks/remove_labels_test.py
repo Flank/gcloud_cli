@@ -47,7 +47,7 @@ class RemoveLabelsTestGA(disks_labels_test_base.DisksLabelsTestBase):
     self._ExpectGetRequest(disk_ref, disk)
     self._ExpectLabelsSetRequest(
         disk_ref, edited_labels, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(disk_ref, updated_disk)
 
     response = self.Run(
@@ -69,7 +69,7 @@ class RemoveLabelsTestGA(disks_labels_test_base.DisksLabelsTestBase):
     self._ExpectGetRequest(disk_ref, disk)
     self._ExpectLabelsSetRequest(
         disk_ref, {}, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(disk_ref, updated_disk)
 
     response = self.Run(
@@ -153,7 +153,7 @@ class RemoveLabelsTestGA(disks_labels_test_base.DisksLabelsTestBase):
     self._ExpectGetRequest(disk_ref, disk)
     self._ExpectLabelsSetRequest(
         disk_ref, edited_labels, b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
+    self._ExpectOperationPollingRequest(operation_ref, operation)
     self._ExpectGetRequest(disk_ref, updated_disk)
 
     response = self.Run(

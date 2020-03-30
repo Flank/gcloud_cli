@@ -20,6 +20,19 @@ gcloud alpha game servers deployments update \- update a Deployment
 \fB(ALPHA)\fR Update a Cloud Game Server Deployment.
 
 
+.SH "EXAMPLES"
+
+To update labels for Game Server Deployment 'my\-deployment' in project
+\'my\-project' and location in 'global'(deployments only support the 'global'
+location) run:
+
+.RS 2m
+$ gcloud alpha game servers deployments update my\-deployment \e
+    \-\-project=my\-project \-\-location=global \e
+    \-\-update\-labels="key1=val1"
+.RE
+
+
 
 .SH "POSITIONAL ARGUMENTS"
 
@@ -92,6 +105,8 @@ $ gcloud alpha game servers deployments update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 
 .RE
@@ -103,8 +118,9 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -120,5 +136,9 @@ this API can be found at: https://cloud.google.com/solutions/gaming/
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta game servers deployments update
+.RE
 

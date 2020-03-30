@@ -23,11 +23,10 @@ import collections
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.events import eventflow_operations
 from googlecloudsdk.command_lib.events import exceptions
-from googlecloudsdk.command_lib.events import resource_args as events_resource_args
+from googlecloudsdk.command_lib.events import resource_args
 from googlecloudsdk.command_lib.events import util
 from googlecloudsdk.command_lib.run import connection_context
-from googlecloudsdk.command_lib.run import flags
-from googlecloudsdk.command_lib.run import resource_args
+from googlecloudsdk.command_lib.run import flags as serverless_flags
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import log
@@ -54,21 +53,9 @@ class Describe(base.Command):
   @staticmethod
   def CommonArgs(parser):
     """Defines arguments common to all release tracks."""
-    # Flags specific to managed CR
-    managed_group = flags.GetManagedArgGroup(parser)
-    flags.AddRegionArg(managed_group)
-    # Flags specific to CRoGKE
-    gke_group = flags.GetGkeArgGroup(parser)
-    concept_parsers.ConceptParser([resource_args.CLUSTER_PRESENTATION
-                                  ]).AddToParser(gke_group)
-    # Flags specific to connecting to a Kubernetes cluster (kubeconfig)
-    kubernetes_group = flags.GetKubernetesArgGroup(parser)
-    flags.AddKubeconfigFlags(kubernetes_group)
-    # Flags not specific to any platform
-    flags.AddPlatformArg(parser)
     trigger_presentation = presentation_specs.ResourcePresentationSpec(
         'trigger',
-        events_resource_args.GetTriggerResourceSpec(),
+        resource_args.GetTriggerResourceSpec(),
         'Name of the trigger to delete',
         required=True)
     concept_parsers.ConceptParser([trigger_presentation]).AddToParser(parser)
@@ -82,10 +69,8 @@ class Describe(base.Command):
 
   def Run(self, args):
     """Executes when the user runs the describe command."""
-    conn_context = connection_context.GetConnectionContext(args)
-    if conn_context.supports_one_platform:
-      raise exceptions.UnsupportedArgumentError(
-          'Events are only available with Cloud Run for Anthos.')
+    conn_context = connection_context.GetConnectionContext(
+        args, serverless_flags.Product.EVENTS, self.ReleaseTrack())
 
     trigger_ref = args.CONCEPTS.trigger.Parse()
     with eventflow_operations.Connect(conn_context) as client:
@@ -93,14 +78,11 @@ class Describe(base.Command):
       source_obj = None
       if trigger_obj is not None:
         source_crds = client.ListSourceCustomResourceDefinitions()
-        source_obj_ref = trigger_obj.dependency
-        source_crd = next(
-            (s for s in source_crds if s.source_kind == source_obj_ref.kind),
-            None)
-        if source_crd is not None:
-          source_ref = util.GetSourceRef(source_obj_ref.name,
-                                         source_obj_ref.namespace, source_crd)
+        source_ref, source_crd = util.GetSourceRefAndCrdForTrigger(
+            trigger_obj, source_crds)
+        if source_ref and source_crd:
           source_obj = client.GetSource(source_ref, source_crd)
+
     if not trigger_obj:
       raise exceptions.TriggerNotFound(
           'Trigger [{}] not found.'.format(trigger_ref.Name()))

@@ -1,14 +1,19 @@
 title: compute snapshots add-iam-policy-binding-condition scenario test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 
 actions:
+- define_reference:
+    reference: release-track
+    track_values:
+      ALPHA: alpha
+      BETA: beta
 # add binding with condition to a policy with condition
 - execute_command:
     command: compute snapshots add-iam-policy-binding my-snapshot --member=user:test@gmail.com --role=roles/non-primitive --condition='expression=expr,title=title,description=descr'
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/global/snapshots/my-snapshot/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
+          uri: https://compute.googleapis.com/compute/$$release-track$$/projects/fake-project/global/snapshots/my-snapshot/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           body: null
         return_response:
@@ -32,7 +37,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/global/snapshots/my-snapshot/setIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/$$release-track$$/projects/fake-project/global/snapshots/my-snapshot/setIamPolicy?alt=json
           method: POST
           body:
             json:

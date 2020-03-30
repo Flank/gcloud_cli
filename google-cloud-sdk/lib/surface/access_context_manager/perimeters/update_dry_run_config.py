@@ -37,10 +37,10 @@ class UpdatePerimetersAlpha(base.UpdateCommand):
   specified, in which case all dry run config values will be removed.
 
   For more information, see:
-  https://cloud.google.com/access-context-manager/docs/reference/rest/v1beta/accessPolicies.servicePerimeters
+  https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
   """
   _INCLUDE_UNRESTRICTED = False
-  _API_VERSION = 'v1beta'
+  _API_VERSION = 'v1alpha'
 
   @staticmethod
   def Args(parser):
@@ -57,7 +57,7 @@ class UpdatePerimetersAlpha(base.UpdateCommand):
 
   def Patch(self, client, args, perimeter_ref, result):
     if args.clear:
-      return client.Patch(perimeter_ref, clear_dry_run=True)
+      return client.UnsetSpec(perimeter_ref, use_explicit_dry_run_spec=False)
 
     resources = perimeters.ParseResources(args, result, dry_run=True)
     restricted_services = perimeters.ParseRestrictedServices(
@@ -66,13 +66,12 @@ class UpdatePerimetersAlpha(base.UpdateCommand):
         args, result, perimeter_ref.accessPoliciesId, dry_run=True)
     vpc_allowed_services = perimeters.ParseVpcRestriction(
         args, result, self._API_VERSION, dry_run=True)
-    enable_vpc_restriction = args.enable_vpc_service_restriction
+    enable_vpc_accessible_services = args.enable_vpc_accessible_services
 
-    return client.Patch(
+    return client.PatchDryRunConfig(
         perimeter_ref,
         resources=resources,
         restricted_services=restricted_services,
         levels=levels,
         vpc_allowed_services=vpc_allowed_services,
-        enable_vpc_service_restriction=enable_vpc_restriction,
-        apply_to_dry_run_config=True)
+        enable_vpc_accessible_services=enable_vpc_accessible_services)

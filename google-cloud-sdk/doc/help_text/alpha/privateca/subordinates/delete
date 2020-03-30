@@ -1,0 +1,61 @@
+NAME
+    gcloud alpha privateca subordinates delete - permanently delete a
+        subordinate certificate authority
+
+SYNOPSIS
+    gcloud alpha privateca subordinates delete
+        (CERTIFICATE_AUTHORITY : --location=LOCATION) [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Permanently deletes a subordinate certificate authority.
+
+    Note that the KMS key will not be affected by this operation. You will need
+    to delete the KMS key separately once the CA is deleted.
+
+POSITIONAL ARGUMENTS
+     Certificate Authority resource - The certificate authority to delete. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [certificate_authority] on the command line with a fully
+     specified name; set the property [core/project]; provide the argument
+     [--project] on the command line. This must be specified.
+
+       CERTIFICATE_AUTHORITY
+          ID of the Certificate Authority or fully qualified identifier for the
+          Certificate Authority. This positional must be specified if any of
+          the other arguments in this group are specified.
+
+       --location=LOCATION
+          The location of the Certificate Authority.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the privateca/v1alpha1 API. The full documentation for
+    this API can be found at: https://cloud.google.com/
+
+EXAMPLES
+    To delete a subordinate CA:
+
+        $ gcloud alpha privateca subordinates delete server-tls-1 \
+            --location 'us-west1'
+
+    To delete a subordinate CA while skipping the confirmation input:
+
+        $ gcloud alpha privateca subordinates delete server-tls-1 \
+            --location 'us-west1' --quiet
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

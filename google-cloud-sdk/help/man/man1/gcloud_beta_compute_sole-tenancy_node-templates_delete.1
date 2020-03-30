@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute sole\-tenancy node\-templates delete \- deletes a Google Compute Engine node template
+gcloud beta compute sole\-tenancy node\-templates delete \- delete a Google Compute Engine node template
 
 
 
@@ -17,7 +17,7 @@ gcloud beta compute sole\-tenancy node\-templates delete \- deletes a Google Com
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Deletes a Google Compute Engine node template.
+\fB(BETA)\fR Delete a Compute Engine node template.
 
 
 
@@ -71,8 +71,20 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a node template, run:
+
+.RS 2m
+$ gcloud beta compute sole\-tenancy node\-templates delete \e
+    my\-node\-template
+.RE
 
 
 

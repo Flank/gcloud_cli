@@ -11,7 +11,7 @@ gcloud alpha identity groups create \- create a new group
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha identity groups create\fR \fIEMAIL\fR \fB\-\-labels\fR=[\fILABELS\fR,...] \fB\-\-organization\fR=\fIORGANIZATION\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-dynamic\-user\-query\fR=[\fIDYNAMIC_USER_QUERY\fR,...]] [\fB\-\-with\-initial\-owner\fR=\fIWITH_INITIAL_OWNER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha identity groups create\fR \fIEMAIL\fR \fB\-\-labels\fR=\fILABELS\fR \fB\-\-organization\fR=\fIORGANIZATION\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-dynamic\-user\-query\fR=\fIDYNAMIC_USER_QUERY\fR] [\fB\-\-with\-initial\-owner\fR=\fIWITH_INITIAL_OWNER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,9 +36,9 @@ The email address of the group to be created.
 
 .RS 2m
 .TP 2m
-\fB\-\-labels\fR=[\fILABELS\fR,...]
+\fB\-\-labels\fR=\fILABELS\fR
 Labels for group resource. Example of labels "\-\-labels
-system/groups/discussion_forum="
+cloudidentity.googleapis.com/groups.discussion_forum"
 
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION\fR
@@ -63,7 +63,7 @@ Groups. Maximum length is 4,096 characters.
 The Group's display name.
 
 .TP 2m
-\fB\-\-dynamic\-user\-query\fR=[\fIDYNAMIC_USER_QUERY\fR,...]
+\fB\-\-dynamic\-user\-query\fR=\fIDYNAMIC_USER_QUERY\fR
 Query that determines the memberships of the dynamic group.
 
 Example of a query:
@@ -84,8 +84,9 @@ the group being created. \fIWITH_INITIAL_OWNER\fR must be one of:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -98,15 +99,15 @@ for this API can be found at: https://cloud.google.com/identity/
 
 .SH "EXAMPLES"
 
-To create a new group.
+To create a new group:
 
-$ gcloud alpha identity groups create eng\-discuss@foo.com \e.RS 2m
-\-\-organization 5149234212 \e
-\-\-with\-initial\-owner WITH_INITIAL_OWNER \e
-\-\-display\-name "Engineer Discuss" \e
-\-\-description "Group for engineering discussions" \e
-\-\-labels "system/groups/discussion_forum="
-
+.RS 2m
+$ gcloud alpha identity groups create eng\-discuss@foo.com  \e
+    \-\-organization="5149234212"  \e
+    \-\-with\-initial\-owner=WITH_INITIAL_OWNER  \e
+    \-\-display\-name="Engineer Discuss"  \e
+    \-\-description="Group for engineering discussions"  \e
+    \-\-labels="cloudidentity.googleapis.com/groups.discussion_forum"
 .RE
 
 
@@ -116,5 +117,9 @@ $ gcloud alpha identity groups create eng\-discuss@foo.com \e.RS 2m
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta identity groups create
+.RE
 

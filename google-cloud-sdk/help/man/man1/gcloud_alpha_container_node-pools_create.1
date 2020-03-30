@@ -11,7 +11,7 @@ gcloud alpha container node\-pools create \- create a node pool in a running clu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autoprovisioning\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-no\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-linux\-sysctls\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR;\ default=1] [\fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-config\fR=\fINODE_CONFIG\fR] [\fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-sandbox\fR=[\fItype\fR=\fITYPE\fR]] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR\ |\ \fB\-\-local\-ssd\-volumes\fR=[[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR],[\fIformat\fR=\fIFORMAT\fR],...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autoprovisioning\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-no\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-linux\-sysctls\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR;\ default=1] [\fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-config\fR=\fINODE_CONFIG\fR] [\fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-sandbox\fR=[\fItype\fR=\fITYPE\fR]] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR\ |\ \fB\-\-local\-ssd\-volumes\fR=[[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR],[\fIformat\fR=\fIFORMAT\fR],...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -56,6 +56,14 @@ value is 1.
 
 .RE
 .sp
+.TP 2m
+\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR
+The Customer Managed Encryption Key used to encrypt the boot disk attached to
+each node in the node pool. This should be of the form
+projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
+For more information about protecting resources with Cloud KMS Keys please see:
+https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption
+
 .TP 2m
 \fB\-\-cluster\fR=\fICLUSTER\fR
 The cluster to add the node pool to. Overrides the default
@@ -480,26 +488,34 @@ Type of metadata server available to pods running in the node pool.
 .RS 2m
 .TP 2m
 \fBEXPOSED\fR
+[DEPRECATED] Pods running in this node pool have access to the node's underlying
+Compute Engine Metadata Server.
+.TP 2m
+\fBGCE_METADATA\fR
 Pods running in this node pool have access to the node's underlying Compute
 Engine Metadata Server.
 .TP 2m
-\fBGKE_METADATA_SERVER\fR
+\fBGKE_METADATA\fR
 Run the Kubernetes Engine Metadata Server on this node. The Kubernetes Engine
 Metadata Server exposes a metadata API to workloads that is compatible with the
 V1 Compute Metadata APIs exposed by the Compute Engine and App Engine Metadata
 Servers. This feature can only be enabled if Workload Identity is enabled at the
 cluster level.
 .TP 2m
+\fBGKE_METADATA_SERVER\fR
+[DEPRECATED] Run the Kubernetes Engine Metadata Server on this node. The
+Kubernetes Engine Metadata Server exposes a metadata API to workloads that is
+compatible with the V1 Compute Metadata APIs exposed by the Compute Engine and
+App Engine Metadata Servers. This feature can only be enabled if Workload
+Identity is enabled at the cluster level.
+.TP 2m
 \fBSECURE\fR
-Prevents pods not in hostNetwork from accessing certain VM metadata,
+[DPRECATED] Prevents pods not in hostNetwork from accessing certain VM metadata,
 specifically kube\-env, which contains Kubelet credentials, and the instance
 identity token. This is a temporary security solution available while the
 bootstrapping process for cluster nodes is being redesigned with significant
 security improvements. This feature is scheduled to be deprecated in the future
 and later removed.
-.TP 2m
-\fBUNSPECIFIED\fR
-Chooses the default.
 .RE
 .sp
 
@@ -605,6 +621,23 @@ Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 .sp
 .TP 2m
 
+Specifies the reservation for the node pool.
+
+.RS 2m
+.TP 2m
+\fB\-\-reservation\fR=\fIRESERVATION\fR
+The name of the reservation, required when
+\f5\-\-reservation\-affinity=specific\fR.
+
+.TP 2m
+\fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR
+The type of the reservation for the node pool. \fIRESERVATION_AFFINITY\fR must
+be one of: \fBany\fR, \fBnone\fR, \fBspecific\fR.
+
+.RE
+.sp
+.TP 2m
+
 Options to specify the node identity.
 
 .RS 2m
@@ -703,8 +736,9 @@ used.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -715,7 +749,7 @@ cluster "sample\-cluster", run:
 
 .RS 2m
 $ gcloud alpha container node\-pools create node\-pool\-1 \e
-    \-\-cluster=example\-cluster
+    \-\-cluster=sample\-cluster
 .RE
 
 The new node pool will show up in the cluster after all the nodes have been
@@ -725,7 +759,7 @@ To create a node pool with 5 nodes, run:
 
 .RS 2m
 $ gcloud alpha container node\-pools create node\-pool\-1 \e
-    \-\-cluster=example\-cluster \-\-num\-nodes=5
+    \-\-cluster=sample\-cluster \-\-num\-nodes=5
 .RE
 
 

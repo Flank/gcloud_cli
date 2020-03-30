@@ -80,14 +80,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     For example, to list named ports for an instance group:
 
         $ gcloud beta compute instance-groups unmanaged get-named-ports \
-            example-instance-group --zone us-central1-a
+            example-instance-group --zone=us-central1-a
 
     The above example lists named ports assigned to an instance group named
     'example-instance-group' in the us-central1-a zone.

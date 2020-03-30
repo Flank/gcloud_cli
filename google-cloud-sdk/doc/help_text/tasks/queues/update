@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud tasks queues update QUEUE
+        [--clear-log-sampling-ratio | --log-sampling-ratio=LOG_SAMPLING_RATIO]
         [--clear-max-attempts | --max-attempts=MAX_ATTEMPTS]
         [--clear-max-backoff | --max-backoff=MAX_BACKOFF]
         [--clear-max-concurrent-dispatches
@@ -24,6 +25,16 @@ POSITIONAL ARGUMENTS
         The queue to update.
 
 FLAGS
+     At most one of these may be specified:
+
+       --clear-log-sampling-ratio
+          Clear the field corresponding to --log-sampling-ratio.
+
+       --log-sampling-ratio=LOG_SAMPLING_RATIO
+          Specifies the fraction of operations to write to Stackdriver Logging.
+          This field may contain any value between 0.0 and 1.0, inclusive. 0.0
+          is the default and means that no operations are logged.
+
      At most one of these may be specified:
 
        --clear-max-attempts
@@ -117,8 +128,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To update a Cloud Tasks queue:

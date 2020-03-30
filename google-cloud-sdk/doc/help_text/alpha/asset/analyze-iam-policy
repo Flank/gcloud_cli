@@ -72,15 +72,16 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To find out who has iam.serviceAccounts.actAs permission permission on a
     specified service account, run:
 
     $ gcloud alpha asset analyze-iam-policy --organization=YOUR_ORG_ID
-    --full-resource-name='//iam.googleapis.com/projects/YOUR_PROJ_ID/serviceAccounts/YOUR_SERVICE_ACCOUNT'
+    --full-resource-name='//iam.googleapis.com/projects/YOUR_PROJ_ID/serviceAccounts/YOUR_SERVICE_ACCOUNT_UNIQUE_ID'
     --permissions='iam.serviceAccounts.actAs'
     --output-partial-result-before-timeout
 
@@ -100,5 +101,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta asset analyze-iam-policy
 

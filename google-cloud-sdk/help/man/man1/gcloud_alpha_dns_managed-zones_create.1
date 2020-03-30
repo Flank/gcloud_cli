@@ -11,7 +11,7 @@ gcloud alpha dns managed\-zones create \- create a Cloud DNS managed\-zone
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha dns managed\-zones create\fR \fIZONE_NAME\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-dns\-name\fR=\fIDNS_NAME\fR [\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR] [\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR] [\fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]] [\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR] [\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-networks\fR=[\fINETWORK\fR,...]] [\fB\-\-visibility\fR=\fIVISIBILITY\fR;\ default="public"] [\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR] [\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR] [\fB\-\-target\-network\fR=\fITARGET_NETWORK\fR\ \fB\-\-target\-project\fR=\fITARGET_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha dns managed\-zones create\fR \fIZONE_NAME\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-dns\-name\fR=\fIDNS_NAME\fR [\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR] [\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR] [\fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]] [\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR] [\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-managed\-reverse\-lookup\fR] [\fB\-\-networks\fR=[\fINETWORK\fR,...]] [\fB\-\-private\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]] [\fB\-\-service\-directory\-namespace\fR=\fISERVICE_DIRECTORY_NAMESPACE\fR] [\fB\-\-visibility\fR=\fIVISIBILITY\fR;\ default="public"] [\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR] [\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR] [\fB\-\-target\-network\fR=\fITARGET_NETWORK\fR\ \fB\-\-target\-project\fR=\fITARGET_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -100,9 +100,25 @@ only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
 
 .TP 2m
+\fB\-\-managed\-reverse\-lookup\fR
+Whether this zone is a managed reverse lookup zone, required for Cloud DNS to
+correctly resolve Non\-RFC1918 PTR records.
+
+.TP 2m
 \fB\-\-networks\fR=[\fINETWORK\fR,...]
 List of networks that the zone should be visible in if the zone visibility is
 [private].
+
+.TP 2m
+\fB\-\-private\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]
+List of IPv4 addresses of target name servers that the zone will forward queries
+to. Ignored for \f5public\fR visibility. All addresses specified for this
+parameter will be reached through the VPC.
+
+.TP 2m
+\fB\-\-service\-directory\-namespace\fR=\fISERVICE_DIRECTORY_NAMESPACE\fR
+The fully qualified URL of the service directory namespace that should be
+associated with the zone. Ignored for \f5public\fR visibility zones.
 
 .TP 2m
 \fB\-\-visibility\fR=\fIVISIBILITY\fR; default="public"
@@ -139,8 +155,9 @@ Project ID of the Google Compute Engine private network to forward queries to.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

@@ -15,6 +15,12 @@ gcloud alpha compute network\-endpoint\-groups list\-network\-endpoints \- list 
 
 
 
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR List network endpoints in a network endpoint group.
+
+
+
 .SH "POSITIONAL ARGUMENTS"
 
 .RS 2m
@@ -112,14 +118,16 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To list network endpoints of a network endpoint group:
+To list network endpoints of a network endpoint group named \f5\fImy\-neg\fR\fR
+in zone \f5\fIus\-central1\-a\fR\fR:
 
 .RS 2m
 $ gcloud alpha compute network\-endpoint\-groups \e

@@ -107,12 +107,10 @@ COMMONLY USED FLAGS
 
 FLAGS
      --app-package=APP_PACKAGE
-        (DEPRECATED) The Java package of the application under test (default:
-        extracted from the APK manifest).
+        (REMOVED) The Java package of the application under test. By default,
+        the application package name is parsed from the APK manifest.
 
-        The --app-package flag is deprecated and should no longer be used. By
-        default, the correct application package name is parsed from the APK
-        manifest.
+        Flag --app-package has been removed.
 
      --async
         Invoke a test asynchronously without waiting for test results.
@@ -138,10 +136,6 @@ FLAGS
         desired values. The environment variables are mirrored as extra options
         to the am instrument -e KEY1 VALUE1 ... command and passed to your test
         runner (typically AndroidJUnitRunner). Examples:
-
-        Break test cases into four shards and run only the first shard:
-
-            --environment-variables numShards=4,shardIndex=0
 
         Enable code coverage and provide a directory to store the coverage
         results when using Android Test Orchestrator (--use-orchestrator):
@@ -219,11 +213,10 @@ ANDROID GAME-LOOP TEST FLAGS
 
 ANDROID INSTRUMENTATION TEST FLAGS
      --test-package=TEST_PACKAGE
-        (DEPRECATED) The Java package name of the instrumentation test
-        (default: extracted from the APK manifest).
+        (REMOVED) The Java package name of the instrumentation test. By
+        default, the test package name is parsed from the APK manifest.
 
-        The --test-package flag is deprecated and should no longer be used. By
-        default, the correct test package name is parsed from the APK manifest.
+        Flag --test-package has been removed.
 
      --test-runner-class=TEST_RUNNER_CLASS
         The fully-qualified Java class name of the instrumentation test runner
@@ -331,39 +324,40 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To invoke a robo test lasting 100 seconds against the default device
     environment, run:
 
-        $ gcloud firebase test android run --app APP_APK --timeout 100s
+        $ gcloud firebase test android run --app=APP_APK --timeout=100s
 
     When specifying devices to test against, the preferred method is to use the
     --device flag. For example, to invoke a robo test against a virtual,
     generic MDPI Nexus device in landscape orientation, run:
 
-        $ gcloud firebase test android run --app APP_APK \
-            --device model=NexusLowRes,orientation=landscape
+        $ gcloud firebase test android run --app=APP_APK \
+            --device=model=NexusLowRes,orientation=landscape
 
     To invoke an instrumentation test against a physical Nexus 6 device
     (MODEL_ID: shamu) which is running Android API level 21 in French, run:
 
-        $ gcloud firebase test android run --app APP_APK --test TEST_APK \
-            --device model=shamu,version=21,locale=fr
+        $ gcloud firebase test android run --app=APP_APK --test=TEST_APK \
+            --device=model=shamu,version=21,locale=fr
 
     To test against multiple devices, specify --device more than once:
 
-        $ gcloud firebase test android run --app APP_APK --test TEST_APK \
-            --device model=Nexus4,version=19 \
-            --device model=Nexus4,version=21 \
-            --device model=NexusLowRes,version=25
+        $ gcloud firebase test android run --app=APP_APK --test=TEST_APK \
+            --device=model=Nexus4,version=19 \
+            --device=model=Nexus4,version=21 \
+            --device=model=NexusLowRes,version=25
 
     To invoke a robo test on an Android App Bundle, pass the .aab file using
     the --app flag.
 
-        $ gcloud firebase test android run --app bundle.aab
+        $ gcloud firebase test android run --app=bundle.aab
 
     You may also use the legacy dimension flags (deprecated) to specify which
     devices to use. Firebase Test Lab will run tests against every possible
@@ -376,7 +370,7 @@ EXAMPLES
     comprehensive matrix of virtual and physical devices, OS versions, locales
     and orientations, run:
 
-        $ gcloud firebase test android run --app APP_APK --timeout 5m \
+        $ gcloud firebase test android run --app=APP_APK --timeout=5m \
             --device-ids=shamu,NexusLowRes,Nexus5,g3,zeroflte \
             --os-version-ids=19,21,22,23,24,25 --locales=en_GB,es,fr,ru,zh \
             --orientations=portrait,landscape
@@ -406,7 +400,7 @@ EXAMPLES
     For example, to run a robo test using a specific Google Cloud Storage
     location to hold the raw test results, run:
 
-        $ gcloud firebase test android run --app APP_APK \
+        $ gcloud firebase test android run --app=APP_APK \
             --results-bucket=gs://my-bucket \
             --results-dir=my/test/results/<unique-value>
 
@@ -414,7 +408,7 @@ EXAMPLES
     history of your tests will be collected and displayed in the Firebase
     console, run:
 
-        $ gcloud firebase test android run --app APP_APK --test TEST_APK \
+        $ gcloud firebase test android run --app=APP_APK --test=TEST_APK \
             --results-history-name='Excelsior App Test History'
 
     Argument Files

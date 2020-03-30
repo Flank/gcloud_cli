@@ -1,0 +1,376 @@
+title: Cloud Game Servers clusters CRUD test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers realms create -q --no-user-output-enabled $$realm-id$$ --location $$location$$ --time-zone EST
+- execute:
+  - command: |
+      game servers clusters create $$gsc-id-1$$ --location $$location$$ --realm
+        $$realm-id$$ --gke-cluster $$gke-cluster-id$$
+        --namespace default --labels a=z --no-dry-run
+  - stderr: |
+      Create request issued for: [$$gsc-id-1$$]
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+  - stderr: |
+      Created game server cluster: [$$gsc-id-1$$]
+- execute:
+  - command: |
+      game servers clusters update $$gsc-id-1$$ --realm $$realm-id$$ --location $$location$$ --update-labels=a=x,b=y --no-dry-run
+  - stderr: |
+      Update request issued for: [$$gsc-id-1$$]
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+  - stderr: |
+      Updated game server cluster: [$$gsc-id-1$$]
+  - stdout: |-
+      .*$$gke-cluster-id$$.*projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$.*
+      $
+- execute:
+  - command: |
+      game servers clusters describe $$gsc-id-1$$ --location $$location$$ --realm $$realm-id$$
+  - stdout: |-
+      .*$$gke-cluster-id$$.*projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$.*
+      $
+- execute:
+  - command: |
+      game servers clusters list --location $$location$$ --realm $$realm-id$$
+  - stdout: |-
+      .*$$gsc-id-1$$.*$$location$$.*$$realm-id$$.*$$gke-cluster-id$$.*
+      $
+- execute:
+  - command: |
+      game servers clusters delete $$gsc-id-1$$ --realm=$$realm-id$$ --location $$location$$ --no-dry-run
+  - prompt:
+    - message: You are about to delete game server cluster $$gsc-id-1$$. Do you want
+        to continue?
+    - input: y
+  - stderr: |
+      Delete request issued for: [$$gsc-id-1$$]
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+  - stderr: |
+      Deleted game server cluster : [$$gsc-id-1$$]
+- execute:
+  - command: |
+      game servers realms delete -q --no-user-output-enabled $$realm-id$$ --location $$location$$
+actions:
+- generate_resource_id:
+    reference: gsc-id-1
+    prefix: gsc
+- generate_resource_id:
+    reference: realm-id
+    prefix: realm
+
+- define_reference:
+    reference: location
+    value: us-east1
+- define_reference:
+    reference: gke-cluster-id
+    value: projects/mcgs-component-autopush/locations/us-central1/clusters/gke-shared-agones-reference-only
+- define_reference:
+    reference: time-regex
+    # 2020-01-17T23:47:45.765934104Z
+    value: \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{9}Z
+- define_reference:
+    reference: label-regex
+    # the order may change and 'u' does not exist in python 3+ by default
+    value: "({u?'a': u?'x', u?'b': u?'y'}|{u?'b': u?'y', u?'a': u?'x'})"
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha
+      BETA: v1beta
+
+- execute_command:
+    command: |
+      game servers realms create -q --no-user-output-enabled $$realm-id$$ --location $$location$$ --time-zone EST
+    validation_only: true
+    events:
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      game servers clusters create $$gsc-id-1$$ --location $$location$$ --realm
+        $$realm-id$$ --gke-cluster $$gke-cluster-id$$
+        --namespace default --labels a=z --no-dry-run
+    events:
+    - expect_stderr: |
+        Create request issued for: [$$gsc-id-1$$]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters?alt=json&gameServerClusterId=$$gsc-id-1$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              connectionInfo:
+                gkeClusterReference:
+                  cluster: $$gke-cluster-id$$
+                namespace: default
+              labels:
+                a: z
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '558'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1583190790755-59fe754b1d49b-36c1d624-0f3a3e6a
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-02T23:13:11.218923068Z'
+              target: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$
+              verb: create
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Created game server cluster: [$$gsc-id-1$$]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '551'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$
+            createTime: '2020-03-02T23:13:11.212291887Z'
+            updateTime: '2020-03-02T23:13:11.375238460Z'
+            labels:
+              a: z
+            connectionInfo:
+              namespace: default
+              gkeClusterReference:
+                cluster: $$gke-cluster-id$$
+            etag: sRpOwzGV9geZ8MBQ1CIS83TxazcUzPo40mB-U8AwITs
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers clusters update $$gsc-id-1$$ --realm $$realm-id$$ --location $$location$$ --update-labels=a=x,b=y --no-dry-run
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '551'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$
+            createTime: '2020-03-02T23:13:11.212291887Z'
+            updateTime: '2020-03-02T23:13:11.375238460Z'
+            labels:
+              a: z
+            connectionInfo:
+              namespace: default
+              gkeClusterReference:
+                cluster: $$gke-cluster-id$$
+            etag: sRpOwzGV9geZ8MBQ1CIS83TxazcUzPo40mB-U8AwITs
+    - expect_stderr: |
+        Update request issued for: [$$gsc-id-1$$]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              connectionInfo:
+                gkeClusterReference:
+                  cluster: $$gke-cluster-id$$
+                namespace: default
+              labels:
+                a: x
+                b: y
+              name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '558'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1583190794161-59fe754e5cde7-90fa3c95-5a24e43d
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-02T23:13:14.173051818Z'
+              target: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$
+              verb: update
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Updated game server cluster: [$$gsc-id-1$$]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '565'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$
+            createTime: '2020-03-02T23:13:11.212291887Z'
+            updateTime: '2020-03-02T23:13:14.174379082Z'
+            labels:
+              a: x
+              b: y
+            connectionInfo:
+              namespace: default
+              gkeClusterReference:
+                cluster: $$gke-cluster-id$$
+            etag: a1wT7orPefqx7lE-7ojNA_N2kJgbTmMMILYKIEx5Pwk
+    - expect_stdout:
+        matches: |
+          .*$$gke-cluster-id$$.*projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers clusters describe $$gsc-id-1$$ --location $$location$$ --realm $$realm-id$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '565'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$
+            createTime: '2020-03-02T23:13:11.212291887Z'
+            updateTime: '2020-03-02T23:13:14.174379082Z'
+            labels:
+              a: x
+              b: y
+            connectionInfo:
+              namespace: default
+              gkeClusterReference:
+                cluster: $$gke-cluster-id$$
+            etag: a1wT7orPefqx7lE-7ojNA_N2kJgbTmMMILYKIEx5Pwk
+    - expect_stdout:
+        matches: |
+          .*$$gke-cluster-id$$.*projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers clusters list --location $$location$$ --realm $$realm-id$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '663'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            gameServerClusters:
+            - name: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$
+              createTime: '2020-03-02T23:13:11.212291887Z'
+              updateTime: '2020-03-02T23:13:14.174379082Z'
+              labels:
+                a: x
+                b: y
+              connectionInfo:
+                namespace: default
+                gkeClusterReference:
+                  cluster: $$gke-cluster-id$$
+              etag: a1wT7orPefqx7lE-7ojNA_N2kJgbTmMMILYKIEx5Pwk
+    - expect_stdout:
+        matches: |
+          .*$$gsc-id-1$$.*$$location$$.*$$realm-id$$.*$$gke-cluster-id$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers clusters delete $$gsc-id-1$$ --realm=$$realm-id$$ --location $$location$$ --no-dry-run
+    cleanup_for: gsc-id-1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete game server cluster $$gsc-id-1$$. Do you
+          want to continue?
+        user_input: y
+    - expect_stderr: |
+        Delete request issued for: [$$gsc-id-1$$]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '558'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1583190797749-59fe7551c8beb-eff22e2b-c35ace46
+            metadata:
+              '@type': type.googleapis.com/google.cloud.gaming.$$api-version$$.OperationMetadata
+              createTime: '2020-03-02T23:13:17.755173584Z'
+              target: projects/cloud-sdk-integration-testing/locations/$$location$$/realms/$$realm-id$$/gameServerClusters/$$gsc-id-1$$
+              verb: delete
+              requestedCancellation: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted game server cluster : [$$gsc-id-1$$]
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers realms delete -q --no-user-output-enabled $$realm-id$$ --location $$location$$
+    validation_only: true
+    cleanup_for: realm-id
+    events:
+    - expect_exit:
+        code: 0

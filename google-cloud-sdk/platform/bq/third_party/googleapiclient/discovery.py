@@ -990,6 +990,8 @@ Returns:
 class Resource(object):
   """A class for interacting with a resource."""
 
+  _HAS_DYNAMIC_ATTRIBUTES = True  # b/144716460
+
   def __init__(self, http, baseUrl, model, requestBuilder, developerKey,
                resourceDesc, rootDesc, schema):
     """Build a Resource from the API description.

@@ -1,0 +1,119 @@
+
+.TH "GCLOUD_COMPUTE_INSTANCE\-GROUPS_MANAGED_CREATE\-INSTANCE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute instance\-groups managed create\-instance \- create a new virtual machine instance in a managed instance group with a defined name
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute instance\-groups managed create\-instance\fR \fINAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud compute instance\-groups managed create\-instance\fR creates a virtual
+machine instance with a defined name.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the managed instance group to create instance in.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+Name of the new instance to create.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the managed instance group to create instance in. If not specified,
+you may be prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the managed instance group to create instance in. If not specified, you
+may be prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create an instance \f5instance\-1\fR in \f5my\-group\fR (in region
+europe\-west4), run:
+
+.RS 2m
+$ gcloud compute instance\-groups managed create\-instance \e
+      my\-group \-\-region=europe\-west4 \-\-instance=instance\-1
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed create\-instance
+$ gcloud beta compute instance\-groups managed create\-instance
+.RE
+

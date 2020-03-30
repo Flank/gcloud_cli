@@ -42,6 +42,17 @@ https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.notificationChan
 \f5channelLabels\fR as an alternative name for \f5labels\fR is supported.
 
 
+.SH "EXAMPLES"
+The following command updates an existing email notification channel to point
+from its original email address to "newaddress@newdomain.tld":
+
+.RS 2m
+$ gcloud alpha monitoring channels update \e
+    "projects/12345/notificationChannels/67890"               \e
+    \-\-update\-channel\-labels=email_address=newaddress@newdomain.tld
+.RE
+
+
 
 .SH "POSITIONAL ARGUMENTS"
 
@@ -156,6 +167,8 @@ $ gcloud alpha monitoring channels update \-\-clear\-channel\-labels \e
 .TP 2m
 \fB\-\-remove\-channel\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-channel\-labels\fR is also specified then
+\f5\-\-remove\-channel\-labels\fR is applied first.
 
 .RE
 .RE
@@ -201,6 +214,8 @@ $ gcloud alpha monitoring channels update \-\-clear\-user\-labels \e
 .TP 2m
 \fB\-\-remove\-user\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-user\-labels\fR is also specified then
+\f5\-\-remove\-user\-labels\fR is applied first.
 
 
 .RE
@@ -215,8 +230,9 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -225,5 +241,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta monitoring channels update
+.RE
 

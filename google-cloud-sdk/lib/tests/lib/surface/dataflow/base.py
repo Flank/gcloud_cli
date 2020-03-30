@@ -133,7 +133,9 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
                  network=None,
                  subnetwork=None,
                  kms_key_name=None,
-                 disable_public_ips=False):
+                 disable_public_ips=False,
+                 worker_region=None,
+                 worker_zone=None):
     run_job_req_body = MESSAGE_MODULE.CreateJobFromTemplateRequest
     run_job_req_class = (
         MESSAGE_MODULE.DataflowProjectsLocationsTemplatesCreateRequest)
@@ -168,7 +170,8 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
             machineType=worker_machine_type,
             kmsKeyName=kms_key_name,
             ipConfiguration=ip_configuration,
-        ),
+            workerRegion=worker_region,
+            workerZone=worker_zone),
         parameters=additional_properties)
 
     self.mocked_client.projects_locations_templates.Create.Expect(
@@ -177,6 +180,109 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
             createJobFromTemplateRequest=body,
             location=location),
         response=job)
+
+  def MockLaunchDynamicTemplate(self,
+                                job=None,
+                                location=None,
+                                gcs_location=None,
+                                parameters=None,
+                                job_name=None,
+                                service_account_email=None,
+                                zone=None,
+                                max_workers=None,
+                                num_workers=None,
+                                worker_machine_type=None,
+                                network=None,
+                                subnetwork=None,
+                                kms_key_name=None,
+                                disable_public_ips=False,
+                                validate_only=False,
+                                worker_region=None,
+                                worker_zone=None):
+    launch_template_parameters = MESSAGE_MODULE.LaunchTemplateParameters
+    launch_template_req_class = (
+        MESSAGE_MODULE.DataflowProjectsLocationsTemplatesLaunchRequest)
+
+    location = location or DEFAULT_REGION
+
+    ip_configuration_enum = MESSAGE_MODULE.RuntimeEnvironment.IpConfigurationValueValuesEnum
+    ip_private = ip_configuration_enum.WORKER_IP_PRIVATE
+    ip_configuration = ip_private if disable_public_ips else None
+
+    additional_properties = None
+    if parameters:
+      params_value = launch_template_parameters.ParametersValue
+      params_list = []
+      for k, v in six.iteritems(parameters):
+        params_list.append(
+            params_value.AdditionalProperty(
+                key=six.text_type(k), value=six.text_type(v)))
+      additional_properties = params_value(additionalProperties=params_list)
+
+    body = launch_template_parameters(
+        environment=MESSAGE_MODULE.RuntimeEnvironment(
+            serviceAccountEmail=service_account_email,
+            zone=zone,
+            maxWorkers=max_workers,
+            numWorkers=num_workers,
+            network=network,
+            subnetwork=subnetwork,
+            machineType=worker_machine_type,
+            kmsKeyName=kms_key_name,
+            ipConfiguration=ip_configuration,
+            workerRegion=worker_region,
+            workerZone=worker_zone),
+        jobName=job_name,
+        parameters=additional_properties,
+        update=False)
+
+    self.mocked_client.projects_locations_templates.Launch.Expect(
+        request=launch_template_req_class(
+            dynamicTemplate_gcsPath=gcs_location,
+            projectId=six.text_type(self.Project()),
+            launchTemplateParameters=body,
+            location=location,
+            validateOnly=validate_only),
+        response=MESSAGE_MODULE.LaunchTemplateResponse(job=job))
+
+  def MockRunFlexTemplateJob(self,
+                             job_response=None,
+                             location=None,
+                             gcs_location=None,
+                             parameters=None,
+                             job_name=None):
+    run_job_req_body = MESSAGE_MODULE.LaunchFlexTemplateRequest
+    run_job_req_class = (
+        MESSAGE_MODULE.DataflowProjectsLocationsFlexTemplatesLaunchRequest)
+
+    location = location or DEFAULT_REGION
+
+    run_job_req_params = MESSAGE_MODULE.LaunchFlexTemplateParameter
+    additional_properties = None
+    params_value = run_job_req_params.ParametersValue
+    params_list = []
+
+    if parameters:
+      for (k, v) in parameters:
+        params_list.append(
+            params_value.AdditionalProperty(
+                key=six.text_type(k), value=six.text_type(v)))
+
+    if params_list:
+      additional_properties = params_value(additionalProperties=params_list)
+
+    param_body = run_job_req_params(
+        jobName=job_name,
+        containerSpecGcsPath=gcs_location,
+        parameters=additional_properties)
+    body = run_job_req_body(launchParameter=param_body)
+
+    self.mocked_client.projects_locations_flexTemplates.Launch.Expect(
+        request=run_job_req_class(
+            projectId=six.text_type(self.Project()),
+            launchFlexTemplateRequest=body,
+            location=location),
+        response=job_response)
 
   def MockGetJobFailure(self, job_id, location=None, view=None):
     get_job_req_class = MESSAGE_MODULE.DataflowProjectsLocationsJobsGetRequest

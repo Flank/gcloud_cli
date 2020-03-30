@@ -46,13 +46,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    The following command lists all autoscaling policies in the project:
+    The following command lists all autoscaling policies in Dataproc's
+    'us-central1' region:
 
-        $ gcloud dataproc autoscaling-policies list
+        $ gcloud dataproc autoscaling-policies list --region=us-central1
 
 NOTES
     These variants are also available:

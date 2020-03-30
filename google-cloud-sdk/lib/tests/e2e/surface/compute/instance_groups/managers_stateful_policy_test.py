@@ -23,13 +23,15 @@ from tests.lib.surface.compute import e2e_managers_stateful_test_base
 from tests.lib.surface.compute import e2e_test_base
 
 
-class ManagedInstanceGroupsStatefulPolicyZonalTest(
+class ManagedInstanceGroupsStatefulPolicyZonalBetaTest(
     e2e_managers_stateful_test_base.ManagedStatefulTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.prefix = 'mig-stateful-policy-zonal'
     self.scope = e2e_test_base.ZONAL
-    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testCreateManageInstanceGroupWithStatefulDisks(self):
     instance_template_name = self.CreateInstanceTemplate(
@@ -49,7 +51,8 @@ class ManagedInstanceGroupsStatefulPolicyZonalTest(
               disk3:
                 autoDelete: NEVER
         """,
-    ], normalize_space=True)
+    ],
+                                    normalize_space=True)
     self.AssertOutputNotContains('disk2')
 
   def testUpdateManageInstanceGroupAddingStatefulDisks(self):
@@ -121,8 +124,8 @@ class ManagedInstanceGroupsStatefulPolicyZonalTest(
     self.AssertOutputNotContains('disk3')
 
 
-class ManagedInstanceGroupsStatefulPolicyRegionalTest(
-    ManagedInstanceGroupsStatefulPolicyZonalTest):
+class ManagedInstanceGroupsStatefulPolicyRegionalBetaTest(
+    ManagedInstanceGroupsStatefulPolicyZonalBetaTest):
 
   def SetUp(self):
     self.prefix = 'mig-stateful-policy-regional'

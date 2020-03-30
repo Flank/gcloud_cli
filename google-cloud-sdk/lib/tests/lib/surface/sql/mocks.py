@@ -18,8 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.api_lib.util import messages as helpers
 from tests.lib.surface.sql import data
+
+sqladmin_v1beta4 = core_apis.GetMessagesModule('sql', 'v1beta4')
 
 
 class MockEndpoints(object):
@@ -32,21 +35,30 @@ class MockEndpoints(object):
                              error)
 
   def GetPendingCreateOperation(self):
-    return self.GetOperation('CREATE', 'PENDING')
+    return self.GetOperation(
+        sqladmin_v1beta4.Operation.OperationTypeValueValuesEnum.CREATE,
+        sqladmin_v1beta4.Operation.StatusValueValuesEnum.PENDING)
 
   def GetDoneCreateOperation(self):
-    return self.GetOperation('CREATE', 'DONE')
+    return self.GetOperation(
+        sqladmin_v1beta4.Operation.OperationTypeValueValuesEnum.CREATE,
+        sqladmin_v1beta4.Operation.StatusValueValuesEnum.DONE)
 
   def GetPendingUpdateOperation(self):
-    return self.GetOperation('UPDATE', 'PENDING')
+    return self.GetOperation(
+        sqladmin_v1beta4.Operation.OperationTypeValueValuesEnum.UPDATE,
+        sqladmin_v1beta4.Operation.StatusValueValuesEnum.PENDING)
 
   def GetDoneUpdateOperation(self):
-    return self.GetOperation('UPDATE', 'DONE')
+    return self.GetOperation(
+        sqladmin_v1beta4.Operation.OperationTypeValueValuesEnum.UPDATE,
+        sqladmin_v1beta4.Operation.StatusValueValuesEnum.DONE)
 
   def GetDoneDeleteBackupOperation(self):
-    return data.GetOperation(self.Project(),
-                             self.GetRequestInstance(self.backup.instance),
-                             'DELETE_BACKUP', 'DONE')
+    return data.GetOperation(
+        self.Project(), self.GetRequestInstance(self.backup.instance),
+        sqladmin_v1beta4.Operation.OperationTypeValueValuesEnum.DELETE_BACKUP,
+        sqladmin_v1beta4.Operation.StatusValueValuesEnum.DONE)
 
   def GetOperationGetRequest(self):
     return data.GetOperationGetRequest(self.Project())
@@ -86,7 +98,9 @@ class MockEndpoints(object):
   # Backup helpers.
 
   def GetSuccessfulBackup(self, instance, backup_id=data.DEFAULT_BACKUP_ID):
-    return data.GetBackup(instance, backup_id, 'SUCCESSFUL')
+    return data.GetBackup(
+        instance, backup_id,
+        sqladmin_v1beta4.BackupRun.StatusValueValuesEnum.SUCCESSFUL)
 
   def GetBackupDeleteRequest(self, backup):
     return data.GetBackupDeleteRequest(self.Project(), backup)

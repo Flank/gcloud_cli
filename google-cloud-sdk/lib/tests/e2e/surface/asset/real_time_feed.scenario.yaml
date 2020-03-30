@@ -1,5 +1,5 @@
 title: surface e2e tests for asset real-time-feed api
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 - generate_resource_id:
@@ -30,7 +30,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p2beta1/projects/cloud-sdk-integration-testing/feeds?alt=json
+          uri: https://cloudasset.googleapis.com/v1/projects/cloud-sdk-integration-testing/feeds?alt=json
           method: POST
           headers: {}
           body: |-
@@ -104,7 +104,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p2beta1/projects/462803083913/feeds/$$my-feed$$?alt=json
+          uri: https://cloudasset.googleapis.com/v1/projects/462803083913/feeds/$$my-feed$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -147,7 +147,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p2beta1/projects/cloud-sdk-integration-testing/feeds?alt=json
+          uri: https://cloudasset.googleapis.com/v1/projects/cloud-sdk-integration-testing/feeds?alt=json
           method: GET
           headers: {}
           body: null
@@ -198,7 +198,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p2beta1/projects/462803083913/feeds/$$my-feed$$?alt=json
+          uri: https://cloudasset.googleapis.com/v1/projects/462803083913/feeds/$$my-feed$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -224,7 +224,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p2beta1/projects/462803083913/feeds/$$my-feed$$?alt=json
+          uri: https://cloudasset.googleapis.com/v1/projects/462803083913/feeds/$$my-feed$$?alt=json
           method: PATCH
           headers: {}
           body: |-
@@ -304,7 +304,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p2beta1/projects/462803083913/feeds/$$my-feed$$?alt=json
+          uri: https://cloudasset.googleapis.com/v1/projects/462803083913/feeds/$$my-feed$$?alt=json
           method: DELETE
           headers: {}
           body: null

@@ -1,5 +1,5 @@
 title: Test remove IAM policy binding
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -12,8 +12,8 @@ actions:
     reference: api-version
     track_values:
       GA: v1
-      BETA: v1beta1
-      ALPHA: v1beta1
+      BETA: v1
+      ALPHA: v1
 
 - execute_command:
     command: iap web remove-iam-policy-binding --resource-type=backend-services --member=user:owner@gmail.com

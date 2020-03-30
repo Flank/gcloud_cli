@@ -42,7 +42,7 @@ summary:
       region:     https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1
       targetSize: 3
 - execute:
-  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+  - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
 - execute:
   - command: compute instance-groups managed list-instances $$manager$$ --region us-central1
@@ -73,7 +73,7 @@ summary:
       selfLink: $$instance1$$
       status:   SUCCESS
 - execute:
-  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+  - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
 - execute:
   - command: compute instances describe $$instance1$$ --format 'text(machineType)'
@@ -85,7 +85,7 @@ summary:
   - stderr: |
       Updated [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
 - execute:
-  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+  - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
 - execute:
   - command: compute instance-groups managed list-instances $$manager$$ --region us-central1
@@ -101,7 +101,7 @@ summary:
   - stderr: |
       Updated [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
 - execute:
-  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+  - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
 - execute:
   - command: compute instance-groups managed list-instances $$manager$$ --region us-central1
@@ -485,7 +485,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+    command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
     validation_only: true
     events:
@@ -773,7 +773,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+    command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
     validation_only: true
     events:
@@ -912,7 +912,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+    command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
     validation_only: true
     events:
@@ -1050,7 +1050,7 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+    command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
     validation_only: true
     events:

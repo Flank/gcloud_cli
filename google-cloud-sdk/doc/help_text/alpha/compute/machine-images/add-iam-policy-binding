@@ -7,8 +7,8 @@ SYNOPSIS
         --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Add an IAM policy binding to the IAM policy of a Google Compute
-    Engine machine image. One binding consists of a member and a role.
+    (ALPHA) Add an IAM policy binding to the IAM policy of a Compute Engine
+    machine image. A policy binding consists of a member and a role.
 
 POSITIONAL ARGUMENTS
      Machine image resource - The machine image for which to add IAM policy
@@ -19,8 +19,8 @@ POSITIONAL ARGUMENTS
      the argument [--project] on the command line. This must be specified.
 
        MACHINE_IMAGE
-          ID of the machine_image or fully qualified identifier for the
-          machine_image.
+          ID of the machine image or fully qualified identifier for the machine
+          image.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -44,8 +44,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the compute/alpha API. The full documentation for this
@@ -67,5 +68,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute machine-images add-iam-policy-binding
 

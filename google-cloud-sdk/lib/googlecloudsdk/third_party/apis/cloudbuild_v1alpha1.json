@@ -17,6 +17,7 @@
   "documentationLink": "https://cloud.google.com/cloud-build/docs/",
   "protocol": "rest",
   "rootUrl": "https://cloudbuild.googleapis.com/",
+  "mtlsRootUrl": "https://cloudbuild.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://cloudbuild.googleapis.com/",
   "batchPath": "batch",
@@ -177,7 +178,7 @@
             "Status of the `WorkerPool` is unknown.",
             "`WorkerPool` is being created.",
             "`WorkerPool` is running.",
-            "`WorkerPool` is being deleting: cancelling builds and draining workers.",
+            "`WorkerPool` is being deleted: cancelling builds and draining workers.",
             "`WorkerPool` is deleted."
           ],
           "type": "string",
@@ -289,7 +290,8 @@
             "Build or step failed to complete successfully.",
             "Build or step failed due to an internal cause.",
             "Build or step took longer than was allowed.",
-            "Build or step was canceled by a user."
+            "Build or step was canceled by a user.",
+            "Build was enqueued for longer than the value of `queue_ttl`."
           ],
           "type": "string",
           "enum": [
@@ -300,7 +302,8 @@
             "FAILURE",
             "INTERNAL_ERROR",
             "TIMEOUT",
-            "CANCELLED"
+            "CANCELLED",
+            "EXPIRED"
           ]
         },
         "statusDetail": {
@@ -348,6 +351,11 @@
           "items": {
             "type": "string"
           }
+        },
+        "queueTtl": {
+          "description": "TTL in queue for this build. If provided and the build is enqueued longer\nthan this value, the build will expire and the build status will be\n`EXPIRED`.\n\nThe TTL starts ticking from create_time.",
+          "type": "string",
+          "format": "google-duration"
         },
         "artifacts": {
           "description": "Artifacts produced by the build that should be uploaded upon\nsuccessful completion of all build steps.",
@@ -448,7 +456,7 @@
           "type": "string"
         },
         "repoName": {
-          "description": "Name of the Cloud Source Repository. If omitted, the name \"default\" is\nassumed.",
+          "description": "Required. Name of the Cloud Source Repository.",
           "type": "string"
         },
         "branchName": {
@@ -466,6 +474,17 @@
         "dir": {
           "description": "Directory, relative to the source root, in which to run the build.\n\nThis must be a relative path. If a step's `dir` is specified and is an\nabsolute path, this value is ignored for that step's execution.",
           "type": "string"
+        },
+        "invertRegex": {
+          "description": "Only trigger a build if the revision regex does NOT match the revision\nregex.",
+          "type": "boolean"
+        },
+        "substitutions": {
+          "description": "Substitutions to use in a triggered build.\nShould only be used with RunBuildTrigger",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
@@ -548,7 +567,8 @@
             "Build or step failed to complete successfully.",
             "Build or step failed due to an internal cause.",
             "Build or step took longer than was allowed.",
-            "Build or step was canceled by a user."
+            "Build or step was canceled by a user.",
+            "Build was enqueued for longer than the value of `queue_ttl`."
           ],
           "type": "string",
           "enum": [
@@ -559,7 +579,8 @@
             "FAILURE",
             "INTERNAL_ERROR",
             "TIMEOUT",
-            "CANCELLED"
+            "CANCELLED",
+            "EXPIRED"
           ]
         }
       }
@@ -839,7 +860,7 @@
           ]
         },
         "workerPool": {
-          "description": "Option to specify a `WorkerPool` for the build. User specifies the pool\nwith the format \"[WORKERPOOL_PROJECT_ID]\/[WORKERPOOL_NAME]\".\nThis is an experimental field.",
+          "description": "Option to specify a `WorkerPool` for the build.\nFormat: projects\/{project}\/workerPools\/{workerPool}\n\nThis field is experimental.",
           "type": "string"
         },
         "logging": {
@@ -948,7 +969,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Creates a `WorkerPool` to run the builds, and returns the new worker pool.\n\nThis API is experimental."
+              "description": "Creates a `WorkerPool` to run the builds, and returns the new worker pool."
             },
             "get": {
               "id": "cloudbuild.projects.workerPools.get",
@@ -973,7 +994,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Returns information about a `WorkerPool`.\n\nThis API is experimental."
+              "description": "Returns information about a `WorkerPool`."
             },
             "delete": {
               "id": "cloudbuild.projects.workerPools.delete",
@@ -998,7 +1019,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Deletes a `WorkerPool` by its project ID and WorkerPool name.\n\nThis API is experimental."
+              "description": "Deletes a `WorkerPool` by its project ID and WorkerPool name."
             },
             "patch": {
               "id": "cloudbuild.projects.workerPools.patch",
@@ -1026,7 +1047,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Update a `WorkerPool`.\n\nThis API is experimental."
+              "description": "Update a `WorkerPool`."
             },
             "list": {
               "id": "cloudbuild.projects.workerPools.list",
@@ -1051,7 +1072,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "List project's `WorkerPool`s.\n\nThis API is experimental."
+              "description": "List project's `WorkerPool`s."
             }
           }
         }

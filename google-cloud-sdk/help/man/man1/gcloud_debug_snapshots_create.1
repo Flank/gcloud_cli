@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud debug snapshots create \- create debug snapshots
+gcloud debug snapshots create \- create debug snapshots for a Cloud Debugger debug target (debuggee)
 
 
 
@@ -17,9 +17,10 @@ gcloud debug snapshots create \- create debug snapshots
 
 .SH "DESCRIPTION"
 
-This command creates a debug snapshot on a Cloud Debugger debug target.
-Snapshots allow you to capture stack traces and local variables from your
-running service without interfering with normal operations.
+\fBgcloud debug snapshots create\fR is used to create a debug snapshot on a
+Cloud Debugger debug target. Snapshots allow you to capture stack traces and
+local variables from your running service without interfering with normal
+operations.
 
 When any instance of the target executes the snapshot location, the optional
 condition expression is evaluated. If the result is true (or if there is no
@@ -27,8 +28,8 @@ condition), the instance captures the current thread state and reports it back
 to Cloud Debugger. Once any instance captures a snapshot, the snapshot is marked
 as completed, and it will not be captured again.
 
-You can most easily view snapshot results in the developer console. It is also
-possible to inspect snapshot results with the "snapshots describe" command.
+You can view snapshot results in the developer console. It is also possible to
+inspect snapshot results with the "snapshots describe" command.
 
 
 
@@ -84,8 +85,36 @@ snapshot is valid.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a snapshot with no conditions or expressions at line 41 of file
+main.py of a debug target (debuggee), run:
+
+.RS 2m
+$ gcloud debug snapshots create main.py:41 \-\-target=<debuggee_id>
+.RE
+
+To create a snapshot at line 41 of file main.py on a debug target (debuggee)
+that will only trigger if the variable name has the value of 'foo', run:
+
+.RS 2m
+$ gcloud debug snapshots create main.py:41 \-\-target=<debuggee_id> \e
+    \-\-condition="name == 'foo'"
+.RE
+
+To create a snapshot at line 41 of file main.py on a debug target (debuggee)
+with the expressions name[0] and name[1], run:
+
+.RS 2m
+$ gcloud debug snapshots create main.py:41 \-\-target=<debuggee_id> \e
+    \-\-expression="name[0]" \-\-expression="name[1]"
+.RE
 
 
 

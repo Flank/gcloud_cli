@@ -101,7 +101,7 @@ class Binding(_messages.Message):
       that represents a Google group.    For example, `admins@example.com`.  *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
-      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      example, `alice@example.com?uid=123456789012345678901`. If the user is
       recovered, this value reverts to `user:{emailid}` and the recovered user
       retains the role in the binding.  *
       `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
@@ -173,6 +173,17 @@ class CloudFunction(_messages.Message):
   Fields:
     availableMemoryMb: The amount of memory in MB available for a function.
       Defaults to 256MB.
+    buildId: Output only. The Cloud Build ID of the latest successful
+      deployment of the function.
+    buildWorkerPool: Name of the Cloud Build Custom Worker Pool that should be
+      used to build the function. The format of this field is
+      `projects/{project}/workerPools/{workerPool}` where {project} is the
+      project id where the worker pool is defined and {workerPool} is the
+      short name of the worker pool.  If the project id is not the same as the
+      function, then the Cloud Functions Service Agent
+      (service-<project_number>@gcf-admin-robot.iam.gserviceaccount.com) must
+      be granted the role Cloud Build Custom Workers Builder
+      (roles/cloudbuild.customworkers.builder) in the project.
     description: User-provided description of a function.
     entryPoint: The name of the function (as defined in source code) that will
       be executed. Defaults to the resource name suffix, if not specified. For
@@ -242,13 +253,10 @@ class CloudFunction(_messages.Message):
       INGRESS_SETTINGS_UNSPECIFIED: Unspecified.
       ALLOW_ALL: Allow HTTP traffic from public and private sources.
       ALLOW_INTERNAL_ONLY: Allow HTTP traffic from only private VPC sources.
-      ALLOW_INTERNAL_AND_GCLB: Allow HTTP traffic from private VPC sources and
-        through GCLB.
     """
     INGRESS_SETTINGS_UNSPECIFIED = 0
     ALLOW_ALL = 1
     ALLOW_INTERNAL_ONLY = 2
-    ALLOW_INTERNAL_AND_GCLB = 3
 
   class StatusValueValuesEnum(_messages.Enum):
     r"""Output only. Status of the function deployment.
@@ -337,27 +345,29 @@ class CloudFunction(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   availableMemoryMb = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  description = _messages.StringField(2)
-  entryPoint = _messages.StringField(3)
-  environmentVariables = _messages.MessageField('EnvironmentVariablesValue', 4)
-  eventTrigger = _messages.MessageField('EventTrigger', 5)
-  httpsTrigger = _messages.MessageField('HttpsTrigger', 6)
-  ingressSettings = _messages.EnumField('IngressSettingsValueValuesEnum', 7)
-  labels = _messages.MessageField('LabelsValue', 8)
-  maxInstances = _messages.IntegerField(9, variant=_messages.Variant.INT32)
-  name = _messages.StringField(10)
-  network = _messages.StringField(11)
-  runtime = _messages.StringField(12)
-  serviceAccountEmail = _messages.StringField(13)
-  sourceArchiveUrl = _messages.StringField(14)
-  sourceRepository = _messages.MessageField('SourceRepository', 15)
-  sourceUploadUrl = _messages.StringField(16)
-  status = _messages.EnumField('StatusValueValuesEnum', 17)
-  timeout = _messages.StringField(18)
-  updateTime = _messages.StringField(19)
-  versionId = _messages.IntegerField(20)
-  vpcConnector = _messages.StringField(21)
-  vpcConnectorEgressSettings = _messages.EnumField('VpcConnectorEgressSettingsValueValuesEnum', 22)
+  buildId = _messages.StringField(2)
+  buildWorkerPool = _messages.StringField(3)
+  description = _messages.StringField(4)
+  entryPoint = _messages.StringField(5)
+  environmentVariables = _messages.MessageField('EnvironmentVariablesValue', 6)
+  eventTrigger = _messages.MessageField('EventTrigger', 7)
+  httpsTrigger = _messages.MessageField('HttpsTrigger', 8)
+  ingressSettings = _messages.EnumField('IngressSettingsValueValuesEnum', 9)
+  labels = _messages.MessageField('LabelsValue', 10)
+  maxInstances = _messages.IntegerField(11, variant=_messages.Variant.INT32)
+  name = _messages.StringField(12)
+  network = _messages.StringField(13)
+  runtime = _messages.StringField(14)
+  serviceAccountEmail = _messages.StringField(15)
+  sourceArchiveUrl = _messages.StringField(16)
+  sourceRepository = _messages.MessageField('SourceRepository', 17)
+  sourceUploadUrl = _messages.StringField(18)
+  status = _messages.EnumField('StatusValueValuesEnum', 19)
+  timeout = _messages.StringField(20)
+  updateTime = _messages.StringField(21)
+  versionId = _messages.IntegerField(22)
+  vpcConnector = _messages.StringField(23)
+  vpcConnectorEgressSettings = _messages.EnumField('VpcConnectorEgressSettingsValueValuesEnum', 24)
 
 
 class CloudfunctionsOperationsGetRequest(_messages.Message):
@@ -614,21 +624,33 @@ class EventTrigger(_messages.Message):
 
 
 class Expr(_messages.Message):
-  r"""Represents an expression text. Example:      title: "User account
-  presence"     description: "Determines whether the request has a user
-  account"     expression: "size(request.user) > 0"
+  r"""Represents a textual expression in the Common Expression Language (CEL)
+  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+  are documented at https://github.com/google/cel-spec.  Example (Comparison):
+  title: "Summary size limit"     description: "Determines if a summary is
+  less than 100 chars"     expression: "document.summary.size() < 100"
+  Example (Equality):      title: "Requestor is owner"     description:
+  "Determines if requestor is the document owner"     expression:
+  "document.owner == request.auth.claims.email"  Example (Logic):      title:
+  "Public documents"     description: "Determine whether the document should
+  be publicly visible"     expression: "document.type != 'private' &&
+  document.type != 'internal'"  Example (Data Manipulation):      title:
+  "Notification string"     description: "Create a notification string with a
+  timestamp."     expression: "'New message received at ' +
+  string(document.create_time)"  The exact variables and functions that may be
+  referenced within an expression are determined by the service that evaluates
+  it. See the service documentation for additional information.
 
   Fields:
-    description: An optional description of the expression. This is a longer
+    description: Optional. Description of the expression. This is a longer
       text which describes the expression, e.g. when hovered over it in a UI.
     expression: Textual representation of an expression in Common Expression
-      Language syntax.  The application context of the containing message
-      determines which well-known feature set of CEL is supported.
-    location: An optional string indicating the location of the expression for
+      Language syntax.
+    location: Optional. String indicating the location of the expression for
       error reporting, e.g. a file name and a position in the file.
-    title: An optional title for the expression, i.e. a short string
-      describing its purpose. This can be used e.g. in UIs which allow to
-      enter the expression.
+    title: Optional. Title for the expression, i.e. a short string describing
+      its purpose. This can be used e.g. in UIs which allow to enter the
+      expression.
   """
 
   description = _messages.StringField(1)
@@ -938,6 +960,8 @@ class OperationMetadataV1(_messages.Message):
     RequestValue: The original request that started the operation.
 
   Fields:
+    buildId: The Cloud Build ID of the function created or updated by an API
+      call. This field is only populated for Create and Update operations.
     request: The original request that started the operation.
     target: Target of the operation - for example
       projects/project-1/locations/region-1/functions/function-1
@@ -986,11 +1010,12 @@ class OperationMetadataV1(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  request = _messages.MessageField('RequestValue', 1)
-  target = _messages.StringField(2)
-  type = _messages.EnumField('TypeValueValuesEnum', 3)
-  updateTime = _messages.StringField(4)
-  versionId = _messages.IntegerField(5)
+  buildId = _messages.StringField(1)
+  request = _messages.MessageField('RequestValue', 2)
+  target = _messages.StringField(3)
+  type = _messages.EnumField('TypeValueValuesEnum', 4)
+  updateTime = _messages.StringField(5)
+  versionId = _messages.IntegerField(6)
 
 
 class OperationMetadataV1Beta2(_messages.Message):
@@ -1059,15 +1084,16 @@ class OperationMetadataV1Beta2(_messages.Message):
 
 
 class Policy(_messages.Message):
-  r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.   A `Policy`
-  is a collection of `bindings`. A `binding` binds one or more `members` to a
-  single `role`. Members can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions (defined by IAM or configured by users). A `binding` can
-  optionally specify a `condition`, which is a logic expression that further
-  constrains the role binding based on attributes about the request and/or
-  target resource.  **JSON Example**      {       "bindings": [         {
+  r"""An Identity and Access Management (IAM) policy, which specifies access
+  controls for Google Cloud resources.   A `Policy` is a collection of
+  `bindings`. A `binding` binds one or more `members` to a single `role`.
+  Members can be user accounts, service accounts, Google groups, and domains
+  (such as G Suite). A `role` is a named list of permissions; each `role` can
+  be an IAM predefined role or a user-created custom role.  Optionally, a
+  `binding` can specify a `condition`, which is a logical expression that
+  allows access to a resource only if the expression evaluates to `true`. A
+  condition can add constraints based on attributes of the request, the
+  resource, or both.  **JSON example:**      {       "bindings": [         {
   "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-project-
@@ -1076,23 +1102,24 @@ class Policy(_messages.Message):
   ["user:eve@example.com"],           "condition": {             "title":
   "expirable access",             "description": "Does not grant access after
   Sep 2020",             "expression": "request.time <
-  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
-  **YAML Example**      bindings:     - members:       - user:mike@example.com
-  - group:admins@example.com       - domain:google.com       - serviceAccount
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ],
+  "etag": "BwWWja0YfJA=",       "version": 3     }  **YAML example:**
+  bindings:     - members:       - user:mike@example.com       -
+  group:admins@example.com       - domain:google.com       - serviceAccount
   :my-project-id@appspot.gserviceaccount.com       role:
   roles/resourcemanager.organizationAdmin     - members:       -
   user:eve@example.com       role: roles/resourcemanager.organizationViewer
   condition:         title: expirable access         description: Does not
   grant access after Sep 2020         expression: request.time <
-  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
-  features, see the [IAM developer's
-  guide](https://cloud.google.com/iam/docs).
+  timestamp('2020-10-01T00:00:00.000Z')     - etag: BwWWja0YfJA=     -
+  version: 3  For a description of IAM and its features, see the [IAM
+  documentation](https://cloud.google.com/iam/docs/).
 
   Fields:
     auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. Optionally may
-      specify a `condition` that determines when binding is in effect.
-      `bindings` with no members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally, may
+      specify a `condition` that determines how and when the `bindings` are
+      applied. Each of the `bindings` must contain at least one member.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1100,19 +1127,24 @@ class Policy(_messages.Message):
       conditions: An `etag` is returned in the response to `getIamPolicy`, and
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
-      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten. Due to blind-set semantics of an
-      etag-less policy, 'setIamPolicy' will not fail even if either of
-      incoming or stored policy does not meet the version requirements.
-    version: Specifies the format of the policy.  Valid values are 0, 1, and
-      3. Requests specifying an invalid value will be rejected.  Operations
-      affecting conditional bindings must specify version 3. This can be
-      either setting a conditional policy, modifying a conditional binding, or
-      removing a conditional binding from the stored conditional policy.
-      Operations on non-conditional policies may specify any valid value or
-      leave the field unset.  If no etag is provided in the call to
-      `setIamPolicy`, any version compliance checks on the incoming and/or
-      stored policy is skipped.
+      policy.  **Important:** If you use IAM Conditions, you must include the
+      `etag` field whenever you call `setIamPolicy`. If you omit this field,
+      then IAM allows you to overwrite a version `3` policy with a version `1`
+      policy, and all of the conditions in the version `3` policy are lost.
+    version: Specifies the format of the policy.  Valid values are `0`, `1`,
+      and `3`. Requests that specify an invalid value are rejected.  Any
+      operation that affects conditional role bindings must specify version
+      `3`. This requirement applies to the following operations:  * Getting a
+      policy that includes a conditional role binding * Adding a conditional
+      role binding to a policy * Changing a conditional role binding in a
+      policy * Removing any role binding, with or without a condition, from a
+      policy   that includes conditions  **Important:** If you use IAM
+      Conditions, you must include the `etag` field whenever you call
+      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
+      a version `3` policy with a version `1` policy, and all of the
+      conditions in the version `3` policy are lost.  If a policy does not
+      include any conditions, operations on that policy may specify any valid
+      version or leave the field unset.
   """
 
   auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)

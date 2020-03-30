@@ -39,6 +39,9 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         ssh.SSHCommand, "Run", autospec=True, return_value=0)
     self.pipes_quote = self.StartObjectPatch(
         six.moves, "shlex_quote", side_effect=six.moves.shlex_quote)
+    self.authorize = self.StartPatch(
+        "googlecloudsdk.command_lib.cloud_shell.util.AuthorizeEnvironment",
+        return_value=None)
 
   def testNoArguments(self):
     self.mockConnection(user="my-user", host="my-host", port=123)
@@ -52,6 +55,7 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         extra_flags=None,
         tty=True,
         options={"StrictHostKeyChecking": "no"})
+    self.authorize.assert_called()
 
   def testNoProject(self):
     self.mockConnection(user="my-user", host="my-host", port=123)
@@ -67,6 +71,7 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         extra_flags=None,
         tty=True,
         options={"StrictHostKeyChecking": "no"})
+    self.authorize.assert_called()
 
   def testCommand(self):
     self.mockConnection(user="my-user", host="my-host", port=123)
@@ -80,6 +85,7 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         extra_flags=None,
         tty=False,
         options={"StrictHostKeyChecking": "no"})
+    self.authorize.assert_called()
 
   def testDryRun(self):
     self.ssh_build.return_value = ["path to command", "arg'1"]
@@ -91,6 +97,7 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         len(self.ssh_build.return_value), self.pipes_quote.call_count)
     self.pipes_quote.assert_has_calls(
         [mock.call(arg) for arg in self.ssh_build.return_value])
+    self.authorize.assert_called()
 
   def testSshFlag(self):
     self.mockConnection(user="my-user", host="my-host", port=123)
@@ -105,6 +112,7 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         extra_flags=["-someFlag", "anotherFlag"],
         tty=True,
         options={"StrictHostKeyChecking": "no"})
+    self.authorize.assert_called()
 
   def mockConnection(self, user="some-user", host="some-host", port=6000):
     self.StartPatch(

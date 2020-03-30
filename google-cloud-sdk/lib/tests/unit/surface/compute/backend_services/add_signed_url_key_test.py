@@ -53,7 +53,7 @@ class BackendServiceAddSignedUrlKeyTestGA(
 
     self.ExpectAddSignedUrlKeyRequest(backend_service_ref, 'key1', self.KEY,
                                       operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(backend_service_ref, updated_backend_service)
 
     response = self.RunBackendServices(
@@ -73,7 +73,7 @@ class BackendServiceAddSignedUrlKeyTestGA(
 
     self.ExpectAddSignedUrlKeyRequest(backend_service_ref, 'key1', self.KEY,
                                       operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(backend_service_ref, updated_backend_service)
 
     response = self.RunBackendServices(

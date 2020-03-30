@@ -11,7 +11,7 @@ gcloud ml\-engine jobs submit training \- submit an AI Platform training job
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud ml\-engine jobs submit training\fR \fIJOB\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-master\-image\-uri\fR=\fIMASTER_IMAGE_URI\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-module\-name\fR=\fIMODULE_NAME\fR] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-parameter\-server\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-parameter\-server\-image\-uri\fR=\fIPARAMETER_SERVER_IMAGE_URI\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-worker\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-worker\-image\-uri\fR=\fIWORKER_IMAGE_URI\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fB\-\-parameter\-server\-count\fR=\fIPARAMETER_SERVER_COUNT\fR\ \fB\-\-parameter\-server\-machine\-type\fR=\fIPARAMETER_SERVER_MACHINE_TYPE\fR] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR\ \fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
+\f5gcloud ml\-engine jobs submit training\fR \fIJOB\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-master\-image\-uri\fR=\fIMASTER_IMAGE_URI\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-module\-name\fR=\fIMODULE_NAME\fR] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-parameter\-server\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-parameter\-server\-image\-uri\fR=\fIPARAMETER_SERVER_IMAGE_URI\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-use\-chief\-in\-tf\-config\fR=\fIUSE_CHIEF_IN_TF_CONFIG\fR] [\fB\-\-worker\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-worker\-image\-uri\fR=\fIWORKER_IMAGE_URI\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fB\-\-parameter\-server\-count\fR=\fIPARAMETER_SERVER_COUNT\fR\ \fB\-\-parameter\-server\-machine\-type\fR=\fIPARAMETER_SERVER_MACHINE_TYPE\fR] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR\ \fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
 
 
 
@@ -327,6 +327,12 @@ Required only if a file upload is necessary (that is, other flags include local
 paths) and no other flags implicitly specify an upload path.
 
 .TP 2m
+\fB\-\-use\-chief\-in\-tf\-config\fR=\fIUSE_CHIEF_IN_TF_CONFIG\fR
+Use "chief" role in the cluster instead of "master". This is required for
+TensorFlow 2.0 and newer versions. Unlike "master" node, "chief" node does not
+run evaluation.
+
+.TP 2m
 \fB\-\-worker\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
 Hardware accelerator config for the worker nodes. Must specify both the
 accelerator type (TYPE) for each server and the number of accelerators to attach
@@ -419,8 +425,9 @@ be specified if any of the other arguments in this group are specified.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

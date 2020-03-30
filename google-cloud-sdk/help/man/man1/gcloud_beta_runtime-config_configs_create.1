@@ -49,8 +49,9 @@ Optional description of the runtime\-config resource.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -66,7 +67,7 @@ To create a runtime\-config resource named "my\-config" with a description, run:
 
 .RS 2m
 $ gcloud beta runtime\-config configs create \e
-    \-\-description "my new configuration" my\-config
+    \-\-description="my new configuration" my\-config
 .RE
 
 

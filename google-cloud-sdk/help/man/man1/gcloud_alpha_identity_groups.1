@@ -26,8 +26,9 @@ gcloud alpha identity groups \- manage Cloud Identity Groups
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -38,7 +39,7 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBmemberships\fR
-\fB(ALPHA)\fR Manage Cloud Identity Groups.
+\fB(ALPHA)\fR Manage Cloud Identity Groups Memberships.
 
 
 .RE
@@ -82,5 +83,9 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta identity groups
+.RE
 

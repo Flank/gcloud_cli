@@ -50,32 +50,30 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     self.resource_manager_messages = apis.GetMessagesModule(
         'cloudresourcemanager', 'v1')
 
-  def SetUpForTrack(self, track):
-    api_version = {
-        calliope_base.ReleaseTrack.ALPHA: 'v1beta',
-        calliope_base.ReleaseTrack.BETA: 'v1beta',
-        calliope_base.ReleaseTrack.GA: 'v1'
-    }[track]
+  def SetUpForAPI(self, api_version):
     self.include_unrestricted_services = {
-        calliope_base.ReleaseTrack.ALPHA: True,
-        calliope_base.ReleaseTrack.BETA: True,
-        calliope_base.ReleaseTrack.GA: False
-    }[track]
+        'v1alpha': False,
+        'v1beta': True,
+        'v1': False
+    }[api_version]
+
     self.support_service_filters = {
-        calliope_base.ReleaseTrack.ALPHA: True,
-        calliope_base.ReleaseTrack.BETA: False,
-        calliope_base.ReleaseTrack.GA: False
-    }[track]
+        'v1alpha': True,
+        'v1beta': True,
+        'v1': True
+    }[api_version]
     self.client = mock.Client(
         client_class=apis.GetClientClass(self._API_NAME, api_version))
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = apis.GetMessagesModule(self._API_NAME, api_version)
 
-  LEVEL_SPEC = ('[{"ipSubnetworks": ["127.0.0.1/24"]}, '
-                '{"members": ["user:example@example.com"]}]')
+  BASIC_LEVEL_SPEC = ('[{"ipSubnetworks": ["127.0.0.1/24"]}, '
+                      '{"members": ["user:example@example.com"]}]')
 
-  ACCESS_LEVEL_SPECS = """
+  CUSTOM_LEVEL_SPEC = 'expression: "inIpRange(origin.ip, [\'127.0.0.1/24\']"'
+
+  ACCESS_LEVEL_SPECS_BASIC = """
       [
         {
           "name": "accessPolicies/1234/accessLevels/myLevel1",
@@ -104,6 +102,33 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       ]
     """
 
+  ACCESS_LEVEL_SPECS_BASIC_CUSTOM = """
+      [
+        {
+          "name": "accessPolicies/1234/accessLevels/myLevel1",
+          "title": "replacement level 1",
+          "description": "level description 1",
+          "basic": {
+            "conditions": [
+                  {"ipSubnetworks": ["127.0.0.1/24"]},
+                  {"members": ["user:example@example.com"]}
+            ],
+            "combiningFunction": "AND"
+          }
+        },
+        {
+          "name": "accessPolicies/1234/accessLevels/myLevel2",
+          "title": "replacement level 2",
+          "description": "level description 2",
+          "custom": {
+            "expr": {
+              "expression": "inIpRange(origin.ip, ['127.0.0.1/24'])"
+            }
+          }
+        }
+      ]
+    """
+
   SERVICE_PERIMETERS_SPECS = """
       [
         {
@@ -119,7 +144,6 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
               "accessPolicies/123/accessLevels/MY_LEVEL",
               "accessPolicies/123/accessLevels/MY_LEVEL_2"
             ],
-            "unrestrictedServices": ["*"],
             "restrictedServices": ["storage.googleapis.com"]
           }
         },
@@ -136,7 +160,6 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
               "accessPolicies/123/accessLevels/MY_LEVEL",
               "accessPolicies/123/accessLevels/MY_LEVEL_2"
             ],
-            "unrestrictedServices": ["*"],
             "restrictedServices": ["storage.googleapis.com"]
           }
         }
@@ -175,6 +198,20 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         title=title,
         updateTime=None)
 
+  def _MakeCustomLevel(self,
+                       name,
+                       expression=None,
+                       description=None,
+                       title=None):
+    return self.messages.AccessLevel(
+        custom=self.messages.CustomLevel(
+            expr=self.messages.Expr(expression=expression)),
+        createTime=None,
+        description=description,
+        name=name,
+        title=title,
+        updateTime=None)
+
   def _MakePerimeter(
       self,
       id_='MY_PERIMETER',
@@ -187,7 +224,7 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       type_=None,
       policy='123',
       vpc_allowed_services=None,
-      enable_vpc_service_restriction=None,
+      enable_vpc_accessible_services=None,
       dry_run=False):
 
     if type_:
@@ -202,9 +239,8 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       config.unrestrictedServices = unrestricted_services
 
     if self.support_service_filters:
-      self._FillInServiceFilterFields(config,
-                                      vpc_allowed_services,
-                                      enable_vpc_service_restriction)
+      self._FillInServiceFilterFields(config, vpc_allowed_services,
+                                      enable_vpc_accessible_services)
 
     if not dry_run:
       return self.messages.ServicePerimeter(
@@ -219,22 +255,22 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
           name='accessPolicies/123/servicePerimeters/' + id_,
           title=title,
           perimeterType=type_,
-          dryRun=True,
+          useExplicitDryRunSpec=True,
           spec=config)
 
   def _FillInServiceFilterFields(self, status, vpc_allowed_services,
-                                 enable_vpc_service_restriction):
+                                 enable_vpc_accessible_services):
     vpc_config = None
     if vpc_allowed_services is not None:
       if vpc_config is None:
-        vpc_config = self.messages.VpcServiceRestriction()
+        vpc_config = self.messages.VpcAccessibleServices()
       vpc_config.allowedServices = vpc_allowed_services
-    if enable_vpc_service_restriction is not None:
+    if enable_vpc_accessible_services is not None:
       if vpc_config is None:
-        vpc_config = self.messages.VpcServiceRestriction()
-      vpc_config.enableRestriction = enable_vpc_service_restriction
+        vpc_config = self.messages.VpcAccessibleServices()
+      vpc_config.enableRestriction = enable_vpc_accessible_services
     if vpc_config is not None:
-      status.vpcServiceRestriction = vpc_config
+      status.vpcAccessibleServices = vpc_config
 
   def _ExpectListPolicies(self, organization_name, policies):
     if isinstance(policies, Exception):

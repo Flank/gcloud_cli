@@ -46,8 +46,7 @@ summary:
           {
             "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ExportAnnotationsErrorDetails",
             "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
-            "errorCount": "1234",
-            "inputSize": "1234"
+            "errorCount": "1234"
           }
         ]
       }
@@ -82,8 +81,7 @@ summary:
           {
             "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ImportAnnotationsErrorDetails",
             "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
-            "errorCount": "1234",
-            "inputSize": "1234"
+            "errorCount": "1234"
           }
         ]
       }
@@ -270,7 +268,6 @@ actions:
                   {
                     "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ExportAnnotationsErrorDetails",
                     "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
-                    "inputSize": "1234",
                     "errorCount": "1234"
                   }
                 ]
@@ -289,8 +286,7 @@ actions:
               {
                 "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ExportAnnotationsErrorDetails",
                 "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
-                "errorCount": "1234",
-                "inputSize": "1234"
+                "errorCount": "1234"
               }
             ]
           }
@@ -403,7 +399,6 @@ actions:
                   {
                     "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ImportAnnotationsErrorDetails",
                     "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
-                    "inputSize": "1234",
                     "errorCount": "1234"
                   }
                 ]
@@ -422,8 +417,7 @@ actions:
               {
                 "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ImportAnnotationsErrorDetails",
                 "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
-                "errorCount": "1234",
-                "inputSize": "1234"
+                "errorCount": "1234"
               }
             ]
           }

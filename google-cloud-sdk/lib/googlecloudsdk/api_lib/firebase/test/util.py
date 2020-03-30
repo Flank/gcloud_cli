@@ -31,17 +31,9 @@ from googlecloudsdk.core import properties
 
 OUTCOMES_FORMAT = """
           table[box](
-            outcome.color(red=Fail, green=Pass, yellow=Inconclusive),
-            axis_value:label=TEST_AXIS_VALUE,
-            test_details:label=TEST_DETAILS
-          )
-"""
-
-FLAKY_ATTEMPTS_OUTCOMES_FORMAT = """
-          table[box](
             outcome.color(red=Fail, green=Pass, blue=Flaky, yellow=Inconclusive),
             axis_value:label=TEST_AXIS_VALUE,
-            passed_executions:label=PASSED_EXECUTIONS
+            test_details:label=TEST_DETAILS
           )
 """
 
@@ -260,3 +252,8 @@ def GetDeprecatedTagWarning(models):
         return ('Some devices are deprecated. Learn more at https://firebase.'
                 'google.com/docs/test-lab/available-testing-devices#deprecated')
   return None
+
+
+def GetRelativeDevicePath(device_path):
+  """Returns the relative device path that can be joined with GCS bucket."""
+  return device_path[1:] if device_path.startswith('/') else device_path

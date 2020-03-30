@@ -1,0 +1,75 @@
+NAME
+    gcloud alpha compute public-delegated-prefixes delegated-sub-prefixes
+        delete - deletes a Google Compute Engine delegated sub prefix
+
+SYNOPSIS
+    gcloud alpha compute public-delegated-prefixes delegated-sub-prefixes
+        delete NAME --public-delegated-prefix=PUBLIC_DELEGATED_PREFIX
+        [--global-public-delegated-prefix
+          | --public-delegated-prefix-region=PUBLIC_DELEGATED_PREFIX_REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the delegated sub prefix to delete.
+
+REQUIRED FLAGS
+     --public-delegated-prefix=PUBLIC_DELEGATED_PREFIX
+        Name of the public delegated prefix to delete the delegate sub prefix
+        for.
+
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --global-public-delegated-prefix
+          If set, the public delegated prefix is global.
+
+       --public-delegated-prefix-region=PUBLIC_DELEGATED_PREFIX_REGION
+          Region of the public delegated prefix to delete the delegate sub
+          prefix for. If not specified, you may be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To delete a delegated sub prefix for a global public delegated prefix:
+
+        $ gcloud alpha compute public-delegated-prefixes \
+            delegated-sub-prefixes delete my-sub-prefix \
+            --public-delegated-prefix=my-pdp \
+          --global-public-delegated-prefix
+
+    To delete a delegated sub prefix for a regional public delegated prefix:
+
+        $ gcloud alpha compute public-delegated-prefixes \
+            delegated-sub-prefixes delete my-sub-prefix \
+            --public-delegated-prefix=my-pdp \
+          --public-delegated-prefix-region us-east1
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

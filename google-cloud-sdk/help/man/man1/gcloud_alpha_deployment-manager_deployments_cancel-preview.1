@@ -58,8 +58,9 @@ fingerprint is printed when deployment data is modified.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -84,7 +85,7 @@ To cancel a preview command providing a fingerprint:
 
 .RS 2m
 $ gcloud alpha deployment\-manager deployments cancel\-preview \e
-    my\-deployment \-\-fingerprint deployment\-fingerprint
+    my\-deployment \-\-fingerprint=deployment\-fingerprint
 .RE
 
 When a deployment preview is cancelled, the deployment itself is not deleted.

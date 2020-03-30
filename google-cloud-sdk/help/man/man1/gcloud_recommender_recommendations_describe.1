@@ -1,0 +1,94 @@
+
+.TH "GCLOUD_RECOMMENDER_RECOMMENDATIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud recommender recommendations describe \- describe a recommendation for a Cloud project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud recommender recommendations describe\fR (\fIRECOMMENDATION\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR\ \fB\-\-recommender\fR=\fIRECOMMENDER\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Describe a recommendation for a Cloud project.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Recommendation resource \- The Cloud Recommendation to describe. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [recommendation] on
+the command line with a fully specified name; provide the argument [\-\-project]
+on the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIRECOMMENDATION\fR
+ID of the recommendation or fully qualified identifier for the recommendation.
+This positional must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location ID.
+
+.TP 2m
+\fB\-\-recommender\fR=\fIRECOMMENDER\fR
+The recommender ID.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBrecommender/v1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/recommender/docs/
+
+
+
+.SH "EXAMPLES"
+
+To describe a recommendation:
+
+.RS 2m
+$ gcloud recommender recommendations describe abcd\-1234 \e
+    \-\-project=project\-name \-\-location=global \e
+    \-\-recommender=google.compute.instance.MachineTypeRecommender
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha recommender recommendations describe
+$ gcloud beta recommender recommendations describe
+.RE
+

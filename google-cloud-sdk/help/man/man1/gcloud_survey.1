@@ -1,0 +1,57 @@
+
+.TH "GCLOUD_SURVEY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud survey \- invoke a customer satisfaction survey for Cloud SDK
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud survey\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+To permanently disable the survey prompt, run:
+
+.RS 2m
+$ gcloud config set survey/disable_prompts True
+.RE
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To launch the survey, run:
+
+.RS 2m
+$ gcloud survey
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha survey
+$ gcloud beta survey
+.RE
+

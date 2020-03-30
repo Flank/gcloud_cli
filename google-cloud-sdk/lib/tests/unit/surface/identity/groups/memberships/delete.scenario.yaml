@@ -1,0 +1,217 @@
+# Copyright 2019 Google LLC. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+title: cloud identity groups memberships delete test scenario
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Delete membership from a group with a specified group email and member
+      email.
+  - command: |
+      identity groups memberships delete
+      --group-email eng-discuss@foo.com --member-email user@foo.com
+  - prompt:
+    - message: You are about to delete None [None]
+    - input: y
+  - stderr: |
+      Deleted.
+- execute:
+  - label: Delete membership with an invalid group email.
+  - command: |
+      identity groups memberships delete --group-email invalid-group@foo.com
+      --member-email user@foo.com
+  - prompt:
+    - message: You are about to delete None [None]
+    - input: y
+  - error: '1: Invalid value for [group_email]: There is no such a group associated
+      with the specified argument:invalid-group@foo.com'
+- execute:
+  - label: Delete membership with an invalid/ non-existent member email.
+  - command: |
+      identity groups memberships delete --group-email eng-discuss@foo.com
+      --member-email invalid-user@foo.com
+  - prompt:
+    - message: You are about to delete None [None]
+    - input: y
+  - error: '1: Invalid value for [group_email, member_email]: There is no such a membership
+      associated with the specified arguments:eng-discuss@foo.com, invalid-user@foo.com'
+- execute:
+  - label: Delete membership, and abort the delete.
+  - command: |
+      identity groups memberships delete --group-email eng-discuss@foo.com
+      --member-email invalid-user@foo.com
+  - prompt:
+    - message: You are about to delete None [None]
+    - input: n
+  - error: '1: Aborted by user.'
+actions:
+
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha1
+      BETA: v1beta1
+
+- execute_command:
+    label: Delete membership from a group with a specified group email and member
+      email.
+    command: |
+      identity groups memberships delete
+      --group-email eng-discuss@foo.com --member-email user@foo.com
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete None [None]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "groups/11zu0gzc3tkdgn2"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "groups/11zu0gzc3tkdgn2/memberships/110293416452252446513"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships/110293416452252446513?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true
+            }
+    - expect_stderr: |
+        Deleted.
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: Delete membership with an invalid group email.
+    command: |
+      identity groups memberships delete --group-email invalid-group@foo.com
+      --member-email user@foo.com
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete None [None]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=invalid-group%40foo.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+          body: |
+            {
+              "error": {
+                "code": 404,
+                "message": "Requested entity was not found.",
+                "status": "NOT_FOUND",
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.rpc.DebugInfo",
+                    "detail": "[ORIGINAL ERROR] generic::not_found: Requested resource is not found.\n"
+                  }
+                ]
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [group_email]: There is no such a group associated
+          with the specified argument:invalid-group@foo.com'
+- execute_command:
+    label: Delete membership with an invalid/ non-existent member email.
+    command: |
+      identity groups memberships delete --group-email eng-discuss@foo.com
+      --member-email invalid-user@foo.com
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete None [None]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "groups/11zu0gzc3tkdgn2"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/$$api-version$$/groups/11zu0gzc3tkdgn2/memberships:lookup?memberKey.id=invalid-user%40foo.com&parent=groups%2F11zu0gzc3tkdgn2
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+          body: |
+            {
+              "error": {
+                "code": 404,
+                "message": "Requested resource is not found.",
+                "status": "NOT_FOUND",
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.rpc.DebugInfo",
+                    "detail": "[ORIGINAL ERROR] generic::not_found: Requested resource is not found.\n"
+                  }
+                ]
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [group_email, member_email]: There is no such
+          a membership associated with the specified arguments:eng-discuss@foo.com,
+          invalid-user@foo.com'
+- execute_command:
+    label: Delete membership, and abort the delete.
+    command: |
+      identity groups memberships delete --group-email eng-discuss@foo.com
+      --member-email invalid-user@foo.com
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete None [None]
+        user_input: n
+    - expect_exit:
+        code: 1
+        message: Aborted by user.

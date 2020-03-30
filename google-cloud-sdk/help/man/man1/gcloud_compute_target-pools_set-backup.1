@@ -101,8 +101,9 @@ Alternatively, the region can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -114,15 +115,15 @@ unhealthy, run:
 
 .RS 2m
 $ gcloud compute target\-pools set\-backup TARGET\-POOL \e
-    \-\-backup\-pool BACKUP\-POOL \-\-failover\-ratio 0.5 \e
-    \-\-region us\-central1
+    \-\-backup\-pool=BACKUP\-POOL \-\-failover\-ratio=0.5 \e
+    \-\-region=us\-central1
 .RE
 
 To remove \f5BACKUP\-POOL\fR as a backup to \f5TARGET\-POOL\fR, run:
 
 .RS 2m
 $ gcloud compute target\-pools set\-backup TARGET\-POOL \e
-    \-\-backup\-pool '' \-\-region us\-central1
+    \-\-backup\-pool='' \-\-region=us\-central1
 .RE
 
 

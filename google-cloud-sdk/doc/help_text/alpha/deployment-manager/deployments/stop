@@ -32,8 +32,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     To stop a running operation on a deployment, run:
@@ -48,7 +49,7 @@ EXAMPLES
     To stop a running operation on a deployment providing a fingerprint, run:
 
         $ gcloud alpha deployment-manager deployments stop my-deployment \
-            --fingerprint deployment-fingerprint
+            --fingerprint=deployment-fingerprint
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

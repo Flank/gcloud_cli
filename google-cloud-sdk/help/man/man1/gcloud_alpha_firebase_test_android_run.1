@@ -11,7 +11,7 @@ gcloud alpha firebase test android run \- invoke a test in Firebase Test Lab for
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha firebase test android run\fR [\fIARGSPEC\fR] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fITEST\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-additional\-apks\fR=\fIAPK\fR,[\fIAPK\fR,...]] [\fB\-\-app\-package\fR=\fIAPP_PACKAGE\fR] [\fB\-\-async\fR] [\fB\-\-auto\-google\-login\fR] [\fB\-\-client\-details\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-directories\-to\-pull\fR=[\fIDIR_TO_PULL\fR,...]] [\fB\-\-environment\-variables\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-profile\fR=\fIPROFILE_ID\fR] [\fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR] [\fB\-\-obb\-files\fR=\fIOBB_FILE\fR,[\fIOBB_FILE\fR]] [\fB\-\-other\-files\fR=\fIFILE\fR=\fIDEVICE_DIR\fR,[...]] [\fB\-\-performance\-metrics\fR] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-scenario\-labels\fR=\fILABEL\fR,[\fILABEL\fR,...]] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-test\-package\fR=\fITEST_PACKAGE\fR] [\fB\-\-test\-runner\-class\fR=\fITEST_RUNNER_CLASS\fR] [\fB\-\-test\-targets\fR=\fITEST_TARGET\fR,[\fITEST_TARGET\fR,...]] [\fB\-\-use\-orchestrator\fR] [\fB\-\-robo\-directives\fR=[\fITYPE\fR:\fIRESOURCE_NAME\fR=\fIINPUT\fR,...]] [\fB\-\-robo\-script\fR=\fIROBO_SCRIPT\fR] [\fB\-\-device\-ids\fR=\fIMODEL_ID\fR,[\fIMODEL_ID\fR,...],\ \fB\-d\fR\ \fIMODEL_ID\fR,[\fIMODEL_ID\fR,...]] [\fB\-\-locales\fR=\fILOCALE\fR,[\fILOCALE\fR,...],\ \fB\-l\fR\ \fILOCALE\fR,[\fILOCALE\fR,...]] [\fB\-\-orientations\fR=\fIORIENTATION\fR,[\fIORIENTATION\fR],\ \fB\-o\fR\ \fIORIENTATION\fR,[\fIORIENTATION\fR]] [\fB\-\-os\-version\-ids\fR=\fIOS_VERSION_ID\fR,[...],\ \fB\-v\fR\ \fIOS_VERSION_ID\fR,[...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha firebase test android run\fR [\fIARGSPEC\fR] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fITEST\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-additional\-apks\fR=\fIAPK\fR,[\fIAPK\fR,...]] [\fB\-\-app\-package\fR=\fIAPP_PACKAGE\fR] [\fB\-\-async\fR] [\fB\-\-auto\-google\-login\fR] [\fB\-\-client\-details\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-directories\-to\-pull\fR=[\fIDIR_TO_PULL\fR,...]] [\fB\-\-environment\-variables\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-profile\fR=\fIPROFILE_ID\fR] [\fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR] [\fB\-\-obb\-files\fR=\fIOBB_FILE\fR,[\fIOBB_FILE\fR]] [\fB\-\-other\-files\fR=\fIDEVICE_PATH\fR=\fIFILE_PATH\fR,[...]] [\fB\-\-performance\-metrics\fR] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-num\-uniform\-shards\fR=\fIint\fR\ |\ \fB\-\-test\-targets\-for\-shard\fR=\fITEST_TARGETS_FOR_SHARD\fR] [\fB\-\-scenario\-labels\fR=\fILABEL\fR,[\fILABEL\fR,...]] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-test\-package\fR=\fITEST_PACKAGE\fR] [\fB\-\-test\-runner\-class\fR=\fITEST_RUNNER_CLASS\fR] [\fB\-\-test\-targets\fR=\fITEST_TARGET\fR,[\fITEST_TARGET\fR,...]] [\fB\-\-use\-orchestrator\fR] [\fB\-\-robo\-directives\fR=[\fITYPE\fR:\fIRESOURCE_NAME\fR=\fIINPUT\fR,...]] [\fB\-\-robo\-script\fR=\fIROBO_SCRIPT\fR] [\fB\-\-device\-ids\fR=\fIMODEL_ID\fR,[\fIMODEL_ID\fR,...],\ \fB\-d\fR\ \fIMODEL_ID\fR,[\fIMODEL_ID\fR,...]] [\fB\-\-locales\fR=\fILOCALE\fR,[\fILOCALE\fR,...],\ \fB\-l\fR\ \fILOCALE\fR,[\fILOCALE\fR,...]] [\fB\-\-orientations\fR=\fIORIENTATION\fR,[\fIORIENTATION\fR],\ \fB\-o\fR\ \fIORIENTATION\fR,[\fIORIENTATION\fR]] [\fB\-\-os\-version\-ids\fR=\fIOS_VERSION_ID\fR,[...],\ \fB\-v\fR\ \fIOS_VERSION_ID\fR,[...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -145,11 +145,10 @@ Storage using gs:// notation.
 
 .TP 2m
 \fB\-\-app\-package\fR=\fIAPP_PACKAGE\fR
-(DEPRECATED) The Java package of the application under test (default: extracted
-from the APK manifest).
+(REMOVED) The Java package of the application under test. By default, the
+application package name is parsed from the APK manifest.
 
-The \f5\-\-app\-package\fR flag is deprecated and should no longer be used. By
-default, the correct application package name is parsed from the APK manifest.
+Flag \-\-app\-package has been removed.
 
 .TP 2m
 \fB\-\-async\fR
@@ -194,12 +193,6 @@ values. The environment variables are mirrored as extra options to the \f5am
 instrument \-e KEY1 VALUE1 ...\fR command and passed to your test runner
 (typically AndroidJUnitRunner). Examples:
 
-Break test cases into four shards and run only the first shard:
-
-.RS 2m
-\-\-environment\-variables numShards=4,shardIndex=0
-.RE
-
 Enable code coverage and provide a directory to store the coverage results when
 using Android Test Orchestrator (\f5\-\-use\-orchestrator\fR):
 
@@ -243,19 +236,18 @@ conform to the format as specified by Android (e.g.
 <shared\-storage>/Android/obb/<package\-name>/ on the test device.
 
 .TP 2m
-\fB\-\-other\-files\fR=\fIFILE\fR=\fIDEVICE_DIR\fR,[...]
-A list of file=device\-directory pairs that indicate paths of files to push to
-the device before starting tests, and the device directory to push them to.
+\fB\-\-other\-files\fR=\fIDEVICE_PATH\fR=\fIFILE_PATH\fR,[...]
+A list of device\-path=file\-path pairs that indicate the device paths to push
+files to the device before starting tests, and the paths of files to push.
 
-Source file paths may be in the local filesystem or in Google Cloud Storage
-(gs://...). Device directories must be absolute, whitelisted paths
-(${EXTERNAL_STORAGE}, or ${ANDROID_DATA}/local/tmp).
+Device paths must be under absolute, whitelisted paths (${EXTERNAL_STORAGE}, or
+${ANDROID_DATA}/local/tmp). Source file paths may be in the local filesystem or
+in Google Cloud Storage (gs://...).
 
 Examples:
 
 .RS 2m
-\-\-other\-files local/file1=/sdcard/dir1/
-\-\-other\-files gs://bucket/file2=/sdcard/dir2
+\-\-other\-files /sdcard/dir1/file1.txt=local/file.txt,/sdcard/dir2/file2.jpg=gs://bucket/file.jpg
 .RE
 
 This flag only copies files to the device. To install files, like OBB or APK
@@ -294,7 +286,56 @@ application's label from the APK manifest). All tests which use the same history
 name will have their results grouped together in the Firebase console in a
 time\-ordered test history list.
 
+.TP 2m
 
+Sharding options. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-num\-uniform\-shards\fR=\fIint\fR
+Specifies the number of shards into which you want to evenly distribute test
+cases. The shards are run in parallel on separate devices. For example, if your
+test execution contains 20 test cases and you specify four shards, each shard
+executes five test cases.
+
+The number of shards should be less than the total number of test cases. The
+number of shards specified must be >= 1 and <= 50.
+
+.TP 2m
+\fB\-\-test\-targets\-for\-shard\fR=\fITEST_TARGETS_FOR_SHARD\fR
+Specifies a group of packages, classes, and/or test cases to run in each shard
+(a group of test cases). The shards are run in parallel on separate devices. You
+can repeat this flag up to 50 times to specify multiple shards.
+
+Note: If you include the flags \-\-environment\-variable or \-\-test\-targets
+when running \-\-test\-targets\-for\-shard, the flags are applied to all the
+shards you create.
+
+Examples:
+
+You can also specify multiple packages, classes, or test cases in the same shard
+by separating each item with a comma. For example:
+
+.RS 2m
+\-\-test\-targets\-for\-shard
+"package com.package1.for.shard1,com.package2.for.shard1"
+.RE
+
+.RS 2m
+\-\-test\-targets\-for\-shard
+"class com.foo.ClassForShard2#testMethod1,com.foo.ClassForShard2#testMethod2"
+.RE
+
+To specify both package and class in the same shard, separate package and class
+with semi\-colons:
+
+.RS 2m
+\-\-test\-targets\-for\-shard
+"class com.foo.ClassForShard3;package com.package.for.shard3"
+.RE
+
+
+.RE
 .RE
 .sp
 
@@ -327,11 +368,10 @@ test matrix, but the maximum number may also be limited by the overall test
 .RS 2m
 .TP 2m
 \fB\-\-test\-package\fR=\fITEST_PACKAGE\fR
-(DEPRECATED) The Java package name of the instrumentation test (default:
-extracted from the APK manifest).
+(REMOVED) The Java package name of the instrumentation test. By default, the
+test package name is parsed from the APK manifest.
 
-The \f5\-\-test\-package\fR flag is deprecated and should no longer be used. By
-default, the correct test package name is parsed from the APK manifest.
+Flag \-\-test\-package has been removed.
 
 .TP 2m
 \fB\-\-test\-runner\-class\fR=\fITEST_RUNNER_CLASS\fR
@@ -499,8 +539,9 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -510,7 +551,7 @@ To invoke a robo test lasting 100 seconds against the default device
 environment, run:
 
 .RS 2m
-$ gcloud alpha firebase test android run \-\-app APP_APK \-\-timeout 100s
+$ gcloud alpha firebase test android run \-\-app=APP_APK \-\-timeout=100s
 .RE
 
 When specifying devices to test against, the preferred method is to use the
@@ -518,32 +559,32 @@ When specifying devices to test against, the preferred method is to use the
 MDPI Nexus device in landscape orientation, run:
 
 .RS 2m
-$ gcloud alpha firebase test android run \-\-app APP_APK \e
-    \-\-device model=NexusLowRes,orientation=landscape
+$ gcloud alpha firebase test android run \-\-app=APP_APK \e
+    \-\-device=model=NexusLowRes,orientation=landscape
 .RE
 
 To invoke an instrumentation test against a physical Nexus 6 device (MODEL_ID:
 shamu) which is running Android API level 21 in French, run:
 
 .RS 2m
-$ gcloud alpha firebase test android run \-\-app APP_APK \e
-    \-\-test TEST_APK \-\-device model=shamu,version=21,locale=fr
+$ gcloud alpha firebase test android run \-\-app=APP_APK \e
+    \-\-test=TEST_APK \-\-device=model=shamu,version=21,locale=fr
 .RE
 
 To test against multiple devices, specify \-\-device more than once:
 
 .RS 2m
-$ gcloud alpha firebase test android run \-\-app APP_APK \e
-    \-\-test TEST_APK \-\-device model=Nexus4,version=19 \e
-    \-\-device model=Nexus4,version=21 \e
-    \-\-device model=NexusLowRes,version=25
+$ gcloud alpha firebase test android run \-\-app=APP_APK \e
+    \-\-test=TEST_APK \-\-device=model=Nexus4,version=19 \e
+    \-\-device=model=Nexus4,version=21 \e
+    \-\-device=model=NexusLowRes,version=25
 .RE
 
 To invoke a robo test on an Android App Bundle, pass the .aab file using the
 \-\-app flag.
 
 .RS 2m
-$ gcloud alpha firebase test android run \-\-app bundle.aab
+$ gcloud alpha firebase test android run \-\-app=bundle.aab
 .RE
 
 You may also use the legacy dimension flags (deprecated) to specify which
@@ -557,8 +598,8 @@ comprehensive matrix of virtual and physical devices, OS versions, locales and
 orientations, run:
 
 .RS 2m
-$ gcloud alpha firebase test android run \-\-app APP_APK \e
-    \-\-timeout 5m \-\-device\-ids=shamu,NexusLowRes,Nexus5,g3,zeroflte \e
+$ gcloud alpha firebase test android run \-\-app=APP_APK \e
+    \-\-timeout=5m \-\-device\-ids=shamu,NexusLowRes,Nexus5,g3,zeroflte \e
     \-\-os\-version\-ids=19,21,22,23,24,25 \-\-locales=en_GB,es,fr,ru,zh \e
     \-\-orientations=portrait,landscape
 .RE
@@ -589,7 +630,7 @@ For example, to run a robo test using a specific Google Cloud Storage location
 to hold the raw test results, run:
 
 .RS 2m
-$ gcloud alpha firebase test android run \-\-app APP_APK \e
+$ gcloud alpha firebase test android run \-\-app=APP_APK \e
     \-\-results\-bucket=gs://my\-bucket \e
     \-\-results\-dir=my/test/results/<unique\-value>
 .RE
@@ -598,8 +639,8 @@ To run an instrumentation test and specify a custom name under which the history
 of your tests will be collected and displayed in the Firebase console, run:
 
 .RS 2m
-$ gcloud alpha firebase test android run \-\-app APP_APK \e
-    \-\-test TEST_APK \e
+$ gcloud alpha firebase test android run \-\-app=APP_APK \e
+    \-\-test=TEST_APK \e
     \-\-results\-history\-name='Excelsior App Test History'
 .RE
 

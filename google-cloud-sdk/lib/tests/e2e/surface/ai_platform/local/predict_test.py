@@ -27,103 +27,57 @@ from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
 
 
-def _VerifyTensorflow():
+def _VerifyLibIsInstalled(lib_name):
+  """Checks whether a python library (module) needed for a test is installed.
+
+  Args:
+    lib_name: name of the library, e.g. `tensorflow`.
+
+  Returns:
+    A tuple for test skip decorators, consisting of two elements:
+     - a boolean value to indicate whether the test should be skipped
+     - a string with the reason for the skip, if any
+  """
+
   python_executables = files.SearchForExecutableOnPath('python')
   if not python_executables:
-    raise RuntimeError('No python executable available')
+    return False, 'No python executable available'
   python_executable = python_executables[0]
-  command = [python_executable, '-c', 'import tensorflow']
+  command = [python_executable, '-c', 'import {}'.format(lib_name)]
   proc = subprocess.Popen(command,
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
   stdout, stderr = proc.communicate()
   if proc.returncode:
-    raise RuntimeError(
-        'Could not verify Tensorflow install.\n'
-        'Python location: {python}\n'
-        'Command to test: {command}\n'
-        '----------------stdout----------------\n'
-        '{stdout}'
-        '----------------stderr----------------'
-        '{stderr}'.format(python=python_executable, command=command,
-                          stdout=stdout, stderr=stderr))
+    # Something went wrong during module import
+    return (
+        False,
+        (
+            'Could not verify {lib} install.\n'
+            'Python location: {python}\n'
+            'Command to test: {command}\n'
+            '----------------stdout----------------\n'
+            '{stdout}'
+            '----------------stderr----------------'
+            '{stderr}'.format(lib=lib_name,
+                              python=python_executable,
+                              command=command,
+                              stdout=stdout,
+                              stderr=stderr)
+        )
+    )
+
+  return True, ''
 
 
-def _VerifyScikitLearn():
-  python_executables = files.SearchForExecutableOnPath('python')
-  if not python_executables:
-    raise RuntimeError('No python executable available')
-  python_executable = python_executables[0]
-  command = [python_executable, '-c', 'import sklearn']
-  proc = subprocess.Popen(
-      command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-  stdout, stderr = proc.communicate()
-  if proc.returncode:
-    raise RuntimeError('Could not verify Scikit-learn install.\n'
-                       'Python location: {python}\n'
-                       'Command to test: {command}\n'
-                       '----------------stdout----------------\n'
-                       '{stdout}'
-                       '----------------stderr----------------'
-                       '{stderr}'.format(
-                           python=python_executable,
-                           command=command,
-                           stdout=stdout,
-                           stderr=stderr))
-
-
-def _VerifyXgboost():
-  python_executables = files.SearchForExecutableOnPath('python')
-  if not python_executables:
-    raise RuntimeError('No python executable available')
-  python_executable = python_executables[0]
-  command = [python_executable, '-c', 'import xgboost']
-  proc = subprocess.Popen(
-      command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-  stdout, stderr = proc.communicate()
-  if proc.returncode:
-    raise RuntimeError('Could not verify XGBoost install.\n'
-                       'Python location: {python}\n'
-                       'Command to test: {command}\n'
-                       '----------------stdout----------------\n'
-                       '{stdout}'
-                       '----------------stderr----------------'
-                       '{stderr}'.format(
-                           python=python_executable,
-                           command=command,
-                           stdout=stdout,
-                           stderr=stderr))
-
-
-try:
-  _VerifyTensorflow()
-except RuntimeError as err:
-  tensorflow_available = False
-  reason = 'Needs tensorflow installed: ' + str(err)
-else:
-  tensorflow_available = True
-  reason = 'Needs tensorflow installed'
-try:
-  _VerifyScikitLearn()
-except RuntimeError as err:
-  sklearn_available = False
-  reason = 'Needs scikit-learn installed: ' + str(err)
-else:
-  sklearn_available = True
-  reason = 'Needs scikit-learn installed'
-try:
-  _VerifyXgboost()
-except RuntimeError as err:
-  xgboost_available = False
-  reason = 'Needs XGBoost installed: ' + str(err)
-else:
-  xgboost_available = True
-  reason = 'Needs XGBoost installed'
+tensorflow_available, tensorflow_reason = _VerifyLibIsInstalled('tensorflow')
+sklearn_available, sklearn_reason = _VerifyLibIsInstalled('sklearn')
+xgboost_available, xgboost_reason = _VerifyLibIsInstalled('xgboost')
 
 
 # If this test is skipped, we have very little effective coverage of this code
 # path and it should be treated as a high-priority issue.
 @sdk_test_base.Filters.RunOnlyInBundle
-@test_case.Filters.RunOnlyIf(tensorflow_available, reason)
+@test_case.Filters.RunOnlyIf(tensorflow_available, tensorflow_reason)
 @parameterized.parameters('ml-engine', 'ai-platform')
 class TensorflowPredictTest(base.MlGaPlatformTestBase):
   """e2e tests for ai-platform local predict command using tensorflow."""
@@ -152,7 +106,7 @@ class TensorflowPredictTest(base.MlGaPlatformTestBase):
 # If this test is skipped, we have very little effective coverage of this code
 # path and it should be treated as a high-priority issue.
 @sdk_test_base.Filters.RunOnlyInBundle
-@test_case.Filters.RunOnlyIf(sklearn_available, reason)
+@test_case.Filters.RunOnlyIf(sklearn_available, sklearn_reason)
 @parameterized.parameters('ml-engine', 'ai-platform')
 class ScikitLearnPredictTest(base.MlGaPlatformTestBase):
   """e2e tests for ai-platform local predict command using scikit-learn."""
@@ -183,7 +137,8 @@ class ScikitLearnPredictTest(base.MlGaPlatformTestBase):
 # If this test is skipped, we have very little effective coverage of this code
 # path and it should be treated as a high-priority issue.
 @sdk_test_base.Filters.RunOnlyInBundle
-@test_case.Filters.RunOnlyIf(xgboost_available, reason)
+@test_case.Filters.RunOnlyIf(xgboost_available, xgboost_reason)
+@test_case.Filters.SkipOnPy3('Missing libraries', 'b/147415841')
 @parameterized.parameters('ml-engine', 'ai-platform')
 class XgboostPredictTest(base.MlGaPlatformTestBase):
   """e2e tests for ai-platform local predict command using xgboost."""

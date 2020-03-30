@@ -12,8 +12,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 COMMANDS
     COMMAND is one of the following:
@@ -23,23 +24,27 @@ COMMANDS
         Engine machine image.
 
      create
-        (ALPHA) Create Google Compute Engine machine images.
+        (ALPHA) Create a Compute Engine machine image.
 
      delete
-        (ALPHA) Delete Google Compute Engine machine images.
+        (ALPHA) Delete a Compute Engine machine image.
 
      describe
-        (ALPHA) Display detailed information about a machine images.
+        (ALPHA) Describe a Compute Engine machine image.
 
      get-iam-policy
         (ALPHA) Get the IAM policy for a Google Compute Engine machine image.
 
+     import
+        (ALPHA) Create a Compute Engine machine image from virtual appliance in
+        OVA/OVF format.
+
      list
-        (ALPHA) List Google Compute Engine machine_images.
+        (ALPHA) List Google Compute Engine machine images.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding from the IAM policy of a Google
-        Compute Engine machine image.
+        (ALPHA) Remove IAM policy binding from the IAM policy of a Compute
+        Engine machine image.
 
      set-iam-policy
         (ALPHA) Set the IAM policy for a Google Compute Engine machine image.
@@ -48,5 +53,7 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute machine-images
 

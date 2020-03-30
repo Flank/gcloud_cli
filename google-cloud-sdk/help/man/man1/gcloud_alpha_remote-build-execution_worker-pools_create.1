@@ -11,7 +11,7 @@ gcloud alpha remote\-build\-execution worker\-pools create \- create a worker po
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha remote\-build\-execution worker\-pools create\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default=200] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-2"] [\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR] [\fB\-\-network\-access\fR=\fINETWORK_ACCESS\fR;\ default="public"] [\fB\-\-reserved\fR] [\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha remote\-build\-execution worker\-pools create\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default=200] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR;\ default="pd\-standard"] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-2"] [\fB\-\-max\-concurrent\-actions\fR=\fIMAX_CONCURRENT_ACTIONS\fR;\ default=1] [\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR] [\fB\-\-network\-access\fR=\fINETWORK_ACCESS\fR;\ default="public"] [\fB\-\-reserved\fR] [\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -73,6 +73,24 @@ Return immediately, without waiting for the operation in progress to complete.
 Size of the disk, in Gb, for each worker. Defaults to 200Gb.
 
 .TP 2m
+\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR; default="pd\-standard"
+Type of persistent disk the worker VMs will use. Default is pd\-standard.
+\fIDISK_TYPE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBpd\-ssd\fR
+SSD persistent disk.
+
+.TP 2m
+\fBpd\-standard\fR
+Standard persistent disk.
+
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to add.
 
@@ -87,6 +105,10 @@ Type of VM to use for each worker. To get a list of valid machine types, use the
 following command:
 
 $ gcloud compute machine\-types list
+
+.TP 2m
+\fB\-\-max\-concurrent\-actions\fR=\fIMAX_CONCURRENT_ACTIONS\fR; default=1
+Maximum actions each worker VM can run concurrently.
 
 .TP 2m
 \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR
@@ -140,8 +162,9 @@ about all available accelerator types.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

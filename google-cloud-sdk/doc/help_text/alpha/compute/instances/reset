@@ -9,6 +9,8 @@ DESCRIPTION
     (ALPHA) gcloud alpha compute instances reset is used to perform a hard
     reset on a Google Compute Engine virtual machine.
 
+    This will not perform a clean shutdown of the guest OS on the instance.
+
 POSITIONAL ARGUMENTS
      INSTANCE_NAMES [INSTANCE_NAMES ...]
         Names of the instances to operate on. For details on valid instance
@@ -43,8 +45,14 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To reset an instance named test-instance, run:
+
+        $ gcloud alpha compute instances reset test-instance
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

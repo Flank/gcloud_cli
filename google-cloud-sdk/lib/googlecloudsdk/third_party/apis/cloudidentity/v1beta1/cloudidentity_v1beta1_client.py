@@ -9,6 +9,7 @@ class CloudidentityV1beta1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://cloudidentity.googleapis.com/'
+  MTLS_BASE_URL = u'https://cloudidentity.mtls.googleapis.com/'
 
   _PACKAGE = u'cloudidentity'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-identity.groups', u'https://www.googleapis.com/auth/cloud-identity.groups.readonly', u'https://www.googleapis.com/auth/cloud-platform']
@@ -35,8 +36,73 @@ class CloudidentityV1beta1(base_api.BaseApiClient):
         default_global_params=default_global_params,
         additional_http_headers=additional_http_headers,
         response_encoding=response_encoding)
+    self.devices = self.DevicesService(self)
     self.groups_memberships = self.GroupsMembershipsService(self)
     self.groups = self.GroupsService(self)
+
+  class DevicesService(base_api.BaseApiService):
+    """Service class for the devices resource."""
+
+    _NAME = u'devices'
+
+    def __init__(self, client):
+      super(CloudidentityV1beta1.DevicesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def GetSettings(self, request, global_params=None):
+      r"""Returns the effective settings compiled for the requested entity.
+
+      Args:
+        request: (CloudidentityDevicesGetSettingsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GetEffectiveSettingsResponse) The response message.
+      """
+      config = self.GetMethodConfig('GetSettings')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetSettings.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/devices/{devicesId}/settings',
+        http_method=u'GET',
+        method_id=u'cloudidentity.devices.getSettings',
+        ordered_params=[u'resourceId'],
+        path_params=[u'resourceId'],
+        query_params=[u'clientContext_appId', u'clientContext_clientVersion', u'clientContext_iosVendorId', u'clientContext_osVersion'],
+        relative_path=u'v1beta1/{+resourceId}/settings',
+        request_field='',
+        request_type_name=u'CloudidentityDevicesGetSettingsRequest',
+        response_type_name=u'GetEffectiveSettingsResponse',
+        supports_download=False,
+    )
+
+    def Settings(self, request, global_params=None):
+      r"""Returns the effective settings compiled for the requested entity.
+
+      Args:
+        request: (CloudidentityDevicesSettingsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GetEffectiveSettingsResponse) The response message.
+      """
+      config = self.GetMethodConfig('Settings')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Settings.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/devices/{devicesId}/settings',
+        http_method=u'POST',
+        method_id=u'cloudidentity.devices.settings',
+        ordered_params=[u'resourceId'],
+        path_params=[u'resourceId'],
+        query_params=[],
+        relative_path=u'v1beta1/{+resourceId}/settings',
+        request_field=u'getEffectiveSettingsRequest',
+        request_type_name=u'CloudidentityDevicesSettingsRequest',
+        response_type_name=u'GetEffectiveSettingsResponse',
+        supports_download=False,
+    )
 
   class GroupsMembershipsService(base_api.BaseApiService):
     """Service class for the groups_memberships resource."""
@@ -48,8 +114,35 @@ class CloudidentityV1beta1(base_api.BaseApiClient):
       self._upload_configs = {
           }
 
+    def CheckTransitiveMembership(self, request, global_params=None):
+      r"""Check a potential member for membership in a group.
+
+      Args:
+        request: (CloudidentityGroupsMembershipsCheckTransitiveMembershipRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (CheckTransitiveMembershipResponse) The response message.
+      """
+      config = self.GetMethodConfig('CheckTransitiveMembership')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    CheckTransitiveMembership.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/groups/{groupsId}/memberships:checkTransitiveMembership',
+        http_method=u'GET',
+        method_id=u'cloudidentity.groups.memberships.checkTransitiveMembership',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'query'],
+        relative_path=u'v1beta1/{+parent}/memberships:checkTransitiveMembership',
+        request_field='',
+        request_type_name=u'CloudidentityGroupsMembershipsCheckTransitiveMembershipRequest',
+        response_type_name=u'CheckTransitiveMembershipResponse',
+        supports_download=False,
+    )
+
     def Create(self, request, global_params=None):
-      r"""Creates a Membership.
+      r"""Creates a `Membership`.
 
       Args:
         request: (CloudidentityGroupsMembershipsCreateRequest) input message
@@ -76,7 +169,7 @@ class CloudidentityV1beta1(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a Membership.
+      r"""Deletes a `Membership`.
 
       Args:
         request: (CloudidentityGroupsMembershipsDeleteRequest) input message
@@ -103,7 +196,7 @@ class CloudidentityV1beta1(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      r"""Retrieves a Membership.
+      r"""Retrieves a `Membership`.
 
       Args:
         request: (CloudidentityGroupsMembershipsGetRequest) input message
@@ -129,8 +222,35 @@ class CloudidentityV1beta1(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def GetMembershipGraph(self, request, global_params=None):
+      r"""Get a membership graph of a member or member/group.
+
+      Args:
+        request: (CloudidentityGroupsMembershipsGetMembershipGraphRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('GetMembershipGraph')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetMembershipGraph.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/groups/{groupsId}/memberships:getMembershipGraph',
+        http_method=u'GET',
+        method_id=u'cloudidentity.groups.memberships.getMembershipGraph',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'query'],
+        relative_path=u'v1beta1/{+parent}/memberships:getMembershipGraph',
+        request_field='',
+        request_type_name=u'CloudidentityGroupsMembershipsGetMembershipGraphRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
     def List(self, request, global_params=None):
-      r"""List Memberships within a Group.
+      r"""Lists the `Membership`s within a `Group`.
 
       Args:
         request: (CloudidentityGroupsMembershipsListRequest) input message
@@ -157,9 +277,9 @@ class CloudidentityV1beta1(base_api.BaseApiClient):
     )
 
     def Lookup(self, request, global_params=None):
-      r"""Looks up [resource.
-name](https://cloud.google.com/apis/design/resource_names) of a Membership
-within a Group by member's EntityKey.
+      r"""Looks up the [resource.
+name](https://cloud.google.com/apis/design/resource_names) of a
+`Membership` by its `EntityKey`.
 
       Args:
         request: (CloudidentityGroupsMembershipsLookupRequest) input message
@@ -186,7 +306,7 @@ within a Group by member's EntityKey.
     )
 
     def ModifyMembershipRoles(self, request, global_params=None):
-      r"""Modify membership roles.
+      r"""Modifies the `MembershipRole`s of a `Membership`.
 
       Args:
         request: (CloudidentityGroupsMembershipsModifyMembershipRolesRequest) input message
@@ -212,6 +332,87 @@ within a Group by member's EntityKey.
         supports_download=False,
     )
 
+    def Patch(self, request, global_params=None):
+      r"""Updates a `Membership`.
+
+      Args:
+        request: (CloudidentityGroupsMembershipsPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/groups/{groupsId}/memberships/{membershipsId}',
+        http_method=u'PATCH',
+        method_id=u'cloudidentity.groups.memberships.patch',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[u'updateMask'],
+        relative_path=u'v1beta1/{+name}',
+        request_field=u'membership',
+        request_type_name=u'CloudidentityGroupsMembershipsPatchRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def SearchTransitiveGroups(self, request, global_params=None):
+      r"""Search transitive groups of a member.
+
+      Args:
+        request: (CloudidentityGroupsMembershipsSearchTransitiveGroupsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (SearchTransitiveGroupsResponse) The response message.
+      """
+      config = self.GetMethodConfig('SearchTransitiveGroups')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SearchTransitiveGroups.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/groups/{groupsId}/memberships:searchTransitiveGroups',
+        http_method=u'GET',
+        method_id=u'cloudidentity.groups.memberships.searchTransitiveGroups',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'pageSize', u'pageToken', u'query'],
+        relative_path=u'v1beta1/{+parent}/memberships:searchTransitiveGroups',
+        request_field='',
+        request_type_name=u'CloudidentityGroupsMembershipsSearchTransitiveGroupsRequest',
+        response_type_name=u'SearchTransitiveGroupsResponse',
+        supports_download=False,
+    )
+
+    def SearchTransitiveMemberships(self, request, global_params=None):
+      r"""Search transitive memberships of a group.
+
+      Args:
+        request: (CloudidentityGroupsMembershipsSearchTransitiveMembershipsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (SearchTransitiveMembershipsResponse) The response message.
+      """
+      config = self.GetMethodConfig('SearchTransitiveMemberships')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SearchTransitiveMemberships.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/groups/{groupsId}/memberships:searchTransitiveMemberships',
+        http_method=u'GET',
+        method_id=u'cloudidentity.groups.memberships.searchTransitiveMemberships',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'pageSize', u'pageToken'],
+        relative_path=u'v1beta1/{+parent}/memberships:searchTransitiveMemberships',
+        request_field='',
+        request_type_name=u'CloudidentityGroupsMembershipsSearchTransitiveMembershipsRequest',
+        response_type_name=u'SearchTransitiveMembershipsResponse',
+        supports_download=False,
+    )
+
   class GroupsService(base_api.BaseApiService):
     """Service class for the groups resource."""
 
@@ -223,7 +424,7 @@ within a Group by member's EntityKey.
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates a Group.
+      r"""Creates a `Group`.
 
       Args:
         request: (CloudidentityGroupsCreateRequest) input message
@@ -249,7 +450,7 @@ within a Group by member's EntityKey.
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a Group.
+      r"""Deletes a `Group`.
 
       Args:
         request: (CloudidentityGroupsDeleteRequest) input message
@@ -276,7 +477,7 @@ within a Group by member's EntityKey.
     )
 
     def Get(self, request, global_params=None):
-      r"""Retrieves a Group.
+      r"""Retrieves a `Group`.
 
       Args:
         request: (CloudidentityGroupsGetRequest) input message
@@ -302,10 +503,36 @@ within a Group by member's EntityKey.
         supports_download=False,
     )
 
+    def List(self, request, global_params=None):
+      r"""Lists the `Group`s under a customer or namespace.
+
+      Args:
+        request: (CloudidentityGroupsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListGroupsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'cloudidentity.groups.list',
+        ordered_params=[],
+        path_params=[],
+        query_params=[u'pageSize', u'pageToken', u'parent', u'view'],
+        relative_path=u'v1beta1/groups',
+        request_field='',
+        request_type_name=u'CloudidentityGroupsListRequest',
+        response_type_name=u'ListGroupsResponse',
+        supports_download=False,
+    )
+
     def Lookup(self, request, global_params=None):
-      r"""Looks up [resource.
-name](https://cloud.google.com/apis/design/resource_names) of a Group by
-its EntityKey.
+      r"""Looks up the [resource.
+name](https://cloud.google.com/apis/design/resource_names) of a `Group` by
+its `EntityKey`.
 
       Args:
         request: (CloudidentityGroupsLookupRequest) input message
@@ -331,7 +558,7 @@ its EntityKey.
     )
 
     def Patch(self, request, global_params=None):
-      r"""Updates a Group.
+      r"""Updates a `Group`.
 
       Args:
         request: (CloudidentityGroupsPatchRequest) input message
@@ -358,7 +585,7 @@ its EntityKey.
     )
 
     def Search(self, request, global_params=None):
-      r"""Searches for Groups.
+      r"""Searches for `Group`s matching a specified query.
 
       Args:
         request: (CloudidentityGroupsSearchRequest) input message

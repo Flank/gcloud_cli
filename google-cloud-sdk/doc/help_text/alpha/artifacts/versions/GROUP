@@ -1,0 +1,47 @@
+NAME
+    gcloud alpha artifacts versions - manage Artifact Registry package versions
+
+SYNOPSIS
+    gcloud alpha artifacts versions COMMAND [GCLOUD_WIDE_FLAG ...]
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (ALPHA) Delete an Artifact Registry package version.
+
+     list
+        (ALPHA) List Artifact Registry package versions.
+
+EXAMPLES
+    To list all versions for a package when the artifacts/repository and
+    artifacts/location properties are set to a repository in the current
+    project, run:
+
+        $ gcloud alpha artifacts versions list --package=my-pkg
+
+    To delete version 1.0.0 under package my-pkg, run:
+
+        $ gcloud alpha artifacts versions delete 1.0.0 --package=my-pkg
+
+    To delete version 1.0.0 under package my-pkg with its tags, run:
+
+        $ gcloud alpha artifacts versions delete 1.0.0 --package=my-pkg \
+          --delete-tags
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta artifacts versions
+

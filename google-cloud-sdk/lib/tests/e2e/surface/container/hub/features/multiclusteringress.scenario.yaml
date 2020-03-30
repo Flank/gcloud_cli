@@ -7,9 +7,10 @@ summary:
       container hub features $$feature$$ describe
       --format "text(featureState,multiclusteringressFeatureSpec,name)"
   - stdout: |
-      featureState.lifecycleState:                     ENABLED
-      $$feature$$FeatureSpec.configMembership: projects/cloud-sdk-integration-testing/locations/global/memberships/golden-cluster
-      name:                                            projects/cloud-sdk-integration-testing/locations/global/features/$$feature$$
+      featureState.detailsByMembership.projects/462803083913/locations/global/memberships/golden-cluster.code: OK
+      featureState.lifecycleState:                                                                             ENABLED
+      $$feature$$FeatureSpec.configMembership:                                                         projects/cloud-sdk-integration-testing/locations/global/memberships/golden-cluster
+      name:                                                                                                    projects/cloud-sdk-integration-testing/locations/global/features/$$feature$$
 actions:
 - define_reference:
     reference: feature
@@ -19,7 +20,7 @@ actions:
 - execute_command:
     command: |
       container hub features $$feature$$ describe
-      --format "text(featureState,multiclusteringressFeatureSpec,name)"
+      --format "text(featureState.lifecycleState,multiclusteringressFeatureSpec,name)"
     events:
     - api_call:
         expect_request:
@@ -30,15 +31,18 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '410'
+            content-length: '552'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/global/features/$$feature$$
             featureState:
               lifecycleState: ENABLED
-            createTime: '2019-07-17T13:09:27.556154294Z'
-            updateTime: '2019-07-17T13:09:27.682820282Z'
+              detailsByMembership:
+                projects/462803083913/locations/global/memberships/golden-cluster:
+                  code: OK
+            createTime: '2019-09-23T19:34:16.010516768Z'
+            updateTime: '2020-01-09T17:51:02.989259835Z'
             multiclusteringressFeatureSpec:
               configMembership: projects/cloud-sdk-integration-testing/locations/global/memberships/golden-cluster
     # TODO Test for other featureState fields.

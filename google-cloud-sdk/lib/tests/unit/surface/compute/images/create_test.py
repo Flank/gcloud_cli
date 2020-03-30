@@ -43,6 +43,8 @@ _BIN_FILE_SUFFIX = '.bin'
 _FILE_CONTENT = b'0\202'
 _STORAGE_IMAGE_URL =\
     'https://www.googleapis.com/storage/v1/b/31dd/o/source-image'
+_STORAGE_IMAGE_URL_DOMAIN_SPLIT = \
+  'https://storage.googleapis.com/storage/v1/b/31dd/o/source-image'
 
 
 class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
@@ -68,7 +70,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                   name='my-image',
                   description='nifty',
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -104,7 +106,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
               image=self.messages.Image(
                   name='my-image',
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -272,7 +274,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                   description='nifty',
                   licenses=licenses,
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -300,7 +302,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                   description='nifty',
                   licenses=licenses,
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -497,7 +499,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -525,7 +527,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -545,6 +547,11 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
     enums = list(
         self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
     enums.remove('FEATURE_TYPE_UNSPECIFIED')
+
+    # Note: SECURE_BOOT still exists in the API, but it is deprecated and has no
+    # effect.
+    enums.remove('SECURE_BOOT')
+
     enums.sort()
 
     # Update the list in the image_utils module if this test fails because of an
@@ -782,7 +789,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                                  'keyRings/ring/cryptoKeys/image-key'
                   ),
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -805,7 +812,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                                  'keyRings/ring/cryptoKeys/image-key'
                   ),
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -828,7 +835,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                                  'keyRings/ring/cryptoKeys/image-key'
                   ),
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -883,7 +890,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
               image=self.messages.Image(
                   name='my-image',
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW,
                   storageLocations=['us-central1']),
               project='my-project'))],
@@ -947,7 +954,7 @@ class ImagesCreateBetaTest(ImagesCreateTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -975,7 +982,7 @@ class ImagesCreateBetaTest(ImagesCreateTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -995,6 +1002,11 @@ class ImagesCreateBetaTest(ImagesCreateTest):
     enums = list(
         self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
     enums.remove('FEATURE_TYPE_UNSPECIFIED')
+
+    # Note: SECURE_BOOT still exists in the API, but it is deprecated and has no
+    # effect.
+    enums.remove('SECURE_BOOT')
+
     enums.sort()
 
     choices = list(image_utils.GUEST_OS_FEATURES_BETA)
@@ -1083,7 +1095,7 @@ class ImagesCreateAlphaTest(ImagesCreateBetaTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -1111,7 +1123,7 @@ class ImagesCreateAlphaTest(ImagesCreateBetaTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -1131,6 +1143,11 @@ class ImagesCreateAlphaTest(ImagesCreateBetaTest):
     enums = list(
         self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
     enums.remove('FEATURE_TYPE_UNSPECIFIED')
+
+    # Note: SECURE_BOOT still exists in the API, but it is deprecated and has no
+    # effect.
+    enums.remove('SECURE_BOOT')
+
     enums.sort()
 
     choices = list(image_utils.GUEST_OS_FEATURES_ALPHA)
@@ -1170,7 +1187,7 @@ class ImagesCreateAlphaTest(ImagesCreateBetaTest):
                               content=_FILE_CONTENT, fileType=self.x509_enum)],
                   },
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )

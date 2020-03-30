@@ -24,7 +24,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class UpdateTestBeta(test_base.BaseTest):
+class UpdateTest(test_base.BaseTest):
   _PM_NAME = 'my-pm'
   _REGION = 'us-central1'
   _ZONE = 'us-central1-a'
@@ -33,11 +33,11 @@ class UpdateTestBeta(test_base.BaseTest):
   _DEFAULT_NETWORK = 'default'
 
   def SetUp(self):
-    self.api_version = 'beta'
+    self.api_version = 'v1'
     self.SelectApi(self.api_version)
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     self.messages = core_apis.GetMessagesModule('compute', self.api_version)
-    self.compute = self.compute_beta
+    self.compute = self.compute_v1
 
   def testUpdate(self):
     self._SetNextGetResult(
@@ -51,7 +51,7 @@ class UpdateTestBeta(test_base.BaseTest):
 
     self.Run("""\
         compute packet-mirrorings update my-pm --region us-central1
-        --priority 1 --no-enable --description 'Mirror the packets'
+        --no-enable --description 'Mirror the packets'
         """)
 
     self._CheckGetAndPatchRequests(
@@ -62,7 +62,6 @@ class UpdateTestBeta(test_base.BaseTest):
         ),
         filter=self.messages.PacketMirroringFilter(),
         enable=self.messages.PacketMirroring.EnableValueValuesEnum.FALSE,
-        priority=1,
         description='Mirror the packets')
 
   def testUpdate_AddRepeatedFields(self):
@@ -241,6 +240,16 @@ class UpdateTestBeta(test_base.BaseTest):
         url='https://compute.googleapis.com/compute/%s/'
         'projects/%s/regions/%s/subnetworks/%s' %
         (self.api_version, self._PROJECT, self._REGION, subnet))
+
+
+class UpdateTestBeta(UpdateTest):
+
+  def SetUp(self):
+    self.api_version = 'beta'
+    self.SelectApi(self.api_version)
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.compute = self.compute_beta
 
 
 class UpdateTestAlpha(UpdateTestBeta):

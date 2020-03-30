@@ -2,8 +2,9 @@ NAME
     gcloud alpha filestore snapshots update - update a Cloud Filestore snapshot
 
 SYNOPSIS
-    gcloud alpha filestore snapshots update SNAPSHOT --region=REGION [--async]
-        [--description=DESCRIPTION] [--update-labels=[KEY=VALUE,...]]
+    gcloud alpha filestore snapshots update SNAPSHOT
+        (--region=REGION | --zone=ZONE) [--async] [--description=DESCRIPTION]
+        [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -20,8 +21,13 @@ POSITIONAL ARGUMENTS
         update.
 
 REQUIRED FLAGS
-     --region=REGION
-        Compute region (e.g. us-central1) for the snapshot.
+     Exactly one of these must be specified:
+
+       --region=REGION
+          Compute region (e.g. us-central1) for the snapshot.
+
+       --zone=ZONE
+          Compute zone (e.g. us-central1-c) for the snapshot.
 
 OPTIONAL FLAGS
      --async
@@ -57,14 +63,16 @@ OPTIONAL FLAGS
 
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
-          silently ignored.
+          silently ignored. If --update-labels is also specified then
+          --remove-labels is applied first.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the file/v1p1alpha1 API. The full documentation for this
@@ -76,12 +84,11 @@ EXAMPLES
     description.'
 
         $ gcloud alpha filestore snapshots update my-snapshot \
-             --region=us-central1 --description "A new description."
+             --region=us-central1 --description="A new description."
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

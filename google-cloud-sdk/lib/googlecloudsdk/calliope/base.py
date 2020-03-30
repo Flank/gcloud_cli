@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 
 import abc
 import collections
-from functools import wraps
+from functools import wraps  # pylint:disable=g-importing-member
 import itertools
 import re
 import sys
@@ -39,6 +39,7 @@ import six
 # Category constants
 AI_AND_MACHINE_LEARNING_CATEGORY = 'AI and Machine Learning'
 API_PLATFORM_AND_ECOSYSTEMS_CATEGORY = 'API Platform and Ecosystems'
+ANTHOS_CLI_CATEGORY = 'Anthos CLI'
 COMPUTE_CATEGORY = 'Compute'
 DATA_ANALYTICS_CATEGORY = 'Data Analytics'
 DATABASES_CATEGORY = 'Databases'
@@ -54,6 +55,16 @@ INSTANCES_CATEGORY = 'Instances'
 LOAD_BALANCING_CATEGORY = 'Load Balancing'
 TOOLS_CATEGORY = 'Tools'
 STORAGE_CATEGORY = 'Storage'
+BILLING_CATEGORY = 'Billing'
+SECURITY_CATEGORY = 'Security'
+IDENTITY_CATEGORY = 'Identity'
+BIG_DATA_CATEGORY = 'Big Data'
+CI_CD_CATEGORY = 'CI/CD'
+MONITORING_CATEGORY = 'Monitoring'
+SOLUTIONS_CATEGORY = 'Solutions'
+SERVERLESS_CATEGORY = 'Serverless'
+UNCATEGORIZED_CATEGORY = 'Other'
+IDENTITY_CATEGORY = 'Identity'
 
 
 # Common markdown.
@@ -409,6 +420,18 @@ URI_FLAG = Argument(
     category=LIST_COMMAND_FLAGS,
     help='Print a list of resource URIs instead of the default output.')
 
+# Binary Command Flags
+BINARY_BACKED_COMMAND_FLAGS = 'BINARY BACKED COMMAND'
+
+SHOW_EXEC_ERROR_FLAG = Argument(
+    '--show-exec-error',
+    hidden=True,
+    action='store_true',
+    required=False,
+    category=BINARY_BACKED_COMMAND_FLAGS,
+    help='If true and command fails, print the underlying command '
+         'that was executed and its exit status.')
+
 
 class _Common(six.with_metaclass(abc.ABCMeta, object)):
   """Base class for Command and Group."""
@@ -630,6 +653,36 @@ class SilentCommand(six.with_metaclass(abc.ABCMeta, Command)):
 
 class DescribeCommand(six.with_metaclass(abc.ABCMeta, Command)):
   """A command that prints one resource in the 'default' format."""
+
+
+class ImportCommand(six.with_metaclass(abc.ABCMeta, Command)):
+  """A command that imports one resource from yaml format."""
+
+
+class ExportCommand(six.with_metaclass(abc.ABCMeta, Command)):
+  """A command that outputs one resource to file in yaml format."""
+
+
+class BinaryBackedCommand(six.with_metaclass(abc.ABCMeta, Command)):
+  """A command that wraps a BinaryBackedOperation."""
+
+  @staticmethod
+  def _Flags(parser):
+    SHOW_EXEC_ERROR_FLAG.AddToParser(parser)
+
+  @staticmethod
+  def _DefaultOperationResponseHandler(response):
+    """Process results of BinaryOperation Execution."""
+    if response.stdout:
+      log.status.Print(response.stdout)
+
+    if response.failed:
+      log.error(response.stderr)
+      return None
+
+    if response.stderr:
+      log.status.Print(response.stderr)
+    return response.stdout
 
 
 class CacheCommand(six.with_metaclass(abc.ABCMeta, Command)):

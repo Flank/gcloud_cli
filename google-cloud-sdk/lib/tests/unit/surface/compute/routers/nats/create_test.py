@@ -29,7 +29,7 @@ from tests.lib.surface.compute import router_test_utils
 class CreateTest(router_test_base.RouterTestBase):
 
   def SetUp(self):
-    self.version = 'v1'
+    self.api_version = 'v1'
     self.SelectApi(calliope_base.ReleaseTrack.GA, 'v1')
 
     self.orig = router_test_utils.CreateEmptyRouterMessage(
@@ -54,7 +54,7 @@ class CreateTest(router_test_base.RouterTestBase):
 
     self.ExpectGet(self.orig)
     self.ExpectPatch(expected_router)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(expected_router)
 
     self.Run("""
@@ -73,13 +73,13 @@ class CreateTest(router_test_base.RouterTestBase):
             natIps=[
                 ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-1') %
-                self.version,
+                self.api_version,
                 ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-2') %
-                self.version,
+                self.api_version,
                 ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-3') %
-                self.version,
+                self.api_version,
             ],
             sourceSubnetworkIpRangesToNat=self.messages.RouterNat
             .SourceSubnetworkIpRangesToNatValueValuesEnum
@@ -88,7 +88,7 @@ class CreateTest(router_test_base.RouterTestBase):
 
     self.ExpectGet(self.orig)
     self.ExpectPatch(expected_router)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(expected_router)
 
     self.Run("""
@@ -112,7 +112,7 @@ class CreateTest(router_test_base.RouterTestBase):
 
     self.ExpectGet(self.orig)
     self.ExpectPatch(expected_router)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(expected_router)
 
     self.Run("""
@@ -135,7 +135,7 @@ class CreateTest(router_test_base.RouterTestBase):
                     name=(
                         'https://compute.googleapis.com/compute/%s/projects/'
                         'fake-project/regions/us-central1/subnetworks/subnet-1')
-                    % self.version,
+                    % self.api_version,
                     sourceIpRangesToNat=[
                         self.messages.RouterNatSubnetworkToNat
                         .SourceIpRangesToNatValueListEntryValuesEnum
@@ -145,7 +145,7 @@ class CreateTest(router_test_base.RouterTestBase):
                     name=(
                         'https://compute.googleapis.com/compute/%s/projects/'
                         'fake-project/regions/us-central1/subnetworks/subnet-2')
-                    % self.version,
+                    % self.api_version,
                     sourceIpRangesToNat=[
                         self.messages.RouterNatSubnetworkToNat
                         .SourceIpRangesToNatValueListEntryValuesEnum
@@ -156,7 +156,7 @@ class CreateTest(router_test_base.RouterTestBase):
                     name=(
                         'https://compute.googleapis.com/compute/%s/projects/'
                         'fake-project/regions/us-central1/subnetworks/subnet-3')
-                    % self.version,
+                    % self.api_version,
                     sourceIpRangesToNat=[
                         self.messages.RouterNatSubnetworkToNat
                         .SourceIpRangesToNatValueListEntryValuesEnum
@@ -171,7 +171,7 @@ class CreateTest(router_test_base.RouterTestBase):
 
     self.ExpectGet(self.orig)
     self.ExpectPatch(expected_router)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(expected_router)
 
     self.Run("""
@@ -200,7 +200,7 @@ class CreateTest(router_test_base.RouterTestBase):
 
     self.ExpectGet(self.orig)
     self.ExpectPatch(expected_router)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(expected_router)
 
     self.Run("""
@@ -249,14 +249,14 @@ class CreateTest(router_test_base.RouterTestBase):
         --region us-central1 --auto-allocate-nat-external-ips
         --nat-all-subnet-ip-ranges --async
         """)
-    self.assertEqual('operation-X', result.name)
+    self.assertIn('operation-X', result.name)
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Create in progress for nat [my-nat] in router [my-router] '
-        '[https://compute.googleapis.com/compute/v1/'
+        '[https://compute.googleapis.com/compute/{0}/'
         'projects/fake-project/regions/us-central1/operations/operation-X] '
         'Run the [gcloud compute operations describe] command to check the '
-        'status of this operation.\n')
+        'status of this operation.\n'.format(self.api_version))
 
   def testLogging(self):
     expected_router = copy.deepcopy(self.orig)
@@ -281,7 +281,7 @@ class CreateTest(router_test_base.RouterTestBase):
 
     self.ExpectGet(self.orig)
     self.ExpectPatch(expected_router)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(expected_router)
 
     self.Run("""
@@ -295,7 +295,7 @@ class CreateTest(router_test_base.RouterTestBase):
 class BetaCreateTest(CreateTest):
 
   def SetUp(self):
-    self.version = 'beta'
+    self.api_version = 'beta'
     self.SelectApi(calliope_base.ReleaseTrack.BETA, 'beta')
 
     self.orig = router_test_utils.CreateEmptyRouterMessage(
@@ -305,7 +305,7 @@ class BetaCreateTest(CreateTest):
 class AlphaCreateTest(CreateTest):
 
   def SetUp(self):
-    self.version = 'alpha'
+    self.api_version = 'alpha'
     self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
 
     self.orig = router_test_utils.CreateEmptyRouterMessage(

@@ -106,6 +106,15 @@ class AuthProvider(_messages.Message):
       the issuer.  - can be inferred from the email domain of the issuer (e.g.
       a Google  service account).  Example:
       https://www.googleapis.com/oauth2/v1/certs
+    jwtLocations: Defines the locations to extract the JWT.  JWT locations can
+      be either from HTTP headers or URL query parameters. The rule is that
+      the first match wins. The checking order is: checking all headers first,
+      then URL query parameters.  If not specified,  default to use following
+      3 locations:    1) Authorization: Bearer    2) x-goog-iap-jwt-assertion
+      3) access_token query parameter  Default locations can be specified as
+      followings:    jwt_locations:    - header: Authorization
+      value_prefix: "Bearer "    - header: x-goog-iap-jwt-assertion    -
+      query: access_token
   """
 
   audiences = _messages.StringField(1)
@@ -113,6 +122,7 @@ class AuthProvider(_messages.Message):
   id = _messages.StringField(3)
   issuer = _messages.StringField(4)
   jwksUri = _messages.StringField(5)
+  jwtLocations = _messages.MessageField('JwtLocation', 6, repeated=True)
 
 
 class AuthRequirement(_messages.Message):
@@ -202,17 +212,40 @@ class BackendRule(_messages.Message):
     PathTranslationValueValuesEnum:
 
   Fields:
-    address: The address of the API backend.
-    deadline: The number of seconds to wait for a response from a request.
-      The default deadline for gRPC is infinite (no deadline) and HTTP
-      requests is 5 seconds.
-    jwtAudience: The JWT audience is used when generating a JWT id token for
-      the backend.
+    address: The address of the API backend.  The scheme is used to determine
+      the backend protocol and security. The following schemes are accepted:
+      SCHEME        PROTOCOL    SECURITY    http://       HTTP        None
+      https://      HTTP        TLS    grpc://       gRPC        None
+      grpcs://      gRPC        TLS  It is recommended to explicitly include a
+      scheme. Leaving out the scheme may cause constrasting behaviors across
+      platforms.  If the port is unspecified, the default is: - 80 for schemes
+      without TLS - 443 for schemes with TLS  For HTTP backends, use protocol
+      to specify the protocol version.
+    deadline: The number of seconds to wait for a response from a request. The
+      default varies based on the request protocol and deployment environment.
+    disableAuth: When disable_auth is true, a JWT ID token won't be generated
+      and the original "Authorization" HTTP header will be preserved. If the
+      header is used to carry the original token and is expected by the
+      backend, this field must be set to true to preserve the header.
+    jwtAudience: The JWT audience is used when generating a JWT ID token for
+      the backend. This ID token will be added in the HTTP "authorization"
+      header, and sent to the backend.
     minDeadline: Minimum deadline in seconds needed for this method. Calls
       having deadline value lower than this will be rejected.
     operationDeadline: The number of seconds to wait for the completion of a
       long running operation. The default is no deadline.
     pathTranslation: A PathTranslationValueValuesEnum attribute.
+    protocol: The protocol used for sending a request to the backend. The
+      supported values are "http/1.1" and "h2".  The default value is inferred
+      from the scheme in the address field:     SCHEME        PROTOCOL
+      http://       http/1.1    https://      http/1.1    grpc://       h2
+      grpcs://      h2  For secure HTTP backends (https://) that support
+      HTTP/2, set this field to "h2" for improved performance.  Configuring
+      this field to non-default values is only supported for secure HTTP
+      backends. This field will be ignored for all other backends.  See
+      https://www.iana.org/assignments/tls-extensiontype-values/tls-
+      extensiontype-values.xhtml#alpn-protocol-ids for more details on the
+      supported values.
     selector: Selects the methods to which this rule applies.  Refer to
       selector for syntax details.
   """
@@ -253,11 +286,13 @@ class BackendRule(_messages.Message):
 
   address = _messages.StringField(1)
   deadline = _messages.FloatField(2)
-  jwtAudience = _messages.StringField(3)
-  minDeadline = _messages.FloatField(4)
-  operationDeadline = _messages.FloatField(5)
-  pathTranslation = _messages.EnumField('PathTranslationValueValuesEnum', 6)
-  selector = _messages.StringField(7)
+  disableAuth = _messages.BooleanField(3)
+  jwtAudience = _messages.StringField(4)
+  minDeadline = _messages.FloatField(5)
+  operationDeadline = _messages.FloatField(6)
+  pathTranslation = _messages.EnumField('PathTranslationValueValuesEnum', 7)
+  protocol = _messages.StringField(8)
+  selector = _messages.StringField(9)
 
 
 class Billing(_messages.Message):
@@ -841,6 +876,8 @@ class HttpRule(_messages.Message):
     additionalBindings: Additional HTTP bindings for the selector. Nested
       bindings must not contain an `additional_bindings` field themselves
       (that is, the nesting may only be one level deep).
+    allowHalfDuplex: When this flag is set to true, HTTP requests will be
+      allowed to invoke a half-duplex streaming method.
     body: The name of the request field whose value is mapped to the HTTP
       request body, or `*` for mapping all request fields not captured by the
       path pattern to the HTTP body, or omitted for not having any HTTP
@@ -866,15 +903,35 @@ class HttpRule(_messages.Message):
   """
 
   additionalBindings = _messages.MessageField('HttpRule', 1, repeated=True)
-  body = _messages.StringField(2)
-  custom = _messages.MessageField('CustomHttpPattern', 3)
-  delete = _messages.StringField(4)
-  get = _messages.StringField(5)
-  patch = _messages.StringField(6)
-  post = _messages.StringField(7)
-  put = _messages.StringField(8)
-  responseBody = _messages.StringField(9)
-  selector = _messages.StringField(10)
+  allowHalfDuplex = _messages.BooleanField(2)
+  body = _messages.StringField(3)
+  custom = _messages.MessageField('CustomHttpPattern', 4)
+  delete = _messages.StringField(5)
+  get = _messages.StringField(6)
+  patch = _messages.StringField(7)
+  post = _messages.StringField(8)
+  put = _messages.StringField(9)
+  responseBody = _messages.StringField(10)
+  selector = _messages.StringField(11)
+
+
+class JwtLocation(_messages.Message):
+  r"""Specifies a location to extract JWT from an API request.
+
+  Fields:
+    header: Specifies HTTP header name to extract JWT token.
+    query: Specifies URL query parameter name to extract JWT token.
+    valuePrefix: The value prefix. The value format is "value_prefix{token}"
+      Only applies to "in" header type. Must be empty for "in" query type. If
+      not empty, the header value has to match (case sensitive) this prefix.
+      If not matched, JWT will not be extracted. If matched, JWT will be
+      extracted after the prefix is removed.  For example, for "Authorization:
+      Bearer {JWT}", value_prefix="Bearer " with a space at the end.
+  """
+
+  header = _messages.StringField(1)
+  query = _messages.StringField(2)
+  valuePrefix = _messages.StringField(3)
 
 
 class LabelDescriptor(_messages.Message):
@@ -1076,32 +1133,61 @@ class MetricDescriptor(_messages.Message):
       "custom.googleapis.com/invoice/paid/amount"
       "external.googleapis.com/prometheus/up"
       "appengine.googleapis.com/http/server/response_latencies"
-    unit: The unit in which the metric value is reported. It is only
+    unit: The units in which the metric value is reported. It is only
       applicable if the `value_type` is `INT64`, `DOUBLE`, or `DISTRIBUTION`.
-      The supported units are a subset of [The Unified Code for Units of
-      Measure](http://unitsofmeasure.org/ucum.html) standard:  **Basic units
-      (UNIT)**  * `bit`   bit * `By`    byte * `s`     second * `min`   minute
-      * `h`     hour * `d`     day  **Prefixes (PREFIX)**  * `k`     kilo
-      (10**3) * `M`     mega    (10**6) * `G`     giga    (10**9) * `T`
-      tera    (10**12) * `P`     peta    (10**15) * `E`     exa     (10**18) *
-      `Z`     zetta   (10**21) * `Y`     yotta   (10**24) * `m`     milli
-      (10**-3) * `u`     micro   (10**-6) * `n`     nano    (10**-9) * `p`
-      pico    (10**-12) * `f`     femto   (10**-15) * `a`     atto
-      (10**-18) * `z`     zepto   (10**-21) * `y`     yocto   (10**-24) * `Ki`
-      kibi    (2**10) * `Mi`    mebi    (2**20) * `Gi`    gibi    (2**30) *
-      `Ti`    tebi    (2**40)  **Grammar**  The grammar also includes these
-      connectors:  * `/`    division (as an infix operator, e.g. `1/s`). * `.`
-      multiplication (as an infix operator, e.g. `GBy.d`)  The grammar for a
-      unit is as follows:      Expression = Component { "." Component } { "/"
-      Component } ;      Component = ( [ PREFIX ] UNIT | "%" ) [ Annotation ]
-      | Annotation               | "1"               ;      Annotation = "{"
-      NAME "}" ;  Notes:  * `Annotation` is just a comment if it follows a
-      `UNIT` and is    equivalent to `1` if it is used alone. For examples,
-      `{requests}/s == 1/s`, `By{transmitted}/s == By/s`. * `NAME` is a
-      sequence of non-blank printable ASCII characters not    containing '{'
-      or '}'. * `1` represents dimensionless value 1, such as in `1/s`. * `%`
-      represents dimensionless value 1/100, and annotates values giving    a
-      percentage.
+      The `unit` defines the representation of the stored metric values.
+      Different systems may scale the values to be more easily displayed (so a
+      value of `0.02KBy` _might_ be displayed as `20By`, and a value of
+      `3523KBy` _might_ be displayed as `3.5MBy`). However, if the `unit` is
+      `KBy`, then the value of the metric is always in thousands of bytes, no
+      matter how it may be displayed..  If you want a custom metric to record
+      the exact number of CPU-seconds used by a job, you can create an `INT64
+      CUMULATIVE` metric whose `unit` is `s{CPU}` (or equivalently `1s{CPU}`
+      or just `s`). If the job uses 12,005 CPU-seconds, then the value is
+      written as `12005`.  Alternatively, if you want a custom metric to
+      record data in a more granular way, you can create a `DOUBLE CUMULATIVE`
+      metric whose `unit` is `ks{CPU}`, and then write the value `12.005`
+      (which is `12005/1000`), or use `Kis{CPU}` and write `11.723` (which is
+      `12005/1024`).  The supported units are a subset of [The Unified Code
+      for Units of Measure](http://unitsofmeasure.org/ucum.html) standard:
+      **Basic units (UNIT)**  * `bit`   bit * `By`    byte * `s`     second *
+      `min`   minute * `h`     hour * `d`     day  **Prefixes (PREFIX)**  *
+      `k`     kilo    (10^3) * `M`     mega    (10^6) * `G`     giga    (10^9)
+      * `T`     tera    (10^12) * `P`     peta    (10^15) * `E`     exa
+      (10^18) * `Z`     zetta   (10^21) * `Y`     yotta   (10^24)  * `m`
+      milli   (10^-3) * `u`     micro   (10^-6) * `n`     nano    (10^-9) *
+      `p`     pico    (10^-12) * `f`     femto   (10^-15) * `a`     atto
+      (10^-18) * `z`     zepto   (10^-21) * `y`     yocto   (10^-24)  * `Ki`
+      kibi    (2^10) * `Mi`    mebi    (2^20) * `Gi`    gibi    (2^30) * `Ti`
+      tebi    (2^40) * `Pi`    pebi    (2^50)  **Grammar**  The grammar also
+      includes these connectors:  * `/`    division or ratio (as an infix
+      operator). For examples,          `kBy/{email}` or `MiBy/10ms` (although
+      you should almost never          have `/s` in a metric `unit`; rates
+      should always be computed at          query time from the underlying
+      cumulative or delta value). * `.`    multiplication or composition (as
+      an infix operator). For          examples, `GBy.d` or `k{watt}.h`.  The
+      grammar for a unit is as follows:      Expression = Component { "."
+      Component } { "/" Component } ;      Component = ( [ PREFIX ] UNIT | "%"
+      ) [ Annotation ]               | Annotation               | "1"
+      ;      Annotation = "{" NAME "}" ;  Notes:  * `Annotation` is just a
+      comment if it follows a `UNIT`. If the annotation    is used alone, then
+      the unit is equivalent to `1`. For examples,    `{request}/s == 1/s`,
+      `By{transmitted}/s == By/s`. * `NAME` is a sequence of non-blank
+      printable ASCII characters not    containing `{` or `}`. * `1`
+      represents a unitary [dimensionless
+      unit](https://en.wikipedia.org/wiki/Dimensionless_quantity) of 1, such
+      as in `1/s`. It is typically used when none of the basic units are
+      appropriate. For example, "new users per day" can be represented as
+      `1/d` or `{new-users}/d` (and a metric value `5` would mean "5 new
+      users). Alternatively, "thousands of page views per day" would be
+      represented as `1000/d` or `k1/d` or `k{page_views}/d` (and a metric
+      value of `5.3` would mean "5300 page views per day"). * `%` represents
+      dimensionless value of 1/100, and annotates values giving    a
+      percentage (so the metric values are typically in the range of 0..100,
+      and a metric value `3` means "3 percent"). * `10^2.%` indicates a metric
+      contains a ratio, typically in the range    0..1, that will be
+      multiplied by 100 and displayed as a percentage    (so a metric value
+      `0.03` means "3 percent").
     valueType: Whether the measurement is an integer, a floating-point number,
       etc. Some combinations of `metric_kind` and `value_type` might not be
       supported.
@@ -1926,7 +2012,7 @@ class Service(_messages.Message):
     configVersion: The semantic version of the service configuration. The
       config version affects the interpretation of the service configuration.
       For example, certain features are enabled by default for certain config
-      versions. The latest config version is `3`.
+      versions.  The latest config version is `3`.
     context: Context configuration.
     control: Configuration for the service control plane.
     customError: Custom error configuration.
@@ -1941,8 +2027,9 @@ class Service(_messages.Message):
       google.someapi.v1.SomeEnum
     http: HTTP configuration.
     id: A unique ID for a specific instance of this message, typically
-      assigned by the client for tracking purpose. If empty, the server may
-      choose to generate one instead. Must be no longer than 60 characters.
+      assigned by the client for tracking purpose. Must be no longer than 63
+      characters and only lower case letters, digits, '.', '_' and '-' are
+      allowed. If empty, the server may choose to generate one instead.
     logging: Logging configuration.
     logs: Defines the logs used by this service.
     metrics: Defines the metrics used by this service.
@@ -2000,6 +2087,28 @@ class Service(_messages.Message):
   title = _messages.StringField(25)
   types = _messages.MessageField('Type', 26, repeated=True)
   usage = _messages.MessageField('Usage', 27)
+
+
+class ServiceIdentity(_messages.Message):
+  r"""The per-product per-project service identity for a service.   Use this
+  field to configure per-product per-project service identity. Example of a
+  service identity configuration.      usage:       service_identity:       -
+  service_account_parent: "projects/123456789"         display_name: "Cloud
+  XXX Service Agent"         description: "Used as the identity of Cloud XXX
+  to access resources"
+
+  Fields:
+    description: Optional. A user-specified opaque description of the service
+      account. Must be less than or equal to 256 UTF-8 bytes.
+    displayName: Optional. A user-specified name for the service account. Must
+      be less than or equal to 100 UTF-8 bytes.
+    serviceAccountParent: A service account project that hosts the service
+      accounts.  An example name would be: `projects/123456789`
+  """
+
+  description = _messages.StringField(1)
+  displayName = _messages.StringField(2)
+  serviceAccountParent = _messages.StringField(3)
 
 
 class ServiceuserProjectsServicesDisableRequest(_messages.Message):
@@ -2379,11 +2488,14 @@ class Usage(_messages.Message):
       'serviceusage.googleapis.com/billing-enabled'.
     rules: A list of usage rules that apply to individual API methods.
       **NOTE:** All service configuration rules follow "last one wins" order.
+    serviceIdentity: The configuration of a per-product per-project service
+      identity.
   """
 
   producerNotificationChannel = _messages.StringField(1)
   requirements = _messages.StringField(2, repeated=True)
   rules = _messages.MessageField('UsageRule', 3, repeated=True)
+  serviceIdentity = _messages.MessageField('ServiceIdentity', 4)
 
 
 class UsageRule(_messages.Message):

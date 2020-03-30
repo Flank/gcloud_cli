@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import copy
 import os
 
 from apitools.base.py import exceptions as api_exceptions
@@ -519,6 +520,108 @@ class CreateBucketIfNotExistsTest(e2e_base.WithMockHttp):
     client = storage_api.StorageClient()
     with self.assertRaisesRegex(api_exceptions.HttpError, 'Permission denied'):
       client.CreateBucketIfNotExists(self._BUCKET_NAME, self._PROJECT_ID)
+
+
+class BucketIamPolicyTest(e2e_base.WithMockHttp):
+
+  _BUCKET_NAME = 'testbucket'
+  _PROJECT_ID = 'project-id'
+
+  def SetUp(self):
+    self.mocked_storage_v1 = api_mock.Client(
+        core_apis.GetClientClass('storage', 'v1'))
+    self.mocked_storage_v1.Mock()
+    self.addCleanup(self.mocked_storage_v1.Unmock)
+    self.storage_v1_messages = core_apis.GetMessagesModule('storage', 'v1')
+
+    self.bucket_reference = storage_util.BucketReference(self._BUCKET_NAME)
+
+  def testGetIamPolicy(self):
+    expected_policy = self.storage_v1_messages.Policy(
+        kind='storage#policy',
+        resourceId='projects/_/buckets/{}'.format(self._BUCKET_NAME),
+        version=1,
+        etag=b'CAE3',
+        bindings=[
+            self.storage_v1_messages.Policy.BindingsValueListEntry(
+                role='roles/storage.legacyBucketOwner',
+                members=[
+                    'projectEditor:{}'.format(self._PROJECT_ID),
+                    'projectOwner:{}'.format(self._PROJECT_ID),
+                ]),
+        ])
+    self.mocked_storage_v1.buckets.GetIamPolicy.Expect(
+        request=self.storage_v1_messages.StorageBucketsGetIamPolicyRequest(
+            bucket=self._BUCKET_NAME, optionsRequestedPolicyVersion=3),
+        response=expected_policy)
+
+    client = storage_api.StorageClient()
+    actual_policy = client.GetIamPolicy(self.bucket_reference)
+    self.assertEqual(actual_policy, expected_policy)
+
+  def testSetIamPolicy(self):
+    new_policy = self.storage_v1_messages.Policy(
+        kind='storage#policy',
+        resourceId='projects/_/buckets/{}'.format(self._BUCKET_NAME),
+        version=3,
+        bindings=[
+            self.storage_v1_messages.Policy.BindingsValueListEntry(
+                role='roles/storage.objectAdmin',
+                members=[
+                    'user:test-user@gmail.com',
+                ]),
+        ])
+    expected_policy = copy.deepcopy(new_policy)
+    expected_policy.etag = b'CAE4'
+    self.mocked_storage_v1.buckets.SetIamPolicy.Expect(
+        request=self.storage_v1_messages.StorageBucketsSetIamPolicyRequest(
+            bucket=self._BUCKET_NAME, policy=new_policy),
+        response=expected_policy)
+
+    client = storage_api.StorageClient()
+    actual_policy = client.SetIamPolicy(self.bucket_reference, new_policy)
+    self.assertEqual(actual_policy, expected_policy)
+
+  def testAddIamPolicyBinding(self):
+    old_policy = self.storage_v1_messages.Policy(
+        kind='storage#policy',
+        resourceId='projects/_/buckets/{}'.format(self._BUCKET_NAME),
+        version=1,
+        etag=b'CAE3',
+        bindings=[
+            self.storage_v1_messages.Policy.BindingsValueListEntry(
+                role='roles/storage.legacyBucketOwner',
+                members=[
+                    'projectEditor:{}'.format(self._PROJECT_ID),
+                    'projectOwner:{}'.format(self._PROJECT_ID),
+                ]),
+        ])
+
+    # IAM utils always sets the policy version to the latest available.
+    new_policy = copy.deepcopy(old_policy)
+    new_policy.version = 3
+    new_policy.bindings.append(
+        self.storage_v1_messages.Policy.BindingsValueListEntry(
+            role='roles/storage.objectAdmin',
+            members=['user:test-user@gmail.com']))
+
+    # ETAG should be updated after SetIamPolicy.
+    expected_policy = copy.deepcopy(new_policy)
+    expected_policy.etag = b'CAE4'
+    self.mocked_storage_v1.buckets.GetIamPolicy.Expect(
+        request=self.storage_v1_messages.StorageBucketsGetIamPolicyRequest(
+            bucket=self._BUCKET_NAME, optionsRequestedPolicyVersion=3),
+        response=old_policy)
+    self.mocked_storage_v1.buckets.SetIamPolicy.Expect(
+        self.storage_v1_messages.StorageBucketsSetIamPolicyRequest(
+            bucket=self._BUCKET_NAME, policy=new_policy),
+        response=expected_policy)
+
+    client = storage_api.StorageClient()
+    actual_policy = client.AddIamPolicyBinding(self.bucket_reference,
+                                               'user:test-user@gmail.com',
+                                               'roles/storage.objectAdmin')
+    self.assertEqual(actual_policy, expected_policy)
 
 
 if __name__ == '__main__':

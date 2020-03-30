@@ -35,40 +35,34 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import yaml
-
 
 def GenerateConfig(context):
-  # Loading the container manifest into a YAML object model so that it will be
-  # serialized as a single JSON-like object when converted to string.
-  manifest = yaml.load(context.imports[context.properties["containerManifest"]])
-
   return """
 resources:
   - type: compute.v1.instance
-    name: %(name)s
+    name: {name}
     properties:
-      zone: %(zone)s
-      machineType: https://www.googleapis.com/compute/v1/projects/%(project)s/zones/%(zone)s/machineTypes/n1-standard-1
+      zone: {zone}
+      machineType: https://www.googleapis.com/compute/v1/projects/{project}/zones/{zone}/machineTypes/n1-standard-1
       metadata:
         items:
           - key: google-container-manifest
-            value: "%(manifest)s"
+            value: "{manifest}"
       disks:
         - deviceName: boot
           type: PERSISTENT
           boot: true
           autoDelete: true
           initializeParams:
-            diskName: %(name)s-disk
-            sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/%(containerImage)s
+            diskName: {name}-disk
+            sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/{containerImage}
       networkInterfaces:
         - accessConfigs:
             - name: external-nat
               type: ONE_TO_ONE_NAT
-          network: https://www.googleapis.com/compute/v1/projects/%(project)s/global/networks/default
-""" % {"name": context.env["name"] + "-" + context.env["deployment"],
-       "project": context.env["project"],
-       "zone": context.properties["zone"],
-       "containerImage": context.properties["containerImage"],
-       "manifest": manifest}
+          network: https://www.googleapis.com/compute/v1/projects/{project}/global/networks/default
+""".format(name=context.env["name"] + "-" + context.env["deployment"],
+           project=context.env["project"],
+           zone=context.properties["zone"],
+           containerImage=context.properties["containerImage"],
+           manifest=context.properties["containerManifest"])

@@ -47,8 +47,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     Suppose the '/foo' directory in the local filesystem has the following
@@ -81,7 +82,7 @@ EXAMPLES
 
     The following command:
 
-        gcloud beta composer environments storage data import myenv --source /foo
+        gcloud beta composer environments storage data import myenv --source=/foo
 
     would result in the following structure in myenv's Cloud Storage bucket:
 
@@ -104,7 +105,7 @@ EXAMPLES
 
     If instead we had run
 
-        gcloud beta composer environments storage data import myenv --source /foo --destination bar
+        gcloud beta composer environments storage data import myenv --source=/foo --destination=bar
 
     the resulting bucket structure would be the following:
 

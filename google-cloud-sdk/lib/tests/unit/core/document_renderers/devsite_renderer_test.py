@@ -56,7 +56,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <html devsite="">
         <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -98,7 +98,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <html devsite="">
         <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -160,7 +160,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <html devsite="">
         <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -225,7 +225,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <head>
         <title>New Title</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -280,7 +280,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <html devsite="">
         <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -348,7 +348,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <html devsite="">
         <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -404,7 +404,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <head>
         <title>New Title</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -486,7 +486,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <head>
         <title>New Title</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -534,7 +534,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <head>
         <title>New Title</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -661,7 +661,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <head>
         <title>New Title</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -745,7 +745,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <head>
         <title>New Title</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
@@ -842,7 +842,7 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <head>
         <title>New Title</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="project_path" value="/sdk/_project.yaml">
+        <meta name="project_path" value="/sdk/docs/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.

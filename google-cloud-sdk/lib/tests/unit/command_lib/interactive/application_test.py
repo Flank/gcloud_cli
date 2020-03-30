@@ -28,6 +28,7 @@ from googlecloudsdk.command_lib.meta import generate_cli_trees
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
+from tests.lib import test_case
 
 from prompt_toolkit import document
 from prompt_toolkit import input as pt_input
@@ -230,6 +231,7 @@ class ApplicationTests(cli_test_base.CliTestBase):
     sys.stdin.close()
     sys.stdin = self.sys_stdin
 
+  @test_case.Filters.DoNotRunOnMac('b/147804852')
   def testInteractiveLayout(self):
     self.SetInput([
         'echo done',  # To prove it doesn't exit on every command.

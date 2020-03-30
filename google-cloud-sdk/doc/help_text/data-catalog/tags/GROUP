@@ -1,0 +1,38 @@
+NAME
+    gcloud data-catalog tags - manage tags in Cloud Data Catalog
+
+SYNOPSIS
+    gcloud data-catalog tags COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage tags in Cloud Data Catalog.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a Cloud Data Catalog entry tag.
+
+     delete
+        Delete a Cloud Data Catalog entry tag.
+
+     list
+        List Cloud Data Catalog entry tags.
+
+     update
+        Update a Cloud Data Catalog entry tag.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha data-catalog tags
+        $ gcloud beta data-catalog tags
+

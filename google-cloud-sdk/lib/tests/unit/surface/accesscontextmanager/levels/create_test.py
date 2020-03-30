@@ -30,6 +30,7 @@ from six import text_type
 class LevelsCreateTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -47,27 +48,28 @@ class LevelsCreateTestGA(accesscontextmanager.Base):
     self.client.accessPolicies_accessLevels.Get.Expect(
         get_req_type(name=level.name), level)
 
-  def testCreate_InvalidSpec(self):
-    self.SetUpForTrack(self.track)
+  def testCreateBasic_InvalidSpec(self):
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(
         yaml.FileLoadError, r'Failed to load YAML from [not-found]'):
       self.Run('access-context-manager levels create my_level --policy 123 '
                '     --title "My Level" --basic-level-spec not-found')
 
   def testCreate_MissingRequired(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must be specified'):
       self.Run('access-context-manager levels create my_level --policy 123 '
                '     --title "My Level"')
 
-  def testCreate(self):
-    self.SetUpForTrack(self.track)
+  def testCreateBasic(self):
+    self.SetUpForAPI(self.api_version)
     level_name = 'accessPolicies/123/accessLevels/my_level'
     level = self._MakeBasicLevel(
         level_name, title='My Level', combining_function='AND')
     self._ExpectCreate(level, '123')
-    level_spec_path = self.Touch(self.temp_path, '', contents=self.LEVEL_SPEC)
+    level_spec_path = self.Touch(
+        self.temp_path, '', contents=self.BASIC_LEVEL_SPEC)
 
     results = self.Run(
         'access-context-manager levels create my_level --policy 123 '
@@ -76,8 +78,8 @@ class LevelsCreateTestGA(accesscontextmanager.Base):
 
     self.assertEqual(results, level)
 
-  def testCreate_AllParams(self):
-    self.SetUpForTrack(self.track)
+  def testCreateBasic_AllParams(self):
+    self.SetUpForAPI(self.api_version)
     level_name = 'accessPolicies/123/accessLevels/my_level'
     level = self._MakeBasicLevel(
         level_name,
@@ -85,7 +87,8 @@ class LevelsCreateTestGA(accesscontextmanager.Base):
         combining_function='OR',
         description='Very long description of my level')
     self._ExpectCreate(level, '123')
-    level_spec_path = self.Touch(self.temp_path, '', contents=self.LEVEL_SPEC)
+    level_spec_path = self.Touch(
+        self.temp_path, '', contents=self.BASIC_LEVEL_SPEC)
 
     results = self.Run(
         'access-context-manager levels create my_level --policy 123 '
@@ -96,15 +99,16 @@ class LevelsCreateTestGA(accesscontextmanager.Base):
 
     self.assertEqual(results, level)
 
-  def testCreate_PolicyFromProperty(self):
-    self.SetUpForTrack(self.track)
+  def testCreateBasic_PolicyFromProperty(self):
+    self.SetUpForAPI(self.api_version)
     policy = '456'
     level_name = 'accessPolicies/456/accessLevels/my_level'
     properties.VALUES.access_context_manager.policy.Set(policy)
     level = self._MakeBasicLevel(
         level_name, title='My Level', combining_function='AND')
     self._ExpectCreate(level, policy)
-    level_spec_path = self.Touch(self.temp_path, '', contents=self.LEVEL_SPEC)
+    level_spec_path = self.Touch(
+        self.temp_path, '', contents=self.BASIC_LEVEL_SPEC)
 
     results = self.Run('access-context-manager levels create my_level '
                        '     --title "My Level"'
@@ -113,8 +117,9 @@ class LevelsCreateTestGA(accesscontextmanager.Base):
     self.assertEqual(results, level)
 
   def testCreate_InvalidPolicyArg(self):
-    self.SetUpForTrack(self.track)
-    level_spec_path = self.Touch(self.temp_path, '', contents=self.LEVEL_SPEC)
+    self.SetUpForAPI(self.api_version)
+    level_spec_path = self.Touch(
+        self.temp_path, '', contents=self.BASIC_LEVEL_SPEC)
 
     with self.assertRaises(properties.InvalidValueError) as ex:
       # Common error is to specify --policy arg as 'accessPolicies/<num>'
@@ -130,13 +135,105 @@ class LevelsCreateTestGA(accesscontextmanager.Base):
 class LevelsCreateTestBeta(LevelsCreateTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def testCreateCustom_InvalidSpec(self):
+    self.SetUpForAPI(self.api_version)
+    with self.AssertRaisesExceptionMatches(
+        yaml.FileLoadError, r'Failed to load YAML from [not-found]'):
+      self.Run('access-context-manager levels create my_level --policy 123 '
+               '     --title "My Level" --custom-level-spec not-found')
+
+  def testCreateCustom(self):
+    self.SetUpForAPI(self.api_version)
+    level_name = 'accessPolicies/123/accessLevels/my_level'
+    level = self._MakeCustomLevel(
+        level_name,
+        title='My Level',
+        expression="inIpRange(origin.ip, ['127.0.0.1/24']")
+    self._ExpectCreate(level, '123')
+    level_spec_path = self.Touch(
+        self.temp_path, '', contents=self.CUSTOM_LEVEL_SPEC)
+
+    results = self.Run(
+        'access-context-manager levels create my_level --policy 123 '
+        '     --title "My Level"'
+        '     --custom-level-spec {}'.format(level_spec_path))
+
+    self.assertEqual(results, level)
+
+  def testCreateBasicCustom_bothProvided(self):
+    self.SetUpForAPI(self.api_version)
+    level_spec_path = self.Touch(
+        self.temp_path, '', contents=self.CUSTOM_LEVEL_SPEC)
+
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           r'Exactly one of'):
+      self.Run('access-context-manager levels create my_level --policy 123 '
+               '     --title "My Level"'
+               '     --basic-level-spec {}'
+               '     --custom-level-spec {}'.format(level_spec_path,
+                                                    level_spec_path))
+
+  def testCreate_MissingRequired(self):
+    self.SetUpForAPI(self.api_version)
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           'Exactly one of'):
+      self.Run('access-context-manager levels create my_level --policy 123 '
+               '     --title "My Level"')
 
 
 class LevelsCreateTestAlpha(LevelsCreateTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateCustom_InvalidSpec(self):
+    self.SetUpForAPI(self.api_version)
+    with self.AssertRaisesExceptionMatches(
+        yaml.FileLoadError, r'Failed to load YAML from [not-found]'):
+      self.Run('access-context-manager levels create my_level --policy 123 '
+               '     --title "My Level" --custom-level-spec not-found')
+
+  def testCreateCustom(self):
+    self.SetUpForAPI(self.api_version)
+    level_name = 'accessPolicies/123/accessLevels/my_level'
+    level = self._MakeCustomLevel(
+        level_name,
+        title='My Level',
+        expression="inIpRange(origin.ip, ['127.0.0.1/24']")
+    self._ExpectCreate(level, '123')
+    level_spec_path = self.Touch(
+        self.temp_path, '', contents=self.CUSTOM_LEVEL_SPEC)
+
+    results = self.Run(
+        'access-context-manager levels create my_level --policy 123 '
+        '     --title "My Level"'
+        '     --custom-level-spec {}'.format(level_spec_path))
+
+    self.assertEqual(results, level)
+
+  def testCreateBasicCustom_bothProvided(self):
+    self.SetUpForAPI(self.api_version)
+    level_spec_path = self.Touch(
+        self.temp_path, '', contents=self.CUSTOM_LEVEL_SPEC)
+
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           r'Exactly one of'):
+      self.Run('access-context-manager levels create my_level --policy 123 '
+               '     --title "My Level"'
+               '     --basic-level-spec {}'
+               '     --custom-level-spec {}'.format(level_spec_path,
+                                                    level_spec_path))
+
+  def testCreate_MissingRequired(self):
+    self.SetUpForAPI(self.api_version)
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           'Exactly one of'):
+      self.Run('access-context-manager levels create my_level --policy 123 '
+               '     --title "My Level"')
 
 
 if __name__ == '__main__':

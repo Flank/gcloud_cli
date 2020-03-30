@@ -48,7 +48,7 @@ actions:
           headers:
             status: '200'
           body:
-            name: projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store
+            name: projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store
     - expect_stderr: |
         Created annotationStore [my-store].
     - expect_exit:
@@ -109,7 +109,7 @@ actions:
     - api_call:
         expect_request:
           uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:getIamPolicy?alt=json
-          method: POST
+          method: GET
           headers: {}
           body: null
         return_response:

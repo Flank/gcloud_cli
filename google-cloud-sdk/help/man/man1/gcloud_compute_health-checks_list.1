@@ -11,7 +11,7 @@ gcloud compute health\-checks list \- list Google Compute Engine health checks
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute health\-checks list\fR [\fINAME\fR\ ...] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-regexp\fR=\fIREGEXP\fR,\ \fB\-r\fR\ \fIREGEXP\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute health\-checks list\fR [\fINAME\fR\ ...] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-regexp\fR=\fIREGEXP\fR,\ \fB\-r\fR\ \fIREGEXP\fR] [\fB\-\-global\fR\ |\ \fB\-\-regions\fR=[\fIREGION\fR,...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,7 +27,11 @@ health checks in a project.
 .RS 2m
 .TP 2m
 [\fINAME\fR ...]
-If provided, show details for the specified names and/or URIs of resources.
+(DEPRECATED) If provided, show details for the specified names and/or URIs of
+resources.
+
+Argument \f5NAME\fR is deprecated. Use \f5\-\-filter="name=( 'NAME' ... )"\fR
+instead.
 
 
 .RE
@@ -44,10 +48,32 @@ for all protocols are listed.
 
 .TP 2m
 \fB\-\-regexp\fR=\fIREGEXP\fR, \fB\-r\fR \fIREGEXP\fR
-Regular expression to filter the names of the results on. Any names that do not
-match the entire regular expression will be filtered out.
+(DEPRECATED) Regular expression to filter the names of the results on. Any names
+that do not match the entire regular expression will be filtered out.
+
+Flag \f5\-\-regexp\fR is deprecated. Use \f5\-\-filter="name~'REGEXP'"\fR
+instead.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If provided, only global resources are shown.
+
+.TP 2m
+\fB\-\-regions\fR=[\fIREGION\fR,...]
+(DEPRECATED) If provided, only regional resources are shown. If arguments are
+provided, only resources from the given regions are shown.
+
+Flag \f5\-\-regions\fR is deprecated. Use \f5\-\-filter="region:( REGION ...
+)"\fR instead. For example \f5\-\-filter="region:( europe\-west1 europe\-west2
+)"\fR.
 
 
+.RE
 .RE
 .sp
 
@@ -96,8 +122,9 @@ Print a list of resource URIs instead of the default output.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

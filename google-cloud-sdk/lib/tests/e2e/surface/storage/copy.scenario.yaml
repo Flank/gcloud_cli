@@ -151,7 +151,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
           method: GET
           headers: {}
           body: null
@@ -171,7 +171,7 @@ actions:
         message: Copying Files
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=c.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=c.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -204,7 +204,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/c.txt/1545086085322318
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
             name: c.txt
             bucket: $$bucket$$
             generation: '1545086085322318'
@@ -229,7 +229,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
           method: GET
           headers: {}
           body: null
@@ -248,7 +248,7 @@ actions:
             items:
             - kind: storage#object
               id: $$bucket$$/c.txt/1545086085322318
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
               name: c.txt
               bucket: $$bucket$$
               generation: '1545086085322318'
@@ -275,7 +275,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
           method: GET
           headers: {}
           body: null
@@ -294,7 +294,7 @@ actions:
             items:
             - kind: storage#object
               id: $$bucket$$/c.txt/1545086085322318
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
               name: c.txt
               bucket: $$bucket$$
               generation: '1545086085322318'
@@ -313,7 +313,7 @@ actions:
         message: Copying Files
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=another_c.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=another_c.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -346,7 +346,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/another_c.txt/1545086086827879
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
             name: another_c.txt
             bucket: $$bucket$$
             generation: '1545086086827879'
@@ -371,7 +371,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
           method: GET
           headers: {}
           body: null
@@ -390,7 +390,7 @@ actions:
             items:
             - kind: storage#object
               id: $$bucket$$/another_c.txt/1545086086827879
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
               name: another_c.txt
               bucket: $$bucket$$
               generation: '1545086086827879'
@@ -407,7 +407,7 @@ actions:
               etag: COee6Zr2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/c.txt/1545086085322318
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
               name: c.txt
               bucket: $$bucket$$
               generation: '1545086085322318'
@@ -442,7 +442,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
           method: GET
           headers: {}
           body: null
@@ -461,7 +461,7 @@ actions:
             items:
             - kind: storage#object
               id: $$bucket$$/another_c.txt/1545086086827879
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
               name: another_c.txt
               bucket: $$bucket$$
               generation: '1545086086827879'
@@ -478,7 +478,7 @@ actions:
               etag: COee6Zr2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/c.txt/1545086085322318
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
               name: c.txt
               bucket: $$bucket$$
               generation: '1545086085322318'
@@ -497,7 +497,7 @@ actions:
         message: Copying Files
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fa.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fa.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -530,7 +530,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/test_data/a.txt/1545086088295719
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt
             name: test_data/a.txt
             bucket: $$bucket$$
             generation: '1545086088295719'
@@ -547,7 +547,7 @@ actions:
             etag: CKfqwpv2p98CEAE=
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fb.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fb.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -580,7 +580,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/test_data/b.txt/1545086088852594
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt
             name: test_data/b.txt
             bucket: $$bucket$$
             generation: '1545086088852594'
@@ -597,7 +597,7 @@ actions:
             etag: CPLo5Jv2p98CEAE=
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fa%2Fa.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fa%2Fa.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -630,7 +630,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/test_data/a/a.txt/1545086089424203
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt
             name: test_data/a/a.txt
             bucket: $$bucket$$
             generation: '1545086089424203'
@@ -647,7 +647,7 @@ actions:
             etag: CMvah5z2p98CEAE=
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Faa%2Fa.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Faa%2Fa.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -680,7 +680,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/test_data/aa/a.txt/1545086089920360
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt
             name: test_data/aa/a.txt
             bucket: $$bucket$$
             generation: '1545086089920360'
@@ -697,7 +697,7 @@ actions:
             etag: COj+pZz2p98CEAE=
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Faa%2Fb.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Faa%2Fb.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -730,7 +730,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/test_data/aa/b.txt/1545086090524524
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt
             name: test_data/aa/b.txt
             bucket: $$bucket$$
             generation: '1545086090524524'
@@ -747,7 +747,7 @@ actions:
             etag: COzuypz2p98CEAE=
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fb%2Fa.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fb%2Fa.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -780,7 +780,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/test_data/b/a.txt/1545086091122122
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt
             name: test_data/b/a.txt
             bucket: $$bucket$$
             generation: '1545086091122122'
@@ -797,7 +797,7 @@ actions:
             etag: CMqr75z2p98CEAE=
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fb%2Fb.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fb%2Fb.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -830,7 +830,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/test_data/b/b.txt/1545086091729742
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt
             name: test_data/b/b.txt
             bucket: $$bucket$$
             generation: '1545086091729742'
@@ -847,7 +847,7 @@ actions:
             etag: CM62lJ32p98CEAE=
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fc%2Fa.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fc%2Fa.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -880,7 +880,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/test_data/c/a.txt/1545086092219942
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt
             name: test_data/c/a.txt
             bucket: $$bucket$$
             generation: '1545086092219942'
@@ -897,7 +897,7 @@ actions:
             etag: CKassp32p98CEAE=
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fc%2Fb.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fc%2Fb.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -930,7 +930,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/test_data/c/b.txt/1545086092729411
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt
             name: test_data/c/b.txt
             bucket: $$bucket$$
             generation: '1545086092729411'
@@ -947,7 +947,7 @@ actions:
             etag: CMO40Z32p98CEAE=
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fc%2Fc.txt&uploadType=multipart
+          uri: https://storage.googleapis.com/upload/storage/v1/b/$$bucket$$/o?alt=json&name=test_data%2Fc%2Fc.txt&uploadType=multipart
           method: POST
           headers: {}
           body:
@@ -980,7 +980,7 @@ actions:
           body:
             kind: storage#object
             id: $$bucket$$/test_data/c/c.txt/1545086093224064
-            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt
+            selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt
             name: test_data/c/c.txt
             bucket: $$bucket$$
             generation: '1545086093224064'
@@ -1007,7 +1007,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
           method: GET
           headers: {}
           body: null
@@ -1026,7 +1026,7 @@ actions:
             items:
             - kind: storage#object
               id: $$bucket$$/another_c.txt/1545086086827879
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
               name: another_c.txt
               bucket: $$bucket$$
               generation: '1545086086827879'
@@ -1043,7 +1043,7 @@ actions:
               etag: COee6Zr2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/c.txt/1545086085322318
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
               name: c.txt
               bucket: $$bucket$$
               generation: '1545086085322318'
@@ -1060,7 +1060,7 @@ actions:
               etag: CM6sjZr2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/a.txt/1545086088295719
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt
               name: test_data/a.txt
               bucket: $$bucket$$
               generation: '1545086088295719'
@@ -1077,7 +1077,7 @@ actions:
               etag: CKfqwpv2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/a/a.txt/1545086089424203
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt
               name: test_data/a/a.txt
               bucket: $$bucket$$
               generation: '1545086089424203'
@@ -1094,7 +1094,7 @@ actions:
               etag: CMvah5z2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/aa/a.txt/1545086089920360
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt
               name: test_data/aa/a.txt
               bucket: $$bucket$$
               generation: '1545086089920360'
@@ -1111,7 +1111,7 @@ actions:
               etag: COj+pZz2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/aa/b.txt/1545086090524524
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt
               name: test_data/aa/b.txt
               bucket: $$bucket$$
               generation: '1545086090524524'
@@ -1128,7 +1128,7 @@ actions:
               etag: COzuypz2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/b.txt/1545086088852594
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt
               name: test_data/b.txt
               bucket: $$bucket$$
               generation: '1545086088852594'
@@ -1145,7 +1145,7 @@ actions:
               etag: CPLo5Jv2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/b/a.txt/1545086091122122
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt
               name: test_data/b/a.txt
               bucket: $$bucket$$
               generation: '1545086091122122'
@@ -1162,7 +1162,7 @@ actions:
               etag: CMqr75z2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/b/b.txt/1545086091729742
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt
               name: test_data/b/b.txt
               bucket: $$bucket$$
               generation: '1545086091729742'
@@ -1179,7 +1179,7 @@ actions:
               etag: CM62lJ32p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/c/a.txt/1545086092219942
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt
               name: test_data/c/a.txt
               bucket: $$bucket$$
               generation: '1545086092219942'
@@ -1196,7 +1196,7 @@ actions:
               etag: CKassp32p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/c/b.txt/1545086092729411
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt
               name: test_data/c/b.txt
               bucket: $$bucket$$
               generation: '1545086092729411'
@@ -1213,7 +1213,7 @@ actions:
               etag: CMO40Z32p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/c/c.txt/1545086093224064
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt
               name: test_data/c/c.txt
               bucket: $$bucket$$
               generation: '1545086093224064'
@@ -1262,7 +1262,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o?alt=json&maxResults=1000
           method: GET
           headers: {}
           body: null
@@ -1281,7 +1281,7 @@ actions:
             items:
             - kind: storage#object
               id: $$bucket$$/another_c.txt/1545086086827879
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt
               name: another_c.txt
               bucket: $$bucket$$
               generation: '1545086086827879'
@@ -1298,7 +1298,7 @@ actions:
               etag: COee6Zr2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/c.txt/1545086085322318
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt
               name: c.txt
               bucket: $$bucket$$
               generation: '1545086085322318'
@@ -1315,7 +1315,7 @@ actions:
               etag: CM6sjZr2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/a.txt/1545086088295719
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt
               name: test_data/a.txt
               bucket: $$bucket$$
               generation: '1545086088295719'
@@ -1332,7 +1332,7 @@ actions:
               etag: CKfqwpv2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/a/a.txt/1545086089424203
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt
               name: test_data/a/a.txt
               bucket: $$bucket$$
               generation: '1545086089424203'
@@ -1349,7 +1349,7 @@ actions:
               etag: CMvah5z2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/aa/a.txt/1545086089920360
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt
               name: test_data/aa/a.txt
               bucket: $$bucket$$
               generation: '1545086089920360'
@@ -1366,7 +1366,7 @@ actions:
               etag: COj+pZz2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/aa/b.txt/1545086090524524
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt
               name: test_data/aa/b.txt
               bucket: $$bucket$$
               generation: '1545086090524524'
@@ -1383,7 +1383,7 @@ actions:
               etag: COzuypz2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/b.txt/1545086088852594
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt
               name: test_data/b.txt
               bucket: $$bucket$$
               generation: '1545086088852594'
@@ -1400,7 +1400,7 @@ actions:
               etag: CPLo5Jv2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/b/a.txt/1545086091122122
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt
               name: test_data/b/a.txt
               bucket: $$bucket$$
               generation: '1545086091122122'
@@ -1417,7 +1417,7 @@ actions:
               etag: CMqr75z2p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/b/b.txt/1545086091729742
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt
               name: test_data/b/b.txt
               bucket: $$bucket$$
               generation: '1545086091729742'
@@ -1434,7 +1434,7 @@ actions:
               etag: CM62lJ32p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/c/a.txt/1545086092219942
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt
               name: test_data/c/a.txt
               bucket: $$bucket$$
               generation: '1545086092219942'
@@ -1451,7 +1451,7 @@ actions:
               etag: CKassp32p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/c/b.txt/1545086092729411
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt
               name: test_data/c/b.txt
               bucket: $$bucket$$
               generation: '1545086092729411'
@@ -1468,7 +1468,7 @@ actions:
               etag: CMO40Z32p98CEAE=
             - kind: storage#object
               id: $$bucket$$/test_data/c/c.txt/1545086093224064
-              selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt
+              selfLink: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt
               name: test_data/c/c.txt
               bucket: $$bucket$$
               generation: '1545086093224064'
@@ -1511,7 +1511,7 @@ actions:
         message: Deleting Files
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/another_c.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1529,7 +1529,7 @@ actions:
           body: ''
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/c.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1547,7 +1547,7 @@ actions:
           body: ''
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1565,7 +1565,7 @@ actions:
           body: ''
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fa%2Fa.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1583,7 +1583,7 @@ actions:
           body: ''
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fa.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1601,7 +1601,7 @@ actions:
           body: ''
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Faa%2Fb.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1619,7 +1619,7 @@ actions:
           body: ''
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1637,7 +1637,7 @@ actions:
           body: ''
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fa.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1655,7 +1655,7 @@ actions:
           body: ''
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fb%2Fb.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1673,7 +1673,7 @@ actions:
           body: ''
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fa.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1691,7 +1691,7 @@ actions:
           body: ''
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fb.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1709,7 +1709,7 @@ actions:
           body: ''
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$/o/test_data%2Fc%2Fc.txt?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1730,7 +1730,7 @@ actions:
         Deleted [12] files.
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$?alt=json
+          uri: https://storage.googleapis.com/storage/v1/b/$$bucket$$?alt=json
           method: DELETE
           headers: {}
           body: null

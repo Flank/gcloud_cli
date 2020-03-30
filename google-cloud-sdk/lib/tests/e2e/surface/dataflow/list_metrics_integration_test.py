@@ -37,8 +37,8 @@ class ListMetricsIntegrationTest(e2e_base.DataflowIntegrationTestBase):
   """
 
   def testListMetrics(self):
-    job = self.FindOldTerminatedJob()
-    metrics = self.ListMetrics(job.id)
+    job = self.GetOldTerminatedJobFromList()
+    metrics = self.ListMetrics(job.id, region=job.location)
     self.assertGreater(len(metrics), 0)
     for metric in metrics:
       # Do we have a name and a value?
@@ -51,10 +51,11 @@ class ListMetricsIntegrationTest(e2e_base.DataflowIntegrationTestBase):
 
   def testListMetricsWithRegion(self):
     try:
-      job = self.FindOldTerminatedJob(region=REGION)
+      job = self.GetOldTerminatedJobFromList()
     except ValueError:
       self.skipTest('No jobs in terminated state. Skipping test.')
-    metrics = self.ListMetrics(job.id, region=REGION)
+      return
+    metrics = self.ListMetrics(job.id, region=job.location)
     self.assertGreater(len(metrics), 0)
     for metric in metrics:
       # Do we have a name and a value?
@@ -66,8 +67,8 @@ class ListMetricsIntegrationTest(e2e_base.DataflowIntegrationTestBase):
       self.assertIn(metric.name.origin, ['dataflow/v1b3', 'user'])
 
   def testListMetricsServiceSource(self):
-    job = self.FindOldTerminatedJob()
-    metrics = self.ListMetrics(job.id, 'service')
+    job = self.GetOldTerminatedJobFromList()
+    metrics = self.ListMetrics(job.id, 'service', region=job.location)
     self.assertGreater(len(metrics), 0)
     for metric in metrics:
       # Do we have a name and a value?

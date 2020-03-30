@@ -18,12 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import sys
-
 from googlecloudsdk.api_lib.ml_engine import operations
 from googlecloudsdk.api_lib.ml_engine import versions_api
-from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.ml_engine import endpoint_util
 from googlecloudsdk.command_lib.ml_engine import flags
 from googlecloudsdk.command_lib.ml_engine import versions_util
 from googlecloudsdk.command_lib.util.args import labels_util
@@ -43,6 +41,7 @@ def _AddCreateArgs(parser):
   """Add common arguments for `versions create` command."""
   flags.GetModelName(positional=False, required=True).AddToParser(parser)
   flags.GetDescriptionFlag('version').AddToParser(parser)
+  flags.GetRegionArg('version').AddToParser(parser)
   flags.VERSION_NAME.AddToParser(parser)
   base.Argument(
       '--origin',
@@ -115,23 +114,24 @@ class CreateGA(base.CreateCommand):
     _AddCreateArgs(parser)
 
   def Run(self, args):
-    versions_client = versions_api.VersionsClient()
-    labels = versions_util.ParseCreateLabels(versions_client, args)
-    framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
-    return versions_util.Create(
-        versions_client,
-        operations.OperationsClient(),
-        args.version,
-        model=args.model,
-        origin=args.origin,
-        staging_bucket=args.staging_bucket,
-        runtime_version=args.runtime_version,
-        config_file=args.config,
-        asyncronous=args.async_,
-        description=args.description,
-        labels=labels,
-        framework=framework,
-        python_version=args.python_version)
+    with endpoint_util.MlEndpointOverrides(region=args.region):
+      client = versions_api.VersionsClient()
+      labels = versions_util.ParseCreateLabels(client, args)
+      framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
+      return versions_util.Create(
+          client,
+          operations.OperationsClient(),
+          args.version,
+          model=args.model,
+          origin=args.origin,
+          staging_bucket=args.staging_bucket,
+          runtime_version=args.runtime_version,
+          config_file=args.config,
+          asyncronous=args.async_,
+          description=args.description,
+          labels=labels,
+          framework=framework,
+          python_version=args.python_version)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -154,32 +154,33 @@ class CreateBeta(CreateGA):
     flags.AddExplainabilityFlags(parser)
 
   def Run(self, args):
-    versions_client = versions_api.VersionsClient()
-    labels = versions_util.ParseCreateLabels(versions_client, args)
-    framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
-    accelerator = flags.ParseAcceleratorFlag(args.accelerator)
-    return versions_util.Create(
-        versions_client,
-        operations.OperationsClient(),
-        args.version,
-        model=args.model,
-        origin=args.origin,
-        staging_bucket=args.staging_bucket,
-        runtime_version=args.runtime_version,
-        config_file=args.config,
-        asyncronous=args.async_,
-        description=args.description,
-        labels=labels,
-        machine_type=args.machine_type,
-        framework=framework,
-        python_version=args.python_version,
-        service_account=args.service_account,
-        prediction_class=args.prediction_class,
-        package_uris=args.package_uris,
-        accelerator_config=accelerator,
-        explanation_method=args.explanation_method,
-        num_integral_steps=args.num_integral_steps,
-        num_paths=args.num_paths)
+    with endpoint_util.MlEndpointOverrides(region=args.region):
+      client = versions_api.VersionsClient()
+      labels = versions_util.ParseCreateLabels(client, args)
+      framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
+      accelerator = flags.ParseAcceleratorFlag(args.accelerator)
+      return versions_util.Create(
+          client,
+          operations.OperationsClient(),
+          args.version,
+          model=args.model,
+          origin=args.origin,
+          staging_bucket=args.staging_bucket,
+          runtime_version=args.runtime_version,
+          config_file=args.config,
+          asyncronous=args.async_,
+          description=args.description,
+          labels=labels,
+          machine_type=args.machine_type,
+          framework=framework,
+          python_version=args.python_version,
+          service_account=args.service_account,
+          prediction_class=args.prediction_class,
+          package_uris=args.package_uris,
+          accelerator_config=accelerator,
+          explanation_method=args.explanation_method,
+          num_integral_steps=args.num_integral_steps,
+          num_paths=args.num_paths)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -193,28 +194,30 @@ class CreateAlpha(CreateBeta):
   """
 
   def Run(self, args):
-    versions_client = versions_api.VersionsClient()
-    labels = versions_util.ParseCreateLabels(versions_client, args)
-    framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
-    accelerator = flags.ParseAcceleratorFlag(args.accelerator)
-    return versions_util.Create(versions_client,
-                                operations.OperationsClient(),
-                                args.version,
-                                model=args.model,
-                                origin=args.origin,
-                                staging_bucket=args.staging_bucket,
-                                runtime_version=args.runtime_version,
-                                config_file=args.config,
-                                asyncronous=args.async_,
-                                labels=labels,
-                                description=args.description,
-                                machine_type=args.machine_type,
-                                framework=framework,
-                                python_version=args.python_version,
-                                prediction_class=args.prediction_class,
-                                package_uris=args.package_uris,
-                                service_account=args.service_account,
-                                accelerator_config=accelerator,
-                                explanation_method=args.explanation_method,
-                                num_integral_steps=args.num_integral_steps,
-                                num_paths=args.num_paths)
+    with endpoint_util.MlEndpointOverrides(region=args.region):
+      client = versions_api.VersionsClient()
+      labels = versions_util.ParseCreateLabels(client, args)
+      framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
+      accelerator = flags.ParseAcceleratorFlag(args.accelerator)
+      return versions_util.Create(
+          client,
+          operations.OperationsClient(),
+          args.version,
+          model=args.model,
+          origin=args.origin,
+          staging_bucket=args.staging_bucket,
+          runtime_version=args.runtime_version,
+          config_file=args.config,
+          asyncronous=args.async_,
+          labels=labels,
+          description=args.description,
+          machine_type=args.machine_type,
+          framework=framework,
+          python_version=args.python_version,
+          prediction_class=args.prediction_class,
+          package_uris=args.package_uris,
+          service_account=args.service_account,
+          accelerator_config=accelerator,
+          explanation_method=args.explanation_method,
+          num_integral_steps=args.num_integral_steps,
+          num_paths=args.num_paths)

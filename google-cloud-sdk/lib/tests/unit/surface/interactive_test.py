@@ -23,14 +23,15 @@ import os
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.interactive import application
+from googlecloudsdk.core.util import encoding
 from tests.lib import calliope_test_base
 
 
 class InteractiveTest(calliope_test_base.CalliopeTestBase):
 
   def _MockMain(self, *args, **kwargs):
-    self.metrics_environment = os.environ.get('CLOUDSDK_METRICS_ENVIRONMENT',
-                                              '')
+    self.metrics_environment = encoding.GetEncodedValue(
+        os.environ, 'CLOUDSDK_METRICS_ENVIRONMENT', '')
     return None
 
   def SetUp(self):

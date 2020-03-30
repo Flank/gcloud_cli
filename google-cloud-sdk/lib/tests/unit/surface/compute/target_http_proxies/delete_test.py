@@ -14,7 +14,6 @@
 # limitations under the License.
 """Tests for the target-http-proxies delete subcommand."""
 
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -26,6 +25,8 @@ from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
+
+import mock
 
 messages = core_apis.GetMessagesModule('compute', 'v1')
 
@@ -39,7 +40,7 @@ class TargetHttpProxiesDeleteTest(test_base.BaseTest,
     self._target_http_proxies_api = self.compute.targetHttpProxies
 
   def RunDelete(self, command):
-    self.Run('compute target-http-proxies delete ' + command)
+    self.Run('compute target-http-proxies delete %s' % command)
 
   def testWithSingleTargetHttpProxy(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -102,11 +103,18 @@ class TargetHttpProxiesDeleteTest(test_base.BaseTest,
               '/global/targetHttpProxies/{0}').format(url_map)
 
   def testDeleteCompletion(self):
-    lister_mock = self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        autospec=True)
-    lister_mock.return_value = resource_projector.MakeSerializable(
-        test_resources.TARGET_HTTP_PROXIES)
+    self._api = ''
+    self.SelectApi('v1')
+    self._compute_api = self.compute_v1
+
+    list_json_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
+    self.addCleanup(list_json_patcher.stop)
+    self.list_json = list_json_patcher.start()
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.TARGET_HTTP_PROXIES),
+        resource_projector.MakeSerializable(test_resources.TARGET_HTTP_PROXIES)
+    ]
     uri_list = [
         'target-http-proxy-1',
         'target-http-proxy-2',
@@ -123,7 +131,7 @@ class TargetHttpProxiesDeleteBetaTest(TargetHttpProxiesDeleteTest):
     self._target_http_proxies_api = self.compute_beta.targetHttpProxies
 
   def RunDelete(self, command):
-    self.Run('beta compute target-http-proxies delete --global ' + command)
+    self.Run('beta compute target-http-proxies delete %s' % command)
 
 
 class TargetHttpProxiesDeleteAlphaTest(TargetHttpProxiesDeleteTest):

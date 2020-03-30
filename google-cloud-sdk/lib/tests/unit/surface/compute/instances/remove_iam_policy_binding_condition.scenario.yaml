@@ -1,14 +1,19 @@
 title: compute instances remove-iam-policy-binding-condition scenario test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 
 actions:
+- define_reference:
+    reference: release-track
+    track_values:
+      ALPHA: alpha
+      BETA: beta
 # remove binding with condition to a policy with condition
 - execute_command:
     command: compute instances remove-iam-policy-binding my-instance --zone=ZONE --member=user:owner@gmail.com --role=roles/non-primitive --condition='expression=expr,title=title,description=descr'
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/ZONE/instances/my-instance/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
+          uri: https://compute.googleapis.com/compute/$$release-track$$/projects/fake-project/zones/ZONE/instances/my-instance/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           body: null
         return_response:
@@ -35,7 +40,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/ZONE/instances/my-instance/setIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/$$release-track$$/projects/fake-project/zones/ZONE/instances/my-instance/setIamPolicy?alt=json
           method: POST
           body:
             json:

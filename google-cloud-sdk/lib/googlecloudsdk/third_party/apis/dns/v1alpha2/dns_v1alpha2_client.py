@@ -9,6 +9,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://dns.googleapis.com/'
+  MTLS_BASE_URL = u'https://dns.mtls.googleapis.com/'
 
   _PACKAGE = u'dns'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform', u'https://www.googleapis.com/auth/cloud-platform.read-only', u'https://www.googleapis.com/auth/ndev.clouddns.readonly', u'https://www.googleapis.com/auth/ndev.clouddns.readwrite']
@@ -35,6 +36,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
         default_global_params=default_global_params,
         additional_http_headers=additional_http_headers,
         response_encoding=response_encoding)
+    self.activePeeringZones = self.ActivePeeringZonesService(self)
     self.changes = self.ChangesService(self)
     self.dnsKeys = self.DnsKeysService(self)
     self.managedZoneOperations = self.ManagedZoneOperationsService(self)
@@ -42,6 +44,96 @@ class DnsV1alpha2(base_api.BaseApiClient):
     self.policies = self.PoliciesService(self)
     self.projects = self.ProjectsService(self)
     self.resourceRecordSets = self.ResourceRecordSetsService(self)
+
+  class ActivePeeringZonesService(base_api.BaseApiService):
+    """Service class for the activePeeringZones resource."""
+
+    _NAME = u'activePeeringZones'
+
+    def __init__(self, client):
+      super(DnsV1alpha2.ActivePeeringZonesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Deactivate(self, request, global_params=None):
+      r"""Deactivate a Peering Zone if it's not already deactivated. Returns an.
+error if the managed zone cannot be found, is not a peering zone. If the
+zone is already deactivated, returns false for deactivate_succeeded field.
+
+      Args:
+        request: (DnsActivePeeringZonesDeactivateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (PeeringZoneDeactivateResponse) The response message.
+      """
+      config = self.GetMethodConfig('Deactivate')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Deactivate.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'DELETE',
+        method_id=u'dns.activePeeringZones.deactivate',
+        ordered_params=[u'project', u'peeringZoneId'],
+        path_params=[u'peeringZoneId', u'project'],
+        query_params=[u'clientOperationId'],
+        relative_path=u'dns/v1alpha2/projects/{project}/activePeeringZones/{peeringZoneId}',
+        request_field='',
+        request_type_name=u'DnsActivePeeringZonesDeactivateRequest',
+        response_type_name=u'PeeringZoneDeactivateResponse',
+        supports_download=False,
+    )
+
+    def GetPeeringZoneInfo(self, request, global_params=None):
+      r"""Fetch the representation of an existing PeeringZone.
+
+      Args:
+        request: (DnsActivePeeringZonesGetPeeringZoneInfoRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ManagedZone) The response message.
+      """
+      config = self.GetMethodConfig('GetPeeringZoneInfo')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetPeeringZoneInfo.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'dns.activePeeringZones.getPeeringZoneInfo',
+        ordered_params=[u'project', u'peeringZoneId'],
+        path_params=[u'peeringZoneId', u'project'],
+        query_params=[u'clientOperationId'],
+        relative_path=u'dns/v1alpha2/projects/{project}/activePeeringZones/{peeringZoneId}',
+        request_field='',
+        request_type_name=u'DnsActivePeeringZonesGetPeeringZoneInfoRequest',
+        response_type_name=u'ManagedZone',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Enumerate PeeringZones that target a given network via dns peering.
+
+      Args:
+        request: (DnsActivePeeringZonesListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (PeeringZonesListResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'dns.activePeeringZones.list',
+        ordered_params=[u'project', u'targetNetwork'],
+        path_params=[u'project'],
+        query_params=[u'maxResults', u'pageToken', u'targetNetwork'],
+        relative_path=u'dns/v1alpha2/projects/{project}/activePeeringZones',
+        request_field='',
+        request_type_name=u'DnsActivePeeringZonesListRequest',
+        response_type_name=u'PeeringZonesListResponse',
+        supports_download=False,
+    )
 
   class ChangesService(base_api.BaseApiService):
     """Service class for the changes resource."""
@@ -54,7 +146,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      r"""! Atomically update the ResourceRecordSet collection.
+      r"""Atomically update the ResourceRecordSet collection.
 
       Args:
         request: (DnsChangesCreateRequest) input message
@@ -80,7 +172,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      r"""! Fetch the representation of an existing Change.
+      r"""Fetch the representation of an existing Change.
 
       Args:
         request: (DnsChangesGetRequest) input message
@@ -106,7 +198,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      r"""! Enumerate Changes to a ResourceRecordSet collection.
+      r"""Enumerate Changes to a ResourceRecordSet collection.
 
       Args:
         request: (DnsChangesListRequest) input message
@@ -142,7 +234,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
           }
 
     def Get(self, request, global_params=None):
-      r"""! Fetch the representation of an existing DnsKey.
+      r"""Fetch the representation of an existing DnsKey.
 
       Args:
         request: (DnsDnsKeysGetRequest) input message
@@ -168,7 +260,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      r"""! Enumerate DnsKeys to a ResourceRecordSet collection.
+      r"""Enumerate DnsKeys to a ResourceRecordSet collection.
 
       Args:
         request: (DnsDnsKeysListRequest) input message
@@ -204,7 +296,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
           }
 
     def Get(self, request, global_params=None):
-      r"""! Fetch the representation of an existing Operation.
+      r"""Fetch the representation of an existing Operation.
 
       Args:
         request: (DnsManagedZoneOperationsGetRequest) input message
@@ -230,7 +322,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      r"""! Enumerate Operations for the given ManagedZone.
+      r"""Enumerate Operations for the given ManagedZone.
 
       Args:
         request: (DnsManagedZoneOperationsListRequest) input message
@@ -266,7 +358,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      r"""! Create a new ManagedZone.
+      r"""Create a new ManagedZone.
 
       Args:
         request: (DnsManagedZonesCreateRequest) input message
@@ -292,7 +384,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""! Delete a previously created ManagedZone.
+      r"""Delete a previously created ManagedZone.
 
       Args:
         request: (DnsManagedZonesDeleteRequest) input message
@@ -318,7 +410,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      r"""! Fetch the representation of an existing ManagedZone.
+      r"""Fetch the representation of an existing ManagedZone.
 
       Args:
         request: (DnsManagedZonesGetRequest) input message
@@ -344,7 +436,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      r"""! Enumerate ManagedZones that have been created but not yet deleted.
+      r"""Enumerate ManagedZones that have been created but not yet deleted.
 
       Args:
         request: (DnsManagedZonesListRequest) input message
@@ -370,7 +462,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def Patch(self, request, global_params=None):
-      r"""! Apply a partial update to an existing ManagedZone.
+      r"""Apply a partial update to an existing ManagedZone.
 
       Args:
         request: (DnsManagedZonesPatchRequest) input message
@@ -396,7 +488,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def Update(self, request, global_params=None):
-      r"""! Update an existing ManagedZone.
+      r"""Update an existing ManagedZone.
 
       Args:
         request: (DnsManagedZonesUpdateRequest) input message
@@ -432,7 +524,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      r"""! Create a new Policy.
+      r"""Create a new Policy.
 
       Args:
         request: (DnsPoliciesCreateRequest) input message
@@ -458,8 +550,8 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""! Delete a previously created Policy. Will fail if the policy is still being.
-! referenced by a network.
+      r"""Delete a previously created Policy. Will fail if the policy is still being.
+referenced by a network.
 
       Args:
         request: (DnsPoliciesDeleteRequest) input message
@@ -485,7 +577,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      r"""! Fetch the representation of an existing Policy.
+      r"""Fetch the representation of an existing Policy.
 
       Args:
         request: (DnsPoliciesGetRequest) input message
@@ -511,7 +603,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      r"""! Enumerate all Policies associated with a project.
+      r"""Enumerate all Policies associated with a project.
 
       Args:
         request: (DnsPoliciesListRequest) input message
@@ -537,7 +629,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def Patch(self, request, global_params=None):
-      r"""! Apply a partial update to an existing Policy.
+      r"""Apply a partial update to an existing Policy.
 
       Args:
         request: (DnsPoliciesPatchRequest) input message
@@ -563,7 +655,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
     )
 
     def Update(self, request, global_params=None):
-      r"""! Update an existing Policy.
+      r"""Update an existing Policy.
 
       Args:
         request: (DnsPoliciesUpdateRequest) input message
@@ -599,7 +691,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
           }
 
     def Get(self, request, global_params=None):
-      r"""! Fetch the representation of an existing Project.
+      r"""Fetch the representation of an existing Project.
 
       Args:
         request: (DnsProjectsGetRequest) input message
@@ -635,7 +727,7 @@ class DnsV1alpha2(base_api.BaseApiClient):
           }
 
     def List(self, request, global_params=None):
-      r"""! Enumerate ResourceRecordSets that have been created but not yet deleted.
+      r"""Enumerate ResourceRecordSets that have been created but not yet deleted.
 
       Args:
         request: (DnsResourceRecordSetsListRequest) input message

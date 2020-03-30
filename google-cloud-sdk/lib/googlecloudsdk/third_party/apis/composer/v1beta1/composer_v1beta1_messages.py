@@ -12,6 +12,26 @@ from apitools.base.py import extra_types
 package = 'composer'
 
 
+class AllowedIpRange(_messages.Message):
+  r"""Allowed IP range with user-provided description.
+
+  Fields:
+    description: Optional. User-provided description. It must contain at most
+      300 characters.
+    value: IP address or range, defined using CIDR notation, of requests that
+      this rule applies to. You can use the wildcard character "*" to match
+      all IPs equivalent to "0/0" and "::/0" together. Examples: `192.168.1.1`
+      or `192.168.0.0/16` or `2001:db8::/32`           or
+      `2001:0db8:0000:0042:0000:8a2e:0370:7334`.   <p>IP range prefixes should
+      be properly truncated. For example, `1.2.3.4/24` should be truncated to
+      `1.2.3.0/24`. Similarly, for IPv6, `2001:db8::1/32` should be truncated
+      to `2001:db8::/32`.
+  """
+
+  description = _messages.StringField(1)
+  value = _messages.StringField(2)
+
+
 class ComposerProjectsLocationsEnvironmentsCreateRequest(_messages.Message):
   r"""A ComposerProjectsLocationsEnvironmentsCreateRequest object.
 
@@ -249,7 +269,8 @@ class Environment(_messages.Message):
       constrained to be <= 128 bytes in size.
     name: The resource name of the environment, in the form:
       "projects/{projectId}/locations/{locationId}/environments/{environmentId
-      }"
+      }"  EnvironmentId must start with a lowercase letter followed by up to
+      63 lowercase letters, numbers, or hyphens, and cannot end with a hyphen.
     state: The current state of the environment.
     updateTime: Output only. The time at which this environment was last
       modified.
@@ -337,6 +358,9 @@ class EnvironmentConfig(_messages.Message):
       Composer environment.
     softwareConfig: The configuration settings for software inside the
       environment.
+    webServerNetworkAccessControl: Optional. The network-level access control
+      policy for the Airflow web server. If unspecified, no network-level
+      access restrictions will be applied.
   """
 
   airflowUri = _messages.StringField(1)
@@ -346,6 +370,7 @@ class EnvironmentConfig(_messages.Message):
   nodeCount = _messages.IntegerField(5, variant=_messages.Variant.INT32)
   privateEnvironmentConfig = _messages.MessageField('PrivateEnvironmentConfig', 6)
   softwareConfig = _messages.MessageField('SoftwareConfig', 7)
+  webServerNetworkAccessControl = _messages.MessageField('WebServerNetworkAccessControl', 8)
 
 
 class IPAllocationPolicy(_messages.Message):
@@ -697,16 +722,19 @@ class PrivateClusterConfig(_messages.Message):
   Fields:
     enablePrivateEndpoint: Optional. If `true`, access to the public endpoint
       of the GKE cluster is denied.
-    masterIpv4CidrBlock: The IP range in CIDR notation to use for the hosted
-      master network. This range is used for assigning internal IP addresses
-      to the cluster master or set of masters and to the internal load
-      balancer virtual IP. This range must not overlap with any other ranges
-      in use within the cluster's network. If left blank, the default value of
-      '172.16.0.0/28' is used.
+    masterIpv4CidrBlock: Optional. The CIDR block from which IPv4 range for
+      GKE master will be reserved. If left blank, the default value of
+      '172.16.0.0/23' is used.
+    masterIpv4ReservedRange: Output only. The IP range in CIDR notation to use
+      for the hosted master network. This range is used for assigning internal
+      IP addresses to the cluster master or set of masters and to the internal
+      load balancer virtual IP. This range must not overlap with any other
+      ranges in use within the cluster's network.
   """
 
   enablePrivateEndpoint = _messages.BooleanField(1)
   masterIpv4CidrBlock = _messages.StringField(2)
+  masterIpv4ReservedRange = _messages.StringField(3)
 
 
 class PrivateEnvironmentConfig(_messages.Message):
@@ -714,15 +742,27 @@ class PrivateEnvironmentConfig(_messages.Message):
   Composer environment.
 
   Fields:
+    cloudSqlIpv4CidrBlock: Optional. The CIDR block from which IP range in
+      tenant project will be reserved for Cloud SQL. Needs to be disjoint from
+      web_server_ipv4_cidr_block
     enablePrivateEnvironment: Optional. If `true`, a Private IP Cloud Composer
       environment is created. If this field is true, `use_ip_aliases` must be
       true.
     privateClusterConfig: Optional. Configuration for the private GKE cluster
       for a Private IP Cloud Composer environment.
+    webServerIpv4CidrBlock: Optional. The CIDR block from which IP range for
+      web server will be reserved. Needs to be disjoint from
+      private_cluster_config.master_ipv4_cidr_block and
+      cloud_sql_ipv4_cidr_block.
+    webServerIpv4ReservedRange: Output only. The IP range reserved for the
+      tenant project's App Engine VMs.
   """
 
-  enablePrivateEnvironment = _messages.BooleanField(1)
-  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 2)
+  cloudSqlIpv4CidrBlock = _messages.StringField(1)
+  enablePrivateEnvironment = _messages.BooleanField(2)
+  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 3)
+  webServerIpv4CidrBlock = _messages.StringField(4)
+  webServerIpv4ReservedRange = _messages.StringField(5)
 
 
 class SoftwareConfig(_messages.Message):
@@ -1033,6 +1073,16 @@ class Status(_messages.Message):
   code = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   details = _messages.MessageField('DetailsValueListEntry', 2, repeated=True)
   message = _messages.StringField(3)
+
+
+class WebServerNetworkAccessControl(_messages.Message):
+  r"""Network-level access control policy for the Airflow web server.
+
+  Fields:
+    allowedIpRanges: A collection of allowed IP ranges with descriptions.
+  """
+
+  allowedIpRanges = _messages.MessageField('AllowedIpRange', 1, repeated=True)
 
 
 encoding.AddCustomJsonFieldMapping(

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha policy\-troubleshoot \- troubleshoot Google Cloud Platform Policies
+gcloud alpha policy\-troubleshoot \- troubleshoot Google Cloud Platform policies
 
 
 
@@ -17,12 +17,9 @@ gcloud alpha policy\-troubleshoot \- troubleshoot Google Cloud Platform Policies
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Policy Troubleshooter troubleshoots cloud policies running on
-Google Cloud Platform. Policy Troubleshooter works by evaluating the current
-access a user has on a cloud resource.
-
-More information on Policy Troubleshooter can be found here:
-https://cloud.google.com/iam
+\fB(ALPHA)\fR Policy Troubleshooter troubleshoots policies for Google Cloud
+Platform resources. Policy Troubleshooter works by evaluating the user's current
+access to a resource.
 
 
 
@@ -31,8 +28,9 @@ https://cloud.google.com/iam
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -54,9 +52,10 @@ help\fR for details.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud policy\-troubleshoot
 $ gcloud beta policy\-troubleshoot
 .RE
 

@@ -36,12 +36,20 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the tpu/v1 API. The full documentation for this API can
     be found at: https://cloud.google.com/tpu/
+
+EXAMPLES
+    The following command describes the v3-8 accelerator types running in zone
+    us-central1-b:
+
+        $ gcloud compute tpus accelerator-types describe v3-8 \
+            --zone=us-central1-b
 
 NOTES
     These variants are also available:

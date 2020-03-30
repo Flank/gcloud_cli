@@ -34,237 +34,16 @@ class HealthChecksListTest(test_base.BaseTest,
                            completer_test_base.CompleterBase):
 
   def SetUp(self):
-    lister_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        autospec=True)
-    self.addCleanup(lister_patcher.stop)
-    self.mock_get_global_resources = lister_patcher.start()
-    self.mock_get_global_resources.return_value = (
-        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS))
-
-  def testTableOutputNoProtocol(self):
-    self.Run("""
-        compute health-checks list
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL
-            health-check-http-1 HTTP
-            health-check-http-2 HTTP
-            health-check-https  HTTPS
-            health-check-tcp    TCP
-            health-check-ssl    SSL
-            health-check-http2  HTTP2
-            """), normalize_space=True)
-
-  def testTableOutputHttp(self):
-    self.Run("""
-        compute health-checks list --protocol http
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL HOST            PORT REQUEST_PATH PROXY_HEADER
-            health-check-http-1 HTTP     www.example.com 8080 /testpath    PROXY_V1
-            health-check-http-2 HTTP     www.example.com 80   /            NONE
-            """),
-        normalize_space=True)
-
-  def testTableOutputHttps(self):
-    self.Run("""
-        compute health-checks list --protocol https
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL HOST            PORT REQUEST_PATH PROXY_HEADER
-            health-check-https  HTTPS    www.example.com 443  /            PROXY_V1
-            """),
-        normalize_space=True)
-
-  def testTableOutputHttp2(self):
-    self.Run("""
-        compute health-checks list --protocol http2
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL HOST            PORT REQUEST_PATH PROXY_HEADER
-            health-check-http2  HTTP2    www.example.com 443  /            PROXY_V1
-            """),
-        normalize_space=True)
-
-  def testTableOutputTcp(self):
-    self.Run("""
-        compute health-checks list --protocol tcp
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL PORT REQUEST RESPONSE PROXY_HEADER
-            health-check-tcp    TCP      80   req     ack      NONE
-            """),
-        normalize_space=True)
-
-  def testTableOutputSsl(self):
-    self.Run("""
-        compute health-checks list --protocol ssl
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL PORT REQUEST RESPONSE PROXY_HEADER
-            health-check-ssl    SSL      443  req     ack      PROXY_V1
-            """),
-        normalize_space=True)
-
-  def testTableOutputListByName(self):
-    # List a specific health check by name.
-    self.Run("""
-        compute health-checks list health-check-https
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL
-            health-check-https  HTTPS
-            """), normalize_space=True)
-
-  def testTableOutputListByNameAndSpecifyProtocol(self):
-    # List a specific health check by name and specify protocol to get
-    # protocol-specific fields.
-    self.Run("""
-        compute health-checks list health-check-https --protocol https
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL HOST            PORT REQUEST_PATH PROXY_HEADER
-            health-check-https  HTTPS    www.example.com 443  /            PROXY_V1
-            """), normalize_space=True)
-
-  def testTableOutputListByNameAndSpecifyNonMatchingProtocol(self):
-    # List a specific health check by name but specify a protocol that
-    # is not the protocol of the named health check.
-    self.Run("""
-        compute health-checks list health-check-tcp --protocol https
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertErrContains('Listed 0 items.')
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            """), normalize_space=True)
-
-  def testInvalidProtocol(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        'Invalid health check protocol totally-wacky.'):
-      self.Run("""
-          compute health-checks list --protocol totally-wacky
-          """)
-    self.CheckRequests()
-
-  def testInvalidProtocolNamedInvalid(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        'Invalid health check protocol invalid.'):
-      self.Run("""
-          compute health-checks list --protocol invalid
-          """)
-    self.CheckRequests()
-
-  def testHealthChecksCompleter(self):
-    self.RunCompleter(
-        completers.HealthChecksCompleter,
-        expected_command=[
-            'compute',
-            'health-checks',
-            'list',
-            '--uri',
-            '--quiet',
-            '--format=disable',
-        ],
-        expected_completions=[
-            'health-check-http-1',
-            'health-check-http-2',
-            'health-check-https',
-            'health-check-ssl',
-            'health-check-tcp',
-            'health-check-http2',
-        ],
-        cli=self.cli,
-    )
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-
-
-class HealthChecksListBetaTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self._api = 'beta'
-    self.SelectApi('beta')
-    self._compute_api = self.compute_beta
-    self._uri_prefix = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
+    self._api = ''
+    self.SelectApi('v1')
+    self._compute_api = self.compute_v1
+    self._uri_prefix = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
 
     self._Setup()
+
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
 
   def _Setup(self):
     list_json_patcher = mock.patch(
@@ -326,12 +105,266 @@ class HealthChecksListBetaTest(test_base.BaseTest):
             region='region-1')
     ]
 
+  def testTableOutputNoProtocol(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    self.Run(self._api + """
+        compute health-checks list --global
+        """)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'List',
+                   self.messages.ComputeHealthChecksListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME                PROTOCOL
+            health-check-http-1 HTTP
+            health-check-http-2 HTTP
+            health-check-https  HTTPS
+            health-check-tcp    TCP
+            health-check-ssl    SSL
+            health-check-http2  HTTP2
+            """), normalize_space=True)
+
+  def testTableOutputHttp(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    self.Run(self._api + """
+        compute health-checks list --global --protocol http
+        """)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'List',
+                   self.messages.ComputeHealthChecksListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME                PROTOCOL HOST            PORT REQUEST_PATH PROXY_HEADER
+            health-check-http-1 HTTP     www.example.com 8080 /testpath    PROXY_V1
+            health-check-http-2 HTTP     www.example.com 80   /            NONE
+            """),
+        normalize_space=True)
+
+  def testTableOutputHttps(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    self.Run(self._api + """
+        compute health-checks list --global --protocol https
+        """)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'List',
+                   self.messages.ComputeHealthChecksListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME                PROTOCOL HOST            PORT REQUEST_PATH PROXY_HEADER
+            health-check-https  HTTPS    www.example.com 443  /            PROXY_V1
+            """),
+        normalize_space=True)
+
+  def testTableOutputHttp2(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    self.Run(self._api + """
+        compute health-checks list --global --protocol http2
+        """)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'List',
+                   self.messages.ComputeHealthChecksListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME                PROTOCOL HOST            PORT REQUEST_PATH PROXY_HEADER
+            health-check-http2  HTTP2    www.example.com 443  /            PROXY_V1
+            """),
+        normalize_space=True)
+
+  def testTableOutputTcp(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    self.Run(self._api + """
+        compute health-checks list --global --protocol tcp
+        """)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'List',
+                   self.messages.ComputeHealthChecksListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME                PROTOCOL PORT REQUEST RESPONSE PROXY_HEADER
+            health-check-tcp    TCP      80   req     ack      NONE
+            """),
+        normalize_space=True)
+
+  def testTableOutputSsl(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    self.Run(self._api + """
+        compute health-checks list --global --protocol ssl
+        """)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'List',
+                   self.messages.ComputeHealthChecksListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME                PROTOCOL PORT REQUEST RESPONSE PROXY_HEADER
+            health-check-ssl    SSL      443  req     ack      PROXY_V1
+            """),
+        normalize_space=True)
+
+  def testTableOutputListByName(self):
+    # List a specific health check by name.
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    self.Run(self._api + """
+        compute health-checks list --global health-check-https
+        """)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'List',
+                   self.messages.ComputeHealthChecksListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME                PROTOCOL
+            health-check-https  HTTPS
+            """), normalize_space=True)
+
+  def testTableOutputListByNameAndSpecifyProtocol(self):
+    # List a specific health check by name and specify protocol to get
+    # protocol-specific fields.
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    self.Run(self._api + """
+        compute health-checks list health-check-https --global --protocol https
+        """)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'List',
+                   self.messages.ComputeHealthChecksListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME                PROTOCOL HOST            PORT REQUEST_PATH PROXY_HEADER
+            health-check-https  HTTPS    www.example.com 443  /            PROXY_V1
+            """), normalize_space=True)
+
+  def testTableOutputListByNameAndSpecifyNonMatchingProtocol(self):
+    # List a specific health check by name but specify a protocol that
+    # is not the protocol of the named health check.
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    self.Run(self._api + """
+        compute health-checks list health-check-tcp --global --protocol https
+        """)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'List',
+                   self.messages.ComputeHealthChecksListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertErrContains('Listed 0 items.')
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            """), normalize_space=True)
+
+  def testInvalidProtocol(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    with self.AssertRaisesToolExceptionRegexp(
+        'Invalid health check protocol totally-wacky.'):
+      self.Run(self._api + """
+          compute health-checks list --global --protocol totally-wacky
+          """)
+    self.CheckRequests()
+
+  def testInvalidProtocolNamedInvalid(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    with self.AssertRaisesToolExceptionRegexp(
+        'Invalid health check protocol invalid.'):
+      self.Run(self._api + """
+          compute health-checks list --global --protocol invalid
+          """)
+    self.CheckRequests()
+
+  def testHealthChecksCompleter(self):
+    # Completer always uses v1 API.
+    self._api = ''
+    self.SelectApi('v1')
+    self._compute_api = self.compute
+    self._uri_prefix = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS)
+    ]
+    self.RunCompleter(
+        completers.HealthChecksCompleter,
+        expected_command=[
+            'compute',
+            'health-checks',
+            'list',
+            '--uri',
+            '--quiet',
+            '--format=disable',
+        ],
+        expected_completions=[
+            'health-check-http-1',
+            'health-check-http-2',
+            'health-check-https',
+            'health-check-ssl',
+            'health-check-tcp',
+            'health-check-http2',
+        ],
+        cli=self.cli,
+    )
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'AggregatedList',
+                   self.messages.ComputeHealthChecksAggregatedListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+
   def testGlobalOption(self):
     command = self._api + ' compute health-checks list --uri --global'
     output = ("""\
         https://compute.googleapis.com/compute/{0}/projects/my-project/global/healthChecks/health-check-http-1
         https://compute.googleapis.com/compute/{0}/projects/my-project/global/healthChecks/health-check-http-2
-    """.format(self._api))
+    """.format(self.api))
 
     self.RequestOnlyGlobal(command, self.health_checks, output)
 
@@ -340,7 +373,7 @@ class HealthChecksListBetaTest(test_base.BaseTest):
     output = ("""\
         https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/healthChecks/health-check-tcp
         https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/healthChecks/health-check-ssl
-        """.format(self._api))
+        """.format(self.api))
 
     self.RequestOneRegion(command, self.region_health_checks, output)
 
@@ -351,7 +384,7 @@ class HealthChecksListBetaTest(test_base.BaseTest):
     output = ("""\
         https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/healthChecks/health-check-tcp
         https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/healthChecks/health-check-ssl
-        """.format(self._api))
+        """.format(self.api))
 
     self.RequestTwoRegions(command, self.region_health_checks, output)
 
@@ -447,6 +480,17 @@ class HealthChecksListBetaTest(test_base.BaseTest):
     self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
 
 
+class HealthChecksListBetaTest(HealthChecksListTest):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi('beta')
+    self._compute_api = self.compute_beta
+    self._uri_prefix = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
+
+    self._Setup()
+
+
 class HealthChecksListAlphaTest(HealthChecksListBetaTest):
 
   def SetUp(self):
@@ -456,6 +500,28 @@ class HealthChecksListAlphaTest(HealthChecksListBetaTest):
     self._uri_prefix = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
 
     self._Setup()
+
+  def testTableOutputListByNameAndSpecifyProtocol(self):
+    # List a specific health check by name and specify protocol to get
+    # protocol-specific fields.
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS_ALPHA)
+    ]
+    self.Run(self._api + """
+        compute health-checks list health-check-grpc --global --protocol grpc
+        """)
+    self.list_json.assert_called_once_with(
+        requests=[(self._compute_api.healthChecks, 'List',
+                   self.messages.ComputeHealthChecksListRequest(
+                       project='my-project', maxResults=500))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME                 PROTOCOL PORT    GRPC_SERVICE_NAME
+            health-check-grpc    GRPC     88      gRPC-service
+            """), normalize_space=True)
 
 
 if __name__ == '__main__':

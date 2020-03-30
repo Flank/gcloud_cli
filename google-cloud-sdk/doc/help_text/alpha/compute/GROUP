@@ -22,8 +22,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -112,7 +113,7 @@ GROUPS
         (ALPHA) Manage Google Compute Engine organization security policies.
 
      os-config
-        (ALPHA) Manage OS Config tasks for Compute Engine VMs.
+        (ALPHA) Manage OS Config tasks for Compute Engine VM instances.
 
      os-login
         (ALPHA) Create and manipulate Google Compute Engine OS Login resources.
@@ -123,6 +124,12 @@ GROUPS
      project-info
         (ALPHA) Read and manipulate project-level data like quotas and
         metadata.
+
+     public-advertised-prefixes
+        (ALPHA) Manage public advertised prefix resources.
+
+     public-delegated-prefixes
+        (ALPHA) Manage public delegated prefix resources.
 
      regions
         (ALPHA) List Google Compute Engine regions.
@@ -151,7 +158,7 @@ GROUPS
         (ALPHA) List, describe, and delete Google Compute Engine snapshots.
 
      sole-tenancy
-        (ALPHA) Read and manage Google Compute Engine sole-tenancy resources.
+        (ALPHA) Read and manage Compute Engine sole-tenancy resources.
 
      ssl-certificates
         (ALPHA) List, create, and delete Google Compute Engine SSL
@@ -160,6 +167,9 @@ GROUPS
      ssl-policies
         (ALPHA) List, create, delete and update Google Compute Engine SSL
         policies.
+
+     target-grpc-proxies
+        (ALPHA) Manage Google Compute Engine target gRPC proxy resources.
 
      target-http-proxies
         (ALPHA) List, create, and delete target HTTP proxies.

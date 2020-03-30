@@ -19,28 +19,76 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import contextlib
 import datetime
 import json
+import dateutil
 
 from googlecloudsdk.api_lib.iamcredentials import util as iamcredentials_util
 from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.credentials import creds as c_creds
 from googlecloudsdk.core.credentials import gce as c_gce
 from googlecloudsdk.core.credentials import store
+from googlecloudsdk.core.util import times
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+from tests.lib.core.credentials import credentials_test_base
 from tests.lib.core.credentials import devshell_test_base
+
 import httplib2
 import mock
-
 from oauth2client import client
 from oauth2client import crypt
 from oauth2client import service_account
 from oauth2client.contrib import gce as oauth2client_gce
+from google.auth import _helpers
+from google.auth import crypt as google_auth_crypt
+from google.auth import jwt
+from google.oauth2 import _client
+from google.oauth2 import credentials
+from google.oauth2 import service_account as google_auth_service_account
 
 
-class StoreTests(sdk_test_base.WithLogCapture):
+def _MakeFakeCredentialsRefreshExpiry():
+  """Returns an expiry for fake credentials refresh result."""
+  return datetime.datetime.utcnow() + datetime.timedelta(seconds=3599)
+
+
+# The argument list needs to match that of the refresh of oauth2client
+# credentials, so pylint: disable=unused-argument
+def _FakeRefreshOauth2clientUserCredentials(self, http):
+  """A fake refresh method for oauth2client user credentails."""
+  self.access_token = 'REFRESHED-ACCESS-TOKEN'
+  self.token_expiry = _MakeFakeCredentialsRefreshExpiry()
+  self.id_token = 'REFRESHED-ID-TOKEN'
+
+
+# pylint: enable=unused-argument
+
+
+# The argument list needs to match that of the refresh of oauth2client
+# credentials, so pylint: disable=unused-argument
+def _FakeRefreshOauth2clientServiceAccountCredentials(self, http):
+  """A fake refresh method for oauth2client service account credentails."""
+  self.access_token = 'REFRESHED-ACCESS-TOKEN'
+  self.token_expiry = _MakeFakeCredentialsRefreshExpiry()
+
+
+# pylint: enable=unused-argument
+
+
+def _MakeFakeOauth2clientServiceAccountIdTokenRefreshResponse():
+  """Returns a fake response for service account ID token refresh.
+
+  This returned response is used by oauth2client credentials.
+  """
+  response = mock.Mock(status=200)
+  content = b'{"id_token": "REFRESHED-ID-TOKEN"}'
+  return response, content
+
+
+class StoreTests(sdk_test_base.WithLogCapture,
+                 credentials_test_base.CredentialsTestBase):
 
   def SetUp(self):
     self.fake_project = 'fake-project'
@@ -48,18 +96,32 @@ class StoreTests(sdk_test_base.WithLogCapture):
     properties.VALUES.core.account.Set(self.fake_account)
     properties.VALUES.core.project.Set(self.fake_project)
     self.fake_cred = client.OAuth2Credentials(
-        'access-token', 'client_id', 'client_secret',
-        'fake-token', None, 'token_uri', 'user_agent',
+        'access-token',
+        'client_id',
+        'client_secret',
+        'fake-token',
+        datetime.datetime(2017, 1, 8, 0, 0, 0),
+        'token_uri',
+        'user_agent',
         scopes=config.CLOUDSDK_SCOPES)
     self.crypt_mock = self.StartObjectPatch(crypt, 'make_signed_jwt')
-    self.refresh_mock = self.StartObjectPatch(client.OAuth2Credentials,
-                                              'refresh')
+    self.refresh_mock = self.StartObjectPatch(
+        client.OAuth2Credentials, 'refresh', autospec=True)
     self.request_mock = self.StartObjectPatch(httplib2.Http, 'request',
                                               autospec=True)
     self.response_mock = self.StartObjectPatch(httplib2, 'Response',
                                                autospec=True)
     self.accounts_mock = self.StartObjectPatch(c_gce.Metadata(), 'Accounts')
-    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
+    self.StartObjectPatch(google_auth_crypt.RSASigner,
+                          'from_service_account_info')
+    self.StartObjectPatch(jwt, 'encode', return_value=b'fake_assertion')
+    self.StartObjectPatch(
+        _client,
+        'jwt_grant',
+        return_value=('REFRESHED-ACCESS-TOKEN',
+                      _MakeFakeCredentialsRefreshExpiry(), []))
     self.adc_file = self.Touch(self.root_path, contents="""\
 {
   "client_id": "foo.apps.googleusercontent.com",
@@ -67,23 +129,68 @@ class StoreTests(sdk_test_base.WithLogCapture):
   "refresh_token": "file-token",
   "type": "authorized_user"
 }""")
-    self.json_file = self.Touch(self.root_path, contents="""\
+    self.json_file = self.Touch(
+        self.root_path,
+        contents="""\
 {
     "private_key_id": "key-id",
     "private_key": "-----BEGIN PRIVATE KEY-----\\nasdf\\n-----END PRIVATE KEY-----\\n",
     "client_email": "bar@developer.gserviceaccount.com",
     "client_id": "bar.apps.googleusercontent.com",
-    "type": "service_account"
+    "type": "service_account",
+    "token_uri": "https://oauth2.googleapis.com/token"
   }""")
+
+  def testLoadFreshCredential(self):
+    self.fake_cred.token_expiry = (
+        datetime.datetime.utcnow() - datetime.timedelta(hours=1))
+    store.Store(self.fake_cred)
+    loaded = store.LoadFreshCredential()
+    self.assertEqual('fake-token', loaded.refresh_token)
+    self.refresh_mock.assert_called()
+
+  def testLoadFreshCredentialNoRefresh(self):
+    self.fake_cred.token_expiry = (
+        datetime.datetime.utcnow() + datetime.timedelta(hours=1))
+    store.Store(self.fake_cred)
+    store.LoadFreshCredential(min_expiry_duration='30m')
+    self.refresh_mock.assert_not_called()
+
+  def testLoadFreshCredentialDefaultDuration(self):
+    self.fake_cred.token_expiry = (
+        datetime.datetime.utcnow() + datetime.timedelta(hours=1))
+    store.Store(self.fake_cred)
+    store.LoadFreshCredential()
+    self.refresh_mock.assert_called_once()
+
+  def testLoadFreshCredentialDefaultDurationNoRefresh(self):
+    self.fake_cred.token_expiry = (
+        datetime.datetime.utcnow() + datetime.timedelta(hours=2))
+    store.Store(self.fake_cred)
+    store.LoadFreshCredential()
+    self.refresh_mock.assert_not_called()
+
+  def testLoadFreshCredentialBadDuration(self):
+    self.fake_cred.token_expiry = (
+        datetime.datetime.utcnow() - datetime.timedelta(1))
+    store.Store(self.fake_cred)
+    with self.assertRaises(ValueError):
+      store.LoadFreshCredential(min_expiry_duration='2h')
+
+    with self.assertRaises(ValueError):
+      store.LoadFreshCredential(min_expiry_duration='Foo')
 
   def testStoreAndLoad(self):
     store.Store(self.fake_cred)
     loaded = store.Load()
+    self.assertIsInstance(loaded, client.OAuth2Credentials)
     self.assertEqual(loaded.scopes, set(config.CLOUDSDK_SCOPES))
-    self.assertEqual('fake-token', loaded.refresh_token)
+    self.assertEqual(loaded.refresh_token, 'fake-token')
     self.refresh_mock.assert_called_once()
 
-    self.assertEqual('fake-token', store.LoadIfEnabled().refresh_token)
+    loaded = store.LoadIfEnabled()
+    self.assertIsInstance(loaded, client.OAuth2Credentials)
+    self.assertEqual(loaded.refresh_token, 'fake-token')
     properties.VALUES.auth.disable_credentials.Set(True)
     self.assertIsNone(store.LoadIfEnabled())
     properties.VALUES.auth.disable_credentials.Set(False)
@@ -118,6 +225,337 @@ gs_oauth2_refresh_token = fake-token
     # Not SignedJwtAssertionCredentials
     self.AssertFileNotExists(
         paths.LegacyCredentialsP12KeyPath(self.fake_account))
+
+  def testStoreOauth2client_LoadOAuth2client_UserCreds(self):
+    self.refresh_mock.side_effect = _FakeRefreshOauth2clientUserCredentials
+
+    creds_stored = self.MakeUserCredentials()
+    expected_creds_dict = {
+        'access_token': 'access-token',
+        'client_id': 'client_id',
+        'client_secret': 'client_secret',
+        'refresh_token': 'fake-token',
+        'token_uri': 'token_uri',
+        'rapt_token': 'rapt_token5',
+        'user_agent': 'user_agent',
+    }
+    expected_expired = True
+    self.AssertCredentials(creds_stored, c_creds.CredentialType.USER_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+    store.Store(creds_stored, self.fake_account)
+    self.AssertFileExists(
+        config.Paths().LegacyCredentialsGSUtilPath(self.fake_account))
+
+    # Load() refreshes expired tokens
+    creds_loaded = store.Load(self.fake_account)
+
+    expected_creds_dict['access_token'] = 'REFRESHED-ACCESS-TOKEN'
+    expected_creds_dict['id_token'] = 'REFRESHED-ID-TOKEN'
+    expected_expired = False
+    self.AssertCredentials(creds_loaded, c_creds.CredentialType.USER_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+  def testStoreOauth2client_LoadOAuth2client_ServiceAccountCreds(self):
+    self.refresh_mock.side_effect = (
+        _FakeRefreshOauth2clientServiceAccountCredentials)
+    self.request_mock.return_value = (
+        _MakeFakeOauth2clientServiceAccountIdTokenRefreshResponse())
+
+    creds_stored = self.MakeServiceAccountCredentials()
+    expected_creds_dict = {
+        'access_token':
+            'access_token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        '_private_key_id':
+            'key-id',
+        '_private_key_pkcs8_pem':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'token_uri':
+            'https://www.googleapis.com/oauth2/v4/token'
+    }
+    expected_expired = True
+    self.AssertCredentials(creds_stored, c_creds.CredentialType.SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+    store.Store(creds_stored, self.fake_account)
+    self.AssertFileExists(
+        config.Paths().LegacyCredentialsGSUtilPath(self.fake_account))
+
+    # Load() refreshes expired tokens
+    creds_loaded = store.Load(self.fake_account)
+
+    expected_creds_dict['access_token'] = 'REFRESHED-ACCESS-TOKEN'
+    expected_creds_dict['id_tokenb64'] = 'REFRESHED-ID-TOKEN'
+    expected_expired = False
+    self.AssertCredentials(creds_loaded, c_creds.CredentialType.SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+  def testStoreOauth2client_LoadOAuth2client_P12ServiceAccountCreds(self):
+    self.refresh_mock.side_effect = (
+        _FakeRefreshOauth2clientServiceAccountCredentials)
+    self.request_mock.return_value = (
+        _MakeFakeOauth2clientServiceAccountIdTokenRefreshResponse())
+
+    creds_stored = self.MakeP12ServiceAccountCredentials()
+    expected_creds_dict = {
+        'access_token': 'access_token',
+        'service_account_email': 'p12owner@developer.gserviceaccount.com',
+        '_private_key_pkcs12': b'BASE64ENCODED',
+        '_private_key_password': 'key-password',
+        'token_uri': 'https://www.googleapis.com/oauth2/v4/token'
+    }
+    expected_expired = True
+    self.AssertCredentials(creds_stored,
+                           c_creds.CredentialType.P12_SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+    store.Store(creds_stored, self.fake_account)
+    self.AssertFileExists(
+        config.Paths().LegacyCredentialsGSUtilPath(self.fake_account))
+
+    # Load() refreshes expired tokens
+    creds_loaded = store.Load(self.fake_account, use_google_auth=True)
+
+    expected_creds_dict['access_token'] = 'REFRESHED-ACCESS-TOKEN'
+    expected_creds_dict['id_tokenb64'] = 'REFRESHED-ID-TOKEN'
+    expected_expired = False
+    self.AssertCredentials(creds_loaded,
+                           c_creds.CredentialType.P12_SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+  def testStoreOauth2client_LoadGoogleAuth_UserCreds(self):
+    self.refresh_mock.side_effect = _FakeRefreshOauth2clientUserCredentials
+
+    creds_stored = self.MakeUserCredentials()
+    expected_creds_dict = {
+        'access_token': 'access-token',
+        'client_id': 'client_id',
+        'client_secret': 'client_secret',
+        'refresh_token': 'fake-token',
+        'token_uri': 'token_uri',
+        'rapt_token': 'rapt_token5',
+        'user_agent': 'user_agent',
+    }
+    expected_expired = True
+    self.AssertCredentials(creds_stored, c_creds.CredentialType.USER_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+    store.Store(creds_stored, self.fake_account)
+    self.AssertFileExists(
+        config.Paths().LegacyCredentialsGSUtilPath(self.fake_account))
+
+    # Load() refreshes expired tokens
+    creds_loaded = store.Load(self.fake_account, use_google_auth=True)
+
+    expected_creds_dict = {
+        'token': 'REFRESHED-ACCESS-TOKEN',
+        'client_id': 'client_id',
+        'client_secret': 'client_secret',
+        'refresh_token': 'fake-token',
+        'token_uri': 'token_uri',
+    }
+    expected_expired = False
+    self.AssertCredentials(creds_loaded,
+                           c_creds.CredentialTypeGoogleAuth.USER_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+  @test_case.Filters.SkipOnKokoroAndLinuxPy3(
+      'pytest loads a wrong version of google-auth library that does not implement _client.id_token_jwt_grant',
+      'b/151428720')
+  def testStoreOauth2client_LoadGoogleAuth_ServiceAccountCreds(self):
+    self.StartObjectPatch(
+        _client,
+        'id_token_jwt_grant',
+        return_value=('REFRESHED-ID-TOKEN', _MakeFakeCredentialsRefreshExpiry(),
+                      []))
+
+    creds_stored = self.MakeServiceAccountCredentials()
+    expected_creds_dict = {
+        'access_token':
+            'access_token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        '_private_key_id':
+            'key-id',
+        '_private_key_pkcs8_pem':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'token_uri':
+            'https://www.googleapis.com/oauth2/v4/token'
+    }
+    expected_expired = True
+    self.AssertCredentials(creds_stored, c_creds.CredentialType.SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+    store.Store(creds_stored, self.fake_account)
+    self.AssertFileExists(
+        config.Paths().LegacyCredentialsGSUtilPath(self.fake_account))
+
+    # Load() refreshes expired tokens
+    creds_loaded = store.Load(self.fake_account, use_google_auth=True)
+
+    expected_creds_dict = {
+        'token':
+            'REFRESHED-ACCESS-TOKEN',
+        'id_tokenb64':
+            'REFRESHED-ID-TOKEN',
+        '_id_token':
+            'REFRESHED-ID-TOKEN',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        'private_key':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'private_key_id':
+            'key-id',
+        '_token_uri':
+            'https://oauth2.googleapis.com/token'
+    }
+    expected_expired = False
+    self.AssertCredentials(creds_loaded,
+                           c_creds.CredentialTypeGoogleAuth.SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+  def testStoreOauth2client_LoadGoogleAuth_P12ServiceAccountCreds(self):
+    self.refresh_mock.side_effect = (
+        _FakeRefreshOauth2clientServiceAccountCredentials)
+    self.request_mock.return_value = (
+        _MakeFakeOauth2clientServiceAccountIdTokenRefreshResponse())
+
+    creds_stored = self.MakeP12ServiceAccountCredentials()
+    expected_creds_dict = {
+        'access_token': 'access_token',
+        'service_account_email': 'p12owner@developer.gserviceaccount.com',
+        '_private_key_pkcs12': b'BASE64ENCODED',
+        '_private_key_password': 'key-password',
+        'token_uri': 'https://www.googleapis.com/oauth2/v4/token'
+    }
+    expected_expired = True
+    self.AssertCredentials(creds_stored,
+                           c_creds.CredentialType.P12_SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+    store.Store(creds_stored, self.fake_account)
+    self.AssertFileExists(
+        config.Paths().LegacyCredentialsGSUtilPath(self.fake_account))
+
+    # Load() refreshes expired tokens
+    creds_loaded = store.Load(self.fake_account, use_google_auth=True)
+
+    expected_creds_dict['access_token'] = 'REFRESHED-ACCESS-TOKEN'
+    expected_creds_dict['id_tokenb64'] = 'REFRESHED-ID-TOKEN'
+    expected_expired = False
+    self.AssertCredentials(creds_loaded,
+                           c_creds.CredentialType.P12_SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+  @test_case.Filters.SkipOnKokoroAndLinuxPy3(
+      'pytest loads a wrong version of google-auth library that does not implement _client.id_token_jwt_grant',
+      'b/151428720')
+  def testStoreGoogleAuth_LoadGoogleAuth_ServiceAccountCreds(self):
+    self.StartObjectPatch(
+        _client,
+        'id_token_jwt_grant',
+        return_value=('REFRESHED-ID-TOKEN', _MakeFakeCredentialsRefreshExpiry(),
+                      []))
+
+    creds_stored = self.MakeServiceAccountCredentialsGoogleAuth()
+    expected_creds_dict = {
+        'token':
+            'access_token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        'private_key':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'private_key_id':
+            'key-id',
+        'project_id':
+            'bar-test',
+        '_token_uri':
+            'https://oauth2.googleapis.com/token'
+    }
+    expected_expired = True
+    self.AssertCredentials(creds_stored,
+                           c_creds.CredentialTypeGoogleAuth.SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+    store.Store(creds_stored, self.fake_account)
+    self.AssertFileNotExists(
+        config.Paths().LegacyCredentialsGSUtilPath(self.fake_account))
+
+    # Load() refreshes expired tokens
+    creds_loaded = store.Load(self.fake_account, use_google_auth=True)
+
+    expected_creds_dict['token'] = 'REFRESHED-ACCESS-TOKEN'
+    expected_creds_dict['id_tokenb64'] = 'REFRESHED-ID-TOKEN'
+    expected_creds_dict['_id_token'] = 'REFRESHED-ID-TOKEN'
+    expected_expired = False
+    self.AssertCredentials(creds_loaded,
+                           c_creds.CredentialTypeGoogleAuth.SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+  def testStoreGoogleAuth_LoadOauth2client_ServiceAccountCreds(self):
+    self.refresh_mock.side_effect = (
+        _FakeRefreshOauth2clientServiceAccountCredentials)
+    self.request_mock.return_value = (
+        _MakeFakeOauth2clientServiceAccountIdTokenRefreshResponse())
+
+    creds_stored = self.MakeServiceAccountCredentialsGoogleAuth()
+    expected_creds_dict = {
+        'token':
+            'access_token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        'private_key':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'private_key_id':
+            'key-id',
+        'project_id':
+            'bar-test',
+        '_token_uri':
+            'https://oauth2.googleapis.com/token'
+    }
+    expected_expired = True
+    self.AssertCredentials(creds_stored,
+                           c_creds.CredentialTypeGoogleAuth.SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
+
+    store.Store(creds_stored, self.fake_account)
+    self.AssertFileNotExists(
+        config.Paths().LegacyCredentialsGSUtilPath(self.fake_account))
+
+    # Load() refreshes expired tokens
+    creds_loaded = store.Load(self.fake_account)
+
+    expected_creds_dict = {
+        'access_token':
+            'REFRESHED-ACCESS-TOKEN',
+        'id_tokenb64':
+            'REFRESHED-ID-TOKEN',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        '_private_key_id':
+            'key-id',
+        '_private_key_pkcs8_pem':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'token_uri':
+            'https://oauth2.googleapis.com/token'
+    }
+    expected_expired = False
+    self.AssertCredentials(creds_loaded, c_creds.CredentialType.SERVICE_ACCOUNT,
+                           expected_creds_dict, expected_expired)
 
   def testStoreGceCredentials(self):
     self.StartObjectPatch(c_gce._GCEMetadata, 'Accounts', return_value=[])
@@ -163,6 +601,9 @@ gs_oauth2_refresh_token = fake-token
     self.assertEqual(['account1', 'account2'], store.AvailableAccounts())
 
   def testStoreAndLoadFileOverride(self):
+    response = mock.Mock(status=200)
+    content = '{"id_token": "id-token"}'.encode()
+    self.request_mock.return_value = response, content
     store.Store(self.fake_cred)
     properties.VALUES.auth.credential_file_override.Set(self.adc_file)
     loaded = store.Load()
@@ -222,6 +663,14 @@ gs_oauth2_refresh_token = fake-token
     with self.assertRaises(store.NoActiveAccountException):
       store.Load()
 
+  def testNoActiveAccountExceptionWithPath(self):
+    store.Store(self.fake_cred)
+    properties.VALUES.core.account.Set(None)
+    with self.assertRaises(store.NoActiveAccountException):
+      store.Load()
+    self.AssertLogContains(
+        'Could not open the configuration file: [')
+
   def testRevokeCredentialsWhenNoAccount(self):
     with self.assertRaises(store.NoActiveAccountException):
       properties.VALUES.core.account.Set(None)
@@ -234,9 +683,9 @@ gs_oauth2_refresh_token = fake-token
     self.request_mock.return_value = self.response_mock, fake_content
     store.Store(self.fake_cred)
     loaded = store.Load()
-    credentials = store.AcquireFromToken(loaded.refresh_token)
-    store.Refresh(credentials)
-    store.Store(credentials, self.fake_account)
+    creds = store.AcquireFromToken(loaded.refresh_token)
+    store.Refresh(creds)
+    store.Store(creds, self.fake_account)
     result = store.Revoke()
     self.assertTrue(result)
     # check that we made an HTTP request to the correct revoke URL
@@ -252,8 +701,8 @@ gs_oauth2_refresh_token = fake-token
     self.response_mock.status = 200
     fake_content = 'fake-content'
     self.request_mock.return_value = self.response_mock, fake_content
-    credentials = store.AcquireFromToken(self.fake_cred.refresh_token)
-    store.Store(credentials, self.fake_account)
+    creds = store.AcquireFromToken(self.fake_cred.refresh_token)
+    store.Store(creds, self.fake_account)
     result = store.Revoke()
     self.assertTrue(result)
     self.refresh_mock.assert_not_called()
@@ -270,8 +719,8 @@ gs_oauth2_refresh_token = fake-token
     self.response_mock.status = 400
     fake_content = '{"error":"invalid_token"}'
     self.request_mock.return_value = self.response_mock, fake_content
-    credentials = store.AcquireFromToken(self.fake_cred.refresh_token)
-    store.Store(credentials, self.fake_account)
+    creds = store.AcquireFromToken(self.fake_cred.refresh_token)
+    store.Store(creds, self.fake_account)
     result = store.Revoke()
     self.assertFalse(result)
     self.refresh_mock.assert_not_called()
@@ -288,8 +737,8 @@ gs_oauth2_refresh_token = fake-token
     self.response_mock.status = 400
     fake_content = '{"error":"invalid_request"}'
     self.request_mock.return_value = self.response_mock, fake_content
-    credentials = store.AcquireFromToken(self.fake_cred.refresh_token)
-    store.Store(credentials, self.fake_account)
+    creds = store.AcquireFromToken(self.fake_cred.refresh_token)
+    store.Store(creds, self.fake_account)
     result = store.Revoke()
     self.assertFalse(result)
     self.refresh_mock.assert_not_called()
@@ -303,17 +752,59 @@ gs_oauth2_refresh_token = fake-token
 
   def testRefreshServiceAccountId(self):
     """Test that store.Refresh refreshes a service account's id_token."""
+    response = mock.Mock(status=200)
+    content = '{"id_token": "old-id-token"}'.encode()
+    self.request_mock.return_value = response, content
     properties.VALUES.auth.credential_file_override.Set(self.json_file)
     loaded = store.Load()
+    # token_response is initialized in the refresh method of oauth2client
+    # credentials, which is mocked in the test. Manually initialize it here so
+    # that the test can verify it will be updated later.
     loaded.token_response = {'id_token': 'old-id-token'}
     self.assertIsInstance(loaded, service_account.ServiceAccountCredentials)
-    http_mock = mock.Mock()
-    http_mock.request.return_value = (
-        mock.Mock(status=200),
-        json.dumps({'id_token': 'fresh-id-token'}))
-    store.Refresh(loaded, http_client=http_mock)
+    self.assertEqual(loaded.id_tokenb64, 'old-id-token')
+
+    content = '{"id_token": "fresh-id-token"}'.encode()
+    self.request_mock.return_value = response, content
+    store.Refresh(loaded)
     self.assertEqual(loaded.id_tokenb64, 'fresh-id-token')
     self.assertEqual(loaded.token_response['id_token'], 'fresh-id-token')
+
+  @test_case.Filters.SkipOnKokoroAndLinuxPy3(
+      'pytest loads a wrong version of google-auth library that does not implement _client.id_token_jwt_grant',
+      'b/151428720')
+  def testRefreshServiceAccountId_GoogleAuth(self):
+    self.StartObjectPatch(
+        _client,
+        'id_token_jwt_grant',
+        return_value=('REFRESHED-ID-TOKEN', _MakeFakeCredentialsRefreshExpiry(),
+                      []))
+
+    creds = self.MakeServiceAccountCredentialsGoogleAuth()
+    expected_creds_dict = {
+        'token':
+            'access_token',
+        'id_tokenb64':
+            'id-token',
+        'service_account_email':
+            'bar@developer.gserviceaccount.com',
+        'client_id':
+            'bar.apps.googleusercontent.com',
+        'private_key':
+            '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
+        'private_key_id':
+            'key-id',
+        'project_id':
+            'bar-test',
+    }
+    self.assertIsInstance(creds, google_auth_service_account.Credentials)
+    self.AssertCredentialsEqual(creds, expected_creds_dict)
+
+    store.Refresh(creds)
+    expected_creds_dict['token'] = 'REFRESHED-ACCESS-TOKEN'
+    expected_creds_dict['id_tokenb64'] = 'REFRESHED-ID-TOKEN'
+    expected_creds_dict['_id_token'] = 'REFRESHED-ID-TOKEN'
+    self.AssertCredentialsEqual(creds, expected_creds_dict)
 
   def testRefreshGceIdToken(self):
     """Test that store.Refresh refreshes a gce service account's id_token."""
@@ -362,57 +853,73 @@ gs_oauth2_refresh_token = fake-token
         'There was a problem refreshing your current auth tokens'):
       store.Refresh(self.fake_cred)
 
+  def testRefreshIfAlmostExpireTokenExceedExpiryWindow_oauth2client(self):
+    now = datetime.datetime(2020, 3, 6, 14, 15, 16, tzinfo=dateutil.tz.tzutc())
+    token_expiry = now + datetime.timedelta(seconds=200)
+    self.StartObjectPatch(times, 'Now', return_value=now)
+    mock_refresh = self.StartObjectPatch(store, 'Refresh', autospec=True)
+    creds = client.OAuth2Credentials(None, None, None, None, token_expiry, None,
+                                     None)
+
+    store._RefreshIfAlmostExpire(creds)
+    mock_refresh.assert_called_once()
+
+  def testRefreshIfAlmostExpireTokenNoExpiry_oauth2client(self):
+    mock_refresh = self.StartObjectPatch(store, 'Refresh', autospec=True)
+    creds = client.OAuth2Credentials(None, None, None, None, None, None, None)
+
+    store._RefreshIfAlmostExpire(creds)
+    mock_refresh.assert_called_once()
+
+  def testRefreshIfAlmostExpireTokenNotExceedExpiryWindow_oauth2client(self):
+    now = datetime.datetime(2020, 3, 6, 14, 15, 16, tzinfo=dateutil.tz.tzutc())
+    token_expiry = now + datetime.timedelta(seconds=400)
+    self.StartObjectPatch(times, 'Now', return_value=now)
+    mock_refresh = self.StartObjectPatch(store, 'Refresh', autospec=True)
+    creds = client.OAuth2Credentials(None, None, None, None, token_expiry, None,
+                                     None)
+
+    store._RefreshIfAlmostExpire(creds)
+    mock_refresh.assert_not_called()
+
+  def testRefreshIfAlmostExpireTokenExpired_google_auth(self):
+    now = datetime.datetime(2020, 3, 6, 14, 15, 16)
+    expiry = now - datetime.timedelta(seconds=20)
+    self.StartObjectPatch(_helpers, 'utcnow', return_value=now)
+    mock_refresh = self.StartObjectPatch(store, 'Refresh', autospec=True)
+    creds = credentials.Credentials('fake-access-token')
+    creds.expiry = expiry
+
+    store._RefreshIfAlmostExpire(creds)
+    mock_refresh.assert_called_once()
+
+  def testRefreshIfAlmostExpireNotExpired_google_auth(self):
+    now = datetime.datetime(2020, 3, 6, 14, 15, 16)
+    # expiry needs to be at least 300s ahead of now for the credentials to be
+    # vallid. This interval accounts for the clock skew
+    # (http://shortn/_nXtCxPblUS) considered by google-auth when calculating the
+    # the validity of the credentials.
+    expiry = now + datetime.timedelta(seconds=320)
+    self.StartObjectPatch(_helpers, 'utcnow', return_value=now)
+    mock_refresh = self.StartObjectPatch(store, 'Refresh', autospec=True)
+    creds = credentials.Credentials('fake-access-token')
+    creds.expiry = expiry
+
+    store._RefreshIfAlmostExpire(creds)
+    mock_refresh.assert_not_called()
+
 
 @test_case.Filters.RunOnlyOnLinux
 @test_case.Filters.SkipInDebPackage(
     'Socket conflict in docker container in test environment', 'b/37959415')
 @test_case.Filters.SkipInRpmPackage(
     'Socket conflict in docker container in test environment', 'b/37959415')
-class DevshellTests(sdk_test_base.SdkBase):
-
-  def _UnregisterDevshellProvider(self, provider):
-    try:
-      provider.UnRegister()
-    except:  # pylint: disable=bare-except
-      # Provider may have all already been unregistered.
-      pass
-
-  @contextlib.contextmanager
-  def _DevshellProvider(self):
-    devshell_provider = store.DevShellCredentialProvider()
-    try:
-      devshell_provider.Register()
-      yield devshell_provider
-    finally:
-      self._UnregisterDevshellProvider(devshell_provider)
-
-  @contextlib.contextmanager
-  def _DevshellProxy(self):
-    devshell_proxy = devshell_test_base.AuthReferenceServer(self.GetPort())
-    try:
-      devshell_proxy.Start()
-      yield devshell_proxy
-    finally:
-      devshell_proxy.Stop()
-
-  @sdk_test_base.Retry(
-      why=('The test server is very rarely flaky.'),
-      max_retrials=3,
-      sleep_ms=300)
-  def _testRevokeRaisesError(self):
-    with self._DevshellProvider() as devshell_provider:
-      self.assertIsNone(properties.VALUES.core.project.Get())
-      with self._DevshellProxy():
-        self.assertEqual('fooproj', properties.VALUES.core.project.Get())
-        with self.assertRaisesRegex(store.RevokeError, 'Cannot revoke'):
-          store.Revoke('joe@example.com')
-
-        # Need to do this check while the dev shell proxy is still active.
-        devshell_provider.UnRegister()
-        self.assertIsNone(properties.VALUES.core.project.Get())
+class DevshellTests(devshell_test_base.DevshellTestBase):
 
   def testThrowsExceptionInDevshell(self):
-    self._testRevokeRaisesError()
+    with self.assertRaisesRegex(store.RevokeError, 'Cannot revoke'):
+      store.Revoke('joe@example.com')
+
 
 if __name__ == '__main__':
   test_case.main()

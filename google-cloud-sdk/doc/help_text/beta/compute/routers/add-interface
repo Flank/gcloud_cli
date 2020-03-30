@@ -6,8 +6,8 @@ SYNOPSIS
     gcloud beta compute routers add-interface NAME
         --interface-name=INTERFACE_NAME
         (--interconnect-attachment=INTERCONNECT_ATTACHMENT
-          | --interconnect-attachment-region=INTERCONNECT_ATTACHMENT_REGION
-          | --vpn-tunnel=VPN_TUNNEL | --vpn-tunnel-region=VPN_TUNNEL_REGION)
+          --interconnect-attachment-region=INTERCONNECT_ATTACHMENT_REGION
+          | --vpn-tunnel=VPN_TUNNEL --vpn-tunnel-region=VPN_TUNNEL_REGION)
         [--ip-address=IP_ADDRESS] [--mask-length=MASK_LENGTH] [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -25,21 +25,25 @@ REQUIRED FLAGS
 
      Exactly one of these must be specified:
 
-       --interconnect-attachment=INTERCONNECT_ATTACHMENT
-          The interconnect attachment of the interface being added.
+       Interconnect Attachment
 
-       --interconnect-attachment-region=INTERCONNECT_ATTACHMENT_REGION
-          Region of the interconnectAttachment to operate on. If not specified
-          it will be set to the region of the router. Overrides the default
-          compute/region property value for this command invocation.
+         --interconnect-attachment=INTERCONNECT_ATTACHMENT
+            The interconnect attachment of the interface being added.
 
-       --vpn-tunnel=VPN_TUNNEL
-          The tunnel of the interface being added.
+         --interconnect-attachment-region=INTERCONNECT_ATTACHMENT_REGION
+            Region of the interconnectAttachment to operate on. If not
+            specified it will be set to the region of the router. Overrides the
+            default compute/region property value for this command invocation.
 
-       --vpn-tunnel-region=VPN_TUNNEL_REGION
-          Region of the vpn tunnel to operate on. If not specified it will be
-          set to the region of the router. Overrides the default compute/region
-          property value for this command invocation.
+       VPN Tunnel
+
+         --vpn-tunnel=VPN_TUNNEL
+            The tunnel of the interface being added.
+
+         --vpn-tunnel-region=VPN_TUNNEL_REGION
+            Region of the vpn tunnel to operate on. If not specified it will be
+            set to the region of the router. Overrides the default
+            compute/region property value for this command invocation.
 
 OPTIONAL FLAGS
      --ip-address=IP_ADDRESS
@@ -74,8 +78,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in BETA and may change without notice. These

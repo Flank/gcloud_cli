@@ -1,0 +1,100 @@
+
+.TH "GCLOUD_ASSET_FEEDS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud asset feeds delete \- delete a Cloud Asset Inventory Feed
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud asset feeds delete\fR \fIFEED_ID\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Delete a Cloud Asset Inventory Feed.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIFEED_ID\fR
+Asset feed identifier to delete.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+Folder of the feed.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+Organization of the feed.
+
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT_ID\fR
+project of the feed.
+
+The Google Cloud Platform project name to use for this invocation. If omitted,
+then the current project is assumed; the current project can be listed using
+\f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
+\f5gcloud config set project PROJECTID\fR.
+
+\f5\-\-project\fR and its fallback \f5core/project\fR property play two roles in
+the invocation. It specifies the project of the resource to operate on. It also
+specifies the project for API enablement check, quota, and billing. To specify a
+different project for quota and billing, use \f5\-\-billing\-project\fR or
+\f5billing/quota_project\fR property.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a feed 'feed1' in project 'p1', run:
+
+.RS 2m
+$ gcloud asset feeds delete feed1 \-\-project=p1
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha asset feeds delete
+$ gcloud beta asset feeds delete
+.RE
+

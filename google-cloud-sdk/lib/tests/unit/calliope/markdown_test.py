@@ -280,7 +280,7 @@ _CONFIGURATION_::
 
 The configuration to use for this command invocation. For more
 information on how to use configurations, run:
-`gcloud topic configurations`.  You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME] environment
+`gcloud topic configurations`.  You can also use the CLOUDSDK_ACTIVE_CONFIG_NAME environment
 variable to set the equivalent of this flag for a terminal
 session.
 """
@@ -295,7 +295,7 @@ session.
 
 The configuration to use for this command invocation. For more
 information on how to use configurations, run:
-`gcloud topic configurations`.  You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME] environment
+`gcloud topic configurations`.  You can also use the CLOUDSDK_ACTIVE_CONFIG_NAME environment
 variable to set the equivalent of this flag for a terminal
 session.
 """
@@ -358,9 +358,9 @@ class MarkdownEditTest(sdk_test_base.SdkBase, parameterized.TestCase):
     actual = self.generator._AddCommandLinkMarkdown(doc)
     self.assertEqual(expected, actual)
 
-  def testAddCommandLinkMarkdownNoSubcommand(self):
+  def testAddCommandLinkMarkdownSkipNoSubcommand(self):
     doc = 'See `gcloud` for an overview of everything.'
-    expected = 'See `link:gcloud[gcloud]` for an overview of everything.'
+    expected = doc
     actual = self.generator._AddCommandLinkMarkdown(doc)
     self.assertEqual(expected, actual)
 
@@ -454,7 +454,7 @@ See `link:gcloud/markdown[gcloud markdown]` for an overview of markdown.
 
 Three.
 
-See `link:gcloud[gcloud]` for an overview of everything.
+See `gcloud` for an overview of everything.
 
 Four.
 

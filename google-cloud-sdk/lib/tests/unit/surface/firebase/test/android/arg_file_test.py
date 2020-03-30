@@ -387,10 +387,11 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
   def testOtherFiles_GoodInput(self):
     args = arg_file.GetArgsFromArgFile(GOOD_ARGS + ':other-files.good',
                                        self.android_args_set)
-    self.assertEqual(args['other_files'], {
-        'local/dir/file1': '/sdcard/dir1',
-        'gs://bucket/file2': '/sdcard/dir2'
-    })
+    self.assertEqual(
+        args['other_files'], {
+            '/sdcard/dir1/file.txt': 'local/dir/file1.txt',
+            '/sdcard/dir2/file.txt': 'gs://bucket/file2.txt'
+        })
 
   def testOtherFiles_ListInput(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException):
@@ -405,6 +406,33 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
   def testOtherFiles_IntInput(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException):
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':other-files.int',
+                                  self.android_args_set)
+
+  # Tests for test-targets-for-shard arg
+
+  def testTestTargetsForShard_GoodInput(self):
+    args = arg_file.GetArgsFromArgFile(
+        GOOD_ARGS + ':test-targets-for-shard.good', self.android_args_set)
+    self.assertEqual(args['test_targets_for_shard'], [
+        'class com.ClassForShard1#flakyTest1;class com.ClassForShard1#flakyTest2',
+        'class com.ClassForShard2#flakyTest3,com.ClassForShard2#flakyTest4'
+    ])
+
+  def testTestTargetsForShard_EmptyInput(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      arg_file.GetArgsFromArgFile(BAD_ARGS + ':test-targets-for-shard.empty',
+                                  self.android_args_set)
+
+  # Tests for num-uniform-shards arg
+
+  def testNumUniformShards_GoodInput(self):
+    args = arg_file.GetArgsFromArgFile(GOOD_ARGS + ':num-uniform-shards.good',
+                                       self.android_args_set)
+    self.assertEqual(args['num_uniform_shards'], 2)
+
+  def testNumUniformShards_StringInput(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      arg_file.GetArgsFromArgFile(BAD_ARGS + ':num-uniform-shards.string',
                                   self.android_args_set)
 
   # Tests for directories-to-pull arg

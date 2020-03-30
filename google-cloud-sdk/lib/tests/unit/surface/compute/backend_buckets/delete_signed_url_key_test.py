@@ -41,7 +41,7 @@ class BackendBucketDeleteSignedUrlKeyTestGA(
     operation = self.MakeOperationMessage(operation_ref, backend_bucket_ref)
 
     self.ExpectDeleteSignedUrlKeyRequest(backend_bucket_ref, 'key2', operation)
-    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectOperationPollingRequest(operation_ref, operation)
     self.ExpectGetRequest(backend_bucket_ref, updated_backend_bucket)
 
     response = self.RunBackendBuckets('delete-signed-url-key ' +

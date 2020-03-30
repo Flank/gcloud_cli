@@ -26,33 +26,31 @@ from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
 
-class MachineImagesDescribeTest(test_base.BaseTest):
+class MachineImagesDescribeTestBeta(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
+    self.api_version = 'beta'
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
-        [test_resources.MACHINE_IMAGES[0]],
+        [test_resources.MakeMachineImages(self.messages, self.api_version)[0]],
     ])
     self.Run("""
         compute machine-images describe machine-image-1
         """)
 
     self.CheckRequests(
-        [(self.compute_alpha.machineImages,
-          'Get',
+        [(self.compute.machineImages, 'Get',
           self.messages.ComputeMachineImagesGetRequest(
-              machineImage='machine-image-1',
-              project='my-project'))],
-    )
+              machineImage='machine-image-1', project='my-project'))],)
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
             description: Machine Image 1
             name: machine-image-1
-            selfLink: {}
+            selfLink: https://compute.googleapis.com/compute/{api_version}/projects/my-project/global/machineImages/machine-image-1
             sourceInstanceProperties:
               disks:
               - autoDelete: true
@@ -68,8 +66,15 @@ class MachineImagesDescribeTest(test_base.BaseTest):
                 type: SCRATCH
               machineType: n1-standard-1
             status: READY
-            """.format('https://compute.googleapis.com/compute/alpha/projects/'
-                       'my-project/global/machineImages/machine-image-1')))
+            """.format(api_version=self.api_version)))
+
+
+class MachineImagesDescribeTestAlpha(MachineImagesDescribeTestBeta):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+    self.api_version = 'alpha'
 
 
 if __name__ == '__main__':

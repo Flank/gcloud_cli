@@ -43,7 +43,7 @@ class CreateTestGA(router_test_base.RouterTestBase):
     result.region = 'us-central1'
 
     self.ExpectInsert(expected)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(result)
 
     self.Run("""
@@ -75,14 +75,14 @@ class CreateTestGA(router_test_base.RouterTestBase):
         --async
         --asn 65000
         """)
-    self.assertEqual('operation-X', result.name)
+    self.assertIn('operation-X', result.name)
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Create in progress for router [my-router] '
-        '[https://compute.googleapis.com/compute/v1/'
+        '[https://compute.googleapis.com/compute/{0}/'
         'projects/fake-project/regions/us-central1/operations/operation-X] '
         'Run the [gcloud compute operations describe] command to check the '
-        'status of this operation.\n')
+        'status of this operation.\n'.format(self.api_version))
 
   def testCreateWithAdvertisements_default(self):
     self.SelectApi(self.track, self.api_version)
@@ -96,7 +96,7 @@ class CreateTestGA(router_test_base.RouterTestBase):
     result.region = 'us-central1'
 
     self.ExpectInsert(expected)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(result)
 
     self.Run("""
@@ -135,7 +135,7 @@ class CreateTestGA(router_test_base.RouterTestBase):
     result.region = 'us-central1'
 
     self.ExpectInsert(expected)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(result)
 
     self.Run("""
@@ -186,7 +186,7 @@ class CreateTestBeta(CreateTestGA):
     result.region = 'us-central1'
 
     self.ExpectInsert(expected)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(result)
 
     self.Run("""
@@ -214,7 +214,7 @@ class CreateTestBeta(CreateTestGA):
     result.region = 'us-central1'
 
     self.ExpectInsert(expected)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(result)
 
     self.Run("""
@@ -241,7 +241,7 @@ class CreateTestBeta(CreateTestGA):
     result.region = 'us-central1'
 
     self.ExpectInsert(expected)
-    self.ExpectOperationsGet()
+    self.ExpectOperationsPolling()
     self.ExpectGet(result)
 
     self.Run("""

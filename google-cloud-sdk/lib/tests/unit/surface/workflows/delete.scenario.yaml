@@ -1,0 +1,61 @@
+title: gcloud workflows delete test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      workflows delete test-workflow --location us-central1
+  - prompt:
+    - message: |
+        You are about to delete workflow [test-workflow] in [us-central1].
+        Any associated data will be lost.
+    - input: y
+  - stderr: |
+      Delete request issued for: [test-workflow]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted workflow [test-workflow].
+actions:
+- execute_command:
+    command: |
+      workflows delete test-workflow --location us-central1
+    events:
+    - expect_prompt_continue:
+        message: |
+          You are about to delete workflow [test-workflow] in [us-central1].
+          Any associated data will be lost.
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://workflows.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/workflows/test-workflow?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-42",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.workflows.v1alpha1.OperationMetadata",
+                "createTime": "2019-06-19T16:58:10.998276253Z",
+                "target": "projects/fake-project/locations/us-central1/workflows/test-workflow",
+                "verb": "delete",
+                "cancelRequested": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+        poll_operation: true
+    - expect_stderr: |
+        Delete request issued for: [test-workflow]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted workflow [test-workflow].
+    - expect_exit:
+        code: 0

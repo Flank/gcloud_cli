@@ -1,0 +1,40 @@
+NAME
+    gcloud alpha notebooks environments - notebooks Environments Command Group
+
+SYNOPSIS
+    gcloud alpha notebooks environments COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Notebooks Environments Command Group.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Request for creating environments.
+
+     delete
+        (ALPHA) Request for deleting environments.
+
+     describe
+        (ALPHA) Request for describing environments.
+
+     list
+        (ALPHA) Request for listing environments.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta notebooks environments
+

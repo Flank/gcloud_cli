@@ -45,6 +45,9 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
   # Location of a script containing "print 'hello world'".
   GCS_PYSPARK_SCRIPT = (
       'gs://dataproc-a63ced4c-fa87-4bea-94a5-4d2f8fbbd783-us/hello_world.py')
+  # Location of an example sparkR main file.
+  CLUSTER_SPARK_R_SCRIPT = ('file:///usr/lib/spark/examples/src/main/r/'
+                            'data-manipulation.R')
   # Additional args to pass on cluster creation
   EXTRA_CLUSTER_ARGS = ''
 
@@ -156,9 +159,25 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
                      result.status.state)
     self.assertIsNotNone(result.sparkSqlJob)
 
-  # SparkR is only available in beta, so it should not be tested on the GA track
   def DoTestSparkRJobSubmission(self):
-    pass
+    local_script = None
+    if self.IsBundled():
+      # If this is bundled, gsutil is available for uploads.
+      with tempfile.NamedTemporaryFile(
+          dir=self.temp_path, suffix='.R', delete=False) as local_script:
+        local_script.write(b'print("hello world")')
+      script_uri = local_script.name
+    else:
+      script_uri = self.CLUSTER_SPARK_R_SCRIPT
+    result = self.RunDataproc(('jobs submit spark-r '
+                               '--cluster {0} '
+                               '--async '
+                               '{1} ').format(self.cluster_name, script_uri))
+    if local_script:
+      os.remove(local_script.name)
+    self.assertEqual(self.messages.JobStatus.StateValueValuesEnum.PENDING,
+                     result.status.state)
+    self.assertIsNotNone(result.sparkRJob)
 
   # Presto is only available in beta, so it should not be tested on the GA track
   def DoTestPrestoJobSubmission(self):
@@ -229,9 +248,6 @@ class JobsIntegrationTestBeta(JobsIntegrationTest, base.DataprocTestBaseBeta):
   clusters.
   """
 
-  # Location of an example sparkR main file.
-  GCS_SPARK_R_SCRIPT = ('file:///usr/lib/spark/examples/src/main/r/'
-                        'data-manipulation.R')
   # Enable Presto optional component for Presto jobs
   EXTRA_CLUSTER_ARGS = '--optional-components=PRESTO'
 
@@ -251,26 +267,6 @@ class JobsIntegrationTestBeta(JobsIntegrationTest, base.DataprocTestBaseBeta):
         '--async '
     ).format(self.cluster_name, job_id))
     self.GetSetIAMPolicy('jobs', job_id)
-
-  def DoTestSparkRJobSubmission(self):
-    local_script = None
-    if self.IsBundled():
-      # If this is bundled, gsutil is available for uploads.
-      with tempfile.NamedTemporaryFile(
-          dir=self.temp_path, suffix='.R', delete=False) as local_script:
-        local_script.write(b'print("hello world")')
-      script_uri = local_script.name
-    else:
-      script_uri = self.GCS_SPARK_R_SCRIPT
-    result = self.RunDataproc(('jobs submit spark-r '
-                               '--cluster {0} '
-                               '--async '
-                               '{1} ').format(self.cluster_name, script_uri))
-    if local_script:
-      os.remove(local_script.name)
-    self.assertEqual(self.messages.JobStatus.StateValueValuesEnum.PENDING,
-                     result.status.state)
-    self.assertIsNotNone(result.sparkRJob)
 
   def DoTestPrestoJobSubmission(self):
     result = self.RunDataproc((

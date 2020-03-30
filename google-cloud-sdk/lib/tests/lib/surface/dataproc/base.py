@@ -25,6 +25,7 @@ import sys
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import encoding
 from tests.lib import cli_test_base
 
 
@@ -51,7 +52,8 @@ class DataprocTestBase(cli_test_base.CliTestBase):
 
   @classmethod
   def SetUpClass(cls):
-    log_level = os.getenv('CLOUDSDK_TEST_LOG_LEVEL', 'INFO')
+    log_level = encoding.GetEncodedValue(os.environ,
+                                         'CLOUDSDK_TEST_LOG_LEVEL', 'INFO')
     cls.log = _CreateLogger('dataproc-test', log_level)
 
   def SetUp(self):

@@ -1,6 +1,20 @@
 title: LabelManager - LabelKeys - Describe test
 release_tracks: [ALPHA]
-
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: labelmanager keys describe env --label-parent="organizations/456"
+  - stdout: |
+      displayName: env
+      name: labelKeys/123
+      parent: organizations/456
+      state: ACTIVE
+- execute:
+  - command: labelmanager keys describe env --label-parent="organizations/456"
+  - error: '1: Invalid display_name for LabelKey [env] in parent [organizations/456]'
+- execute:
+  - command: labelmanager keys describe env --label-parent="organizations/456"
+  - error: '1: PERMISSION_DENIED: The caller does not have permission'
 actions:
 - execute_command:
     command: labelmanager keys describe env --label-parent="organizations/456"
@@ -58,7 +72,7 @@ actions:
               name: labelKeys/456
     - expect_exit:
         code: 1
-        message: 'Invalid display_name for label key [env] in parent [organizations/456]'
+        message: Invalid display_name for LabelKey [env] in parent [organizations/456]
 - execute_command:
     command: labelmanager keys describe env --label-parent="organizations/456"
     events:

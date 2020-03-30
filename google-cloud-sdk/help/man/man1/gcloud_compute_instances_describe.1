@@ -20,6 +20,10 @@ gcloud compute instances describe \- describe a virtual machine instance
 \fBgcloud compute instances describe\fR displays all data associated with a
 Google Compute Engine virtual machine instance.
 
+It's possible to limit the the scope of the description by using the
+\'\-\-format' flag. For details, see Filtering and formatting fun with gcloud
+(https://cloud.google.com/blog/products/gcp/filtering\-and\-formatting\-fun\-with).
+
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -76,8 +80,27 @@ Alternatively, the zone can be stored in the environment variable
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe an instance named \f5\fItest\-instance\fR\fR, run:
+
+.RS 2m
+$ gcloud compute instances describe test\-instance
+.RE
+
+To output only a set of fields from the available information, specify it using
+the '\-\-format' flag:
+
+.RS 2m
+$ gcloud compute instances describe test\-instance \e
+    \-\-format='yaml(name,status,disks)'
+.RE
 
 
 

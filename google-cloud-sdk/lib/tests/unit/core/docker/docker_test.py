@@ -64,6 +64,7 @@ class DockerTest(sdk_test_base.WithFakeAuth):
       self.refreshes += 1
       if cred:
         cred.access_token = _TOKEN
+        self.StartObjectPatch(store, 'Load', return_value=cred)
 
     self.StartObjectPatch(store, 'Refresh', side_effect=FakeRefresh)
 
@@ -158,10 +159,10 @@ class DockerTest(sdk_test_base.WithFakeAuth):
     docker.UpdateDockerCredentials(constants.DEFAULT_REGISTRY)
 
     self.popen_mock.side_effect = self.AssertDockerLoginForRegistry(
-        constants.REGIONAL_REGISTRIES[0], _EXPECTED_DOCKER_OPTIONS)
+        constants.REGIONAL_GCR_REGISTRIES[0], _EXPECTED_DOCKER_OPTIONS)
 
-    docker.UpdateDockerCredentials(constants.REGIONAL_REGISTRIES[0],
-                                   refresh=False)
+    docker.UpdateDockerCredentials(
+        constants.REGIONAL_GCR_REGISTRIES[0], refresh=False)
     self.assertEqual(1, self.refreshes)
 
     # 2x(docker login)
@@ -210,8 +211,8 @@ class DockerTest(sdk_test_base.WithFakeAuth):
     self.WriteNewDockerConfig('{}')
 
     docker.UpdateDockerCredentials(constants.DEFAULT_REGISTRY)
-    docker.UpdateDockerCredentials(constants.REGIONAL_REGISTRIES[0],
-                                   refresh=False)
+    docker.UpdateDockerCredentials(
+        constants.REGIONAL_GCR_REGISTRIES[0], refresh=False)
     self.assertEqual(1, self.refreshes)
 
     self.CheckDockerConfigAuths({
@@ -219,7 +220,7 @@ class DockerTest(sdk_test_base.WithFakeAuth):
             'email': _EMAIL,
             'auth': self.auth
         },
-        'https://' + constants.REGIONAL_REGISTRIES[0]: {
+        'https://' + constants.REGIONAL_GCR_REGISTRIES[0]: {
             'email': _EMAIL,
             'auth': self.auth
         }

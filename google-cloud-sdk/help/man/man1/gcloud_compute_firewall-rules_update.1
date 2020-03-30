@@ -115,7 +115,18 @@ $ gcloud compute firewall\-rules update MY\-RULE \-\-no\-disabled
 .TP 2m
 \fB\-\-enable\-logging\fR
 Enable logging for the firewall rule. Logs will be exported to StackDriver.
-Firewall logging is disabled by default.
+Firewall logging is disabled by default. To enable logging for an existing rule,
+run:
+
+.RS 2m
+$ gcloud compute firewall\-rules update MY\-RULE \-\-enable\-logging
+.RE
+
+To disable logging on an existing rule, run:
+
+.RS 2m
+$ gcloud compute firewall\-rules update MY\-RULE \-\-no\-enable\-logging
+.RE
 
 .TP 2m
 \fB\-\-priority\fR=\fIPRIORITY\fR
@@ -246,8 +257,9 @@ $ gcloud compute firewall\-rules update MY\-RULE \-\-target\-tags
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

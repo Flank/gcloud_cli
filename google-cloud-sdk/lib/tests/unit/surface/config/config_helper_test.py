@@ -47,9 +47,8 @@ class ConfigHelperTest(sdk_test_base.WithFakeAuth,
     return cred_mock
 
   def SetMockLoadCreds(self, expiry_time):
-    mock_load = self.StartObjectPatch(store, 'Load', autospec=True)
     fake_cred = self.GetFakeCred(expiry_time)
-    mock_load.return_value = fake_cred
+    self.StartObjectPatch(store, 'Load', return_value=fake_cred)
 
   def testConfigHelper(self):
     c = named_configs.ConfigurationStore.CreateConfig('foo')

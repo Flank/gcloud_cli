@@ -1,0 +1,121 @@
+title: Create, Describe and Delete a notebooks environment
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: notebooks environments create $$my-environment$$ --location=us-central1-a
+      --container-repository=gcr.io/deeplearning-platform-release/base-cpu --container-tag=test-tag
+      --description=test-description --post-startup-script=gs://path-to-file/file-name
+      --display-name=test-display-name --async
+  - stderr: |
+      Create in progress for notebooks environment $$my-environment$$ [https://notebooks.googleapis.com/v1beta1/$$operation$$].
+- execute:
+  - command: notebooks environments describe $$my-environment$$ --location=us-central1-a
+  - stdout: .*$$my-environment$$.*$
+- execute:
+  - command: notebooks environments delete $$my-environment$$ --location=us-central1-a
+  - progress_tracker:
+    - message: Waiting for Environment [$$my-environment$$] to be deleted with [$$operation$$]
+    - status: SUCCESS
+  - stderr: |
+      Deleted notebooks environment $$my-environment$$ [https://notebooks.googleapis.com/v1beta1/$$operation$$].
+actions:
+- generate_resource_id:
+    reference: my-environment
+    prefix: notebooks-environment
+
+- execute_command:
+    command: notebooks environments create $$my-environment$$ --location=us-central1-a
+      --container-repository=gcr.io/deeplearning-platform-release/base-cpu --container-tag=test-tag
+      --description=test-description --post-startup-script=gs://path-to-file/file-name
+      --display-name=test-display-name --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-a/environments?alt=json&environmentId=$$my-environment$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              containerImage:
+                repository: gcr.io/deeplearning-platform-release/base-cpu
+                tag: test-tag
+              description: test-description
+              displayName: test-display-name
+              name: $$my-environment$$
+              postStartupScript: gs://path-to-file/file-name
+        return_response:
+          omit_fields:
+          - metadata
+          headers:
+            cache-control: private
+            content-length: '543'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-a/operations/operation-1581104924080-59e01ad5a3ae1-e0192b24-1c14c1d6
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Create in progress for notebooks environment $$my-environment$$ [https://notebooks.googleapis.com/v1beta1/$$operation$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: notebooks environments describe $$my-environment$$ --location=us-central1-a
+    events:
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-a/environments/$$my-environment$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          omit_fields:
+          - createTime
+          headers:
+            cache-control: private
+            content-length: '430'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-a/environments/$$my-environment$$
+            displayName: test-display-name
+            description: test-description
+            containerImage:
+              repository: gcr.io/deeplearning-platform-release/base-cpu
+              tag: test-tag
+            postStartupScript: gs://path-to-file/file-name
+    - expect_stdout:
+        matches: .*$$my-environment$$.*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: notebooks environments delete $$my-environment$$ --location=us-central1-a
+    cleanup_for: my-environment
+    events:
+    - api_call:
+        expect_request:
+          uri: https://notebooks.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1-a/environments/$$my-environment$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          omit_fields:
+          - metadata
+          headers:
+            cache-control: private
+            content-length: '543'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1-a/operations/operation-1581104924642-59e01ad62cb40-d328cbd7-8964249d
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for Environment [$$my-environment$$] to be deleted with [$$operation$$]
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted notebooks environment $$my-environment$$ [https://notebooks.googleapis.com/v1beta1/$$operation$$].
+    - expect_exit:
+        code: 0

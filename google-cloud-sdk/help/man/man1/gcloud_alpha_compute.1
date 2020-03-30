@@ -35,8 +35,9 @@ https://cloud.google.com/compute/docs/
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -153,7 +154,7 @@ instances.
 
 .TP 2m
 \fBos\-config\fR
-\fB(ALPHA)\fR Manage OS Config tasks for Compute Engine VMs.
+\fB(ALPHA)\fR Manage OS Config tasks for Compute Engine VM instances.
 
 .TP 2m
 \fBos\-login\fR
@@ -166,6 +167,14 @@ instances.
 .TP 2m
 \fBproject\-info\fR
 \fB(ALPHA)\fR Read and manipulate project\-level data like quotas and metadata.
+
+.TP 2m
+\fBpublic\-advertised\-prefixes\fR
+\fB(ALPHA)\fR Manage public advertised prefix resources.
+
+.TP 2m
+\fBpublic\-delegated\-prefixes\fR
+\fB(ALPHA)\fR Manage public delegated prefix resources.
 
 .TP 2m
 \fBregions\fR
@@ -203,7 +212,7 @@ balancers.
 
 .TP 2m
 \fBsole\-tenancy\fR
-\fB(ALPHA)\fR Read and manage Google Compute Engine sole\-tenancy resources.
+\fB(ALPHA)\fR Read and manage Compute Engine sole\-tenancy resources.
 
 .TP 2m
 \fBssl\-certificates\fR
@@ -213,6 +222,10 @@ balancers.
 \fBssl\-policies\fR
 \fB(ALPHA)\fR List, create, delete and update Google Compute Engine SSL
 policies.
+
+.TP 2m
+\fBtarget\-grpc\-proxies\fR
+\fB(ALPHA)\fR Manage Google Compute Engine target gRPC proxy resources.
 
 .TP 2m
 \fBtarget\-http\-proxies\fR

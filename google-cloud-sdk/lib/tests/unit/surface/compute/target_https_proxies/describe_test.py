@@ -35,12 +35,12 @@ class TargetHttpsProxiesDescribeTest(test_base.BaseTest,
                                      test_case.WithOutputCapture):
 
   def SetUp(self):
-    self._api = 'v1'
-    self.SelectApi(self._api)
+    self._api = ''
+    self.SelectApi('v1')
     self._target_https_proxies_api = self.compute.targetHttpsProxies
 
   def RunDescribe(self, command):
-    self.Run('compute target-https-proxies describe ' + command)
+    self.Run('compute target-https-proxies describe %s' % command)
 
   def LoadSideEffect(self):
     self.make_requests.side_effect = iter([
@@ -65,7 +65,7 @@ class TargetHttpsProxiesDescribeTest(test_base.BaseTest,
             sslCertificates:
             - {uri}/projects/my-project/global/sslCertificates/ssl-cert-1
             urlMap: {uri}/projects/my-project/global/urlMaps/url-map-1
-            """.format(version=self._api, uri=self.compute_uri)))
+            """.format(version=self.api, uri=self.compute_uri)))
 
 
 class TargetHttpsProxiesDescribeBetaTest(TargetHttpsProxiesDescribeTest):
@@ -76,7 +76,7 @@ class TargetHttpsProxiesDescribeBetaTest(TargetHttpsProxiesDescribeTest):
     self._target_https_proxies_api = self.compute.targetHttpsProxies
 
   def RunDescribe(self, command):
-    self.Run('beta compute target-https-proxies describe --global ' + command)
+    self.Run('beta compute target-https-proxies describe %s' % command)
 
   def LoadSideEffect(self):
     self.make_requests.side_effect = iter([
@@ -92,7 +92,7 @@ class TargetHttpsProxiesDescribeAlphaTest(TargetHttpsProxiesDescribeBetaTest):
     self._target_https_proxies_api = self.compute.targetHttpsProxies
 
   def RunDescribe(self, command):
-    self.Run('alpha compute target-https-proxies describe --global ' + command)
+    self.Run('alpha compute target-https-proxies describe %s' % command)
 
   def LoadSideEffect(self):
     self.make_requests.side_effect = iter([
@@ -100,15 +100,15 @@ class TargetHttpsProxiesDescribeAlphaTest(TargetHttpsProxiesDescribeBetaTest):
     ])
 
 
-class RegionTargetHttpsProxiesDescribeBetaTest(
-    test_base.BaseTest, completer_test_base.CompleterBase,
-    test_case.WithOutputCapture):
+class RegionTargetHttpsProxiesDescribeTest(test_base.BaseTest,
+                                           completer_test_base.CompleterBase,
+                                           test_case.WithOutputCapture):
 
-  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
+  URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
 
   def SetUp(self):
-    self._api = 'beta'
-    self.SelectApi(self._api)
+    self._api = ''
+    self.SelectApi('v1')
     self._target_https_proxies_api = self.compute.regionTargetHttpsProxies
 
     self.target_https_proxies = [
@@ -156,13 +156,16 @@ class RegionTargetHttpsProxiesDescribeBetaTest(
     self.list_json = list_json_patcher.start()
 
   def RunDescribe(self, command):
-    self.Run('beta compute target-https-proxies describe --region us-west-1 ' +
+    self.Run('compute target-https-proxies describe --region us-west-1 ' +
              command)
 
-  def testSimpleCase(self):
+  def LoadSideEffect(self):
     self.make_requests.side_effect = iter([
-        [test_resources.TARGET_HTTPS_PROXIES_BETA[0]],
+        [test_resources.TARGET_HTTPS_PROXIES_V1[0]],
     ])
+
+  def testSimpleCase(self):
+    self.LoadSideEffect()
 
     self.RunDescribe('target-https-proxy-1')
 
@@ -174,6 +177,10 @@ class RegionTargetHttpsProxiesDescribeBetaTest(
               targetHttpsProxy='target-https-proxy-1'))],)
 
   def testDescribleCompletion(self):
+    self._api = ''
+    self.SelectApi('v1')
+    self._target_https_proxies_api = self.compute.targetHttpsProxies
+
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(self.target_https_proxies),
         resource_projector.MakeSerializable(self.region_target_https_proxies)
@@ -182,7 +189,6 @@ class RegionTargetHttpsProxiesDescribeBetaTest(
         flags.TargetHttpsProxiesCompleterAlpha,
         expected_command=[
             [
-                'alpha',
                 'compute',
                 'target-https-proxies',
                 'list',
@@ -192,7 +198,6 @@ class RegionTargetHttpsProxiesDescribeBetaTest(
                 '--format=disable',
             ],
             [
-                'alpha',
                 'compute',
                 'target-https-proxies',
                 'list',
@@ -212,6 +217,26 @@ class RegionTargetHttpsProxiesDescribeBetaTest(
     )
 
 
+class RegionTargetHttpsProxiesDescribeBetaTest(
+    RegionTargetHttpsProxiesDescribeTest):
+
+  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_https_proxies_api = self.compute.regionTargetHttpsProxies
+
+  def RunDescribe(self, command):
+    self.Run('beta compute target-https-proxies describe --region us-west-1 ' +
+             command)
+
+  def LoadSideEffect(self):
+    self.make_requests.side_effect = iter([
+        [test_resources.TARGET_HTTPS_PROXIES_BETA[0]],
+    ])
+
+
 class RegionTargetHttpsProxiesDescribeAlphaTest(
     RegionTargetHttpsProxiesDescribeBetaTest):
 
@@ -222,53 +247,14 @@ class RegionTargetHttpsProxiesDescribeAlphaTest(
     self.SelectApi(self._api)
     self._target_https_proxies_api = self.compute.regionTargetHttpsProxies
 
-    self.target_https_proxies = [
-        self.messages.TargetHttpsProxy(
-            name='target-https-proxy-1',
-            sslCertificates=[
-                self.URI_PREFIX + 'global/sslCertificates/my-cert-1'
-            ],
-            urlMap=self.URI_PREFIX + 'global/urlMaps/url-map-1',
-            selfLink=(self.URI_PREFIX +
-                      'global/targetHttpsProxies/target-https-proxy-1')),
-        self.messages.TargetHttpsProxy(
-            name='target-https-proxy-2',
-            sslCertificates=[
-                self.URI_PREFIX + 'global/sslCertificates/my-cert-2'
-            ],
-            urlMap=self.URI_PREFIX + 'global/urlMaps/url-map-2',
-            selfLink=(self.URI_PREFIX +
-                      'global/targetHttpsProxies/target-https-proxy-2')),
-    ]
-
-    self.region_target_https_proxies = [
-        self.messages.TargetHttpsProxy(
-            name='target-https-proxy-3',
-            sslCertificates=[
-                self.URI_PREFIX + 'regions/region-1/sslCertificates/my-cert-1'
-            ],
-            urlMap=self.URI_PREFIX + 'regions/region-1/urlMaps/url-map-3',
-            selfLink=(self.URI_PREFIX + 'regions/region-1/targetHttpsProxies/'
-                      'target-https-proxy-3'),
-            region='region-1'),
-        self.messages.TargetHttpsProxy(
-            name='target-https-proxy-4',
-            sslCertificates=[
-                self.URI_PREFIX + 'regions/region-2/sslCertificates/my-cert-2'
-            ],
-            urlMap=self.URI_PREFIX + 'regions/region-2/urlMaps/url-map-4',
-            selfLink=(self.URI_PREFIX + 'regions/region-2/targetHttpsProxies/'
-                      'target-https-proxy-4'),
-            region='region-2'),
-    ]
-    list_json_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
-    self.addCleanup(list_json_patcher.stop)
-    self.list_json = list_json_patcher.start()
-
   def RunDescribe(self, command):
     self.Run('alpha compute target-https-proxies describe --region us-west-1 ' +
              command)
+
+  def LoadSideEffect(self):
+    self.make_requests.side_effect = iter([
+        [test_resources.TARGET_HTTPS_PROXIES_ALPHA[0]],
+    ])
 
 
 if __name__ == '__main__':

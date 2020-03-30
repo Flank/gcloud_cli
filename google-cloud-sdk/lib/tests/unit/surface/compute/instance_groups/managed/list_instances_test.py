@@ -20,22 +20,30 @@ from __future__ import unicode_literals
 
 import textwrap
 
+from googlecloudsdk.api_lib.compute.instance_groups.managed import stateful_policy_utils as policy_utils
+from googlecloudsdk.api_lib.compute.instance_groups.managed.instance_configs import utils as config_utils
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
-API_VERSION = 'v1'
-
 
 class InstanceGroupsListInstancesZonalTest(test_base.BaseTest):
 
+  API_VERSION = 'v1'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
   def SetUp(self):
-    self.SelectApi(API_VERSION)
+    self.SelectApi(self.API_VERSION)
     self.make_requests.side_effect = iter([
-        [self.messages.InstanceGroupManagersListManagedInstancesResponse(
-            managedInstances=(
-                test_resources.MakeInstancesInManagedInstanceGroup(
-                    self.messages, API_VERSION)))],
+        [
+            self.messages.InstanceGroupManagersListManagedInstancesResponse(
+                managedInstances=(
+                    test_resources.MakeInstancesInManagedInstanceGroup(
+                        self.messages, self.API_VERSION))),
+        ],
     ])
 
   def testListInstances(self):
@@ -45,12 +53,13 @@ class InstanceGroupsListInstancesZonalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
-            inst-1 central2-a RUNNING         NONE       template-1        xxx
-            inst-2 central2-a STOPPED         RECREATING template-1
-            inst-3 central2-a RUNNING         DELETING   template-2        yyy
-            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
-            """), normalize_space=True)
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING template-1
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   template-2        yyy
+            inst-4 central2-a                      CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            """),
+        normalize_space=True)
 
   def testListInstancesWithLimit(self):
     self.Run("""
@@ -60,25 +69,27 @@ class InstanceGroupsListInstancesZonalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
-            inst-1 central2-a RUNNING         NONE       template-1        xxx
-            inst-2 central2-a STOPPED         RECREATING template-1
-            """), normalize_space=True)
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING template-1
+            """),
+        normalize_space=True)
 
   def testListInstancesByUri(self):
     self.Run("""
         compute instance-groups managed list-instances
           https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroupManagers/group-1
           --zone central2-a
-        """.format(API_VERSION))
+        """.format(self.API_VERSION))
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
-            inst-1 central2-a RUNNING         NONE       template-1        xxx
-            inst-2 central2-a STOPPED         RECREATING template-1
-            inst-3 central2-a RUNNING         DELETING   template-2        yyy
-            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
-            """), normalize_space=True)
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING template-1
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   template-2        yyy
+            inst-4 central2-a                      CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            """),
+        normalize_space=True)
 
   def testListInstancesBySorted(self):
     self.Run("""
@@ -88,12 +99,13 @@ class InstanceGroupsListInstancesZonalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
-            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
-            inst-3 central2-a RUNNING         DELETING   template-2        yyy
-            inst-2 central2-a STOPPED         RECREATING template-1
-            inst-1 central2-a RUNNING         NONE       template-1        xxx
-            """), normalize_space=True)
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-4 central2-a                      CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   template-2        yyy
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING template-1
+            inst-1 central2-a RUNNING HEALTHY      NONE       template-1        xxx
+            """),
+        normalize_space=True)
 
   def testListInstancesUriOutput(self):
     self.Run("""
@@ -107,18 +119,25 @@ class InstanceGroupsListInstancesZonalTest(test_base.BaseTest):
             https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-2
             https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
             https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-4
-            """.format(API_VERSION)))
+            """.format(self.API_VERSION)))
 
 
 class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
 
+  API_VERSION = 'v1'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
   def SetUp(self):
-    self.SelectApi(API_VERSION)
+    self.SelectApi(self.API_VERSION)
     self.make_requests.side_effect = iter([
-        [self.messages.InstanceGroupManagersListManagedInstancesResponse(
-            managedInstances=(
-                test_resources.MakeInstancesInManagedInstanceGroup(
-                    self.messages, API_VERSION)))],
+        [
+            self.messages.InstanceGroupManagersListManagedInstancesResponse(
+                managedInstances=(
+                    test_resources.MakeInstancesInManagedInstanceGroup(
+                        self.messages, self.API_VERSION))),
+        ],
     ])
 
   def testListInstances(self):
@@ -128,12 +147,13 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
-            inst-1 central2-a RUNNING         NONE       template-1        xxx
-            inst-2 central2-a STOPPED         RECREATING template-1
-            inst-3 central2-a RUNNING         DELETING   template-2        yyy
-            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
-            """), normalize_space=True)
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING template-1
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   template-2        yyy
+            inst-4 central2-a                      CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            """),
+        normalize_space=True)
 
   def testListInstancesWithLimit(self):
     self.Run("""
@@ -143,25 +163,27 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
-            inst-1 central2-a RUNNING         NONE       template-1        xxx
-            inst-2 central2-a STOPPED         RECREATING template-1
-            """), normalize_space=True)
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING template-1
+            """),
+        normalize_space=True)
 
   def testListInstancesByUri(self):
     self.Run("""
         compute instance-groups managed list-instances
           https://compute.googleapis.com/compute/{0}/projects/my-project/regions/central2/instanceGroupManagers/group-1
           --region central2
-        """.format(API_VERSION))
+        """.format(self.API_VERSION))
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
-            inst-1 central2-a RUNNING         NONE       template-1        xxx
-            inst-2 central2-a STOPPED         RECREATING template-1
-            inst-3 central2-a RUNNING         DELETING   template-2        yyy
-            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
-            """), normalize_space=True)
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING template-1
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   template-2        yyy
+            inst-4 central2-a                      CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            """),
+        normalize_space=True)
 
   def testListInstancesBySorted(self):
     self.Run("""
@@ -171,12 +193,13 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
-            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
-            inst-3 central2-a RUNNING         DELETING   template-2        yyy
-            inst-2 central2-a STOPPED         RECREATING template-1
-            inst-1 central2-a RUNNING         NONE       template-1        xxx
-            """), normalize_space=True)
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-4 central2-a                      CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   template-2        yyy
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING template-1
+            inst-1 central2-a RUNNING HEALTHY      NONE       template-1        xxx
+            """),
+        normalize_space=True)
 
   def testListInstancesUriOutput(self):
     self.Run("""
@@ -190,19 +213,21 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
             https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-2
             https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
             https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-4
-            """.format(API_VERSION)))
+            """.format(self.API_VERSION)))
 
   def testPrompting(self):
     # ResourceArgument checks if this is true before attempting to prompt.
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
     self.make_requests.side_effect = iter([
         [self.messages.Region(name='central2')],
         [self.messages.Zone(name='central2-a')],
-        [self.messages.InstanceGroupManagersListManagedInstancesResponse(
-            managedInstances=(
-                test_resources.MakeInstancesInManagedInstanceGroup(
-                    self.messages, API_VERSION)))],
+        [
+            self.messages.InstanceGroupManagersListManagedInstancesResponse(
+                managedInstances=(
+                    test_resources.MakeInstancesInManagedInstanceGroup(
+                        self.messages, self.API_VERSION))),
+        ],
     ])
     self.WriteInput('2\n')
     self.Run("""
@@ -210,12 +235,281 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
-            inst-1 central2-a RUNNING         NONE       template-1        xxx
-            inst-2 central2-a STOPPED         RECREATING template-1
-            inst-3 central2-a RUNNING         DELETING   template-2        yyy
-            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
-            """), normalize_space=True)
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING template-1
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   template-2        yyy
+            inst-4 central2-a                      CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            """),
+        normalize_space=True)
+
+
+class InstanceGroupsListInstancesBetaZonalTest(
+    InstanceGroupsListInstancesZonalTest):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    self.SelectApi(self.API_VERSION)
+    self.endpoint_uri = (
+        'https://compute.googleapis.com/compute/{api_version}/'.format(
+            api_version=self.API_VERSION))
+    self.project_uri = '{endpoint_uri}projects/fake-project'.format(
+        endpoint_uri=self.endpoint_uri)
+
+    managed_instances = test_resources.MakeInstancesInManagedInstanceGroup(
+        self.messages, self.API_VERSION)
+
+    # Add stateful policy to all 4 managed instances
+    for i in range(len(managed_instances)):
+      managed_instances[i].preservedStateFromPolicy = (
+          policy_utils.MakePreservedState(self.messages, [
+              policy_utils.MakePreservedStateDisksMapEntry(
+                  self.messages, {
+                      'device_name': 'disk-a',
+                      'auto_delete': 'never'
+                  }),
+          ]))
+
+    # Add PICs to the last two managed instances
+    source = self.project_uri + '/zones/central2-a/disks/baz'
+    for managed_instance in managed_instances[2:]:
+      managed_instance.preservedStateFromConfig = (
+          config_utils.MakePreservedState(self.messages, [
+              config_utils.MakePreservedStateDiskMapEntry(
+                  self.messages, 'disk-a', source, 'ro'),
+          ]))
+
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.InstanceGroupManagersListManagedInstancesResponse(
+                managedInstances=managed_instances),
+        ],
+    ])
+
+  def testListInstances(self):
+    self.Run("""
+        compute instance-groups managed list-instances group-1
+          --zone central2-a
+        """)
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     PRESERVED_STATE INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       POLICY          template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING POLICY          template-1
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   POLICY,CONFIG   template-2        yyy
+            inst-4 central2-a                      CREATING   POLICY,CONFIG   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            """),
+        normalize_space=True)
+
+  def testListInstancesWithLimit(self):
+    self.Run("""
+        compute instance-groups managed list-instances group-1
+          --zone central2-a
+          --limit 2
+        """)
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     PRESERVED_STATE INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       POLICY          template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING POLICY          template-1
+            """),
+        normalize_space=True)
+
+  def testListInstancesByUri(self):
+    self.Run("""
+        compute instance-groups managed list-instances
+          https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroupManagers/group-1
+          --zone central2-a
+        """.format(self.API_VERSION))
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     PRESERVED_STATE INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       POLICY          template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING POLICY          template-1
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   POLICY,CONFIG   template-2        yyy
+            inst-4 central2-a                      CREATING   POLICY,CONFIG   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            """),
+        normalize_space=True)
+
+  def testListInstancesBySorted(self):
+    self.Run("""
+        compute instance-groups managed list-instances group-1
+          --zone central2-a
+          --sort-by ~NAME
+        """)
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     PRESERVED_STATE INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-4 central2-a                      CREATING   POLICY,CONFIG   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   POLICY,CONFIG   template-2        yyy
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING POLICY          template-1
+            inst-1 central2-a RUNNING HEALTHY      NONE       POLICY          template-1        xxx
+            """),
+        normalize_space=True)
+
+
+class InstanceGroupsListInstancesBetaRegionalTest(
+    InstanceGroupsListInstancesRegionalTest):
+
+  API_VERSION = 'beta'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    self.SelectApi(self.API_VERSION)
+    self.endpoint_uri = (
+        'https://compute.googleapis.com/compute/{api_version}/'.format(
+            api_version=self.API_VERSION))
+    self.project_uri = '{endpoint_uri}projects/fake-project'.format(
+        endpoint_uri=self.endpoint_uri)
+
+    managed_instances = test_resources.MakeInstancesInManagedInstanceGroup(
+        self.messages, self.API_VERSION)
+
+    # Add stateful policy to all 4 managed instances
+    for i in range(len(managed_instances)):
+      managed_instances[i].preservedStateFromPolicy = (
+          policy_utils.MakePreservedState(self.messages, [
+              policy_utils.MakePreservedStateDisksMapEntry(
+                  self.messages, {
+                      'device_name': 'disk-a',
+                      'auto_delete': 'never'
+                  }),
+          ]))
+
+    # Add PICs to the last two managed instances
+    source = self.project_uri + '/zones/central2-a/disks/baz'
+    for managed_instance in managed_instances[2:]:
+      managed_instance.preservedStateFromConfig = (
+          config_utils.MakePreservedState(self.messages, [
+              config_utils.MakePreservedStateDiskMapEntry(
+                  self.messages, 'disk-a', source, 'ro'),
+          ]))
+
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.InstanceGroupManagersListManagedInstancesResponse(
+                managedInstances=managed_instances),
+        ],
+    ])
+
+  def testListInstances(self):
+    self.Run("""
+        compute instance-groups managed list-instances group-1
+          --region central2
+        """)
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     PRESERVED_STATE INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       POLICY          template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING POLICY          template-1
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   POLICY,CONFIG  template-2        yyy
+            inst-4 central2-a                      CREATING   POLICY,CONFIG  template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            """),
+        normalize_space=True)
+
+  def testListInstancesWithLimit(self):
+    self.Run("""
+        compute instance-groups managed list-instances group-1
+          --region central2
+          --limit 2
+        """)
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     PRESERVED_STATE INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       POLICY          template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING POLICY          template-1
+            """),
+        normalize_space=True)
+
+  def testListInstancesByUri(self):
+    self.Run("""
+        compute instance-groups managed list-instances
+          https://compute.googleapis.com/compute/{0}/projects/my-project/regions/central2/instanceGroupManagers/group-1
+          --region central2
+        """.format(self.API_VERSION))
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     PRESERVED_STATE INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE       POLICY          template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING POLICY          template-1
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   POLICY,CONFIG  template-2        yyy
+            inst-4 central2-a                      CREATING   POLICY,CONFIG  template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            """),
+        normalize_space=True)
+
+  def testListInstancesBySorted(self):
+    self.Run("""
+        compute instance-groups managed list-instances group-1
+          --region central2
+          --sort-by ~NAME
+        """)
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     PRESERVED_STATE INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-4 central2-a                      CREATING   POLICY,CONFIG   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            inst-3 central2-a RUNNING TIMEOUT      DELETING   POLICY,CONFIG   template-2        yyy
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING POLICY          template-1
+            inst-1 central2-a RUNNING HEALTHY      NONE       POLICY          template-1        xxx
+            """),
+        normalize_space=True)
+
+  def testListInstancesUriOutput(self):
+    self.Run("""
+        compute instance-groups managed list-instances group-1
+          --region central2
+          --uri
+        """)
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-1
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-2
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-4
+            """.format(self.API_VERSION)))
+
+  def testPrompting(self):
+    # ResourceArgument checks if this is true before attempting to prompt.
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
+    self.make_requests.side_effect = iter([
+        [self.messages.Region(name='central2')],
+        [self.messages.Zone(name='central2-a')],
+        [
+            self.messages.InstanceGroupManagersListManagedInstancesResponse(
+                managedInstances=(
+                    test_resources.MakeInstancesInManagedInstanceGroup(
+                        self.messages, self.API_VERSION)))
+        ],
+    ])
+    self.WriteInput('2\n')
+    self.Run("""
+        compute instance-groups managed list-instances group-1
+        """)
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME   ZONE       STATUS  HEALTH_STATE ACTION     PRESERVED_STATE INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING HEALTHY      NONE                       template-1        xxx
+            inst-2 central2-a STOPPED UNHEALTHY    RECREATING                 template-1
+            inst-3 central2-a RUNNING TIMEOUT      DELETING                   template-2        yyy
+            inst-4 central2-a                      CREATING                   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            """),
+        normalize_space=True)
+
+
+class InstanceGroupsListInstancesAlphaZonalTest(
+    InstanceGroupsListInstancesBetaZonalTest):
+
+  API_VERSION = 'alpha'
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

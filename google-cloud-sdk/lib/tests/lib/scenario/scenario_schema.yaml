@@ -216,8 +216,10 @@ definitions:
           properties:
 
             # Any fields listed here will be omitted when caching response
-            # data. This is mostly to keep down the size of the scenario file
+            # data. This helps keep down the size of the scenario file
             # for fields that have no impact on what is being tested.
+            # For e2e tests, this list should also include values that will differ
+            # from actual responses during e2e execution, such as `creationTime`.
             # TODO(b/115502954): Make this support full jsonpath strings instead
             # of just top level fields.
             omit_fields:
@@ -395,7 +397,7 @@ definitions:
       prefix: {type: string}
       delimiter: {type: string}
       # If set to true, you don't have to register a cleanup rule for this
-      # resource. You should only use this for resoruces that can't actually
+      # resource. You should only use this for resources that can't actually
       # be deleted (but that you still give a name to) like jobs.
       requires_cleanup: {type: boolean}
 

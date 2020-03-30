@@ -55,8 +55,7 @@ class GlobalSslCertificatesCompleter(compute_completers.ListCommandCompleter):
   def __init__(self, **kwargs):
     super(GlobalSslCertificatesCompleter, self).__init__(
         collection='compute.sslCertificates',
-        api_version='alpha',
-        list_command='alpha compute ssl-certificates list --global --uri',
+        list_command='compute ssl-certificates list --global --uri',
         **kwargs)
 
 
@@ -65,9 +64,7 @@ class RegionSslCertificatesCompleter(compute_completers.ListCommandCompleter):
   def __init__(self, **kwargs):
     super(RegionSslCertificatesCompleter, self).__init__(
         collection='compute.regionSslCertificates',
-        api_version='alpha',
-        list_command=
-        'alpha compute ssl-certificates list --filter=region:* --uri',
+        list_command='compute ssl-certificates list --filter=region:* --uri',
         **kwargs)
 
 
@@ -83,7 +80,8 @@ class SslCertificatesCompleterBeta(completers.MultiResourceCompleter):
 
 def SslCertificateArgument(required=True,
                            plural=False,
-                           include_l7_internal_load_balancing=False):
+                           include_l7_internal_load_balancing=False,
+                           global_help_text=None):
   return compute_flags.ResourceArgument(
       resource_name='SSL certificate',
       completer=SslCertificatesCompleterBeta
@@ -91,6 +89,7 @@ def SslCertificateArgument(required=True,
       plural=plural,
       required=required,
       global_collection='compute.sslCertificates',
+      global_help_text=global_help_text,
       regional_collection='compute.regionSslCertificates'
       if include_l7_internal_load_balancing else None,
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION

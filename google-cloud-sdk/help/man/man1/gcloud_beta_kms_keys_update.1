@@ -57,16 +57,17 @@ Name of the key to update.
 .RS 2m
 .TP 2m
 \fB\-\-default\-algorithm\fR=\fIDEFAULT_ALGORITHM\fR
-The default algorithm for the crypto key. See
-https://cloud.google.com/kms/docs/algorithms for guidance on choosing an
-algorithm. \fIDEFAULT_ALGORITHM\fR must be one of: \fBec\-sign\-p256\-sha256\fR,
-\fBec\-sign\-p384\-sha384\fR, \fBgoogle\-symmetric\-encryption\fR,
-\fBrsa\-decrypt\-oaep\-2048\-sha256\fR, \fBrsa\-decrypt\-oaep\-3072\-sha256\fR,
-\fBrsa\-decrypt\-oaep\-4096\-sha256\fR, \fBrsa\-decrypt\-oaep\-4096\-sha512\fR,
-\fBrsa\-sign\-pkcs1\-2048\-sha256\fR, \fBrsa\-sign\-pkcs1\-3072\-sha256\fR,
-\fBrsa\-sign\-pkcs1\-4096\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha512\fR,
-\fBrsa\-sign\-pss\-2048\-sha256\fR, \fBrsa\-sign\-pss\-3072\-sha256\fR,
-\fBrsa\-sign\-pss\-4096\-sha256\fR, \fBrsa\-sign\-pss\-4096\-sha512\fR.
+The default algorithm for the crypto key. For more information about choosing an
+algorithm, see https://cloud.google.com/kms/docs/algorithms.
+\fIDEFAULT_ALGORITHM\fR must be one of: \fBec\-sign\-p256\-sha256\fR,
+\fBec\-sign\-p384\-sha384\fR, \fBexternal\-symmetric\-encryption\fR,
+\fBgoogle\-symmetric\-encryption\fR, \fBrsa\-decrypt\-oaep\-2048\-sha256\fR,
+\fBrsa\-decrypt\-oaep\-3072\-sha256\fR, \fBrsa\-decrypt\-oaep\-4096\-sha256\fR,
+\fBrsa\-decrypt\-oaep\-4096\-sha512\fR, \fBrsa\-sign\-pkcs1\-2048\-sha256\fR,
+\fBrsa\-sign\-pkcs1\-3072\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha256\fR,
+\fBrsa\-sign\-pkcs1\-4096\-sha512\fR, \fBrsa\-sign\-pss\-2048\-sha256\fR,
+\fBrsa\-sign\-pss\-3072\-sha256\fR, \fBrsa\-sign\-pss\-4096\-sha256\fR,
+\fBrsa\-sign\-pss\-4096\-sha512\fR.
 
 .TP 2m
 \fB\-\-keyring\fR=\fIKEYRING\fR
@@ -130,6 +131,8 @@ $ gcloud beta kms keys update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 
 .RE
@@ -141,8 +144,9 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

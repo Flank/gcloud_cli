@@ -52,7 +52,7 @@ class ForwardingRulesGlobalAccessTest(e2e_test_base.BaseTest):
                                                self.SUBNET_RANGE))
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     self.backend_service_name = self._GetResourceName()
     self.health_check_name = self._GetResourceName()
     self.forwarding_rule_name = self._GetResourceName()

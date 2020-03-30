@@ -54,11 +54,48 @@ class TasksDescribeTest(test_base.CloudTasksTestBase):
     expected = self.messages.Task(name=self.task_ref.RelativeName())
     self.tasks_service.Get.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksGetRequest(
-            name=self.task_ref.RelativeName()),
+            name=self.task_ref.RelativeName(),
+            responseView=self.messages
+            .CloudtasksProjectsLocationsQueuesTasksGetRequest
+            .ResponseViewValueValuesEnum.BASIC),
         response=expected)
 
     actual = self.Run('tasks describe {} --queue {}'.format(self.task_id,
                                                             self.queue_id))
+
+    self.assertEqual(expected, actual)
+    self.resolve_loc_mock.assert_called_once_with(parsers.ParseProject())
+
+  def testDescribe_FullView(self):
+    expected = self.messages.Task(name=self.task_ref.RelativeName())
+    self.tasks_service.Get.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesTasksGetRequest(
+            name=self.task_ref.RelativeName(),
+            responseView=self.messages
+            .CloudtasksProjectsLocationsQueuesTasksGetRequest
+            .ResponseViewValueValuesEnum.FULL),
+        response=expected)
+
+    actual = self.Run(
+        'tasks describe --response-view full {} --queue {}'.format(
+            self.task_id, self.queue_id))
+
+    self.assertEqual(expected, actual)
+    self.resolve_loc_mock.assert_called_once_with(parsers.ParseProject())
+
+  def testDescribe_BasicView(self):
+    expected = self.messages.Task(name=self.task_ref.RelativeName())
+    self.tasks_service.Get.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesTasksGetRequest(
+            name=self.task_ref.RelativeName(),
+            responseView=self.messages
+            .CloudtasksProjectsLocationsQueuesTasksGetRequest
+            .ResponseViewValueValuesEnum.BASIC),
+        response=expected)
+
+    actual = self.Run(
+        'tasks describe --response-view BASIC {} --queue {}'.format(
+            self.task_id, self.queue_id))
 
     self.assertEqual(expected, actual)
     self.resolve_loc_mock.assert_called_once_with(parsers.ParseProject())
@@ -69,7 +106,10 @@ class TasksDescribeTest(test_base.CloudTasksTestBase):
     expected = self.messages.Task(name=task_name)
     self.tasks_service.Get.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksGetRequest(
-            name=task_name),
+            name=task_name,
+            responseView=self.messages
+            .CloudtasksProjectsLocationsQueuesTasksGetRequest
+            .ResponseViewValueValuesEnum.BASIC),
         response=expected)
 
     actual = self.Run('tasks describe {}'.format(task_name))
@@ -88,7 +128,10 @@ class TasksDescribeTest(test_base.CloudTasksTestBase):
     expected = self.messages.Task(name=task_ref.RelativeName())
     self.tasks_service.Get.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksGetRequest(
-            name=task_ref.RelativeName()),
+            name=task_ref.RelativeName(),
+            responseView=self.messages
+            .CloudtasksProjectsLocationsQueuesTasksGetRequest
+            .ResponseViewValueValuesEnum.BASIC),
         response=expected)
 
     actual = self.Run(
@@ -101,7 +144,10 @@ class TasksDescribeTest(test_base.CloudTasksTestBase):
     self.tasks_service.Get.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksGetRequest(
             name='projects/{}/locations/us-central1/queues/my-queue/'
-            'tasks/my-task'.format(self.Project())),
+            'tasks/my-task'.format(self.Project()),
+            responseView=self.messages
+            .CloudtasksProjectsLocationsQueuesTasksGetRequest
+            .ResponseViewValueValuesEnum.BASIC),
         exception=http_error.MakeDetailedHttpError(
             code=404,
             message='Requested entity was not found.'))

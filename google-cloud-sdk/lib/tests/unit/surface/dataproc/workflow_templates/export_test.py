@@ -23,7 +23,9 @@ import os
 
 from googlecloudsdk import calliope
 from googlecloudsdk.api_lib.dataproc import dataproc as dp
+from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.command_lib.export import util as export_util
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import compute_base
@@ -34,18 +36,39 @@ class WorkflowTemplateExportUnitTest(unit_base.DataprocUnitTestBase,
                                      compute_base.BaseComputeUnitTest):
   """Tests for workflow template export."""
 
-  def testExportWorkflowTemplatesToStdOut(self):
-    workflow_template = self.MakeWorkflowTemplate(labels={'foo': 'bar'})
+  def _testExportWorkflowTemplatesToStdOut(self, region=None, region_flag=''):
+    if region is None:
+      region = self.REGION
+    workflow_template = self.MakeWorkflowTemplate(
+        labels={'foo': 'bar'}, region=region)
 
     # Expected output has template-specific info cleared.
     expected_output = copy.deepcopy(workflow_template)
     expected_output.id = None
     expected_output.name = None
 
-    self.ExpectGetWorkflowTemplate(response=workflow_template)
-    self.RunDataproc('workflow-templates export {0}'.format(
-        self.WORKFLOW_TEMPLATE))
+    self.ExpectGetWorkflowTemplate(response=workflow_template, region=region)
+    self.RunDataproc('workflow-templates export {0} {1}'.format(
+        self.WORKFLOW_TEMPLATE, region_flag))
     self.AssertOutputEquals(export_util.Export(expected_output))
+
+  def testExportWorkflowTemplatesToStdOut(self):
+    self._testExportWorkflowTemplatesToStdOut()
+
+  def testExportWorkflowTemplatesToStdOut_regionProperty(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testExportWorkflowTemplatesToStdOut(region='global')
+
+  def testExportWorkflowTemplatesToStdOut_regionFlag(self):
+    properties.VALUES.dataproc.region.Set('global')
+    self._testExportWorkflowTemplatesToStdOut(
+        region='us-central1', region_flag='--region=us-central1')
+
+  def testExportWorkflowTemplatesToStdOut_withoutRegionProperty(self):
+    # No region is specified via flag or config.
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc('workflow-templates export foo', set_region=False)
 
   def testExportWorkflowTemplatesHttpError(self):
     self.ExpectGetWorkflowTemplate(exception=self.MakeHttpError(403))

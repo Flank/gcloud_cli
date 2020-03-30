@@ -1,13 +1,18 @@
 title: Mark an insight as ACCEPTED
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 - execute_command:
     command: recommender insights mark-accepted my-insight --project=my-project --location=my-location
       --insight-type=my-insight-type --etag=my-etag
     events:
     - api_call:
         expect_request:
-          uri: https://recommender.googleapis.com/v1alpha2/projects/my-project/locations/my-location/insightTypes/my-insight-type/insights/my-insight:markAccepted?alt=json
+          uri: https://recommender.googleapis.com/$$api-version$$/projects/my-project/locations/my-location/insightTypes/my-insight-type/insights/my-insight:markAccepted?alt=json
           method: POST
           headers: {}
           body: |

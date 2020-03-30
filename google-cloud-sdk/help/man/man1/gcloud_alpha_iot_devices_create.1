@@ -204,8 +204,9 @@ This flag may be provide multiple times to provide multiple keys (maximum 3).
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -213,6 +214,28 @@ help\fR for details.
 
 This command uses the \fBcloudiot/v1\fR API. The full documentation for this API
 can be found at: https://cloud.google.com/iot
+
+
+
+.SH "EXAMPLES"
+
+To create a new device 'my\-device' in device registry 'my\-registry' and region
+\'us\-central1', run:
+
+.RS 2m
+$ gcloud alpha iot devices create my\-device \-\-region=us\-central1 \e
+    \-\-registry=my\-registry
+.RE
+
+The following command creates a new non\-gateway device 'my\-device' in device
+registry 'my\-registry' and region 'us\-central1', blocks the device, and sets
+metadata values.
+
+.RS 2m
+$ gcloud alpha iot devices create my\-device \-\-region=us\-central1 \e
+    \-\-registry=my\-registry \-\-blocked \-\-device\-type=non\-gateway \e
+    \-\-metadata=key1=value1,key2=value2
+.RE
 
 
 

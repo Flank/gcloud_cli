@@ -40,6 +40,7 @@ class GetIamPolicyTestBeta(parameterized.TestCase,
   )
   def testGetIAMPolicy(self, collection):
     self.GetIamPolicyNoError(collection)
+    self.GetIamPolicyNoErrorFlagOverrideRegion(collection)
     self.GetIamPolicyNotFound(collection)
 
   def GetIamPolicyNoError(self, collection):
@@ -49,6 +50,18 @@ class GetIamPolicyTestBeta(parameterized.TestCase,
     self.ExpectGetIamPolicy(collection, expected_resource)
 
     policy = self.RunDataproc('{0} get-iam-policy test-{0}'.format(collection))
+    self.assertIsNotNone(policy)
+    self.AssertMessagesEqual(policy, self.GetTestIamPolicy())
+
+  def GetIamPolicyNoErrorFlagOverrideRegion(self, collection):
+    properties.VALUES.dataproc.region.Set('other-default-region')
+    expected_resource = self.RelativeName(collection)
+
+    self.ExpectGetIamPolicy(collection, expected_resource)
+
+    # The --region flag should override properties.VALUES.dataproc.region.
+    policy = self.RunDataproc('{0} get-iam-policy --region {1} test-{0}'.format(
+        collection, self.REGION))
     self.assertIsNotNone(policy)
     self.AssertMessagesEqual(policy, self.GetTestIamPolicy())
 

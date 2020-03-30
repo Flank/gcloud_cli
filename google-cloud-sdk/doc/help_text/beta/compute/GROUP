@@ -21,8 +21,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
@@ -90,6 +91,9 @@ GROUPS
      interconnects
         (BETA) Read and manipulate Google Compute Engine interconnects.
 
+     machine-images
+        (BETA) Read and manage Google Compute Engine machine image resources.
+
      machine-types
         (BETA) Read Google Compute Engine virtual machine types.
 
@@ -102,6 +106,12 @@ GROUPS
 
      operations
         (BETA) Read and manipulate Google Compute Engine operations.
+
+     org-security-policies
+        (BETA) Manage Google Compute Engine organization security policies.
+
+     os-config
+        (BETA) Manage OS Config tasks for Compute Engine VM instances.
 
      os-login
         (BETA) Create and manipulate Google Compute Engine OS Login resources.
@@ -139,7 +149,7 @@ GROUPS
         (BETA) List, describe, and delete Google Compute Engine snapshots.
 
      sole-tenancy
-        (BETA) Read and manage Google Compute Engine sole-tenancy resources.
+        (BETA) Read and manage Compute Engine sole-tenancy resources.
 
      ssl-certificates
         (BETA) List, create, and delete Google Compute Engine SSL certificates.

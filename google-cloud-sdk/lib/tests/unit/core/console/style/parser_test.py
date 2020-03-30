@@ -32,33 +32,31 @@ class ParserText(style_test_base.StyleTestBase, parameterized.TestCase):
 
   def SetUp(self):
     # Bypass parser.GetTypedTextParser as this isn't a platform specific test.
-    self.parser = parser.TypedTextParser(
-        style_test_base.STYLE_MAPPINGS_TESTING, True)
+    self.parser = parser.TypedTextParser(style_test_base.STYLE_MAPPINGS_TESTING,
+                                         True)
 
   def testBasicColoring(self):
     blue_text = text.TypedText('blue', style_test_base.TestTextTypes.BLUE)
     parsed_text = self.parser.ParseTypedTextToString(blue_text)
-    self.assertEquals(self.blue + 'blue' + self.reset, parsed_text)
+    self.assertEqual(self.blue + 'blue' + self.reset, parsed_text)
 
   def testStringFormatting(self):
     blue_text = text.TypedText('blue',
                                style_test_base.TestTextTypes.BLUE_AND_BRACKETS)
     parsed_text = self.parser.ParseTypedTextToString(blue_text)
-    self.assertEquals(self.blue + '[blue]' + self.reset, parsed_text)
+    self.assertEqual(self.blue + '[blue]' + self.reset, parsed_text)
 
   def testAttributes(self):
-    bold_text = text.TypedText('bold',
-                               style_test_base.TestTextTypes.BOLD)
+    bold_text = text.TypedText('bold', style_test_base.TestTextTypes.BOLD)
     parsed_text = self.parser.ParseTypedTextToString(bold_text)
-    self.assertEquals(self.bold + 'bold' + self.reset, parsed_text)
+    self.assertEqual(self.bold + 'bold' + self.no_bold, parsed_text)
 
   def testNestedText(self):
     blue_text = text.TypedText('blue', style_test_base.TestTextTypes.BLUE)
     text_with_nested_text = text.TypedText(['Text: ', blue_text, '.'])
     parsed_text = self.parser.ParseTypedTextToString(text_with_nested_text)
-    self.assertEquals(
-        'Text: {blue}blue{reset}.'.format(
-            blue=self.blue, reset=self.reset),
+    self.assertEqual(
+        'Text: {blue}blue{reset}.'.format(blue=self.blue, reset=self.reset),
         parsed_text)
 
   def testNestedTextAttributesReset(self):
@@ -70,29 +68,37 @@ class ParserText(style_test_base.StyleTestBase, parameterized.TestCase):
     message = text.TypedText(
         ['Created instance ', resource_path, '. ', success_message])
     parsed_text = self.parser.ParseTypedTextToString(message)
-    self.assertEquals(
-        'Created instance {blue}[projects/{blue_bold}cool-project{reset}'
-        '{blue}/instance/{blue_bold}my-instance{reset}{blue}]{reset}. '
-        '{italics}Success!{reset}'.format(
-            blue=self.blue, reset=self.reset, blue_bold=self.blue_bold,
-            italics=self.italics),
-        parsed_text)
+    self.assertEqual(
+        'Created instance {blue}[projects/{blue_bold}cool-project{no_blue_bold}'
+        '{blue}/instance/{blue_bold}my-instance{no_blue_bold}{blue}]{reset}. '
+        '{italics}Success!{no_italics}'.format(
+            blue=self.blue,
+            reset=self.reset,
+            blue_bold=self.blue_bold,
+            italics=self.italics,
+            no_blue_bold=self.no_blue_bold,
+            no_italics=self.no_italics), parsed_text)
 
   def testNestedTextParentAttributesPropagate(self):
     project_name = style_test_base.TestTextTypes.BOLD('cool-project')
     instance_name = style_test_base.TestTextTypes.BOLD('my-instance')
     resource_path = style_test_base.TestTextTypes.BLUE_AND_BRACKETS(
         'projects/', project_name, '/instance/', instance_name)
-    message = style_test_base.TestTextTypes.ITALICS(
-        'Created instance ', resource_path, '.')
+    message = style_test_base.TestTextTypes.ITALICS('Created instance ',
+                                                    resource_path, '.')
     parsed_text = self.parser.ParseTypedTextToString(message)
-    self.assertEquals(
-        '{italics}Created instance {blue_italics}[projects/{bold_italics}'
-        'cool-project{reset}{blue_italics}/instance/{bold_italics}my-instance'
-        '{reset}{blue_italics}]{reset}{italics}.{reset}'.format(
-            blue_italics=self.blue_italics, reset=self.reset,
-            bold_italics=self.blue_bold_italics, italics=self.italics),
-        parsed_text)
+    self.assertEqual(
+        '{italics}Created instance {blue_italics}[projects/{blue_bold_italics}'
+        'cool-project{no_blue_bold_italics}{blue_italics}/instance/'
+        '{blue_bold_italics}my-instance{no_blue_bold_italics}{blue_italics}]'
+        '{no_blue_italics}{italics}.{no_italics}'
+        .format(
+            blue_bold_italics=self.blue_bold_italics,
+            blue_italics=self.blue_italics,
+            italics=self.italics,
+            no_blue_bold_italics=self.no_blue_bold_italics,
+            no_blue_italics=self.no_blue_italics,
+            no_italics=self.no_italics), parsed_text)
 
   def testParentAttributeIsSame(self):
     bold_text = style_test_base.TestTextTypes.BOLD('bold')
@@ -101,10 +107,9 @@ class ParserText(style_test_base.StyleTestBase, parameterized.TestCase):
     parsed_text = self.parser.ParseTypedTextToString(nested_bold_text)
     # The double bold is not great. Would need to support knowing how many
     # levels above in the rescursive stack the attribute came from.
-    self.assertEquals(
-        '{bold}outer_bold {bold}bold{reset}{bold}{reset}'.format(
-            bold=self.bold, reset=self.reset),
-        parsed_text)
+    self.assertEqual(
+        '{bold}outer_bold {bold}bold{no_bold}{bold}{no_bold}'.format(
+            bold=self.bold, no_bold=self.no_bold), parsed_text)
 
   @parameterized.named_parameters(
       ('RequestEnabled', None, None, None, False, True, True),
@@ -122,8 +127,8 @@ class ParserText(style_test_base.StyleTestBase, parameterized.TestCase):
     self.StartObjectPatch(platforms.OperatingSystem, 'Current').return_value = (
         platform or platforms.OperatingSystem.LINUX)
     properties.VALUES.core.interactive_ux_style.Set(interactive_ux or 'NORMAL')
-    properties.VALUES.core.show_structured_logs.Set(
-        show_structured_logs or 'never')
+    properties.VALUES.core.show_structured_logs.Set(show_structured_logs or
+                                                    'never')
     properties.VALUES.core.disable_color.Set(disable_color)
     style_parser = parser.GetTypedTextParser(enabled=enabled)
     self.assertEqual(expected_enabled, style_parser.style_enabled)

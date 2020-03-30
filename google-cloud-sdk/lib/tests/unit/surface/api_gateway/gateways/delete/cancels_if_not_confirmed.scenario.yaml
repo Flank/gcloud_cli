@@ -1,0 +1,26 @@
+title: Cloud API Gateway Gateway Delete with False Confirmation
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      api-gateway gateways delete test-name --location us-central1
+  - prompt:
+    - message: Are you sure? This will delete the gateway 'projects/fake-project/locations/us-central1/gateways/test-name',
+        along with all of the associated consumer information.
+    - prompt_string: Continue anyway
+    - input: n
+  - error: '1: Aborted by user.'
+actions:
+- execute_command:
+    command: |
+      api-gateway gateways delete test-name --location us-central1
+    events:
+    - expect_prompt_continue:
+        message: Are you sure? This will delete the gateway 'projects/fake-project/locations/us-central1/gateways/test-name',
+          along with all of the associated consumer information.
+        prompt_string: Continue anyway
+        user_input: n
+    - expect_exit:
+        code: 1
+        message: Aborted by user.

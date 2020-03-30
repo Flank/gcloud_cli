@@ -1,4 +1,4 @@
-- release_tracks: [ALPHA]
+- release_tracks: [ALPHA, BETA]
   command_type: GENERIC
 
   help_text:
@@ -7,13 +7,31 @@
     description: |
       Replace all existing service perimeter in specified access policy with service perimeters
       specified in a file.
+
+      ## EXAMPLES
+
+        To replace all perimeters within a policy, using etag:
+        $ {command} my-policy-number --source-file=path-to-file-containing-all-replacement-service-perimeters.yaml --etag=optional-latest-etag-of-policy
+
+        To replace all perimeters within a policy, without using etag:
+        $ {command} my-policy-number --source-file=path-to-file-containing-all-replacement-service-perimeters.yaml
+
   request:
-    api_version: v1beta
-    method: replaceAll
     collection: accesscontextmanager.accessPolicies.servicePerimeters
+    ALPHA:
+      api_version: v1alpha
+      method: replaceAll
+    BETA:
+      api_version: v1
+      method: replaceAll
+
   response:
-    modify_response_hooks:
-    - googlecloudsdk.command_lib.accesscontextmanager.perimeters:ParseReplaceServicePerimetersResponseBeta
+    ALPHA:
+      modify_response_hooks:
+      - googlecloudsdk.command_lib.accesscontextmanager.perimeters:ParseReplaceServicePerimetersResponseAlpha
+    BETA:
+      modify_response_hooks:
+      - googlecloudsdk.command_lib.accesscontextmanager.perimeters:ParseReplaceServicePerimetersResponseBeta
 
   arguments:
     resource:
@@ -22,6 +40,13 @@
       override_resource_collection: true
 
     params:
+    - api_field: replaceServicePerimetersRequest.etag
+      arg_name: etag
+      required: false
+      help_text: |
+        An etag which specifies the version of the Access Policy. Only etags
+        that represent the latest version of the Access Policy will be accepted.
+      repeated: false
     - api_field: replaceServicePerimetersRequest.servicePerimeters
       arg_name: source-file
       required: true
@@ -42,13 +67,16 @@
             - projects/0123456789
             accessLevels:
             - accessPolicies/my_policy/accessLevels/my_level
-            unrestrictedServices:
-            - "*"
             restrictedServices:
             - storage.googleapis.com
         ```
 
-        For more information, see:
-        https://cloud.google.com/access-context-manager/docs/reference/rest/v1beta/accessPolicies.servicePerimeters
+        For more information about the alpha version, see:
+        https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
+        For more information about the beta version, see:
+        https://cloud.google.com/access-context-manager/docs/reference/rest/v1/accessPolicies.servicePerimeters
       repeated: false
-      processor: googlecloudsdk.command_lib.accesscontextmanager.perimeters:ParseServicePerimetersBeta
+      ALPHA:
+        processor: googlecloudsdk.command_lib.accesscontextmanager.perimeters:ParseServicePerimetersAlpha
+      BETA:
+        processor: googlecloudsdk.command_lib.accesscontextmanager.perimeters:ParseServicePerimetersBeta

@@ -19,8 +19,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import json
 import socket
+import wsgiref
+
 from googlecloudsdk.core.credentials import flow
+from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -66,7 +70,7 @@ class FlowTest(test_case.WithInput, sdk_test_base.WithOutputCapture):
     http_mock = mock.Mock()
     self.WriteInput(self._AUTH_CODE)
 
-    with self.assertRaises(flow.AuthRequestFailedException):
+    with self.assertRaises(flow.AuthRequestFailedError):
       flow.Run(webflow_mock, launch_browser=False, http=http_mock)
 
   def testFlowWithBrowser(self):
@@ -122,6 +126,114 @@ class FlowTest(test_case.WithInput, sdk_test_base.WithOutputCapture):
     webflow_mock.step2_exchange.assert_called_with(
         self._AUTH_CODE, http=http_mock)
     self.assertEqual(cred, self._CREDENTIALS)
+
+
+class GoogleAuthFlowTest(cli_test_base.CliTestBase):
+
+  def SetUp(self):
+    self.scopes = ('openid', 'https://www.googleapis.com/auth/userinfo.email',
+                   'https://www.googleapis.com/auth/accounts.reauth')
+    client_id_file_content = {
+        'installed': {
+            'client_id': 'client_id',
+            'client_secret': 'client_secret',
+            'auth_uri': 'auth_uri',
+            'token_uri': 'token_uri'
+        }
+    }
+
+    self.client_id_file = self.Touch(
+        self.temp_path, contents=json.dumps(client_id_file_content))
+    self.StartPatch(
+        'googlecloudsdk.core.properties.VALUES.auth.auth_host.Get',
+        return_value='auth_uri_property')
+    self.StartPatch(
+        'googlecloudsdk.core.properties.VALUES.auth.token_host.Get',
+        return_value='token_uri_property')
+    self.StartPatch(
+        'googlecloudsdk.core.properties.VALUES.auth.client_id.Get',
+        return_value='client_id_property')
+    self.StartPatch(
+        'googlecloudsdk.core.properties.VALUES.auth.client_secret.Get',
+        return_value='client_secret_property')
+
+  def testCreateGoogleAuthFlow_FromProperties(self):
+    google_auth_flow = flow.CreateGoogleAuthFlow(self.scopes)
+    self.assertEqual(google_auth_flow.client_type, 'installed')
+    client_config = google_auth_flow.client_config
+    self.assertEqual(client_config['client_id'], 'client_id_property')
+    self.assertEqual(client_config['client_secret'], 'client_secret_property')
+    self.assertEqual(client_config['auth_uri'], 'auth_uri_property')
+    self.assertEqual(client_config['token_uri'], 'token_uri_property')
+    self.assertTrue(google_auth_flow.autogenerate_code_verifier)
+
+  def testCreateGoogleAuthFlow_FromFile(self):
+    google_auth_flow = flow.CreateGoogleAuthFlow(self.scopes,
+                                                 self.client_id_file)
+    self.assertEqual(google_auth_flow.client_type, 'installed')
+    client_config = google_auth_flow.client_config
+    self.assertEqual(client_config['client_id'], 'client_id')
+    self.assertEqual(client_config['client_secret'], 'client_secret')
+    self.assertEqual(client_config['auth_uri'], 'auth_uri')
+    self.assertEqual(client_config['token_uri'], 'token_uri')
+    self.assertTrue(google_auth_flow.autogenerate_code_verifier)
+
+  def testRunGoogleAuthFlow_NoLaunchBrowser(self):
+    run_local_server_mock = self.StartObjectPatch(flow.InstalledAppFlow,
+                                                  'run_local_server')
+    run_console_mock = self.StartObjectPatch(flow.InstalledAppFlow,
+                                             'run_console')
+    google_auth_flow = flow.CreateGoogleAuthFlow(self.scopes,
+                                                 self.client_id_file)
+    flow.RunGoogleAuthFlow(google_auth_flow, launch_browser=False)
+    run_console_mock.assert_called()
+    run_local_server_mock.assert_not_called()
+
+  def testRunGoogleAuthFlow_LaunchBrowser(self):
+    run_local_server_mock = self.StartObjectPatch(flow.InstalledAppFlow,
+                                                  'run_local_server')
+    run_console_mock = self.StartObjectPatch(flow.InstalledAppFlow,
+                                             'run_console')
+    google_auth_flow = flow.CreateGoogleAuthFlow(self.scopes,
+                                                 self.client_id_file)
+    flow.RunGoogleAuthFlow(google_auth_flow, launch_browser=True)
+    run_console_mock.assert_not_called()
+    run_local_server_mock.assert_called()
+
+  def testRunGoogleAuthFlow_LaunchBrowser_LocalServerError(self):
+    run_local_server_mock = self.StartObjectPatch(flow.InstalledAppFlow,
+                                                  'run_local_server')
+    run_local_server_mock.side_effect = flow.LocalServerCreationError
+    run_console_mock = self.StartObjectPatch(flow.InstalledAppFlow,
+                                             'run_console')
+    google_auth_flow = flow.CreateGoogleAuthFlow(self.scopes,
+                                                 self.client_id_file)
+    flow.RunGoogleAuthFlow(google_auth_flow, launch_browser=True)
+    run_console_mock.assert_called()
+    run_local_server_mock.assert_called()
+    self.AssertErrContains('Defaulting to URL copy/paste mode.')
+
+
+class LocalSeverCreationTest(cli_test_base.CliTestBase):
+
+  def testCreateLocalServer_CannotFindPort(self):
+    mock_make_server = self.StartObjectPatch(wsgiref.simple_server,
+                                             'make_server')
+    mock_make_server.side_effect = OSError
+    with self.AssertRaisesExceptionRegexp(
+        flow.LocalServerCreationError,
+        'Failed to start a local webserver listening on any port '
+        'between 8085 and 8184.*'):
+      flow.CreateLocalServer(None, 8085, 8185)
+    self.assertEqual(mock_make_server.call_count, 100)
+
+  def testCreateLocalServer(self):
+    mock_make_server = self.StartObjectPatch(wsgiref.simple_server,
+                                             'make_server')
+    mock_make_server.side_effect = [OSError, socket.error, 'server']
+    server = flow.CreateLocalServer(None, 8085, 8185)
+    self.assertEqual(server, 'server')
+    self.assertEqual(mock_make_server.call_count, 3)
 
 
 if __name__ == '__main__':

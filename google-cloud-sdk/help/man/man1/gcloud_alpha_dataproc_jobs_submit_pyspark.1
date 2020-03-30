@@ -122,8 +122,9 @@ property value for this command invocation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -132,14 +133,14 @@ help\fR for details.
 To submit a PySpark job with a local script and custom flags, run:
 
 .RS 2m
-$ gcloud alpha dataproc jobs submit pyspark \-\-cluster my_cluster \e
+$ gcloud alpha dataproc jobs submit pyspark \-\-cluster=my_cluster \e
     my_script.py \-\- \-\-custom\-flag
 .RE
 
 To submit a Spark job that runs a script that is already on the cluster, run:
 
 .RS 2m
-$ gcloud alpha dataproc jobs submit pyspark \-\-cluster my_cluster \e
+$ gcloud alpha dataproc jobs submit pyspark \-\-cluster=my_cluster \e
     file:///usr/lib/spark/examples/src/main/python/pi.py 100
 .RE
 

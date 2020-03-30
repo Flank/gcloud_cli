@@ -174,8 +174,13 @@ class SubmitTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
             self.cloudbuild_v1_messages.BuildStep(
                 name='gcr.io/kaniko-project/executor:latest',
                 args=[
-                    '--destination', 'gcr.io/my-project/image', '--cache',
-                    'true', '--cache-ttl', '6h'
+                    '--destination',
+                    'gcr.io/my-project/image',
+                    '--cache',
+                    '--cache-ttl',
+                    '6h',
+                    '--cache-dir',
+                    '',
                 ],
             ),
         ])
@@ -196,8 +201,13 @@ class SubmitTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
             self.cloudbuild_v1_messages.BuildStep(
                 name='gcr.io/kaniko-project/executor:latest',
                 args=[
-                    '--destination', 'gcr.io/my-project/image', '--cache',
-                    'true', '--cache-ttl', '6h'
+                    '--destination',
+                    'gcr.io/my-project/image',
+                    '--cache',
+                    '--cache-ttl',
+                    '6h',
+                    '--cache-dir',
+                    '',
                 ],
             ),
         ])
@@ -237,8 +247,13 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             self.cloudbuild_v1_messages.BuildStep(
                 name='gcr.io/kaniko-project/executor:latest',
                 args=[
-                    '--destination', 'gcr.io/my-project/image', '--cache',
-                    'true', '--cache-ttl', '1h'
+                    '--destination',
+                    'gcr.io/my-project/image',
+                    '--cache',
+                    '--cache-ttl',
+                    '1h',
+                    '--cache-dir',
+                    '',
                 ],
             ),
         ])
@@ -259,8 +274,13 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             self.cloudbuild_v1_messages.BuildStep(
                 name='gcr.io/kaniko-project/executor:latest',
                 args=[
-                    '--destination', 'gcr.io/my-project/image', '--cache',
-                    'true', '--cache-ttl', '1h'
+                    '--destination',
+                    'gcr.io/my-project/image',
+                    '--cache',
+                    '--cache-ttl',
+                    '1h',
+                    '--cache-dir',
+                    '',
                 ],
             ),
         ])
@@ -316,8 +336,13 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             self.cloudbuild_v1_messages.BuildStep(
                 name='gcr.io/kaniko-project/executor:latest',
                 args=[
-                    '--destination', 'gcr.io/my-project/image', '--cache',
-                    'true', '--cache-ttl', '0h'
+                    '--destination',
+                    'gcr.io/my-project/image',
+                    '--cache',
+                    '--cache-ttl',
+                    '0h',
+                    '--cache-dir',
+                    '',
                 ],
             ),
         ])
@@ -338,8 +363,13 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             self.cloudbuild_v1_messages.BuildStep(
                 name='gcr.io/kaniko-project/executor:latest',
                 args=[
-                    '--destination', 'gcr.io/my-project/image', '--cache',
-                    'true', '--cache-ttl', '0h'
+                    '--destination',
+                    'gcr.io/my-project/image',
+                    '--cache',
+                    '--cache-ttl',
+                    '0h',
+                    '--cache-dir',
+                    '',
                 ],
             ),
         ])
@@ -379,8 +409,13 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             self.cloudbuild_v1_messages.BuildStep(
                 name='gcr.io/some-other/kaniko-image',
                 args=[
-                    '--destination', 'gcr.io/my-project/image', '--cache',
-                    'true', '--cache-ttl', '6h'
+                    '--destination',
+                    'gcr.io/my-project/image',
+                    '--cache',
+                    '--cache-ttl',
+                    '6h',
+                    '--cache-dir',
+                    '',
                 ],
             ),
         ])
@@ -401,8 +436,13 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
             self.cloudbuild_v1_messages.BuildStep(
                 name='gcr.io/some-other/kaniko-image',
                 args=[
-                    '--destination', 'gcr.io/my-project/image', '--cache',
-                    'true', '--cache-ttl', '6h'
+                    '--destination',
+                    'gcr.io/my-project/image',
+                    '--cache',
+                    '--cache-ttl',
+                    '6h',
+                    '--cache-dir',
+                    '',
                 ],
             ),
         ])

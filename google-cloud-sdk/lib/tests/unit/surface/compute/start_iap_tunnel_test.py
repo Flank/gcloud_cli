@@ -248,7 +248,7 @@ class StartIapTunnelStdinTestGA(test_base.BaseTest):
     # Mock how StdinSocket accesses stdin.
     if platforms.OperatingSystem.IsWindows():
       self.StartPatch('ctypes.windll.kernel32.GetStdHandle', autospec=True)
-      self.StartPatch('ctypes.windll.kernel32.ReadFile', autospec=True)
+      self.StartPatch('ctypes.windll.kernel32.ReadFile')
 
       read_data = [b'data1', b'data2', b'']
 
@@ -285,7 +285,6 @@ class StartIapTunnelStdinTestGA(test_base.BaseTest):
         iap_tunnel_websocket, 'IapTunnelWebSocket', autospec=True,
         side_effect=WebSocketInitGenerator())
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/143145077')
   def testSimpleCase(self):
     self.make_requests.side_effect = [
         [INSTANCE_WITH_EXTERNAL_ADDRESS],

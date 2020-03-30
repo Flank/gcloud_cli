@@ -164,6 +164,34 @@ class UpdateTest(test_base.OsloginBaseTest):
                --ttl 10s
           """)
 
+  def testImpersonateServiceAccount(self, track):
+    self._RunSetUp(track)
+    self.time.return_value = 1500000000.000001
+
+    self.mock_oslogin_client.users.GetLoginProfile.Expect(
+        request=self.messages.OsloginUsersGetLoginProfileRequest(
+            name='users/service_account_user@google.com'),
+        response=self.profiles['profile_with_keys'])
+
+    key = self.messages.SshPublicKey(
+        expirationTimeUsec=1500000010000001,
+        fingerprint=None,
+        key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ')
+    self.mock_oslogin_client.users_sshPublicKeys.Patch.Expect(
+        request=self.messages.OsloginUsersSshPublicKeysPatchRequest(
+            name='users/service_account_user@google.com/sshPublicKeys/qwertyuiop',
+            sshPublicKey=key,
+            updateMask='expirationTimeUsec',
+        ),
+        response=key)
+
+    response = self.Run("""
+        compute os-login ssh-keys update --key 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ'
+            --ttl 10s --impersonate-service-account service_account_user@google.com
+        """)
+
+    self.assertEqual(response, key)
+
 
 if __name__ == '__main__':
   test_case.main()

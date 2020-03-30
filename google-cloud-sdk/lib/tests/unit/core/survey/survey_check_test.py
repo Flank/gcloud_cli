@@ -166,7 +166,7 @@ class SurveyPrompterTest(sdk_test_base.WithOutputCapture,
 
   def testPromptForSurvey_NoCacheFile(self):
     prompter = survey_check.SurveyPrompter()
-    prompter.PromptForSurvey()
+    prompter.Prompt()
     self.AssertErrEquals('')
     with survey_check.PromptRecord() as pr:
       self.assertEqual(pr.last_prompt_time, 1544651979)
@@ -176,10 +176,10 @@ class SurveyPrompterTest(sdk_test_base.WithOutputCapture,
     with survey_check.PromptRecord() as pr:
       pr.last_prompt_time = 0
     prompter = survey_check.SurveyPrompter()
-    prompter.PromptForSurvey()
+    prompter.Prompt()
     self.AssertErrEquals(
         '\n\nTo take a quick anonymous survey, run:\n'
-        '  $ gcloud alpha survey\n\n'
+        '  $ gcloud survey\n\n'
     )
     with survey_check.PromptRecord() as pr:
       self.assertEqual(pr.last_prompt_time, 1544651979)

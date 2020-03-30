@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute sole\-tenancy node\-groups update \- updates a Google Compute Engine node group
+gcloud alpha compute sole\-tenancy node\-groups update \- update a Compute Engine node group
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute sole\-tenancy node\-groups update\fR \fINAME\fR [\fB\-\-node\-template\fR=\fINODE_TEMPLATE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-add\-nodes\fR=\fIADD_NODES\fR\ |\ \fB\-\-delete\-nodes\fR=[\fINODE\fR,...]] [\fB\-\-mode\fR=\fIMODE\fR\ :\ \fB\-\-max\-size\fR=\fIMAX_SIZE\fR\ \fB\-\-min\-size\fR=\fIMIN_SIZE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute sole\-tenancy node\-groups update\fR \fINAME\fR [\fB\-\-node\-template\fR=\fINODE_TEMPLATE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-add\-nodes\fR=\fIADD_NODES\fR\ |\ \fB\-\-delete\-nodes\fR=[\fINODE\fR,...]] [\fB\-\-autoscaler\-mode\fR=\fIAUTOSCALER_MODE\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Updates a Google Compute Engine node group.
+\fB(ALPHA)\fR Update a Compute Engine node group.
 
 
 
@@ -88,22 +88,34 @@ Autoscaling policy for node groups.
 
 .RS 2m
 .TP 2m
-\fB\-\-mode\fR=\fIMODE\fR
-Options for mode are 'on' or 'off'. When set to 'on', the autoscaler will
-increase or decrease the size of the node group in response to capacity needs.
-If set to 'off', the autoscaler will not update the size of the node group. This
-flag must be specified if any of the other arguments in this group are
-specified.
+\fB\-\-autoscaler\-mode\fR=\fIAUTOSCALER_MODE\fR
+Set the mode of an autoscaler for a node group. \fIAUTOSCALER_MODE\fR must be
+one of:
+
+.RS 2m
+.TP 2m
+\fBoff\fR
+to turn off autoscaling.
+.TP 2m
+\fBon\fR
+to permit autoscaling to scale in and out.
+.TP 2m
+\fBonly\-scale\-out\fR
+to permit autoscaling to scale only out and not in.
+.RE
+.sp
+
 
 .TP 2m
-\fB\-\-max\-size\fR=\fIMAX_SIZE\fR
-The maximum size of the node group. Default is 100 and must be smaller or equal
-to 100 and larger than or equal to min\-size.
+\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR
+The maximum size of the node group. Must be smaller or equal to 100 and larger
+than or equal to \f5\-\-min\-nodes\fR. Must be specified if
+\f5\-\-autoscaler\-mode\fR is not \f5\fIoff\fR\fR.
 
 .TP 2m
-\fB\-\-min\-size\fR=\fIMIN_SIZE\fR
+\fB\-\-min\-nodes\fR=\fIMIN_NODES\fR
 The minimum size of the node group. Default is 0 and must be an integer value
-smaller than or equal to max\-size.
+smaller than or equal to \f5\-\-max\-nodes\fR.
 
 
 .RE
@@ -115,8 +127,20 @@ smaller than or equal to max\-size.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update a node group to have two more nodes, run:
+
+.RS 2m
+$ gcloud alpha compute sole\-tenancy node\-groups update \e
+    my\-node\-group \-\-add\-nodes=2
+.RE
 
 
 

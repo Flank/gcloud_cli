@@ -1,6 +1,6 @@
 NAME
     gcloud compute sole-tenancy node-groups get-iam-policy - get the IAM policy
-        for a Google Compute Engine node group
+        for a Compute Engine node group
 
 SYNOPSIS
     gcloud compute sole-tenancy node-groups get-iam-policy
@@ -9,8 +9,8 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute sole-tenancy node-groups get-iam-policy displays the IAM
-    policy associated with a Google Compute Engine node group in a zone. If
-    formatted as JSON, the output can be edited and used as a policy file for
+    policy associated with a Compute Engine node group in a zone. If formatted
+    as JSON, the output can be edited and used as a policy file for
     set-iam-policy. The output includes an "etag" field identifying the version
     emitted and allowing detection of concurrent policy updates; see $ {parent}
     set-iam-policy for additional details.
@@ -62,8 +62,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 API REFERENCE
     This command uses the compute/v1 API. The full documentation for this API

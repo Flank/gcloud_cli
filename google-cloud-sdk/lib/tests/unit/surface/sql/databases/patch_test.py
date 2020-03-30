@@ -26,7 +26,7 @@ from tests.lib.surface.sql import base
 class _BaseDatabasesPatchTest(object):
 
   def testDatabasesPatch(self):
-    sqladmin = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
+    sqladmin = core_apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.databases.Get.Expect(
         sqladmin.SqlDatabasesGetRequest(
             instance='mock-instance',
@@ -39,9 +39,8 @@ class _BaseDatabasesPatchTest(object):
             name='mock-db',
             charset='utf-8',
             collation='some-collation',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
-            format(self.Project()),
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'
+            .format(self.Project()),
             etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
             kind='sql#database'))
     self.mocked_client.databases.Patch.Expect(
@@ -62,7 +61,8 @@ class _BaseDatabasesPatchTest(object):
             operation='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
             project=self.Project(),
         ),
-        sqladmin.Operation(status='DONE'))
+        sqladmin.Operation(
+            status=sqladmin.Operation.StatusValueValuesEnum.DONE))
     self.mocked_client.databases.Get.Expect(
         sqladmin.SqlDatabasesGetRequest(
             instance='mock-instance',
@@ -75,9 +75,8 @@ class _BaseDatabasesPatchTest(object):
             name='mock-db',
             charset='utf-8',
             collation='another-collation',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
-            format(self.Project()),
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'
+            .format(self.Project()),
             etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
             kind='sql#database'))
 
@@ -95,12 +94,12 @@ instance: mock-instance
 kind: sql#database
 name: mock-db
 project: {0}
-selfLink: https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db
+selfLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db
 """.format(self.Project()),
         normalize_space=True)
 
   def testDatabasesPatchWithDiff(self):
-    sqladmin = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
+    sqladmin = core_apis.GetMessagesModule('sql', 'v1beta4')
     self.mocked_client.databases.Get.Expect(
         sqladmin.SqlDatabasesGetRequest(
             instance='mock-instance',
@@ -113,9 +112,8 @@ selfLink: https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-ins
             name='mock-db',
             charset='utf-8',
             collation='some-collation',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
-            format(self.Project()),
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'
+            .format(self.Project()),
             etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
             kind='sql#database'))
     self.mocked_client.databases.Patch.Expect(
@@ -137,7 +135,8 @@ selfLink: https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-ins
             operation='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
             project=self.Project(),
         ),
-        sqladmin.Operation(status='DONE'))
+        sqladmin.Operation(
+            status=sqladmin.Operation.StatusValueValuesEnum.DONE))
     self.mocked_client.databases.Get.Expect(
         sqladmin.SqlDatabasesGetRequest(
             instance='mock-instance',
@@ -150,9 +149,8 @@ selfLink: https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-ins
             name='mock-db',
             charset='another-charset',
             collation='another-collation',
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
-            format(self.Project()),
+            selfLink='https://sqladmin.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'
+            .format(self.Project()),
             etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
             kind='sql#database'))
 

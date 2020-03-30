@@ -17,6 +17,7 @@
   "documentationLink": "https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview",
   "protocol": "rest",
   "rootUrl": "https://securitycenter.googleapis.com/",
+  "mtlsRootUrl": "https://securitycenter.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://securitycenter.googleapis.com/",
   "batchPath": "batch",
@@ -229,7 +230,7 @@
           "type": "string"
         },
         "resourceName": {
-          "description": "The full resource name of the Google Cloud Platform (GCP) resource this\nfinding is for. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name\nThis field is immutable after creation time.",
+          "description": "For findings on Google Cloud Platform (GCP) resources, the full resource\nname of the GCP resource this finding is for. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name\nWhen the finding is for a non-GCP resource, the resourceName can be a\ncustomer or partner defined string.\nThis field is immutable after creation time.",
           "type": "string"
         },
         "state": {
@@ -287,11 +288,49 @@
           "type": "string"
         },
         "marks": {
-          "description": "Mutable user specified security marks belonging to the parent resource.\nConstraints are as follows:\n  - Keys and values are treated as case insensitive\n  - Keys must be between 1 - 256 characters (inclusive)\n  - Keys must be letters, numbers, underscores, or dashes\n  - Values have leading and trailing whitespace trimmed, remaining\n    characters must be between 1 - 4096 characters (inclusive)",
+          "description": "Mutable user specified security marks belonging to the parent resource.\nConstraints are as follows:\n\n  * Keys and values are treated as case insensitive\n  * Keys must be between 1 - 256 characters (inclusive)\n  * Keys must be letters, numbers, underscores, or dashes\n  * Values have leading and trailing whitespace trimmed, remaining\n    characters must be between 1 - 4096 characters (inclusive)",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
+        }
+      }
+    },
+    "NotificationConfig": {
+      "id": "NotificationConfig",
+      "description": "Cloud Security Command Center (Cloud SCC) notification configs.\n\nA notification config is a Cloud SCC resource that contains the configuration\nto send notifications for create\/update events of findings, assets and etc.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The relative resource name of this notification config. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name\nExample:\n\"organizations\/{organization_id}\/notificationConfigs\/notify_public_bucket\".",
+          "type": "string"
+        },
+        "description": {
+          "description": "The description of the notification config (max of 1024 characters).",
+          "type": "string"
+        },
+        "pubsubTopic": {
+          "description": "The PubSub topic to send notifications to. Its format is\n\"projects\/[project_id]\/topics\/[topic]\".",
+          "type": "string"
+        },
+        "serviceAccount": {
+          "description": "Output only. The service account that needs \"pubsub.topics.publish\"\npermission to publish to the PubSub topic.",
+          "type": "string"
+        },
+        "streamingConfig": {
+          "description": "The config for triggering streaming-based notifications.",
+          "$ref": "StreamingConfig"
+        }
+      }
+    },
+    "StreamingConfig": {
+      "id": "StreamingConfig",
+      "description": "The config for streaming-based notifications, which send each event as soon\nas it is detected.",
+      "type": "object",
+      "properties": {
+        "filter": {
+          "description": "Expression that defines the filter to apply across create\/update events\nof assets or findings as specified by the event type. The expression is a\nlist of zero or more restrictions combined via logical operators `AND`\nand `OR`. Parentheses are supported, and `OR` has higher precedence than\n`AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a\n`-` character in front of them to indicate negation. The fields map to\nthose defined in the corresponding resource.\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.",
+          "type": "string"
         }
       }
     },
@@ -320,16 +359,16 @@
     },
     "Policy": {
       "id": "Policy",
-      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions (defined by IAM or configured by users). A `binding` can\noptionally specify a `condition`, which is a logic expression that further\nconstrains the role binding based on attributes about the request and\/or\ntarget resource.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time <\n            timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles\/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles\/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
+      "description": "An Identity and Access Management (IAM) policy, which specifies access\ncontrols for Google Cloud resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions; each `role` can be an IAM predefined role or a user-created\ncustom role.\n\nOptionally, a `binding` can specify a `condition`, which is a logical\nexpression that allows access to a resource only if the expression evaluates\nto `true`. A condition can add constraints based on attributes of the\nrequest, the resource, or both.\n\n**JSON example:**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ],\n      \"etag\": \"BwWWja0YfJA=\",\n      \"version\": 3\n    }\n\n**YAML example:**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles\/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles\/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n    - etag: BwWWja0YfJA=\n    - version: 3\n\nFor a description of IAM and its features, see the\n[IAM documentation](https:\/\/cloud.google.com\/iam\/docs\/).",
       "type": "object",
       "properties": {
         "version": {
-          "description": "Specifies the format of the policy.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nOperations affecting conditional bindings must specify version 3. This can\nbe either setting a conditional policy, modifying a conditional binding,\nor removing a conditional binding from the stored conditional policy.\nOperations on non-conditional policies may specify any valid value or\nleave the field unset.\n\nIf no etag is provided in the call to `setIamPolicy`, any version\ncompliance checks on the incoming and\/or stored policy is skipped.",
+          "description": "Specifies the format of the policy.\n\nValid values are `0`, `1`, and `3`. Requests that specify an invalid value\nare rejected.\n\nAny operation that affects conditional role bindings must specify version\n`3`. This requirement applies to the following operations:\n\n* Getting a policy that includes a conditional role binding\n* Adding a conditional role binding to a policy\n* Changing a conditional role binding in a policy\n* Removing any role binding, with or without a condition, from a policy\n  that includes conditions\n\n**Important:** If you use IAM Conditions, you must include the `etag` field\nwhenever you call `setIamPolicy`. If you omit this field, then IAM allows\nyou to overwrite a version `3` policy with a version `1` policy, and all of\nthe conditions in the version `3` policy are lost.\n\nIf a policy does not include any conditions, operations on that policy may\nspecify any valid version or leave the field unset.",
           "type": "integer",
           "format": "int32"
         },
         "bindings": {
-          "description": "Associates a list of `members` to a `role`. Optionally may specify a\n`condition` that determines when binding is in effect.\n`bindings` with no members will result in an error.",
+          "description": "Associates a list of `members` to a `role`. Optionally, may specify a\n`condition` that determines how and when the `bindings` are applied. Each\nof the `bindings` must contain at least one member.",
           "type": "array",
           "items": {
             "$ref": "Binding"
@@ -343,7 +382,7 @@
           }
         },
         "etag": {
-          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten. Due to blind-set semantics of an etag-less policy,\n'setIamPolicy' will not fail even if either of incoming or stored policy\ndoes not meet the version requirements.",
+          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\n**Important:** If you use IAM Conditions, you must include the `etag` field\nwhenever you call `setIamPolicy`. If you omit this field, then IAM allows\nyou to overwrite a version `3` policy with a version `1` policy, and all of\nthe conditions in the version `3` policy are lost.",
           "type": "string",
           "format": "byte"
         }
@@ -359,7 +398,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n* `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a user that has been recently deleted. For\n   example,`alice@example.com?uid=123456789012345678901`. If the user is\n   recovered, this value reverts to `user:{emailid}` and the recovered user\n   retains the role in the binding.\n\n* `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus\n   unique identifier) representing a service account that has been recently\n   deleted. For example,\n   `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.\n   If the service account is undeleted, this value reverts to\n   `serviceAccount:{emailid}` and the undeleted service account retains the\n   role in the binding.\n\n* `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a Google group that has been recently\n   deleted. For example, `admins@example.com?uid=123456789012345678901`. If\n   the group is recovered, this value reverts to `group:{emailid}` and the\n   recovered group retains the role in the binding.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
+          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n* `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a user that has been recently deleted. For\n   example, `alice@example.com?uid=123456789012345678901`. If the user is\n   recovered, this value reverts to `user:{emailid}` and the recovered user\n   retains the role in the binding.\n\n* `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus\n   unique identifier) representing a service account that has been recently\n   deleted. For example,\n   `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.\n   If the service account is undeleted, this value reverts to\n   `serviceAccount:{emailid}` and the undeleted service account retains the\n   role in the binding.\n\n* `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a Google group that has been recently\n   deleted. For example, `admins@example.com?uid=123456789012345678901`. If\n   the group is recovered, this value reverts to `group:{emailid}` and the\n   recovered group retains the role in the binding.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
           "type": "array",
           "items": {
             "type": "string"
@@ -373,23 +412,23 @@
     },
     "Expr": {
       "id": "Expr",
-      "description": "Represents an expression text. Example:\n\n    title: \"User account presence\"\n    description: \"Determines whether the request has a user account\"\n    expression: \"size(request.user) > 0\"",
+      "description": "Represents a textual expression in the Common Expression Language (CEL)\nsyntax. CEL is a C-like expression language. The syntax and semantics of CEL\nare documented at https:\/\/github.com\/google\/cel-spec.\n\nExample (Comparison):\n\n    title: \"Summary size limit\"\n    description: \"Determines if a summary is less than 100 chars\"\n    expression: \"document.summary.size() < 100\"\n\nExample (Equality):\n\n    title: \"Requestor is owner\"\n    description: \"Determines if requestor is the document owner\"\n    expression: \"document.owner == request.auth.claims.email\"\n\nExample (Logic):\n\n    title: \"Public documents\"\n    description: \"Determine whether the document should be publicly visible\"\n    expression: \"document.type != 'private' && document.type != 'internal'\"\n\nExample (Data Manipulation):\n\n    title: \"Notification string\"\n    description: \"Create a notification string with a timestamp.\"\n    expression: \"'New message received at ' + string(document.create_time)\"\n\nThe exact variables and functions that may be referenced within an expression\nare determined by the service that evaluates it. See the service\ndocumentation for additional information.",
       "type": "object",
       "properties": {
         "expression": {
-          "description": "Textual representation of an expression in\nCommon Expression Language syntax.\n\nThe application context of the containing message determines which\nwell-known feature set of CEL is supported.",
+          "description": "Textual representation of an expression in Common Expression Language\nsyntax.",
           "type": "string"
         },
         "title": {
-          "description": "An optional title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
+          "description": "Optional. Title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
           "type": "string"
         },
         "description": {
-          "description": "An optional description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
+          "description": "Optional. Description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.",
           "type": "string"
         },
         "location": {
-          "description": "An optional string indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
+          "description": "Optional. String indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.",
           "type": "string"
         }
       }
@@ -495,11 +534,11 @@
       "type": "object",
       "properties": {
         "filter": {
-          "description": "Expression that defines the filter to apply across assets.\nThe expression is a list of zero or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. The fields map to those\ndefined in the Asset resource. Examples include:\n\n* name\n* security_center_properties.resource_name\n* resource_properties.a_property\n* security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\n* name: `=`\n* update_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"update_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"update_time = 1560208038000\"\n\n* create_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"create_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"create_time = 1560208038000\"\n\n* iam_policy.policy_blob: `=`, `:`\n* resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n* security_marks.marks: `=`, `:`\n* security_center_properties.resource_name: `=`, `:`\n* security_center_properties.resource_type: `=`, `:`\n* security_center_properties.resource_parent: `=`, `:`\n* security_center_properties.resource_project: `=`, `:`\n* security_center_properties.resource_owners: `=`, `:`\n\nFor example, `resource_properties.size = 100` is a valid filter string.",
+          "description": "Expression that defines the filter to apply across assets.\nThe expression is a list of zero or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. The fields map to those\ndefined in the Asset resource. Examples include:\n\n* name\n* security_center_properties.resource_name\n* resource_properties.a_property\n* security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\n* name: `=`\n* update_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"update_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"update_time = 1560208038000\"\n\n* create_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"create_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"create_time = 1560208038000\"\n\n* iam_policy.policy_blob: `=`, `:`\n* resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n* security_marks.marks: `=`, `:`\n* security_center_properties.resource_name: `=`, `:`\n* security_center_properties.resource_display_name: `=`, `:`\n* security_center_properties.resource_type: `=`, `:`\n* security_center_properties.resource_parent: `=`, `:`\n* security_center_properties.resource_parent_display_name: `=`, `:`\n* security_center_properties.resource_project: `=`, `:`\n* security_center_properties.resource_project_display_name: `=`, `:`\n* security_center_properties.resource_owners: `=`, `:`\n\nFor example, `resource_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: \"resource_properties.my_property : \\\"\\\"\"\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: \"-resource_properties.my_property : \\\"\\\"\"",
           "type": "string"
         },
         "groupBy": {
-          "description": "Required. Expression that defines what assets fields to use for grouping. The string\nvalue should follow SQL syntax: comma separated list of fields. For\nexample:\n\"security_center_properties.resource_project,security_center_properties.project\".\n\nThe following fields are supported when compare_duration is not set:\n\n* security_center_properties.resource_project\n* security_center_properties.resource_type\n* security_center_properties.resource_parent\n\nThe following fields are supported when compare_duration is set:\n\n* security_center_properties.resource_type",
+          "description": "Required. Expression that defines what assets fields to use for grouping. The string\nvalue should follow SQL syntax: comma separated list of fields. For\nexample:\n\"security_center_properties.resource_project,security_center_properties.project\".\n\nThe following fields are supported when compare_duration is not set:\n\n* security_center_properties.resource_project\n* security_center_properties.resource_project_display_name\n* security_center_properties.resource_type\n* security_center_properties.resource_parent\n* security_center_properties.resource_parent_display_name\n\nThe following fields are supported when compare_duration is set:\n\n* security_center_properties.resource_type\n* security_center_properties.resource_project_display_name\n* security_center_properties.resource_parent_display_name",
           "type": "string"
         },
         "compareDuration": {
@@ -576,7 +615,7 @@
       "type": "object",
       "properties": {
         "filter": {
-          "description": "Expression that defines the filter to apply across findings.\nThe expression is a list of one or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. Examples include:\n\n * name\n * source_properties.a_property\n * security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\n* name: `=`\n* parent: `=`, `:`\n* resource_name: `=`, `:`\n* state: `=`, `:`\n* category: `=`, `:`\n* external_uri: `=`, `:`\n* event_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"event_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"event_time = 1560208038000\"\n\n* security_marks.marks: `=`, `:`\n* source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n\nFor example, `source_properties.size = 100` is a valid filter string.",
+          "description": "Expression that defines the filter to apply across findings.\nThe expression is a list of one or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. Examples include:\n\n * name\n * source_properties.a_property\n * security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\n* name: `=`\n* parent: `=`, `:`\n* resource_name: `=`, `:`\n* state: `=`, `:`\n* category: `=`, `:`\n* external_uri: `=`, `:`\n* event_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"event_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"event_time = 1560208038000\"\n\n* security_marks.marks: `=`, `:`\n* source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n\nFor example, `source_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: \"source_properties.my_property : \\\"\\\"\"\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: \"-source_properties.my_property : \\\"\\\"\"",
           "type": "string"
         },
         "groupBy": {
@@ -589,7 +628,7 @@
           "format": "google-datetime"
         },
         "compareDuration": {
-          "description": "When compare_duration is set, the GroupResult's \"state_change\" attribute is\nupdated to indicate whether the finding had its state changed, the\nfinding's state remained unchanged, or if the finding was added during the\ncompare_duration period of time that precedes the read_time. This is the\ntime between (read_time - compare_duration) and read_time.\n\nThe state_change value is derived based on the presence and state of the\nfinding at the two points in time. Intermediate state changes between the\ntwo times don't affect the result. For example, the results aren't affected\nif the finding is made inactive and then active again.\n\nPossible \"state_change\" values when compare_duration is specified:\n\n* \"CHANGED\":   indicates that the finding was present at the start of\n                 compare_duration, but changed its state at read_time.\n* \"UNCHANGED\": indicates that the finding was present at the start of\n                 compare_duration and did not change state at read_time.\n* \"ADDED\":     indicates that the finding was not present at the start\n                 of compare_duration, but was present at read_time.\n\nIf compare_duration is not specified, then the only possible state_change\nis \"UNUSED\",  which will be the state_change set for all findings present\nat read_time.\n\nIf this field is set then `state_change` must be a specified field in\n`group_by`.",
+          "description": "When compare_duration is set, the GroupResult's \"state_change\" attribute is\nupdated to indicate whether the finding had its state changed, the\nfinding's state remained unchanged, or if the finding was added during the\ncompare_duration period of time that precedes the read_time. This is the\ntime between (read_time - compare_duration) and read_time.\n\nThe state_change value is derived based on the presence and state of the\nfinding at the two points in time. Intermediate state changes between the\ntwo times don't affect the result. For example, the results aren't affected\nif the finding is made inactive and then active again.\n\nPossible \"state_change\" values when compare_duration is specified:\n\n* \"CHANGED\":   indicates that the finding was present and matched the given\n                 filter at the start of compare_duration, but changed its\n                 state at read_time.\n* \"UNCHANGED\": indicates that the finding was present and matched the given\n                 filter at the start of compare_duration and did not change\n                 state at read_time.\n* \"ADDED\":     indicates that the finding did not match the given filter or\n                 was not present at the start of compare_duration, but was\n                 present at read_time.\n* \"REMOVED\":   indicates that the finding was present and matched the\n                 filter at the start of compare_duration, but did not match\n                 the filter at read_time.\n\nIf compare_duration is not specified, then the only possible state_change\nis \"UNUSED\",  which will be the state_change set for all findings present\nat read_time.\n\nIf this field is set then `state_change` must be a specified field in\n`group_by`.",
           "type": "string",
           "format": "google-duration"
         },
@@ -754,6 +793,18 @@
           "items": {
             "type": "string"
           }
+        },
+        "resourceDisplayName": {
+          "description": "The user defined display name for this resource.",
+          "type": "string"
+        },
+        "resourceParentDisplayName": {
+          "description": "The user defined display name for the parent of this resource.",
+          "type": "string"
+        },
+        "resourceProjectDisplayName": {
+          "description": "The user defined display name for the project of this resource.",
+          "type": "string"
         }
       }
     },
@@ -852,6 +903,24 @@
         },
         "parentDisplayName": {
           "description": "The human readable name of resource's parent.",
+          "type": "string"
+        }
+      }
+    },
+    "ListNotificationConfigsResponse": {
+      "id": "ListNotificationConfigsResponse",
+      "description": "Response message for listing notification configs.",
+      "type": "object",
+      "properties": {
+        "notificationConfigs": {
+          "description": "Notification configs belonging to the requested parent.",
+          "type": "array",
+          "items": {
+            "$ref": "NotificationConfig"
+          }
+        },
+        "nextPageToken": {
+          "description": "Token to retrieve the next page of results, or empty if there are no more\nresults.",
           "type": "string"
         }
       }
@@ -979,8 +1048,270 @@
         }
       }
     },
+    "GoogleCloudSecuritycenterV1NotificationMessage": {
+      "id": "GoogleCloudSecuritycenterV1NotificationMessage",
+      "description": "Cloud SCC's Notification",
+      "type": "object",
+      "properties": {
+        "notificationConfigName": {
+          "description": "Name of the notification config that generated current notification.",
+          "type": "string"
+        },
+        "finding": {
+          "description": "If it's a Finding based notification config, this field will be\npopulated.",
+          "$ref": "Finding"
+        }
+      }
+    },
     "GoogleCloudSecuritycenterV1RunAssetDiscoveryResponse": {
       "id": "GoogleCloudSecuritycenterV1RunAssetDiscoveryResponse",
+      "description": "Response of asset discovery run",
+      "type": "object",
+      "properties": {
+        "state": {
+          "description": "The state of an asset discovery run.",
+          "enumDescriptions": [
+            "Asset discovery run state was unspecified.",
+            "Asset discovery run completed successfully.",
+            "Asset discovery run was cancelled with tasks still pending, as another\nrun for the same organization was started with a higher priority.",
+            "Asset discovery run was killed and terminated."
+          ],
+          "type": "string",
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "COMPLETED",
+            "SUPERSEDED",
+            "TERMINATED"
+          ]
+        },
+        "duration": {
+          "description": "The duration between asset discovery run start and end",
+          "type": "string",
+          "format": "google-duration"
+        }
+      }
+    },
+    "GoogleCloudSecuritycenterV1p1beta1NotificationMessage": {
+      "id": "GoogleCloudSecuritycenterV1p1beta1NotificationMessage",
+      "description": "Cloud SCC's Notification",
+      "type": "object",
+      "properties": {
+        "notificationConfigName": {
+          "description": "Name of the notification config that generated current notification.",
+          "type": "string"
+        },
+        "finding": {
+          "description": "If it's a Finding based notification config, this field will be\npopulated.",
+          "$ref": "GoogleCloudSecuritycenterV1p1beta1Finding"
+        },
+        "temporalAsset": {
+          "description": "If it's an asset based notification config, this field will be\npopulated.",
+          "$ref": "GoogleCloudSecuritycenterV1p1beta1TemporalAsset"
+        }
+      }
+    },
+    "GoogleCloudSecuritycenterV1p1beta1Finding": {
+      "id": "GoogleCloudSecuritycenterV1p1beta1Finding",
+      "description": "Cloud Security Command Center (Cloud SCC) finding.\n\nA finding is a record of assessment data (security, risk, health or privacy)\ningested into Cloud SCC for presentation, notification, analysis,\npolicy testing, and enforcement. For example, an XSS vulnerability in an\nApp Engine application is a finding.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The relative resource name of this finding. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name\nExample:\n\"organizations\/{organization_id}\/sources\/{source_id}\/findings\/{finding_id}\"",
+          "type": "string"
+        },
+        "parent": {
+          "description": "The relative resource name of the source the finding belongs to. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name\nThis field is immutable after creation time.\nFor example:\n\"organizations\/{organization_id}\/sources\/{source_id}\"",
+          "type": "string"
+        },
+        "resourceName": {
+          "description": "For findings on Google Cloud Platform (GCP) resources, the full resource\nname of the GCP resource this finding is for. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name\nWhen the finding is for a non-GCP resource, the resourceName can be a\ncustomer or partner defined string.\nThis field is immutable after creation time.",
+          "type": "string"
+        },
+        "state": {
+          "description": "The state of the finding.",
+          "enumDescriptions": [
+            "Unspecified state.",
+            "The finding requires attention and has not been addressed yet.",
+            "The finding has been fixed, triaged as a non-issue or otherwise addressed\nand is no longer active."
+          ],
+          "type": "string",
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "ACTIVE",
+            "INACTIVE"
+          ]
+        },
+        "category": {
+          "description": "The additional taxonomy group within findings from a given source.\nThis field is immutable after creation time.\nExample: \"XSS_FLASH_INJECTION\"",
+          "type": "string"
+        },
+        "externalUri": {
+          "description": "The URI that, if available, points to a web page outside of Cloud SCC\nwhere additional information about the finding can be found. This field is\nguaranteed to be either empty or a well formed URL.",
+          "type": "string"
+        },
+        "sourceProperties": {
+          "description": "Source specific properties. These properties are managed by the source\nthat writes the finding. The key names in the source_properties map must be\nbetween 1 and 255 characters, and must start with a letter and contain\nalphanumeric characters or underscores only.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "any"
+          }
+        },
+        "securityMarks": {
+          "description": "Output only. User specified security marks. These marks are entirely\nmanaged by the user and come from the SecurityMarks resource that belongs\nto the finding.",
+          "$ref": "GoogleCloudSecuritycenterV1p1beta1SecurityMarks"
+        },
+        "eventTime": {
+          "description": "The time at which the event took place. For example, if the finding\nrepresents an open firewall it would capture the time the detector believes\nthe firewall became open. The accuracy is determined by the detector.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "createTime": {
+          "description": "The time at which the finding was created in Cloud SCC.",
+          "type": "string",
+          "format": "google-datetime"
+        }
+      }
+    },
+    "GoogleCloudSecuritycenterV1p1beta1SecurityMarks": {
+      "id": "GoogleCloudSecuritycenterV1p1beta1SecurityMarks",
+      "description": "User specified security marks that are attached to the parent Cloud Security\nCommand Center (Cloud SCC) resource. Security marks are scoped within a Cloud\nSCC organization -- they can be modified and viewed by all users who have\nproper permissions on the organization.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The relative resource name of the SecurityMarks. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name\nExamples:\n\"organizations\/{organization_id}\/assets\/{asset_id}\/securityMarks\"\n\"organizations\/{organization_id}\/sources\/{source_id}\/findings\/{finding_id}\/securityMarks\".",
+          "type": "string"
+        },
+        "marks": {
+          "description": "Mutable user specified security marks belonging to the parent resource.\nConstraints are as follows:\n\n  * Keys and values are treated as case insensitive\n  * Keys must be between 1 - 256 characters (inclusive)\n  * Keys must be letters, numbers, underscores, or dashes\n  * Values have leading and trailing whitespace trimmed, remaining\n    characters must be between 1 - 4096 characters (inclusive)",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "GoogleCloudSecuritycenterV1p1beta1TemporalAsset": {
+      "id": "GoogleCloudSecuritycenterV1p1beta1TemporalAsset",
+      "description": "Wrapper over asset object that also captures the state change for the asset\ne.g. if it was a newly created asset vs updated or deleted asset.",
+      "type": "object",
+      "properties": {
+        "changeType": {
+          "description": "Represents if the asset was created\/updated\/deleted.",
+          "enumDescriptions": [
+            "Unspecified or default.",
+            "Newly created Asset",
+            "Asset was updated.",
+            "Asset was deleted."
+          ],
+          "type": "string",
+          "enum": [
+            "CHANGE_TYPE_UNSPECIFIED",
+            "CREATED",
+            "UPDATED",
+            "DELETED"
+          ]
+        },
+        "asset": {
+          "description": "Asset data that includes attributes, properties and marks about the asset.",
+          "$ref": "GoogleCloudSecuritycenterV1p1beta1Asset"
+        }
+      }
+    },
+    "GoogleCloudSecuritycenterV1p1beta1Asset": {
+      "id": "GoogleCloudSecuritycenterV1p1beta1Asset",
+      "description": "Cloud Security Command Center's (Cloud SCC) representation of a Google Cloud\nPlatform (GCP) resource.\n\nThe Asset is a Cloud SCC resource that captures information about a single\nGCP resource. All modifications to an Asset are only within the context of\nCloud SCC and don't affect the referenced GCP resource.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The relative resource name of this asset. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name\nExample:\n\"organizations\/{organization_id}\/assets\/{asset_id}\".",
+          "type": "string"
+        },
+        "securityCenterProperties": {
+          "description": "Cloud SCC managed properties. These properties are managed by\nCloud SCC and cannot be modified by the user.",
+          "$ref": "GoogleCloudSecuritycenterV1p1beta1SecurityCenterProperties"
+        },
+        "resourceProperties": {
+          "description": "Resource managed properties. These properties are managed and defined by\nthe GCP resource and cannot be modified by the user.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "any"
+          }
+        },
+        "securityMarks": {
+          "description": "User specified security marks. These marks are entirely managed by the user\nand come from the SecurityMarks resource that belongs to the asset.",
+          "$ref": "GoogleCloudSecuritycenterV1p1beta1SecurityMarks"
+        },
+        "createTime": {
+          "description": "The time at which the asset was created in Cloud SCC.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "updateTime": {
+          "description": "The time at which the asset was last updated, added, or deleted in Cloud\nSCC.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "iamPolicy": {
+          "description": "IAM Policy information associated with the GCP resource described by the\nCloud SCC asset. This information is managed and defined by the GCP\nresource and cannot be modified by the user.",
+          "$ref": "GoogleCloudSecuritycenterV1p1beta1IamPolicy"
+        }
+      }
+    },
+    "GoogleCloudSecuritycenterV1p1beta1SecurityCenterProperties": {
+      "id": "GoogleCloudSecuritycenterV1p1beta1SecurityCenterProperties",
+      "description": "Cloud SCC managed properties. These properties are managed by Cloud SCC and\ncannot be modified by the user.",
+      "type": "object",
+      "properties": {
+        "resourceName": {
+          "description": "The full resource name of the GCP resource this asset\nrepresents. This field is immutable after create time. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name",
+          "type": "string"
+        },
+        "resourceType": {
+          "description": "The type of the GCP resource. Examples include: APPLICATION,\nPROJECT, and ORGANIZATION. This is a case insensitive field defined by\nCloud SCC and\/or the producer of the resource and is immutable\nafter create time.",
+          "type": "string"
+        },
+        "resourceParent": {
+          "description": "The full resource name of the immediate parent of the resource. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name",
+          "type": "string"
+        },
+        "resourceProject": {
+          "description": "The full resource name of the project the resource belongs to. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name",
+          "type": "string"
+        },
+        "resourceOwners": {
+          "description": "Owners of the Google Cloud resource.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resourceDisplayName": {
+          "description": "The user defined display name for this resource.",
+          "type": "string"
+        },
+        "resourceParentDisplayName": {
+          "description": "The user defined display name for the parent of this resource.",
+          "type": "string"
+        },
+        "resourceProjectDisplayName": {
+          "description": "The user defined display name for the project of this resource.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudSecuritycenterV1p1beta1IamPolicy": {
+      "id": "GoogleCloudSecuritycenterV1p1beta1IamPolicy",
+      "description": "IAM Policy information associated with the GCP resource described by the\nCloud SCC asset. This information is managed and defined by the GCP\nresource and cannot be modified by the user.",
+      "type": "object",
+      "properties": {
+        "policyBlob": {
+          "description": "The JSON representation of the Policy associated with the asset.\nSee https:\/\/cloud.google.com\/iam\/reference\/rest\/v1p1beta1\/Policy for\nformat details.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudSecuritycenterV1p1beta1RunAssetDiscoveryResponse": {
+      "id": "GoogleCloudSecuritycenterV1p1beta1RunAssetDiscoveryResponse",
       "description": "Response of asset discovery run",
       "type": "object",
       "properties": {
@@ -1482,7 +1813,7 @@
                       "type": "string"
                     },
                     "filter": {
-                      "description": "Expression that defines the filter to apply across findings.\nThe expression is a list of one or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. Examples include:\n\n * name\n * source_properties.a_property\n * security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\nname: `=`\nparent: `=`, `:`\nresource_name: `=`, `:`\nstate: `=`, `:`\ncategory: `=`, `:`\nexternal_uri: `=`, `:`\nevent_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"event_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"event_time = 1560208038000\"\n\nsecurity_marks.marks: `=`, `:`\nsource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n\nFor example, `source_properties.size = 100` is a valid filter string.",
+                      "description": "Expression that defines the filter to apply across findings.\nThe expression is a list of one or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. Examples include:\n\n * name\n * source_properties.a_property\n * security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\nname: `=`\nparent: `=`, `:`\nresource_name: `=`, `:`\nstate: `=`, `:`\ncategory: `=`, `:`\nexternal_uri: `=`, `:`\nevent_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"event_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"event_time = 1560208038000\"\n\nsecurity_marks.marks: `=`, `:`\nsource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n\nFor example, `source_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: \"source_properties.my_property : \\\"\\\"\"\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: \"-source_properties.my_property : \\\"\\\"\"",
                       "location": "query",
                       "type": "string"
                     },
@@ -1498,7 +1829,7 @@
                       "format": "google-datetime"
                     },
                     "compareDuration": {
-                      "description": "When compare_duration is set, the ListFindingsResult's \"state_change\"\nattribute is updated to indicate whether the finding had its state changed,\nthe finding's state remained unchanged, or if the finding was added in any\nstate during the compare_duration period of time that precedes the\nread_time. This is the time between (read_time - compare_duration) and\nread_time.\n\nThe state_change value is derived based on the presence and state of the\nfinding at the two points in time. Intermediate state changes between the\ntwo times don't affect the result. For example, the results aren't affected\nif the finding is made inactive and then active again.\n\nPossible \"state_change\" values when compare_duration is specified:\n\n* \"CHANGED\":   indicates that the finding was present at the start of\n                 compare_duration, but changed its state at read_time.\n* \"UNCHANGED\": indicates that the finding was present at the start of\n                 compare_duration and did not change state at read_time.\n* \"ADDED\":     indicates that the finding was not present at the start\n                 of compare_duration, but was present at read_time.\n\nIf compare_duration is not specified, then the only possible state_change\nis \"UNUSED\", which will be the state_change set for all findings present at\nread_time.",
+                      "description": "When compare_duration is set, the ListFindingsResult's \"state_change\"\nattribute is updated to indicate whether the finding had its state changed,\nthe finding's state remained unchanged, or if the finding was added in any\nstate during the compare_duration period of time that precedes the\nread_time. This is the time between (read_time - compare_duration) and\nread_time.\n\nThe state_change value is derived based on the presence and state of the\nfinding at the two points in time. Intermediate state changes between the\ntwo times don't affect the result. For example, the results aren't affected\nif the finding is made inactive and then active again.\n\nPossible \"state_change\" values when compare_duration is specified:\n\n* \"CHANGED\":   indicates that the finding was present and matched the given\n                 filter at the start of compare_duration, but changed its\n                 state at read_time.\n* \"UNCHANGED\": indicates that the finding was present and matched the given\n                 filter at the start of compare_duration and did not change\n                 state at read_time.\n* \"ADDED\":     indicates that the finding did not match the given filter or\n                 was not present at the start of compare_duration, but was\n                 present at read_time.\n* \"REMOVED\":   indicates that the finding was present and matched the\n                 filter at the start of compare_duration, but did not match\n                 the filter at read_time.\n\nIf compare_duration is not specified, then the only possible state_change\nis \"UNUSED\", which will be the state_change set for all findings present at\nread_time.",
                       "location": "query",
                       "type": "string",
                       "format": "google-duration"
@@ -1638,6 +1969,163 @@
             }
           }
         },
+        "notificationConfigs": {
+          "methods": {
+            "create": {
+              "id": "securitycenter.organizations.notificationConfigs.create",
+              "path": "v1/{+parent}/notificationConfigs",
+              "flatPath": "v1/organizations/{organizationsId}/notificationConfigs",
+              "httpMethod": "POST",
+              "parameters": {
+                "parent": {
+                  "description": "Required. Resource name of the new notification config's parent. Its format is\n\"organizations\/[organization_id]\".",
+                  "location": "path",
+                  "required": true,
+                  "pattern": "^organizations\/[^\/]+$",
+                  "type": "string"
+                },
+                "configId": {
+                  "description": "Required.\nUnique identifier provided by the client within the parent scope.\nIt must be between 1 and 128 characters, and contains alphanumeric\ncharacters, underscores or hyphens only.",
+                  "location": "query",
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "request": {
+                "$ref": "NotificationConfig"
+              },
+              "response": {
+                "$ref": "NotificationConfig"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Creates a notification config."
+            },
+            "delete": {
+              "id": "securitycenter.organizations.notificationConfigs.delete",
+              "path": "v1/{+name}",
+              "flatPath": "v1/organizations/{organizationsId}/notificationConfigs/{notificationConfigsId}",
+              "httpMethod": "DELETE",
+              "parameters": {
+                "name": {
+                  "description": "Required. Name of the notification config to delete. Its format is\n\"organizations\/[organization_id]\/notificationConfigs\/[config_id]\".",
+                  "location": "path",
+                  "required": true,
+                  "pattern": "^organizations\/[^\/]+\/notificationConfigs\/[^\/]+$",
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "response": {
+                "$ref": "Empty"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Deletes a notification config."
+            },
+            "get": {
+              "id": "securitycenter.organizations.notificationConfigs.get",
+              "path": "v1/{+name}",
+              "flatPath": "v1/organizations/{organizationsId}/notificationConfigs/{notificationConfigsId}",
+              "httpMethod": "GET",
+              "parameters": {
+                "name": {
+                  "description": "Required. Name of the notification config to get. Its format is\n\"organizations\/[organization_id]\/notificationConfigs\/[config_id]\".",
+                  "location": "path",
+                  "required": true,
+                  "pattern": "^organizations\/[^\/]+\/notificationConfigs\/[^\/]+$",
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "response": {
+                "$ref": "NotificationConfig"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Gets a notification config."
+            },
+            "list": {
+              "id": "securitycenter.organizations.notificationConfigs.list",
+              "path": "v1/{+parent}/notificationConfigs",
+              "flatPath": "v1/organizations/{organizationsId}/notificationConfigs",
+              "httpMethod": "GET",
+              "parameters": {
+                "parent": {
+                  "description": "Required. Name of the organization to list notification configs.\nIts format is \"organizations\/[organization_id]\".",
+                  "location": "path",
+                  "required": true,
+                  "pattern": "^organizations\/[^\/]+$",
+                  "type": "string"
+                },
+                "pageToken": {
+                  "description": "The value returned by the last `ListNotificationConfigsResponse`; indicates\nthat this is a continuation of a prior `ListNotificationConfigs` call, and\nthat the system should return the next page of data.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "pageSize": {
+                  "description": "The maximum number of results to return in a single response. Default is\n10, minimum is 1, maximum is 1000.",
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "response": {
+                "$ref": "ListNotificationConfigsResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Lists notification configs."
+            },
+            "patch": {
+              "id": "securitycenter.organizations.notificationConfigs.patch",
+              "path": "v1/{+name}",
+              "flatPath": "v1/organizations/{organizationsId}/notificationConfigs/{notificationConfigsId}",
+              "httpMethod": "PATCH",
+              "parameters": {
+                "name": {
+                  "description": "The relative resource name of this notification config. See:\nhttps:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name\nExample:\n\"organizations\/{organization_id}\/notificationConfigs\/notify_public_bucket\".",
+                  "location": "path",
+                  "required": true,
+                  "pattern": "^organizations\/[^\/]+\/notificationConfigs\/[^\/]+$",
+                  "type": "string"
+                },
+                "updateMask": {
+                  "description": "The FieldMask to use when updating the notification config.\n\nIf empty all mutable fields will be updated.",
+                  "location": "query",
+                  "type": "string",
+                  "format": "google-fieldmask"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "request": {
+                "$ref": "NotificationConfig"
+              },
+              "response": {
+                "$ref": "NotificationConfig"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "\nUpdates a notification config."
+            }
+          }
+        },
         "assets": {
           "methods": {
             "group": {
@@ -1682,12 +2170,12 @@
                   "type": "string"
                 },
                 "filter": {
-                  "description": "Expression that defines the filter to apply across assets.\nThe expression is a list of zero or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. The fields map to those\ndefined in the Asset resource. Examples include:\n\n* name\n* security_center_properties.resource_name\n* resource_properties.a_property\n* security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following are the allowed field and operator combinations:\n\n* name: `=`\n* update_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"update_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"update_time = 1560208038000\"\n\n* create_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"create_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"create_time = 1560208038000\"\n\n* iam_policy.policy_blob: `=`, `:`\n* resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n* security_marks.marks: `=`, `:`\n* security_center_properties.resource_name: `=`, `:`\n* security_center_properties.resource_type: `=`, `:`\n* security_center_properties.resource_parent: `=`, `:`\n* security_center_properties.resource_project: `=`, `:`\n* security_center_properties.resource_owners: `=`, `:`\n\nFor example, `resource_properties.size = 100` is a valid filter string.",
+                  "description": "Expression that defines the filter to apply across assets.\nThe expression is a list of zero or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `<field> <operator> <value>` and may have a `-`\ncharacter in front of them to indicate negation. The fields map to those\ndefined in the Asset resource. Examples include:\n\n* name\n* security_center_properties.resource_name\n* resource_properties.a_property\n* security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `>`, `<`, `>=`, `<=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following are the allowed field and operator combinations:\n\n* name: `=`\n* update_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"update_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"update_time = 1560208038000\"\n\n* create_time: `=`, `>`, `<`, `>=`, `<=`\n\n  Usage: This should be milliseconds since epoch or an RFC3339 string.\n  Examples:\n    \"create_time = \\\"2019-06-10T16:07:18-07:00\\\"\"\n    \"create_time = 1560208038000\"\n\n* iam_policy.policy_blob: `=`, `:`\n* resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`\n* security_marks.marks: `=`, `:`\n* security_center_properties.resource_name: `=`, `:`\n* security_center_properties.resource_display_name: `=`, `:`\n* security_center_properties.resource_type: `=`, `:`\n* security_center_properties.resource_parent: `=`, `:`\n* security_center_properties.resource_parent_display_name: `=`, `:`\n* security_center_properties.resource_project: `=`, `:`\n* security_center_properties.resource_project_display_name: `=`, `:`\n* security_center_properties.resource_owners: `=`, `:`\n\nFor example, `resource_properties.size = 100` is a valid filter string.\n\nUse a partial match on the empty string to filter based on a property\nexisting: \"resource_properties.my_property : \\\"\\\"\"\n\nUse a negated partial match on the empty string to filter based on a\nproperty not existing: \"-resource_properties.my_property : \\\"\\\"\"",
                   "location": "query",
                   "type": "string"
                 },
                 "orderBy": {
-                  "description": "Expression that defines what fields and order to use for sorting. The\nstring value should follow SQL syntax: comma separated list of fields. For\nexample: \"name,resource_properties.a_property\". The default sorting order\nis ascending. To specify descending order for a field, a suffix \" desc\"\nshould be appended to the field name. For example: \"name\ndesc,resource_properties.a_property\". Redundant space characters in the\nsyntax are insignificant. \"name desc,resource_properties.a_property\" and \"\nname     desc  ,   resource_properties.a_property  \" are equivalent.\n\nThe following fields are supported:\nname\nupdate_time\nresource_properties\nsecurity_marks.marks\nsecurity_center_properties.resource_name\nsecurity_center_properties.resource_parent\nsecurity_center_properties.resource_project\nsecurity_center_properties.resource_type",
+                  "description": "Expression that defines what fields and order to use for sorting. The\nstring value should follow SQL syntax: comma separated list of fields. For\nexample: \"name,resource_properties.a_property\". The default sorting order\nis ascending. To specify descending order for a field, a suffix \" desc\"\nshould be appended to the field name. For example: \"name\ndesc,resource_properties.a_property\". Redundant space characters in the\nsyntax are insignificant. \"name desc,resource_properties.a_property\" and \"\nname     desc  ,   resource_properties.a_property  \" are equivalent.\n\nThe following fields are supported:\nname\nupdate_time\nresource_properties\nsecurity_marks.marks\nsecurity_center_properties.resource_name\nsecurity_center_properties.resource_display_name\nsecurity_center_properties.resource_parent\nsecurity_center_properties.resource_parent_display_name\nsecurity_center_properties.resource_project\nsecurity_center_properties.resource_project_display_name\nsecurity_center_properties.resource_type",
                   "location": "query",
                   "type": "string"
                 },

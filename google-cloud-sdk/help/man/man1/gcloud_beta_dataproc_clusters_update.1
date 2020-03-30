@@ -11,7 +11,7 @@ gcloud beta dataproc clusters update \- update labels and/or the number of worke
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta dataproc clusters update\fR (\fICLUSTER\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-async\fR] [\fB\-\-graceful\-decommission\-timeout\fR=\fIGRACEFUL_DECOMMISSION_TIMEOUT\fR] [\fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR] [\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-autoscaling\-policy\fR=\fIAUTOSCALING_POLICY\fR\ :\ \fB\-\-disable\-autoscaling\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-expiration\-time\fR=\fIEXPIRATION_TIME\fR\ |\ \fB\-\-max\-age\fR=\fIMAX_AGE\fR\ |\ \fB\-\-no\-max\-age\fR] [\fB\-\-max\-idle\fR=\fIMAX_IDLE\fR\ |\ \fB\-\-no\-max\-idle\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta dataproc clusters update\fR (\fICLUSTER\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-async\fR] [\fB\-\-graceful\-decommission\-timeout\fR=\fIGRACEFUL_DECOMMISSION_TIMEOUT\fR] [\fB\-\-num\-secondary\-workers\fR=\fINUM_SECONDARY_WORKERS\fR] [\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-autoscaling\-policy\fR=\fIAUTOSCALING_POLICY\fR\ :\ \fB\-\-disable\-autoscaling\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-expiration\-time\fR=\fIEXPIRATION_TIME\fR\ |\ \fB\-\-max\-age\fR=\fIMAX_AGE\fR\ |\ \fB\-\-no\-max\-age\fR] [\fB\-\-max\-idle\fR=\fIMAX_IDLE\fR\ |\ \fB\-\-no\-max\-idle\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -41,13 +41,10 @@ must be specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-Cloud Dataproc region for the cluster. Each Cloud Dataproc region constitutes an
-independent resource namespace constrained to deploying instances into Google
-Compute Engine zones inside the region. The default value of \f5global\fR is a
-special multi\-region namespace which is capable of deploying instances into all
-Google Compute Engine zones globally, and is disjoint from other Cloud Dataproc
-regions. Overrides the default \f5dataproc/region\fR property value for this
-command invocation.
+Dataproc region for the cluster. Each Dataproc region constitutes an independent
+resource namespace constrained to deploying instances into Compute Engine zones
+inside the region. Overrides the default \f5dataproc/region\fR property value
+for this command invocation.
 
 
 .RE
@@ -72,8 +69,8 @@ forceful decommission), and the maximum allowed timeout is 1 day. See $ gcloud
 topic datetimes for information on duration formats.
 
 .TP 2m
-\fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR
-The new number of preemptible worker nodes in the cluster.
+\fB\-\-num\-secondary\-workers\fR=\fINUM_SECONDARY_WORKERS\fR
+The new number of secondary worker nodes in the cluster.
 
 .TP 2m
 \fB\-\-num\-workers\fR=\fINUM_WORKERS\fR
@@ -104,7 +101,7 @@ provide the argument [\-\-project] on the command line; set the property
 [core/project]. To set the [region] attribute: provide the argument
 [\-\-autoscaling\-policy] on the command line with a fully specified name;
 provide the argument [\-\-region] on the command line; set the property
-[dataproc/region]; N/A.
+[dataproc/region].
 
 .RS 2m
 .TP 2m
@@ -117,7 +114,7 @@ policy.
 .TP 2m
 \fB\-\-disable\-autoscaling\fR
 Disable autoscaling, if it is enabled. This is an alias for passing the empty
-string to \-\-autoscaling\-policy',
+string to \-\-autoscaling\-policy'.
 
 .RE
 .sp
@@ -147,6 +144,8 @@ $ gcloud beta dataproc clusters update \-\-clear\-labels \e
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
+If \f5\-\-update\-labels\fR is also specified then \f5\-\-remove\-labels\fR is
+applied first.
 
 .RE
 .sp
@@ -198,8 +197,9 @@ Cancels the cluster auto\-deletion by cluster idle duration (configured by
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -208,35 +208,36 @@ help\fR for details.
 To resize a cluster, run:
 
 .RS 2m
-$ gcloud beta dataproc clusters update my_cluster \-\-num\-workers 5
+$ gcloud beta dataproc clusters update my_cluster \e
+    \-\-region=us\-central1 \-\-num\-workers=5
 .RE
 
 To change the number preemptible workers in a cluster, run:
 
 .RS 2m
 $ gcloud beta dataproc clusters update my_cluster \e
-    \-\-num\-preemptible\-workers 5
+    \-\-region=us\-central1 \-\-num\-preemptible\-workers=5
 .RE
 
 To add the label 'customer=acme' to a cluster, run:
 
 .RS 2m
 $ gcloud beta dataproc clusters update my_cluster \e
-    \-\-update\-labels=customer=acme
+    \-\-region=us\-central1 \-\-update\-labels=customer=acme
 .RE
 
 To update the label 'customer=ackme' to 'customer=acme', run:
 
 .RS 2m
 $ gcloud beta dataproc clusters update my_cluster \e
-    \-\-update\-labels=customer=acme
+    \-\-region=us\-central1 \-\-update\-labels=customer=acme
 .RE
 
 To remove the label whose key is 'customer', run:
 
 .RS 2m
 $ gcloud beta dataproc clusters update my_cluster \e
-    \-\-remove\-labels=customer
+    \-\-region=us\-central1 \-\-remove\-labels=customer
 .RE
 
 

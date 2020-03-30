@@ -32,10 +32,13 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import utils as compute_utils
 from googlecloudsdk.api_lib.storage import storage_util
+from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.util import completers
+
+messages = apis.GetMessagesModule('sql', 'v1beta4')
 
 _IP_ADDRESS_PART = r'(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})'  # Match decimal 0-255
 _CIDR_PREFIX_PART = r'([0-9]|[1-2][0-9]|3[0-2])'  # Match decimal 0-32
@@ -166,6 +169,14 @@ def AddPromptForPassword(parser):
             'including the RETURN or ENTER key.'))
 
 
+def AddType(parser):
+  parser.add_argument('--type', help='Cloud SQL user\'s type. It determines '
+                      'the method to authenticate the user during login. '
+                      'See the list of user types at '
+                      'https://cloud.google.com/sql/docs/postgres/admin-api/'
+                      'v1beta4/users#type')
+
+
 # Instance create and patch flags
 
 
@@ -236,6 +247,15 @@ def AddBackupStartTime(parser):
             'format - HH:MM, in the UTC timezone.'))
 
 
+def AddBackupLocation(parser, allow_empty):
+  help_text = (
+      'Choose where to store your backups. Backups are stored in the closest '
+      'multi-region location to you by default. Only customize if needed.')
+  if allow_empty:
+    help_text += ' Specify empty string to revert to default.'
+  parser.add_argument('--backup-location', required=False, help=help_text)
+
+
 def AddDatabaseFlags(parser, update=False):
   """Adds the `--database-flags` flag."""
   help_ = ('Comma-separated list of database flags to set on the '
@@ -263,7 +283,12 @@ def AddDatabaseVersion(parser, restrict_choices=True):
       'MYSQL_5_6',
       'MYSQL_5_7',
       'POSTGRES_9_6',
+      'POSTGRES_10',
       'POSTGRES_11',
+      'SQLSERVER_2017_EXPRESS',
+      'SQLSERVER_2017_WEB',
+      'SQLSERVER_2017_STANDARD',
+      'SQLSERVER_2017_ENTERPRISE',
   ]
   help_text = (
       'The database engine type and version. If left unspecified, the API '
@@ -308,6 +333,17 @@ def AddEnableBinLog(parser, show_negated_in_help=False):
       required=False,
       help=('Specified if binary log should be enabled. If backup '
             'configuration is disabled, binary log must be disabled as well.'),
+      **kwargs)
+
+
+def AddEnablePointInTimeRecovery(parser, show_negated_in_help=False):
+  kwargs = _GetKwargsForBoolFlag(show_negated_in_help)
+  parser.add_argument(
+      '--enable-point-in-time-recovery',
+      required=False,
+      help=('Specified if point-in-time recovery (using write-ahead log '
+            'archiving) should be enabled. If backup configuration is '
+            'disabled, point-in-time recovery must be disabled as well.'),
       **kwargs)
 
 
@@ -504,11 +540,6 @@ def AddTier(parser, is_patch=False):
                'available here: https://cloud.google.com/sql/pricing.')
   if is_patch:
     help_text += ' WARNING: Instance will be restarted.'
-  # TODO(b/122660263): Remove when V1 instances are no longer supported.
-  # V1 deprecation notice.
-  help_text += ('\n\nIMPORTANT: First Generation instances are deprecated. '
-                'If you\'re considering any First Generation tiers, we '
-                'recommend using Second Generation instead.')
 
   parser.add_argument('--tier', '-t', required=False, help=help_text)
 
@@ -668,6 +699,36 @@ def AddEncryptedBakFlags(parser):
           'up to but not including the RETURN or ENTER key.'))
 
 
+def AddRescheduleType(parser):
+  """Add the flag to specify reschedule type.
+
+  Args:
+    parser: The current argparse parser to add this to.
+  """
+  choices = [
+      messages.Reschedule.RescheduleTypeValueValuesEnum.IMMEDIATE.name,
+      messages.Reschedule.RescheduleTypeValueValuesEnum.NEXT_AVAILABLE_WINDOW
+      .name,
+      messages.Reschedule.RescheduleTypeValueValuesEnum.SPECIFIC_TIME.name,
+  ]
+  help_text = 'The type of reschedule operation to perform.'
+  parser.add_argument(
+      '--reschedule-type', choices=choices, required=True, help=help_text)
+
+
+def AddScheduleTime(parser):
+  """Add the flag for maintenance reschedule schedule time.
+
+  Args:
+    parser: The current argparse parser to add this to.
+  """
+  parser.add_argument(
+      '--schedule-time',
+      type=arg_parsers.Datetime.Parse,
+      help=('When specifying SPECIFIC_TIME, the date and time at which to '
+            'schedule the maintenance in ISO 8601 format.'))
+
+
 INSTANCES_USERLABELS_FORMAT = ':(settings.userLabels:alias=labels:label=LABELS)'
 
 INSTANCES_FORMAT_COLUMNS = [
@@ -733,9 +794,17 @@ TIERS_FORMAT = """
   )
 """
 
-USERS_FORMAT_BETA = """
+USERS_FORMAT = """
   table(
     name.yesno(no='(anonymous)'),
     host
+  )
+"""
+
+USERS_FORMAT_ALPHA = """
+  table(
+    name.yesno(no='(anonymous)'),
+    host,
+    type.yesno(no='NATIVE')
   )
 """

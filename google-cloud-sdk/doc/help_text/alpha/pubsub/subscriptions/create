@@ -6,7 +6,8 @@ SYNOPSIS
     gcloud alpha pubsub subscriptions create SUBSCRIPTION [SUBSCRIPTION ...]
         (--topic=TOPIC : --topic-project=TOPIC_PROJECT)
         [--ack-deadline=ACK_DEADLINE] [--enable-message-ordering]
-        [--expiration-period=EXPIRATION_PERIOD] [--labels=[KEY=VALUE,...]]
+        [--expiration-period=EXPIRATION_PERIOD] [--filter=FILTER]
+        [--labels=[KEY=VALUE,...]]
         [--message-retention-duration=MESSAGE_RETENTION_DURATION]
         [--push-auth-service-account=SERVICE_ACCOUNT_EMAIL]
         [--push-auth-token-audience=OPTIONAL_AUDIENCE_OVERRIDE]
@@ -14,6 +15,7 @@ SYNOPSIS
         [--max-delivery-attempts=MAX_DELIVERY_ATTEMPTS
           [--dead-letter-topic=DEAD_LETTER_TOPIC
           : --dead-letter-topic-project=DEAD_LETTER_TOPIC_PROJECT]]
+        [--max-retry-delay=MAX_RETRY_DELAY --min-retry-delay=MIN_RETRY_DELAY]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -64,6 +66,10 @@ OPTIONAL FLAGS
         respectively. If the unit is omitted, seconds is assumed. This flag
         additionally accepts the special value "never" to indicate that the
         subscription will never expire.
+
+     --filter=FILTER
+        A non-empty string written in the Cloud Pub/Sub filter language. This
+        feature is part of an invitation-only alpha release.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -125,12 +131,31 @@ OPTIONAL FLAGS
             Project ID of the Google Cloud Platform project for the
             dead-letter-topic.
 
+     Retry Policy Options. Retry policy specifies how Cloud Pub/Sub retries
+     message delivery for this subscription. This feature is currently
+     experimental and not recommended for production use.
+
+       --max-retry-delay=MAX_RETRY_DELAY
+          The maximum delay between consecutive deliveries of a given message.
+          Value should be between 0 and 600 seconds. Defaults to 10 seconds.
+          Valid values are strings of the form INTEGER[UNIT], where UNIT is one
+          of "s", "m", "h", and "d" for seconds, minutes, hours, and days,
+          respectively. If the unit is omitted, seconds is assumed.
+
+       --min-retry-delay=MIN_RETRY_DELAY
+          The minimum delay between consecutive deliveries of a given message.
+          Value should be between 0 and 600 seconds. Defaults to 10 seconds.
+          Valid values are strings of the form INTEGER[UNIT], where UNIT is one
+          of "s", "m", "h", and "d" for seconds, minutes, hours, and days,
+          respectively. If the unit is omitted, seconds is assumed.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

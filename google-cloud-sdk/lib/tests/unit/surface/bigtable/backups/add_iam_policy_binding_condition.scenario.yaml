@@ -1,0 +1,70 @@
+title: cloud bigtable backups add-iam-policy-binding-condition test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      bigtable backups add-iam-policy-binding my-backup --instance='my-instance' --cluster='my-cluster' --member=user:test@gmail.com --role=roles/non-primitive --condition='expression=expr,title=title,description=descr'
+  - stderr: |
+      Updated IAM policy for backup [my-backup].
+  - stdout: |
+      {}
+actions:
+- execute_command:
+    command: |
+      bigtable backups add-iam-policy-binding my-backup --instance='my-instance' --cluster='my-cluster' --member=user:test@gmail.com --role=roles/non-primitive --condition='expression=expr,title=title,description=descr'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/projects/fake-project/instances/my-instance/clusters/my-cluster/backups/my-backup:getIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": ["user:oldtest@gmail.com"],
+                  "condition": {
+                    "expression": "expr",
+                    "title": "title",
+                    "description": "descr"
+                  }
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/projects/fake-project/instances/my-instance/clusters/my-cluster/backups/my-backup:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - condition:
+                    description: descr
+                    expression: expr
+                    title: title
+                  members:
+                  - user:oldtest@gmail.com
+                  - user:test@gmail.com
+                  role: roles/non-primitive
+                etag: etag
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Updated IAM policy for backup [my-backup].
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0

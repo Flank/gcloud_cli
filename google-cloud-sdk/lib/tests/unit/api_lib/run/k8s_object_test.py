@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.run import k8s_object
 from tests.lib import cli_test_base
+from tests.lib import test_case
 from tests.lib.api_lib.run import base
 
 import mock
@@ -231,3 +232,7 @@ class HelpersTest(cli_test_base.CliTestBase):
         'm3': FakeMessage(name='m3', value=3),
         'm4': FakeMessage(name='m4', value=4),
     }, dict(wrapped_msgs))
+
+
+if __name__ == '__main__':
+  test_case.main()

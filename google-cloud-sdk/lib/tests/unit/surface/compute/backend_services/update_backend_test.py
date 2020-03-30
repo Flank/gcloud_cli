@@ -989,6 +989,63 @@ class BackendServicesUpdateBackendTest(test_base.BaseTest):
               project='my-project'))],
     )
 
+  def testWithFailover(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self._backend_services[1]],
+
+        [],
+    ])
+
+    self.Run("""
+        compute backend-services update-backend backend-service-2
+          --instance-group group-1
+          --instance-group-zone zone-1
+          --failover
+          --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-2', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-2',
+              backendServiceResource=messages.BackendService(
+                  backends=[
+                      messages.Backend(
+                          balancingMode=self._rate,
+                          failover=True,
+                          description='group one',
+                          group=(
+                              'https://compute.googleapis.com/compute/'
+                              'v1/projects/my-project/zones/zone-1/'
+                              'instanceGroups/group-1'),
+                          maxRate=100),
+                      messages.Backend(
+                          balancingMode=self._utilization,
+                          description='group two',
+                          group=(
+                              'https://compute.googleapis.com/compute/'
+                              'v1/projects/my-project/zones/zone-2/'
+                              'instanceGroups/group-2'),
+                          maxUtilization=1.0),
+                  ],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
+                  name='backend-service-2',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/'
+                            'my-project/global/backendServices/'
+                            'backend-service-2'),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
+
 
 class BackendServicesUpdateBackendWithNEGTest(test_base.BaseTest,
                                               parameterized.TestCase):

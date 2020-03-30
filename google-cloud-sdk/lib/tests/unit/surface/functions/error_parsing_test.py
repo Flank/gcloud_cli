@@ -111,16 +111,21 @@ class ErrorParsingTest(sdk_test_base.SdkBase):
 
   def testErrorSuccessful(self):
     content = """{"error": {"details":
-    [{"field": "value", "fieldViolations": [
+    [{"field": "some.field.name", "fieldViolations": [
     {"description": "value 1"}, {"description": "value 2"}]},
-    {"field": "my value", "fieldViolations":
-    [{"field": "key", "description": "value 3"}]}]}}"""
+    {"field": "outer.field.name", "fieldViolations":
+    [{"field": "inner.field.name", "description": "value 3"}]}]}}"""
     error = testutil.CreateTestHttpError(10, 'reason', content)
     result = util.GetHttpErrorMessage(error)
+    # When multiple overlapping field names are provided at different depths:
+    # one at the same level as the "fieldViolations" key (outer) and
+    # one at the same level as a violation in the "fieldViolations" list (inner)
+    # then the outer field name is used.
     self.assertEqual(
         result,
         '\n'.join(['ResponseError: status=[10], code=[reason], message=[',
-                   'Problems:', 'value 1', 'value 2', 'value 3', ']']))
+                   'Problems:', 'some.field.name:', 'value 1', 'value 2',
+                   'outer.field.name:', 'value 3', ']']))
 
 if __name__ == '__main__':
   test_case.main()

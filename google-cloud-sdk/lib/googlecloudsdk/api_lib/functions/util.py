@@ -72,6 +72,18 @@ _API_VERSION = 'v1'
 
 
 def _GetApiVersion(track=calliope_base.ReleaseTrack.GA):  # pylint: disable=unused-argument
+  """Returns the current cloudfunctions Api Version configured in the sdk.
+
+  NOTE: Currently the value is hard-coded to v1, and surface/functions/deploy.py
+  assumes this to parse OperationMetadataV1 from the response.
+  Please change the parsing if more versions should be supported.
+
+  Args:
+    track: The gcloud track.
+
+  Returns:
+    The current cloudfunctions Api Version.
+  """
   return _API_VERSION
 
 
@@ -267,10 +279,15 @@ def _GetViolationsFromError(error):
     String of newline-separated violations descriptions.
   """
   error_payload = exceptions_util.HttpErrorPayload(error)
-  field_errors = error_payload.field_violations
-  if not field_errors:
-    return ''
-  return '\n'.join(field_errors.values()) + '\n'
+  errors = []
+  errors.extend(
+      ['{}:\n{}'.format(k, v) for k, v in error_payload.violations.items()])
+  errors.extend([
+      '{}:\n{}'.format(k, v) for k, v in error_payload.field_violations.items()
+  ])
+  if errors:
+    return '\n'.join(errors) + '\n'
+  return ''
 
 
 def _GetPermissionErrorDetails(error_info):
@@ -334,18 +351,22 @@ def GetFunction(function_name):
     raise
 
 
-# TODO(b/139026575): Remove do_every_poll option
+# TODO(b/139026575): Remove try_set_invoker option
 @CatchHTTPErrorRaiseHTTPException
-def WaitForFunctionUpdateOperation(op, do_every_poll=None):
+def WaitForFunctionUpdateOperation(op, try_set_invoker=None,
+                                   on_every_poll=None):
   """Wait for the specied function update to complete.
 
   Args:
     op: Cloud operation to wait on.
-    do_every_poll: function, A function to execute every time we poll.
+    try_set_invoker: function to try setting invoker, see above TODO.
+    on_every_poll: list of functions to execute every time we poll.
+                   Functions should take in Operation as an argument.
   """
   client = GetApiClientInstance()
   operations.Wait(op, client.MESSAGES_MODULE, client, _DEPLOY_WAIT_NOTICE,
-                  do_every_poll=do_every_poll)
+                  try_set_invoker=try_set_invoker,
+                  on_every_poll=on_every_poll)
 
 
 @CatchHTTPErrorRaiseHTTPException

@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute packet-mirrorings create - create a Google Compute
-        Engine packet mirroring
+        Engine packet mirroring policy
 
 SYNOPSIS
     gcloud alpha compute packet-mirrorings create NAME
@@ -9,11 +9,10 @@ SYNOPSIS
         [--filter-cidr-ranges=[CIDR_RANGE,...]]
         [--filter-protocols=[PROTOCOL,...]]
         [--mirrored-instances=[INSTANCE,...]] [--mirrored-subnets=[SUBNET,...]]
-        [--mirrored-tags=[TAG,...]] [--priority=PRIORITY] [--region=REGION]
-        [GCLOUD_WIDE_FLAG ...]
+        [--mirrored-tags=[TAG,...]] [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Create a Google Compute Engine packet mirroring.
+    (ALPHA) Create a Google Compute Engine packet mirroring policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -95,23 +94,6 @@ OPTIONAL FLAGS
         The virtual machines with the provided tags must live in zones
         contained in the same region as this packet mirroring.
 
-     --priority=PRIORITY
-        Priority of applying this packet mirroring. Priority is used to break
-        ties in cases where there is more than one matching policy. In the case
-        of two policies that apply for a given Instance, the one with the
-        lowest-numbered priority value wins. Mirroring all instances in a
-        region for the network may produce a lot of mirrored traffic. If you
-        want to "zoom in" on a subset of that traffic you can create another
-        packet mirroring with a more restricted set of mirrored instances
-        (using the --mirrored- flags) or a more restrictive CIDR filter and
-        send that traffic to a dedicated collector. Because we cannot mirror
-        traffic to multiple sets of collector, you should set the priority for
-        the more specific packet mirroring configuration to a lower value to
-        ensure the packets are sent to the desired collector. Default value is
-        1000. Valid range is 0 through 65535. If multiple policies end up
-        having the same priority, then one of the policies is picked
-        non-deterministically.
-
      --region=REGION
         Region of the packet mirroring to create. Overrides the default
         compute/region property value for this command invocation.
@@ -120,8 +102,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     Mirror all tcp traffic to/from all instances in subnet my-subnet in
@@ -146,7 +129,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud compute packet-mirrorings create
         $ gcloud beta compute packet-mirrorings create
 

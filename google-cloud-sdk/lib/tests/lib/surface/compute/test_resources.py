@@ -987,8 +987,23 @@ def MakeHealthCheckBeta(msgs, api):
                     'my-project/global/healthChecks/health-check-http2')),
   ]
 
+
+def MakeHealthCheckAlpha(msgs, api):
+  prefix = _COMPUTE_PATH + '/' + api
+  return [
+      msgs.HealthCheck(
+          name='health-check-grpc',
+          type=msgs.HealthCheck.TypeValueValuesEnum.GRPC,
+          grpcHealthCheck=msgs.GRPCHealthCheck(
+              port=88,
+              grpcServiceName='gRPC-service'),
+          selfLink=(prefix + '/projects/'
+                    'my-project/global/healthChecks/health-check-grpc')),
+  ]
+
 HEALTH_CHECKS = MakeHealthChecks(messages, 'v1')
 HEALTH_CHECKS_BETA = MakeHealthCheckBeta(beta_messages, 'beta')
+HEALTH_CHECKS_ALPHA = MakeHealthCheckAlpha(alpha_messages, 'alpha')
 
 HTTP_HEALTH_CHECKS = [
     messages.HttpHealthCheck(
@@ -1235,51 +1250,6 @@ def MakeInstancesInManagedInstanceGroup(msgs, api):
       msgs.ManagedInstance(
           instance=(prefix +
                     'projects/my-project/zones/central2-a/instances/inst-1'),
-          instanceStatus=(msgs.ManagedInstance
-                          .InstanceStatusValueValuesEnum.RUNNING),
-          currentAction=(msgs.ManagedInstance
-                         .CurrentActionValueValuesEnum.NONE),
-          version=msgs.ManagedInstanceVersion(
-              instanceTemplate='template-1',
-              name='xxx')),
-      msgs.ManagedInstance(
-          instance=(prefix +
-                    'projects/my-project/zones/central2-a/instances/inst-2'),
-          instanceStatus=(msgs.ManagedInstance
-                          .InstanceStatusValueValuesEnum.STOPPED),
-          currentAction=(msgs.ManagedInstance
-                         .CurrentActionValueValuesEnum.RECREATING),
-          version=msgs.ManagedInstanceVersion(
-              instanceTemplate='template-1')),
-      msgs.ManagedInstance(
-          instance=(prefix +
-                    'projects/my-project/zones/central2-a/instances/inst-3'),
-          instanceStatus=(msgs.ManagedInstance
-                          .InstanceStatusValueValuesEnum.RUNNING),
-          currentAction=(msgs.ManagedInstance
-                         .CurrentActionValueValuesEnum.DELETING),
-          version=msgs.ManagedInstanceVersion(
-              instanceTemplate='template-2',
-              name='yyy')),
-      msgs.ManagedInstance(
-          instance=(prefix +
-                    'projects/my-project/zones/central2-a/instances/inst-4'),
-          currentAction=(msgs.ManagedInstance
-                         .CurrentActionValueValuesEnum.CREATING),
-          version=msgs.ManagedInstanceVersion(
-              instanceTemplate='template-3'),
-          lastAttempt=MakeLastAttemptErrors(
-              msgs, [('CONDITION_NOT_MET', 'True is not False'),
-                     ('QUOTA_EXCEEDED', 'Limit is 5')])),
-  ]
-
-
-def MakeInstancesInManagedInstanceGroupBeta(msgs, api):
-  prefix = '{0}/{1}/'.format(_COMPUTE_PATH, api)
-  return [
-      msgs.ManagedInstance(
-          instance=(prefix +
-                    'projects/my-project/zones/central2-a/instances/inst-1'),
           instanceStatus=(
               msgs.ManagedInstance.InstanceStatusValueValuesEnum.RUNNING),
           instanceHealth=[
@@ -1330,7 +1300,7 @@ def MakeInstancesInManagedInstanceGroupBeta(msgs, api):
   ]
 
 
-def MakeErrorsInManagedInstanceGroupAlpha(msgs, api):
+def MakeErrorsInManagedInstanceGroup(msgs, api):
   prefix = '{0}/{1}/'.format(_COMPUTE_PATH, api)
   return [
       msgs.InstanceManagedByIgmError(
@@ -2059,7 +2029,7 @@ def MakeNodeTypes(msgs, api):
           guestCpus=96,
           id=159265360,
           kind='compute#nodeType',
-          localSsdGb=46,
+          localSsdGb=0,
           memoryMb=416000,
           name='n1-node-96-624',
           selfLink=(prefix + '/projects/my-project/'
@@ -2143,11 +2113,55 @@ def MakeGlobalNetworkEndpointGroups(msgs, api):
   ]
 
 
+def MakeRegionNetworkEndpointGroups(msgs, api):
+  prefix = _COMPUTE_PATH + '/' + api
+  neg_type_enum = msgs.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum
+  return [
+      msgs.NetworkEndpointGroup(
+          description='My Cloud Run Serverless NEG',
+          kind='compute#networkEndpointGroup',
+          region='region-1',
+          name='my-cloud-run-neg',
+          networkEndpointType=neg_type_enum.SERVERLESS,
+          selfLink=(prefix + '/projects/my-project/regions/region-1/'
+                    'networkEndpointGroups/my-cloud-run-neg'),
+          cloudRun=msgs.NetworkEndpointGroupCloudRun(
+              service='cloud-run-service', tag='cloud-run-tag'),
+          size=0),
+      msgs.NetworkEndpointGroup(
+          description='My App Engine Serverless NEG',
+          kind='compute#networkEndpointGroup',
+          region='region-2',
+          name='my-app-engine-neg',
+          networkEndpointType=neg_type_enum.SERVERLESS,
+          selfLink=(prefix + '/projects/my-project/regions/region-2/'
+                    'networkEndpointGroups/my-app-engine-neg'),
+          appEngine=msgs.NetworkEndpointGroupAppEngine(),
+          size=0),
+      msgs.NetworkEndpointGroup(
+          description='My Cloud Function Serverless NEG',
+          kind='compute#networkEndpointGroup',
+          region='region-3',
+          name='my-cloud-function-neg',
+          networkEndpointType=neg_type_enum.SERVERLESS,
+          selfLink=(prefix + '/projects/my-project/regions/region-3/'
+                    'networkEndpointGroups/my-cloud-function-neg'),
+          cloudFunction=msgs.NetworkEndpointGroupCloudFunction(
+              urlMask='/<function>'),
+          size=0)
+  ]
+
+
 NETWORK_ENDPOINT_GROUPS = MakeNetworkEndpointGroups(messages, 'v1')
 NETWORK_ENDPOINT_GROUPS_ALPHA = MakeNetworkEndpointGroups(
     alpha_messages, 'alpha')
-
+NETWORK_ENDPOINT_GROUPS_BETA = MakeNetworkEndpointGroups(beta_messages, 'beta')
+GLOBAL_NETWORK_ENDPOINT_GROUPS = MakeGlobalNetworkEndpointGroups(messages, 'v1')
 GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA = MakeGlobalNetworkEndpointGroups(
+    alpha_messages, 'alpha')
+GLOBAL_NETWORK_ENDPOINT_GROUPS_BETA = MakeGlobalNetworkEndpointGroups(
+    beta_messages, 'beta')
+REGION_NETWORK_ENDPOINT_GROUPS_ALPHA = MakeRegionNetworkEndpointGroups(
     alpha_messages, 'alpha')
 
 
@@ -2526,6 +2540,48 @@ def MakeSecurityPolicy(msgs, security_policy_ref):
       selfLink=security_policy_ref.SelfLink())
 
 
+def MakeSecurityPolicyCloudArmorConfig(msgs, security_policy_ref):
+  return msgs.SecurityPolicy(
+      name=security_policy_ref.Name(),
+      description='my description',
+      id=123,
+      fingerprint=b'=g\313\0305\220\f\266',
+      rules=[
+          msgs.SecurityPolicyRule(
+              description='default rule',
+              priority=2147483647,
+              match=msgs.SecurityPolicyRuleMatcher(
+                  versionedExpr=msgs.SecurityPolicyRuleMatcher.
+                  VersionedExprValueValuesEnum('SRC_IPS_V1'),
+                  config=msgs.SecurityPolicyRuleMatcherConfig(
+                      srcIpRanges=['*'])),
+              action='allow',
+              preview=False)
+      ],
+      cloudArmorConfig=msgs.SecurityPolicyCloudArmorConfig(enableMl=True),
+      selfLink=security_policy_ref.SelfLink())
+
+
+def MakeSecurityPolicyMatchExpression(msgs, security_policy_ref):
+  return msgs.SecurityPolicy(
+      name=security_policy_ref.Name(),
+      description='my description',
+      id=123,
+      fingerprint=b'=g\313\0305\220\f\266',
+      rules=[
+          msgs.SecurityPolicyRule(
+              description='default rule',
+              priority=2147483647,
+              match=msgs.SecurityPolicyRuleMatcher(
+                  expr=msgs.Expr(expression="origin.region_code == 'GB'"),
+                  config=msgs.SecurityPolicyRuleMatcherConfig(
+                      srcIpRanges=['*'])),
+              action='allow',
+              preview=False)
+      ],
+      selfLink=security_policy_ref.SelfLink())
+
+
 def MakeSecurityPolicyRule(msgs):
   return msgs.SecurityPolicyRule(
       priority=1000,
@@ -2748,6 +2804,16 @@ ALPHA_SSL_CERTIFICATES = [
 ]
 
 
+def MakeOrgSecurityPolicy(msgs, security_policy_ref):
+  return msgs.SecurityPolicy(
+      name=security_policy_ref.Name(),
+      description='test-description',
+      displayName='display-name',
+      id=123,
+      fingerprint=b'=g\313\0305\220\f\266',
+      selfLink=security_policy_ref.SelfLink())
+
+
 def MakeSslPolicies(msgs, api):
   """Make ssl policy test resources for the given api version."""
   prefix = _COMPUTE_PATH + '/' + api
@@ -2785,6 +2851,35 @@ TARGET_HTTP_PROXIES = [
         selfLink=(
             _V1_URI_PREFIX + 'global/targetHttpProxies/target-http-proxy-3')),
 ]
+
+
+def MakeTargetGrpcProxies(msgs, api):
+  prefix = _COMPUTE_PATH + '/' + api
+  long_prefix = prefix + '/projects/my-project'
+  return [
+      msgs.TargetGrpcProxy(
+          name='target-grpc-proxy-1',
+          description='My first proxy',
+          urlMap=long_prefix + '/global/urlMaps/url-map-1',
+          validateForProxyless=False,
+          selfLink=(long_prefix +
+                    '/global/targetGrpcProxies/target-grpc-proxy-1')),
+      msgs.TargetGrpcProxy(
+          name='target-grpc-proxy-2',
+          urlMap=long_prefix + '/global/urlMaps/url-map-2',
+          validateForProxyless=True,
+          selfLink=(long_prefix +
+                    '/global/targetGrpcProxies/target-grpc-proxy-2')),
+      msgs.TargetGrpcProxy(
+          name='target-grpc-proxy-3',
+          description='My last proxy',
+          urlMap=long_prefix + '/global/urlMaps/url-map-3',
+          selfLink=(long_prefix +
+                    '/global/targetGrpcProxies/target-grpc-proxy-3'))
+  ]
+
+
+TARGET_GRPC_PROXIES_ALPHA = MakeTargetGrpcProxies(alpha_messages, 'alpha')
 
 
 def MakeTargetHttpsProxies(msgs, api):
@@ -3301,3 +3396,95 @@ BETA_SUBNETWORKS = [
                   'regions/us-central1/subnetworks/my-subnet2'),
     ),
 ]
+
+
+def MakePublicAdvertisedPrefixes(msgs, api):
+  """Creates a set of public advertised prefixes messages for the given API version.
+
+  Args:
+    msgs: The compute messages API handle.
+    api: The API version for which to create the instances.
+
+  Returns:
+    A list of message objects representing public advertised prefixes.
+  """
+  prefix = _COMPUTE_PATH + '/' + api
+  status_enum = msgs.PublicAdvertisedPrefix.StatusValueValuesEnum
+  return [
+      msgs.PublicAdvertisedPrefix(
+          description='My PAP 1',
+          kind='compute#publicAdvertisedPrefix',
+          name='my-pap1',
+          selfLink=(prefix + '/projects/my-project/'
+                    'publicAdvertisedPrefixes/my-pap1'),
+          ipCidrRange='1.2.3.0/24',
+          dnsVerificationIp='1.2.3.4',
+          sharedSecret='vader is luke\'s father',
+          status=status_enum.VALIDATED),
+      msgs.PublicAdvertisedPrefix(
+          description='My PAP number two',
+          kind='compute#publicAdvertisedPrefix',
+          name='my-pap2',
+          selfLink=(prefix + '/projects/my-project/'
+                    'publicAdvertisedPrefixes/my-pap2'),
+          ipCidrRange='100.66.0.0/16',
+          dnsVerificationIp='100.66.20.1',
+          sharedSecret='longsecretisbestsecret',
+          status=status_enum.PTR_CONFIGURED),
+  ]
+
+
+PUBLIC_ADVERTISED_PREFIXES_ALPHA = MakePublicAdvertisedPrefixes(
+    alpha_messages, 'alpha')
+
+
+def MakePublicDelegatedPrefixes(msgs, api):
+  """Creates a set of public delegated prefixes messages for the given API version.
+
+  Args:
+    msgs: The compute messages API handle.
+    api: The API version for which to create the instances.
+
+  Returns:
+    A list of message objects representing public delegated prefixes.
+  """
+  prefix = _COMPUTE_PATH + '/' + api
+  return [
+      msgs.PublicDelegatedPrefix(
+          description='My global PDP 1',
+          fingerprint=b'1234',
+          ipCidrRange='1.2.3.128/25',
+          kind='compute#globalPublicDelegatedPrefix',
+          name='my-pdp1',
+          selfLink=(prefix + '/projects/my-project/global/'
+                    'publicDelegatedPrefixes/my-pdp1'),
+          parentPrefix=(prefix + '/projects/my-project/global/'
+                        'publicAdvertisedPrefixes/my-pap1')
+      ),
+      msgs.PublicDelegatedPrefix(
+          description='My PDP 2',
+          fingerprint=b'12345',
+          ipCidrRange='1.2.3.12/30',
+          kind='compute#publicDelegatedPrefix',
+          name='my-pdp2',
+          selfLink=(prefix + '/projects/my-project/regions/us-central1/'
+                             'publicDelegatedPrefixes/my-pdp2'),
+          parentPrefix=(prefix + '/projects/my-project/global/'
+                                 'publicAdvertisedPrefixes/my-pap1')
+      ),
+      msgs.PublicDelegatedPrefix(
+          description='My PDP 3',
+          fingerprint=b'123456',
+          ipCidrRange='1.2.3.40/30',
+          kind='compute#publicDelegatedPrefix',
+          name='my-pdp3',
+          selfLink=(prefix + '/projects/my-project/regions/us-east1/'
+                             'publicDelegatedPrefixes/my-pdp3'),
+          parentPrefix=(prefix + '/projects/my-project/global/'
+                                 'publicAdvertisedPrefixes/my-pap1')
+      )
+  ]
+
+
+PUBLIC_DELEGATED_PREFIXES_ALPHA = MakePublicDelegatedPrefixes(
+    alpha_messages, 'alpha')

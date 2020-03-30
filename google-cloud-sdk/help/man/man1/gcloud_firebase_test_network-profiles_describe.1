@@ -17,6 +17,8 @@ gcloud firebase test network\-profiles describe \- describe a network profile
 
 .SH "DESCRIPTION"
 
+Describe a network profile.
+
 Run \f5$ gcloud firebase test network\-profiles \-\-help\fR for descriptions of
 the network profile parameters.
 
@@ -39,8 +41,25 @@ network\-profiles list.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe a network profile, run:
+
+.RS 2m
+gcloud firebase test network\-profiles describe GSM
+.RE
+
+To describe a network profiles in JSON format, run:
+
+.RS 2m
+gcloud firebase test network\-profiles describe GSM \-\-format=json
+.RE
 
 
 

@@ -11,13 +11,25 @@ gcloud alpha game servers realms create \- create a Realm
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha game servers realms create\fR (\fIREALM\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-async\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha game servers realms create\fR (\fIREALM\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR Create a Cloud Game Server Realm.
+
+
+.SH "EXAMPLES"
+
+To create Realm 'my\-realm' in project 'my\-project' and location in
+\'my\-location' run:
+
+.RS 2m
+$ gcloud alpha game servers realms create my\-realm \e
+    \-\-project=my\-project \-\-location=my\-location \-\-time\-zone=UTC \e
+    \-\-labels=a=x,b=y
+.RE
 
 
 
@@ -56,6 +68,10 @@ Google Cloud location.
 Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Game server realm description.
+
+.TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to add.
 
@@ -79,8 +95,9 @@ https://www.iana.org/time\-zones. If not specified, UTC is assumed by default.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
@@ -96,5 +113,9 @@ this API can be found at: https://cloud.google.com/solutions/gaming/
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta game servers realms create
+.RE
 

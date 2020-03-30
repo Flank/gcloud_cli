@@ -11,7 +11,7 @@ gcloud compute networks subnets update \- updates properties of an existing Goog
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute networks subnets update\fR \fINAME\fR [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute networks subnets update\fR \fINAME\fR [\fB\-\-drain\-timeout\fR=\fIDRAIN_TIMEOUT\fR;\ default="0s"] [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-role\fR=\fIROLE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -35,6 +35,16 @@ Name of the subnetwork to update.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-drain\-timeout\fR=\fIDRAIN_TIMEOUT\fR; default="0s"
+The time period for draining traffic from Internal HTTP(S) Load Balancer proxies
+that are assigned addresses in the current ACTIVE subnetwork. For example,
+\f5\fI1h\fR\fR, \f5\fI60m\fR\fR and \f5\fI3600s\fR\fR each specify a duration of
+1 hour for draining the traffic. Longer times reduce the number of proxies that
+are draining traffic at any one time, and so improve the availability of proxies
+for load balancing. The drain timeout is only applicable when the
+[\-\-role=ACTIVE] flag is being used.
+
 .TP 2m
 \fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR
 Can only be specified if VPC flow logging for this subnetwork is enabled.
@@ -131,6 +141,25 @@ Removes secondary ranges from the subnetwork.
 For example, \f5\-\-remove\-secondary\-ranges range2,range3\fR removes the
 secondary ranges with names range2 and range3.
 
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+The role is set to ACTIVE to update a BACKUP reserved address range to be the
+new ACTIVE address range. Note that the only supported value for this flag is
+ACTIVE since setting an address range to BACKUP is not supported.
+
+This field is only valid when updating a reserved IP address range used for the
+purpose of Internal HTTP(S) Load Balancer.
+
+\fIROLE\fR must be (currently only one value is supported):
+
+.RS 2m
+.TP 2m
+\fBACTIVE\fR
+The ACTIVE subnet that is currently used.
+.RE
+.sp
+
+
 
 .RE
 .RE
@@ -141,8 +170,9 @@ secondary ranges with names range2 and range3.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

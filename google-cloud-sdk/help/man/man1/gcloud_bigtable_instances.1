@@ -11,7 +11,7 @@ gcloud bigtable instances \- manage Cloud Bigtable instances
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud bigtable instances\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud bigtable instances\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,10 +26,24 @@ Manage Cloud Bigtable instances.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBtables\fR
+Query Cloud Bigtable tables.
+
+
+.RE
+.sp
 
 .SH "COMMANDS"
 
@@ -66,7 +80,7 @@ Remove an IAM policy binding from a Cloud Bigtable instance.
 
 .TP 2m
 \fBset\-iam\-policy\fR
-Set the IAM policy for a Cloud Bigtable instance.
+Set IAM policy for an instance.
 
 .TP 2m
 \fBupdate\fR

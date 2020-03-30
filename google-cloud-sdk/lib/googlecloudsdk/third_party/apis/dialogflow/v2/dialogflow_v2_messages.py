@@ -185,6 +185,248 @@ class DialogflowProjectsAgentEntityTypesPatchRequest(_messages.Message):
   updateMask = _messages.StringField(4)
 
 
+class DialogflowProjectsAgentEnvironmentsUsersSessionsContextsCreateRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentEnvironmentsUsersSessionsContextsCreateRequest
+  object.
+
+  Fields:
+    googleCloudDialogflowV2Context: A GoogleCloudDialogflowV2Context resource
+      to be passed as the request body.
+    parent: Required. The session to create a context for. Format:
+      `projects/<Project ID>/agent/sessions/<Session ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      assume default '-' user.
+  """
+
+  googleCloudDialogflowV2Context = _messages.MessageField('GoogleCloudDialogflowV2Context', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class DialogflowProjectsAgentEnvironmentsUsersSessionsContextsDeleteRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentEnvironmentsUsersSessionsContextsDeleteRequest
+  object.
+
+  Fields:
+    name: Required. The name of the context to delete. Format:
+      `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context
+      ID>` or `projects/<Project ID>/agent/environments/<Environment
+      ID>/users/<User ID>/sessions/<Session ID>/contexts/<Context ID>`. If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class DialogflowProjectsAgentEnvironmentsUsersSessionsContextsGetRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentEnvironmentsUsersSessionsContextsGetRequest
+  object.
+
+  Fields:
+    name: Required. The name of the context. Format: `projects/<Project
+      ID>/agent/sessions/<Session ID>/contexts/<Context ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>/contexts/<Context ID>`. If `Environment ID` is
+      not specified, we assume default 'draft' environment. If `User ID` is
+      not specified, we assume default '-' user.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class DialogflowProjectsAgentEnvironmentsUsersSessionsContextsListRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentEnvironmentsUsersSessionsContextsListRequest
+  object.
+
+  Fields:
+    pageSize: Optional. The maximum number of items to return in a single
+      page. By default 100 and at most 1000.
+    pageToken: Optional. The next_page_token value returned from a previous
+      list request.
+    parent: Required. The session to list all contexts from. Format:
+      `projects/<Project ID>/agent/sessions/<Session ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      assume default '-' user.
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class DialogflowProjectsAgentEnvironmentsUsersSessionsContextsPatchRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentEnvironmentsUsersSessionsContextsPatchRequest
+  object.
+
+  Fields:
+    googleCloudDialogflowV2Context: A GoogleCloudDialogflowV2Context resource
+      to be passed as the request body.
+    name: Required. The unique identifier of the context. Format:
+      `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context
+      ID>`, or `projects/<Project ID>/agent/environments/<Environment
+      ID>/users/<User ID>/sessions/<Session ID>/contexts/<Context ID>`.  The
+      `Context ID` is always converted to lowercase, may only contain
+      characters in a-zA-Z0-9_-% and may be at most 250 bytes long.  If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
+      The following context names are reserved for internal use by Dialogflow.
+      You should not use these contexts or create contexts with these names:
+      * `__system_counters__` * `*_id_dialog_context` * `*_dialog_params_size`
+    updateMask: Optional. The mask to control which fields get updated.
+  """
+
+  googleCloudDialogflowV2Context = _messages.MessageField('GoogleCloudDialogflowV2Context', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
+
+
+class DialogflowProjectsAgentEnvironmentsUsersSessionsDeleteContextsRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentEnvironmentsUsersSessionsDeleteContextsRequest
+  object.
+
+  Fields:
+    parent: Required. The name of the session to delete all contexts from.
+      Format: `projects/<Project ID>/agent/sessions/<Session ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>`. If `Environment ID` is not specified we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      assume default '-' user.
+  """
+
+  parent = _messages.StringField(1, required=True)
+
+
+class DialogflowProjectsAgentEnvironmentsUsersSessionsDetectIntentRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentEnvironmentsUsersSessionsDetectIntentRequest
+  object.
+
+  Fields:
+    googleCloudDialogflowV2DetectIntentRequest: A
+      GoogleCloudDialogflowV2DetectIntentRequest resource to be passed as the
+      request body.
+    session: Required. The name of the session this query is sent to. Format:
+      `projects/<Project ID>/agent/sessions/<Session ID>`, or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      are using "-". It's up to the API caller to choose an appropriate
+      `Session ID` and `User Id`. They can be a random number or some type of
+      user and session identifiers (preferably hashed). The length of the
+      `Session ID` and `User ID` must not exceed 36 characters.
+  """
+
+  googleCloudDialogflowV2DetectIntentRequest = _messages.MessageField('GoogleCloudDialogflowV2DetectIntentRequest', 1)
+  session = _messages.StringField(2, required=True)
+
+
+class DialogflowProjectsAgentEnvironmentsUsersSessionsEntityTypesCreateRequest(_messages.Message):
+  r"""A
+  DialogflowProjectsAgentEnvironmentsUsersSessionsEntityTypesCreateRequest
+  object.
+
+  Fields:
+    googleCloudDialogflowV2SessionEntityType: A
+      GoogleCloudDialogflowV2SessionEntityType resource to be passed as the
+      request body.
+    parent: Required. The session to create a session entity type for. Format:
+      `projects/<Project ID>/agent/sessions/<Session ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/ sessions/<Session ID>`. If `Environment ID` is not specified, we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      assume default '-' user.
+  """
+
+  googleCloudDialogflowV2SessionEntityType = _messages.MessageField('GoogleCloudDialogflowV2SessionEntityType', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class DialogflowProjectsAgentEnvironmentsUsersSessionsEntityTypesDeleteRequest(_messages.Message):
+  r"""A
+  DialogflowProjectsAgentEnvironmentsUsersSessionsEntityTypesDeleteRequest
+  object.
+
+  Fields:
+    name: Required. The name of the entity type to delete. Format:
+      `projects/<Project ID>/agent/sessions/<Session ID>/entityTypes/<Entity
+      Type Display Name>` or `projects/<Project
+      ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>/entityTypes/<Entity Type Display Name>`. If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class DialogflowProjectsAgentEnvironmentsUsersSessionsEntityTypesGetRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentEnvironmentsUsersSessionsEntityTypesGetRequest
+  object.
+
+  Fields:
+    name: Required. The name of the session entity type. Format:
+      `projects/<Project ID>/agent/sessions/<Session ID>/entityTypes/<Entity
+      Type Display Name>` or `projects/<Project
+      ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>/entityTypes/<Entity Type Display Name>`. If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class DialogflowProjectsAgentEnvironmentsUsersSessionsEntityTypesListRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentEnvironmentsUsersSessionsEntityTypesListRequest
+  object.
+
+  Fields:
+    pageSize: Optional. The maximum number of items to return in a single
+      page. By default 100 and at most 1000.
+    pageToken: Optional. The next_page_token value returned from a previous
+      list request.
+    parent: Required. The session to list all session entity types from.
+      Format: `projects/<Project ID>/agent/sessions/<Session ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/ sessions/<Session ID>`. If `Environment ID` is not specified, we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      assume default '-' user.
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class DialogflowProjectsAgentEnvironmentsUsersSessionsEntityTypesPatchRequest(_messages.Message):
+  r"""A
+  DialogflowProjectsAgentEnvironmentsUsersSessionsEntityTypesPatchRequest
+  object.
+
+  Fields:
+    googleCloudDialogflowV2SessionEntityType: A
+      GoogleCloudDialogflowV2SessionEntityType resource to be passed as the
+      request body.
+    name: Required. The unique identifier of this session entity type. Format:
+      `projects/<Project ID>/agent/sessions/<Session ID>/entityTypes/<Entity
+      Type Display Name>`, or `projects/<Project
+      ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>/entityTypes/<Entity Type Display Name>`. If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
+      `<Entity Type Display Name>` must be the display name of an existing
+      entity type in the same agent that will be overridden or supplemented.
+    updateMask: Optional. The mask to control which fields get updated.
+  """
+
+  googleCloudDialogflowV2SessionEntityType = _messages.MessageField('GoogleCloudDialogflowV2SessionEntityType', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
+
+
 class DialogflowProjectsAgentExportRequest(_messages.Message):
   r"""A DialogflowProjectsAgentExportRequest object.
 
@@ -197,6 +439,34 @@ class DialogflowProjectsAgentExportRequest(_messages.Message):
   """
 
   googleCloudDialogflowV2ExportAgentRequest = _messages.MessageField('GoogleCloudDialogflowV2ExportAgentRequest', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class DialogflowProjectsAgentGetFulfillmentRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentGetFulfillmentRequest object.
+
+  Fields:
+    name: Required. The name of the fulfillment. Format: `projects/<Project
+      ID>/agent/fulfillment`.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class DialogflowProjectsAgentGetValidationResultRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentGetValidationResultRequest object.
+
+  Fields:
+    languageCode: Optional. The language for which you want a validation
+      result. If not specified, the agent's default language is used. [Many
+      languages](https://cloud.google.com/dialogflow/docs/reference/language)
+      are supported. Note: languages must be enabled in the agent before they
+      can be used.
+    parent: Required. The project that the agent is associated with. Format:
+      `projects/<Project ID>`.
+  """
+
+  languageCode = _messages.StringField(1)
   parent = _messages.StringField(2, required=True)
 
 
@@ -408,22 +678,6 @@ class DialogflowProjectsAgentIntentsPatchRequest(_messages.Message):
   updateMask = _messages.StringField(5)
 
 
-class DialogflowProjectsAgentRequest(_messages.Message):
-  r"""A DialogflowProjectsAgentRequest object.
-
-  Fields:
-    googleCloudDialogflowV2Agent: A GoogleCloudDialogflowV2Agent resource to
-      be passed as the request body.
-    parent: Required. The project of this agent. Format: `projects/<Project
-      ID>`.
-    updateMask: Optional. The mask to control which fields get updated.
-  """
-
-  googleCloudDialogflowV2Agent = _messages.MessageField('GoogleCloudDialogflowV2Agent', 1)
-  parent = _messages.StringField(2, required=True)
-  updateMask = _messages.StringField(3)
-
-
 class DialogflowProjectsAgentRestoreRequest(_messages.Message):
   r"""A DialogflowProjectsAgentRestoreRequest object.
 
@@ -463,7 +717,11 @@ class DialogflowProjectsAgentSessionsContextsCreateRequest(_messages.Message):
     googleCloudDialogflowV2Context: A GoogleCloudDialogflowV2Context resource
       to be passed as the request body.
     parent: Required. The session to create a context for. Format:
-      `projects/<Project ID>/agent/sessions/<Session ID>`.
+      `projects/<Project ID>/agent/sessions/<Session ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      assume default '-' user.
   """
 
   googleCloudDialogflowV2Context = _messages.MessageField('GoogleCloudDialogflowV2Context', 1)
@@ -476,7 +734,10 @@ class DialogflowProjectsAgentSessionsContextsDeleteRequest(_messages.Message):
   Fields:
     name: Required. The name of the context to delete. Format:
       `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context
-      ID>`.
+      ID>` or `projects/<Project ID>/agent/environments/<Environment
+      ID>/users/<User ID>/sessions/<Session ID>/contexts/<Context ID>`. If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
   """
 
   name = _messages.StringField(1, required=True)
@@ -487,7 +748,11 @@ class DialogflowProjectsAgentSessionsContextsGetRequest(_messages.Message):
 
   Fields:
     name: Required. The name of the context. Format: `projects/<Project
-      ID>/agent/sessions/<Session ID>/contexts/<Context ID>`.
+      ID>/agent/sessions/<Session ID>/contexts/<Context ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>/contexts/<Context ID>`. If `Environment ID` is
+      not specified, we assume default 'draft' environment. If `User ID` is
+      not specified, we assume default '-' user.
   """
 
   name = _messages.StringField(1, required=True)
@@ -502,7 +767,11 @@ class DialogflowProjectsAgentSessionsContextsListRequest(_messages.Message):
     pageToken: Optional. The next_page_token value returned from a previous
       list request.
     parent: Required. The session to list all contexts from. Format:
-      `projects/<Project ID>/agent/sessions/<Session ID>`.
+      `projects/<Project ID>/agent/sessions/<Session ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      assume default '-' user.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -518,8 +787,15 @@ class DialogflowProjectsAgentSessionsContextsPatchRequest(_messages.Message):
       to be passed as the request body.
     name: Required. The unique identifier of the context. Format:
       `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context
-      ID>`.  The `Context ID` is always converted to lowercase, may only
-      contain characters in [a-zA-Z0-9_-%] and may be at most 250 bytes long.
+      ID>`, or `projects/<Project ID>/agent/environments/<Environment
+      ID>/users/<User ID>/sessions/<Session ID>/contexts/<Context ID>`.  The
+      `Context ID` is always converted to lowercase, may only contain
+      characters in a-zA-Z0-9_-% and may be at most 250 bytes long.  If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
+      The following context names are reserved for internal use by Dialogflow.
+      You should not use these contexts or create contexts with these names:
+      * `__system_counters__` * `*_id_dialog_context` * `*_dialog_params_size`
     updateMask: Optional. The mask to control which fields get updated.
   """
 
@@ -533,7 +809,11 @@ class DialogflowProjectsAgentSessionsDeleteContextsRequest(_messages.Message):
 
   Fields:
     parent: Required. The name of the session to delete all contexts from.
-      Format: `projects/<Project ID>/agent/sessions/<Session ID>`.
+      Format: `projects/<Project ID>/agent/sessions/<Session ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>`. If `Environment ID` is not specified we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      assume default '-' user.
   """
 
   parent = _messages.StringField(1, required=True)
@@ -547,10 +827,14 @@ class DialogflowProjectsAgentSessionsDetectIntentRequest(_messages.Message):
       GoogleCloudDialogflowV2DetectIntentRequest resource to be passed as the
       request body.
     session: Required. The name of the session this query is sent to. Format:
-      `projects/<Project ID>/agent/sessions/<Session ID>`. It's up to the API
-      caller to choose an appropriate session ID. It can be a random number or
-      some type of user identifier (preferably hashed). The length of the
-      session ID must not exceed 36 bytes.
+      `projects/<Project ID>/agent/sessions/<Session ID>`, or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      are using "-". It's up to the API caller to choose an appropriate
+      `Session ID` and `User Id`. They can be a random number or some type of
+      user and session identifiers (preferably hashed). The length of the
+      `Session ID` and `User ID` must not exceed 36 characters.
   """
 
   googleCloudDialogflowV2DetectIntentRequest = _messages.MessageField('GoogleCloudDialogflowV2DetectIntentRequest', 1)
@@ -565,7 +849,11 @@ class DialogflowProjectsAgentSessionsEntityTypesCreateRequest(_messages.Message)
       GoogleCloudDialogflowV2SessionEntityType resource to be passed as the
       request body.
     parent: Required. The session to create a session entity type for. Format:
-      `projects/<Project ID>/agent/sessions/<Session ID>`.
+      `projects/<Project ID>/agent/sessions/<Session ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/ sessions/<Session ID>`. If `Environment ID` is not specified, we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      assume default '-' user.
   """
 
   googleCloudDialogflowV2SessionEntityType = _messages.MessageField('GoogleCloudDialogflowV2SessionEntityType', 1)
@@ -578,7 +866,11 @@ class DialogflowProjectsAgentSessionsEntityTypesDeleteRequest(_messages.Message)
   Fields:
     name: Required. The name of the entity type to delete. Format:
       `projects/<Project ID>/agent/sessions/<Session ID>/entityTypes/<Entity
-      Type Display Name>`.
+      Type Display Name>` or `projects/<Project
+      ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>/entityTypes/<Entity Type Display Name>`. If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
   """
 
   name = _messages.StringField(1, required=True)
@@ -590,7 +882,11 @@ class DialogflowProjectsAgentSessionsEntityTypesGetRequest(_messages.Message):
   Fields:
     name: Required. The name of the session entity type. Format:
       `projects/<Project ID>/agent/sessions/<Session ID>/entityTypes/<Entity
-      Type Display Name>`.
+      Type Display Name>` or `projects/<Project
+      ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>/entityTypes/<Entity Type Display Name>`. If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
   """
 
   name = _messages.StringField(1, required=True)
@@ -605,7 +901,11 @@ class DialogflowProjectsAgentSessionsEntityTypesListRequest(_messages.Message):
     pageToken: Optional. The next_page_token value returned from a previous
       list request.
     parent: Required. The session to list all session entity types from.
-      Format: `projects/<Project ID>/agent/sessions/<Session ID>`.
+      Format: `projects/<Project ID>/agent/sessions/<Session ID>` or
+      `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+      ID>/ sessions/<Session ID>`. If `Environment ID` is not specified, we
+      assume default 'draft' environment. If `User ID` is not specified, we
+      assume default '-' user.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -622,9 +922,13 @@ class DialogflowProjectsAgentSessionsEntityTypesPatchRequest(_messages.Message):
       request body.
     name: Required. The unique identifier of this session entity type. Format:
       `projects/<Project ID>/agent/sessions/<Session ID>/entityTypes/<Entity
-      Type Display Name>`.  `<Entity Type Display Name>` must be the display
-      name of an existing entity type in the same agent that will be
-      overridden or supplemented.
+      Type Display Name>`, or `projects/<Project
+      ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>/entityTypes/<Entity Type Display Name>`. If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
+      `<Entity Type Display Name>` must be the display name of an existing
+      entity type in the same agent that will be overridden or supplemented.
     updateMask: Optional. The mask to control which fields get updated.
   """
 
@@ -646,6 +950,23 @@ class DialogflowProjectsAgentTrainRequest(_messages.Message):
 
   googleCloudDialogflowV2TrainAgentRequest = _messages.MessageField('GoogleCloudDialogflowV2TrainAgentRequest', 1)
   parent = _messages.StringField(2, required=True)
+
+
+class DialogflowProjectsAgentUpdateFulfillmentRequest(_messages.Message):
+  r"""A DialogflowProjectsAgentUpdateFulfillmentRequest object.
+
+  Fields:
+    googleCloudDialogflowV2Fulfillment: A GoogleCloudDialogflowV2Fulfillment
+      resource to be passed as the request body.
+    name: Required. The unique identifier of the fulfillment. Format:
+      `projects/<Project ID>/agent/fulfillment`.
+    updateMask: Required. The mask to control which fields get updated. If the
+      mask is not present, all fields will be updated.
+  """
+
+  googleCloudDialogflowV2Fulfillment = _messages.MessageField('GoogleCloudDialogflowV2Fulfillment', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
 
 
 class DialogflowProjectsDeleteAgentRequest(_messages.Message):
@@ -742,6 +1063,22 @@ class DialogflowProjectsOperationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
 
 
+class DialogflowProjectsSetAgentRequest(_messages.Message):
+  r"""A DialogflowProjectsSetAgentRequest object.
+
+  Fields:
+    googleCloudDialogflowV2Agent: A GoogleCloudDialogflowV2Agent resource to
+      be passed as the request body.
+    parent: Required. The project of this agent. Format: `projects/<Project
+      ID>`.
+    updateMask: Optional. The mask to control which fields get updated.
+  """
+
+  googleCloudDialogflowV2Agent = _messages.MessageField('GoogleCloudDialogflowV2Agent', 1)
+  parent = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
+
+
 class GoogleCloudDialogflowV2Agent(_messages.Message):
   r"""Represents a conversational agent.
 
@@ -821,7 +1158,7 @@ class GoogleCloudDialogflowV2Agent(_messages.Message):
         intents and/or wide use of templates syntax and composite entities.
       MATCH_MODE_ML_ONLY: Can be used for agents with a large number of
         examples in intents, especially the ones using @sys.any or very large
-        developer entities.
+        custom entities.
     """
     MATCH_MODE_UNSPECIFIED = 0
     MATCH_MODE_HYBRID = 1
@@ -855,6 +1192,29 @@ class GoogleCloudDialogflowV2Agent(_messages.Message):
   timeZone = _messages.StringField(12)
 
 
+class GoogleCloudDialogflowV2AnnotatedMessagePart(_messages.Message):
+  r"""Represents a part of a message possibly annotated with an entity. The
+  part can be an entity or purely a part of the message between two entities
+  or message start/end.
+
+  Fields:
+    entityType: The [Dialogflow system entity
+      type](https://cloud.google.com/dialogflow/docs/reference/system-
+      entities) of this message part. If this is empty, Dialogflow could not
+      annotate the phrase part with a system entity.
+    formattedValue: The [Dialogflow system entity formatted value
+      ](https://cloud.google.com/dialogflow/docs/reference/system-entities) of
+      this message part. For example for a system entity of type `@sys.unit-
+      currency`, this may contain: <pre> {   "amount": 5,   "currency": "USD"
+      } </pre>
+    text: A part of a message possibly annotated with an entity.
+  """
+
+  entityType = _messages.StringField(1)
+  formattedValue = _messages.MessageField('extra_types.JsonValue', 2)
+  text = _messages.StringField(3)
+
+
 class GoogleCloudDialogflowV2BatchCreateEntitiesRequest(_messages.Message):
   r"""The request message for EntityTypes.BatchCreateEntities.
 
@@ -876,7 +1236,7 @@ class GoogleCloudDialogflowV2BatchDeleteEntitiesRequest(_messages.Message):
   r"""The request message for EntityTypes.BatchDeleteEntities.
 
   Fields:
-    entityValues: Required. The canonical `values` of the entities to delete.
+    entityValues: Required. The reference `values` of the entities to delete.
       Note that these are not fully-qualified names, i.e. they don't start
       with `projects/<Project ID>`.
     languageCode: Optional. The language of entity synonyms defined in
@@ -1033,8 +1393,15 @@ class GoogleCloudDialogflowV2Context(_messages.Message):
       there are no matching queries.
     name: Required. The unique identifier of the context. Format:
       `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context
-      ID>`.  The `Context ID` is always converted to lowercase, may only
-      contain characters in [a-zA-Z0-9_-%] and may be at most 250 bytes long.
+      ID>`, or `projects/<Project ID>/agent/environments/<Environment
+      ID>/users/<User ID>/sessions/<Session ID>/contexts/<Context ID>`.  The
+      `Context ID` is always converted to lowercase, may only contain
+      characters in a-zA-Z0-9_-% and may be at most 250 bytes long.  If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
+      The following context names are reserved for internal use by Dialogflow.
+      You should not use these contexts or create contexts with these names:
+      * `__system_counters__` * `*_id_dialog_context` * `*_dialog_params_size`
     parameters: Optional. The collection of parameters associated with this
       context. Refer to [this doc](https://cloud.google.com/dialogflow/docs
       /intents-actions-parameters) for syntax.
@@ -1071,28 +1438,88 @@ class GoogleCloudDialogflowV2Context(_messages.Message):
   parameters = _messages.MessageField('ParametersValue', 3)
 
 
-class GoogleCloudDialogflowV2DetectIntentRequest(_messages.Message):
-  r"""The request to detect user's intent.
+class GoogleCloudDialogflowV2ConversationEvent(_messages.Message):
+  r"""Represents a notification sent to Cloud Pub/Sub subscribers for
+  conversation lifecycle events.
+
+  Enums:
+    TypeValueValuesEnum: The type of the event that this notification refers
+      to.
 
   Fields:
-    inputAudio: Optional. The natural language speech audio to be processed.
-      This field should be populated iff `query_input` is set to an input
-      audio config. A single request can contain up to 1 minute of speech
-      audio data.
-    outputAudioConfig: Optional. Instructs the speech synthesizer how to
-      generate the output audio. If this field is not set and agent-level
-      speech synthesizer is not configured, no output audio is generated.
+    conversation: The unique identifier of the conversation this notification
+      refers to. Format: `projects/<Project ID>/conversations/<Conversation
+      ID>`.
+    errorStatus: More detailed information about an error. Only set for type
+      UNRECOVERABLE_ERROR_IN_PHONE_CALL.
+    newMessagePayload: Payload of NEW_MESSAGE event.
+    type: The type of the event that this notification refers to.
+  """
+
+  class TypeValueValuesEnum(_messages.Enum):
+    r"""The type of the event that this notification refers to.
+
+    Values:
+      TYPE_UNSPECIFIED: Type not set.
+      CONVERSATION_STARTED: A new conversation has been opened. This is fired
+        when a telephone call is answered, or a conversation is created via
+        the API.
+      CONVERSATION_FINISHED: An existing conversation has closed. This is
+        fired when a telephone call is terminated, or a conversation is closed
+        via the API.
+      HUMAN_INTERVENTION_NEEDED: An existing conversation has received
+        notification from Dialogflow that human intervention is required.
+      NEW_MESSAGE: An existing conversation has received a new message, either
+        from API or telephony. It is configured in
+        ConversationProfile.new_message_event_notification_config
+      UNRECOVERABLE_ERROR: Unrecoverable error during a telephone call.  In
+        general non-recoverable errors only occur if something was
+        misconfigured in the ConversationProfile corresponding to the call.
+        After a non-recoverable error, Dialogflow may stop responding.  We
+        don't fire this event: * in an API call because we can directly return
+        the error, or, * when we can recover from an error.
+    """
+    TYPE_UNSPECIFIED = 0
+    CONVERSATION_STARTED = 1
+    CONVERSATION_FINISHED = 2
+    HUMAN_INTERVENTION_NEEDED = 3
+    NEW_MESSAGE = 4
+    UNRECOVERABLE_ERROR = 5
+
+  conversation = _messages.StringField(1)
+  errorStatus = _messages.MessageField('GoogleRpcStatus', 2)
+  newMessagePayload = _messages.MessageField('GoogleCloudDialogflowV2Message', 3)
+  type = _messages.EnumField('TypeValueValuesEnum', 4)
+
+
+class GoogleCloudDialogflowV2DetectIntentRequest(_messages.Message):
+  r"""========================================================================
+  ==== Requests and responses for custom methods. The request to detect user's
+  intent.
+
+  Fields:
+    inputAudio: The natural language speech audio to be processed. This field
+      should be populated iff `query_input` is set to an input audio config. A
+      single request can contain up to 1 minute of speech audio data.
+    outputAudioConfig: Instructs the speech synthesizer how to generate the
+      output audio. If this field is not set and agent-level speech
+      synthesizer is not configured, no output audio is generated.
+    outputAudioConfigMask: Mask for output_audio_config indicating which
+      settings in this request-level config should override speech synthesizer
+      settings defined at agent-level.  If unspecified or empty,
+      output_audio_config replaces the agent-level config in its entirety.
     queryInput: Required. The input specification. It can be set to:  1.  an
       audio config     which instructs the speech recognizer how to process
       the speech audio,  2.  a conversational query in the form of text, or
       3.  an event that specifies which intent to trigger.
-    queryParams: Optional. The parameters of this query.
+    queryParams: The parameters of this query.
   """
 
   inputAudio = _messages.BytesField(1)
   outputAudioConfig = _messages.MessageField('GoogleCloudDialogflowV2OutputAudioConfig', 2)
-  queryInput = _messages.MessageField('GoogleCloudDialogflowV2QueryInput', 3)
-  queryParams = _messages.MessageField('GoogleCloudDialogflowV2QueryParameters', 4)
+  outputAudioConfigMask = _messages.StringField(3)
+  queryInput = _messages.MessageField('GoogleCloudDialogflowV2QueryInput', 4)
+  queryParams = _messages.MessageField('GoogleCloudDialogflowV2QueryParameters', 5)
 
 
 class GoogleCloudDialogflowV2DetectIntentResponse(_messages.Message):
@@ -1164,9 +1591,9 @@ class GoogleCloudDialogflowV2EntityType(_messages.Message):
     Values:
       KIND_UNSPECIFIED: Not specified. This value should be never used.
       KIND_MAP: Map entity types allow mapping of a group of synonyms to a
-        canonical value.
+        reference value.
       KIND_LIST: List entity types contain a set of entries that do not map to
-        canonical values. However, list entity types can contain references to
+        reference values. However, list entity types can contain references to
         other entity types (with or without aliases).
       KIND_REGEXP: Regexp entity types allow to specify regular expressions in
         entries values.
@@ -1204,7 +1631,7 @@ class GoogleCloudDialogflowV2EntityTypeEntity(_messages.Message):
       must contain exactly one synonym equal to `value`.
     value: Required. The primary value associated with this entity entry. For
       example, if the entity type is *vegetable*, the value could be
-      *scallions*.  For `KIND_MAP` entity types:  *   A canonical value to be
+      *scallions*.  For `KIND_MAP` entity types:  *   A reference value to be
       used in place of synonyms.  For `KIND_LIST` entity types:  *   A string
       that can contain references to other entity types (with or     without
       aliases).
@@ -1222,8 +1649,7 @@ class GoogleCloudDialogflowV2EventInput(_messages.Message):
   #welcome_event.name! What can I do for you today?"`.
 
   Messages:
-    ParametersValue: Optional. The collection of parameters associated with
-      the event.
+    ParametersValue: The collection of parameters associated with the event.
 
   Fields:
     languageCode: Required. The language of this query. See [Language
@@ -1232,13 +1658,12 @@ class GoogleCloudDialogflowV2EventInput(_messages.Message):
       in the same session do not necessarily need to specify the same
       language.
     name: Required. The unique identifier of the event.
-    parameters: Optional. The collection of parameters associated with the
-      event.
+    parameters: The collection of parameters associated with the event.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class ParametersValue(_messages.Message):
-    r"""Optional. The collection of parameters associated with the event.
+    r"""The collection of parameters associated with the event.
 
     Messages:
       AdditionalProperty: An additional property for a ParametersValue object.
@@ -1291,6 +1716,104 @@ class GoogleCloudDialogflowV2ExportAgentResponse(_messages.Message):
   agentUri = _messages.StringField(2)
 
 
+class GoogleCloudDialogflowV2Fulfillment(_messages.Message):
+  r"""Represents a fulfillment.
+
+  Fields:
+    displayName: Optional. The human-readable name of the fulfillment, unique
+      within the agent.
+    enabled: Optional. Whether fulfillment is enabled.
+    features: Optional. The field defines whether the fulfillment is enabled
+      for certain features.
+    genericWebService: Configuration for a generic web service.
+    name: Required. The unique identifier of the fulfillment. Format:
+      `projects/<Project ID>/agent/fulfillment`.
+  """
+
+  displayName = _messages.StringField(1)
+  enabled = _messages.BooleanField(2)
+  features = _messages.MessageField('GoogleCloudDialogflowV2FulfillmentFeature', 3, repeated=True)
+  genericWebService = _messages.MessageField('GoogleCloudDialogflowV2FulfillmentGenericWebService', 4)
+  name = _messages.StringField(5)
+
+
+class GoogleCloudDialogflowV2FulfillmentFeature(_messages.Message):
+  r"""Whether fulfillment is enabled for the specific feature.
+
+  Enums:
+    TypeValueValuesEnum: The type of the feature that enabled for fulfillment.
+
+  Fields:
+    type: The type of the feature that enabled for fulfillment.
+  """
+
+  class TypeValueValuesEnum(_messages.Enum):
+    r"""The type of the feature that enabled for fulfillment.
+
+    Values:
+      TYPE_UNSPECIFIED: Feature type not specified.
+      SMALLTALK: Fulfillment is enabled for SmallTalk.
+    """
+    TYPE_UNSPECIFIED = 0
+    SMALLTALK = 1
+
+  type = _messages.EnumField('TypeValueValuesEnum', 1)
+
+
+class GoogleCloudDialogflowV2FulfillmentGenericWebService(_messages.Message):
+  r"""Represents configuration for a generic web service. Dialogflow supports
+  two mechanisms for authentications: - Basic authentication with username and
+  password. - Authentication with additional authentication headers. More
+  information could be found at: https://cloud.google.com/dialogflow/docs
+  /fulfillment-configure.
+
+  Messages:
+    RequestHeadersValue: Optional. The HTTP request headers to send together
+      with fulfillment requests.
+
+  Fields:
+    isCloudFunction: Optional. Indicates if generic web service is created
+      through Cloud Functions integration. Defaults to false.
+    password: Optional. The password for HTTP Basic authentication.
+    requestHeaders: Optional. The HTTP request headers to send together with
+      fulfillment requests.
+    uri: Required. The fulfillment URI for receiving POST requests.
+    username: Optional. The user name for HTTP Basic authentication.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class RequestHeadersValue(_messages.Message):
+    r"""Optional. The HTTP request headers to send together with fulfillment
+    requests.
+
+    Messages:
+      AdditionalProperty: An additional property for a RequestHeadersValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type RequestHeadersValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a RequestHeadersValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  isCloudFunction = _messages.BooleanField(1)
+  password = _messages.StringField(2)
+  requestHeaders = _messages.MessageField('RequestHeadersValue', 3)
+  uri = _messages.StringField(4)
+  username = _messages.StringField(5)
+
+
 class GoogleCloudDialogflowV2ImportAgentRequest(_messages.Message):
   r"""The request message for Agents.ImportAgent.
 
@@ -1310,35 +1833,53 @@ class GoogleCloudDialogflowV2InputAudioConfig(_messages.Message):
   Enums:
     AudioEncodingValueValuesEnum: Required. Audio encoding of the audio
       content to process.
-    ModelVariantValueValuesEnum: Optional. Which variant of the Speech model
-      to use.
+    ModelVariantValueValuesEnum: Which variant of the Speech model to use.
 
   Fields:
     audioEncoding: Required. Audio encoding of the audio content to process.
+    enableWordInfo: If `true`, Dialogflow returns SpeechWordInfo in
+      StreamingRecognitionResult with information about the recognized speech
+      words, e.g. start and end time offsets. If false or unspecified, Speech
+      doesn't return any word-level information.
     languageCode: Required. The language of the supplied audio. Dialogflow
       does not do translations. See [Language
       Support](https://cloud.google.com/dialogflow/docs/reference/language)
       for a list of the currently supported language codes. Note that queries
       in the same session do not necessarily need to specify the same
       language.
-    modelVariant: Optional. Which variant of the Speech model to use.
-    phraseHints: Optional. A list of strings containing words and phrases that
-      the speech recognizer should recognize with higher likelihood.  See [the
+    model: Which Speech model to select for the given request. Select the
+      model best suited to your domain to get best results. If a model is not
+      explicitly specified, then we auto-select a model based on the
+      parameters in the InputAudioConfig. If enhanced speech model is enabled
+      for the agent and an enhanced version of the specified model for the
+      language does not exist, then the speech is recognized using the
+      standard version of the specified model. Refer to [Cloud Speech API
+      documentation](https://cloud.google.com/speech-to-text/docs/basics
+      #select-model) for more details.
+    modelVariant: Which variant of the Speech model to use.
+    phraseHints: A list of strings containing words and phrases that the
+      speech recognizer should recognize with higher likelihood.  See [the
       Cloud Speech documentation](https://cloud.google.com/speech-to-
-      text/docs/basics#phrase-hints) for more details.
+      text/docs/basics#phrase-hints) for more details.  This field is
+      deprecated. Please use [speech_contexts]() instead. If you specify both
+      [phrase_hints]() and [speech_contexts](), Dialogflow will treat the
+      [phrase_hints]() as a single additional [SpeechContext]().
     sampleRateHertz: Required. Sample rate (in Hertz) of the audio content
       sent in the query. Refer to [Cloud Speech API
       documentation](https://cloud.google.com/speech-to-text/docs/basics) for
       more details.
-    singleUtterance: Optional. If `false` (default), recognition does not
-      cease until the client closes the stream. If `true`, the recognizer will
-      detect a single spoken utterance in input audio. Recognition ceases when
-      it detects the audio's voice has stopped or paused. In this case, once a
+    singleUtterance: If `false` (default), recognition does not cease until
+      the client closes the stream. If `true`, the recognizer will detect a
+      single spoken utterance in input audio. Recognition ceases when it
+      detects the audio's voice has stopped or paused. In this case, once a
       detected intent is received, the client should close the stream and
       start a new request with a new stream as needed. Note: This setting is
       relevant only for streaming methods. Note: When specified,
       InputAudioConfig.single_utterance takes precedence over
       StreamingDetectIntentRequest.single_utterance.
+    speechContexts: Context information to assist speech recognition.  See
+      [the Cloud Speech documentation](https://cloud.google.com/speech-to-
+      text/docs/basics#phrase-hints) for more details.
   """
 
   class AudioEncodingValueValuesEnum(_messages.Enum):
@@ -1387,7 +1928,7 @@ class GoogleCloudDialogflowV2InputAudioConfig(_messages.Message):
     AUDIO_ENCODING_SPEEX_WITH_HEADER_BYTE = 7
 
   class ModelVariantValueValuesEnum(_messages.Enum):
-    r"""Optional. Which variant of the Speech model to use.
+    r"""Which variant of the Speech model to use.
 
     Values:
       SPEECH_MODEL_VARIANT_UNSPECIFIED: No model variant specified. In this
@@ -1416,11 +1957,14 @@ class GoogleCloudDialogflowV2InputAudioConfig(_messages.Message):
     USE_ENHANCED = 3
 
   audioEncoding = _messages.EnumField('AudioEncodingValueValuesEnum', 1)
-  languageCode = _messages.StringField(2)
-  modelVariant = _messages.EnumField('ModelVariantValueValuesEnum', 3)
-  phraseHints = _messages.StringField(4, repeated=True)
-  sampleRateHertz = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  singleUtterance = _messages.BooleanField(6)
+  enableWordInfo = _messages.BooleanField(2)
+  languageCode = _messages.StringField(3)
+  model = _messages.StringField(4)
+  modelVariant = _messages.EnumField('ModelVariantValueValuesEnum', 5)
+  phraseHints = _messages.StringField(6, repeated=True)
+  sampleRateHertz = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  singleUtterance = _messages.BooleanField(8)
+  speechContexts = _messages.MessageField('GoogleCloudDialogflowV2SpeechContext', 9, repeated=True)
 
 
 class GoogleCloudDialogflowV2Intent(_messages.Message):
@@ -1443,7 +1987,7 @@ class GoogleCloudDialogflowV2Intent(_messages.Message):
     events: Optional. The collection of event names that trigger the intent.
       If the collection of input contexts is not empty, all of the contexts
       must be present in the active user session for an event to trigger this
-      intent.
+      intent. Event names are limited to 50 characters.
     followupIntentInfo: Read-only. Information about all followup intents that
       have this intent as a direct or indirect parent. We populate this field
       only in the output.
@@ -1454,7 +1998,7 @@ class GoogleCloudDialogflowV2Intent(_messages.Message):
     messages: Optional. The collection of rich messages corresponding to the
       `Response` field in the Dialogflow console.
     mlDisabled: Optional. Indicates whether Machine Learning is disabled for
-      the intent. Note: If `ml_diabled` setting is set to true, then this
+      the intent. Note: If `ml_disabled` setting is set to true, then this
       intent is not taken into account during inference in `ML ONLY` match
       mode. Also, auto-markup in the UI is turned off.
     name: The unique identifier of this intent. Required for
@@ -2322,6 +2866,64 @@ class GoogleCloudDialogflowV2ListSessionEntityTypesResponse(_messages.Message):
   sessionEntityTypes = _messages.MessageField('GoogleCloudDialogflowV2SessionEntityType', 2, repeated=True)
 
 
+class GoogleCloudDialogflowV2Message(_messages.Message):
+  r"""Represents a message posted into a conversation.
+
+  Enums:
+    ParticipantRoleValueValuesEnum: Output only. The role of the participant.
+
+  Fields:
+    content: Required. The message content.
+    createTime: Output only. The time when the message was created.
+    languageCode: Optional. The message language. This should be a
+      [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.
+      Example: "en-US".
+    messageAnnotation: Output only. The annotation for the message.
+    name: The unique identifier of the message. Format: `projects/<Project
+      ID>/conversations/<Conversation ID>/messages/<Message ID>`.
+    participant: Output only. The participant that sends this message.
+    participantRole: Output only. The role of the participant.
+  """
+
+  class ParticipantRoleValueValuesEnum(_messages.Enum):
+    r"""Output only. The role of the participant.
+
+    Values:
+      ROLE_UNSPECIFIED: Participant role not set.
+      HUMAN_AGENT: Participant is a human agent.
+      AUTOMATED_AGENT: Participant is an automated agent, such as a Dialogflow
+        agent.
+      END_USER: Participant is an end user that has called or chatted with
+        Dialogflow services.
+    """
+    ROLE_UNSPECIFIED = 0
+    HUMAN_AGENT = 1
+    AUTOMATED_AGENT = 2
+    END_USER = 3
+
+  content = _messages.StringField(1)
+  createTime = _messages.StringField(2)
+  languageCode = _messages.StringField(3)
+  messageAnnotation = _messages.MessageField('GoogleCloudDialogflowV2MessageAnnotation', 4)
+  name = _messages.StringField(5)
+  participant = _messages.StringField(6)
+  participantRole = _messages.EnumField('ParticipantRoleValueValuesEnum', 7)
+
+
+class GoogleCloudDialogflowV2MessageAnnotation(_messages.Message):
+  r"""Represents the result of annotation for the message.
+
+  Fields:
+    containEntities: Indicates whether the text message contains entities.
+    parts: The collection of annotated message parts ordered by their position
+      in the message. You can recover the annotated message by concatenating
+      [AnnotatedMessagePart.text].
+  """
+
+  containEntities = _messages.BooleanField(1)
+  parts = _messages.MessageField('GoogleCloudDialogflowV2AnnotatedMessagePart', 2, repeated=True)
+
+
 class GoogleCloudDialogflowV2OriginalDetectIntentRequest(_messages.Message):
   r"""Represents the contents of the original request that was passed to the
   `[Streaming]DetectIntent` call.
@@ -2392,7 +2994,8 @@ class GoogleCloudDialogflowV2OriginalDetectIntentRequest(_messages.Message):
 
 class GoogleCloudDialogflowV2OutputAudioConfig(_messages.Message):
   r"""Instructs the speech synthesizer on how to generate the output audio
-  content.
+  content. If this audio config is supplied in a request, it overrides all
+  existing text-to-speech settings applied to the agent.
 
   Enums:
     AudioEncodingValueValuesEnum: Required. Audio encoding of the synthesized
@@ -2400,14 +3003,13 @@ class GoogleCloudDialogflowV2OutputAudioConfig(_messages.Message):
 
   Fields:
     audioEncoding: Required. Audio encoding of the synthesized audio content.
-    sampleRateHertz: Optional. The synthesis sample rate (in hertz) for this
-      audio. If not provided, then the synthesizer will use the default sample
-      rate based on the audio encoding. If this is different from the voice's
+    sampleRateHertz: The synthesis sample rate (in hertz) for this audio. If
+      not provided, then the synthesizer will use the default sample rate
+      based on the audio encoding. If this is different from the voice's
       natural sample rate, then the synthesizer will honor this request by
       converting to the desired sample rate (which might result in worse audio
       quality).
-    synthesizeSpeechConfig: Optional. Configuration of how speech should be
-      synthesized.
+    synthesizeSpeechConfig: Configuration of how speech should be synthesized.
   """
 
   class AudioEncodingValueValuesEnum(_messages.Enum):
@@ -2418,7 +3020,7 @@ class GoogleCloudDialogflowV2OutputAudioConfig(_messages.Message):
       OUTPUT_AUDIO_ENCODING_LINEAR_16: Uncompressed 16-bit signed little-
         endian samples (Linear PCM). Audio content returned as LINEAR16 also
         contains a WAV header.
-      OUTPUT_AUDIO_ENCODING_MP3: MP3 audio.
+      OUTPUT_AUDIO_ENCODING_MP3: MP3 audio at 32kbps.
       OUTPUT_AUDIO_ENCODING_OGG_OPUS: Opus encoded audio wrapped in an ogg
         container. The result will be a file which can be played natively on
         Android, and in browsers (at least Chrome and Firefox). The quality of
@@ -2457,34 +3059,32 @@ class GoogleCloudDialogflowV2QueryParameters(_messages.Message):
   r"""Represents the parameters of the conversational query.
 
   Messages:
-    PayloadValue: Optional. This field can be used to pass custom data into
-      the webhook associated with the agent. Arbitrary JSON objects are
-      supported.
+    PayloadValue: This field can be used to pass custom data into the webhook
+      associated with the agent. Arbitrary JSON objects are supported.
 
   Fields:
-    contexts: Optional. The collection of contexts to be activated before this
-      query is executed.
-    geoLocation: Optional. The geo location of this conversational query.
-    payload: Optional. This field can be used to pass custom data into the
-      webhook associated with the agent. Arbitrary JSON objects are supported.
-    resetContexts: Optional. Specifies whether to delete all contexts in the
-      current session before the new ones are activated.
-    sentimentAnalysisRequestConfig: Optional. Configures the type of sentiment
-      analysis to perform. If not provided, sentiment analysis is not
-      performed.
-    sessionEntityTypes: Optional. Additional session entity types to replace
-      or extend developer entity types with. The entity synonyms apply to all
-      languages and persist for the session of this query.
-    timeZone: Optional. The time zone of this conversational query from the
-      [time zone database](https://www.iana.org/time-zones), e.g.,
-      America/New_York, Europe/Paris. If not provided, the time zone specified
-      in agent settings is used.
+    contexts: The collection of contexts to be activated before this query is
+      executed.
+    geoLocation: The geo location of this conversational query.
+    payload: This field can be used to pass custom data into the webhook
+      associated with the agent. Arbitrary JSON objects are supported.
+    resetContexts: Specifies whether to delete all contexts in the current
+      session before the new ones are activated.
+    sentimentAnalysisRequestConfig: Configures the type of sentiment analysis
+      to perform. If not provided, sentiment analysis is not performed.
+    sessionEntityTypes: Additional session entity types to replace or extend
+      developer entity types with. The entity synonyms apply to all languages
+      and persist for the session of this query.
+    timeZone: The time zone of this conversational query from the [time zone
+      database](https://www.iana.org/time-zones), e.g., America/New_York,
+      Europe/Paris. If not provided, the time zone specified in agent settings
+      is used.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class PayloadValue(_messages.Message):
-    r"""Optional. This field can be used to pass custom data into the webhook
-    associated with the agent. Arbitrary JSON objects are supported.
+    r"""This field can be used to pass custom data into the webhook associated
+    with the agent. Arbitrary JSON objects are supported.
 
     Messages:
       AdditionalProperty: An additional property for a PayloadValue object.
@@ -2519,9 +3119,10 @@ class GoogleCloudDialogflowV2QueryResult(_messages.Message):
   r"""Represents the result of conversational query or event processing.
 
   Messages:
-    DiagnosticInfoValue: The free-form diagnostic info. For example, this
-      field could contain webhook call latency. The string keys of the
-      Struct's fields map can change without notice.
+    DiagnosticInfoValue: Free-form diagnostic information for the associated
+      detect intent request. The fields of this data can change without
+      notice, so you should not write code that depends on its structure. The
+      data may contain:  - webhook call latency - webhook errors
     ParametersValue: The collection of extracted parameters.
     WebhookPayloadValue: If the query was fulfilled by a webhook call, this
       field is set to the value of the `payload` field returned in the webhook
@@ -2534,9 +3135,10 @@ class GoogleCloudDialogflowV2QueryResult(_messages.Message):
       values have been collected. - `true` if all required parameter values
       have been collected, or if the    matched intent doesn't contain any
       required parameters.
-    diagnosticInfo: The free-form diagnostic info. For example, this field
-      could contain webhook call latency. The string keys of the Struct's
-      fields map can change without notice.
+    diagnosticInfo: Free-form diagnostic information for the associated detect
+      intent request. The fields of this data can change without notice, so
+      you should not write code that depends on its structure. The data may
+      contain:  - webhook call latency - webhook errors
     fulfillmentMessages: The collection of rich messages to present to the
       user.
     fulfillmentText: The text to be pronounced to the user or shown on the
@@ -2588,9 +3190,10 @@ class GoogleCloudDialogflowV2QueryResult(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class DiagnosticInfoValue(_messages.Message):
-    r"""The free-form diagnostic info. For example, this field could contain
-    webhook call latency. The string keys of the Struct's fields map can
-    change without notice.
+    r"""Free-form diagnostic information for the associated detect intent
+    request. The fields of this data can change without notice, so you should
+    not write code that depends on its structure. The data may contain:  -
+    webhook call latency - webhook errors
 
     Messages:
       AdditionalProperty: An additional property for a DiagnosticInfoValue
@@ -2727,9 +3330,9 @@ class GoogleCloudDialogflowV2SentimentAnalysisRequestConfig(_messages.Message):
   r"""Configures the types of sentiment analysis to perform.
 
   Fields:
-    analyzeQueryTextSentiment: Optional. Instructs the service to perform
-      sentiment analysis on `query_text`. If not provided, sentiment analysis
-      is not performed on `query_text`.
+    analyzeQueryTextSentiment: Instructs the service to perform sentiment
+      analysis on `query_text`. If not provided, sentiment analysis is not
+      performed on `query_text`.
   """
 
   analyzeQueryTextSentiment = _messages.BooleanField(1)
@@ -2747,46 +3350,50 @@ class GoogleCloudDialogflowV2SentimentAnalysisResult(_messages.Message):
 
 
 class GoogleCloudDialogflowV2SessionEntityType(_messages.Message):
-  r"""Represents a session entity type.  Extends or replaces a developer
-  entity type at the user session level (we refer to the entity types defined
-  at the agent level as "developer entity types").  Note: session entity types
-  apply to all queries, regardless of the language.
+  r"""Represents a session entity type.  Extends or replaces a custom entity
+  type at the user session level (we refer to the entity types defined at the
+  agent level as "custom entity types").  Note: session entity types apply to
+  all queries, regardless of the language.
 
   Enums:
     EntityOverrideModeValueValuesEnum: Required. Indicates whether the
-      additional data should override or supplement the developer entity type
+      additional data should override or supplement the custom entity type
       definition.
 
   Fields:
     entities: Required. The collection of entities associated with this
       session entity type.
     entityOverrideMode: Required. Indicates whether the additional data should
-      override or supplement the developer entity type definition.
+      override or supplement the custom entity type definition.
     name: Required. The unique identifier of this session entity type. Format:
       `projects/<Project ID>/agent/sessions/<Session ID>/entityTypes/<Entity
-      Type Display Name>`.  `<Entity Type Display Name>` must be the display
-      name of an existing entity type in the same agent that will be
-      overridden or supplemented.
+      Type Display Name>`, or `projects/<Project
+      ID>/agent/environments/<Environment ID>/users/<User
+      ID>/sessions/<Session ID>/entityTypes/<Entity Type Display Name>`. If
+      `Environment ID` is not specified, we assume default 'draft'
+      environment. If `User ID` is not specified, we assume default '-' user.
+      `<Entity Type Display Name>` must be the display name of an existing
+      entity type in the same agent that will be overridden or supplemented.
   """
 
   class EntityOverrideModeValueValuesEnum(_messages.Enum):
     r"""Required. Indicates whether the additional data should override or
-    supplement the developer entity type definition.
+    supplement the custom entity type definition.
 
     Values:
       ENTITY_OVERRIDE_MODE_UNSPECIFIED: Not specified. This value should be
         never used.
       ENTITY_OVERRIDE_MODE_OVERRIDE: The collection of session entities
-        overrides the collection of entities in the corresponding developer
+        overrides the collection of entities in the corresponding custom
         entity type.
       ENTITY_OVERRIDE_MODE_SUPPLEMENT: The collection of session entities
-        extends the collection of entities in the corresponding developer
-        entity type.  Note: Even in this override mode calls to
+        extends the collection of entities in the corresponding custom entity
+        type.  Note: Even in this override mode calls to
         `ListSessionEntityTypes`, `GetSessionEntityType`,
         `CreateSessionEntityType` and `UpdateSessionEntityType` only return
         the additional entities added in this session entity type. If you want
         to get the supplemented list, please call EntityTypes.GetEntityType on
-        the developer entity type and merge.
+        the custom entity type and merge.
     """
     ENTITY_OVERRIDE_MODE_UNSPECIFIED = 0
     ENTITY_OVERRIDE_MODE_OVERRIDE = 1
@@ -2795,6 +3402,31 @@ class GoogleCloudDialogflowV2SessionEntityType(_messages.Message):
   entities = _messages.MessageField('GoogleCloudDialogflowV2EntityTypeEntity', 1, repeated=True)
   entityOverrideMode = _messages.EnumField('EntityOverrideModeValueValuesEnum', 2)
   name = _messages.StringField(3)
+
+
+class GoogleCloudDialogflowV2SpeechContext(_messages.Message):
+  r"""Hints for the speech recognizer to help with recognition in a specific
+  conversation state.
+
+  Fields:
+    boost: Optional. Boost for this context compared to other contexts: * If
+      the boost is positive, Dialogflow will increase the probability that
+      the phrases in this context are recognized over similar sounding
+      phrases. * If the boost is unspecified or non-positive, Dialogflow will
+      not apply   any boost.  Dialogflow recommends that you use boosts in the
+      range (0, 20] and that you find a value that fits your use case with
+      binary search.
+    phrases: Optional. A list of strings containing words and phrases that the
+      speech recognizer should recognize with higher likelihood.  This list
+      can be used to: * improve accuracy for words and phrases you expect the
+      user to say,   e.g. typical commands for your Dialogflow agent * add
+      additional words to the speech recognizer vocabulary * ...  See the
+      [Cloud Speech documentation](https://cloud.google.com/speech-to-
+      text/quotas) for usage limits.
+  """
+
+  boost = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
+  phrases = _messages.StringField(2, repeated=True)
 
 
 class GoogleCloudDialogflowV2SynthesizeSpeechConfig(_messages.Message):
@@ -2850,6 +3482,59 @@ class GoogleCloudDialogflowV2TextInput(_messages.Message):
 
 class GoogleCloudDialogflowV2TrainAgentRequest(_messages.Message):
   r"""The request message for Agents.TrainAgent."""
+
+
+class GoogleCloudDialogflowV2ValidationError(_messages.Message):
+  r"""Represents a single validation error.
+
+  Enums:
+    SeverityValueValuesEnum: The severity of the error.
+
+  Fields:
+    entries: The names of the entries that the error is associated with.
+      Format:  - "projects/<Project ID>/agent", if the error is associated
+      with the entire agent. - "projects/<Project ID>/agent/intents/<Intent
+      ID>", if the error is associated with certain intents. -
+      "projects/<Project ID>/agent/intents/<Intent
+      Id>/trainingPhrases/<Training Phrase ID>", if the error is associated
+      with certain intent training phrases. - "projects/<Project
+      ID>/agent/intents/<Intent Id>/parameters/<Parameter ID>", if the error
+      is associated with certain intent parameters. - "projects/<Project
+      ID>/agent/entities/<Entity ID>", if the error is associated with certain
+      entities.
+    errorMessage: The detailed error messsage.
+    severity: The severity of the error.
+  """
+
+  class SeverityValueValuesEnum(_messages.Enum):
+    r"""The severity of the error.
+
+    Values:
+      SEVERITY_UNSPECIFIED: Not specified. This value should never be used.
+      INFO: The agent doesn't follow Dialogflow best practicies.
+      WARNING: The agent may not behave as expected.
+      ERROR: The agent may experience partial failures.
+      CRITICAL: The agent may completely fail.
+    """
+    SEVERITY_UNSPECIFIED = 0
+    INFO = 1
+    WARNING = 2
+    ERROR = 3
+    CRITICAL = 4
+
+  entries = _messages.StringField(1, repeated=True)
+  errorMessage = _messages.StringField(2)
+  severity = _messages.EnumField('SeverityValueValuesEnum', 3)
+
+
+class GoogleCloudDialogflowV2ValidationResult(_messages.Message):
+  r"""Represents the output of agent validation.
+
+  Fields:
+    validationErrors: Contains all validation errors.
+  """
+
+  validationErrors = _messages.MessageField('GoogleCloudDialogflowV2ValidationError', 1, repeated=True)
 
 
 class GoogleCloudDialogflowV2VoiceSelectionParams(_messages.Message):
@@ -2924,7 +3609,13 @@ class GoogleCloudDialogflowV2WebhookRequest(_messages.Message):
 
 
 class GoogleCloudDialogflowV2WebhookResponse(_messages.Message):
-  r"""The response message for a webhook call.
+  r"""The response message for a webhook call.  This response is validated by
+  the Dialogflow server. If validation fails, an error will be returned in the
+  QueryResult.diagnostic_info field. Setting JSON fields to an empty value
+  with the wrong type is a common error. To avoid this error:  - Use `""` for
+  empty strings - Use `{}` or `null` for empty objects - Use `[]` or `null`
+  for empty arrays  For more information, see the [Protocol Buffers Language
+  Guide](https://developers.google.com/protocol-buffers/docs/proto3#json).
 
   Messages:
     PayloadValue: Optional. This value is passed directly to
@@ -3095,6 +3786,9 @@ class GoogleCloudDialogflowV2beta1Context(_messages.Message):
       characters in a-zA-Z0-9_-% and may be at most 250 bytes long.  If
       `Environment ID` is not specified, we assume default 'draft'
       environment. If `User ID` is not specified, we assume default '-' user.
+      The following context names are reserved for internal use by Dialogflow.
+      You should not use these contexts or create contexts with these names:
+      * `__system_counters__` * `*_id_dialog_context` * `*_dialog_params_size`
     parameters: Optional. The collection of parameters associated with this
       context. Refer to [this doc](https://cloud.google.com/dialogflow/docs
       /intents-actions-parameters) for syntax.
@@ -3173,9 +3867,9 @@ class GoogleCloudDialogflowV2beta1EntityType(_messages.Message):
     Values:
       KIND_UNSPECIFIED: Not specified. This value should be never used.
       KIND_MAP: Map entity types allow mapping of a group of synonyms to a
-        canonical value.
+        reference value.
       KIND_LIST: List entity types contain a set of entries that do not map to
-        canonical values. However, list entity types can contain references to
+        reference values. However, list entity types can contain references to
         other entity types (with or without aliases).
       KIND_REGEXP: Regexp entity types allow to specify regular expressions in
         entries values.
@@ -3203,7 +3897,7 @@ class GoogleCloudDialogflowV2beta1EntityTypeEntity(_messages.Message):
       must contain exactly one synonym equal to `value`.
     value: Required. The primary value associated with this entity entry. For
       example, if the entity type is *vegetable*, the value could be
-      *scallions*.  For `KIND_MAP` entity types:  *   A canonical value to be
+      *scallions*.  For `KIND_MAP` entity types:  *   A reference value to be
       used in place of synonyms.  For `KIND_LIST` entity types:  *   A string
       that can contain references to other entity types (with or     without
       aliases).
@@ -3221,8 +3915,7 @@ class GoogleCloudDialogflowV2beta1EventInput(_messages.Message):
   #welcome_event.name! What can I do for you today?"`.
 
   Messages:
-    ParametersValue: Optional. The collection of parameters associated with
-      the event.
+    ParametersValue: The collection of parameters associated with the event.
 
   Fields:
     languageCode: Required. The language of this query. See [Language
@@ -3231,13 +3924,12 @@ class GoogleCloudDialogflowV2beta1EventInput(_messages.Message):
       in the same session do not necessarily need to specify the same
       language.
     name: Required. The unique identifier of the event.
-    parameters: Optional. The collection of parameters associated with the
-      event.
+    parameters: The collection of parameters associated with the event.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class ParametersValue(_messages.Message):
-    r"""Optional. The collection of parameters associated with the event.
+    r"""The collection of parameters associated with the event.
 
     Messages:
       AdditionalProperty: An additional property for a ParametersValue object.
@@ -3301,7 +3993,7 @@ class GoogleCloudDialogflowV2beta1Intent(_messages.Message):
     events: Optional. The collection of event names that trigger the intent.
       If the collection of input contexts is not empty, all of the contexts
       must be present in the active user session for an event to trigger this
-      intent.
+      intent. Event names are limited to 50 characters.
     followupIntentInfo: Read-only. Information about all followup intents that
       have this intent as a direct or indirect parent. We populate this field
       only in the output.
@@ -4544,7 +5236,7 @@ class GoogleCloudDialogflowV2beta1KnowledgeOperationMetadata(_messages.Message):
 
 
 class GoogleCloudDialogflowV2beta1LabelConversationResponse(_messages.Message):
-  r"""The response for ConversationDatasets.LabelConversation
+  r"""The response for ConversationDatasets.LabelConversation.
 
   Fields:
     annotatedConversationDataset: New annotated conversation dataset created
@@ -4626,9 +5318,10 @@ class GoogleCloudDialogflowV2beta1QueryResult(_messages.Message):
   r"""Represents the result of conversational query or event processing.
 
   Messages:
-    DiagnosticInfoValue: The free-form diagnostic info. For example, this
-      field could contain webhook call latency. The string keys of the
-      Struct's fields map can change without notice.
+    DiagnosticInfoValue: Free-form diagnostic information for the associated
+      detect intent request. The fields of this data can change without
+      notice, so you should not write code that depends on its structure. The
+      data may contain:  - webhook call latency - webhook errors
     ParametersValue: The collection of extracted parameters.
     WebhookPayloadValue: If the query was fulfilled by a webhook call, this
       field is set to the value of the `payload` field returned in the webhook
@@ -4641,9 +5334,10 @@ class GoogleCloudDialogflowV2beta1QueryResult(_messages.Message):
       values have been collected. - `true` if all required parameter values
       have been collected, or if the    matched intent doesn't contain any
       required parameters.
-    diagnosticInfo: The free-form diagnostic info. For example, this field
-      could contain webhook call latency. The string keys of the Struct's
-      fields map can change without notice.
+    diagnosticInfo: Free-form diagnostic information for the associated detect
+      intent request. The fields of this data can change without notice, so
+      you should not write code that depends on its structure. The data may
+      contain:  - webhook call latency - webhook errors
     fulfillmentMessages: The collection of rich messages to present to the
       user.
     fulfillmentText: The text to be pronounced to the user or shown on the
@@ -4697,9 +5391,10 @@ class GoogleCloudDialogflowV2beta1QueryResult(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class DiagnosticInfoValue(_messages.Message):
-    r"""The free-form diagnostic info. For example, this field could contain
-    webhook call latency. The string keys of the Struct's fields map can
-    change without notice.
+    r"""Free-form diagnostic information for the associated detect intent
+    request. The fields of this data can change without notice, so you should
+    not write code that depends on its structure. The data may contain:  -
+    webhook call latency - webhook errors
 
     Messages:
       AdditionalProperty: An additional property for a DiagnosticInfoValue
@@ -4818,21 +5513,21 @@ class GoogleCloudDialogflowV2beta1SentimentAnalysisResult(_messages.Message):
 
 
 class GoogleCloudDialogflowV2beta1SessionEntityType(_messages.Message):
-  r"""Represents a session entity type.  Extends or replaces a developer
-  entity type at the user session level (we refer to the entity types defined
-  at the agent level as "developer entity types").  Note: session entity types
-  apply to all queries, regardless of the language.
+  r"""Represents a session entity type.  Extends or replaces a custom entity
+  type at the user session level (we refer to the entity types defined at the
+  agent level as "custom entity types").  Note: session entity types apply to
+  all queries, regardless of the language.
 
   Enums:
     EntityOverrideModeValueValuesEnum: Required. Indicates whether the
-      additional data should override or supplement the developer entity type
+      additional data should override or supplement the custom entity type
       definition.
 
   Fields:
     entities: Required. The collection of entities associated with this
       session entity type.
     entityOverrideMode: Required. Indicates whether the additional data should
-      override or supplement the developer entity type definition.
+      override or supplement the custom entity type definition.
     name: Required. The unique identifier of this session entity type. Format:
       `projects/<Project ID>/agent/sessions/<Session ID>/entityTypes/<Entity
       Type Display Name>`, or `projects/<Project
@@ -4846,22 +5541,22 @@ class GoogleCloudDialogflowV2beta1SessionEntityType(_messages.Message):
 
   class EntityOverrideModeValueValuesEnum(_messages.Enum):
     r"""Required. Indicates whether the additional data should override or
-    supplement the developer entity type definition.
+    supplement the custom entity type definition.
 
     Values:
       ENTITY_OVERRIDE_MODE_UNSPECIFIED: Not specified. This value should be
         never used.
       ENTITY_OVERRIDE_MODE_OVERRIDE: The collection of session entities
-        overrides the collection of entities in the corresponding developer
+        overrides the collection of entities in the corresponding custom
         entity type.
       ENTITY_OVERRIDE_MODE_SUPPLEMENT: The collection of session entities
-        extends the collection of entities in the corresponding developer
-        entity type.  Note: Even in this override mode calls to
+        extends the collection of entities in the corresponding custom entity
+        type.  Note: Even in this override mode calls to
         `ListSessionEntityTypes`, `GetSessionEntityType`,
         `CreateSessionEntityType` and `UpdateSessionEntityType` only return
         the additional entities added in this session entity type. If you want
         to get the supplemented list, please call EntityTypes.GetEntityType on
-        the developer entity type and merge.
+        the custom entity type and merge.
     """
     ENTITY_OVERRIDE_MODE_UNSPECIFIED = 0
     ENTITY_OVERRIDE_MODE_OVERRIDE = 1
@@ -4899,7 +5594,13 @@ class GoogleCloudDialogflowV2beta1WebhookRequest(_messages.Message):
 
 
 class GoogleCloudDialogflowV2beta1WebhookResponse(_messages.Message):
-  r"""The response message for a webhook call.
+  r"""The response message for a webhook call.  This response is validated by
+  the Dialogflow server. If validation fails, an error will be returned in the
+  QueryResult.diagnostic_info field. Setting JSON fields to an empty value
+  with the wrong type is a common error. To avoid this error:  - Use `""` for
+  empty strings - Use `{}` or `null` for empty objects - Use `[]` or `null`
+  for empty arrays  For more information, see the [Protocol Buffers Language
+  Guide](https://developers.google.com/protocol-buffers/docs/proto3#json).
 
   Messages:
     PayloadValue: Optional. This value is passed directly to

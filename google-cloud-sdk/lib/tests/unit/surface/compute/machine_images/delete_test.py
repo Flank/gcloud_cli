@@ -24,23 +24,21 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class MachineImagesDeleteTest(test_base.BaseTest):
+class MachineImagesDeleteTestBeta(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
+    self.api_version = 'beta'
 
   def testWithSingleMachineImage(self):
     properties.VALUES.core.disable_prompts.Set(True)
     self.Run('compute machine-images delete machine-image-1')
 
     self.CheckRequests(
-        [(self.compute_alpha.machineImages,
-          'Delete',
+        [(self.compute.machineImages, 'Delete',
           self.messages.ComputeMachineImagesDeleteRequest(
-              machineImage='machine-image-1',
-              project='my-project'))],
-    )
+              machineImage='machine-image-1', project='my-project'))],)
 
   def testWithManyMachineImages(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -48,53 +46,34 @@ class MachineImagesDeleteTest(test_base.BaseTest):
              'machine-image-3')
 
     self.CheckRequests(
-        [(self.compute_alpha.machineImages,
-          'Delete',
+        [(self.compute.machineImages, 'Delete',
           self.messages.ComputeMachineImagesDeleteRequest(
-              machineImage='machine-image-1',
-              project='my-project')),
-
-         (self.compute_alpha.machineImages,
-          'Delete',
+              machineImage='machine-image-1', project='my-project')),
+         (self.compute.machineImages, 'Delete',
           self.messages.ComputeMachineImagesDeleteRequest(
-              machineImage='machine-image-2',
-              project='my-project')),
-
-         (self.compute_alpha.machineImages,
-          'Delete',
+              machineImage='machine-image-2', project='my-project')),
+         (self.compute.machineImages, 'Delete',
           self.messages.ComputeMachineImagesDeleteRequest(
-              machineImage='machine-image-3',
-              project='my-project'))],
-    )
+              machineImage='machine-image-3', project='my-project'))],)
 
   def testPromptingWithYes(self):
     self.WriteInput('y\n')
     self.Run('compute machine-images delete machine-image-1 machine-image-2'
              ' machine-image-3')
     self.CheckRequests(
-        [(self.compute_alpha.machineImages,
-          'Delete',
+        [(self.compute.machineImages, 'Delete',
           self.messages.ComputeMachineImagesDeleteRequest(
-              machineImage='machine-image-1',
-              project='my-project')),
-
-         (self.compute_alpha.machineImages,
-          'Delete',
+              machineImage='machine-image-1', project='my-project')),
+         (self.compute.machineImages, 'Delete',
           self.messages.ComputeMachineImagesDeleteRequest(
-              machineImage='machine-image-2',
-              project='my-project')),
-
-         (self.compute_alpha.machineImages,
-          'Delete',
+              machineImage='machine-image-2', project='my-project')),
+         (self.compute.machineImages, 'Delete',
           self.messages.ComputeMachineImagesDeleteRequest(
-              machineImage='machine-image-3',
-              project='my-project'))],
-    )
-    self.AssertErrContains(
-        r'The following machine images will be deleted:\n'
-        r' - [machine-image-1]\n'
-        r' - [machine-image-2]\n'
-        r' - [machine-image-3]\n')
+              machineImage='machine-image-3', project='my-project'))],)
+    self.AssertErrContains(r'The following machine images will be deleted:\n'
+                           r' - [machine-image-1]\n'
+                           r' - [machine-image-2]\n'
+                           r' - [machine-image-3]\n')
     self.AssertErrContains('PROMPT_CONTINUE')
 
   def testPromptingWithNo(self):
@@ -104,6 +83,15 @@ class MachineImagesDeleteTest(test_base.BaseTest):
                'machine-image-3')
 
     self.CheckRequests()
+
+
+class MachineImagesDeleteTestAlpha(MachineImagesDeleteTestBeta):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+    self.api_version = 'alpha'
+
 
 if __name__ == '__main__':
   test_case.main()

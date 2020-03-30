@@ -185,7 +185,7 @@ class ListInstancesTestGA(ListInstancesTestBase):
   def testInventoryFilterWithLimit(self):
     self.ExpectListerInvoke(
         scope_set=self.MakeAllScopesWithRegistry(self.api_mock.resources),
-        max_results=2,
+        max_results=None,
         result=resource_projector.MakeSerializable(self.instances),
         with_implementation=self.implementation)
     self.api_mock.batch_responder.ExpectBatch(

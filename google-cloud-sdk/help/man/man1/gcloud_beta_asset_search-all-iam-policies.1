@@ -1,0 +1,131 @@
+
+.TH "GCLOUD_BETA_ASSET_SEARCH\-ALL\-IAM\-POLICIES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta asset search\-all\-iam\-policies \- searches all IAM policies under a given scope (i.e.,\ an\ organization,\ a\ folder,\ or\ a\ project) with \f5cloudasset.assets.searchAllIamPolicies\fR permission
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta asset search\-all\-iam\-policies\fR [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR] [\fB\-\-query\fR=\fIQUERY\fR] [\fB\-\-scope\fR=\fISCOPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Searches all IAM policies under a given scope (i.e., an
+organization, a folder, or a project) with
+\f5cloudasset.assets.searchAllIamPolicies\fR permission.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+The page size for search result pagination. The number of matching results may
+be fewer than requested based on the query. The maximum page size is 2000. If
+page\-size is not given the back end will pick an appropriate default page size.
+
+.TP 2m
+\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR
+If present, retrieve the next batch of results from the preceding call to this
+method. \f5page_token\fR must be the value of \f5next_page_token\fR from the
+previous response. The values of all other method parameters must be identical
+to those in the previous call.
+
+.TP 2m
+\fB\-\-query\fR=\fIQUERY\fR
+The query statement.
+
+Examples:
+.RS 2m
+.IP "\(em" 2m
+To find all Cloud IAM policies in your organization that contain
+amy@mycompany.com: \f5policy:"amy@mydomain.com"\fR
+.IP "\(em" 2m
+To find all Cloud IAM policies in your organization that contain owner role:
+\f5policy:"roles/owner"\fR
+.IP "\(em" 2m
+To find all Cloud IAM policies in your organization which have
+myuser@mycompany.com in the owner role: \f5policy:("roles/owner"
+"myuser@mycompany.com")\fR
+.IP "\(em" 2m
+To find all Cloud IAM policies in your organization which have
+myuser@mycompany.com in the owner role or youruser@mycompany.com in the viewer
+role: \f5policy:(("roles/owner" "myuser@mycompany.com") OR ("roles/viewer"
+"youruser@mycompany.com"))\fR
+.IP "\(em" 2m
+To find all Cloud IAM policies that are set on a resource: \f5resource:
+"projects/123"\fR
+.IP "\(em" 2m
+To find all Cloud IAM policies of resources that match a query. \f5resource:
+"\fBproj\fR"\fR
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-scope\fR=\fISCOPE\fR
+The search result scope is limited within a project, folder, or organization.
+You must have the cloudasset.assets.searchAllIamPolicies permission granted to
+the caller for the desired scope. The allowed value must be one of the
+following:
+.RS 2m
+.IP "\(em" 2m
+Organization number (i.e. "organizations/123")
+.IP "\(em" 2m
+Folder number(i.e. "folders/1234")
+.IP "\(em" 2m
+Project number (i.e. "projects/12345")
+.RE
+.RE
+.sp
+If not specified, it will use your configured project in \f5$ gcloud config list
+project\fR. You can change this setting by running \f5$ gcloud config set
+project PROJECT_ID\fR.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudasset/v1p1beta1\fR API. The full documentation for
+this API can be found at:
+https://cloud.google.com/asset\-inventory/docs/quickstart
+
+
+
+.SH "EXAMPLES"
+
+To search all the IAM policies that contains \f5amy@mycompany.com\fR under the
+organization (organizations/123), which you have
+\f5cloudasset.assets.searchAllIamPolicies\fR permission, run:
+
+.RS 2m
+$ gcloud beta asset search\-all\-iam\-policies \e
+  \-\-scope='organizations/123' \-\-query='policy:"amy@mydomain.com"'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

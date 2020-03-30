@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import abc
 import errno
 import io
 import os
@@ -32,13 +33,125 @@ from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import encoding
+from googlecloudsdk.core.util import parallel
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
+import six
 
-class ExecutionTests(sdk_test_base.WithLogCapture,
-                     sdk_test_base.WithOutputCapture):
+
+class _ExecTestBase(six.with_metaclass(abc.ABCMeta, object)):
   _SCRIPT = 'test.' + ('cmd' if test_case.Filters.IsOnWindows() else 'sh')
+
+  @abc.abstractmethod
+  def RunExec(self, args,
+              env=None,
+              no_exit=False,
+              out_func=None,
+              err_func=None,
+              in_str=None,
+              **extra_popen_kwargs):
+    pass
+
+  @abc.abstractmethod
+  def testExec_WithArgsWithExit(self):
+    # Also tests unicode args are handled correctly. Exec() raises exception
+    # if args are not encoded properly.
+    pass
+
+  @abc.abstractmethod
+  def testExec_NoExit(self):
+    pass
+
+  @abc.abstractmethod
+  def testExecPipeOut(self):
+    pass
+
+  @abc.abstractmethod
+  def testExecPipeIn(self):
+    pass
+
+  @abc.abstractmethod
+  def testExecPipeErr(self):
+    pass
+
+  @abc.abstractmethod
+  def testExecPipeInAndOut(self):
+    pass
+
+  @abc.abstractmethod
+  def testExec_WithExit(self):
+    pass
+
+  def testExecPipeOutAndErr(self):
+    self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),
+                 out_func=log.out.write, err_func=log.err.write,
+                 in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
+    self.exit_mock.assert_called_once_with(1)
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertErrContains('test Ṳᾔḯ¢◎ⅾℯ error')
+
+  def testExecPipeInAndOutAndErr(self):
+    self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),
+                 out_func=log.out.write, err_func=log.err.write,
+                 in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
+    self.exit_mock.assert_called_once_with(1)
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ input')
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertErrContains('test Ṳᾔḯ¢◎ⅾℯ error')
+
+  def testExecPipeThroughLogger(self):
+    self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),
+                 err_func=log.file_only_logger.debug,
+                 out_func=log.file_only_logger.debug,
+                 in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
+    self.exit_mock.assert_called_once_with(1)
+    self.AssertLogContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertLogContains('test Ṳᾔḯ¢◎ⅾℯ error')
+
+  def testExec_FilePermissionError(self):
+    error_message = 'Permission denied'
+    popen_mock = self.StartObjectPatch(subprocess, 'Popen')
+    popen_mock.side_effect = OSError(errno.EACCES, error_message)
+    self.assertRaises(execution_utils.PermissionError)
+    with self.assertRaisesRegex(execution_utils.PermissionError, re.escape(
+        '\nPlease verify that you have execute permission for all '
+        'files in your CLOUD SDK bin'
+        ' folder')):
+      self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT))
+
+  def testExec_InvalidCommandError(self):
+    error_message = 'No such file or directory'
+    fake_command = ['fake', 'command']
+    popen_mock = self.StartObjectPatch(subprocess, 'Popen')
+    popen_mock.side_effect = OSError(errno.ENOENT, error_message)
+    self.assertRaises(OSError)
+    with self.assertRaisesRegex(execution_utils.InvalidCommandError, re.escape(
+        '{0}: command not found'.format(fake_command[0]))):
+      self.RunExec(fake_command)
+
+  def testExec_OtherOSError(self):
+    error_message = 'No such process'
+    popen_mock = self.StartObjectPatch(subprocess, 'Popen')
+    popen_mock.side_effect = OSError(errno.ESRCH, error_message)
+    self.assertRaises(OSError)
+    with self.assertRaisesRegex(OSError, re.escape(
+        '[Errno 3] {0}'.format(error_message))):
+      self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT))
+
+
+class ExecutionTests(_ExecTestBase, sdk_test_base.WithLogCapture,
+                     sdk_test_base.WithOutputCapture):
+
+  def RunExec(self, args,
+              env=None,
+              no_exit=False,
+              out_func=None,
+              err_func=None,
+              in_str=None,
+              **extra_popen_kwargs):
+    return execution_utils.Exec(args, env, no_exit, out_func, err_func,
+                                in_str, **extra_popen_kwargs)
 
   def SetUp(self):
     self.scripts_dir = self.Resource(
@@ -119,64 +232,115 @@ class ExecutionTests(sdk_test_base.WithLogCapture,
     self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
     self.AssertErrNotContains('test Ṳᾔḯ¢◎ⅾℯ error')
 
-  def testExecPipeOutAndErr(self):
-    execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
-                         out_func=log.out.write,
-                         err_func=log.err.write,
-                         in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
+
+@test_case.Filters.DoNotRunInDebPackage
+@test_case.Filters.DoNotRunInRpmPackage
+class StreamingExecutionTests(_ExecTestBase, sdk_test_base.WithLogCapture,
+                              sdk_test_base.WithOutputCapture):
+  """Test for execution with streaming output."""
+
+  def RunExec(self, args,
+              env=None,
+              no_exit=False,
+              out_func=None,
+              err_func=None,
+              in_str=None,
+              **extra_popen_kwargs):
+    return execution_utils.ExecWithStreamingOutput(
+        args, env, no_exit, out_func, err_func, in_str, **extra_popen_kwargs)
+
+  def SetUp(self):
+    self.scripts_dir = self.Resource(
+        'tests', 'unit', 'core', 'test_data', 'execution_utils', 'scripts')
+    self.exit_mock = self.StartObjectPatch(sys, 'exit')
+
+    # Set encoding so sys.stdout and sys.stderr mocks can accept unicode
+    self.SetEncoding('utf8')
+
+  def testExecPipeIn(self):
+    self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),
+                 in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
+    self.exit_mock.assert_called_once_with(1)
+    # Has no output
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ input')
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertErrContains('test Ṳᾔḯ¢◎ⅾℯ error')
+
+  def testExecPipeErr(self):
+    self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),
+                 in_str='test Ṳᾔḯ¢◎ⅾℯ input\n', err_func=log.err.write)
     self.exit_mock.assert_called_once_with(1)
     self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
     self.AssertErrContains('test Ṳᾔḯ¢◎ⅾℯ error')
 
-  def testExecPipeInAndOutAndErr(self):
-    execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
-                         out_func=log.out.write, err_func=log.err.write,
-                         in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
+  def testExecPipeInAndOut(self):
+    self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),
+                 out_func=log.out.write, in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
     self.exit_mock.assert_called_once_with(1)
     self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ input')
     self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
     self.AssertErrContains('test Ṳᾔḯ¢◎ⅾℯ error')
 
-  def testExecPipeThroughLogger(self):
-    execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
-                         err_func=log.file_only_logger.debug,
-                         out_func=log.file_only_logger.debug,
-                         in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
-    self.exit_mock.assert_called_once_with(1)
+  def testExec_WithExit(self):
+    self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),
+                 in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
     self.AssertLogContains('test Ṳᾔḯ¢◎ⅾℯ output')
-    self.AssertLogContains('test Ṳᾔḯ¢◎ⅾℯ error')
+    self.exit_mock.assert_called_once_with(1)
 
-  def testExec_FilePermissionError(self):
-    error_message = 'Permission denied'
-    popen_mock = self.StartObjectPatch(subprocess, 'Popen')
-    popen_mock.side_effect = OSError(errno.EACCES, error_message)
-    self.assertRaises(execution_utils.PermissionError)
-    with self.assertRaisesRegex(execution_utils.PermissionError, re.escape(
-        '\nPlease verify that you have execute permission for all '
-        'files in your CLOUD SDK bin'
-        ' folder')):
-      execution_utils.Exec(
-          os.path.join(self.scripts_dir, self._SCRIPT))
+  def testExec_WithArgsWithExit(self):
+    # Also tests unicode args are handled correctly. Exec() raises exception
+    # if args are not encoded properly.
+    self.RunExec([os.path.join(self.scripts_dir, self._SCRIPT),
+                  'unicode'],
+                 in_str='fḯsh',
+                 out_func=sys.stdout.write,
+                 err_func=sys.stderr.write,)
+    # The script above just echoes what we provided which is python encoded
+    # value. This just make sure that arguments are encoded by default.
+    self.assertMultiLineEqual(
+        'input: fḯsh'
+        'argument: unicode'
+        'test Ṳᾔḯ¢◎ⅾℯ output',
+        encoding.Decode(self.stdout.getvalue()))
+    self.AssertErrContains('test Ṳᾔḯ¢◎ⅾℯ error')
+    self.AssertLogNotContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.exit_mock.assert_called_once_with(1)
 
-  def testExec_InvalidCommandError(self):
-    error_message = 'No such file or directory'
-    fake_command = ['fake', 'command']
-    popen_mock = self.StartObjectPatch(subprocess, 'Popen')
-    popen_mock.side_effect = OSError(errno.ENOENT, error_message)
+  def testExecPipeOut(self):
+    self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),
+                 in_str='test Ṳᾔḯ¢◎ⅾℯ input\n', out_func=log.out.write)
+    self.exit_mock.assert_called_once_with(1)
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertErrContains('test Ṳᾔḯ¢◎ⅾℯ error')
+
+  def testExecPipeOut_NoOp(self):
+    self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),
+                 in_str='test Ṳᾔḯ¢◎ⅾℯ input\n', out_func=lambda x: x)
+    self.exit_mock.assert_called_once_with(1)
+    self.AssertOutputNotContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertErrContains('test Ṳᾔḯ¢◎ⅾℯ error')
+
+  def testExec_NoExit(self):
+    ret_val = self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),
+                           in_str='test Ṳᾔḯ¢◎ⅾℯ input\n',
+                           no_exit=True)
+    self.assertEqual(ret_val, 1)
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertLogContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.assertFalse(self.exit_mock.called)
+
+  def testExecThreadPoolError(self):
+    error_message = 'Error in ThreadPool'
+    thread_mock = self.StartObjectPatch(parallel.ThreadPool,
+                                        'ApplyAsync')
+    thread_mock.side_effect = OSError(errno.ENOENT, error_message)
     self.assertRaises(OSError)
-    with self.assertRaisesRegex(execution_utils.InvalidCommandError, re.escape(
-        '{0}: command not found'.format(fake_command[0]))):
-      execution_utils.Exec(fake_command)
-
-  def testExec_OtherOSError(self):
-    error_message = 'No such process'
-    popen_mock = self.StartObjectPatch(subprocess, 'Popen')
-    popen_mock.side_effect = OSError(errno.ESRCH, error_message)
-    self.assertRaises(OSError)
-    with self.assertRaisesRegex(OSError, re.escape(
-        '[Errno 3] {0}'.format(error_message))):
-      execution_utils.Exec(
-          os.path.join(self.scripts_dir, self._SCRIPT))
+    with self.assertRaisesRegex(execution_utils.OutputStreamProcessingException,
+                                error_message):
+      self.RunExec(os.path.join(self.scripts_dir, self._SCRIPT),
+                   in_str='test Ṳᾔḯ¢◎ⅾℯ input\n',
+                   no_exit=True)
 
 
 class GetPythonExecutableTests(test_case.TestCase):

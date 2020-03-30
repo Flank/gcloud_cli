@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""list endpoints command."""
+"""list network endpoints command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -25,39 +25,45 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute import flags as compute_flags
 from googlecloudsdk.command_lib.compute.network_endpoint_groups import flags
 
+DETAILED_HELP = {
+    'EXAMPLES': """
+To list network endpoints of a network endpoint group named ``my-neg''
+in zone ``us-central1-a'':
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
-class ListEndpoints(base.ListCommand):
-  r"""List network endpoints in a network endpoint group.
+  $ {command} my-neg --zone=us-central1-a
+""",
+}
 
-  ## EXAMPLES
 
-  To list network endpoints of a network endpoint group:
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
+class ListNetworkEndpoints(base.ListCommand):
+  """List network endpoints in a network endpoint group."""
 
-    $ {command} my-neg --zone=us-central1-a
-  """
-
-  @staticmethod
-  def Args(parser):
-    parser.display_info.AddFormat("""\
+  detailed_help = DETAILED_HELP
+  display_info_format = """\
         table(
           networkEndpoint.instance,
           networkEndpoint.ipAddress,
-          networkEndpoint.port
-        )""")
+          networkEndpoint.port,
+          networkEndpoint.fqdn
+        )"""
+  support_global_scope = True
+
+  @classmethod
+  def Args(cls, parser):
+    parser.display_info.AddFormat(cls.display_info_format)
     base.URI_FLAG.RemoveFromParser(parser)
-    flags.MakeNetworkEndpointGroupsArg().AddArgument(parser)
+    flags.MakeNetworkEndpointGroupsArg(
+        support_global_scope=cls.support_global_scope).AddArgument(parser)
 
   def Run(self, args):
-    return self._Run(args)
-
-  def _Run(self, args, support_global_scope=False):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     client = holder.client
     messages = client.messages
 
     neg_ref = flags.MakeNetworkEndpointGroupsArg(
-        support_global_scope=support_global_scope).ResolveAsResource(
+        support_global_scope=self.support_global_scope).ResolveAsResource(
             args,
             holder.resources,
             scope_lister=compute_flags.GetDefaultScopeLister(client))
@@ -85,31 +91,3 @@ class ListEndpoints(base.ListCommand):
         field='items',
         limit=args.limit,
         batch_size=None)
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class AlphaListEndpoints(ListEndpoints):
-  r"""List network endpoints in a network endpoint group.
-
-  ## EXAMPLES
-
-  To list network endpoints of a network endpoint group:
-
-    $ {command} my-neg --zone=us-central1-a
-  """
-
-  @staticmethod
-  def Args(parser):
-    parser.display_info.AddFormat("""\
-        table(
-          networkEndpoint.instance,
-          networkEndpoint.ipAddress,
-          networkEndpoint.port,
-          networkEndpoint.fqdn
-        )""")
-    base.URI_FLAG.RemoveFromParser(parser)
-    flags.MakeNetworkEndpointGroupsArg(
-        support_global_scope=True).AddArgument(parser)
-
-  def Run(self, args):
-    return self._Run(args, support_global_scope=True)

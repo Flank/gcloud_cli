@@ -11,7 +11,7 @@ gcloud compute ssl\-certificates delete \- delete Google Compute Engine SSL cert
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute ssl\-certificates delete\fR \fINAME\fR [\fINAME\fR\ ...] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute ssl\-certificates delete\fR \fINAME\fR [\fINAME\fR\ ...] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -19,7 +19,7 @@ gcloud compute ssl\-certificates delete \- delete Google Compute Engine SSL cert
 
 \fBgcloud compute ssl\-certificates delete\fR deletes one or more Google Compute
 Engine SSL certificates. SSL certificates can only be deleted when no other
-resources (e.g., target HTTPS proxies) refer to them.
+resources (for example, target HTTPS proxies) refer to them.
 
 
 
@@ -34,13 +34,74 @@ Names of the SSL certificates to delete.
 .RE
 .sp
 
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the SSL certificates are global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the SSL certificates to delete. If not specified, you may be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a certificate 'my\-cert', run:
+
+.RS 2m
+$ gcloud compute ssl\-certificates delete my\-cert
+.RE
+
+To delete certificates 'my\-cert1', 'my\-cert2' and 'my\-cert3', run:
+
+.RS 2m
+$ gcloud compute ssl\-certificates delete my\-cert1 my\-cert2 my\-cert3
+.RE
 
 
 

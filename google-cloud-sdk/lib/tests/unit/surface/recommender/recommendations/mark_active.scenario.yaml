@@ -70,7 +70,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://recommender.googleapis.com/v1alpha1/projects/my-project/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation:markActive?alt=json
+          uri: https://recommender.googleapis.com/v1alpha2/projects/my-project/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation:markActive?alt=json
           method: POST
           headers: {}
           body: |

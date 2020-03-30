@@ -62,37 +62,39 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     Filter metrics with the given name:
 
-        $ gcloud beta dataflow metrics list --filter="name=ElementCount"
+        $ gcloud beta dataflow metrics list JOB --filter="name=ElementCount"
 
     Filter child metrics with matching transforms:
 
-        $ gcloud beta dataflow metrics list --transform=WordCount
+        $ gcloud beta dataflow metrics list JOB --transform=WordCount
 
     Filter child output metrics:
 
-        $ gcloud beta dataflow metrics list --transform=WordCount/Write.*out
+        $ gcloud beta dataflow metrics list JOB \
+            --transform=WordCount/Write.*out
 
     Filter all output metrics:
 
-        $ gcloud beta dataflow metrics list --transform=.*out
+        $ gcloud beta dataflow metrics list JOB --transform=.*out
 
     Filter all custom-defined user metrics
 
-        $ gcloud beta dataflow metrics list --source=user
+        $ gcloud beta dataflow metrics list JOB --source=user
 
     Filter metrics with a scalar value greater than a threshold.
 
-        $ gcloud beta dataflow metrics list --filter="scalar > 50"
+        $ gcloud beta dataflow metrics list JOB --filter="scalar > 50"
 
     List metrics that have changed in the last 2 weeks:
 
-        $ gcloud beta dataflow metrics list --after=-P2W
+        $ gcloud beta dataflow metrics list JOB --changed-after=-P2W
 
 NOTES
     This command is currently in BETA and may change without notice. This

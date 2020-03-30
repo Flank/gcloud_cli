@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud compute sole\-tenancy node\-groups list\-nodes \- list Google Compute Engine sole\-tenant nodes present in a node group
+gcloud compute sole\-tenancy node\-groups list\-nodes \- list Compute Engine sole\-tenant nodes present in a nodegroup
 
 
 
@@ -17,7 +17,7 @@ gcloud compute sole\-tenancy node\-groups list\-nodes \- list Google Compute Eng
 
 .SH "DESCRIPTION"
 
-List Google Compute Engine sole\-tenant nodes present in a node group.
+List Compute Engine sole\-tenant nodes present in a node group.
 
 
 
@@ -108,8 +108,19 @@ flag interacts with other flags that are applied in this order:
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list sole\-tenant nodes present in a node group, run:
+
+.RS 2m
+$ gcloud compute sole\-tenancy node\-groups list\-nodes my\-node\-group
+.RE
 
 
 

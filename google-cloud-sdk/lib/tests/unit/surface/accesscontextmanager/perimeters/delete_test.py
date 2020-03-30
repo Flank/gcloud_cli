@@ -30,6 +30,7 @@ from six import text_type
 class PerimetersDeleteTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
@@ -47,19 +48,19 @@ class PerimetersDeleteTestGA(accesscontextmanager.Base):
     self._ExpectGetOperation('operations/my-op')
 
   def testDelete_MissingRequired(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
       self.Run('access-context-manager perimeters delete --policy 123')
 
   def testDelete_Prompt(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     with self.assertRaises(console_io.UnattendedPromptError):
       self.Run('access-context-manager perimeters delete my_perimeter '
                '--policy 123')
 
   def testDelete(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     self._ExpectDelete('my_perimeter', '123')
 
     self.Run('access-context-manager perimeters delete my_perimeter --policy '
@@ -68,7 +69,7 @@ class PerimetersDeleteTestGA(accesscontextmanager.Base):
     self.AssertOutputEquals('')
 
   def testDelete_PolicyFromProperty(self):
-    self.SetUpForTrack(self.track)
+    self.SetUpForAPI(self.api_version)
     policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
     self._ExpectDelete('my_perimeter', policy)
@@ -89,12 +90,14 @@ class PerimetersDeleteTestGA(accesscontextmanager.Base):
 class PerimetersDeleteTestBeta(PerimetersDeleteTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class PerimetersDeleteTestAlpha(PerimetersDeleteTestGA):
 
   def PreSetUp(self):
+    self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 

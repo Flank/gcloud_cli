@@ -1,16 +1,17 @@
 NAME
-    gcloud alpha compute sole-tenancy node-groups create - creates a Google
-        Compute Engine node group
+    gcloud alpha compute sole-tenancy node-groups create - create a Compute
+        Engine node group
 
 SYNOPSIS
     gcloud alpha compute sole-tenancy node-groups create NAME
         --node-template=NODE_TEMPLATE --target-size=TARGET_SIZE
         [--description=DESCRIPTION] [--maintenance-policy=MAINTENANCE_POLICY]
-        [--zone=ZONE] [--mode=MODE : --max-size=MAX_SIZE --min-size=MIN_SIZE]
-        [GCLOUD_WIDE_FLAG ...]
+        [--maintenance-window-start-time=START_TIME] [--zone=ZONE]
+        [--autoscaler-mode=AUTOSCALER_MODE
+          : --max-nodes=MAX_NODES --min-nodes=MIN_NODES] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Creates a Google Compute Engine node group.
+    (ALPHA) Create a Compute Engine node group.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -41,6 +42,10 @@ OPTIONAL FLAGS
             VM instances on the host are terminated and then restarted on the
             same physical server after the maintenance event has completed.
 
+     --maintenance-window-start-time=START_TIME
+        The time (in GMT) when planned maintenance operations window begins.
+        The possible values are 00:00, 04:00, 08:00, 12:00, 16:00, 20:00.
+
      --zone=ZONE
         Zone of the node group to operate on. If not specified and the
         compute/zone property isn't set, you may be prompted to select a zone.
@@ -63,27 +68,42 @@ OPTIONAL FLAGS
 
      Autoscaling policy for node groups.
 
-       --mode=MODE
-          Options for mode are 'on' or 'off'. When set to 'on', the autoscaler
-          will increase or decrease the size of the node group in response to
-          capacity needs. If set to 'off', the autoscaler will not update the
-          size of the node group. This flag must be specified if any of the
-          other arguments in this group are specified.
+       --autoscaler-mode=AUTOSCALER_MODE
+          Set the mode of an autoscaler for a node group. AUTOSCALER_MODE must
+          be one of:
 
-       --max-size=MAX_SIZE
-          The maximum size of the node group. Default is 100 and must be
-          smaller or equal to 100 and larger than or equal to min-size.
+           off
+              to turn off autoscaling.
+           on
+              to permit autoscaling to scale in and out.
+           only-scale-out
+              to permit autoscaling to scale only out and not in.
 
-       --min-size=MIN_SIZE
+          This flag must be specified if any of the other arguments in this
+          group are specified.
+
+       --max-nodes=MAX_NODES
+          The maximum size of the node group. Must be smaller or equal to 100
+          and larger than or equal to --min-nodes. Must be specified if
+          --autoscaler-mode is not off.
+
+       --min-nodes=MIN_NODES
           The minimum size of the node group. Default is 0 and must be an
-          integer value smaller than or equal to max-size.
+          integer value smaller than or equal to --max-nodes.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To create a node group, run:
+
+        $ gcloud alpha compute sole-tenancy node-groups create \
+            my-node-group --node-template=example-template --target-size=4
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

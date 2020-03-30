@@ -9,6 +9,7 @@ class ContainerV1beta1(base_api.BaseApiClient):
 
   MESSAGES_MODULE = messages
   BASE_URL = u'https://container.googleapis.com/'
+  MTLS_BASE_URL = u'https://container.mtls.googleapis.com/'
 
   _PACKAGE = u'container'
   _SCOPES = [u'https://www.googleapis.com/auth/cloud-platform']
@@ -644,6 +645,9 @@ zones.
 
     def SetLocations(self, request, global_params=None):
       r"""Sets the locations for a specific cluster.
+Deprecated. Use
+[projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1beta1/projects.locations.clusters.update)
+instead.
 
       Args:
         request: (SetLocationsRequest) input message
@@ -1529,6 +1533,9 @@ zones.
 
     def Locations(self, request, global_params=None):
       r"""Sets the locations for a specific cluster.
+Deprecated. Use
+[projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1beta1/projects.locations.clusters.update)
+instead.
 
       Args:
         request: (SetLocationsRequest) input message

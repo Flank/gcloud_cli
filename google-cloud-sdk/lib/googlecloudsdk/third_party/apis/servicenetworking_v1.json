@@ -17,6 +17,7 @@
   "documentationLink": "https://cloud.google.com/service-infrastructure/docs/service-networking/getting-started",
   "protocol": "rest",
   "rootUrl": "https://servicenetworking.googleapis.com/",
+  "mtlsRootUrl": "https://servicenetworking.mtls.googleapis.com/",
   "servicePath": "",
   "baseUrl": "https://servicenetworking.googleapis.com/",
   "batchPath": "batch",
@@ -246,6 +247,28 @@
         }
       }
     },
+    "DisableVpcServiceControlsRequest": {
+      "id": "DisableVpcServiceControlsRequest",
+      "description": "Request to disable VPC service controls.",
+      "type": "object",
+      "properties": {
+        "consumerNetwork": {
+          "description": "Required. The network that the consumer is using to connect with services.\nMust be in the form of projects\/{project}\/global\/networks\/{network}\n{project} is a project number, as in '12345'\n{network} is network name.",
+          "type": "string"
+        }
+      }
+    },
+    "EnableVpcServiceControlsRequest": {
+      "id": "EnableVpcServiceControlsRequest",
+      "description": "Request to enable VPC service controls.",
+      "type": "object",
+      "properties": {
+        "consumerNetwork": {
+          "description": "Required. The network that the consumer is using to connect with services.\nMust be in the form of projects\/{project}\/global\/networks\/{network}\n{project} is a project number, as in '12345'\n{network} is network name.",
+          "type": "string"
+        }
+      }
+    },
     "AddSubnetworkRequest": {
       "id": "AddSubnetworkRequest",
       "description": "Request to create a subnetwork in a previously peered service network.",
@@ -269,7 +292,7 @@
           "format": "int32"
         },
         "description": {
-          "description": "An optional description of the subnet.",
+          "description": "Optional. Description of the subnet.",
           "type": "string"
         },
         "subnetworkUsers": {
@@ -286,6 +309,10 @@
         "requestedAddress": {
           "description": "Optional. The starting address of a range. The address must be a valid\nIPv4 address in the x.x.x.x format. This value combined with the IP prefix\nrange is the CIDR range for the subnet. The range must be within the\nallocated range that is assigned to the private connection. If the CIDR\nrange isn't available, the call fails.",
           "type": "string"
+        },
+        "privateIpv6GoogleAccess": {
+          "description": "Optional. The private IPv6 google access type for the VMs in this subnet.\nFor information about the access types that can be set using this field,\nsee [subnetwork](\/compute\/docs\/reference\/rest\/v1\/subnetworks)\nin the Compute API documentation.",
+          "type": "string"
         }
       }
     },
@@ -295,13 +322,109 @@
       "type": "object",
       "properties": {
         "network": {
-          "description": "Network name in the consumer project.   This network must have been\nalready peered with a shared VPC network using CreateConnection\nmethod.\nMust be in a form 'projects\/{project}\/global\/networks\/{network}'.\n{project} is a project number, as in '12345'\n{network} is network name.",
+          "description": "Network name in the consumer project. This network must have been\nalready peered with a shared VPC network using CreateConnection\nmethod. Must be in a form 'projects\/{project}\/global\/networks\/{network}'.\n{project} is a project number, as in '12345' {network} is network name.",
           "type": "string"
         },
         "ipPrefixLength": {
-          "description": "Required. The prefix length of the IP range.\nUse usual CIDR range notation.\nFor example, '30' to find unused x.x.x.x\/30 CIDR range.\nActual range will be determined using allocated range for the consumer\npeered network and returned in the result.",
+          "description": "Required. The prefix length of the IP range. Use usual CIDR range notation. For\nexample, '30' to find unused x.x.x.x\/30 CIDR range. Actual range will be\ndetermined using allocated range for the consumer peered network and\nreturned in the result.",
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "ValidateConsumerConfigRequest": {
+      "id": "ValidateConsumerConfigRequest",
+      "type": "object",
+      "properties": {
+        "consumerNetwork": {
+          "description": "Required. The network that the consumer is using to connect with services. Must be in\nthe form of projects\/{project}\/global\/networks\/{network} {project} is a\nproject number, as in '12345' {network} is network name.",
+          "type": "string"
+        },
+        "validateNetwork": {
+          "description": "The validations will be performed in the order listed in the\nValidationError enum. The first failure will return. If a validation is not\nrequested, then the next one will be performed.\nSERVICE_NETWORKING_NOT_ENABLED and NETWORK_NOT_PEERED checks are performed\nfor all requests where validation is requested. NETWORK_NOT_FOUND and\nNETWORK_DISCONNECTED checks are done for requests that have\nvalidate_network set to true.",
+          "type": "boolean"
+        },
+        "consumerProject": {
+          "description": "NETWORK_NOT_IN_CONSUMERS_PROJECT, NETWORK_NOT_IN_CONSUMERS_HOST_PROJECT,\nand HOST_PROJECT_NOT_FOUND are done when consumer_project is provided.",
+          "$ref": "ConsumerProject"
+        },
+        "rangeReservation": {
+          "description": "RANGES_EXHAUSTED, RANGES_EXHAUSTED, and RANGES_DELETED_LATER are done\nwhen range_reservation is provided.",
+          "$ref": "RangeReservation"
+        }
+      }
+    },
+    "ConsumerProject": {
+      "id": "ConsumerProject",
+      "description": "Represents a consumer project.",
+      "type": "object",
+      "properties": {
+        "projectNum": {
+          "description": "Required. Project number of the consumer that is launching the service instance. It\ncan own the network that is peered with Google or, be a service project in\nan XPN where the host project has the network.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "RangeReservation": {
+      "id": "RangeReservation",
+      "description": "Represents a range reservation.",
+      "type": "object",
+      "properties": {
+        "ipPrefixLength": {
+          "description": "Required. The size of the desired subnet. Use usual CIDR range notation. For example,\n'30' to find unused x.x.x.x\/30 CIDR range. The goal is to determine if one\nof the allocated ranges has enough free space for a subnet of the requested\nsize.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "secondaryRangeIpPrefixLengths": {
+          "description": "Optional. DO NOT USE - Under development.\nThe size of the desired secondary ranges for the subnet. Use usual CIDR\nrange notation. For example, '30' to find unused x.x.x.x\/30 CIDR range. The\ngoal is to determine that the allocated ranges have enough free space for\nall the requested secondary ranges.",
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "ValidateConsumerConfigResponse": {
+      "id": "ValidateConsumerConfigResponse",
+      "type": "object",
+      "properties": {
+        "isValid": {
+          "type": "boolean"
+        },
+        "validationError": {
+          "enumDescriptions": [
+            "",
+            "In case none of the validations are requested.",
+            "",
+            "The network provided by the consumer does not exist.",
+            "The network has not been peered with the producer org.",
+            "The peering was created and later deleted.",
+            "The network is a regular VPC but the network is not in the consumer's\nproject.",
+            "The consumer project is a service project, and network is a shared VPC,\nbut the network is not in the host project of this consumer project.",
+            "The host project associated with the consumer project\nwas not found.",
+            "The consumer project is not a service project for\nthe specified host project.",
+            "The reserved IP ranges do not have enough space to create\na subnet of desired size.",
+            "The IP ranges were not reserved.",
+            "The IP ranges were reserved but deleted later."
+          ],
+          "type": "string",
+          "enum": [
+            "VALIDATION_ERROR_UNSPECIFIED",
+            "VALIDATION_NOT_REQUESTED",
+            "SERVICE_NETWORKING_NOT_ENABLED",
+            "NETWORK_NOT_FOUND",
+            "NETWORK_NOT_PEERED",
+            "NETWORK_PEERING_DELETED",
+            "NETWORK_NOT_IN_CONSUMERS_PROJECT",
+            "NETWORK_NOT_IN_CONSUMERS_HOST_PROJECT",
+            "HOST_PROJECT_NOT_FOUND",
+            "CONSUMER_PROJECT_NOT_SERVICE_PROJECT",
+            "RANGES_EXHAUSTED",
+            "RANGES_NOT_RESERVED",
+            "RANGES_DELETED_LATER"
+          ]
         }
       }
     },
@@ -311,7 +434,7 @@
       "type": "object",
       "properties": {
         "configVersion": {
-          "description": "The semantic version of the service configuration. The config version\naffects the interpretation of the service configuration. For example,\ncertain features are enabled by default for certain config versions.\nThe latest config version is `3`.",
+          "description": "The semantic version of the service configuration. The config version\naffects the interpretation of the service configuration. For example,\ncertain features are enabled by default for certain config versions.\n\nThe latest config version is `3`.",
           "type": "integer",
           "format": "uint32"
         },
@@ -320,7 +443,7 @@
           "type": "string"
         },
         "id": {
-          "description": "A unique ID for a specific instance of this message, typically assigned\nby the client for tracking purpose. If empty, the server may choose to\ngenerate one instead. Must be no longer than 60 characters.",
+          "description": "A unique ID for a specific instance of this message, typically assigned\nby the client for tracking purpose. Must be no longer than 63 characters\nand only lower case letters, digits, '.', '_' and '-' are allowed. If\nempty, the server may choose to generate one instead.",
           "type": "string"
         },
         "title": {
@@ -908,11 +1031,11 @@
           "type": "string"
         },
         "address": {
-          "description": "The address of the API backend.",
+          "description": "The address of the API backend.\n\nThe scheme is used to determine the backend protocol and security.\nThe following schemes are accepted:\n\n   SCHEME        PROTOCOL    SECURITY\n   http:\/\/       HTTP        None\n   https:\/\/      HTTP        TLS\n   grpc:\/\/       gRPC        None\n   grpcs:\/\/      gRPC        TLS\n\nIt is recommended to explicitly include a scheme. Leaving out the scheme\nmay cause constrasting behaviors across platforms.\n\nIf the port is unspecified, the default is:\n- 80 for schemes without TLS\n- 443 for schemes with TLS\n\nFor HTTP backends, use protocol\nto specify the protocol version.",
           "type": "string"
         },
         "deadline": {
-          "description": "The number of seconds to wait for a response from a request.  The default\ndeadline for gRPC is infinite (no deadline) and HTTP requests is 5 seconds.",
+          "description": "The number of seconds to wait for a response from a request. The default\nvaries based on the request protocol and deployment environment.",
           "type": "number",
           "format": "double"
         },
@@ -940,7 +1063,15 @@
           ]
         },
         "jwtAudience": {
-          "description": "The JWT audience is used when generating a JWT id token for the backend.",
+          "description": "The JWT audience is used when generating a JWT ID token for the backend.\nThis ID token will be added in the HTTP \"authorization\" header, and sent\nto the backend.",
+          "type": "string"
+        },
+        "disableAuth": {
+          "description": "When disable_auth is true, a JWT ID token won't be generated and the\noriginal \"Authorization\" HTTP header will be preserved. If the header is\nused to carry the original token and is expected by the backend, this\nfield must be set to true to preserve the header.",
+          "type": "boolean"
+        },
+        "protocol": {
+          "description": "The protocol used for sending a request to the backend.\nThe supported values are \"http\/1.1\" and \"h2\".\n\nThe default value is inferred from the scheme in the\naddress field:\n\n   SCHEME        PROTOCOL\n   http:\/\/       http\/1.1\n   https:\/\/      http\/1.1\n   grpc:\/\/       h2\n   grpcs:\/\/      h2\n\nFor secure HTTP backends (https:\/\/) that support HTTP\/2, set this field\nto \"h2\" for improved performance.\n\nConfiguring this field to non-default values is only supported for secure\nHTTP backends. This field will be ignored for all other backends.\n\nSee\nhttps:\/\/www.iana.org\/assignments\/tls-extensiontype-values\/tls-extensiontype-values.xhtml#alpn-protocol-ids\nfor more details on the supported values.",
           "type": "string"
         }
       }
@@ -1010,6 +1141,10 @@
           "items": {
             "$ref": "HttpRule"
           }
+        },
+        "allowHalfDuplex": {
+          "description": "When this flag is set to true, HTTP requests will be allowed to invoke a\nhalf-duplex streaming method.",
+          "type": "boolean"
         }
       }
     },
@@ -1219,6 +1354,32 @@
         "authorizationUrl": {
           "description": "Redirect URL if JWT token is required but not present or is expired.\nImplement authorizationUrl of securityDefinitions in OpenAPI spec.",
           "type": "string"
+        },
+        "jwtLocations": {
+          "description": "Defines the locations to extract the JWT.\n\nJWT locations can be either from HTTP headers or URL query parameters.\nThe rule is that the first match wins. The checking order is: checking\nall headers first, then URL query parameters.\n\nIf not specified,  default to use following 3 locations:\n   1) Authorization: Bearer\n   2) x-goog-iap-jwt-assertion\n   3) access_token query parameter\n\nDefault locations can be specified as followings:\n   jwt_locations:\n   - header: Authorization\n     value_prefix: \"Bearer \"\n   - header: x-goog-iap-jwt-assertion\n   - query: access_token",
+          "type": "array",
+          "items": {
+            "$ref": "JwtLocation"
+          }
+        }
+      }
+    },
+    "JwtLocation": {
+      "id": "JwtLocation",
+      "description": "Specifies a location to extract JWT from an API request.",
+      "type": "object",
+      "properties": {
+        "header": {
+          "description": "Specifies HTTP header name to extract JWT token.",
+          "type": "string"
+        },
+        "query": {
+          "description": "Specifies URL query parameter name to extract JWT token.",
+          "type": "string"
+        },
+        "valuePrefix": {
+          "description": "The value prefix. The value format is \"value_prefix{token}\"\nOnly applies to \"in\" header type. Must be empty for \"in\" query type.\nIf not empty, the header value has to match (case sensitive) this prefix.\nIf not matched, JWT will not be extracted. If matched, JWT will be\nextracted after the prefix is removed.\n\nFor example, for \"Authorization: Bearer {JWT}\",\nvalue_prefix=\"Bearer \" with a space at the end.",
+          "type": "string"
         }
       }
     },
@@ -1297,6 +1458,10 @@
         "producerNotificationChannel": {
           "description": "The full resource name of a channel used for sending notifications to the\nservice producer.\n\nGoogle Service Management currently only supports\n[Google Cloud Pub\/Sub](https:\/\/cloud.google.com\/pubsub) as a notification\nchannel. To use Google Cloud Pub\/Sub as the channel, this must be the name\nof a Cloud Pub\/Sub topic that uses the Cloud Pub\/Sub topic name format\ndocumented in https:\/\/cloud.google.com\/pubsub\/docs\/overview.",
           "type": "string"
+        },
+        "serviceIdentity": {
+          "description": "The configuration of a per-product per-project service identity.",
+          "$ref": "ServiceIdentity"
         }
       }
     },
@@ -1316,6 +1481,25 @@
         "skipServiceControl": {
           "description": "If true, the selected method should skip service control and the control\nplane features, such as quota and billing, will not be available.\nThis flag is used by Google Cloud Endpoints to bypass checks for internal\nmethods, such as service health check methods.",
           "type": "boolean"
+        }
+      }
+    },
+    "ServiceIdentity": {
+      "id": "ServiceIdentity",
+      "description": "The per-product per-project service identity for a service.\n\n\nUse this field to configure per-product per-project service identity.\nExample of a service identity configuration.\n\n    usage:\n      service_identity:\n      - service_account_parent: \"projects\/123456789\"\n        display_name: \"Cloud XXX Service Agent\"\n        description: \"Used as the identity of Cloud XXX to access resources\"",
+      "type": "object",
+      "properties": {
+        "serviceAccountParent": {
+          "description": "A service account project that hosts the service accounts.\n\nAn example name would be:\n`projects\/123456789`",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Optional. A user-specified name for the service account.\nMust be less than or equal to 100 UTF-8 bytes.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. A user-specified opaque description of the service account.\nMust be less than or equal to 256 UTF-8 bytes.",
+          "type": "string"
         }
       }
     },
@@ -1513,7 +1697,7 @@
           ]
         },
         "unit": {
-          "description": "The unit in which the metric value is reported. It is only applicable\nif the `value_type` is `INT64`, `DOUBLE`, or `DISTRIBUTION`. The\nsupported units are a subset of [The Unified Code for Units of\nMeasure](http:\/\/unitsofmeasure.org\/ucum.html) standard:\n\n**Basic units (UNIT)**\n\n* `bit`   bit\n* `By`    byte\n* `s`     second\n* `min`   minute\n* `h`     hour\n* `d`     day\n\n**Prefixes (PREFIX)**\n\n* `k`     kilo    (10**3)\n* `M`     mega    (10**6)\n* `G`     giga    (10**9)\n* `T`     tera    (10**12)\n* `P`     peta    (10**15)\n* `E`     exa     (10**18)\n* `Z`     zetta   (10**21)\n* `Y`     yotta   (10**24)\n* `m`     milli   (10**-3)\n* `u`     micro   (10**-6)\n* `n`     nano    (10**-9)\n* `p`     pico    (10**-12)\n* `f`     femto   (10**-15)\n* `a`     atto    (10**-18)\n* `z`     zepto   (10**-21)\n* `y`     yocto   (10**-24)\n* `Ki`    kibi    (2**10)\n* `Mi`    mebi    (2**20)\n* `Gi`    gibi    (2**30)\n* `Ti`    tebi    (2**40)\n\n**Grammar**\n\nThe grammar also includes these connectors:\n\n* `\/`    division (as an infix operator, e.g. `1\/s`).\n* `.`    multiplication (as an infix operator, e.g. `GBy.d`)\n\nThe grammar for a unit is as follows:\n\n    Expression = Component { \".\" Component } { \"\/\" Component } ;\n\n    Component = ( [ PREFIX ] UNIT | \"%\" ) [ Annotation ]\n              | Annotation\n              | \"1\"\n              ;\n\n    Annotation = \"{\" NAME \"}\" ;\n\nNotes:\n\n* `Annotation` is just a comment if it follows a `UNIT` and is\n   equivalent to `1` if it is used alone. For examples,\n   `{requests}\/s == 1\/s`, `By{transmitted}\/s == By\/s`.\n* `NAME` is a sequence of non-blank printable ASCII characters not\n   containing '{' or '}'.\n* `1` represents dimensionless value 1, such as in `1\/s`.\n* `%` represents dimensionless value 1\/100, and annotates values giving\n   a percentage.",
+          "description": "The units in which the metric value is reported. It is only applicable\nif the `value_type` is `INT64`, `DOUBLE`, or `DISTRIBUTION`. The `unit`\ndefines the representation of the stored metric values.\n\nDifferent systems may scale the values to be more easily displayed (so a\nvalue of `0.02KBy` _might_ be displayed as `20By`, and a value of\n`3523KBy` _might_ be displayed as `3.5MBy`). However, if the `unit` is\n`KBy`, then the value of the metric is always in thousands of bytes, no\nmatter how it may be displayed..\n\nIf you want a custom metric to record the exact number of CPU-seconds used\nby a job, you can create an `INT64 CUMULATIVE` metric whose `unit` is\n`s{CPU}` (or equivalently `1s{CPU}` or just `s`). If the job uses 12,005\nCPU-seconds, then the value is written as `12005`.\n\nAlternatively, if you want a custom metric to record data in a more\ngranular way, you can create a `DOUBLE CUMULATIVE` metric whose `unit` is\n`ks{CPU}`, and then write the value `12.005` (which is `12005\/1000`),\nor use `Kis{CPU}` and write `11.723` (which is `12005\/1024`).\n\nThe supported units are a subset of [The Unified Code for Units of\nMeasure](http:\/\/unitsofmeasure.org\/ucum.html) standard:\n\n**Basic units (UNIT)**\n\n* `bit`   bit\n* `By`    byte\n* `s`     second\n* `min`   minute\n* `h`     hour\n* `d`     day\n\n**Prefixes (PREFIX)**\n\n* `k`     kilo    (10^3)\n* `M`     mega    (10^6)\n* `G`     giga    (10^9)\n* `T`     tera    (10^12)\n* `P`     peta    (10^15)\n* `E`     exa     (10^18)\n* `Z`     zetta   (10^21)\n* `Y`     yotta   (10^24)\n\n* `m`     milli   (10^-3)\n* `u`     micro   (10^-6)\n* `n`     nano    (10^-9)\n* `p`     pico    (10^-12)\n* `f`     femto   (10^-15)\n* `a`     atto    (10^-18)\n* `z`     zepto   (10^-21)\n* `y`     yocto   (10^-24)\n\n* `Ki`    kibi    (2^10)\n* `Mi`    mebi    (2^20)\n* `Gi`    gibi    (2^30)\n* `Ti`    tebi    (2^40)\n* `Pi`    pebi    (2^50)\n\n**Grammar**\n\nThe grammar also includes these connectors:\n\n* `\/`    division or ratio (as an infix operator). For examples,\n         `kBy\/{email}` or `MiBy\/10ms` (although you should almost never\n         have `\/s` in a metric `unit`; rates should always be computed at\n         query time from the underlying cumulative or delta value).\n* `.`    multiplication or composition (as an infix operator). For\n         examples, `GBy.d` or `k{watt}.h`.\n\nThe grammar for a unit is as follows:\n\n    Expression = Component { \".\" Component } { \"\/\" Component } ;\n\n    Component = ( [ PREFIX ] UNIT | \"%\" ) [ Annotation ]\n              | Annotation\n              | \"1\"\n              ;\n\n    Annotation = \"{\" NAME \"}\" ;\n\nNotes:\n\n* `Annotation` is just a comment if it follows a `UNIT`. If the annotation\n   is used alone, then the unit is equivalent to `1`. For examples,\n   `{request}\/s == 1\/s`, `By{transmitted}\/s == By\/s`.\n* `NAME` is a sequence of non-blank printable ASCII characters not\n   containing `{` or `}`.\n* `1` represents a unitary [dimensionless\n   unit](https:\/\/en.wikipedia.org\/wiki\/Dimensionless_quantity) of 1, such\n   as in `1\/s`. It is typically used when none of the basic units are\n   appropriate. For example, \"new users per day\" can be represented as\n   `1\/d` or `{new-users}\/d` (and a metric value `5` would mean \"5 new\n   users). Alternatively, \"thousands of page views per day\" would be\n   represented as `1000\/d` or `k1\/d` or `k{page_views}\/d` (and a metric\n   value of `5.3` would mean \"5300 page views per day\").\n* `%` represents dimensionless value of 1\/100, and annotates values giving\n   a percentage (so the metric values are typically in the range of 0..100,\n   and a metric value `3` means \"3 percent\").\n* `10^2.%` indicates a metric contains a ratio, typically in the range\n   0..1, that will be multiplied by 100 and displayed as a percentage\n   (so a metric value `0.03` means \"3 percent\").",
           "type": "string"
         },
         "description": {
@@ -1966,7 +2150,7 @@
               "description": "The name of the operation resource to be deleted.",
               "location": "path",
               "required": true,
-              "pattern": "^operations\/.+$",
+              "pattern": "^operations\/.*$",
               "type": "string"
             }
           },
@@ -1992,7 +2176,7 @@
               "description": "The name of the operation resource to be cancelled.",
               "location": "path",
               "required": true,
-              "pattern": "^operations\/.+$",
+              "pattern": "^operations\/.*$",
               "type": "string"
             }
           },
@@ -2015,6 +2199,64 @@
     },
     "services": {
       "methods": {
+        "disableVpcServiceControls": {
+          "id": "servicenetworking.services.disableVpcServiceControls",
+          "path": "v1/{+parent}:disableVpcServiceControls",
+          "flatPath": "v1/services/{servicesId}:disableVpcServiceControls",
+          "httpMethod": "PATCH",
+          "parameters": {
+            "parent": {
+              "description": "The service that is managing peering connectivity for a service producer's\norganization. For Google services that support this functionality, this\nvalue is `services\/servicenetworking.googleapis.com`.",
+              "location": "path",
+              "required": true,
+              "pattern": "^services\/[^\/]+$",
+              "type": "string"
+            }
+          },
+          "parameterOrder": [
+            "parent"
+          ],
+          "request": {
+            "$ref": "DisableVpcServiceControlsRequest"
+          },
+          "response": {
+            "$ref": "Operation"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/service.management"
+          ],
+          "description": "Disables VPC service controls for a connection."
+        },
+        "enableVpcServiceControls": {
+          "id": "servicenetworking.services.enableVpcServiceControls",
+          "path": "v1/{+parent}:enableVpcServiceControls",
+          "flatPath": "v1/services/{servicesId}:enableVpcServiceControls",
+          "httpMethod": "PATCH",
+          "parameters": {
+            "parent": {
+              "description": "The service that is managing peering connectivity for a service producer's\norganization. For Google services that support this functionality, this\nvalue is `services\/servicenetworking.googleapis.com`.",
+              "location": "path",
+              "required": true,
+              "pattern": "^services\/[^\/]+$",
+              "type": "string"
+            }
+          },
+          "parameterOrder": [
+            "parent"
+          ],
+          "request": {
+            "$ref": "EnableVpcServiceControlsRequest"
+          },
+          "response": {
+            "$ref": "Operation"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/service.management"
+          ],
+          "description": "Enables VPC service controls for a connection."
+        },
         "addSubnetwork": {
           "id": "servicenetworking.services.addSubnetwork",
           "path": "v1/{+parent}:addSubnetwork",
@@ -2051,7 +2293,7 @@
           "httpMethod": "POST",
           "parameters": {
             "parent": {
-              "description": "Required. This is in a form services\/{service}.\n{service} the name of the private access management service, for example\n'service-peering.example.com'.",
+              "description": "Required. This is in a form services\/{service}. {service} the name of the private\naccess management service, for example 'service-peering.example.com'.",
               "location": "path",
               "required": true,
               "pattern": "^services\/[^\/]+$",
@@ -2072,6 +2314,35 @@
             "https://www.googleapis.com/auth/service.management"
           ],
           "description": "Service producers can use this method to find a currently unused range\nwithin consumer allocated ranges.   This returned range is not reserved,\nand not guaranteed to remain unused.\nIt will validate previously provided allocated ranges, find\nnon-conflicting sub-range of requested size (expressed in\nnumber of leading bits of ipv4 network mask, as in CIDR range\nnotation).\nOperation<response: Range>"
+        },
+        "validate": {
+          "id": "servicenetworking.services.validate",
+          "path": "v1/{+parent}:validate",
+          "flatPath": "v1/services/{servicesId}:validate",
+          "httpMethod": "POST",
+          "parameters": {
+            "parent": {
+              "description": "Required. This is in a form services\/{service} where {service} is the name of the\nprivate access management service. For example\n'service-peering.example.com'.",
+              "location": "path",
+              "required": true,
+              "pattern": "^services\/[^\/]+$",
+              "type": "string"
+            }
+          },
+          "parameterOrder": [
+            "parent"
+          ],
+          "request": {
+            "$ref": "ValidateConsumerConfigRequest"
+          },
+          "response": {
+            "$ref": "ValidateConsumerConfigResponse"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/service.management"
+          ],
+          "description": "Service producers use this method to validate if the consumer provided\nnetwork, project and the requested range is valid. This allows them to use\na fail-fast mechanism for consumer requests, and not have to wait for\nAddSubnetwork operation completion to determine if user request is invalid."
         }
       }
       ,

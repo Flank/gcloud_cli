@@ -1,11 +1,11 @@
 NAME
     gcloud alpha compute packet-mirrorings update - update a Google Compute
-        Engine packet mirroring
+        Engine packet mirroring policy
 
 SYNOPSIS
     gcloud alpha compute packet-mirrorings update NAME [--async]
         [--collector-ilb=COLLECTOR_ILB] [--description=DESCRIPTION] [--enable]
-        [--priority=PRIORITY] [--region=REGION]
+        [--region=REGION]
         [--add-filter-cidr-ranges=[CIDR_RANGE,...] | --clear-filter-cidr-ranges
           | --remove-filter-cidr-ranges=[CIDR_RANGE,...]
           | --set-filter-cidr-ranges=[CIDR_RANGE,...]]
@@ -23,7 +23,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Update a Google Compute Engine packet mirroring.
+    (ALPHA) Update a Google Compute Engine packet mirroring policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -51,23 +51,6 @@ FLAGS
 
      --enable
         Enable or disable the packet-mirroring.
-
-     --priority=PRIORITY
-        Priority of applying this packet mirroring. Priority is used to break
-        ties in cases where there is more than one matching policy. In the case
-        of two policies that apply for a given Instance, the one with the
-        lowest-numbered priority value wins. Mirroring all instances in a
-        region for the network may produce a lot of mirrored traffic. If you
-        want to "zoom in" on a subset of that traffic you can create another
-        packet mirroring with a more restricted set of mirrored instances
-        (using the --mirrored- flags) or a more restrictive CIDR filter and
-        send that traffic to a dedicated collector. Because we cannot mirror
-        traffic to multiple sets of collector, you should set the priority for
-        the more specific packet mirroring configuration to a lower value to
-        ensure the packets are sent to the desired collector. Default value is
-        1000. Valid range is 0 through 65535. If multiple policies end up
-        having the same priority, then one of the policies is picked
-        non-deterministically.
 
      --region=REGION
         Region of the packet mirroring to update. Overrides the default
@@ -162,8 +145,9 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     Stop mirroring by tags, add subnet-1 as a mirrored subnet.
@@ -191,7 +175,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud compute packet-mirrorings update
         $ gcloud beta compute packet-mirrorings update
 

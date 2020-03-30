@@ -1,12 +1,12 @@
 title: compute machine-images get-iam-policy scenario test
-release_tracks: [ALPHA]
+release_tracks: [BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
       compute machine-images set-iam-policy my-image policy.json
   - stderr: |
-      Updated IAM policy for machine_image [my-image].
+      Updated IAM policy for machine image [my-image].
   - stdout: |
       bindings:
       - members:
@@ -14,6 +14,11 @@ summary:
         role: roles/compute.admin
       etag: BwWG4uduM3w=
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: alpha
+      BETA: beta
 - write_file:
     path: policy.json
     contents: |
@@ -34,7 +39,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/global/machineImages/my-image/setIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/machineImages/my-image/setIamPolicy?alt=json
           method: POST
           headers: {}
           body:
@@ -62,7 +67,7 @@ actions:
               ]
             }
     - expect_stderr: |
-        Updated IAM policy for machine_image [my-image].
+        Updated IAM policy for machine image [my-image].
     - expect_stdout: |
         bindings:
         - members:

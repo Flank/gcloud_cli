@@ -23,8 +23,8 @@ DESCRIPTION
     specify the least and the most disruptive actions that can be performed
     while updating the instances. This way you can reduce the risk of rolling
     out too many changes at once. Possible actions are: none, refresh, restart
-    and replace. The order of disruption to the instance is: none < refresh <
-    restart < replace.
+    and replace. The level of disruption to the instance is ordered as: none <
+    refresh < restart < replace.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -93,12 +93,13 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To update instances instance-1, instance-2 in my-group, with minimal-action
-    none and most-disruptive-allowed-action equal to restart, run:
+    To update instances instance-1, instance-2 in my-group, with
+    minimal-action=none and most-disruptive-allowed-action=restart, run:
 
         $ gcloud beta compute instance-groups managed update-instances \
               my-group --instances=instance-1,instance2 \
@@ -106,8 +107,9 @@ EXAMPLES
               --most-disruptive-allowed-action=restart
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute instance-groups managed update-instances
         $ gcloud alpha compute instance-groups managed update-instances
 

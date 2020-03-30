@@ -608,7 +608,11 @@ class Operation(object):
     return self._name
 
   def MatchesPollingRequest(self, uri, method):
-    return method == 'GET' and ('/' + self.name) in uri
+    # Operations can be polled using an async Get method or a sync Wait method.
+    is_operation_get = method == 'GET' and '/{}'.format(self.name) in uri
+    is_operation_wait = (method == 'POST' and
+                         '/{}/wait'.format(self.name) in uri)
+    return is_operation_get or is_operation_wait
 
   def Respond(self):
     self.status = Operation._NEXT_STATE[self.status]

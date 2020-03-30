@@ -17,8 +17,7 @@ gcloud alpha domains registrations operations describe \- show details about a C
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR This command fetches and prints information about a Cloud Domains
-operation.
+\fB(ALPHA)\fR Print information about a Cloud Domains operation.
 
 
 
@@ -51,18 +50,18 @@ ID of the operation or fully qualified identifier for the operation.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To describe an operation, run:
+To describe an operation \f5\fIoperation\-id\fR\fR, run:
 
 .RS 2m
-$ gcloud alpha domains registrations operations describe \e
-    operation\-1549382742802\-58127c801803a\-67763ca9\-86a28c16
+$ gcloud alpha domains registrations operations describe operation\-id
 .RE
 
 

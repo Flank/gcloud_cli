@@ -48,14 +48,20 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
     The following command lists the last five created projects, sorted
     alphabetically by project ID:
 
         $ gcloud beta projects list --sort-by=projectId --limit=5
+
+    To list projects that have been marked for deletion:
+
+        $ gcloud beta projects list \
+            --filter='lifecycleState:DELETE_REQUESTED'
 
 NOTES
     This command is currently in BETA and may change without notice. These

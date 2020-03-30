@@ -11,7 +11,7 @@ gcloud compute health\-checks create http2 \- create a HTTP2 health check to mon
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute health\-checks create http2\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR;\ default="/"] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-port\fR=\fIPORT\fR;\ default=80\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR\ \fB\-\-use\-serving\-port\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute health\-checks create http2\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR;\ default="/"] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-port\fR=\fIPORT\fR;\ default=80\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR\ \fB\-\-use\-serving\-port\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -105,6 +105,44 @@ marked as unhealthy. The default is 2.
 
 .TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the HTTP2 health check is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the HTTP2 health check to create. If not specified, you may be
+prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.RE
+.sp
+.TP 2m
+
 These flags configure the port that the health check monitors. If none is
 specified, the default port of 80 is used; if both \f5\-\-port\fR and
 \f5\-\-port\-name\fR are specified, \f5\-\-port\fR takes precedence.
@@ -141,8 +179,9 @@ service.
 These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
-\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
-help\fR for details.
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
 
 
 

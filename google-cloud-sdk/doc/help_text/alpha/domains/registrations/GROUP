@@ -5,23 +5,24 @@ SYNOPSIS
     gcloud alpha domains registrations GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Commands for managing domain registrations.
+    (ALPHA) Commands for managing Cloud Domains registrations.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 GROUPS
     GROUP is one of the following:
 
      authorization-code
-        (ALPHA) Manage Cloud Domains authorization code.
+        (ALPHA) Manage Cloud Domains registration's authorization code.
 
      operations
-        (ALPHA) Manage your Cloud Domains operations.
+        (ALPHA) Manage Cloud Domains operations.
 
 COMMANDS
     COMMAND is one of the following:
@@ -33,13 +34,13 @@ COMMANDS
         (ALPHA) Create a new domain registration.
 
      describe
-        (ALPHA) Describe an existing domain registration.
+        (ALPHA) Describe an existing Cloud Domains registration.
 
      detach
         (ALPHA) Detach a domain registration.
 
      list
-        (ALPHA) List domain registrations.
+        (ALPHA) List Cloud Domains registrations.
 
      search-domains
         (ALPHA) Search for available domains.

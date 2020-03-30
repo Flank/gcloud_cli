@@ -65,30 +65,34 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
     --impersonate-service-account, --log-http, --project, --quiet,
-    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
-    details.
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
 
 EXAMPLES
-    To see the list of all operations, run:
+    To see the list of all operations in Dataproc's 'us-central1' region, run:
 
-        $ gcloud beta dataproc operations list
+        $ gcloud beta dataproc operations list --region='us-central1'
 
-    To see the list of all create cluster operations, run:
+    To see the list of all create cluster operations in Dataproc's 'global'
+    region, run:
 
-        $ gcloud beta dataproc operations list \
+        $ gcloud beta dataproc operations list --region='global' \
             --filter='operationType = CREATE'
 
-    To see the list of all active operations in a cluster named mycluster, run:
+    To see the list of all active operations in a cluster named 'mycluster'
+    located in Dataproc's 'global' region, run:
 
-        $ gcloud beta dataproc operations list \
-            --filter='status.state = RUNNING AND clusterName = mycluster'
+        $ gcloud beta dataproc operations list --region='global' \
+            --filter='status.state = RUNNING AND
+          clusterName = mycluster'
 
-    To see a list of all pending operations the label env=staging on cluster
-    mycluster, run:
+    To see a list of all pending operations with the label env=staging on
+    cluster mycluster located in Dataproc's 'us-central1' region, run:
 
-        $ gcloud beta dataproc operations list \
-            --filter='status.state = PENDING  AND labels.env = staging AND
-         clusterName = mycluster'
+        $ gcloud beta dataproc operations list --region='us-central1' \
+            --filter='status.state = PENDING
+          AND labels.env = staging AND clusterName = mycluster'
 
 NOTES
     This command is currently in BETA and may change without notice. These
