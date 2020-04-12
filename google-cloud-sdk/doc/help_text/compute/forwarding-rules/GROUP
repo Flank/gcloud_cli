@@ -6,7 +6,17 @@ SYNOPSIS
     gcloud compute forwarding-rules COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Read and manipulate traffic forwarding rules to network load balancers.
+    Read and manipulate traffic forwarding rules for load balancers, protocol
+    forwarding, or Classic Cloud VPN.
+
+    For more information about forwarding rules, see the forwarding rules
+    documentation
+    (https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts).
+
+    See also: Region forwarding rules API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/forwardingRules)
+    and Global forwarding rules API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/globalForwardingRules).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

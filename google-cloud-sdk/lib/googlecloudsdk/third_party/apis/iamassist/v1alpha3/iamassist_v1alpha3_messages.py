@@ -831,6 +831,16 @@ class GoogleIamAssistV1alpha3ReplayLogsMetadata(_messages.Message):
   unchangedCount = _messages.IntegerField(6, variant=_messages.Variant.INT32)
 
 
+class GoogleIamAssistV1alpha3ReplayOperationMetadata(_messages.Message):
+  r"""Metadata about a ReplayAccessLogs operation.
+
+  Fields:
+    startTime: Time when the request was received.
+  """
+
+  startTime = _messages.StringField(1)
+
+
 class GoogleIamAssistV1alpha3ReplayResult(_messages.Message):
   r"""The result of replaying a single access tuple against a simulated state.
 
@@ -1035,6 +1045,19 @@ class GoogleIamV1Policy(_messages.Message):
   bindings = _messages.MessageField('GoogleIamV1Binding', 2, repeated=True)
   etag = _messages.BytesField(3)
   version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+
+
+class GoogleLongrunningListOperationsResponse(_messages.Message):
+  r"""The response message for Operations.ListOperations.
+
+  Fields:
+    nextPageToken: The standard List next-page token.
+    operations: A list of operations that matches the specified filter in the
+      request.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  operations = _messages.MessageField('GoogleLongrunningOperation', 2, repeated=True)
 
 
 class GoogleLongrunningOperation(_messages.Message):
@@ -1657,6 +1680,32 @@ class GoogleTypeExpr(_messages.Message):
   expression = _messages.StringField(2)
   location = _messages.StringField(3)
   title = _messages.StringField(4)
+
+
+class IamassistOperationsGetRequest(_messages.Message):
+  r"""A IamassistOperationsGetRequest object.
+
+  Fields:
+    name: The name of the operation resource.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class IamassistOperationsListRequest(_messages.Message):
+  r"""A IamassistOperationsListRequest object.
+
+  Fields:
+    filter: The standard list filter.
+    name: The name of the operation's parent resource.
+    pageSize: The standard list page size.
+    pageToken: The standard list page token.
+  """
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
 
 
 class IamassistReplaysGetRequest(_messages.Message):

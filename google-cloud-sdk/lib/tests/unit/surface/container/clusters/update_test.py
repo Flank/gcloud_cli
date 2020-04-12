@@ -2318,6 +2318,11 @@ resourceLimits:
         self.msgs.ClusterUpdate(desiredPrivateClusterConfig=desired),
         flags=flags)
 
+  def testEnableGvnic(self):
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredEnableGvnic=True),
+        flags='--enable-gvnic')
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):

@@ -1,0 +1,79 @@
+
+.TH "GCLOUD_BETA_EMULATORS_SPANNER_START" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta emulators spanner start \- start a local Cloud Spanner emulator
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta emulators spanner start\fR [\fB\-\-host\-port\fR=\fIHOST_PORT\fR] [\fB\-\-rest\-port\fR=\fIREST_PORT\fR] [\fB\-\-use\-docker\fR=\fIUSE_DOCKER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command starts a local Cloud Spanner emulator.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-host\-port\fR=\fIHOST_PORT\fR
+The host:port to which the emulator should be bound. The default value is
+localhost:9010. Note that this port serves gRPC requests. To override the
+default port serving REST requests, use \-\-rest\-port. If using Docker to run
+the emulator, the host must be specified as an ipaddress.
+
+.TP 2m
+\fB\-\-rest\-port\fR=\fIREST_PORT\fR
+The port at which REST requests are served. gcloud uses REST to communicate with
+the emulator. The default value is 9020.
+
+.TP 2m
+\fB\-\-use\-docker\fR=\fIUSE_DOCKER\fR
+Use the cloud spanner emulator docker image even if the platform has a native
+binary available in the sdk. Currently we only provide a native binary for
+Linux. For other systems, you must install docker for your platform before
+starting the emulator.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To start a local Cloud Spanner emulator, run:
+
+.RS 2m
+$ gcloud beta emulators spanner start
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha emulators spanner start
+.RE
+

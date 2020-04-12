@@ -57,11 +57,11 @@ FLAGS
      revision names or "LATEST" for the latest ready revision. For example,
      --set-tags=candidate=LATEST,current=myservice-v1 assigns the tag
      "candidate" to the latest ready revision and the tag "current" to the
-     revision with name "service-nw9hs" and clears any existing tags. Changing
+     revision with name "myservice-v1" and clears any existing tags. Changing
      tags does not affect the traffic percentage assigned to revisions. When
-     using a tags flag and one or more of --to-latest and --to-revisions, in
-     the same command, the tags change occurs first, then the traffic
-     percentage change occurs. At most one of these may be specified:
+     using a tags flag and one or more of --to-latest and --to-revisions in the
+     same command, the tags change occurs first then the traffic percentage
+     change occurs. At most one of these may be specified:
 
        --clear-tags
           Remove all tags.

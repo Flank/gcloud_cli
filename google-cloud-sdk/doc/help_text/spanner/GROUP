@@ -18,9 +18,6 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
-     backups
-        Manage Cloud Spanner backups.
-
      databases
         Manage Cloud Spanner databases.
 

@@ -23,7 +23,8 @@ SYNOPSIS
         [--network-interface=[PROPERTY=VALUE,...]]
         [--network-tier=NETWORK_TIER] [--preemptible]
         [--private-network-ip=PRIVATE_NETWORK_IP]
-        [--no-require-csek-key-create] [--no-restart-on-failure]
+        [--no-require-csek-key-create]
+        [--resource-policies=[RESOURCE_POLICY,...]] [--no-restart-on-failure]
         [--shielded-integrity-monitoring] [--shielded-secure-boot]
         [--shielded-vtpm] [--source-instance-template=SOURCE_INSTANCE_TEMPLATE]
         [--subnet=SUBNET] [--tags=TAG,[TAG,...]] [--zone=ZONE]
@@ -447,6 +448,10 @@ FLAGS
         https://cloud.google.com/compute/docs/disks/customer-supplied-encryption
         for more details. Enabled by default, use --no-require-csek-key-create
         to disable.
+
+     --resource-policies=[RESOURCE_POLICY,...]
+        A list of resource policy names to be added to the instance. The
+        policies must exist in the same region as the instance.
 
      --restart-on-failure
         The instances will be restarted if they are terminated by Compute

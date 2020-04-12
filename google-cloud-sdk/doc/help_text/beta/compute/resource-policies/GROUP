@@ -1,13 +1,20 @@
 NAME
-    gcloud beta compute resource-policies - manage Google Compute Engine
-        Resource Policies
+    gcloud beta compute resource-policies - manage Compute Engine Resource
+        Policies
 
 SYNOPSIS
     gcloud beta compute resource-policies GROUP | COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Manage Google Compute Engine Resource Policies.
+    (BETA) Manage Compute Engine resource policies.
+
+    For more information about resource policies, see the resource policies
+    documentation
+    (https://cloud.google.com/compute/docs/access#resource-policies).
+
+    See also: Resource policies API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/resourcePolicies).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

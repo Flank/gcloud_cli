@@ -1313,17 +1313,6 @@ class InstanceGroupManagersSetAutoscalingBetaTest(
         [(self.compute.autoscalers, 'Update', request)],
     )
 
-
-class InstanceGroupManagersSetAutoscalingAlphaTest(
-    InstanceGroupManagersSetAutoscalingBetaTest):
-
-  INSTANCE_GROUP_MANAGERS = (
-      test_resources.MakeInstanceGroupManagers('alpha'))
-  AUTOSCALERS = test_resources.MakeAutoscalers('alpha')
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def testInsertAutoscaler_ScaleIn(self):
     self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1 '
@@ -1390,6 +1379,17 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(
         self.autoscalers_list_request,
         [(self.compute.autoscalers, 'Update', request)],
     )
+
+
+class InstanceGroupManagersSetAutoscalingAlphaTest(
+    InstanceGroupManagersSetAutoscalingBetaTest):
+
+  INSTANCE_GROUP_MANAGERS = (
+      test_resources.MakeInstanceGroupManagers('alpha'))
+  AUTOSCALERS = test_resources.MakeAutoscalers('alpha')
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testUpdatePredictiveAutoscaling(self):
     self.make_requests.side_effect = iter([[self.INSTANCE_GROUP_MANAGERS[0]],

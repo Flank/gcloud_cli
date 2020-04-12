@@ -213,9 +213,9 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         'secondaryWorkerBootDiskSizeGb' in kwargs or
         'secondaryWorkerBootDiskType' in kwargs or
         'secondaryWorkerAcceleratorTypeUri' in kwargs or
-        'secondaryWorkerPreemptibility' in kwargs):
+        'secondaryWorkerType' in kwargs):
 
-      preemptibility_map = {
+      type_map = {
           'preemptible':
               self.messages.InstanceGroupConfig.PreemptibilityValueValuesEnum(
                   'PREEMPTIBLE'),
@@ -228,8 +228,8 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
           numInstances=kwargs.get('secondaryWorkerConfigNumInstances', None),
           diskConfig=make_disk_config('secondaryWorker'),
           accelerators=make_accelerators('secondaryWorker'),
-          preemptibility=preemptibility_map.get(
-              kwargs.get('secondaryWorkerPreemptibility', None), None))
+          preemptibility=type_map.get(
+              kwargs.get('secondaryWorkerType', None), None))
 
     endpoint_config = None
     if 'enableHttpPortAccess' in kwargs:

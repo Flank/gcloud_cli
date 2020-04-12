@@ -41,10 +41,13 @@ class EndpointUtilTest(test_case.TestCase):
     self.assertEqual(properties.VALUES.api_endpoint_overrides.ml.Get(),
                      existing_override)
 
-  def testGetRegionalMlEndpoint(self):
-    regional_endpoint = util.GetRegionalMlEndpoint(REGION)
+  def testGetEffectiveMlEndpoint(self):
+    regional_endpoint = util.GetEffectiveMlEndpoint(REGION)
     self.assertEqual(regional_endpoint,
                      'https://us-central1-ml.googleapis.com/')
+    global_endpoint = util.GetEffectiveMlEndpoint(None)
+    self.assertEqual(global_endpoint,
+                     'https://ml.googleapis.com/')
 
 
 if __name__ == '__main__':

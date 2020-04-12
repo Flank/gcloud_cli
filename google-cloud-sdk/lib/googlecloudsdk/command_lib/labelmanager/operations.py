@@ -20,7 +20,12 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.labelmanager import service as labelmanager
 from googlecloudsdk.api_lib.util import waiter
+from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import resources
+
+
+class OperationError(exceptions.Error):
+  pass
 
 
 def WaitForOperation(operation, message, service):
@@ -36,7 +41,7 @@ def WaitForOperation(operation, message, service):
     apitools.base.py.HttpError: if the request returns an HTTP error
 
   Returns:
-    The created LabelKey or LabelValue resource.
+    The LabelKey or LabelValue resource.
   """
   operation_ref = resources.REGISTRY.Parse(
       operation.name, collection='labelmanager.operations')

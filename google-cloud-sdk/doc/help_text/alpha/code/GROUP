@@ -77,7 +77,7 @@ COMMANDS
     COMMAND is one of the following:
 
      dev
-        (ALPHA) Run a service in a development environment.
+        (ALPHA) Run a Cloud Run service in a local development environment.
 
      export
         (ALPHA) Writes skaffold and kubernetes files for local development.
@@ -85,7 +85,7 @@ COMMANDS
 EXAMPLES
     To set up a local development environment, run:
 
-        $ gcloud alpha code setup
+        $ gcloud alpha code dev
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

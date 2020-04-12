@@ -39,6 +39,10 @@ GROUPS
      metrics
         (BETA) A group of subcommands for working with Dataflow metrics.
 
+     snapshots
+        (BETA) A group of subcommands for working with Cloud Dataflow
+        snapshots.
+
      sql
         (BETA) A group of subcommands for working with Dataflow SQL.
 

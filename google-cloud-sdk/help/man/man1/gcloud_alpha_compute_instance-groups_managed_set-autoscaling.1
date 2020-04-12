@@ -197,8 +197,9 @@ exclusive with 'max\-scaled\-in\-replicas'.
 
 .TP 2m
 \fBtime\-window\fR
-How long back autoscaling should look when computing recommendations to include
-directives regarding slower scale in. Measured in seconds.
+How long back autoscaling should look when computing recommendations. The
+autoscaler will not resize below the maximum allowed deduction subtracted from
+the peak size observed in this period. Measured in seconds.
 
 .RE
 .sp

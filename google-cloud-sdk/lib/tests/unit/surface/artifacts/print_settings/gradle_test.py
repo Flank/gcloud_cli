@@ -19,16 +19,21 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.artifacts import exceptions as ar_exceptions
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.artifacts import base
 
 
-class GradleTests(base.ARTestBase):
+class GradleTestsBeta(base.ARTestBase):
+
+  def PreSetUp(self):
+    super(GradleTestsBeta, self).PreSetUp()
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testGradle(self):
     cmd = ' '.join([
-        'beta', 'artifacts', 'print-settings', 'gradle',
-        '--repository=my-repo', '--location=us'
+        'artifacts', 'print-settings', 'gradle', '--repository=my-repo',
+        '--location=us'
     ])
     self.SetListLocationsExpect('us')
     self.SetGetRepositoryExpect(
@@ -42,7 +47,7 @@ see docs.gradle.org/current/userguide/publishing_maven.html
 ======================================================
 plugins {
   id "maven-publish"
-  id "com.google.cloud.artifactregistry.gradle-plugin" version "2.0.0"
+  id "com.google.cloud.artifactregistry.gradle-plugin" version "2.0.1"
 }
 
 publishing {
@@ -64,15 +69,15 @@ repositories {
         normalize_space=True)
 
   def testMissingRepo(self):
-    cmd = ' '.join(['beta', 'artifacts', 'print-settings', 'gradle'])
+    cmd = ' '.join(['artifacts', 'print-settings', 'gradle'])
     with self.assertRaises(ar_exceptions.InvalidInputValueError):
       self.Run(cmd)
     self.AssertErrContains('Failed to find attribute [repository]')
 
   def testInvalidLocation(self):
     cmd = ' '.join([
-        'beta', 'artifacts', 'print-settings', 'gradle',
-        '--repository=my-repo', '--location=invalid'
+        'artifacts', 'print-settings', 'gradle', '--repository=my-repo',
+        '--location=invalid'
     ])
     self.SetListLocationsExpect('us')
     with self.assertRaises(ar_exceptions.UnsupportedLocationError):
@@ -82,8 +87,8 @@ repositories {
 
   def testInvalidRepoType(self):
     cmd = ' '.join([
-        'beta', 'artifacts', 'print-settings', 'gradle',
-        '--repository=my-repo', '--location=us'
+        'artifacts', 'print-settings', 'gradle', '--repository=my-repo',
+        '--location=us'
     ])
     self.SetListLocationsExpect('us')
     self.SetGetRepositoryExpect(
@@ -91,6 +96,13 @@ repositories {
     with self.assertRaises(ar_exceptions.InvalidInputValueError):
       self.Run(cmd)
     self.AssertErrContains('Invalid repository type NPM. Valid type is MAVEN')
+
+
+class GradleTestsAlpha(GradleTestsBeta):
+
+  def PreSetUp(self):
+    super(GradleTestsAlpha, self).PreSetUp()
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

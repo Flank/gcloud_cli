@@ -6,6 +6,8 @@ summary:
   - command: ai-platform models remove-iam-policy-binding my_model --member=user:owner@gmail.com
       --role=roles/owner
   - stderr: |
+      WARNING: Using endpoint [https://ml.googleapis.com/]
+  - stderr: |
       Updated IAM policy for model [my_model].
   - stdout: |
       bindings:
@@ -20,6 +22,8 @@ actions:
     command: ai-platform models remove-iam-policy-binding my_model --member=user:owner@gmail.com
       --role=roles/owner
     events:
+    - expect_stderr: |
+        WARNING: Using endpoint [https://ml.googleapis.com/]
     - api_call:
         expect_request:
           uri: https://ml.googleapis.com/v1/projects/fake-project/models/my_model:getIamPolicy?alt=json

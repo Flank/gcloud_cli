@@ -35,27 +35,26 @@ FLAGS
         be identical to those in the previous call.
 
      --query=QUERY
-        The query statement.
+        The query statement. To learn how to construct a query, see
+        https://cloud.google.com/asset-inventory/docs/searching-resources#how_to_construct_a_query.
 
         Examples:
-        * To find all Cloud resources with "foobar" in their searchable
-          attributes: foobar
-        * To find all Cloud resources with "foo" prefix in their searchable
-          attributes: foo
-        * To find all Cloud resources with "oo" substring within any
-          searchable attribute: oo
-        * To find all Cloud resources with token "//xyz/123" in the full
-          resource name. See Full Resource Names
-          (https://cloud.google.com/apis/design/resource_names#full_resource_name):
-          name: "//xyz/123"
-        * To find all Cloud resources with prefix "//xyz" in the full
-          resource names. name: "//xyz"
-        * To find all Cloud resources with substring "xyz" in the full
-          resource names. name: "xyz"
-        * To find all Cloud resources with "xyz" in their display name:
-          displayName: "xyz"
-        * To find all Cloud resources with "xyz" in their description:
-          description: "xyz"
+        * To find all Google Cloud resources with "foobar" in their
+          searchable attributes: foobar
+        * To find all Google Cloud resources with "foo" prefix in their
+          searchable attributes: foo*
+        * To find all Google Cloud resources with "oo" substring within any
+          searchable attribute: *oo*
+        * To find all Google Cloud resources with token "//xyz/123" in the
+          full resource name: name : "//xyz/123"
+        * To find all Google Cloud resources with prefix "//xyz" in the full
+          resource names: name : "//xyz*"
+        * To find all Google Cloud resources with substring "xyz" in the full
+          resource names: name : "*xyz*"
+        * To find all Google Cloud resources with "xyz" in their display
+          name: displayName : "xyz"
+        * To find all Google Cloud resources with "xyz" in their description:
+          description : "xyz"
 
      --scope=SCOPE
         The search result scope is limited within a project, folder, or
@@ -88,7 +87,7 @@ EXAMPLES
     cloudasset.assets.searchAllResources permission, run:
 
         $ gcloud beta asset search-all-resources \
-          --scope='organizations/123' --query='name:"*xyz*"'
+          --scope='organizations/123' --query='name : "*xyz*"'
 
 NOTES
     This command is currently in BETA and may change without notice.

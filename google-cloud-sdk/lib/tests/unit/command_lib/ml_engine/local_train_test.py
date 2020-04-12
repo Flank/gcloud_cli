@@ -52,7 +52,7 @@ class LocalTrainTest(base.MlBetaPlatformTestBase):
 
   def SetUp(self):
     self.version_patcher = mock.patch(
-        'googlecloudsdk.command_lib.ml_engine.local_train._GetPrimaryNodeName',
+        'googlecloudsdk.command_lib.ml_engine.local_train.GetPrimaryNodeName',
         return_value='master')
     self.version_patcher.start()
 
@@ -205,24 +205,24 @@ class LocalTrainTest(base.MlBetaPlatformTestBase):
     self.StartPatch(
         'subprocess.Popen',
         return_value=_TensorFlowVersionTestHelper(b'1.0', 0))
-    result = local_train._GetPrimaryNodeName()
+    result = local_train.GetPrimaryNodeName()
     self.assertEqual(result, 'master')
     # 2.x with binary
     self.StartPatch(
         'subprocess.Popen',
         return_value=_TensorFlowVersionTestHelper(b'2.0', 0))
-    result = local_train._GetPrimaryNodeName()
+    result = local_train.GetPrimaryNodeName()
     self.assertEqual(result, 'chief')
     # 1.x
     self.StartPatch(
         'subprocess.Popen', return_value=_TensorFlowVersionTestHelper('1.0', 0))
-    result = local_train._GetPrimaryNodeName()
+    result = local_train.GetPrimaryNodeName()
     self.assertEqual(result, 'master')
     # tf not installed. function won't raise if tf not installed. The check
     # is enforced by higer level of the sdk.
     self.StartPatch(
         'subprocess.Popen',
         return_value=_TensorFlowVersionTestHelper(b"Can't Import", 1))
-    result = local_train._GetPrimaryNodeName()
+    result = local_train.GetPrimaryNodeName()
     self.assertEqual(result, 'chief')
 

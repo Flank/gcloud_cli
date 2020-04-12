@@ -1,4 +1,4 @@
-title: LabelManager - LabelValues - Describe test
+title: LabelManager - LabelBindings - List test
 release_tracks: [ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
@@ -37,7 +37,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F961309089256
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F961309089256&showDeleted=True
           method: GET
           body: null
         return_response:
@@ -57,7 +57,7 @@ actions:
               createTime: '2019-10-10T22:06:52.891Z'
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F889673984972
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F889673984972&showDeleted=True
           method: GET
           body: null
         return_response:
@@ -109,7 +109,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F889673984972
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F889673984972&showDeleted=True
           method: GET
           body: null
         return_response:

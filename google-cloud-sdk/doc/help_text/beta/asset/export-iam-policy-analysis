@@ -1,0 +1,115 @@
+NAME
+    gcloud beta asset export-iam-policy-analysis - export IAM policy analysis
+        that match a request to Google Cloud Storage
+
+SYNOPSIS
+    gcloud beta asset export-iam-policy-analysis --output-path=OUTPUT_PATH
+        (--folder=FOLDER_ID | --organization=ORGANIZATION_ID)
+        [--full-resource-name=FULL_RESOURCE_NAME] [--identity=IDENTITY]
+        [--expand-groups --expand-resources
+          --expand-roles --output-group-edges --output-resource-edges]
+        [--permissions=[PERMISSIONS,...] --roles=[ROLES,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Export IAM policy analysis that matches a request to Google Cloud
+    Storage.
+
+REQUIRED FLAGS
+     The destination path for exporting IAM policy analysis. This must be
+     specified.
+
+       --output-path=OUTPUT_PATH
+          Google Cloud Storage URI where the results will go. URI must start
+          with "gs://". For example, "gs://bucket_name/object_name"
+
+     Exactly one of these must be specified:
+
+       --folder=FOLDER_ID
+          The folder ID to perform the analysis.
+
+       --organization=ORGANIZATION_ID
+          The organization ID to perform the analysis.
+
+OPTIONAL FLAGS
+     Specifies a resource for analysis. Leaving it empty means ANY.
+
+       --full-resource-name=FULL_RESOURCE_NAME
+          The full resource name.
+
+     Specifies an identity for analysis. Leaving it empty means ANY.
+
+       --identity=IDENTITY
+          The identity appearing in the form of members in the IAM policy
+          binding.
+
+     The analysis options.
+
+       --expand-groups
+          If true, the identities section of the result will expand any Google
+          groups appearing in an IAM policy binding. Default is false.
+
+       --expand-resources
+          If true, the resource section of the result will expand any resource
+          attached to an IAM policy to include resources lower in the resource
+          hierarchy. Default is false.
+
+       --expand-roles
+          If true, the access section of result will expand any roles appearing
+          in IAM policy bindings to include their permissions. Default is
+          false.
+
+       --output-group-edges
+          If true, the result will output group identity edges, starting from
+          the binding's group members, to any expanded identities. Default is
+          false.
+
+       --output-resource-edges
+          If true, the result will output resource edges, starting from the
+          policy attached resource, to any expanded resources. Default is
+          false.
+
+     Specifies roles or permissions for analysis. Leaving it empty means ANY.
+
+       --permissions=[PERMISSIONS,...]
+          The permissions to appear in the result.
+
+       --roles=[ROLES,...]
+          The roles to appear in the result.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+EXAMPLES
+    To find out which users have been granted the iam.serviceAccounts.actAs
+    permission on a service account, run:
+
+        $ gcloud beta asset export-iam-policy-analysis \
+            --organization=YOUR_ORG_ID \
+            --full-resource-name=YOUR_SERVICE_ACCOUNT_FULL_RESOURCE_NAME \
+            --permissions='iam.serviceAccounts.actAs' \
+            --output-path='gs://YOUR_BUCKET_NAME/YOUR_OBJECT_NAME'
+
+    To find out which resources a user can access, run:
+
+        $ gcloud beta asset export-iam-policy-analysis \
+            --organization=YOUR_ORG_ID --identity='user:u1@foo.com' \
+            --output-path='gs://YOUR_BUCKET_NAME/YOUR_OBJECT_NAME'
+
+    To find out which roles or permissions a user has been granted on a
+    project, run:
+
+        $ gcloud beta asset export-iam-policy-analysis \
+            --organization=YOUR_ORG_ID \
+            --full-resource-name=YOUR_PROJECT_FULL_RESOURCE_NAME \
+            --identity='user:u1@foo.com' \
+            --output-path='gs://YOUR_BUCKET_NAME/YOUR_OBJECT_NAME'
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

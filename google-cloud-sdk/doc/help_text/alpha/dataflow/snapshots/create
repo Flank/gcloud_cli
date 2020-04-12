@@ -3,7 +3,7 @@ NAME
         Dataflow job
 
 SYNOPSIS
-    gcloud alpha dataflow snapshots create --job-id=JOB_ID [--region=REGION_ID]
+    gcloud alpha dataflow snapshots create --job-id=JOB_ID --region=REGION_ID
         [--snapshot-sources=SNAPSHOT_SOURCES]
         [--snapshot-ttl=DURATION; default="7d"] [GCLOUD_WIDE_FLAG ...]
 
@@ -14,11 +14,10 @@ REQUIRED FLAGS
      --job-id=JOB_ID
         The job ID to snapshot.
 
-OPTIONAL FLAGS
      --region=REGION_ID
-        The region ID of the snapshot and job's regional endpoint. Defaults to
-        'us-central1'.
+        The region ID of the snapshot and job's regional endpoint.
 
+OPTIONAL FLAGS
      --snapshot-sources=SNAPSHOT_SOURCES
         If true, snapshots will also be created for the Cloud Pub/Sub sources
         of the Cloud Dataflow job.
@@ -34,10 +33,17 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To create a Cloud Dataflow snapshot with sources for a running job, run:
+
+        $ gcloud alpha dataflow snapshots create --job-id=JOB_ID \
+            --region=JOB_REGION --snapshot-sources=true --snapshot-ttl=7d
+
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta dataflow snapshots create
 

@@ -711,7 +711,8 @@ class HTTPResponsePayload(object):
         update_mode=assertions.updates.Mode.API_RESPONSE_PAYLOADS,
         custom_update_hook=_ResponseUpdateHook)
     return [assertions.Failure.ForGeneric(
-        update_context, 'API Response Payload', (headers, body.decode('utf8')))]
+        update_context, 'API Response Payload',
+        (headers, six.ensure_text(body)))]
 
 
 class ReferenceExtraction(object):

@@ -19,15 +19,20 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.artifacts import exceptions as ar_exceptions
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.artifacts import base
 
 
-class MavenTests(base.ARTestBase):
+class MavenTestsBeta(base.ARTestBase):
+
+  def PreSetUp(self):
+    super(MavenTestsBeta, self).PreSetUp()
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testMaven(self):
     cmd = ' '.join([
-        'beta', 'artifacts', 'print-settings', 'mvn', '--repository=my-repo',
+        'artifacts', 'print-settings', 'mvn', '--repository=my-repo',
         '--location=us'
     ])
     self.SetListLocationsExpect('us')
@@ -69,7 +74,7 @@ Please insert following snippet into your pom.xml
       <extension>
         <groupId>com.google.cloud.artifactregistry</groupId>
         <artifactId>artifactregistry-maven-wagon</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
       </extension>
     </extensions>
   </build>
@@ -80,14 +85,14 @@ Please insert following snippet into your pom.xml
         normalize_space=True)
 
   def testMissingRepo(self):
-    cmd = ' '.join(['beta', 'artifacts', 'print-settings', 'mvn'])
+    cmd = ' '.join(['artifacts', 'print-settings', 'mvn'])
     with self.assertRaises(ar_exceptions.InvalidInputValueError):
       self.Run(cmd)
     self.AssertErrContains('Failed to find attribute [repository]')
 
   def testInvalidLocation(self):
     cmd = ' '.join([
-        'beta', 'artifacts', 'print-settings', 'mvn', '--repository=my-repo',
+        'artifacts', 'print-settings', 'mvn', '--repository=my-repo',
         '--location=invalid'
     ])
     self.SetListLocationsExpect('us')
@@ -98,7 +103,7 @@ Please insert following snippet into your pom.xml
 
   def testInvalidRepoType(self):
     cmd = ' '.join([
-        'beta', 'artifacts', 'print-settings', 'mvn', '--repository=my-repo',
+        'artifacts', 'print-settings', 'mvn', '--repository=my-repo',
         '--location=us'
     ])
     self.SetListLocationsExpect('us')
@@ -107,6 +112,13 @@ Please insert following snippet into your pom.xml
     with self.assertRaises(ar_exceptions.InvalidInputValueError):
       self.Run(cmd)
     self.AssertErrContains('Invalid repository type NPM. Valid type is MAVEN')
+
+
+class MavenTestsAlpha(MavenTestsBeta):
+
+  def PreSetUp(self):
+    super(MavenTestsAlpha, self).PreSetUp()
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

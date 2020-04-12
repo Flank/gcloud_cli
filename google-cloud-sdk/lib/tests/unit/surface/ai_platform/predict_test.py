@@ -44,7 +44,7 @@ class PredictTestBase(object):
       command += ' --version ' + version
 
     path = self.Touch(self.temp_path, 'instances.txt', contents=contents)
-    command += ' --{}-instances '.format(type_) + path
+    command += ' --{} '.format(type_) + path
 
     return self.Run(command)
 
@@ -59,15 +59,37 @@ class PredictArgumentsTest(PredictTestBase):
 
   def testPredictInstancesRequired(self, module_name):
     with self.AssertRaisesArgumentErrorMatches(
-        'Exactly one of (--json-instances | --text-instances) must be '
-        'specified.'):
+        'Exactly one of (--json-instances | --json-request | --text-instances) '
+        'must be specified.'):
       self.Run('{} predict --model my_model'.format(module_name))
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError,
+        'argument --json-instances: Exactly one of (--json-instances | '
+        '--json-request | --text-instances) must be specified.'):
+      self.Run('{} predict --model my_model '
+               '--json-request=request.json '
+               '--json-instances=instances.json'.format(module_name))
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError,
+        'argument --json-request: Exactly one of (--json-instances | '
+        '--json-request | --text-instances) must be specified.'):
+      self.Run('{} predict --model my_model '
+               '--json-request=request.json '
+               '--text-instances=instances.json'.format(module_name))
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError,
+        'argument --json-instances: Exactly one of (--json-instances | '
+        '--json-request | --text-instances) must be specified.'):
+      self.Run('{} predict --model my_model '
+               '--json-request=request.json '
+               '--json-instances=instances.json '
+               '--text-instances=instances.txt'.format(module_name))
 
   def testPredictInstancesCannotSpecifyBoth(self, module_name):
     with self.AssertRaisesExceptionMatches(
         cli_test_base.MockArgumentError,
         'argument --json-instances: Exactly one of (--json-instances | '
-        '--text-instances) must be specified.'):
+        '--json-request | --text-instances) must be specified.'):
       self.Run('{} predict --model my_model '
                '--text-instances=instances.txt '
                '--json-instances=instances.json'.format(module_name))
@@ -86,10 +108,19 @@ class PredictTest(PredictTestBase):
                                                  modelsId='my_model',
                                                  projectsId=self.Project())
 
+  def testPredictJsonRequest(self, module_name):
+    self.mock_predict.return_value = self._PREDICTIONS
+    test_request = '{"instances": [{"images": [0, 1], "key": 3}]}'
+    self._RunWithInstances(test_request, 'json-request', module_name)
+
+    self.mock_predict.assert_called_once_with(self.version_ref,
+                                              [{'images': [0, 1], 'key': 3}],
+                                              signature_name=None)
+
   def testPredictJsonInstances(self, module_name):
     self.mock_predict.return_value = self._PREDICTIONS
     test_instances = '{"images": [0, 1], "key": 3}'
-    self._RunWithInstances(test_instances, 'json', module_name)
+    self._RunWithInstances(test_instances, 'json-instances', module_name)
 
     self.mock_predict.assert_called_once_with(self.version_ref,
                                               [{'images': [0, 1], 'key': 3}],
@@ -101,7 +132,7 @@ class PredictTest(PredictTestBase):
     test_instances = ('{"images": [0, 1], "key": 3}\n'
                       '{"images": [3, 2], "key": 2}\n'
                       '{"images": [2, 1], "key": 1}')
-    self._RunWithInstances(test_instances, 'json', module_name)
+    self._RunWithInstances(test_instances, 'json-instances', module_name)
 
     self.mock_predict.assert_called_once_with(
         self.version_ref,
@@ -114,7 +145,8 @@ class PredictTest(PredictTestBase):
     self.mock_predict.return_value = self._PREDICTIONS
 
     test_instances = '{"images": [0, 1], "key": 3}'
-    self._RunWithInstances(test_instances, 'json', module_name, version=None)
+    self._RunWithInstances(
+        test_instances, 'json-instances', module_name, version=None)
 
     model_ref = resources.REGISTRY.Create('ml.projects.models',
                                           modelsId='my_model',
@@ -125,22 +157,41 @@ class PredictTest(PredictTestBase):
   def testPredictEmptyFile(self, module_name):
     with self.assertRaisesRegex(core_exceptions.Error,
                                 'No valid instance was found.'):
-      self._RunWithInstances('', 'json', module_name)
+      self._RunWithInstances('', 'json-instances', module_name)
 
   def testPredictTooManyInstances(self, module_name):
     test_instances = '\n'.join(['{"images": [0, 1], "key": 3}'] * 101)
     with self.assertRaisesRegex(core_exceptions.Error, 'no more than 100'):
-      self._RunWithInstances(test_instances, 'json', module_name)
+      self._RunWithInstances(test_instances, 'json-instances', module_name)
 
-  def testPredictNonJSON(self, module_name):
+  def testPredictNonJSONRequest(self, module_name):
     with self.assertRaisesRegex(core_exceptions.Error,
                                 'Input instances are not in JSON format.'):
-      self._RunWithInstances('abcd', 'json', module_name)
+      self._RunWithInstances('abcd', 'json-request', module_name)
+
+  def testPredictMissingInstancesAttribute(self, module_name):
+    with self.assertRaisesRegex(
+        core_exceptions.Error,
+        'Invalid JSON request: missing "instances" attribute'):
+      self._RunWithInstances('{"NOT_INSTANCES": []}', 'json-request',
+                             module_name)
+
+  def testPredictInstancesNotAList(self, module_name):
+    with self.assertRaisesRegex(
+        core_exceptions.Error,
+        'Invalid JSON request: "instances" must be a list'):
+      self._RunWithInstances('{"instances": "not_a_list"}', 'json-request',
+                             module_name)
+
+  def testPredictNonJSONInstances(self, module_name):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Input instances are not in JSON format'):
+      self._RunWithInstances('abcd', 'json-instances', module_name)
 
   def testPredictTextFile(self, module_name):
     self.mock_predict.return_value = self._PREDICTIONS
 
-    self._RunWithInstances('2, 3', 'text', module_name)
+    self._RunWithInstances('2, 3', 'text-instances', module_name)
 
     self.mock_predict.assert_called_once_with(self.version_ref, ['2, 3'],
                                               signature_name=None)
@@ -148,7 +199,7 @@ class PredictTest(PredictTestBase):
   def testPredictTextFileMultipleInstances(self, module_name):
     self.mock_predict.return_value = self._PREDICTIONS_LIST
 
-    self._RunWithInstances('2, 3\n4, 5\n6, 7', 'text', module_name)
+    self._RunWithInstances('2, 3\n4, 5\n6, 7', 'text-instances', module_name)
 
     self.mock_predict.assert_called_once_with(self.version_ref,
                                               ['2, 3', '4, 5', '6, 7'],
@@ -160,7 +211,7 @@ class PredictTest(PredictTestBase):
                       '{"images": [3, 2], "key": 2}\n'
                       '{"images": [2, 1], "key": 1}')
 
-    self._RunWithInstances(test_instances, 'text', module_name)
+    self._RunWithInstances(test_instances, 'text-instances', module_name)
 
     self.mock_predict.assert_called_once_with(
         self.version_ref,
@@ -174,7 +225,7 @@ class PredictTest(PredictTestBase):
                     '--signature-name my-custom-signature')
     self.mock_predict.return_value = self._PREDICTIONS
     test_instances = '{"images": [0, 1], "key": 3}'
-    self._RunWithInstances(test_instances, 'json', module_name)
+    self._RunWithInstances(test_instances, 'json-instances', module_name)
 
     self.mock_predict.assert_called_once_with(
         self.version_ref,
@@ -184,23 +235,23 @@ class PredictTest(PredictTestBase):
   def testPredictNewlineOnlyJson(self, module_name):
     with self.assertRaisesRegex(core_exceptions.Error,
                                 'Empty line is not allowed'):
-      self._RunWithInstances('\n', 'json', module_name)
+      self._RunWithInstances('\n', 'json-instances', module_name)
 
   def testPredictNewlineOnlyText(self, module_name):
     with self.assertRaisesRegex(core_exceptions.Error,
                                 'Empty line is not allowed'):
-      self._RunWithInstances('\n', 'text', module_name)
+      self._RunWithInstances('\n', 'text-instances', module_name)
 
   def testPredictEmptyLineJson(self, module_name):
     test_instances = '{"images": [0, 1], "key": 3}\n\n'
     with self.assertRaisesRegex(core_exceptions.Error,
                                 'Empty line is not allowed'):
-      self._RunWithInstances(test_instances, 'text', module_name)
+      self._RunWithInstances(test_instances, 'text-instances', module_name)
 
   def testPredictEmptyLineText(self, module_name):
     with self.assertRaisesRegex(core_exceptions.Error,
                                 'Empty line is not allowed'):
-      self._RunWithInstances('2, 3\n\n', 'text', module_name)
+      self._RunWithInstances('2, 3\n\n', 'text-instances', module_name)
 
 
 @parameterized.parameters('ml-engine', 'ai-platform')
@@ -208,7 +259,7 @@ class PredictFormattingTestBase(PredictTestBase):
 
   def _RunWithResult(self, result, module_name, version='v1'):
     self.mock_predict.return_value = {'predictions': result}
-    self._RunWithInstances('{}', 'json', module_name, version=version)
+    self._RunWithInstances('{}', 'json-instances', module_name, version=version)
     version_ref = resources.REGISTRY.Create('ml.projects.models.versions',
                                             versionsId='v1',
                                             modelsId='my_model',
@@ -224,7 +275,7 @@ class PredictFormattingTestBase(PredictTestBase):
   def testInvalidFormat(self, module_name):
     self.mock_predict.return_value = {'bad-key': []}
 
-    self._RunWithInstances('{}', 'json', module_name)
+    self._RunWithInstances('{}', 'json-instances', module_name)
 
     self.AssertOutputEquals('{\n"bad-key": []\n}\n', normalize_space=True)
 

@@ -43,8 +43,6 @@ EXAMPLES
         $ gcloud spanner backups delete BACKUP_NAME --instance=INSTANCE_NAME
 
 NOTES
-    These variants are also available:
-
-        $ gcloud alpha spanner backups delete
-        $ gcloud beta spanner backups delete
+    This command is an internal implementation detail and may change or
+    disappear without notice.
 

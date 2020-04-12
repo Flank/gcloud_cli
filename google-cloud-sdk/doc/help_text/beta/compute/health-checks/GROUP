@@ -8,6 +8,15 @@ SYNOPSIS
 DESCRIPTION
     (BETA) Read and manipulate health checks for load balanced instances.
 
+    For more information about health checks, see the health checks
+    documentation
+    (https://cloud.google.com/load-balancing/docs/health-check-concepts).
+
+    See also: Health checks API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/healthChecks) and
+    Regional health checks API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/regionHealthChecks).
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,

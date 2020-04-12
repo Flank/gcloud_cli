@@ -240,6 +240,20 @@ Run \fB$ gcloud help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To create a commitment called \f5\fIcommitment\-1\fR\fR in the
+\f5\fIus\-central1\fR\fR region, with a \f5\fI12\-month\fR\fR plan,
+\f5\fI9GB\fR\fR of memory and 4 vcpu cores, run:
+
+.RS 2m
+$ gcloud beta compute commitments create commitment\-1 \e
+    \-\-plan=12\-month \-\-resources=memory=9GB,vcpu=4 \e
+    \-\-region=us\-central1
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in BETA and may change without notice. These variants

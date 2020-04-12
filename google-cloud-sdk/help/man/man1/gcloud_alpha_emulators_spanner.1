@@ -1,0 +1,74 @@
+
+.TH "GCLOUD_ALPHA_EMULATORS_SPANNER" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha emulators spanner \- manage your local Spanner emulator
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha emulators spanner\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This set of commands allows you to start and use a local Spanner
+emulator.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBenv\-init\fR
+\fB(ALPHA)\fR Print the commands required to export Spanner emulator's env
+variables.
+
+.TP 2m
+\fBstart\fR
+\fB(ALPHA)\fR Start a local Cloud Spanner emulator.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To start a local Cloud Spanner emulator, run:
+
+.RS 2m
+$ gcloud alpha emulators spanner start
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta emulators spanner
+.RE
+

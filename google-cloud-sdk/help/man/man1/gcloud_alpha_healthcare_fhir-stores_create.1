@@ -11,7 +11,7 @@ gcloud alpha healthcare fhir\-stores create \- create a Cloud Healthcare API FHI
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha healthcare fhir\-stores create\fR (\fIFHIR_STORE\fR\ :\ \fB\-\-dataset\fR=\fIDATASET\fR\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-disable\-referential\-integrity\fR] [\fB\-\-disable\-resource\-versioning\fR] [\fB\-\-enable\-update\-create\fR] [\fB\-\-pubsub\-topic\fR=\fIPUBSUB_TOPIC\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha healthcare fhir\-stores create\fR (\fIFHIR_STORE\fR\ :\ \fB\-\-dataset\fR=\fIDATASET\fR\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-disable\-referential\-integrity\fR] [\fB\-\-disable\-resource\-versioning\fR] [\fB\-\-enable\-update\-create\fR] [\fB\-\-pubsub\-topic\fR=\fIPUBSUB_TOPIC\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -88,6 +88,30 @@ Google Cloud Pub/Sub topic to send updates to.
 Note, a topic needs to be created before publishing or subscribing to it. For
 instructions on creating topics, refer to:
 https://cloud.google.com/pubsub/docs/admin#create_a_topic
+
+.TP 2m
+\fB\-\-version\fR=\fIVERSION\fR
+The FHIR specification version that this FHIR store supports natively. This
+field is immutable after store creation. Requests are rejected if they contain
+FHIR resources of a different version. An empty value is treated as STU3.
+\fIVERSION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBdstu2\fR
+Draft Standard for Trial Use, Release 2 (https://www.hl7.org/fhir/DSTU2)
+
+.TP 2m
+\fBr4\fR
+Release 4 (https://www.hl7.org/fhir/R4)
+
+.TP 2m
+\fBstu3\fR
+Standard for Trial Use, Release 3 (https://www.hl7.org/fhir/STU3)
+
+.RE
+.sp
+
 
 
 .RE

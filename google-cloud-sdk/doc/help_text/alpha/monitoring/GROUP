@@ -1,18 +1,19 @@
 NAME
-    gcloud alpha monitoring - manage Stackdriver Monitoring alerting policies
-        and notification channels
+    gcloud alpha monitoring - manage Stackdriver Monitoring alerting policies,
+        dashboards, and notification channels
 
 SYNOPSIS
     gcloud alpha monitoring GROUP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage Stackdriver Monitoring alerting policies and notification
-    channels.
+    (ALPHA) Manage Stackdriver Monitoring alerting policies, dashboards, and
+    notification channels.
 
     More information can be found here:
       o https://cloud.google.com/monitoring/api/v3/
       o https://cloud.google.com/monitoring/alerts/using-alerting-api
       o https://cloud.google.com/monitoring/alerts/using-channels-api
+      o https://cloud.google.com/monitoring/dashboards/api-dashboard
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -41,7 +42,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud monitoring
         $ gcloud beta monitoring
 

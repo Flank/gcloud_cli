@@ -71,6 +71,11 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To list commitments, run:
+
+        $ gcloud alpha compute commitments list
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

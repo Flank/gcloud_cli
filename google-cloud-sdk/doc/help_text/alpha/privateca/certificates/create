@@ -120,8 +120,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --cert-output-file=CERT_OUTPUT_FILE
-        The path where the resulting PEM-encoded certificate file should be
-        written.
+        The path where the resulting PEM-encoded certificate chain file should
+        be written (ordered from leaf to root).
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.

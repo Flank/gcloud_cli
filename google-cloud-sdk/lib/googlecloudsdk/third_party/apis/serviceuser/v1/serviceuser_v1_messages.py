@@ -81,12 +81,14 @@ class AuthProvider(_messages.Message):
     audiences: The list of JWT [audiences](https://tools.ietf.org/html/draft-
       ietf-oauth-json-web-token-32#section-4.1.3). that are allowed to access.
       A JWT containing any of these audiences will be accepted. When this
-      setting is absent, only JWTs with audience
-      "https://Service_name/API_name" will be accepted. For example, if no
-      audiences are in the setting, LibraryService API will only accept JWTs
-      with the following audience "https://library-
-      example.googleapis.com/google.example.library.v1.LibraryService".
-      Example:      audiences: bookstore_android.apps.googleusercontent.com,
+      setting is absent, JWTs with audiences:   -
+      "https://[service.name]/[google.protobuf.Api.name]"   -
+      "https://[service.name]/" will be accepted. For example, if no audiences
+      are in the setting, LibraryService API will accept JWTs with the
+      following audiences:   -   https://library-
+      example.googleapis.com/google.example.library.v1.LibraryService   -
+      https://library-example.googleapis.com/  Example:      audiences:
+      bookstore_android.apps.googleusercontent.com,
       bookstore_web.apps.googleusercontent.com
     authorizationUrl: Redirect URL if JWT token is required but not present or
       is expired. Implement authorizationUrl of securityDefinitions in OpenAPI
@@ -246,6 +248,27 @@ class BackendRule(_messages.Message):
       https://www.iana.org/assignments/tls-extensiontype-values/tls-
       extensiontype-values.xhtml#alpn-protocol-ids for more details on the
       supported values.
+    renameTo: Unimplemented. Do not use.  The new name the selected proto
+      elements should be renamed to.  The package, the service and the method
+      can all be renamed. The backend server should implement the renamed
+      proto. However, clients should call the original method, and ESF routes
+      the traffic to the renamed method.  HTTP clients should call the URL
+      mapped to the original method. gRPC and Stubby clients should call the
+      original method with package name.  For legacy reasons, ESF allows
+      Stubby clients to call with the short name (without the package name).
+      However, for API Versioning(or multiple methods mapped to the same short
+      name), all Stubby clients must call the method's full name with the
+      package name, otherwise the first one (selector) wins.  If this
+      `rename_to` is specified with a trailing `*`, the `selector` must be
+      specified with a trailing `*` as well. The all element short names
+      matched by the `*` in the selector will be kept in the `rename_to`.  For
+      example,     rename_rules:     - selector: |-
+      google.example.library.v1.*       rename_to: google.example.library.*
+      The selector matches `google.example.library.v1.Library.CreateShelf` and
+      `google.example.library.v1.Library.CreateBook`, they will be renamed to
+      `google.example.library.Library.CreateShelf` and
+      `google.example.library.Library.CreateBook`. It essentially renames the
+      proto package name section of the matched proto service and methods.
     selector: Selects the methods to which this rule applies.  Refer to
       selector for syntax details.
   """
@@ -292,7 +315,8 @@ class BackendRule(_messages.Message):
   operationDeadline = _messages.FloatField(6)
   pathTranslation = _messages.EnumField('PathTranslationValueValuesEnum', 7)
   protocol = _messages.StringField(8)
-  selector = _messages.StringField(9)
+  renameTo = _messages.StringField(9)
+  selector = _messages.StringField(10)
 
 
 class Billing(_messages.Message):
@@ -1198,6 +1222,9 @@ class MetricDescriptor(_messages.Message):
 
     Values:
       LAUNCH_STAGE_UNSPECIFIED: Do not use this default value.
+      UNIMPLEMENTED: The feature is not yet implemented. Users can not use it.
+      PRELAUNCH: Prelaunch features are hidden from users and are only visible
+        internally.
       EARLY_ACCESS: Early Access features are limited to a closed group of
         testers. To use these features, you must sign up in advance and sign a
         Trusted Tester agreement (which includes confidentiality provisions).
@@ -1226,11 +1253,13 @@ class MetricDescriptor(_messages.Message):
         Policy](https://cloud.google.com/terms/deprecation) documentation.
     """
     LAUNCH_STAGE_UNSPECIFIED = 0
-    EARLY_ACCESS = 1
-    ALPHA = 2
-    BETA = 3
-    GA = 4
-    DEPRECATED = 5
+    UNIMPLEMENTED = 1
+    PRELAUNCH = 2
+    EARLY_ACCESS = 3
+    ALPHA = 4
+    BETA = 5
+    GA = 6
+    DEPRECATED = 7
 
   class MetricKindValueValuesEnum(_messages.Enum):
     r"""Whether the metric records instantaneous values, changes to a value,
@@ -1312,6 +1341,9 @@ class MetricDescriptorMetadata(_messages.Message):
 
     Values:
       LAUNCH_STAGE_UNSPECIFIED: Do not use this default value.
+      UNIMPLEMENTED: The feature is not yet implemented. Users can not use it.
+      PRELAUNCH: Prelaunch features are hidden from users and are only visible
+        internally.
       EARLY_ACCESS: Early Access features are limited to a closed group of
         testers. To use these features, you must sign up in advance and sign a
         Trusted Tester agreement (which includes confidentiality provisions).
@@ -1340,11 +1372,13 @@ class MetricDescriptorMetadata(_messages.Message):
         Policy](https://cloud.google.com/terms/deprecation) documentation.
     """
     LAUNCH_STAGE_UNSPECIFIED = 0
-    EARLY_ACCESS = 1
-    ALPHA = 2
-    BETA = 3
-    GA = 4
-    DEPRECATED = 5
+    UNIMPLEMENTED = 1
+    PRELAUNCH = 2
+    EARLY_ACCESS = 3
+    ALPHA = 4
+    BETA = 5
+    GA = 6
+    DEPRECATED = 7
 
   ingestDelay = _messages.StringField(1)
   launchStage = _messages.EnumField('LaunchStageValueValuesEnum', 2)
@@ -1492,6 +1526,9 @@ class MonitoredResourceDescriptor(_messages.Message):
 
     Values:
       LAUNCH_STAGE_UNSPECIFIED: Do not use this default value.
+      UNIMPLEMENTED: The feature is not yet implemented. Users can not use it.
+      PRELAUNCH: Prelaunch features are hidden from users and are only visible
+        internally.
       EARLY_ACCESS: Early Access features are limited to a closed group of
         testers. To use these features, you must sign up in advance and sign a
         Trusted Tester agreement (which includes confidentiality provisions).
@@ -1520,11 +1557,13 @@ class MonitoredResourceDescriptor(_messages.Message):
         Policy](https://cloud.google.com/terms/deprecation) documentation.
     """
     LAUNCH_STAGE_UNSPECIFIED = 0
-    EARLY_ACCESS = 1
-    ALPHA = 2
-    BETA = 3
-    GA = 4
-    DEPRECATED = 5
+    UNIMPLEMENTED = 1
+    PRELAUNCH = 2
+    EARLY_ACCESS = 3
+    ALPHA = 4
+    BETA = 5
+    GA = 6
+    DEPRECATED = 7
 
   description = _messages.StringField(1)
   displayName = _messages.StringField(2)

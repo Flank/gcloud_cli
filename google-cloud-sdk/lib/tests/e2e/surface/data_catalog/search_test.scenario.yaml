@@ -1,3 +1,7 @@
+filters:
+  skip:
+    reason: flaking
+    bug: b/152289882
 title: Lookup, describe, and update a Data Catalog entry.
 release_tracks: [BETA]
 summary:

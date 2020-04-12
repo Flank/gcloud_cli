@@ -13,6 +13,22 @@ summary:
   - stderr: |
       Created bucket [$$bucket$$].
 - execute:
+  - command: container clusters create $$cluster$$ --zone=$$location$$ -q --num-nodes=1
+      --timeout=1080 --no-enable-basic-auth --no-issue-client-certificate --verbosity="none"
+      --disk-size=10GB
+  - stderr: |
+      This will enable the autorepair feature for nodes. Please see https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more information on node autorepairs.
+  - progress_tracker:
+    - message: Creating cluster $$cluster$$ in $$location$$
+    - status: SUCCESS
+  - write_file: ~/.kube/config
+  - write_file: ~/.kube/config
+  - stderr: |
+      Created [https://container.googleapis.com/v1alpha1/projects/$$project$$/zones/$$location$$/clusters/$$cluster$$].
+      To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/$$location$$/$$cluster$$?project=$$project$$
+      kubeconfig entry generated for $$cluster$$.
+  - stdout: .*$$cluster$$\s+$$location$$.*RUNNING.*$
+- execute:
   - command: builds deploy configure gke --cluster=$$cluster$$ --location=$$location$$
       --repo-type=csr --repo-name=$$source-repo$$ --app-name=my-app --branch-pattern=master
       --namespace=my-namespace --expose=80 --gcs-config-staging-dir=gs://$$bucket$$/config
@@ -58,6 +74,13 @@ summary:
 
       Deleted [0] file.
       Deleted bucket [gs://$$bucket$$].
+- execute:
+  - command: container clusters delete $$cluster$$ --zone=$$location$$ --async
+  - prompt:
+    - message: |
+        The following clusters will be deleted.
+         - [$$cluster$$] in [$$location$$]
+    - input: y
 actions:
 - define_reference:
     reference: project
@@ -371,6 +394,8 @@ actions:
                   - --output=output
                   - --annotation=gcb-build-id=$BUILD_ID,$_K8S_ANNOTATIONS
                   - --expose=$_EXPOSE_PORT
+                  - --create-application-cr
+                  - --links="Build details=https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID"
                   id: Prepare deploy
                   name: gcr.io/cloud-builders/gke-deploy
                 - args:
@@ -502,6 +527,8 @@ actions:
                 - --output=output
                 - --annotation=gcb-build-id=$BUILD_ID,$_K8S_ANNOTATIONS
                 - --expose=$_EXPOSE_PORT
+                - --create-application-cr
+                - --links="Build details=https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID"
                 id: Prepare deploy
               - name: gcr.io/cloud-builders/gsutil
                 args:
@@ -601,6 +628,8 @@ actions:
                   - --output=output
                   - --annotation=gcb-build-id=$BUILD_ID,$_K8S_ANNOTATIONS
                   - --expose=$_EXPOSE_PORT
+                  - --create-application-cr
+                  - --links="Build details=https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID"
                   id: Prepare deploy
                   name: gcr.io/cloud-builders/gke-deploy
                 - args:
@@ -734,6 +763,8 @@ actions:
                 - --output=output
                 - --annotation=gcb-build-id=$BUILD_ID,$_K8S_ANNOTATIONS
                 - --expose=$_EXPOSE_PORT
+                - --create-application-cr
+                - --links="Build details=https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID"
                 id: Prepare deploy
               - name: gcr.io/cloud-builders/gsutil
                 args:

@@ -64,9 +64,7 @@ EXAMPLES
             --instance=INSTANCE_NAME --retention-period=2w
 
 NOTES
-    This command is currently in BETA and may change without notice. These
-    variants are also available:
-
-        $ gcloud spanner backups update-metadata
-        $ gcloud alpha spanner backups update-metadata
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
 

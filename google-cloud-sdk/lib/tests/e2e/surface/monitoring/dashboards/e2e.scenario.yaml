@@ -1,5 +1,5 @@
 title: dashboards e2e test
-release_tracks: [BETA]
+release_tracks: [GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:

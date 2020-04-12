@@ -48,7 +48,6 @@ from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
-from googlecloudsdk.core.util import times
 
 _VISIBILITY_MODES = {
     'internal': 'Visible only within the cluster.',
@@ -79,6 +78,8 @@ _PLATFORM_SHORT_DESCRIPTIONS = {
 }
 
 _DEFAULT_KUBECONFIG_PATH = '~/.kube/config'
+
+_FIFTEEN_MINUTES = 15 * 60
 
 
 class ArgumentError(exceptions.Error):
@@ -174,7 +175,7 @@ def AddAllowUnauthenticatedFlag(parser):
       '--allow-unauthenticated',
       action=arg_parsers.StoreTrueFalseAction,
       help='Whether to enable allowing unauthenticated access to the service. '
-           'This may take a few moments to take effect.')
+      'This may take a few moments to take effect.')
 
 
 def AddAsyncFlag(parser):
@@ -225,11 +226,11 @@ def AddNoTrafficFlag(parser):
       '--no-traffic',
       default=False,
       action='store_true',
-      help='True to avoid sending traffic to the revision beign deployed. '
+      help='True to avoid sending traffic to the revision being deployed. '
       'Setting this flag assigns any traffic assigned to the LATEST revision '
       'to the specific revision bound to LATEST before the deployment. The '
       'effect is that the revsion being deployed will not receive traffic. '
-      'After a deployment with this flag the LATEST revision will not recieve '
+      'After a deployment with this flag the LATEST revision will not receive '
       'traffic on future deployments.')
 
 
@@ -249,12 +250,12 @@ def AddTrafficTagsFlags(parser):
                   'myservice-v1 assigns the tag "candidate" '
                   'to the latest ready revision and the tag'
                   ' "current" to the revision with name '
-                  '"service-nw9hs" and clears any existing tags. '
+                  '"myservice-v1" and clears any existing tags. '
                   'Changing tags does not '
                   'affect the traffic percentage assigned to '
                   'revisions. When using a tags flag and '
-                  'one or more of --to-latest and --to-revisions, in the same '
-                  'command, the tags change occurs first, then the traffic '
+                  'one or more of --to-latest and --to-revisions in the same '
+                  'command, the tags change occurs first then the traffic '
                   'percentage change occurs.'),
       flag_name='tags')
 
@@ -271,15 +272,13 @@ def AddUpdateTrafficFlags(parser):
     """Type validation for traffic percentage flag values."""
     try:
       result = int(value)
-    except  (TypeError, ValueError):
-      raise ArgumentError(
-          'Traffic percentage value %s is not an integer.' % value
-      )
+    except (TypeError, ValueError):
+      raise ArgumentError('Traffic percentage value %s is not an integer.' %
+                          value)
 
     if result < 0 or result > 100:
       raise ArgumentError(
-          'Traffic percentage value %s is not between 0 and 100.' % value
-      )
+          'Traffic percentage value %s is not between 0 and 100.' % value)
     return result
 
   group = parser.add_mutually_exclusive_group()
@@ -408,8 +407,7 @@ def AddConcurrencyFlag(parser):
   parser.add_argument(
       '--concurrency',
       type=arg_parsers.CustomFunctionValidator(
-          _ConcurrencyValue,
-          'must be an integer greater than 0 or "default".'),
+          _ConcurrencyValue, 'must be an integer greater than 0 or "default".'),
       help='Set the number of concurrent requests allowed per '
       'container instance. A concurrency of 0 or unspecified indicates '
       'any number of concurrent requests are allowed. To unset '
@@ -419,6 +417,7 @@ def AddConcurrencyFlag(parser):
 def AddTimeoutFlag(parser):
   parser.add_argument(
       '--timeout',
+      type=arg_parsers.Duration(lower_bound='1s'),
       help='Set the maximum request execution time (timeout). It is specified '
       'as a duration; for example, "10m5s" is ten minutes, and five seconds. '
       'If you don\'t specify a unit, seconds is assumed. For example, "10" is '
@@ -446,9 +445,8 @@ def AddServiceAccountFlagAlpha(parser):
       'the name of a Kubernetes service account in the same namespace as the '
       'service. If not provided, the revision will use the default service '
       'account of the project, or default Kubernetes namespace service account '
-      'respectively.'.format(
-          PLATFORM_MANAGED, PLATFORM_GKE, PLATFORM_KUBERNETES)
-      )
+      'respectively.'.format(PLATFORM_MANAGED, PLATFORM_GKE,
+                             PLATFORM_KUBERNETES))
 
 
 def AddPlatformArg(parser):
@@ -545,7 +543,8 @@ def AddLabelsFlags(parser):
   add_group = group.add_mutually_exclusive_group()
   labels_util.GetCreateLabelsFlag(
       'An alias to --update-labels.',
-      validate_keys=False, validate_values=False).AddToParser(add_group)
+      validate_keys=False,
+      validate_values=False).AddToParser(add_group)
   labels_util.GetUpdateLabelsFlag(
       '', validate_keys=False, validate_values=False).AddToParser(add_group)
   remove_group = group.add_mutually_exclusive_group()
@@ -561,11 +560,9 @@ class _ScaleValue(object):
     if not self.restore_default:
       try:
         self.instance_count = int(value)
-      except  (TypeError, ValueError):
-        raise ArgumentError(
-            'Instance count value %s is not an integer '
-            'or \'default\'.' % value
-        )
+      except (TypeError, ValueError):
+        raise ArgumentError('Instance count value %s is not an integer '
+                            'or \'default\'.' % value)
 
       if self.instance_count < 0:
         raise ArgumentError('Instance count value %s is negative.' % value)
@@ -665,6 +662,15 @@ def _HasCloudSQLChanges(args):
   return _HasChanges(args, instances_flags)
 
 
+def _EnabledCloudSqlApiRequired(args):
+  """True iff flags that add or set cloud sql instances are set."""
+  instances_flags = (
+      'add_cloudsql_instances',
+      'set_cloudsql_instances',
+  )
+  return _HasChanges(args, instances_flags)
+
+
 def _HasLabelChanges(args):
   """True iff any of the label flags are set."""
   label_flags = ['labels', 'update_labels', 'clear_labels', 'remove_labels']
@@ -724,19 +730,25 @@ def _GetScalingChanges(args):
   if 'min_instances' in args and args.min_instances is not None:
     scale_value = args.min_instances
     if scale_value.restore_default or scale_value.instance_count == 0:
-      result.append(config_changes.DeleteTemplateAnnotationChange(
-          'autoscaling.knative.dev/minScale'))
+      result.append(
+          config_changes.DeleteTemplateAnnotationChange(
+              'autoscaling.knative.dev/minScale'))
     else:
-      result.append(config_changes.SetTemplateAnnotationChange(
-          'autoscaling.knative.dev/minScale', str(scale_value.instance_count)))
+      result.append(
+          config_changes.SetTemplateAnnotationChange(
+              'autoscaling.knative.dev/minScale',
+              str(scale_value.instance_count)))
   if 'max_instances' in args and args.max_instances is not None:
     scale_value = args.max_instances
     if scale_value.restore_default:
-      result.append(config_changes.DeleteTemplateAnnotationChange(
-          'autoscaling.knative.dev/maxScale'))
+      result.append(
+          config_changes.DeleteTemplateAnnotationChange(
+              'autoscaling.knative.dev/maxScale'))
     else:
-      result.append(config_changes.SetTemplateAnnotationChange(
-          'autoscaling.knative.dev/maxScale', str(scale_value.instance_count)))
+      result.append(
+          config_changes.SetTemplateAnnotationChange(
+              'autoscaling.knative.dev/maxScale',
+              str(scale_value.instance_count)))
   return result
 
 
@@ -892,7 +904,8 @@ def GetConfigurationChanges(args):
     project = (
         getattr(args, 'project', None) or
         properties.VALUES.core.project.Get(required=True))
-    _CheckCloudSQLApiEnablement()
+    if _EnabledCloudSqlApiRequired(args):
+      _CheckCloudSQLApiEnablement()
     changes.append(config_changes.CloudSQLChanges(project, region, args))
 
   if _HasSecretsChanges(args):
@@ -909,19 +922,10 @@ def GetConfigurationChanges(args):
   if 'memory' in args and args.memory:
     changes.append(config_changes.ResourceChanges(memory=args.memory))
   if 'concurrency' in args and args.concurrency:
-    changes.append(config_changes.ConcurrencyChanges(
-        concurrency=args.concurrency))
+    changes.append(
+        config_changes.ConcurrencyChanges(concurrency=args.concurrency))
   if 'timeout' in args and args.timeout:
-    try:
-      # A bare number is interpreted as seconds.
-      timeout_secs = int(args.timeout)
-    except ValueError:
-      timeout_duration = times.ParseDuration(args.timeout)
-      timeout_secs = int(timeout_duration.total_seconds)
-    if timeout_secs <= 0:
-      raise ArgumentError(
-          'The --timeout argument must be a positive time duration.')
-    changes.append(config_changes.TimeoutChanges(timeout=timeout_secs))
+    changes.append(config_changes.TimeoutChanges(timeout=args.timeout))
   if 'service_account' in args and args.service_account:
     changes.append(
         config_changes.ServiceAccountChanges(
@@ -1210,13 +1214,11 @@ def VerifyOnePlatformFlags(args, release_track, product):
             platform=PLATFORM_KUBERNETES,
             platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_KUBERNETES]))
 
-  if (FlagIsExplicitlySet(args, 'no_traffic') and
-      release_track != base.ReleaseTrack.ALPHA):
-    raise serverless_exceptions.ConfigurationError(
-        error_msg.format(
-            flag='--no-traffic',
-            platform=PLATFORM_KUBERNETES,
-            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_KUBERNETES]))
+  if (FlagIsExplicitlySet(args, 'timeout') and
+      release_track == base.ReleaseTrack.GA):
+    if args.timeout > _FIFTEEN_MINUTES:
+      raise serverless_exceptions.ConfigurationError(
+          'Timeout duration must be less than 15m.')
 
 
 def VerifyGKEFlags(args, release_track, product):
@@ -1234,8 +1236,7 @@ def VerifyGKEFlags(args, release_track, product):
             platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_MANAGED]))
 
   if (release_track != base.ReleaseTrack.ALPHA and
-      FlagIsExplicitlySet(args, 'service_account') and
-      product == Product.RUN):
+      FlagIsExplicitlySet(args, 'service_account') and product == Product.RUN):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
             flag='--service-account',
@@ -1293,8 +1294,7 @@ def VerifyKubernetesFlags(args, release_track, product):
             platform_desc=_PLATFORM_SHORT_DESCRIPTIONS[PLATFORM_MANAGED]))
 
   if (release_track != base.ReleaseTrack.ALPHA and
-      FlagIsExplicitlySet(args, 'service_account') and
-      product == Product.RUN):
+      FlagIsExplicitlySet(args, 'service_account') and product == Product.RUN):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
             flag='--service-account',
@@ -1366,9 +1366,8 @@ def GetPlatform():
       raise ArgumentError(
           'No platform specified. Pass the `--platform` flag or set '
           'the [run/platform] property to specify a target platform.\n'
-          'Available platforms:\n{}'.format(
-              '\n'.join(
-                  ['- {}: {}'.format(k, v) for k, v in _PLATFORMS.items()])))
+          'Available platforms:\n{}'.format('\n'.join(
+              ['- {}: {}'.format(k, v) for k, v in _PLATFORMS.items()])))
   return platform
 
 

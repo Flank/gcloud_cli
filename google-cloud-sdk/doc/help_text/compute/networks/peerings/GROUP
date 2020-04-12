@@ -1,12 +1,18 @@
 NAME
-    gcloud compute networks peerings - list, create, and delete Google Compute
-        Engine network peerings
+    gcloud compute networks peerings - list, create, and delete, and update VPC
+        Network Peering
 
 SYNOPSIS
     gcloud compute networks peerings COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    List, create, and delete Google Compute Engine network peerings.
+    Read and manipulate VPC Network Peering connections.
+
+    For more information about VPC Network Peering, see the VPC Network Peering
+    documentation (https://cloud.google.com/vpc/docs/vpc-peering).
+
+    See also: Network API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/networks).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

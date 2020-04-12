@@ -20,12 +20,12 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock
 
+from googlecloudsdk.api_lib import artifacts
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
 API_NAME = 'artifactregistry'
-API_VERSION = 'v1beta1'
 
 
 class ARTestBase(sdk_test_base.WithLogCapture, sdk_test_base.WithFakeAuth,
@@ -33,11 +33,12 @@ class ARTestBase(sdk_test_base.WithLogCapture, sdk_test_base.WithFakeAuth,
   """A base class for artifacts tests that need to use a mocked AR client."""
 
   def SetUp(self):
+    self.api_version = artifacts.API_VERSION_FOR_TRACK[self.track]
     self.client = mock.Client(
-        core_apis.GetClientClass(API_NAME, API_VERSION),
-        real_client=core_apis.GetClientInstance(API_NAME, API_VERSION))
+        core_apis.GetClientClass(API_NAME, self.api_version),
+        real_client=core_apis.GetClientInstance(API_NAME, self.api_version))
     self.client.Mock()
-    self.messages = core_apis.GetMessagesModule(API_NAME, API_VERSION)
+    self.messages = core_apis.GetMessagesModule(API_NAME, self.api_version)
     self.addCleanup(self.client.Unmock)
 
   def SetListLocationsExpect(self, location):

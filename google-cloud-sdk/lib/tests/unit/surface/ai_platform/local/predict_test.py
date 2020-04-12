@@ -57,6 +57,16 @@ class LocalPredictTestBase(object):
       """)
   TEXT_INSTANCES_NORMALIZED = '"foo"\n"bar"\n"baz"\n'
 
+  JSON_REQUEST = textwrap.dedent("""\
+      {
+        "instances": [
+          {"a": "b"},
+          {"a": "c"}
+        ]
+      }
+      """)
+  JSON_REQUEST_INSTANCES = '{"a": "b"}\n{"a": "c"}\n'
+
   def SetUp(self):
     self.StartObjectPatch(
         files, 'SearchForExecutableOnPath', return_value=['/tmp/python'])
@@ -176,6 +186,20 @@ class LocalPredictTestBase(object):
 
     self.assertEqual(results, [])
     self._AssertPopenCalledCorrectly(popen_mock, self.TEXT_INSTANCES_NORMALIZED)
+    self.AssertErrNotContains('WARNING: warning!\n')
+
+  def testLocalPredict_JsonRequest(self, module_name):
+    popen_mock = self._MockPopen()
+    request_file = self.Touch(self.temp_path, 'request.json',
+                              contents=self.JSON_REQUEST)
+
+    results = self.Run(
+        '{} local predict '
+        '--model-dir {} '
+        '--json-request {}'.format(module_name, self.temp_path, request_file))
+
+    self.assertEqual(results, [])
+    self._AssertPopenCalledCorrectly(popen_mock, self.JSON_REQUEST_INSTANCES)
     self.AssertErrNotContains('WARNING: warning!\n')
 
   def _RunFrameworkTest(self, framework, module_name):

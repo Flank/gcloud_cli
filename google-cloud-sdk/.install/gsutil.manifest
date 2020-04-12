@@ -227,6 +227,7 @@ platform/gsutil/gslib/utils/posix_util.py
 platform/gsutil/gslib/utils/retention_util.py
 platform/gsutil/gslib/utils/retry_util.py
 platform/gsutil/gslib/utils/rsync_util.py
+platform/gsutil/gslib/utils/signurl_helper.py
 platform/gsutil/gslib/utils/system_util.py
 platform/gsutil/gslib/utils/text_util.py
 platform/gsutil/gslib/utils/translation_helper.py

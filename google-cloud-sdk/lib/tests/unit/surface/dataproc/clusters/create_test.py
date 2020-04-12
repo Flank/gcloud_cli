@@ -226,7 +226,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     num_masters = 3
     num_workers = 7
     num_secondary_workers = 5
-    secondary_worker_preemptibility = 'non-preemptible'
+    secondary_worker_type = 'non-preemptible'
     image_version = '1.7'
     network = 'foo-network'
     network_uri = ('https://compute.googleapis.com/compute/v1/projects/'
@@ -273,7 +273,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         masterConfigNumInstances=num_masters,
         workerConfigNumInstances=num_workers,
         secondaryWorkerConfigNumInstances=num_secondary_workers,
-        secondaryWorkerPreemptibility=secondary_worker_preemptibility,
+        secondaryWorkerType=secondary_worker_type,
         projectId=project,
         zoneUri=zone,
         initializationActions=initialization_actions,
@@ -323,7 +323,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         '--initialization-action-timeout 2m '
         '--initialization-actions {actions} '
         '--num-secondary-workers {num_secondary} '
-        '--secondary-worker-preemptibility {secondary_worker_preemptibility} '
+        '--secondary-worker-type {secondary_worker_type} '
         '--service-account {service_account} '
         '--scopes {scopes} '
         '--no-address '
@@ -363,7 +363,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
             image_version=image_version,
             actions=','.join(action_uris),
             num_secondary=num_secondary_workers,
-            secondary_worker_preemptibility=secondary_worker_preemptibility,
+            secondary_worker_type=secondary_worker_type,
             service_account=service_account,
             scopes=scope_list)
 
@@ -380,7 +380,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     secondary_worker_accelerator_type = 'foo-bar-gpu'
     secondary_worker_accelerator_count = 3
     num_secondary_workers = 5
-    secondary_worker_preemptibility = 'preemptible'
+    secondary_worker_type = 'preemptible'
     secondary_worker_boot_disk_size = 42
     secondary_worker_boot_disk_type = 'pd-standard'
     secondary_worker_local_ssds = 1
@@ -389,7 +389,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         secondaryWorkerAcceleratorTypeUri=secondary_worker_accelerator_type,
         secondaryWorkerAcceleratorCount=secondary_worker_accelerator_count,
         secondaryWorkerConfigNumInstances=num_secondary_workers,
-        secondaryWorkerPreemptibility=secondary_worker_preemptibility,
+        secondaryWorkerType=secondary_worker_type,
         secondaryWorkerBootDiskSizeGb=secondary_worker_boot_disk_size,
         secondaryWorkerBootDiskType=secondary_worker_boot_disk_type,
         secondaryWorkerNumLocalSsds=secondary_worker_local_ssds,
@@ -405,7 +405,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         '--preemptible-worker-accelerator '
         'type={secondary_worker_accelerator_type},count={secondary_worker_accelerator_count}'
         ' --num-preemptible-workers {num_secondary} '
-        '--secondary-worker-preemptibility {secondary_worker_preemptibility} '
+        '--secondary-worker-type {secondary_worker_type} '
         '--preemptible-worker-boot-disk-size '
         '{secondary_worker_boot_disk_size}GB '
         '--preemptible-worker-boot-disk-type {secondary_worker_boot_disk_type}'
@@ -417,7 +417,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         secondary_worker_accelerator_type=secondary_worker_accelerator_type,
         secondary_worker_accelerator_count=secondary_worker_accelerator_count,
         num_secondary=num_secondary_workers,
-        secondary_worker_preemptibility=secondary_worker_preemptibility,
+        secondary_worker_type=secondary_worker_type,
         secondary_worker_boot_disk_size=secondary_worker_boot_disk_size,
         secondary_worker_boot_disk_type=secondary_worker_boot_disk_type,
         secondary_worker_local_ssds=secondary_worker_local_ssds)
@@ -435,7 +435,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
     secondary_worker_accelerator_type = 'foo-bar-gpu'
     secondary_worker_accelerator_count = 3
     num_secondary_workers = 5
-    secondary_worker_preemptibility = 'non-preemptible'
+    secondary_worker_type = 'non-preemptible'
     secondary_worker_boot_disk_size = 42
     secondary_worker_boot_disk_type = 'pd-standard'
     secondary_worker_local_ssds = 1
@@ -444,7 +444,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         secondaryWorkerAcceleratorTypeUri=secondary_worker_accelerator_type,
         secondaryWorkerAcceleratorCount=secondary_worker_accelerator_count,
         secondaryWorkerConfigNumInstances=num_secondary_workers,
-        secondaryWorkerPreemptibility=secondary_worker_preemptibility,
+        secondaryWorkerType=secondary_worker_type,
         secondaryWorkerBootDiskSizeGb=secondary_worker_boot_disk_size,
         secondaryWorkerBootDiskType=secondary_worker_boot_disk_type,
         secondaryWorkerNumLocalSsds=secondary_worker_local_ssds,
@@ -460,7 +460,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         '--secondary-worker-accelerator '
         'type={secondary_worker_accelerator_type},count={secondary_worker_accelerator_count}'
         ' --num-secondary-workers {num_secondary} '
-        '--secondary-worker-preemptibility {secondary_worker_preemptibility} '
+        '--secondary-worker-type {secondary_worker_type} '
         '--secondary-worker-boot-disk-size {secondary_worker_boot_disk_size}GB'
         ' --secondary-worker-boot-disk-type {secondary_worker_boot_disk_type} '
         '--num-secondary-worker-local-ssds {secondary_worker_local_ssds} '
@@ -471,7 +471,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
         secondary_worker_accelerator_type=secondary_worker_accelerator_type,
         secondary_worker_accelerator_count=secondary_worker_accelerator_count,
         num_secondary=num_secondary_workers,
-        secondary_worker_preemptibility=secondary_worker_preemptibility,
+        secondary_worker_type=secondary_worker_type,
         secondary_worker_boot_disk_size=secondary_worker_boot_disk_size,
         secondary_worker_boot_disk_type=secondary_worker_boot_disk_type,
         secondary_worker_local_ssds=secondary_worker_local_ssds)
@@ -588,45 +588,43 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
 
   def testCreateClusterWithSecondaryWorkersPreemptible(self):
     expected_request_cluster = self.MakeCluster(
-        secondaryWorkerPreemptibility='preemptible')
+        secondaryWorkerType='preemptible')
     expected_response_cluster = self.MakeRunningCluster(
-        secondaryWorkerPreemptibility='preemptible')
+        secondaryWorkerType='preemptible')
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
         response_cluster=expected_response_cluster)
-    result = self.RunDataproc(
-        'clusters create {name} --zone={zone} '
-        '--secondary-worker-preemptibility="preemptible"'.format(
-            name=self.CLUSTER_NAME, zone=self.ZONE))
+    result = self.RunDataproc('clusters create {name} --zone={zone} '
+                              '--secondary-worker-type="preemptible"'.format(
+                                  name=self.CLUSTER_NAME, zone=self.ZONE))
     self.AssertMessagesEqual(expected_response_cluster, result)
 
   def testCreateClusterWithSecondaryWorkersNonPreemptible(self):
     expected_request_cluster = self.MakeCluster(
-        secondaryWorkerPreemptibility='non-preemptible')
+        secondaryWorkerType='non-preemptible')
     expected_response_cluster = self.MakeRunningCluster(
-        secondaryWorkerPreemptibility='non-preemptible')
+        secondaryWorkerType='non-preemptible')
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
         response_cluster=expected_response_cluster)
     result = self.RunDataproc(
         'clusters create {name} --zone={zone} '
-        '--secondary-worker-preemptibility="non-preemptible"'.format(
+        '--secondary-worker-type="non-preemptible"'.format(
             name=self.CLUSTER_NAME, zone=self.ZONE))
     self.AssertMessagesEqual(expected_response_cluster, result)
 
-  def testCreateClusterWithSecondaryWorkersPreemptibilityUnspecified(self):
+  def testCreateClusterWithSecondaryWorkersTypeUnspecified(self):
     expected_request_cluster = self.MakeCluster()
     expected_response_cluster = self.MakeRunningCluster()
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
         response_cluster=expected_response_cluster)
-    result = self.RunDataproc(
-        'clusters create {name} --zone={zone} '
-        '--secondary-worker-preemptibility="unspecified"'.format(
-            name=self.CLUSTER_NAME, zone=self.ZONE))
+    result = self.RunDataproc('clusters create {name} --zone={zone} '
+                              '--secondary-worker-type="unspecified"'.format(
+                                  name=self.CLUSTER_NAME, zone=self.ZONE))
     self.AssertMessagesEqual(expected_response_cluster, result)
 
-  def testCreateClusterWithSecondaryWorkersPreemptibilityOmitted(self):
+  def testCreateClusterWithSecondaryWorkersTypeOmitted(self):
     expected_request_cluster = self.MakeCluster()
     expected_response_cluster = self.MakeRunningCluster()
     self.ExpectCreateCalls(
@@ -775,7 +773,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
   def testCreateSingleNodeWithSingleNodeAndNumWorkersFlagZero(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --single-node: At most one of --single-node | '
-        '--num-secondary-workers --num-workers --secondary-worker-preemptibility may be specified.'
+        '--num-secondary-workers --num-workers --secondary-worker-type may be specified.'
     ):
       self.RunDataproc(
           'clusters create {name} --zone={zone} --single-node --num-workers=0'
@@ -784,7 +782,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
   def testCreateSingleNodeWithWorkers(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --single-node: At most one of --single-node | '
-        '--num-secondary-workers --num-workers --secondary-worker-preemptibility may be specified.'
+        '--num-secondary-workers --num-workers --secondary-worker-type may be specified.'
     ):
       self.RunDataproc('clusters create {name} --zone={zone} '
                        '--num-workers=2 --single-node'.format(
@@ -793,7 +791,7 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
   def testCreateSingleNodeWithSecondaryWorkers(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --single-node: At most one of --single-node | '
-        '--num-secondary-workers --num-workers --secondary-worker-preemptibility may be specified.'
+        '--num-secondary-workers --num-workers --secondary-worker-type may be specified.'
     ):
       self.RunDataproc('clusters create {name} --zone={zone} '
                        '--num-secondary-workers=2 --single-node'.format(
@@ -802,21 +800,21 @@ class ClustersCreateUnitTest(unit_base.DataprocUnitTestBase,
   def testCreateSingleNodeWithPreemptibleWorkers(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --single-node: At most one of --single-node | '
-        '--num-secondary-workers --num-workers --secondary-worker-preemptibility may be specified.'
+        '--num-secondary-workers --num-workers --secondary-worker-type may be specified.'
     ):
       self.RunDataproc('clusters create {name} --zone={zone} '
                        '--num-preemptible-workers=2 --single-node'.format(
                            name=self.CLUSTER_NAME, zone=self.ZONE))
 
-  def testCreateSingleNodeWithSecondaryWorkerPreemptibility(self):
+  def testCreateSingleNodeWithSecondaryWorkerType(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --single-node: At most one of --single-node | '
-        '--num-secondary-workers --num-workers --secondary-worker-preemptibility may be specified.'
+        '--num-secondary-workers --num-workers --secondary-worker-type may be specified.'
     ):
       self.RunDataproc(
           'clusters create {name} --zone={zone} '
-          '--secondary-worker-preemptibility=non-preemptible --single-node'
-          .format(name=self.CLUSTER_NAME, zone=self.ZONE))
+          '--secondary-worker-type=non-preemptible --single-node'.format(
+              name=self.CLUSTER_NAME, zone=self.ZONE))
 
   def testCreateSpecifyUnsupportedSingleNodeProperty(self):
     with self.AssertRaisesExceptionMatches(
@@ -1367,17 +1365,17 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
   def testCreateZonalGkeBasedCluster(self):
     expected_request_cluster = self.MakeCluster(
         clusterName='test-cluster',
-        projectId='test-project',
         gkeClusterNamespace='test-namespace',
-        gkeClusterPath='projects/test-project/locations/test-zone/clusters/test-gke-cluster'
-    )
+        # Without specifying a project, it should use the default project for
+        # the GKE cluster.
+        gkeClusterPath='projects/{0}/locations/test-zone/clusters/test-gke-cluster'
+        .format(self.Project()))
 
     expected_response_cluster = copy.deepcopy(expected_request_cluster)
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
 
     command = ('clusters create test-cluster '
-               '--project=test-project '
                '--zone=test-zone '
                '--gke-cluster=test-gke-cluster '
                '--gke-cluster-namespace=test-namespace')

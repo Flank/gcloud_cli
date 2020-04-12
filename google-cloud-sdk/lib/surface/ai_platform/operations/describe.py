@@ -25,11 +25,30 @@ from googlecloudsdk.command_lib.ml_engine import flags
 from googlecloudsdk.command_lib.ml_engine import operations_util
 
 
-def _AddDescribeArgs(parser):
+def _AddDescribeArgs(parser, hide_region_flag=True):
   flags.OPERATION_NAME.AddToParser(parser)
-  flags.GetRegionArg('operation').AddToParser(parser)
+  flags.GetRegionArg(hidden=hide_region_flag).AddToParser(parser)
 
 
+def _Run(args):
+  with endpoint_util.MlEndpointOverrides(region=args.region):
+    client = operations.OperationsClient()
+    return operations_util.Describe(client, args.operation)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+class DescribeBeta(base.DescribeCommand):
+  """Describe an AI Platform operation."""
+
+  @staticmethod
+  def Args(parser):
+    _AddDescribeArgs(parser, hide_region_flag=False)
+
+  def Run(self, args):
+    return _Run(args)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Describe(base.DescribeCommand):
   """Describe an AI Platform operation."""
 
@@ -38,6 +57,5 @@ class Describe(base.DescribeCommand):
     _AddDescribeArgs(parser)
 
   def Run(self, args):
-    with endpoint_util.MlEndpointOverrides(region=args.region):
-      client = operations.OperationsClient()
-      return operations_util.Describe(client, args.operation)
+    return _Run(args)
+

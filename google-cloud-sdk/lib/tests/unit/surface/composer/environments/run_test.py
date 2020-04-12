@@ -280,11 +280,12 @@ class EnvironmentsRunGATest(base.KubectlShellingUnitTest):
     def _KubectlExecCallback(args, **_):
       expected_args = command_util.AddKubectlNamespace(
           self.TEST_KUBECTL_DEFAULT_NAMESPACE, [
-              self.TEST_KUBECTL_PATH, 'exec', pod, '-tic', self.TEST_CONTAINER,
+              self.TEST_KUBECTL_PATH, 'exec', pod, '--stdin', '--tty',
+              '--container', self.TEST_CONTAINER, '--',
               'airflow', subcmd
           ])
       if subcmd_args:
-        expected_args.extend(['--'] + subcmd_args)
+        expected_args.extend(subcmd_args)
       self.assertEqual(expected_args, args)
       return 0
 

@@ -1,12 +1,19 @@
 NAME
-    gcloud compute target-vpn-gateways - read and manipulate Google Compute
-        Engine Classic VPN Gateways
+    gcloud compute target-vpn-gateways - read and manipulate classic VPN
+        gateways
 
 SYNOPSIS
     gcloud compute target-vpn-gateways COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    read and manipulate Classic VPN Gateways.
+    Read and manipulate Classic VPN gateways for Cloud VPN.
+
+    For more information about Classic VPN gateways, see the Classic VPN
+    gateways documentation
+    (https://cloud.google.com/vpn/docs/concepts/overview#classic-vpn).
+
+    See also: Classic VPN gateways API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/targetVpnGateways).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

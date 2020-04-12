@@ -404,16 +404,18 @@ projects/my-project/global/machineImages/machine-image-1",
     """Ensures that the given requests were made to the server."""
     expected_calls = []
     for requests in request_sets:
-      expected_calls.append(mock.call(
-          requests=requests,
-          http=self.mock_http(),
-          batch_url=self.batch_url,
-          errors=mock.ANY))
+      expected_calls.append(
+          mock.call(
+              requests=requests,
+              http=self.mock_http(),
+              batch_url=self.batch_url,
+              errors=mock.ANY))
 
     # Check request against request helper function
     # googlecloudsdk.api_lib.compute.request_helper.MakeRequests.
     required_method_args = set(['requests', 'http', 'batch_url', 'errors'])
-    optional_method_args = set(['progress_tracker', 'followup_overrides'])
+    optional_method_args = set(
+        ['progress_tracker', 'followup_overrides', 'log_result'])
 
     for (_, _, expected), (_, actual) in zip(
         expected_calls, self.make_requests.call_args_list):

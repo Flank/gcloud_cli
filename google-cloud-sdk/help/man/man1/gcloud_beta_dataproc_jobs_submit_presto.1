@@ -35,11 +35,11 @@ Exactly one of these must be specified:
 .RS 2m
 .TP 2m
 \fB\-\-execute\fR=\fIQUERY\fR, \fB\-e\fR \fIQUERY\fR
-A Presto query to execute as the job.
+A Presto query to execute.
 
 .TP 2m
 \fB\-\-file\fR=\fIFILE\fR, \fB\-f\fR \fIFILE\fR
-HCFS URI of file containing Presto script to execute as the job
+HCFS URI of file containing the Presto script to execute.
 
 
 .RE
@@ -60,15 +60,15 @@ bucket.
 
 .TP 2m
 \fB\-\-client\-tags\fR=[\fICLIENT_TAG\fR,...]
-List of Presto client tags to attach to this query.
+A list of Presto client tags to attach to this query.
 
 .TP 2m
 \fB\-\-continue\-on\-failure\fR
-Whether to continue if a single query fails.
+Whether to continue if a query fails.
 
 .TP 2m
 \fB\-\-driver\-log\-levels\fR=[\fIPACKAGE\fR=\fILEVEL\fR,...]
-A list of package to log4j log level pairs to configure driver logging. For
+A list of package\-to\-log4j log level pairs to configure driver logging. For
 example: root=FATAL,com.example=INFO
 
 .TP 2m
@@ -87,12 +87,12 @@ Expressed as a per\-hour rate. Default is 0 (no failure retries).
 
 .TP 2m
 \fB\-\-properties\fR=[\fIPARAM\fR=\fIVALUE\fR,...]
-A list of key value pairs to set Presto session properties
+A list of key value pairs to set Presto session properties.
 
 .TP 2m
 \fB\-\-query\-output\-format\fR=\fIQUERY_OUTPUT_FORMAT\fR
-The format in which query output will be displayed. See the Presto documentation
-for supported output formats.
+The query output display format. See the Presto documentation for supported
+output formats.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
@@ -136,10 +136,11 @@ $ gcloud beta dataproc jobs submit presto \-\-cluster=my_cluster \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud dataproc jobs submit presto
 $ gcloud alpha dataproc jobs submit presto
 .RE
 

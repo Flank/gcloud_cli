@@ -1,12 +1,17 @@
 NAME
-    gcloud alpha compute disk-types - read Google Compute Engine virtual disk
-        types
+    gcloud alpha compute disk-types - read Compute Engine virtual disk types
 
 SYNOPSIS
     gcloud alpha compute disk-types COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read Google Compute Engine virtual disk types.
+    (ALPHA) Read Compute Engine virtual disk types.
+
+    For more information disk types, see the disk types documentation
+    (https://cloud.google.com/compute/docs/disks/).
+
+    See also: Disk types API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/diskTypes).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -145,6 +145,12 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
 
     def check_requests():
       self.compute_requests_patcher.assert_called_once_with(
-          requests=requests, batch_url=mock.ANY, errors=mock.ANY,
-          http=mock.ANY, progress_tracker=None, followup_overrides=None)
+          requests=requests,
+          batch_url=mock.ANY,
+          errors=mock.ANY,
+          http=mock.ANY,
+          progress_tracker=None,
+          followup_overrides=None,
+          log_result=True)
+
     self.addCleanup(check_requests)

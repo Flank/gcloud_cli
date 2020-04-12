@@ -1,12 +1,15 @@
 NAME
-    gcloud alpha compute instances os-inventory - read Google Compute Engine OS
+    gcloud alpha compute instances os-inventory - read Compute Engine OS
         Inventory Data and Related Resources
 
 SYNOPSIS
     gcloud alpha compute instances os-inventory COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read Google Compute Engine OS Inventory Data and Related Resources.
+    (ALPHA) Read Compute Engine OS inventory data.
+
+    For more information about OS inventory, see the OS inventory documentation
+    (https://cloud.google.com/compute/docs/instances/os-inventory-management).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

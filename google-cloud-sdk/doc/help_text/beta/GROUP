@@ -159,7 +159,7 @@ GROUPS
         (BETA) Create and manage Cloud Composer Environments.
 
      compute
-        (BETA) Create and manipulate Google Compute Engine resources.
+        (BETA) Create and manipulate Compute Engine resources.
 
      config
         (BETA) View and edit Cloud SDK properties.
@@ -252,7 +252,7 @@ GROUPS
         (BETA) Manage AI Platform jobs and models.
 
      monitoring
-        (BETA) Manage Stackdriver Monitoring alerting policies and notification
+        (BETA) Manage Stackdriver Monitoring dashboards and notification
         channels.
 
      network-management

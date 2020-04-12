@@ -128,6 +128,13 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To update reservations of the commitment called commitment-1 in the
+    us-central1 region with values from reservations.yaml, run:
+
+        $ gcloud beta compute commitments update-reservations commitment-1 \
+            --reservations-from-file=reservations.yaml
+
 NOTES
     This command is currently in BETA and may change without notice. This
     variant is also available:

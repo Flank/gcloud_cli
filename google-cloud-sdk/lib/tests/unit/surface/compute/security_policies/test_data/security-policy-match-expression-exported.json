@@ -13,7 +13,9 @@
             "*"
           ]
         },
-        "expr": "origin.region_code == 'GB'"
+        "expr": {
+          "expression": "origin.region_code == 'GB'"
+        }
       },
       "preview": false,
       "priority": 2147483647

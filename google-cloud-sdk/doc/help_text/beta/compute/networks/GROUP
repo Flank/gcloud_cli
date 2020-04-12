@@ -1,12 +1,18 @@
 NAME
-    gcloud beta compute networks - list, create, and delete Google Compute
-        Engine networks
+    gcloud beta compute networks - list, create, and delete Compute Engine
+        networks
 
 SYNOPSIS
     gcloud beta compute networks GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) List, create, and delete Google Compute Engine networks.
+    (BETA) Read and manipulate VPC networks.
+
+    For more information about networks, see the networks documentation
+    (https://cloud.google.com/vpc/docs/vpc).
+
+    See also: Networks API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/networks).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,10 +26,11 @@ GROUPS
     GROUP is one of the following:
 
      peerings
-        (BETA) List, create, and delete Google Compute Engine network peerings.
+        (BETA) List, create, and delete, and update VPC Network Peering.
 
      subnets
-        (BETA) List, describe, and delete Google Compute Engine subnetworks.
+        (BETA) List, describe, and delete, and update Compute Engine
+        subnetworks.
 
      vpc-access
         (BETA) Manage VPC Access Service resources.

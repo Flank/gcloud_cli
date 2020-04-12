@@ -18,50 +18,54 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-
-messages = core_apis.GetMessagesModule('compute', 'v1')
 
 
 class TargetInstancesCreateTest(test_base.BaseTest):
 
+  def SetUp(self):
+    self.SelectApi('v1')
+    self._api = ''
+    self._target_instances_api = self.compute_v1.targetInstances
+
+  def RunCreate(self, args):
+    self.Run(self._api + ' compute target-instances create ' + args)
+
   def testSimpleCase(self):
-    self.Run("""
-        compute target-instances create my-target-instance
-          --instance my-instance --zone central2-a
+    self.RunCreate("""
+        my-target-instance --instance my-instance --zone central2-a
         """)
 
     self.CheckRequests(
-        [(self.compute_v1.targetInstances,
+        [(self._target_instances_api,
           'Insert',
-          messages.ComputeTargetInstancesInsertRequest(
-              targetInstance=messages.TargetInstance(
+          self.messages.ComputeTargetInstancesInsertRequest(
+              targetInstance=self.messages.TargetInstance(
                   name='my-target-instance',
-                  instance=('https://compute.googleapis.com/compute/v1/projects/'
-                            'my-project/zones/central2-a/instances/'
-                            'my-instance'),
+                  instance=(self.compute_uri +
+                            '/projects/my-project/zones/central2-a/instances/'
+                            'my-instance')
               ),
               project='my-project',
               zone='central2-a'))],
     )
 
   def testUriSupport(self):
-    self.Run("""
-        compute target-instances create
-          https://compute.googleapis.com/compute/v1/projects/my-project/zones/central2-a/targetInstances/my-target-instance
-          --instance https://compute.googleapis.com/compute/v1/projects/my-project/zones/central2-a/instances/my-instance
-        """)
+    self.RunCreate("""
+          https://compute.googleapis.com/compute/%(api)s/projects/my-project/zones/central2-a/targetInstances/my-target-instance
+          --instance https://compute.googleapis.com/compute/%(api)s/projects/my-project/zones/central2-a/instances/my-instance
+          --zone central2-a
+        """ % {'api': self.api})
 
     self.CheckRequests(
-        [(self.compute_v1.targetInstances,
+        [(self._target_instances_api,
           'Insert',
-          messages.ComputeTargetInstancesInsertRequest(
-              targetInstance=messages.TargetInstance(
+          self.messages.ComputeTargetInstancesInsertRequest(
+              targetInstance=self.messages.TargetInstance(
                   name='my-target-instance',
-                  instance=('https://compute.googleapis.com/compute/v1/projects/'
-                            'my-project/zones/central2-a/instances/'
+                  instance=(self.compute_uri +
+                            '/projects/my-project/zones/central2-a/instances/'
                             'my-instance'),
               ),
               project='my-project',
@@ -71,10 +75,10 @@ class TargetInstancesCreateTest(test_base.BaseTest):
   def testDifferentZones(self):
     with self.AssertRaisesToolExceptionRegexp(
         'Target instance zone must match the virtual machine instance zone.'):
-      self.Run("""
-          compute target-instances create
+      self.RunCreate("""
             https://compute.googleapis.com/compute/v1/projects/my-project/zones/central2-a/targetInstances/my-target-instance
             --instance https://compute.googleapis.com/compute/v1/projects/my-project/zones/central2-b/instances/my-instance
+            --zone central2-a
           """)
 
     self.CheckRequests()
@@ -84,29 +88,28 @@ class TargetInstancesCreateTest(test_base.BaseTest):
                     return_value=True)
     self.make_requests.side_effect = iter([
         [
-            messages.Zone(name='central1-a'),
-            messages.Zone(name='central1-b'),
-            messages.Zone(name='central2-a'),
+            self.messages.Zone(name='central1-a'),
+            self.messages.Zone(name='central1-b'),
+            self.messages.Zone(name='central2-a'),
         ],
         []
     ])
     self.WriteInput('3\n')
 
-    self.Run("""
-        compute target-instances create my-target-instance
-          --instance my-instance
+    self.RunCreate("""
+        my-target-instance --instance my-instance
         """)
 
     self.CheckRequests(
         self.zones_list_request,
 
-        [(self.compute_v1.targetInstances,
+        [(self._target_instances_api,
           'Insert',
-          messages.ComputeTargetInstancesInsertRequest(
-              targetInstance=messages.TargetInstance(
+          self.messages.ComputeTargetInstancesInsertRequest(
+              targetInstance=self.messages.TargetInstance(
                   name='my-target-instance',
-                  instance=('https://compute.googleapis.com/compute/v1/projects/'
-                            'my-project/zones/central2-a/instances/'
+                  instance=(self.compute_uri +
+                            '/projects/my-project/zones/central2-a/instances/'
                             'my-instance'),
               ),
               project='my-project',
@@ -119,21 +122,21 @@ class TargetInstancesCreateTest(test_base.BaseTest):
     self.AssertErrContains('central2-a')
 
   def testWithDescriptionFlag(self):
-    self.Run("""
-        compute target-instances create my-target-instance
+    self.RunCreate("""
+        my-target-instance
           --instance my-instance --zone central2-a
           --description my-description
         """)
 
     self.CheckRequests(
-        [(self.compute_v1.targetInstances,
+        [(self._target_instances_api,
           'Insert',
-          messages.ComputeTargetInstancesInsertRequest(
-              targetInstance=messages.TargetInstance(
+          self.messages.ComputeTargetInstancesInsertRequest(
+              targetInstance=self.messages.TargetInstance(
                   description='my-description',
                   name='my-target-instance',
-                  instance=('https://compute.googleapis.com/compute/v1/projects/'
-                            'my-project/zones/central2-a/instances/'
+                  instance=(self.compute_uri +
+                            '/projects/my-project/zones/central2-a/instances/'
                             'my-instance'),
               ),
               project='my-project',
@@ -141,23 +144,62 @@ class TargetInstancesCreateTest(test_base.BaseTest):
     )
 
   def testLegacyProject(self):
-    self.Run("""
-        compute target-instances create my-target-instance
+    self.RunCreate("""
+        my-target-instance
           --instance my-instance --zone central2-a
           --project google.com:my-legacy-project
         """)
 
     self.CheckRequests(
-        [(self.compute_v1.targetInstances,
+        [(self._target_instances_api,
           'Insert',
-          messages.ComputeTargetInstancesInsertRequest(
-              targetInstance=messages.TargetInstance(
+          self.messages.ComputeTargetInstancesInsertRequest(
+              targetInstance=self.messages.TargetInstance(
                   name='my-target-instance',
-                  instance=('https://compute.googleapis.com/compute/v1/projects/'
-                            'google.com:my-legacy-project/zones/central2-a/'
-                            'instances/my-instance'),
-              ),
+                  instance=(self.compute_uri +
+                            '/projects/google.com:my-legacy-project/zones/'
+                            'central2-a/instances/my-instance')
+                  ),
               project='google.com:my-legacy-project',
+              zone='central2-a'))],
+    )
+
+
+class TargetInstancesCreateBetaTest(TargetInstancesCreateTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._target_instances_api = self.compute_beta.targetInstances
+
+
+class TargetInstancesCreateAlphaTest(TargetInstancesCreateTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._api = 'alpha'
+    self._target_instances_api = self.compute_alpha.targetInstances
+
+  def testWithNetwork(self):
+    self.RunCreate("""
+          my-target-instance
+          --instance my-instance --zone central2-a
+          --network default
+        """)
+
+    self.CheckRequests(
+        [(self._target_instances_api,
+          'Insert',
+          self.messages.ComputeTargetInstancesInsertRequest(
+              targetInstance=self.messages.TargetInstance(
+                  name='my-target-instance',
+                  instance=(self.compute_uri +
+                            '/projects/my-project/zones/central2-a/instances/'
+                            'my-instance'),
+                  network=(self.compute_uri +
+                           '/projects/my-project/global/networks/default')
+                  ),
+              project='my-project',
               zone='central2-a'))],
     )
 

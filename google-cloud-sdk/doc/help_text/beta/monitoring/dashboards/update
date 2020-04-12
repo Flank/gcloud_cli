@@ -97,7 +97,7 @@ EXAMPLES
         $ gcloud beta monitoring dashboards update MY-DASHBOARD \
             --config-from-file=MY-FILE
 
-        Sample contents of MY-FILE:
+    Sample contents of MY-FILE:
 
         displayName: New Dashboard with new Display Name
         etag: 40d1040034db4e5a9dee931ec1b12c0d
@@ -107,8 +107,9 @@ EXAMPLES
               content: Hello World
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud monitoring dashboards update
         $ gcloud alpha monitoring dashboards update
 

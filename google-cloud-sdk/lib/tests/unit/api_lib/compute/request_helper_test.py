@@ -152,7 +152,8 @@ class MakeRequestsTest(test_case.TestCase):
         batch_url='https://www.googleapis.com/batch/compute',
         progress_tracker=None,
         warnings=[],
-        errors=[])
+        errors=[],
+        log_result=True)
 
   def testWithAsynchronousAndSynchronousRequests(self):
     operations = [
@@ -230,7 +231,8 @@ class MakeRequestsTest(test_case.TestCase):
         batch_url='https://www.googleapis.com/batch/compute',
         progress_tracker=None,
         warnings=[],
-        errors=[])
+        errors=[],
+        log_result=True)
 
   def testWithSingleZoneMutation(self):
     operations = [self.messages.Operation(targetLink='my-instance',
@@ -280,7 +282,8 @@ class MakeRequestsTest(test_case.TestCase):
         batch_url='https://www.googleapis.com/batch/compute',
         progress_tracker=None,
         warnings=[],
-        errors=[])
+        errors=[],
+        log_result=True)
 
   def testWithProgressTracker(self):
     operations = [self.messages.Operation(targetLink='my-instance',
@@ -333,7 +336,8 @@ class MakeRequestsTest(test_case.TestCase):
         batch_url='https://www.googleapis.com/batch/compute',
         progress_tracker=mock_progress_tracker,
         warnings=[],
-        errors=[])
+        errors=[],
+        log_result=True)
 
   def testWithSingleRegionMutation(self):
     operations = [
@@ -384,7 +388,8 @@ class MakeRequestsTest(test_case.TestCase):
         batch_url='https://www.googleapis.com/batch/compute',
         progress_tracker=None,
         warnings=[],
-        errors=[])
+        errors=[],
+        log_result=True)
 
   def testWithSingleGlobalMutation(self):
     operations = [
@@ -434,7 +439,8 @@ class MakeRequestsTest(test_case.TestCase):
         batch_url='https://www.googleapis.com/batch/compute',
         progress_tracker=None,
         warnings=[],
-        errors=[])
+        errors=[],
+        log_result=True)
 
   def testThatListRequestsCannotBeMixedWithNonListRequests(self):
     requests = [

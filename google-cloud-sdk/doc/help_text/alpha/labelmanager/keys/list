@@ -4,12 +4,17 @@ NAME
 
 SYNOPSIS
     gcloud alpha labelmanager keys list --label-parent=LABEL_PARENT
-        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
-        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
+        [--show-deleted=SHOW_DELETED] [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [GCLOUD_WIDE_FLAG ...]
 
 REQUIRED FLAGS
      --label-parent=LABEL_PARENT
         Parent of the LabelKey. This must be the form organizations/{org_id}.
+
+FLAGS
+     --show-deleted=SHOW_DELETED
+        Show deleted resources when listing.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

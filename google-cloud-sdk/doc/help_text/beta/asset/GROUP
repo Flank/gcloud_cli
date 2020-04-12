@@ -33,6 +33,10 @@ COMMANDS
      export
         (BETA) Export the cloud assets to Google Cloud Storage.
 
+     export-iam-policy-analysis
+        (BETA) Export IAM policy analysis that match a request to Google Cloud
+        Storage.
+
      get-history
         (BETA) Get the update history of assets that overlaps a time window.
 

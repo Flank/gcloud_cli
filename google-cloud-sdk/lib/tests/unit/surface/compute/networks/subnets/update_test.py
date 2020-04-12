@@ -392,6 +392,128 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
              subnetwork='subnet-1',
              subnetworkResource=expected_subnetwork_resource))])
 
+  def testUpdateFlowLogsFilterExpr(self):
+    """Test updating a subnet with a filter expr for flow logs."""
+    subnetwork_resource = {
+        'name': 'subnet-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+        'logConfig': {'enable': True},
+        'fingerprint': b'ABC123',
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+        --logging-filter-expr 'src_location.asn != 36647'
+        --region us-central2
+        """)
+
+    expected_subnetwork_resource = {
+        'logConfig': {
+            'filterExpr': 'src_location.asn != 36647'
+        },
+        'fingerprint': b'ABC123',
+    }
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=expected_subnetwork_resource))])
+
+  def testCreateWithFlowLogsCustomMetadata(self):
+    """Test updating a subnet with a custom metadata fields for flow logs."""
+    subnetwork_resource = {
+        'name': 'subnet-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+        'logConfig': {'enable': True},
+        'fingerprint': b'ABC123',
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+        --logging-metadata custom
+        --region us-central2
+        """)
+
+    expected_subnetwork_resource = {
+        'logConfig': {
+            'metadata': (self.messages.SubnetworkLogConfig
+                         .MetadataValueValuesEnum.CUSTOM_METADATA)
+        },
+        'fingerprint': b'ABC123',
+    }
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=expected_subnetwork_resource))])
+
+  def testCreateWithFlowLogsMetadataFields(self):
+    """Test updating a subnet with a custom metadata fields for flow logs."""
+    subnetwork_resource = {
+        'name': 'subnet-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+        'logConfig': {
+            'enable': True,
+            'metadata': (self.messages.SubnetworkLogConfig
+                         .MetadataValueValuesEnum.CUSTOM_METADATA)
+        },
+        'fingerprint': b'ABC123',
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+        --logging-metadata-fields 'src_instance,dest_instance'
+        --region us-central2
+        """)
+
+    expected_subnetwork_resource = {
+        'logConfig': {
+            'metadataFields': ['src_instance', 'dest_instance']
+        },
+        'fingerprint': b'ABC123',
+    }
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=expected_subnetwork_resource))])
+
   def testSetRoleToActive(self):
     """Tests setting the role of a subnet to ACTIVE."""
     subnetwork_resource = {
@@ -575,128 +697,6 @@ class SubnetsUpdateTestAlpha(SubnetsUpdateTest):
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi('alpha')
-
-  def testUpdateFlowLogsFilterExpr(self):
-    """Test updating a subnet with a filter expr for flow logs."""
-    subnetwork_resource = {
-        'name': 'subnet-1',
-        'network': ('https://compute.googleapis.com/compute/v1/projects/'
-                    'my-project/global/networks/default'),
-        'logConfig': {'enable': True},
-        'fingerprint': b'ABC123',
-    }
-    self.make_requests.side_effect = iter([
-        [self.messages.Subnetwork(**subnetwork_resource)],
-        [],
-    ])
-
-    self.Run("""
-        compute networks subnets update subnet-1
-        --logging-filter-expr 'src_location.asn != 36647'
-        --region us-central2
-        """)
-
-    expected_subnetwork_resource = {
-        'logConfig': {
-            'filterExpr': 'src_location.asn != 36647'
-        },
-        'fingerprint': b'ABC123',
-    }
-
-    self.CheckRequests([
-        (self.compute.subnetworks, 'Get',
-         self.messages.ComputeSubnetworksGetRequest(
-             project='my-project', region='us-central2',
-             subnetwork='subnet-1')),
-    ], [(self.compute.subnetworks, 'Patch',
-         self.messages.ComputeSubnetworksPatchRequest(
-             project='my-project',
-             region='us-central2',
-             subnetwork='subnet-1',
-             subnetworkResource=expected_subnetwork_resource))])
-
-  def testCreateWithFlowLogsCustomMetadata(self):
-    """Test updating a subnet with a custom metadata fields for flow logs."""
-    subnetwork_resource = {
-        'name': 'subnet-1',
-        'network': ('https://compute.googleapis.com/compute/v1/projects/'
-                    'my-project/global/networks/default'),
-        'logConfig': {'enable': True},
-        'fingerprint': b'ABC123',
-    }
-    self.make_requests.side_effect = iter([
-        [self.messages.Subnetwork(**subnetwork_resource)],
-        [],
-    ])
-
-    self.Run("""
-        compute networks subnets update subnet-1
-        --logging-metadata custom
-        --region us-central2
-        """)
-
-    expected_subnetwork_resource = {
-        'logConfig': {
-            'metadata': (self.messages.SubnetworkLogConfig
-                         .MetadataValueValuesEnum.CUSTOM_METADATA)
-        },
-        'fingerprint': b'ABC123',
-    }
-
-    self.CheckRequests([
-        (self.compute.subnetworks, 'Get',
-         self.messages.ComputeSubnetworksGetRequest(
-             project='my-project', region='us-central2',
-             subnetwork='subnet-1')),
-    ], [(self.compute.subnetworks, 'Patch',
-         self.messages.ComputeSubnetworksPatchRequest(
-             project='my-project',
-             region='us-central2',
-             subnetwork='subnet-1',
-             subnetworkResource=expected_subnetwork_resource))])
-
-  def testCreateWithFlowLogsMetadataFields(self):
-    """Test updating a subnet with a custom metadata fields for flow logs."""
-    subnetwork_resource = {
-        'name': 'subnet-1',
-        'network': ('https://compute.googleapis.com/compute/v1/projects/'
-                    'my-project/global/networks/default'),
-        'logConfig': {
-            'enable': True,
-            'metadata': (self.messages.SubnetworkLogConfig
-                         .MetadataValueValuesEnum.CUSTOM_METADATA)
-        },
-        'fingerprint': b'ABC123',
-    }
-    self.make_requests.side_effect = iter([
-        [self.messages.Subnetwork(**subnetwork_resource)],
-        [],
-    ])
-
-    self.Run("""
-        compute networks subnets update subnet-1
-        --logging-metadata-fields 'src_instance,dest_instance'
-        --region us-central2
-        """)
-
-    expected_subnetwork_resource = {
-        'logConfig': {
-            'metadataFields': ['src_instance', 'dest_instance']
-        },
-        'fingerprint': b'ABC123',
-    }
-
-    self.CheckRequests([
-        (self.compute.subnetworks, 'Get',
-         self.messages.ComputeSubnetworksGetRequest(
-             project='my-project', region='us-central2',
-             subnetwork='subnet-1')),
-    ], [(self.compute.subnetworks, 'Patch',
-         self.messages.ComputeSubnetworksPatchRequest(
-             project='my-project',
-             region='us-central2',
-             subnetwork='subnet-1',
-             subnetworkResource=expected_subnetwork_resource))])
 
   def testSetRoleToActive(self):
     """Tests setting the role of a subnet to ACTIVE."""

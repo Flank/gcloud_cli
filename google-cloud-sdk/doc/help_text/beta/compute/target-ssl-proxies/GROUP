@@ -6,7 +6,14 @@ SYNOPSIS
     gcloud beta compute target-ssl-proxies COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) List, create, and delete target SSL proxies.
+    (BETA) List, create, and delete target SSL target proxies for SSL Proxy
+    Load Balancing.
+
+    For more information about target SSL proxies, see the SSL proxy load
+    balancer documentation (https://cloud.google.com/load-balancing/docs/ssl/).
+
+    See also: Target SSL proxies API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/targetSslProxies).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

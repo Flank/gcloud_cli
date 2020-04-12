@@ -19,8 +19,20 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     create
+        (ALPHA) Create a view.
+
+     delete
+        (ALPHA) Delete a view.
+
+     describe
+        (ALPHA) Display information about a view.
+
      list
-        (ALPHA) Lists the defined views.
+        (ALPHA) List the defined views.
+
+     update
+        (ALPHA) Update a view.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

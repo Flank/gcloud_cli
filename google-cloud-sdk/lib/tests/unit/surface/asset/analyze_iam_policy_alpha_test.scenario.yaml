@@ -53,7 +53,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p4alpha1/organizations/o1:analyzeIamPolicy?accessSelector.permissions=a.b.get&accessSelector.permissions=a.b.create&accessSelector.roles=roles%2Fcloudasset.r1&accessSelector.roles=roles%2Fcloudasset.r2&options.expandGroups=True&options.expandResources=False&options.expandRoles=True&options.outputGroupEdges=True&options.outputPartialResultBeforeTimeout=True&options.outputResourceEdges=False&resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1
+          uri: https://cloudasset.googleapis.com/v1p4alpha1/organizations/o1:analyzeIamPolicy?accessSelector.permissions=a.b.get&accessSelector.permissions=a.b.create&accessSelector.roles=roles%2Fcloudasset.r1&accessSelector.roles=roles%2Fcloudasset.r2&options.expandGroups=True&options.expandRoles=True&options.outputGroupEdges=True&options.outputPartialResultBeforeTimeout=True&resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1
           method: GET
           headers: {}
           body: null
@@ -122,7 +122,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p4alpha1/organizations/o1:analyzeIamPolicy?accessSelector.permissions=a.b.get&accessSelector.permissions=a.b.create&accessSelector.roles=roles%2Fcloudasset.r1&accessSelector.roles=roles%2Fcloudasset.r2&identitySelector.identity=user%3Auser1%40foo.com&options.expandGroups=False&options.expandResources=True&options.expandRoles=False&options.outputGroupEdges=False&options.outputPartialResultBeforeTimeout=True&options.outputResourceEdges=True
+          uri: https://cloudasset.googleapis.com/v1p4alpha1/organizations/o1:analyzeIamPolicy?accessSelector.permissions=a.b.get&accessSelector.permissions=a.b.create&accessSelector.roles=roles%2Fcloudasset.r1&accessSelector.roles=roles%2Fcloudasset.r2&identitySelector.identity=user%3Auser1%40foo.com&options.expandResources=True&options.outputPartialResultBeforeTimeout=True&options.outputResourceEdges=True
           method: GET
           headers: {}
           body: null

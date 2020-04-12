@@ -1,11 +1,17 @@
 NAME
-    gcloud beta compute regions - list Google Compute Engine regions
+    gcloud beta compute regions - list Compute Engine regions
 
 SYNOPSIS
     gcloud beta compute regions COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) List Google Compute Engine regions.
+    (BETA) List Compute Engine regions.
+
+    For more information about regions, see the regions documentation
+    (https://cloud.google.com/compute/docs/regions-zones/).
+
+    See also: Regions API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/regions).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

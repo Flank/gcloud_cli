@@ -175,12 +175,6 @@ AVAILABLE PROPERTIES
             different project, you can use this property to specify the
             alternate project.
 
-     build_artifacts
-         repository
-            Default repository to use when working with Cloud Build Artifacts
-            resources. When a repository is required but not provided by a
-            flag, the command will fall back to this value, if set.
-
      builds
          kaniko_cache_ttl
             TTL, in hours, of cached layers when using Kaniko. If zero, layer

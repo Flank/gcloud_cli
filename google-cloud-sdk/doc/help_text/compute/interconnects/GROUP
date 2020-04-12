@@ -1,12 +1,19 @@
 NAME
-    gcloud compute interconnects - read and manipulate Google Compute Engine
+    gcloud compute interconnects - read and manipulate Compute Engine
         interconnects
 
 SYNOPSIS
     gcloud compute interconnects GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Read and manipulate Google Compute Engine interconnects.
+    Read and manipulate Cloud Interconnect connections.
+
+    For more information about Cloud Interconnect, see the Cloud Interconnect
+    documentation
+    (https://cloud.google.com/interconnect/docs/concepts/overview).
+
+    See also: Interconnects API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/interconnects).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -23,7 +30,7 @@ GROUPS
         Read and manipulate Google Compute Engine interconnect attachments.
 
      locations
-        Read and manipulate Google Compute Engine interconnect locations.
+        Read and manipulate Compute Engine interconnect locations.
 
 COMMANDS
     COMMAND is one of the following:

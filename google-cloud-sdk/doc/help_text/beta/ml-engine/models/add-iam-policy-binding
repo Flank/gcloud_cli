@@ -1,16 +1,13 @@
 NAME
     gcloud beta ml-engine models add-iam-policy-binding - add IAM policy
-        binding to a model
+        binding for a model
 
 SYNOPSIS
     gcloud beta ml-engine models add-iam-policy-binding MODEL --member=MEMBER
-        --role=ROLE [GCLOUD_WIDE_FLAG ...]
+        --role=ROLE [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Adds IAM policy binding to the given model.
-
-    See https://cloud.google.com/iam/docs/managing-policies for details of
-    policy role and member types.
+    (BETA) Add IAM policy binding to a model.
 
 POSITIONAL ARGUMENTS
      MODEL
@@ -34,6 +31,16 @@ REQUIRED FLAGS
      --role=ROLE
         Define the role of the member.
 
+OPTIONAL FLAGS
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -43,12 +50,27 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    The following command will add an IAM policy binding for the role of
-    'roles/editor' for the user 'test-user@gmail.com' on the model my_model:
+    To add an IAM policy binding for the role of 'roles/ml.admin' for the user
+    'test-user@gmail.com' on a model with identifier 'my_model', run:
 
         $ gcloud beta ml-engine models add-iam-policy-binding my_model \
-            --member='user:test-user@gmail.com' \
-            --role='roles/editor'
+            --member='user:test-user@gmail.com' --role='roles/ml.admin'
+
+    To add an IAM policy binding for the role of 'roles/ml.admin' to the
+    service account 'test-proj1@example.domain.com', run:
+
+        $ gcloud beta ml-engine models add-iam-policy-binding my_model \
+            --member='serviceAccount:test-proj1@example.domain.com' \
+            --role='roles/ml.admin'
+
+    To add an IAM policy binding for the role of 'roles/ml.admin' for all
+    authenticated users on a model with identifier 'my_model', run:
+
+        $ gcloud beta ml-engine models add-iam-policy-binding my_model \
+            --member='allAuthenticatedUsers' --role='roles/ml.admin'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
 
 NOTES
     This command is currently in BETA and may change without notice. These

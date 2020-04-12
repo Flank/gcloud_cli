@@ -17,10 +17,16 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha access-context-manager perimeters
-    update-dry-run-config updates the dry run config (spec) on the service
-    perimeter resource. The dry run config will not be enforced, but will be
-    dry run. This allows for testing the config before rolling it out.
+    (ALPHA) (DEPRECATED) Update the dry-run config for an existing Service
+    Perimeter.
+
+    This command is deprecated. Please use gcloud beta access-context-manager
+    perimeters dry-run to manage dry-run state.
+
+    gcloud alpha access-context-manager perimeters update-dry-run-config
+    updates the dry run config (spec) on the service perimeter resource. The
+    dry run config will not be enforced, but will be dry run. This allows for
+    testing the config before rolling it out.
 
     Note: The dry_run field will be set to true unless the --clear flag is
     specified, in which case all dry run config values will be removed.

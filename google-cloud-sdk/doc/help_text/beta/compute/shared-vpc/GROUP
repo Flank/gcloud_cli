@@ -5,7 +5,10 @@ SYNOPSIS
     gcloud beta compute shared-vpc GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Configure shared VPC.
+    (BETA) Configure Shared VPC configurations.
+
+    For more information about Shared VPC, see the Shared VPC documentation
+    (https://cloud.google.com/vpc/docs/shared-vpc/).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -19,11 +22,10 @@ GROUPS
     GROUP is one of the following:
 
      associated-projects
-        (BETA) Configure associated projects for cross-project networking
-        (XPN).
+        (BETA) Configure associated projects for Shared VPC networking.
 
      organizations
-        (BETA) Configure organizations for cross-project networking (XPN).
+        (BETA) Configure organizations for Shared VPC networking.
 
 COMMANDS
     COMMAND is one of the following:

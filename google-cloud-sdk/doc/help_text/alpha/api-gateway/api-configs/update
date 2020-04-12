@@ -1,5 +1,6 @@
 NAME
     gcloud alpha api-gateway api-configs update - update an API Gateway API
+        config
 
 SYNOPSIS
     gcloud alpha api-gateway api-configs update (API_CONFIG : --api=API)
@@ -8,7 +9,9 @@ SYNOPSIS
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Update an API Gateway API.
+    (ALPHA) Update an API Gateway API config.
+
+    NOTE: Only the name and labels may be updated on an API config.
 
 POSITIONAL ARGUMENTS
      Api config resource - Name for API Config which will be updated. The
@@ -73,6 +76,15 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+EXAMPLES
+    To update the display name of an API config, run:
+
+        $ gcloud alpha api-gateway api-configs update my-config \
+            --api my-api --display-name="New Display Name"
+
+    NOTE: Only the display name and labels attributes are mutable on an API
+    config.
 
 NOTES
     This command is an internal implementation detail and may change or

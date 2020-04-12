@@ -218,6 +218,10 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
     return self.Run('access-context-manager perimeters dry-run reset '
                     '    {}'.format(perimeter_id))
 
+  def _DropDryRunPerimeter(self, perimeter_id):
+    return self.Run('access-context-manager perimeters dry-run drop '
+                    '    {}'.format(perimeter_id))
+
   def _CommitDryRunConfig(self):
     full_policy_id = self._GetTestPolicyId()
     just_policy_number = full_policy_id[full_policy_id.find('/') + 1:]
@@ -365,6 +369,35 @@ This Service Perimeter has been marked for deletion dry-run mode.
         self._CreateDryRunPerimeter(perimeter_id)
         self._DescribeDryRunPerimeter(perimeter_id)
         self._ResetDryRunPerimeter(perimeter_id)
+        self._DescribeDryRunPerimeter(perimeter_id)
+        # This is the combined output of the two 'describe' calls.
+        self.AssertOutputEquals("""\
+name: {perimeter}
+title: My Perimeter {perimeter}
+type: PERIMETER_TYPE_REGULAR
+resources:
+   NONE
+restrictedServices:
+  +bigquery.googleapis.com
+accessLevels:
+   NONE
+vpcAccessibleServices:
+   NONE
+This Service Perimeter has no dry-run or enforcement mode config.
+""".format(perimeter=perimeter_id))
+    finally:
+      self._DestroyPerimeter(perimeter_id)
+
+  def testServicePerimeterDryRunCreateAndDrop(self):
+    if (self.track is not calliope_base.ReleaseTrack.ALPHA and
+        self.track is not calliope_base.ReleaseTrack.BETA):
+      return
+    perimeter_id = _GetResourceName('DRY_RUN_PERIMETER')
+    try:
+      with self._SetPolicyProperty(self._GetTestPolicyId()):
+        self._CreateDryRunPerimeter(perimeter_id)
+        self._DescribeDryRunPerimeter(perimeter_id)
+        self._DropDryRunPerimeter(perimeter_id)
         self._DescribeDryRunPerimeter(perimeter_id)
         # This is the combined output of the two 'describe' calls.
         self.AssertOutputEquals("""\

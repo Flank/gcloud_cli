@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.labelmanager import service as labelmanager
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.labelmanager import arguments
+from googlecloudsdk.command_lib.labelmanager import operations
 from googlecloudsdk.command_lib.labelmanager import utils
 
 
@@ -84,9 +85,14 @@ class Delete(base.Command):
     labelmanager_messages = labelmanager.LabelManagerMessages()
 
     label_value = utils.GetLabelValueIfArgsAreValid(args)
-    label_binding_name = utils.GetLabelBindingNameFromLabelValueAndResource(label_value, args.resource)
+    label_binding_name = utils.GetLabelBindingNameFromLabelValueAndResource(
+        label_value, args.resource)
 
     request = labelmanager_messages.LabelmanagerLabelBindingsDeleteRequest(
         name=label_binding_name)
 
-    return labelbindings_service.Delete(request)
+    op = labelbindings_service.Delete(request)
+    if op.response is not None:
+      return {'response': op.response}
+    else:
+      raise operations.OperationError(op.error.message)

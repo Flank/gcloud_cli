@@ -5,7 +5,10 @@ SYNOPSIS
     gcloud compute shared-vpc GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Configure shared VPC.
+    Configure Shared VPC configurations.
+
+    For more information about Shared VPC, see the Shared VPC documentation
+    (https://cloud.google.com/vpc/docs/shared-vpc/).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -19,10 +22,10 @@ GROUPS
     GROUP is one of the following:
 
      associated-projects
-        Configure associated projects for cross-project networking (XPN).
+        Configure associated projects for Shared VPC networking.
 
      organizations
-        Configure organizations for cross-project networking (XPN).
+        Configure organizations for Shared VPC networking.
 
 COMMANDS
     COMMAND is one of the following:

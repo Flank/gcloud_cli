@@ -11,7 +11,7 @@ gcloud ai\-platform predict \- run AI Platform online prediction
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud ai\-platform predict\fR \fB\-\-model\fR=\fIMODEL\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud ai\-platform predict\fR \fB\-\-model\fR=\fIMODEL\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-json\-request\fR=\fIJSON_REQUEST\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -52,6 +52,23 @@ An example of the JSON instances file:
 {"images": [0.0, ..., 0.1], "key": 3}
 {"images": [0.0, ..., 0.1], "key": 2}
 ...
+.RE
+
+This flag accepts "\-" for stdin.
+
+.TP 2m
+\fB\-\-json\-request\fR=\fIJSON_REQUEST\fR
+Path to a local file containing the body of JSON request.
+
+An example of a JSON request:
+
+.RS 2m
+{
+  "instances": [
+    {"x": [1, 2], "y": [3, 4]},
+    {"x": [\-1, \-2], "y": [\-3, \-4]}
+  ]
+}
 .RE
 
 This flag accepts "\-" for stdin.

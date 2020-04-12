@@ -103,6 +103,15 @@ class MockFeaturesAPI(object):
                 feature=feature)),
         response=response)
 
+  def ExpectUpdate(self, mask, feature, response):
+    self.mocked_client.projects_locations_global_features.Patch.Expect(
+        request=(
+            self.messages.GkehubProjectsLocationsGlobalFeaturesPatchRequest(
+                name=self.resource_name,
+                updateMask=mask,
+                feature=feature)),
+        response=response)
+
   def _MakeOperation(self, name=None, done=False, error=None, response=None):
     operation = self.messages.Operation(
         name=name or self.wait_operation_relative_name,
@@ -136,7 +145,10 @@ class FeaturesTestBase(cli_test_base.CliTestBase,
     self.addCleanup(self.features_api.mocked_client.Unmock)
 
   def RunCommand(self, params):
-    prefix = ['container', 'hub', 'features', self.FEATURE_NAME]
+    if hasattr(self, 'NO_FEATURE_PREFIX'):
+      prefix = ['container', 'hub', self.FEATURE_NAME]
+    else:
+      prefix = ['container', 'hub', 'features', self.FEATURE_NAME]
     if isinstance(params, six.string_types):
       return self.Run(prefix + [params], track=self.track)
     return self.Run(prefix + params, track=self.track)

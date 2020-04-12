@@ -8,6 +8,9 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) Read and manage Compute Engine sole-tenancy resources.
 
+    For more information about sole-tenancy resources, see the sole-tenancy
+    documentation (https://cloud.google.com/compute/docs/nodes/).
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,

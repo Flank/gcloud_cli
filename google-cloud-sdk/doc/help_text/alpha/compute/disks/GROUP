@@ -1,12 +1,17 @@
 NAME
-    gcloud alpha compute disks - read and manipulate Google Compute Engine
-        disks
+    gcloud alpha compute disks - read and manipulate Compute Engine disks
 
 SYNOPSIS
     gcloud alpha compute disks COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read and manipulate Google Compute Engine disks.
+    (ALPHA) Read and manipulate Compute Engine disks.
+
+    For more information about disks, see the disks documentation
+    (https://cloud.google.com/compute/docs/disks/).
+
+    See also: Disks API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/disks).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

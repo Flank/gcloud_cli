@@ -3,7 +3,8 @@ NAME
         operation
 
 SYNOPSIS
-    gcloud alpha ml-engine operations describe OPERATION [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha ml-engine operations describe OPERATION [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Describe an AI Platform operation.
@@ -11,6 +12,16 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      OPERATION
         Name of the operation.
+
+FLAGS
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

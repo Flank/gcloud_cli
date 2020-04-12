@@ -11,7 +11,7 @@ gcloud beta ml\-engine explain \- run AI Platform explanation
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ml\-engine explain\fR \fB\-\-model\fR=\fIMODEL\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ml\-engine explain\fR \fB\-\-model\fR=\fIMODEL\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-json\-request\fR=\fIJSON_REQUEST\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -52,6 +52,23 @@ An example of the JSON instances file:
 This flag accepts "\-" for stdin.
 
 .TP 2m
+\fB\-\-json\-request\fR=\fIJSON_REQUEST\fR
+Path to a local file containing the body of JSON request.
+
+An example of a JSON request:
+
+.RS 2m
+{
+  "instances": [
+    {"x": [1, 2], "y": [3, 4]},
+    {"x": [\-1, \-2], "y": [\-3, \-4]}
+  ]
+}
+.RE
+
+This flag accepts "\-" for stdin.
+
+.TP 2m
 \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR
 Path to a local file from which instances are read. Instances are in UTF\-8
 encoded text format; newline delimited.
@@ -74,6 +91,15 @@ This flag accepts "\-" for stdin.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Google Cloud region of the regional endpoint to use for this command. If
+unspecified, the command uses the global endpoint of the AI Platform Training
+and Prediction API.
+
+Learn more about regional endpoints and see a list of available regions:
+https://cloud.google.com/ai\-platform/prediction/docs/regional\-endpoints
+
 .TP 2m
 \fB\-\-version\fR=\fIVERSION\fR
 Model version to be used.

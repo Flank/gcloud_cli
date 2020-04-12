@@ -1,12 +1,12 @@
 NAME
-    gcloud compute diagnose - debugging tools for Google Compute Engine virtual
+    gcloud compute diagnose - debugging tools for Compute Engine virtual
         machine instances
 
 SYNOPSIS
     gcloud compute diagnose COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Debugging tools for Google Compute Engine virtual machine instances.
+    Debugging tools for Compute Engine virtual machine instances.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

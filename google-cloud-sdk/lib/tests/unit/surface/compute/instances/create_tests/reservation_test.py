@@ -195,13 +195,6 @@ class InstancesCreateReservationTest(create_test_base.InstancesCreateTestBase,
           ))],
     )
 
-
-class InstancesCreateReservationTestBeta(InstancesCreateReservationTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'beta'
-
   def testWithMultipleResourcePolicies(self):
     m = self.messages
 
@@ -257,6 +250,13 @@ class InstancesCreateReservationTestBeta(InstancesCreateReservationTest):
               zone='central2-a',
           ))],
     )
+
+
+class InstancesCreateReservationTestBeta(InstancesCreateReservationTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
 
   def testWithMinNodeCpus(self):
     m = self.messages

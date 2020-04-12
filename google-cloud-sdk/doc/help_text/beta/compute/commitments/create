@@ -164,6 +164,14 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To create a commitment called commitment-1 in the us-central1 region, with
+    a 12-month plan, 9GB of memory and 4 vcpu cores, run:
+
+        $ gcloud beta compute commitments create commitment-1 \
+            --plan=12-month --resources=memory=9GB,vcpu=4 \
+            --region=us-central1
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

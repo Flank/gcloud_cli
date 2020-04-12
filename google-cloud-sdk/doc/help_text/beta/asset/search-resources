@@ -32,27 +32,26 @@ FLAGS
         be identical to those in the previous call.
 
      --query=QUERY
-        The query statement.
+        The query statement. To learn how to construct a query, see
+        https://cloud.google.com/asset-inventory/docs/searching-resources#how_to_construct_a_query.
 
         Examples:
-        * To find Cloud resources with "foobar" in their searchable
+        * To find Google Cloud resources with "foobar" in their searchable
           attributes: foobar
-        * To find Cloud resources with "foo" prefix in their searchable
-          attributes: foo
-        * To find Cloud resources with "oo" substring within any searchable
-          attribute: oo
-        * To find Cloud resources with token "//xyz/123" in the full resource
-          name. See Full Resource Names
-          (https://cloud.google.com/apis/design/resource_names#full_resource_name):
-          name: "//xyz/123"
-        * To find Cloud resources with prefix "//xyz" in the full resource
-          names. name: "//xyz"
-        * To find Cloud resources with substring "xyz" in the full resource
-          names. name: "xyz"
-        * To find Cloud resources with "xyz" in their display name:
-          displayName: "xyz"
-        * To find Cloud resources with "xyz" in their description:
-          description: "xyz"
+        * To find Google Cloud resources with "foo" prefix in their
+          searchable attributes: foo*
+        * To find Google Cloud resources with "oo" substring within any
+          searchable attribute: *oo*
+        * To find Google Cloud resources with token "//xyz/123" in the full
+          resource name: name : "//xyz/123"
+        * To find Google Cloud resources with prefix "//xyz" in the full
+          resource names: name : "//xyz*"
+        * To find Google Cloud resources with substring "xyz" in the full
+          resource names: name : "*xyz*"
+        * To find Google Cloud resources with "xyz" in their display name:
+          displayName : "xyz"
+        * To find Google Cloud resources with "xyz" in their description:
+          description : "xyz"
 
      --scope=SCOPE
         The search is limited to the resources within the scope. The allowed
@@ -82,7 +81,7 @@ EXAMPLES
     name, under your organization (organizations/123), run:
 
         $ gcloud beta asset search-resources --scope='organizations/123' \
-          --query='name:"*xyz*"'
+          --query='name : "*xyz*"'
 
 NOTES
     This command is an internal implementation detail and may change or

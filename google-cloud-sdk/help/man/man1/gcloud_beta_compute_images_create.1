@@ -11,7 +11,7 @@ gcloud beta compute images create \- create Google Compute Engine images
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute images create\fR \fIIMAGE_NAME\fR (\fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR\ |\ \fB\-\-source\-image\-family\fR=\fISOURCE_IMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR\ |\ \fB\-\-source\-uri\fR=\fISOURCE_URI\fR) [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-family\fR=\fIFAMILY\fR] [\fB\-\-force\fR] [\fB\-\-force\-create\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSES\fR,...]] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR] [\fB\-\-source\-image\-project\fR=\fISOURCE_IMAGE_PROJECT\fR] [\fB\-\-storage\-location\fR=\fILOCATION\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute images create\fR \fIIMAGE_NAME\fR (\fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR\ |\ \fB\-\-source\-image\-family\fR=\fISOURCE_IMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR\ |\ \fB\-\-source\-uri\fR=\fISOURCE_URI\fR) [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-family\fR=\fIFAMILY\fR] [\fB\-\-forbidden\-database\-file\fR=[\fIDBX_VALUE\fR,...]] [\fB\-\-force\fR] [\fB\-\-force\-create\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-key\-exchange\-key\-file\fR=[\fIKEK_VALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSES\fR,...]] [\fB\-\-platform\-key\-file\fR=\fIPLATFORM_KEY_FILE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-signature\-database\-file\fR=[\fIDB_VALUE\fR,...]] [\fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR] [\fB\-\-source\-image\-project\fR=\fISOURCE_IMAGE_PROJECT\fR] [\fB\-\-storage\-location\fR=\fILOCATION\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -108,6 +108,12 @@ The family of the image. When creating an instance or disk, specifying a family
 will cause the latest non\-deprecated image in the family to be used.
 
 .TP 2m
+\fB\-\-forbidden\-database\-file\fR=[\fIDBX_VALUE\fR,...]
+Comma\-separated list of file paths that point to revoked X.509 certificates or
+raw binary files. When you create a shielded VM from this image, these
+certificates or files are added to the forbidden signature database (dbx).
+
+.TP 2m
 \fB\-\-force\fR
 By default, image creation fails when it is created from a disk that is attached
 to a running instance. When this flag is used, image creation from disk will
@@ -124,40 +130,18 @@ Flag force\-create is deprecated. Use \-\-force instead.
 .TP 2m
 \fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]
 This parameter enables one or more features for VM instances that use the image
-for their boot disks. The following features are available:
+for their boot disks. See
+https://cloud.google.com/compute/docs/images/create\-delete\-deprecate\-private\-images#guest\-os\-features
+for descriptions of the supported features. \fIGUEST_OS_FEATURE\fR must be one
+of: \fBGVNIC\fR, \fBMULTI_IP_SUBNET\fR, \fBUEFI_COMPATIBLE\fR,
+\fBVIRTIO_SCSI_MULTIQUEUE\fR, \fBWINDOWS\fR.
 
-.RS 2m
-.IP "\(em" 2m
-MULTI_IP_SUBNET \- For configuring interfaces with a netmask other than /32.
+.TP 2m
+\fB\-\-key\-exchange\-key\-file\fR=[\fIKEK_VALUE\fR,...]
+Comma\-separated list of file paths that point to X.509 certificates or raw
+binary files. When you create a shielded VM from this image, these certificates
+or files are used as key exchange keys (KEK).
 
-.IP "\(em" 2m
-UEFI_COMPATIBLE \- Enables UEFI booting, which is an alternative system boot
-method. Most public images use the GRUB bootloader as their primary boot method.
-
-.IP "\(em" 2m
-VIRTIO_SCSI_MULTIQUEUE \- Enables multiqueue SCSI capabilities for Local SSD
-devices. This option is an alternative to NVMe.
-.RS 2m
-.IP "\(bu" 2m
-For Linux images, you can enable VIRTIO_SCSI_MULTIQUEUE on images with kernel
-versions 3.17 and higher.
-.IP "\(bu" 2m
-For Windows images, you can enable VIRTIO_SCSI_MULTIQUEUE on images with driver
-version 1.2.0.1621 or higher.
-
-.RE
-.sp
-.IP "\(em" 2m
-WINDOWS \- Required for Windows Server images. Newer public images for Windows
-server include the WINDOWS parameter to indicate that it is a Windows image.
-
-.RE
-.RE
-.sp
-\fIGUEST_OS_FEATURE\fR must be one of: \fBMULTI_IP_SUBNET\fR,
-\fBUEFI_COMPATIBLE\fR, \fBVIRTIO_SCSI_MULTIQUEUE\fR, \fBWINDOWS\fR, \fBGVNIC\fR.
-
-.RS 2m
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to add.
@@ -172,6 +156,12 @@ numbers.
 Comma\-separated list of URIs to license resources.
 
 .TP 2m
+\fB\-\-platform\-key\-file\fR=\fIPLATFORM_KEY_FILE\fR
+File path that points to an X.509 certificate or raw binary file. When you
+create a shielded VM from this image, this certificate or raw binary file is
+used as the platform key (PK).
+
+.TP 2m
 \fB\-\-require\-csek\-key\-create\fR
 Refuse to create images not protected by a user managed key in the key file when
 \-\-csek\-key\-file is given. This behavior is enabled by default to prevent
@@ -181,6 +171,12 @@ matching Customer\-Supplied Encryption Key in the supplied \-\-csek\-key\-file.
 See https://cloud.google.com/compute/docs/disks/customer\-supplied\-encryption
 for more details. Enabled by default, use
 \fB\-\-no\-require\-csek\-key\-create\fR to disable.
+
+.TP 2m
+\fB\-\-signature\-database\-file\fR=[\fIDB_VALUE\fR,...]
+Comma\-separated list of file paths that point to valid X.509 certificates or
+raw binary files. When you create a shielded VM from this image, these
+certificates or files are added to the signature database (db).
 
 .TP 2m
 \fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR

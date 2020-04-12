@@ -1,12 +1,18 @@
 NAME
-    gcloud alpha compute operations - read and manipulate Google Compute Engine
+    gcloud alpha compute operations - read and manipulate Compute Engine
         operations
 
 SYNOPSIS
     gcloud alpha compute operations COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read and manipulate Google Compute Engine operations.
+    (ALPHA) Read and manipulate Compute Engine operations.
+
+    For more information about operations, see the operations documentation
+    (https://cloud.google.com/compute/docs/audit-logging).
+
+    See also: Operations API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/regionOperations).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -96,6 +96,17 @@ actions:
                 yIKLqy1HdDQ8VakrOSCUAiEAoGoDcrlhiQE866/PnqWVM0S2sxwpQLYJ7F8Zjx9N
                 3AM=
                 -----END CERTIFICATE----
+                -----BEGIN CERTIFICATE-----
+                MIIEiDCCAnACFBIqqUoIQUU5RgXxiua8ISTU9YMcMA0GCSqGSIb3DQEBCwUAMIGM
+                MQswCQYDVQQGEwJVUzETMBEGA1UECAwKV2FzaGluZ3RvbjERMA8GA1UEBwwIS2ly
+                a2xhbmQxHTAbBgNVBAoMFEludGVybWVkaWF0ZSBDQSBJbmMuMRswGQYDVQQLDBJT
+                dGlsbCBVbml0IFRlc3RpbmcxGTAXBgNVBAMMEGludGVybWVkaWF0ZS5jb20wHhcN
+                aW+svhFsZ2biuAeCloOAOPlISg9Lr3ydTrUMZHQB3a7W42NEkcxdO4ab1FEArsVA
+                uS1zHs1yhoRXtfNgyQ9zykxHlBgjXDZsFxfUuzJZa4t7VqtWgLeUXdewCBSaf63+
+                SKOLgx8l6QnTHnUh5700ApIuoXBuaSqc6BfTl1nkQqUZEoGlcuFZqJXe2sWN1oDP
+                rI7NPXRWJqTdNuSjUznzSMO+AsBcZBcYad1pjhWDNnW4n1UFoMpaIYzb6jZSedo9
+                y4+LpDFE2AxuNZ/x
+                -----END CERTIFICATE-----
     - expect_file_written:
         path: cert_out.pem
         contents: |-
@@ -120,6 +131,27 @@ actions:
           3DCQvfQg6kvNZ2zj/1iIXDsQ0mYTTjNQzeWzlOF/CLL0mUk6xpSXY1HnW4Y7hREI
           hEJNcfJX6cLmq0XK+H3MgLtSB+6dTQ5TLISZwYYrAyHGdJDDu9DEsEZXgGZCZCdP
           mlBvmxoXlW9NFD9TBTD3M/txNg/UySLJjK/wxfaR/XXGnLv5PgYcHc2ajdZmArba
+          aW+svhFsZ2biuAeCloOAOPlISg9Lr3ydTrUMZHQB3a7W42NEkcxdO4ab1FEArsVA
+          uS1zHs1yhoRXtfNgyQ9zykxHlBgjXDZsFxfUuzJZa4t7VqtWgLeUXdewCBSaf63+
+          SKOLgx8l6QnTHnUh5700ApIuoXBuaSqc6BfTl1nkQqUZEoGlcuFZqJXe2sWN1oDP
+          rI7NPXRWJqTdNuSjUznzSMO+AsBcZBcYad1pjhWDNnW4n1UFoMpaIYzb6jZSedo9
+          y4+LpDFE2AxuNZ/x
+          -----END CERTIFICATE-----
+          -----BEGIN CERTIFICATE-----
+          MIIBTjCB9aADAgECAgEBMAoGCCqGSM49BAMCMCYxJDAiBgNVBAMTG1VuaXRUZXN0
+          OiBTZWxmLXNpZ25lZCBFQ0RTQTAgFw0xMDA4MDExNzAwMDBaGA8zMDEwMDgwMTE3
+          MDAwMFowJjEkMCIGA1UEAxMbVW5pdFRlc3Q6IFNlbGYtc2lnbmVkIEVDRFNBMFkw
+          EwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEN9VdYSWzSS6eRWF5+1LKaGBnfX7gV9/r
+          hklpUtt+wW99lPWSH/uZFMwpuo/mZkNaLEmhkm9cM9SwBQDxnOUyY6MSMBAwDgYD
+          VR0PAQH/BAQDAgIEMAoGCCqGSM49BAMCA0gAMEUCID/dNgLyTUSHN4eaFCUc2L3t
+          yIKLqy1HdDQ8VakrOSCUAiEAoGoDcrlhiQE866/PnqWVM0S2sxwpQLYJ7F8Zjx9N
+          3AM=
+          -----END CERTIFICATE----
+          -----BEGIN CERTIFICATE-----
+          MIIEiDCCAnACFBIqqUoIQUU5RgXxiua8ISTU9YMcMA0GCSqGSIb3DQEBCwUAMIGM
+          MQswCQYDVQQGEwJVUzETMBEGA1UECAwKV2FzaGluZ3RvbjERMA8GA1UEBwwIS2ly
+          a2xhbmQxHTAbBgNVBAoMFEludGVybWVkaWF0ZSBDQSBJbmMuMRswGQYDVQQLDBJT
+          dGlsbCBVbml0IFRlc3RpbmcxGTAXBgNVBAMMEGludGVybWVkaWF0ZS5jb20wHhcN
           aW+svhFsZ2biuAeCloOAOPlISg9Lr3ydTrUMZHQB3a7W42NEkcxdO4ab1FEArsVA
           uS1zHs1yhoRXtfNgyQ9zykxHlBgjXDZsFxfUuzJZa4t7VqtWgLeUXdewCBSaf63+
           SKOLgx8l6QnTHnUh5700ApIuoXBuaSqc6BfTl1nkQqUZEoGlcuFZqJXe2sWN1oDP
@@ -235,6 +267,16 @@ actions:
           SKOLgx8l6QnTHnUh5700ApIuoXBuaSqc6BfTl1nkQqUZEoGlcuFZqJXe2sWN1oDP
           rI7NPXRWJqTdNuSjUznzSMO+AsBcZBcYad1pjhWDNnW4n1UFoMpaIYzb6jZSedo9
           y4+LpDFE2AxuNZ/x
+          -----END CERTIFICATE-----
+          -----BEGIN CERTIFICATE-----
+          MIIBTjCB9aADAgECAgEBMAoGCCqGSM49BAMCMCYxJDAiBgNVBAMTG1VuaXRUZXN0
+          OiBTZWxmLXNpZ25lZCBFQ0RTQTAgFw0xMDA4MDExNzAwMDBaGA8zMDEwMDgwMTE3
+          MDAwMFowJjEkMCIGA1UEAxMbVW5pdFRlc3Q6IFNlbGYtc2lnbmVkIEVDRFNBMFkw
+          EwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEN9VdYSWzSS6eRWF5+1LKaGBnfX7gV9/r
+          hklpUtt+wW99lPWSH/uZFMwpuo/mZkNaLEmhkm9cM9SwBQDxnOUyY6MSMBAwDgYD
+          VR0PAQH/BAQDAgIEMAoGCCqGSM49BAMCA0gAMEUCID/dNgLyTUSHN4eaFCUc2L3t
+          yIKLqy1HdDQ8VakrOSCUAiEAoGoDcrlhiQE866/PnqWVM0S2sxwpQLYJ7F8Zjx9N
+          3AM=
           -----END CERTIFICATE-----
     - expect_stderr: |
         Created Certificate [projects/foo/locations/europe-west1/certificateAuthorities/ca/certificates/cert].

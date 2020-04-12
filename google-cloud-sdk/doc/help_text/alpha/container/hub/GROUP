@@ -26,6 +26,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     configmanagement
+        (ALPHA) Manage Config Management feature.
+
      features
         (ALPHA) Manage features on all Hub memberships(registered clusters).
 

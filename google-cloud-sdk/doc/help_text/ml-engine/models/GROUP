@@ -26,7 +26,7 @@ COMMANDS
     COMMAND is one of the following:
 
      add-iam-policy-binding
-        Add IAM policy binding to a model.
+        Add IAM policy binding for a model.
 
      create
         Create a new AI Platform model.

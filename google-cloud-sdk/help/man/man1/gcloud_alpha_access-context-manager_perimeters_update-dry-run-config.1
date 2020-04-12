@@ -17,10 +17,16 @@ gcloud alpha access\-context\-manager perimeters update\-dry\-run\-config \- upd
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR gcloud alpha access\-context\-manager perimeters
-update\-dry\-run\-config updates the dry run config (\f5spec\fR) on the service
-perimeter resource. The dry run config will not be enforced, but will be dry
-run. This allows for testing the config before rolling it out.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Update the dry\-run config for an existing
+Service Perimeter.
+
+This command is deprecated. Please use \f5gcloud beta access\-context\-manager
+perimeters dry\-run\fR to manage dry\-run state.
+
+gcloud alpha access\-context\-manager perimeters update\-dry\-run\-config
+updates the dry run config (\f5spec\fR) on the service perimeter resource. The
+dry run config will not be enforced, but will be dry run. This allows for
+testing the config before rolling it out.
 
 Note: The \f5dry_run\fR field will be set to \f5true\fR unless the
 \f5\-\-clear\fR flag is specified, in which case all dry run config values will

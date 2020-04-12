@@ -41,7 +41,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F1
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F1&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -62,7 +62,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F1
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F1&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -76,7 +76,7 @@ actions:
               name: labelKeys/101
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F100
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F100&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -97,7 +97,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F1
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F1&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -111,7 +111,7 @@ actions:
               name: labelKeys/101
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F100
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F100&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -149,6 +149,8 @@ actions:
             status: '200'
           body: |
             {
+              "done": true,
+              "name": "operations/dlb.12345",
               "response": {
                 "@type": "type.googleapis.com/google.protobuf.Empty"
               }
@@ -163,7 +165,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F100
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F100&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -201,6 +203,8 @@ actions:
             status: '200'
           body: |
             {
+              "done": true,
+              "name": "operations/dlb.12345",
               "response": {
                 "@type": "type.googleapis.com/google.protobuf.Empty"
               }
@@ -215,7 +219,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F100
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F100&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -253,6 +257,8 @@ actions:
             status: '200'
           body: |
             {
+              "done": true,
+              "name": "operations/dlb.12345",
               "response": {
                 "@type": "type.googleapis.com/google.protobuf.Empty"
               }
@@ -291,6 +297,8 @@ actions:
             status: '200'
           body: |
             {
+              "done": true,
+              "name": "operations/dlb.12345",
               "response": {
                 "@type": "type.googleapis.com/google.protobuf.Empty"
               }

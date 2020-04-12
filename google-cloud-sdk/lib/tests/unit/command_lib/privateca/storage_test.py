@@ -62,7 +62,8 @@ class StorageUtilsTest(sdk_test_base.WithFakeAuth):
             project='foo',
             bucket=self.messages.Bucket(
                 name=expected_bucket_name,
-                location='us-west1')),
+                location='us-west1',
+                versioning=self.messages.Bucket.VersioningValue(enabled=True))),
         response=self.messages.Bucket())
 
     result = storage.CreateBucketForCertificateAuthority(self.ca_ref)

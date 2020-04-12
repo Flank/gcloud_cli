@@ -70,40 +70,12 @@ https://cloud.google.com/sdk/gcloud/reference/compute/disks/snapshot#\-\-guest\-
 .TP 2m
 \fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]
 This parameter enables one or more features for VM instances that use the image
-for their boot disks. The following features are available:
+for their boot disks. See
+https://cloud.google.com/compute/docs/images/create\-delete\-deprecate\-private\-images#guest\-os\-features
+for descriptions of the supported features. \fIGUEST_OS_FEATURE\fR must be one
+of: \fBGVNIC\fR, \fBMULTI_IP_SUBNET\fR, \fBUEFI_COMPATIBLE\fR,
+\fBVIRTIO_SCSI_MULTIQUEUE\fR, \fBWINDOWS\fR.
 
-.RS 2m
-.IP "\(em" 2m
-MULTI_IP_SUBNET \- For configuring interfaces with a netmask other than /32.
-
-.IP "\(em" 2m
-UEFI_COMPATIBLE \- Enables UEFI booting, which is an alternative system boot
-method. Most public images use the GRUB bootloader as their primary boot method.
-
-.IP "\(em" 2m
-VIRTIO_SCSI_MULTIQUEUE \- Enables multiqueue SCSI capabilities for Local SSD
-devices. This option is an alternative to NVMe.
-.RS 2m
-.IP "\(bu" 2m
-For Linux images, you can enable VIRTIO_SCSI_MULTIQUEUE on images with kernel
-versions 3.17 and higher.
-.IP "\(bu" 2m
-For Windows images, you can enable VIRTIO_SCSI_MULTIQUEUE on images with driver
-version 1.2.0.1621 or higher.
-
-.RE
-.sp
-.IP "\(em" 2m
-WINDOWS \- Required for Windows Server images. Newer public images for Windows
-server include the WINDOWS parameter to indicate that it is a Windows image.
-
-.RE
-.RE
-.sp
-\fIGUEST_OS_FEATURE\fR must be one of: \fBMULTI_IP_SUBNET\fR,
-\fBUEFI_COMPATIBLE\fR, \fBVIRTIO_SCSI_MULTIQUEUE\fR, \fBWINDOWS\fR, \fBGVNIC\fR.
-
-.RS 2m
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to add.

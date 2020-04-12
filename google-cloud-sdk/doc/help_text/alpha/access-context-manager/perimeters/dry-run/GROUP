@@ -44,6 +44,9 @@ COMMANDS
      describe
         (ALPHA) Display the dry-run mode configuration for a Service Perimeter.
 
+     drop
+        (ALPHA) Reset the dry-run mode configuration of a Service Perimeter.
+
      list
         (ALPHA) List the effective dry-run configuration across all Service
         Perimeters.

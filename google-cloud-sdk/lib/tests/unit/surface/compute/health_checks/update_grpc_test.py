@@ -235,40 +235,7 @@ class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
               project='my-project'))],
     )
 
-  def testPortNameOptionWithPreexistingPortName(self):
-    self.make_requests.side_effect = iter([
-        [
-            self.messages.HealthCheck(
-                name='my-health-check',
-                type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                grpcHealthCheck=self.messages.GRPCHealthCheck(
-                    portName='old-port'))
-        ],
-        [],
-    ])
-
-    self.Run('compute health-checks update grpc my-health-check '
-             '--port-name new-port')
-
-    self.CheckRequests(
-        [(self.compute.healthChecks, 'Get',
-          self.messages.ComputeHealthChecksGetRequest(
-              healthCheck='my-health-check', project='my-project'))],
-        [(self.compute.healthChecks, 'Update',
-          self.messages.ComputeHealthChecksUpdateRequest(
-              healthCheck='my-health-check',
-              healthCheckResource=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                  grpcHealthCheck=self.messages.GRPCHealthCheck(
-                      portSpecification=(
-                          self.messages.GRPCHealthCheck
-                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT),
-                      portName='new-port')),
-              project='my-project'))],
-    )
-
-  def testPortNameOptionWithoutPreexistingPortName(self):
+  def testPortOptionWithoutPreexistingPort(self):
     self.make_requests.side_effect = iter([
         [
             self.messages.HealthCheck(
@@ -283,73 +250,7 @@ class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
     ])
 
     self.Run('compute health-checks update grpc my-health-check '
-             '--port-name new-port')
-
-    self.CheckRequests(
-        [(self.compute.healthChecks, 'Get',
-          self.messages.ComputeHealthChecksGetRequest(
-              healthCheck='my-health-check', project='my-project'))],
-        [(self.compute.healthChecks, 'Update',
-          self.messages.ComputeHealthChecksUpdateRequest(
-              healthCheck='my-health-check',
-              healthCheckResource=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                  grpcHealthCheck=self.messages.GRPCHealthCheck(
-                      portSpecification=(
-                          self.messages.GRPCHealthCheck
-                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT),
-                      portName='new-port')),
-              project='my-project'))],
-    )
-
-  def testUnsetPortNameOption(self):
-    self.make_requests.side_effect = iter([
-        [
-            self.messages.HealthCheck(
-                name='my-health-check',
-                type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                grpcHealthCheck=self.messages.GRPCHealthCheck(
-                    portName='happy-port'))
-        ],
-        [],
-    ])
-
-    self.Run("""
-        compute health-checks update grpc my-health-check --port-name ''
-        """)
-
-    self.CheckRequests(
-        [(self.compute.healthChecks, 'Get',
-          self.messages.ComputeHealthChecksGetRequest(
-              healthCheck='my-health-check', project='my-project'))],
-        [(self.compute.healthChecks, 'Update',
-          self.messages.ComputeHealthChecksUpdateRequest(
-              healthCheck='my-health-check',
-              healthCheckResource=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                  grpcHealthCheck=self.messages.GRPCHealthCheck(
-                      portSpecification=(
-                          self.messages.GRPCHealthCheck
-                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT))),
-              project='my-project'))],
-    )
-
-  def testPortAndPortNameOption(self):
-    self.make_requests.side_effect = iter([
-        [
-            self.messages.HealthCheck(
-                name='my-health-check',
-                type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                grpcHealthCheck=self.messages.GRPCHealthCheck(
-                    port=80))
-        ],
-        [],
-    ])
-
-    self.Run('compute health-checks update grpc my-health-check '
-             '--port 8888 --port-name new-port')
+             '--port 88')
 
     self.CheckRequests(
         [(self.compute.healthChecks, 'Get',
@@ -365,7 +266,7 @@ class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
                       portSpecification=(
                           self.messages.GRPCHealthCheck
                           .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
-                      port=8888)),
+                      port=88)),
               project='my-project'))],
     )
 
@@ -400,14 +301,14 @@ class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
               project='my-project'))],
     )
 
-  def testUseServingPortOptionWithPreexistingPortName(self):
+  def testUseServingPortOptionWithPreexistingPort(self):
     self.make_requests.side_effect = iter([
         [
             self.messages.HealthCheck(
                 name='my-health-check',
                 type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
                 grpcHealthCheck=self.messages.GRPCHealthCheck(
-                    portName='old-port'))
+                    port=888))
         ],
         [],
     ])
@@ -432,8 +333,7 @@ class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
               project='my-project'))],
     )
 
-  @parameterized.parameters(('--port', 80), ('--port-name', 'my-port'))
-  def testUseServingPortOptionErrors(self, flag, flag_value):
+  def testUseServingPortOptionErrors(self):
     self.make_requests.side_effect = iter([
         [
             self.messages.HealthCheck(
@@ -446,12 +346,12 @@ class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
 
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
-        'Invalid value for [--use-serving-port]: {0} cannot '
-        'be specified when using: --use-serving-port'.format(flag)):
+        'Invalid value for [--use-serving-port]: --port cannot '
+        'be specified when using: --use-serving-port'):
       self.Run("""
           compute health-checks update grpc my-health-check
-          --use-serving-port {0} {1}
-      """.format(flag, flag_value))
+          --use-serving-port --port 88
+      """)
 
   def testCheckIntervalOption(self):
     self.make_requests.side_effect = iter([
@@ -730,7 +630,7 @@ class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
                 name='my-health-check',
                 type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
                 grpcHealthCheck=self.messages.GRPCHealthCheck(
-                    portName='happy-port',
+                    port=88,
                     grpcServiceName='my-new-gRPC-service'))
         ],
         [],
@@ -750,7 +650,7 @@ class HealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
                   name='my-health-check',
                   type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
                   grpcHealthCheck=self.messages.GRPCHealthCheck(
-                      portName='happy-port')),
+                      port=88)),
               project='my-project'))],
     )
 
@@ -1040,43 +940,7 @@ class RegionHealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
               region='us-west-1'))],
     )
 
-  def testPortNameOptionWithPreexistingPortName(self):
-    self.make_requests.side_effect = iter([
-        [
-            self.messages.HealthCheck(
-                name='my-health-check',
-                type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                grpcHealthCheck=self.messages.GRPCHealthCheck(
-                    portName='old-port'))
-        ],
-        [],
-    ])
-
-    self.Run('compute health-checks update grpc my-health-check '
-             '--port-name new-port --region us-west-1')
-
-    self.CheckRequests(
-        [(self.compute.regionHealthChecks, 'Get',
-          self.messages.ComputeRegionHealthChecksGetRequest(
-              healthCheck='my-health-check',
-              project='my-project',
-              region='us-west-1'))],
-        [(self.compute.regionHealthChecks, 'Update',
-          self.messages.ComputeRegionHealthChecksUpdateRequest(
-              healthCheck='my-health-check',
-              healthCheckResource=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                  grpcHealthCheck=self.messages.GRPCHealthCheck(
-                      portSpecification=(
-                          self.messages.GRPCHealthCheck
-                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT),
-                      portName='new-port')),
-              project='my-project',
-              region='us-west-1'))],
-    )
-
-  def testPortNameOptionWithoutPreexistingPortName(self):
+  def testPortOptionWithoutPreexistingPort(self):
     self.make_requests.side_effect = iter([
         [
             self.messages.HealthCheck(
@@ -1091,7 +955,7 @@ class RegionHealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
     ])
 
     self.Run('compute health-checks update grpc my-health-check '
-             '--port-name new-port --region us-west-1')
+             '--port 88 --region us-west-1')
 
     self.CheckRequests(
         [(self.compute.regionHealthChecks, 'Get',
@@ -1108,45 +972,8 @@ class RegionHealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
                   grpcHealthCheck=self.messages.GRPCHealthCheck(
                       portSpecification=(
                           self.messages.GRPCHealthCheck
-                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT),
-                      portName='new-port')),
-              project='my-project',
-              region='us-west-1'))],
-    )
-
-  def testUnsetPortNameOption(self):
-    self.make_requests.side_effect = iter([
-        [
-            self.messages.HealthCheck(
-                name='my-health-check',
-                type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                grpcHealthCheck=self.messages.GRPCHealthCheck(
-                    portName='happy-port'))
-        ],
-        [],
-    ])
-
-    self.Run("""
-        compute health-checks update grpc my-health-check --port-name ''
-        --region us-west-1
-        """)
-
-    self.CheckRequests(
-        [(self.compute.regionHealthChecks, 'Get',
-          self.messages.ComputeRegionHealthChecksGetRequest(
-              healthCheck='my-health-check',
-              project='my-project',
-              region='us-west-1'))],
-        [(self.compute.regionHealthChecks, 'Update',
-          self.messages.ComputeRegionHealthChecksUpdateRequest(
-              healthCheck='my-health-check',
-              healthCheckResource=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                  grpcHealthCheck=self.messages.GRPCHealthCheck(
-                      portSpecification=(
-                          self.messages.GRPCHealthCheck
-                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT))),
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
+                      port=88)),
               project='my-project',
               region='us-west-1'))],
     )
@@ -1453,7 +1280,7 @@ class RegionHealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
                 name='my-health-check',
                 type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
                 grpcHealthCheck=self.messages.GRPCHealthCheck(
-                    portName='happy-port', grpcServiceName='my-gRPC-service'))
+                    port=88, grpcServiceName='my-gRPC-service'))
         ],
         [],
     ])
@@ -1475,7 +1302,7 @@ class RegionHealthChecksUpdateGrpcAlphaTest(test_base.BaseTest,
                   name='my-health-check',
                   type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
                   grpcHealthCheck=self.messages.GRPCHealthCheck(
-                      portName='happy-port')),
+                      port=88)),
               project='my-project',
               region='us-west-1'))],
     )

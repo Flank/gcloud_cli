@@ -176,6 +176,7 @@ information on how to structure KEYs and VALUEs, run
       portion, the patch version can be omitted and the current
       version will be selected. The version numbers that are used will
       be stored.""")
+  flags.AddIpAliasEnvironmentFlags(parser)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -189,12 +190,20 @@ class Create(base.Command):
   """
 
   detailed_help = DETAILED_HELP
+  _support_web_server_cloud_sql_private_ip_ranges = True
+  _support_web_server_access_control = False
 
   @staticmethod
   def Args(parser):
     _CommonArgs(parser)
+    flags.AddPrivateIpEnvironmentFlags(parser, True)
 
   def Run(self, args):
+    self.ParseIpAliasConfigOptions(args)
+    self.ParsePrivateEnvironmentConfigOptions(args)
+    if self._support_web_server_cloud_sql_private_ip_ranges:
+      self.ParsePrivateEnvironmentWebServerCloudSqlRanges(args)
+
     flags.ValidateDiskSize('--disk-size', args.disk_size)
     self.env_ref = args.CONCEPTS.environment.Parse()
     env_name = self.env_ref.Name()
@@ -249,63 +258,8 @@ class Create(base.Command):
             'Error creating [{}]: {}'.format(self.env_ref.RelativeName(),
                                              six.text_type(e)))
 
-  def GetOperationMessage(self, args):
-    """Constructs Create message."""
-    return environments_api_util.Create(
-        self.env_ref,
-        args.node_count,
-        labels=args.labels,
-        location=self.zone,
-        machine_type=self.machine_type,
-        network=self.network,
-        subnetwork=self.subnetwork,
-        env_variables=args.env_variables,
-        airflow_config_overrides=args.airflow_configs,
-        service_account=args.service_account,
-        oauth_scopes=args.oauth_scopes,
-        tags=args.tags,
-        disk_size_gb=args.disk_size >> 30,
-        python_version=args.python_version,
-        image_version=self.image_version,
-        release_track=self.ReleaseTrack())
-
-
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class CreateBeta(Create):
-  """Create and initialize a Cloud Composer environment.
-
-  If run asynchronously with `--async`, exits after printing an operation
-  that can be used to poll the status of the creation operation via:
-
-    {top_command} composer operations describe
-  """
-
-  @staticmethod
-  def AlphaAndBetaArgs(parser):
-    Create.Args(parser)
-    flags.AddPrivateIpEnvironmentFlags(parser)
-    flags.AddIpAliasEnvironmentFlags(parser)
-
-  @staticmethod
-  def Args(parser):
-    CreateBeta.AlphaAndBetaArgs(parser)
-    web_server_group = parser.add_mutually_exclusive_group()
-    flags.WEB_SERVER_ALLOW_IP.AddToParser(web_server_group)
-    flags.WEB_SERVER_DENY_ALL.AddToParser(web_server_group)
-
-  def Run(self, args):
-    self.ParseIpAliasConfigOptions(args)
-    self.ParsePrivateEnvironmentConfigOptions(args)
-    if self.ReleaseTrack() == base.ReleaseTrack.BETA:
-      self.ParseWebServerAccessControlConfigOptions(args)
-    return super(CreateBeta, self).Run(args)
-
   def ParseIpAliasConfigOptions(self, args):
     """Parses the options for VPC-native configuration."""
-    if args.enable_private_environment and not args.enable_ip_alias:
-      raise command_util.InvalidUserInputError(
-          PREREQUISITE_OPTION_ERROR_MSG.format(
-              prerequisite='enable-ip-alias', opt='enable-private-environment'))
     if args.cluster_ipv4_cidr and not args.enable_ip_alias:
       raise command_util.InvalidUserInputError(
           PREREQUISITE_OPTION_ERROR_MSG.format(
@@ -327,6 +281,11 @@ class CreateBeta(Create):
 
   def ParsePrivateEnvironmentConfigOptions(self, args):
     """Parses the options for Private Environment configuration."""
+    if args.enable_private_environment and not args.enable_ip_alias:
+      raise command_util.InvalidUserInputError(
+          PREREQUISITE_OPTION_ERROR_MSG.format(
+              prerequisite='enable-ip-alias', opt='enable-private-environment'))
+
     if args.enable_private_endpoint and not args.enable_private_environment:
       raise command_util.InvalidUserInputError(
           PREREQUISITE_OPTION_ERROR_MSG.format(
@@ -339,10 +298,88 @@ class CreateBeta(Create):
               prerequisite='enable-private-environment',
               opt='master-ipv4-cidr'))
 
+  def ParsePrivateEnvironmentWebServerCloudSqlRanges(self, args):
+    if args.web_server_ipv4_cidr and not args.enable_private_environment:
+      raise command_util.InvalidUserInputError(
+          PREREQUISITE_OPTION_ERROR_MSG.format(
+              prerequisite='enable-private-environment',
+              opt='web-server-ipv4-cidr'))
+
+    if args.cloud_sql_ipv4_cidr and not args.enable_private_environment:
+      raise command_util.InvalidUserInputError(
+          PREREQUISITE_OPTION_ERROR_MSG.format(
+              prerequisite='enable-private-environment',
+              opt='cloud-sql-ipv4-cidr'))
+
+  def GetOperationMessage(self, args):
+    """Constructs Create message."""
+    return environments_api_util.Create(
+        self.env_ref,
+        args.node_count,
+        labels=args.labels,
+        location=self.zone,
+        machine_type=self.machine_type,
+        network=self.network,
+        subnetwork=self.subnetwork,
+        env_variables=args.env_variables,
+        airflow_config_overrides=args.airflow_configs,
+        service_account=args.service_account,
+        oauth_scopes=args.oauth_scopes,
+        tags=args.tags,
+        disk_size_gb=args.disk_size >> 30,
+        python_version=args.python_version,
+        image_version=self.image_version,
+        use_ip_aliases=args.enable_ip_alias,
+        cluster_secondary_range_name=args.cluster_secondary_range_name,
+        services_secondary_range_name=args.services_secondary_range_name,
+        cluster_ipv4_cidr_block=args.cluster_ipv4_cidr,
+        services_ipv4_cidr_block=args.services_ipv4_cidr,
+        private_environment=args.enable_private_environment,
+        private_endpoint=args.enable_private_endpoint,
+        master_ipv4_cidr=args.master_ipv4_cidr,
+        web_server_ipv4_cidr=args.web_server_ipv4_cidr,
+        cloud_sql_ipv4_cidr=args.cloud_sql_ipv4_cidr,
+        release_track=self.ReleaseTrack())
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(Create):
+  """Create and initialize a Cloud Composer environment.
+
+  If run asynchronously with `--async`, exits after printing an operation
+  that can be used to poll the status of the creation operation via:
+
+    {top_command} composer operations describe
+  """
+
+  _support_web_server_access_control = True
+
+  @staticmethod
+  def Args(parser):
+    Create.Args(parser)
+    web_server_group = parser.add_mutually_exclusive_group()
+    flags.WEB_SERVER_ALLOW_IP.AddToParser(web_server_group)
+    flags.WEB_SERVER_ALLOW_ALL.AddToParser(web_server_group)
+    flags.WEB_SERVER_DENY_ALL.AddToParser(web_server_group)
+
+  def Run(self, args):
+    if self._support_web_server_access_control:
+      self.ParseWebServerAccessControlConfigOptions(args)
+    return super(CreateBeta, self).Run(args)
+
   def ParseWebServerAccessControlConfigOptions(self, args):
-    self.web_server_access_control = environments_api_util.BuildWebServerAllowedIps(
-        args.web_server_allow_ip, not args.web_server_allow_ip,
-        args.web_server_deny_all)
+    if (args.enable_private_environment and not args.web_server_allow_ip and
+        not args.web_server_allow_all and not args.web_server_deny_all):
+      raise command_util.InvalidUserInputError(
+          'Cannot specify --enable-private-environment without one of: ' +
+          '--web-server-allow-ip, --web-server-allow-all ' +
+          'or --web-server-deny-all')
+
+    # Default to allow all if no flag is specified.
+    self.web_server_access_control = (
+        environments_api_util.BuildWebServerAllowedIps(
+            args.web_server_allow_ip, args.web_server_allow_all or
+            not args.web_server_allow_ip, args.web_server_deny_all))
     flags.ValidateIpRanges(
         [acl['ip_range'] for acl in self.web_server_access_control])
 
@@ -372,6 +409,8 @@ class CreateBeta(Create):
         private_environment=args.enable_private_environment,
         private_endpoint=args.enable_private_endpoint,
         master_ipv4_cidr=args.master_ipv4_cidr,
+        web_server_ipv4_cidr=args.web_server_ipv4_cidr,
+        cloud_sql_ipv4_cidr=args.cloud_sql_ipv4_cidr,
         web_server_access_control=self.web_server_access_control,
         release_track=self.ReleaseTrack())
 
@@ -386,9 +425,15 @@ class CreateAlpha(CreateBeta):
     {top_command} composer operations describe
   """
 
+  _support_web_server_cloud_sql_private_ip_ranges = False
+  _support_web_server_access_control = False
+
   @staticmethod
   def Args(parser):
-    CreateBeta.AlphaAndBetaArgs(parser)
+    _CommonArgs(parser)
+
+    # Private IP falgs without ranges missing in alpha.
+    flags.AddPrivateIpEnvironmentFlags(parser, False)
 
     # Adding alpha arguments
     parser.add_argument(

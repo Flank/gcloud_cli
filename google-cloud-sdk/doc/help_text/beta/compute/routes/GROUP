@@ -7,6 +7,12 @@ SYNOPSIS
 DESCRIPTION
     (BETA) Read and manipulate routes.
 
+    For more information about routes, see the routes documentation
+    (https://cloud.google.com/vpc/docs/routes).
+
+    See also: Routes API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/routes).
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,

@@ -46,11 +46,9 @@ COMMANDS
         (ALPHA) Updates the metadata of a Cloud Spanner a backup.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. If this
-    command fails with API permission errors despite specifying the right
-    project, you may be trying to access an API with an invitation-only early
-    access whitelist. These variants are also available:
-
-        $ gcloud spanner backups
-        $ gcloud beta spanner backups
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
 

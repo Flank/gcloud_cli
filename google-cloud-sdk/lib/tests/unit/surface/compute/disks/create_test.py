@@ -757,6 +757,25 @@ class DisksCreateTestAlpha(DisksCreateTestBeta):
               project='my-project',
               zone='central2-a'))])
 
+  def testTypePdBalancedOption(self):
+    self.Run("""
+        compute disks create disk-1 --zone central2-a
+          --type pd-balanced
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        [(self.message_version.disks, 'Insert',
+          self.messages.ComputeDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='disk-1',
+                  sizeGb=100,
+                  type=(self.compute_uri + '/projects/'
+                        'my-project/zones/central2-a/diskTypes/pd-balanced')),
+              project='my-project',
+              zone='central2-a'))],
+    )
+
 
 class DisksCreateTestWithCsekKeys(test_base.BaseTest):
 

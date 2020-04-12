@@ -11,7 +11,7 @@ gcloud alpha builds submit \- submit a build using Google Cloud Build
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] [\fB\-\-async\fR] [\fB\-\-no\-cache\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-config\fR=\fICONFIG\fR;\ default="cloudbuild.yaml"\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] [\fB\-\-async\fR] [\fB\-\-no\-cache\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-config\fR=\fICONFIG\fR;\ default="cloudbuild.yaml"\ |\ \fB\-\-pack\fR=[\fIbuilder\fR=\fIBUILDER\fR],[\fIenv\fR=\fIENV\fR],[\fIimage\fR=\fIIMAGE\fR]\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -137,16 +137,27 @@ At most one of these may be specified:
 The YAML or JSON file to use as the build configuration file.
 
 .TP 2m
-\fB\-\-tag\fR=\fITAG\fR, \fB\-t\fR \fITAG\fR
+\fB\-\-pack\fR=[\fIbuilder\fR=\fIBUILDER\fR],[\fIenv\fR=\fIENV\fR],[\fIimage\fR=\fIIMAGE\fR]
+Uses CNCF buildpack (https://buildpacks.io/) to create image. The "image"
+key/value must be provided. The image name must be in the gcr.io/\fB, *.gcr.io,
+or pkg.dev namespaces. By default gcr.io/buildpacks/builder will be used. To
+specify your own builder image use the optional "builder" key/value argument. To
+pass environment variables to the builder use the optional "env" key/value
+argument where value is a list of key values using escaping
+(https://cloud.google.com/sdk/gcloud/reference/topic/escaping) if neccessary.
+
+.TP 2m
+\fR\-\-tag\fB=\fITAG\fR, \fR\-t\fB \fITAG\fR
 The tag to use with a "docker build" image creation. Cloud Build will run a
 remote "docker build \-t $TAG .", where $TAG is the tag provided by this flag.
 The tag must be in the gcr.io/* or *.gcr.io/* namespaces. Specify a tag if you
 want Cloud Build to build using a Dockerfile instead of a build config file. If
 you specify a tag in this command, your source must include a Dockerfile. For
 instructions on building using a Dockerfile see
-https://cloud.google.com/cloud\-build/docs/quickstart\-docker.
+https://cloud.google.com/cloud\-build/docs/quickstart\-build.
 
 
+\fR
 .RE
 .RE
 .sp

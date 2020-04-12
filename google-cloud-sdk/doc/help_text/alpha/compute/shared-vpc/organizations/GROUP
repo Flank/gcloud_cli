@@ -1,13 +1,13 @@
 NAME
     gcloud alpha compute shared-vpc organizations - configure organizations for
-        cross-project networking (XPN)
+        Shared VPC networking
 
 SYNOPSIS
     gcloud alpha compute shared-vpc organizations COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Configure organizations for cross-project networking (XPN).
+    (ALPHA) Configure organizations for Shared VPC networking.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

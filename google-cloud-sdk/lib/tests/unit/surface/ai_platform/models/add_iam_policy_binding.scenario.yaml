@@ -5,6 +5,8 @@ summary:
 - execute:
   - command: ai-platform models add-iam-policy-binding my_model --member=user:test@gmail.com
       --role=roles/non-primitive
+  - stderr: |
+      WARNING: Using endpoint [https://ml.googleapis.com/]
   - stdout: |
       bindings:
       - members:
@@ -21,6 +23,8 @@ actions:
     command: ai-platform models add-iam-policy-binding my_model --member=user:test@gmail.com
       --role=roles/non-primitive
     events:
+    - expect_stderr: |
+        WARNING: Using endpoint [https://ml.googleapis.com/]
     - api_call:
         expect_request:
           uri: https://ml.googleapis.com/v1/projects/fake-project/models/my_model:getIamPolicy?alt=json

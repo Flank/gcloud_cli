@@ -145,6 +145,35 @@ class CreateTestAlpha(CreateTestBeta):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi('alpha')
 
+  def testCreateWithLocationHint(self):
+    self.make_requests.side_effect = iter([[]])
+    reservation = self.messages.Reservation(
+        name='alloc',
+        zone='fake-zone',
+        specificReservationRequired=True,
+        specificReservation=self.messages.AllocationSpecificSKUReservation(
+            count=1,
+            instanceProperties=self.messages
+            .AllocationSpecificSKUAllocationReservedInstanceProperties(
+                machineType='n1-standard-1',
+                minCpuPlatform='Intel Haswell',
+                locationHint='cell'
+                )))
+
+    self.Run('compute reservations create alloc --zone=fake-zone '
+             '--require-specific-reservation '
+             '--vm-count=1 '
+             '--machine-type=n1-standard-1 '
+             '--min-cpu-platform="Intel Haswell" '
+             '--location-hint cell')
+
+    self.CheckRequests([(self.compute.reservations, 'Insert',
+                         self.messages.ComputeReservationsInsertRequest(
+                             reservation=reservation,
+                             project='my-project',
+                             zone='fake-zone',
+                         ))],)
+
 
 if __name__ == '__main__':
   test_case.main()

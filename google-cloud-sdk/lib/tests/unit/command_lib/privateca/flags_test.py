@@ -313,7 +313,7 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         prefixes=True).AddToParser(self.parser)
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
     args = self.parser.parse_args(['--reusable-config', reusable_config_id])
-    reusable_config_wrapper = flags.ParseReusableConfig(args)
+    reusable_config_wrapper = flags.ParseReusableConfig(args, is_ca=True)
     self.assertEqual(reusable_config_wrapper.reusableConfig, reusable_config_id)
     self.assertEqual(reusable_config_wrapper.reusableConfigValues, None)
 
@@ -323,14 +323,38 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         resource_args.CreateReusableConfigResourceSpec(),
         'Reusable config for this CA.',
         prefixes=True).AddToParser(self.parser)
-    flags.AddInlineReusableConfigFlags(self.parser, is_ca=False)
-    args = self.parser.parse_args(['--is-ca-cert', '--max-chain-length', '1'])
-    reusable_config_wrapper = flags.ParseReusableConfig(args)
+    flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
+    args = self.parser.parse_args(['--max-chain-length', '1'])
+    reusable_config_wrapper = flags.ParseReusableConfig(args, is_ca=True)
     self.assertEqual(
         reusable_config_wrapper.reusableConfigValues.caOptions.isCa, True)
     self.assertEqual(
         reusable_config_wrapper.reusableConfigValues.caOptions
         .maxIssuerPathLength, 1)
+    self.assertEqual(
+        reusable_config_wrapper.reusableConfigValues.keyUsage.baseKeyUsage
+        .certSign, True)
+    self.assertEqual(
+        reusable_config_wrapper.reusableConfigValues.keyUsage.baseKeyUsage
+        .crlSign, True)
+
+  def testParseReusableConfigIsCa(self):
+    concept_parsers.ConceptParser.ForResource(
+        '--reusable-config',
+        resource_args.CreateReusableConfigResourceSpec(),
+        'Reusable config for this CA.',
+        prefixes=True).AddToParser(self.parser)
+    flags.AddInlineReusableConfigFlags(self.parser, is_ca=True)
+    args = self.parser.parse_args([])
+    reusable_config_wrapper = flags.ParseReusableConfig(args, is_ca=True)
+    self.assertEqual(
+        reusable_config_wrapper.reusableConfigValues.caOptions.isCa, True)
+    self.assertEqual(
+        reusable_config_wrapper.reusableConfigValues.keyUsage.baseKeyUsage
+        .certSign, True)
+    self.assertEqual(
+        reusable_config_wrapper.reusableConfigValues.keyUsage.baseKeyUsage
+        .crlSign, True)
 
   def testParseReusableConfigMaxChainLengthIgnored(self):
     concept_parsers.ConceptParser.ForResource(
@@ -341,7 +365,7 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
     flags.AddInlineReusableConfigFlags(self.parser, is_ca=False)
     args = self.parser.parse_args(
         ['--no-is-ca-cert', '--max-chain-length', '1'])
-    reusable_config_wrapper = flags.ParseReusableConfig(args)
+    reusable_config_wrapper = flags.ParseReusableConfig(args, is_ca=False)
     self.assertEqual(
         reusable_config_wrapper.reusableConfigValues.caOptions.isCa, False)
     self.assertEqual(
@@ -360,7 +384,7 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         '--key-usages', 'cert_sign,crl_sign'
     ])
     with self.AssertRaisesExceptionMatches(Exception, 'Invalid value'):
-      flags.ParseReusableConfig(args)
+      flags.ParseReusableConfig(args, is_ca=True)
 
   def testParseReusableConfigInlineValues(self):
     concept_parsers.ConceptParser.ForResource(
@@ -373,7 +397,7 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         '--key-usages', 'cert_sign,crl_sign', '--extended-key-usages',
         'server_auth,client_auth', '--max-chain-length', '2'
     ])
-    reusable_config_wrapper = flags.ParseReusableConfig(args)
+    reusable_config_wrapper = flags.ParseReusableConfig(args, is_ca=True)
     self.assertEqual(reusable_config_wrapper.reusableConfig, None)
     values = reusable_config_wrapper.reusableConfigValues
     self.assertEqual(values.keyUsage.baseKeyUsage.certSign, True)
@@ -407,7 +431,7 @@ class FlagsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
         '--key-usages', 'cert_sign,crl_sign', '--extended-key-usages',
         'server_auth,client_auth', '--no-is-ca-cert'
     ])
-    reusable_config_wrapper = flags.ParseReusableConfig(args)
+    reusable_config_wrapper = flags.ParseReusableConfig(args, is_ca=False)
     self.assertEqual(
         reusable_config_wrapper.reusableConfigValues.caOptions.isCa, False)
 

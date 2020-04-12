@@ -233,6 +233,22 @@ class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
     self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
     self.assertEqual(result, node_group)
 
+  def testCreateWithLocationHint(self):
+    node_group = self._CreateNodeGroup(
+        name='my-node-group',
+        description='Frontend Group',
+        node_template='my-template')
+    node_group.locationHint = 'cell'
+    request = self._ExpectCreate(node_group, 3)
+
+    result = self.Run('compute sole-tenancy node-groups create my-node-group '
+                      '--node-template my-template --target-size 3 '
+                      '--location-hint cell '
+                      '--description "Frontend Group" --zone ' + self.zone)
+
+    self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
+    self.assertEqual(result, node_group)
+
 
 if __name__ == '__main__':
   test_case.main()

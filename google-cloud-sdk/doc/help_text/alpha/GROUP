@@ -158,9 +158,6 @@ GROUPS
      bq
         (ALPHA) Interact with and manage resources in Google BigQuery.
 
-     build-artifacts
-        (ALPHA) Manage Cloud Build Artifacts resources.
-
      builds
         (ALPHA) Create and manage builds for Google Cloud Build.
 
@@ -175,7 +172,7 @@ GROUPS
         (ALPHA) Create and manage Cloud Composer Environments.
 
      compute
-        (ALPHA) Create and manipulate Google Compute Engine resources.
+        (ALPHA) Create and manipulate Compute Engine resources.
 
      config
         (ALPHA) View and edit Cloud SDK properties.
@@ -269,8 +266,11 @@ GROUPS
         (ALPHA) Manage AI Platform jobs and models.
 
      monitoring
-        (ALPHA) Manage Stackdriver Monitoring alerting policies and
-        notification channels.
+        (ALPHA) Manage Stackdriver Monitoring alerting policies, dashboards,
+        and notification channels.
+
+     network-services
+        (ALPHA) Manage Network Services resources.
 
      notebooks
         (ALPHA) Notebooks Command Group.

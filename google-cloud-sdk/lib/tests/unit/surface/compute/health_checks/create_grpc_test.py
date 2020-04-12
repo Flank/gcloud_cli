@@ -37,7 +37,7 @@ class HealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
 
   def testWithoutPortRelatedOptions(self):
     with self.AssertRaisesToolExceptionRegexp(
-        'Either --port, --port-name or --use-serving-port must be set for gRPC '
+        'Either --port or --use-serving-port must be set for gRPC '
         'health check.'):
       self.RunCreate('my-health-check')
       self.CheckRequests()
@@ -67,46 +67,6 @@ class HealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
 
   def testPortOption(self):
     self.RunCreate('my-health-check --port 8888')
-
-    self.CheckRequests(
-        [(self.compute.healthChecks, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                  grpcHealthCheck=self.messages.GRPCHealthCheck(
-                      port=8888,
-                      portSpecification=(
-                          self.messages.GRPCHealthCheck
-                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testPortNameOption(self):
-    self.RunCreate('my-health-check --port-name magic-port')
-
-    self.CheckRequests(
-        [(self.compute.healthChecks, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                  grpcHealthCheck=self.messages.GRPCHealthCheck(
-                      portName='magic-port',
-                      portSpecification=(
-                          self.messages.GRPCHealthCheck
-                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testPortAndPortNameOption(self):
-    self.RunCreate('my-health-check --port 8888 --port-name magic-port')
 
     self.CheckRequests(
         [(self.compute.healthChecks, 'Insert',
@@ -270,14 +230,12 @@ class HealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
                   unhealthyThreshold=2),
               project='my-project'))],)
 
-  @parameterized.parameters(('--port', 80), ('--port-name', 'my-port'))
-  def testUseServingPortOptionErrors(self, flag, flag_value):
+  def testUseServingPortOptionErrors(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
-        'Invalid value for [--use-serving-port]: {0} cannot '
-        'be specified when using: --use-serving-port'.format(flag)):
-      self.RunCreate('my-health-check --use-serving-port {0} {1}'.format(
-          flag, flag_value))
+        'Invalid value for [--use-serving-port]: --port cannot '
+        'be specified when using: --use-serving-port'):
+      self.RunCreate('my-health-check --use-serving-port --port 80')
 
   @parameterized.named_parameters(
       ('DisableLogging', '--no-enable-logging', False),
@@ -342,7 +300,7 @@ class RegionHealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
 
   def testWithoutPortRelatedOptions(self):
     with self.AssertRaisesToolExceptionRegexp(
-        'Either --port, --port-name or --use-serving-port must be set for gRPC '
+        'Either --port or --use-serving-port must be set for gRPC '
         'health check.'):
       self.RunCreate('my-health-check')
       self.CheckRequests()
@@ -385,27 +343,6 @@ class RegionHealthChecksCreateGrpcAlphaTest(test_base.BaseTest,
                       portSpecification=(
                           self.messages.GRPCHealthCheck
                           .PortSpecificationValueValuesEnum.USE_FIXED_PORT)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project',
-              region='us-west-1'))],)
-
-  def testPortNameOption(self):
-    self.RunCreate('my-health-check --port-name magic-port')
-
-    self.CheckRequests(
-        [(self.compute.regionHealthChecks, 'Insert',
-          self.messages.ComputeRegionHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.GRPC,
-                  grpcHealthCheck=self.messages.GRPCHealthCheck(
-                      portName='magic-port',
-                      portSpecification=(
-                          self.messages.GRPCHealthCheck
-                          .PortSpecificationValueValuesEnum.USE_NAMED_PORT)),
                   checkIntervalSec=5,
                   timeoutSec=5,
                   healthyThreshold=2,

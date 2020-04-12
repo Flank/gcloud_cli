@@ -5,7 +5,7 @@ summary:
 - execute:
   - command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
       --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
-      --expand-groups --expand-roles --no-expand-resources --output-group-edges --no-output-resource-edges
+      --expand-groups --expand-roles --output-group-edges
       --execution-timeout "60s"
   - stdout: |
       analysisResults:
@@ -25,8 +25,7 @@ summary:
 - execute:
   - command: asset analyze-iam-policy --folder "f1" --identity "user:user1@foo.com"
       --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
-      --no-expand-groups --no-expand-roles --expand-resources --no-output-group-edges
-      --output-resource-edges --execution-timeout "60s" --show-response
+      --expand-resources --output-resource-edges --execution-timeout "60s" --show-response
   - stdout: |
       analysisResults:
       - accessControlLists:
@@ -46,12 +45,11 @@ actions:
 - execute_command:
     command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
       --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
-      --expand-groups --expand-roles --no-expand-resources --output-group-edges --no-output-resource-edges
-      --execution-timeout "60s"
+      --expand-groups --expand-roles --execution-timeout "60s"
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p4beta1/organizations/o1:analyzeIamPolicy?analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1&options.executionTimeout=60&options.expandGroups=True&options.expandResources=False&options.expandRoles=True&options.outputGroupEdges=True&options.outputResourceEdges=False
+          uri: https://cloudasset.googleapis.com/v1p4beta1/organizations/o1:analyzeIamPolicy?analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1&options.executionTimeout=60s&options.expandGroups=True&options.expandRoles=True
           method: GET
           headers: {}
           body: null
@@ -61,6 +59,7 @@ actions:
           body: |
             {
               "mainAnalysis": {
+                "fullyExplored": true,
                 "analysisQuery": {
                   "parent": "organizations/o1",
                   "resourceSelector": {
@@ -150,17 +149,70 @@ actions:
         - fullResourceName: //cloudresourcemanager.googleapis.com/o2
         - fullResourceName: //cloudresourcemanager.googleapis.com/f2
         - fullResourceName: //cloudresourcemanager.googleapis.com/p2
+    - expect_stderr: |
+        Your analysis request is fully explored. The ACLs matching your requests are listed per IAM policy binding, so there could be duplications.
     - expect_exit:
         code: 0
 - execute_command:
-    command: asset analyze-iam-policy --folder "f1" --identity "user:user1@foo.com"
+    command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
       --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
-      --no-expand-groups --no-expand-roles --expand-resources --no-output-group-edges
-      --output-resource-edges --execution-timeout "60s" --show-response
+      --expand-groups --expand-roles --execution-timeout "60s"
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1p4beta1/folders/f1:analyzeIamPolicy?analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.identitySelector.identity=user%3Auser1%40foo.com&options.executionTimeout=60&options.expandGroups=False&options.expandResources=True&options.expandRoles=False&options.outputGroupEdges=False&options.outputResourceEdges=True
+          uri: https://cloudasset.googleapis.com/v1p4beta1/organizations/o1:analyzeIamPolicy?analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.resourceSelector.fullResourceName=%2F%2Fo1%2Ff%2Fp%2Fr1&options.executionTimeout=60s&options.expandGroups=True&options.expandRoles=True
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "mainAnalysis": {
+                "fullyExplored": false,
+                "analysisQuery": {
+                  "parent": "folders/f1",
+                  "identitySelector": {
+                    "identity": "user:user1@foo.com"
+                  },
+                  "accessSelector": {
+                    "roles": "roles/cloudasset.r3",
+                    "roles": "roles/cloudasset.r4",
+                    "permissions": "a.b.get",
+                    "permissions": "c.d.create"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Your analysis request is NOT fully explored. You can use the --show-response option to see the unexplored part. No matching ACL is found.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
+      --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
+      --expand-groups --expand-roles --output-group-edges
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--output-group-edges]: Must be set together with --show-response to take effect.'
+- execute_command:
+    command: asset analyze-iam-policy --organization "o1" --full-resource-name "//o1/f/p/r1"
+      --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
+      --expand-groups --expand-roles --output-resource-edges
+    events:
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [--output-resource-edges]: Must be set together with --show-response to take effect.'
+- execute_command:
+    command: asset analyze-iam-policy --folder "f1" --identity "user:user1@foo.com"
+      --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
+      --expand-resources --output-resource-edges --execution-timeout "60s" --show-response
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1p4beta1/folders/f1:analyzeIamPolicy?analysisQuery.accessSelector.permissions=a.b.get&analysisQuery.accessSelector.permissions=c.d.create&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r1&analysisQuery.accessSelector.roles=roles%2Fcloudasset.r2&analysisQuery.identitySelector.identity=user%3Auser1%40foo.com&options.executionTimeout=60s&options.expandResources=True&options.outputResourceEdges=True
           method: GET
           headers: {}
           body: null
@@ -217,14 +269,6 @@ actions:
               }
             }
     - expect_stdout: |
-        ---
-        accesses:
-        - role: roles/cloudasset.r1
-        identities:
-        - name: user:user1@foo.com
-        resources:
-        - fullResourceName: //cloudresourcemanager.googleapis.com/o1
-        ---
         mainAnalysis:
           analysisQuery:
             accessSelector:

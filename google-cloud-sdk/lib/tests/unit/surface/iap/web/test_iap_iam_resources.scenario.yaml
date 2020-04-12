@@ -3,6 +3,14 @@ release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
+  - command: iap web get-iam-policy
+  - stdout: |
+      bindings:
+      - members:
+        - user:newowner@gmail.com
+        role: roles/owner
+      etag: etag
+- execute:
   - command: iap web get-iam-policy --resource-type=app-engine
   - stdout: |
       bindings:
@@ -50,6 +58,56 @@ actions:
       GA: v1
       BETA: v1
       ALPHA: v1
+
+- execute_command:
+    command: iap web get-iam-policy
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/fake-project?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            projectNumber: '462803083913'
+            projectId: fake-project
+            lifecycleState: ACTIVE
+            name: Fake Project
+            labels:
+              service-account-downloaded-notification-opt-out: 'true'
+            createTime: '2014-09-30T14:51:18.935Z'
+            parent:
+              type: folder
+              id: '396521612403'
+    - api_call:
+        expect_request:
+          uri: https://iap.googleapis.com/$$api-version$$/projects/462803083913/iap_web:getIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
+        return_response:
+          headers:
+            status: '200'
+          body:
+            etag: etag
+            bindings:
+            - role: roles/owner
+              members:
+              - user:newowner@gmail.com
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:newowner@gmail.com
+          role: roles/owner
+        etag: etag
+    - expect_exit:
+        code: 0
 
 - execute_command:
     command: iap web get-iam-policy --resource-type=app-engine

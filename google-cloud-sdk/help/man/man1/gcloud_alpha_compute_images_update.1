@@ -5,13 +5,13 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute images update \- update a Google Compute Engine image
+gcloud alpha compute images update \- update Google Compute Engine images
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute images update\fR \fIIMAGE_NAME\fR [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute images update\fR \fIIMAGE_NAME\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-family\fR=\fIFAMILY\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,6 +36,15 @@ Name of the disk image to update.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional text description for the image being created.
+
+.TP 2m
+\fB\-\-family\fR=\fIFAMILY\fR
+Family of the image. When creating an instance or disk, specifying a family will
+cause the latest non\-deprecated image in the family to be used.
+
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to update. If a label exists its value is

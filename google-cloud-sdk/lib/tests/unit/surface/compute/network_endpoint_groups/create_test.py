@@ -250,8 +250,9 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--network-endpoint-type\]: Global NEGs only '
-        r'support network endpoint types of internet-ip-port or '
-        r'internet-fqdn-port.'):
+        r'support network endpoints of type internet-ip-port or '
+        r'internet-fqdn-port. Type gce-vm-ip-port must be specified in the '
+        r'zonal scope.'):
       self.Run("""
       compute network-endpoint-groups create my-neg1 --global
         --network-endpoint-type GCE_VM_IP_PORT
@@ -261,7 +262,8 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only '
-        r'support network endpoint types of gce-vm-ip-port.'):
+        r'support network endpoints of type gce-vm-ip-port. Type '
+        r'internet-ip-port must be specified in the global scope.'):
       self.Run("""
       compute network-endpoint-groups create my-neg1 --zone {0}
         --network-endpoint-type INTERNET_IP_PORT
@@ -271,7 +273,8 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only '
-        r'support network endpoint types of gce-vm-ip-port.'):
+        r'support network endpoints of type gce-vm-ip-port. Type '
+        r'internet-fqdn-port must be specified in the global scope.'):
       self.Run("""
       compute network-endpoint-groups create my-neg1 --zone {0}
         --network-endpoint-type INTERNET_FQDN_PORT
@@ -447,13 +450,59 @@ class AlphaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
                          request)])
     self.assertEqual(result, network_endpoint_group)
 
+  def testCreateGlobal_CloudFunction_fails(self):
+    with self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        r'Invalid value for \[--network-endpoint-type\]: Global NEGs only '
+        r'support network endpoints of type internet-ip-port or '
+        r'internet-fqdn-port. Type serverless must be specified in the '
+        r'regional scope.'):
+      self.Run('compute network-endpoint-groups create my-cloud-function-neg '
+               '--global --network-endpoint-type=serverless '
+               '--cloud-function-name=function-name')
+
+  def testCreateZonal_CloudFunction_fails(self):
+    with self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        r'Zonal NEGs only support network endpoints of type gce-vm-ip-port, '
+        r'non-gcp-private-ip-port, or gce-vm-primary-ip. Type serverless must '
+        r'be specified in the regional scope.'):
+      self.Run('compute network-endpoint-groups create my-cloud-function-neg '
+               '--zone ' + self.zone + ' --network-endpoint-type=serverless '
+               '--cloud-function-name=function-name')
+
   def testCreateRegional_InternetType_fails(self):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--network-endpoint-type\]: Regional NEGs only '
-        r'support network endpoint types of serverless.'):
+        r'support network endpoints of type serverless. Type '
+        r'internet-ip-port must be specified in the global scope.'):
       self.Run('compute network-endpoint-groups create my-neg1 --region ' +
                self.region + ' --network-endpoint-type=internet-ip-port')
+
+  def testCreateZonal_InternetIpPortType_fails(self):
+    with self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only '
+        r'support network endpoints of type gce-vm-ip-port, '
+        r'non-gcp-private-ip-port, or gce-vm-primary-ip. Type '
+        r'internet-ip-port must be specified in the global scope.'):
+      self.Run("""
+    compute network-endpoint-groups create my-neg1 --zone {0}
+      --network-endpoint-type INTERNET_IP_PORT
+    """.format(self.zone))
+
+  def testCreateZonal_InternetFqdnPortType_fails(self):
+    with self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only '
+        r'support network endpoints of type gce-vm-ip-port, '
+        r'non-gcp-private-ip-port, or gce-vm-primary-ip. Type '
+        r'internet-fqdn-port must be specified in the global scope.'):
+      self.Run("""
+      compute network-endpoint-groups create my-neg1 --zone {0}
+        --network-endpoint-type INTERNET_FQDN_PORT
+      """.format(self.zone))
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute instance-templates - read and manipulate Google
-        Compute Engine instances templates
+    gcloud alpha compute instance-templates - read and manipulate Compute
+        Engine instances templates
 
 SYNOPSIS
     gcloud alpha compute instance-templates COMMAND [GCLOUD_WIDE_FLAG ...]
@@ -9,8 +9,11 @@ DESCRIPTION
     (ALPHA) Lists, creates, deletes, and modifies Compute Engine instance
     templates.
 
-    More information on Compute Engine instance templates can be found here:
-    https://cloud.google.com/compute/docs/instance-templates
+    For more information about instance templates, see the instances templates
+    documentation (https://cloud.google.com/compute/docs/instance-templates).
+
+    See also: Instance templates API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/instanceTemplates).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

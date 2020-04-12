@@ -44,6 +44,9 @@ COMMANDS
      describe
         (BETA) Display the dry-run mode configuration for a Service Perimeter.
 
+     drop
+        (BETA) Reset the dry-run mode configuration of a Service Perimeter.
+
      list
         (BETA) List the effective dry-run configuration across all Service
         Perimeters.

@@ -38,7 +38,7 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
   def _SupportsServiceFilters(self):
     return {
         calliope_base.ReleaseTrack.ALPHA: True,
-        calliope_base.ReleaseTrack.BETA: False,
+        calliope_base.ReleaseTrack.BETA: True,
         calliope_base.ReleaseTrack.GA: False
     }[self.track]
 
@@ -151,13 +151,6 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
 class PerimetersCreateTestBeta(PerimetersCreateTestGA):
 
   def PreSetUp(self):
-    self.api_version = 'v1'
-    self.track = calliope_base.ReleaseTrack.BETA
-
-
-class PerimetersCreateTestAlpha(PerimetersCreateTestGA):
-
-  def PreSetUp(self):
     self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
@@ -188,6 +181,13 @@ class PerimetersCreateTestAlpha(PerimetersCreateTestGA):
         '    --enable-vpc-accessible-services')
 
     self.assertEqual(result, perimeter)
+
+
+class PerimetersCreateTestAlpha(PerimetersCreateTestBeta):
+
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

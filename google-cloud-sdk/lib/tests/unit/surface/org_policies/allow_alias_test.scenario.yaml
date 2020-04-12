@@ -45,7 +45,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F123
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F123&showDeleted=True
           method: GET
           body: null
         return_response:
@@ -66,7 +66,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F123
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F123&showDeleted=True
           method: GET
           body: null
         return_response:
@@ -78,7 +78,7 @@ actions:
               name: labelKeys/123
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F123
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F123&showDeleted=True
           method: GET
           body: None
         return_response:

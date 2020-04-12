@@ -12,8 +12,8 @@ stateOrProvinceName    = Washington
 localityName           = Kirkland
 0.organizationName     = Google
 organizationalUnitName = LLC
-commonName             = google.com
+commonName             = gcloud_e2e_test
 emailAddress           = private-ca-team@google.com
 
 [ ext ]
-basicConstraints=CA:TRUE,pathlen:0
+keyUsage = digitalSignature

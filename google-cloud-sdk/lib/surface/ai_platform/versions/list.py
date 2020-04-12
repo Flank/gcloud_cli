@@ -25,21 +25,38 @@ from googlecloudsdk.command_lib.ml_engine import flags
 from googlecloudsdk.command_lib.ml_engine import versions_util
 
 
-def _AddListArgs(parser):
+def _AddListArgs(parser, hide_region_arg=True):
   flags.GetModelName(positional=False, required=True).AddToParser(parser)
-  flags.GetRegionArg('model').AddToParser(parser)
+  flags.GetRegionArg(hidden=hide_region_arg).AddToParser(parser)
+  parser.display_info.AddFormat(
+      'table(name.basename(), deploymentUri, state)')
 
 
+def _Run(args):
+  with endpoint_util.MlEndpointOverrides(region=args.region):
+    client = versions_api.VersionsClient()
+    return versions_util.List(client, model=args.model)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class List(base.ListCommand):
   """List existing AI Platform versions."""
 
   @staticmethod
   def Args(parser):
     _AddListArgs(parser)
-    parser.display_info.AddFormat(
-        'table(name.basename(), deploymentUri, state)')
 
   def Run(self, args):
-    with endpoint_util.MlEndpointOverrides(region=args.region):
-      client = versions_api.VersionsClient()
-      return versions_util.List(client, model=args.model)
+    return _Run(args)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+class ListBeta(base.ListCommand):
+  """List existing AI Platform versions."""
+
+  @staticmethod
+  def Args(parser):
+    _AddListArgs(parser, hide_region_arg=False)
+
+  def Run(self, args):
+    return _Run(args)

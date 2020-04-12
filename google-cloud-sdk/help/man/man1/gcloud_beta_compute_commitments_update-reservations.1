@@ -187,6 +187,19 @@ Run \fB$ gcloud help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To update reservations of the commitment called \f5\fIcommitment\-1\fR\fR in the
+\f5\fIus\-central1\fR\fR region with values from \f5\fIreservations.yaml\fR\fR,
+run:
+
+.RS 2m
+$ gcloud beta compute commitments update\-reservations commitment\-1 \e
+    \-\-reservations\-from\-file=reservations.yaml
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in BETA and may change without notice. This variant is

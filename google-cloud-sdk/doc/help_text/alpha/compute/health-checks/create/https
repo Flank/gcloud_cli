@@ -110,7 +110,7 @@ FLAGS
           CLOUDSDK_COMPUTE_REGION.
 
      These flags configure the port that the health check monitors. If none is
-     specified, the default port of 80 is used; if both --port and --port-name
+     specified, the default port of 80 is used. If both --port and --port-name
      are specified, --port takes precedence.
 
        --port=PORT; default=80

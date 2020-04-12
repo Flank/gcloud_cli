@@ -6,7 +6,13 @@ SYNOPSIS
     gcloud beta compute target-pools COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Control Compute Engine target pools for network load balancing.
+    (BETA) Control Compute Engine target pools for Network Load Balancing.
+
+    For more information about target pools, see the target pools documentation
+    (https://cloud.google.com/load-balancing/docs/target-pools).
+
+    See also: Target pools API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/targetPools).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

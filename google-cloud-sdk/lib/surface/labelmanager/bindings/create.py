@@ -18,9 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import encoding
 from googlecloudsdk.api_lib.labelmanager import service as labelmanager
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.labelmanager import arguments
+from googlecloudsdk.command_lib.labelmanager import operations
 from googlecloudsdk.command_lib.labelmanager import utils
 
 
@@ -84,4 +86,11 @@ class Create(base.Command):
     binding = labelmanager_messages.LabelBinding(
         labelValue=label_value, resource=args.resource)
 
-    return labelbindings_service.Create(binding)
+    op = labelbindings_service.Create(binding)
+
+    if op.response is not None:
+      response_dict = encoding.MessageToPyValue(op.response)
+      del response_dict['@type']
+      return response_dict
+    else:
+      raise operations.OperationError(op.error.message)

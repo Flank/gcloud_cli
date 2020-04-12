@@ -6,7 +6,14 @@ SYNOPSIS
     gcloud beta compute target-tcp-proxies COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) List, create, and delete target TCP proxies.
+    (BETA) List, create, and delete target TCP proxies for TCP Proxy Load
+    Balancing.
+
+    For more information about target TCP proxies, see the TCP proxy load
+    balancer documentation (https://cloud.google.com/load-balancing/docs/tcp/).
+
+    See also: Target TCP proxies API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/targetTcpProxies).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -48,8 +48,8 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
   # Location of an example sparkR main file.
   CLUSTER_SPARK_R_SCRIPT = ('file:///usr/lib/spark/examples/src/main/r/'
                             'data-manipulation.R')
-  # Additional args to pass on cluster creation
-  EXTRA_CLUSTER_ARGS = ''
+  # Enable Presto optional component for Presto jobs
+  EXTRA_CLUSTER_ARGS = '--optional-components=PRESTO'
 
   def SetUp(self):
     self.job_id_generator = e2e_utils.GetResourceNameGenerator(
@@ -179,9 +179,15 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
                      result.status.state)
     self.assertIsNotNone(result.sparkRJob)
 
-  # Presto is only available in beta, so it should not be tested on the GA track
   def DoTestPrestoJobSubmission(self):
-    pass
+    result = self.RunDataproc(
+        ('jobs submit presto '
+         '--cluster {0} '
+         '--async '
+         '--execute "USE hive.default;" ').format(self.cluster_name))
+    self.assertEqual(self.messages.JobStatus.StateValueValuesEnum.PENDING,
+                     result.status.state)
+    self.assertIsNotNone(result.prestoJob)
 
   def DoTestJobWaiting(self):
     job_id = next(self.job_id_generator)
@@ -248,9 +254,6 @@ class JobsIntegrationTestBeta(JobsIntegrationTest, base.DataprocTestBaseBeta):
   clusters.
   """
 
-  # Enable Presto optional component for Presto jobs
-  EXTRA_CLUSTER_ARGS = '--optional-components=PRESTO'
-
   def testBeta(self):
     self.assertEqual(self.messages,
                      core_apis.GetMessagesModule('dataproc', 'v1beta2'))
@@ -267,17 +270,6 @@ class JobsIntegrationTestBeta(JobsIntegrationTest, base.DataprocTestBaseBeta):
         '--async '
     ).format(self.cluster_name, job_id))
     self.GetSetIAMPolicy('jobs', job_id)
-
-  def DoTestPrestoJobSubmission(self):
-    result = self.RunDataproc((
-        'jobs submit presto '
-        '--cluster {0} '
-        '--async '
-        '--execute "USE hive.default;" '
-    ).format(self.cluster_name))
-    self.assertEqual(self.messages.JobStatus.StateValueValuesEnum.PENDING,
-                     result.status.state)
-    self.assertIsNotNone(result.prestoJob)
 
 
 if __name__ == '__main__':

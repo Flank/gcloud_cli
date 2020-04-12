@@ -730,6 +730,20 @@ DESCRIPTION
          undefined
             Returns this value if there is no response code.
 
+     org_firewall_rule(rule, undefined="")
+        Returns a compact string describing an organization firewall rule.
+
+        The compact string is a comma-separated list of PROTOCOL:PORT_RANGE
+        items. If a particular protocol has no port ranges then only the
+        protocol is listed.
+
+        The arguments are:
+
+         rule
+            JSON-serializable object.
+         undefined
+            Returns this value if the resource cannot be formatted.
+
      project(undefined="")
         Returns a project name from a selfLink.
 

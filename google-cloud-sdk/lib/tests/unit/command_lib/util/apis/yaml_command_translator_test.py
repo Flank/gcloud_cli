@@ -173,6 +173,33 @@ class DescribeCommandTests(yaml_command_base.CommandTestsBase,
     self.assertEqual(result, {'foo': 'bar'})
     self.AssertOutputEquals('foo: bar\n')
 
+  def testRunDeprecated(self):
+    self.Expect()
+    command = self.MakeCommandData()
+    command['deprecate'] = {
+        'is_removed': False,
+        'warning': 'warning for the test'
+    }
+    d = yaml_command_schema.CommandData('describe', command)
+    cli = self.MakeCLI(d)
+    self.AssertArgs(cli, 'INSTANCE', '--zone')
+    result = cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
+    self.assertEqual(result, {'foo': 'bar'})
+    self.AssertOutputEquals('foo: bar\n')
+    self.AssertErrEquals('WARNING: warning for the test\n')
+
+  def testRunDeprecatedRemoved(self):
+    command = self.MakeCommandData()
+    command['deprecate'] = {
+        'is_removed': True,
+    }
+    d = yaml_command_schema.CommandData('describe', command)
+    cli = self.MakeCLI(d)
+    self.AssertArgs(cli, 'INSTANCE', '--zone')
+    with self.assertRaises(SystemExit):
+      cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
+    self.AssertErrContains('This command has been removed.')
+
   def testRunWithPrompt(self):
     self.Expect()
     d = yaml_command_schema.CommandData('describe', self.MakeCommandData())

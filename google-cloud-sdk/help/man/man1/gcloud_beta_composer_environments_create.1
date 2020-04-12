@@ -11,7 +11,7 @@ gcloud beta composer environments create \- create and initialize a Cloud Compos
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ |\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR\ \fB\-\-cluster\-secondary\-range\-name\fR=\fICLUSTER_SECONDARY_RANGE_NAME\fR\ \fB\-\-enable\-ip\-alias\fR\ \fB\-\-services\-ipv4\-cidr\fR=\fISERVICES_IPV4_CIDR\fR\ \fB\-\-services\-secondary\-range\-name\fR=\fISERVICES_SECONDARY_RANGE_NAME\fR] [\fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-environment\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-web\-server\-allow\-ip\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIip_range\fR=\fIIP_RANGE\fR]\ |\ \fB\-\-web\-server\-deny\-all\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ |\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR] [\fB\-\-cloud\-sql\-ipv4\-cidr\fR=\fICLOUD_SQL_IPV4_CIDR\fR\ \fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-environment\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR\ \fB\-\-web\-server\-ipv4\-cidr\fR=\fIWEB_SERVER_IPV4_CIDR\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR\ \fB\-\-cluster\-secondary\-range\-name\fR=\fICLUSTER_SECONDARY_RANGE_NAME\fR\ \fB\-\-enable\-ip\-alias\fR\ \fB\-\-services\-ipv4\-cidr\fR=\fISERVICES_IPV4_CIDR\fR\ \fB\-\-services\-secondary\-range\-name\fR=\fISERVICES_SECONDARY_RANGE_NAME\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-web\-server\-allow\-all\fR\ |\ \fB\-\-web\-server\-allow\-ip\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIip_range\fR=\fIIP_RANGE\fR]\ |\ \fB\-\-web\-server\-deny\-all\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -182,6 +182,57 @@ be stored.
 .sp
 .TP 2m
 
+Private Clusters
+
+.RS 2m
+.TP 2m
+\fB\-\-cloud\-sql\-ipv4\-cidr\fR=\fICLOUD_SQL_IPV4_CIDR\fR
+IPv4 CIDR range to use for the Cloud SQL network. This should have a size of the
+netmask not greater than 24.
+
+Cannot be specified unless '\-\-enable\-private\-environnment' is also
+specified.
+
+.TP 2m
+\fB\-\-enable\-private\-endpoint\fR
+Environment cluster is managed using the private IP address of the master API
+endpoint. Therefore access to the master endpoint must be from internal IP
+addresses.
+
+If not specified, the master API endpoint will be accessible by its public IP
+address.
+
+Cannot be specified unless '\-\-enable\-private\-environnment' is also
+specified.
+
+.TP 2m
+\fB\-\-enable\-private\-environment\fR
+Environment cluster is created with no public IP addresses on the cluster nodes.
+
+If not specified, cluster nodes will be assigned public IP addresses.
+
+Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
+
+.TP 2m
+\fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR
+IPv4 CIDR range to use for the cluste master network. This should have a size of
+the netmask between 23 and 28.
+
+Cannot be specified unless '\-\-enable\-private\-environnment' is also
+specified.
+
+.TP 2m
+\fB\-\-web\-server\-ipv4\-cidr\fR=\fIWEB_SERVER_IPV4_CIDR\fR
+IPv4 CIDR range to use for the Airflow web server network. This should have a
+size of the netmask between 24 and 29.
+
+Cannot be specified unless '\-\-enable\-private\-environnment' is also
+specified.
+
+.RE
+.sp
+.TP 2m
+
 IP Alias (VPC\-native)
 
 .RS 2m
@@ -229,41 +280,6 @@ Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
 .sp
 .TP 2m
 
-Private Clusters
-
-.RS 2m
-.TP 2m
-\fB\-\-enable\-private\-endpoint\fR
-Environment cluster is managed using the private IP address of the master API
-endpoint. Therefore access to the master endpoint must be from internal IP
-addresses.
-
-If not specified, the master API endpoint will be accessible by its public IP
-address.
-
-Cannot be specified unless '\-\-enable\-private\-environnment' is also
-specified.
-
-.TP 2m
-\fB\-\-enable\-private\-environment\fR
-Environment cluster is created with no public IP addresses on the cluster nodes.
-
-If not specified, cluster nodes will be assigned public IP addresses.
-
-Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
-
-.TP 2m
-\fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR
-IPv4 CIDR range to use for the master network. This should have a netmask of
-size /28.
-
-Cannot be specified unless '\-\-enable\-private\-environnment' is also
-specified.
-
-.RE
-.sp
-.TP 2m
-
 Virtual Private Cloud networking
 
 .RS 2m
@@ -287,6 +303,10 @@ will be connected.
 At most one of these may be specified:
 
 .RS 2m
+.TP 2m
+\fB\-\-web\-server\-allow\-all\fR
+Allows all IP addresses to access the Airflow web server.
+
 .TP 2m
 \fB\-\-web\-server\-allow\-ip\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIip_range\fR=\fIIP_RANGE\fR]
 Specifies a list of IPv4 or IPv6 ranges that will be allowed to access the

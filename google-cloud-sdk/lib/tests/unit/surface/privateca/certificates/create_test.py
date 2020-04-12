@@ -56,6 +56,8 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
     self.test_cert = files.ReadFileContents(
         self.Resource('tests', 'unit', 'surface', 'privateca', 'test_data',
                       'test_cert.pem'))
+    self.parent_cert = ('----BEGIN CERTIFICATE----\ntest\n----END '
+                        'CERTIFICATE----')
 
   def _ExpectCreateOperation(self,
                              parent_name,
@@ -72,7 +74,8 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
     response_val = encoding.PyValueToMessage(
         self.messages.Operation.ResponseValue, {
             'name': '{}/certificate/{}'.format(parent_name, cert_name),
-            'pemCertificate': self.test_cert
+            'pemCertificate': self.test_cert,
+            'pemCertificateChain': [self.parent_cert]
         })
     response = self.messages.Operation(done=True, response=response_val)
 
@@ -123,7 +126,8 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
              '--subject "CN=google.com, OU=organizationUnit, L=locality"')
 
     self.AssertFileEquals('private', 'private_key.pem')
-    self.AssertFileEquals(self.test_cert, 'cert_out.pem')
+    self.AssertFileEquals(self.test_cert + '\n' + self.parent_cert,
+                          'cert_out.pem')
 
   @mock.patch.object(
       request_utils, 'GenerateRequestId', return_value='create_id')
@@ -203,19 +207,20 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD,
             reusableConfigValues=self.messages.ReusableConfigValues(
                 keyUsage=self.messages.KeyUsage(
                     baseKeyUsage=self.messages.KeyUsageOptions(
-                        digitalSignature=True, certSign=True),
+                        digitalSignature=True, certSign=True, crlSign=True),
                     extendedKeyUsage=self.messages.ExtendedKeyUsageOptions(
                         clientAuth=True, serverAuth=True)),
                 caOptions=self.messages.CaOptions(
                     isCa=True, maxIssuerPathLength=3))),
         subject_config=self.messages.SubjectConfig(
             commonName='google.com',
-            subject=self.messages.Subject(),
+            subject=self.messages.Subject(organization='google'),
             subjectAltName=self.messages.SubjectAltNames()))
 
-    self.Run('alpha privateca certificates create cert --issuer ca '
-             '--issuer-location europe --cert-output-file cert_out.pem '
-             '--generate-key --key-output-file private_key.pem '
-             '--extended-key-usages client_auth,server_auth '
-             '--key-usages digital_signature,cert_sign '
-             '--subject CN=google.com --is-ca-cert --max-chain-length 3')
+    self.Run(
+        'alpha privateca certificates create cert --issuer ca '
+        '--issuer-location europe --cert-output-file cert_out.pem '
+        '--generate-key --key-output-file private_key.pem '
+        '--extended-key-usages client_auth,server_auth '
+        '--key-usages digital_signature,cert_sign '
+        '--subject CN=google.com,O=google --is-ca-cert --max-chain-length 3')

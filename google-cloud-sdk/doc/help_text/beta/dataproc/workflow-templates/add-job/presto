@@ -22,10 +22,10 @@ REQUIRED FLAGS
      Exactly one of these must be specified:
 
        --execute=QUERY, -e QUERY
-          A Presto query to execute as the job.
+          A Presto query to execute.
 
        --file=FILE, -f FILE
-          HCFS URI of file containing Presto script to execute as the job
+          HCFS URI of file containing the Presto script to execute.
 
      Template resource - The name of the workflow template to add job to. The
      arguments in this group can be used to specify the attributes of this
@@ -48,13 +48,13 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --client-tags=[CLIENT_TAG,...]
-        List of Presto client tags to attach to this query.
+        A list of Presto client tags to attach to this query.
 
      --continue-on-failure
-        Whether to continue if a single query fails.
+        Whether to continue if a query fails.
 
      --driver-log-levels=[PACKAGE=LEVEL,...]
-        A list of package to log4j log level pairs to configure driver logging.
+        A list of package-to-log4j log level pairs to configure driver logging.
         For example: root=FATAL,com.example=INFO
 
      --labels=[KEY=VALUE,...]
@@ -66,11 +66,11 @@ OPTIONAL FLAGS
         numbers.
 
      --properties=[PARAM=VALUE,...]
-        A list of key value pairs to set Presto session properties
+        A list of key value pairs to set Presto session properties.
 
      --query-output-format=QUERY_OUTPUT_FORMAT
-        The format in which query output will be displayed. See the Presto
-        documentation for supported output formats.
+        The query output display format. See the Presto documentation for
+        supported output formats.
 
      --start-after=STEP_ID,[STEP_ID,...]
         (Optional) List of step IDs to start this job after.
@@ -84,8 +84,9 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To add a Presto job executing query 'QUERY' to a the workflow template
-    'my-workflow-template' in region 'us-central1' with step-id 'my-step-id' ,
+    To add a Presto job that executes query 'QUERY' to a the workflow template
+    'my-workflow-template' in region 'us-central1' with step-id 'my-step-id',
+
     run:
 
         $ gcloud beta dataproc workflow-templates add-job presto \
@@ -93,8 +94,9 @@ EXAMPLES
             --workflow-template=my-workflow-template --region=us-central1
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud dataproc workflow-templates add-job presto
         $ gcloud alpha dataproc workflow-templates add-job presto
 

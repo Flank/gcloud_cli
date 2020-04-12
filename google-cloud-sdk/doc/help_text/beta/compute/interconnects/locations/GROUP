@@ -1,12 +1,19 @@
 NAME
-    gcloud beta compute interconnects locations - read and manipulate Google
-        Compute Engine interconnect locations
+    gcloud beta compute interconnects locations - read and manipulate Compute
+        Engine interconnect locations
 
 SYNOPSIS
     gcloud beta compute interconnects locations COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Read and manipulate Google Compute Engine interconnect locations.
+    (BETA) Read and manipulate Cloud Interconnect locations.
+
+    For more information about interconnect locations, see the interconnect
+    locations documentation
+    (https://cloud.google.com/interconnect/docs/concepts/colocation-facilities).
+
+    See also: Interconnect locations API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/interconnectLocations).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

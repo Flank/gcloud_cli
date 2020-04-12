@@ -53,6 +53,54 @@ class DeployConnectAgentTest(sdk_test_base.WithFakeAuth,
     register.Register.Args(self.parser)
     self.registry = resources.Registry()
 
+  def testSuccessfulAgentDeploymentWorkloadIdentityAlpha(self):
+    properties.VALUES.core.project.Set('my-project')
+    self.mock_kubernetes_client.Apply.return_value = ('some output', None)
+    self.mock_kubernetes_client.Logs.return_value = ('Fake log', None)
+    self.mock_kubernetes_client.Delete.return_value = None
+    self.mock_kubernetes_client.NamespaceExists.return_value = False
+    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = None
+    self.StartObjectPatch(gkehub_api_adapter, 'InitAPIAdapter',
+                          return_value=self.mock_api_adapter)
+    self.StartObjectPatch(
+        api_util,
+        'GenerateConnectAgentManifest')
+    self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
+
+    # Current SetUp doesn't add alpha track arguments, so manually add
+    # --enable-workload-identity and other required args for testing.
+    # This is ugly, but it seems like there is no public API to manually set
+    # the release track for a command, so we can't just call Register.Args()
+    # with the alpha track here.
+    # TODO(b/152240680): This is another example of over-reliance on args in
+    # deep methods.
+    # TODO(b/152762400): Make alpha track arguments easier to test.
+    parser = test_util.ArgumentParser()
+    parser.add_argument('CLUSTER_NAME', help='foo', type=str)
+    parser.add_argument('--kubeconfig', help='foo', type=str)
+    parser.add_argument('--context', help='foo', type=str)
+    parser.add_argument('--proxy', help='foo', type=str)
+    parser.add_argument('--docker-registry', help='foo', type=str)
+    parser.add_argument('--version', help='foo', type=str)
+    parser.add_argument('--manifest-output-file', help='foo', type=str)
+    parser.add_argument(
+        '--enable-workload-identity', help='foo', action='store_true')
+
+    # This omits --service-account-key-file and ensures that doing so does not
+    # cause an exception when deploying Connect Agent with Workload Identity
+    # enabled.
+    args = parser.parse_args([
+        'my-membership',
+        '--kubeconfig', '/tmp/kubeconfig',
+        '--context', 'default',
+        '--enable-workload-identity',
+    ])
+    agent_util.DeployConnectAgent(
+        self.mock_kubernetes_client, args,
+        'some data', 'some other data',
+        'project/my-project/locations/global/memberships/my-membership',
+        calliope_base.ReleaseTrack.ALPHA)
+
   def testSuccessfulAgentDeploymentBeta(self):
     properties.VALUES.core.project.Set('my-project')
     self.mock_kubernetes_client.Apply.return_value = ('some output', None)

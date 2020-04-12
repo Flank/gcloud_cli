@@ -96,6 +96,40 @@ class CryptoKeysUpdateTestGa(base.KmsMockTest):
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id))
 
+    # Test that trying to remove a nonexistent label doesn't remove the rest.
+    self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
+        self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
+            name=self.key_name.RelativeName(),
+        ),
+        self.messages.CryptoKey(
+            name=self.key_name.RelativeName(),
+            labels=self.messages.CryptoKey.LabelsValue(
+                additionalProperties=[
+                    self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                        key='k1', value='v1'),
+                    self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                        key='k2', value='v2')])))
+
+    self.kms.projects_locations_keyRings_cryptoKeys.Patch.Expect(
+        self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysPatchRequest(
+            name=self.key_name.RelativeName(),
+            cryptoKey=self.messages.CryptoKey(
+                labels=self.messages.CryptoKey.LabelsValue(
+                    additionalProperties=[
+                        self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                            key='k1', value='v1'),
+                        self.messages.CryptoKey.LabelsValue.AdditionalProperty(
+                            key='k2', value='v2')])),
+            updateMask='labels'),
+        self.messages.CryptoKey(
+            name=self.key_name.RelativeName()))
+
+    self.Run('kms keys update '
+             '--location={0} --keyring={1} {2} '
+             '--remove-labels=k3'.format(
+                 self.key_name.location_id, self.key_name.key_ring_id,
+                 self.key_name.crypto_key_id))
+
     # Test clear labels.
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(

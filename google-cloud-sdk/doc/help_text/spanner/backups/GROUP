@@ -46,8 +46,6 @@ COMMANDS
         Updates the metadata of a Cloud Spanner a backup.
 
 NOTES
-    These variants are also available:
-
-        $ gcloud alpha spanner backups
-        $ gcloud beta spanner backups
+    This command is an internal implementation detail and may change or
+    disappear without notice.
 

@@ -42,6 +42,13 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To describe the commitment called commitment-1 in the us-central1 region,
+    run:
+
+        $ gcloud compute commitments describe commitment-1 \
+            --region=us-central1
+
 NOTES
     These variants are also available:
 

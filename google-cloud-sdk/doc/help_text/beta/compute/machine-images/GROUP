@@ -1,12 +1,18 @@
 NAME
-    gcloud beta compute machine-images - read and manage Google Compute Engine
-        machine image resources
+    gcloud beta compute machine-images - read and manage Compute Engine machine
+        image resources
 
 SYNOPSIS
     gcloud beta compute machine-images COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Read and manage Google Compute Engine machine image resources.
+    (BETA) Read and manage Compute Engine machine image resources..
+
+    For more information about machine images, see the machine images
+    documentation (https://cloud.google.com/compute/docs/machine-images).
+
+    See also: Machine images API
+    (https://cloud.google.com/compute/docs/reference/rest/beta/machineImages).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

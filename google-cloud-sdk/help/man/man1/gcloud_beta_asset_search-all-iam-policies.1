@@ -41,31 +41,32 @@ to those in the previous call.
 
 .TP 2m
 \fB\-\-query\fR=\fIQUERY\fR
-The query statement.
+The query statement. To learn how to construct a query, see
+https://cloud.google.com/asset\-inventory/docs/searching\-iam\-policies#how_to_construct_a_query.
 
 Examples:
 .RS 2m
 .IP "\(em" 2m
-To find all Cloud IAM policies in your organization that contain
-amy@mycompany.com: \f5policy:"amy@mydomain.com"\fR
+To find all Cloud IAM policy bindings in your organization that contain
+amy@mycompany.com: \f5policy : "amy@mydomain.com"\fR
 .IP "\(em" 2m
-To find all Cloud IAM policies in your organization that contain owner role:
-\f5policy:"roles/owner"\fR
+To find all Cloud IAM policy bindings in your organization that contain the
+Owner role: \f5policy : "roles/owner"\fR
 .IP "\(em" 2m
-To find all Cloud IAM policies in your organization which have
-myuser@mycompany.com in the owner role: \f5policy:("roles/owner"
+To find all Cloud IAM policy bindings in your organization that have
+myuser@mycompany.com in the Owner role: \f5policy : ("roles/owner"
 "myuser@mycompany.com")\fR
 .IP "\(em" 2m
-To find all Cloud IAM policies in your organization which have
-myuser@mycompany.com in the owner role or youruser@mycompany.com in the viewer
-role: \f5policy:(("roles/owner" "myuser@mycompany.com") OR ("roles/viewer"
+To find all Cloud IAM policy bindings in your organization that have
+myuser@mycompany.com in the owner role or youruser@mycompany.com in the Viewer
+role: \f5policy : (("roles/owner" "myuser@mycompany.com") OR ("roles/viewer"
 "youruser@mycompany.com"))\fR
 .IP "\(em" 2m
-To find all Cloud IAM policies that are set on a resource: \f5resource:
+To find all Cloud IAM policy bindings that are set on a resource: \f5resource :
 "projects/123"\fR
 .IP "\(em" 2m
-To find all Cloud IAM policies of resources that match a query. \f5resource:
-"\fBproj\fR"\fR
+To find all Cloud IAM policy bindings that are set on resources whose names
+contain substring "proj": \f5resource : "*proj*"\fR
 .RE
 .RE
 .sp
@@ -120,7 +121,8 @@ organization (organizations/123), which you have
 
 .RS 2m
 $ gcloud beta asset search\-all\-iam\-policies \e
-  \-\-scope='organizations/123' \-\-query='policy:"amy@mydomain.com"'
+  \-\-scope='organizations/123' \e
+  \-\-query='policy : "amy@mydomain.com"'
 .RE
 
 

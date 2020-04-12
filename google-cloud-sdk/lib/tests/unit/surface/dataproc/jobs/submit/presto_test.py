@@ -28,15 +28,7 @@ from tests.lib.surface.dataproc import jobs_unit_base
 
 
 class JobsSubmitPrestoUnitTest(jobs_unit_base.JobsUnitTestBase):
-  pass  # Presto jobs are beta only
-
-
-class JobsSubmitPrestoUnitTestBeta(jobs_unit_base.JobsUnitTestBase,
-                                   base.DataprocTestBaseBeta):
-
-  def testBeta(self):
-    self.assertEqual(self.messages, self._beta_messages)
-    self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
+  """Tests for dataproc jobs submit presto."""
 
   def testSubmitPrestoJob(self):
     job = self.MakeJob(prestoJob=self.PRESTO_JOB)
@@ -119,6 +111,15 @@ class JobsSubmitPrestoUnitTestBeta(jobs_unit_base.JobsUnitTestBase,
           '--query-output-format foo-output '
           '--client-tags foo-tag,bar-tag '
           .format(self.CLUSTER_NAME, self.JOB_ID, self.SCRIPT_URI))
+
+
+class JobsSubmitPrestoUnitTestBeta(jobs_unit_base.JobsUnitTestBase,
+                                   base.DataprocTestBaseBeta):
+  """Tests for beta track of dataproc jobs submit presto."""
+
+  def testBeta(self):
+    self.assertEqual(self.messages, self._beta_messages)
+    self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
 
 
 class JobsSubmitPrestoUnitTestAlpha(jobs_unit_base.JobsUnitTestBase,

@@ -73,8 +73,6 @@ EXAMPLES
         SOURCE_INSTANCE_ID/databases/DATABASE_ID
 
 NOTES
-    These variants are also available:
-
-        $ gcloud alpha spanner databases restore
-        $ gcloud beta spanner databases restore
+    This command is an internal implementation detail and may change or
+    disappear without notice.
 

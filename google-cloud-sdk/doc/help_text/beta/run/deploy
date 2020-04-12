@@ -6,13 +6,13 @@ SYNOPSIS
         [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
         [--concurrency=CONCURRENCY] [--cpu=CPU] [--max-instances=MAX_INSTANCES]
         [--memory=MEMORY] [--platform=PLATFORM] [--port=PORT]
-        [--timeout=TIMEOUT]
+        [--timeout=TIMEOUT] [--no-traffic]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
           | --update-labels=[KEY=VALUE,...]]
-        [--connectivity=CONNECTIVITY --min-instances=MIN_INSTANCES
-          --no-traffic --[no-]use-http2 --clear-config-maps
+        [--connectivity=CONNECTIVITY
+          --min-instances=MIN_INSTANCES --[no-]use-http2 --clear-config-maps
           | --set-config-maps=[KEY=VALUE,...] | --remove-config-maps=[KEY,...]
           --update-config-maps=[KEY=VALUE,...] --clear-secrets
           | --set-secrets=[KEY=VALUE,...]
@@ -107,6 +107,14 @@ OPTIONAL FLAGS
         don't specify a unit, seconds is assumed. For example, "10" is 10
         seconds.
 
+     --no-traffic
+        True to avoid sending traffic to the revision being deployed. Setting
+        this flag assigns any traffic assigned to the LATEST revision to the
+        specific revision bound to LATEST before the deployment. The effect is
+        that the revsion being deployed will not receive traffic. After a
+        deployment with this flag the LATEST revision will not receive traffic
+        on future deployments.
+
      At most one of these may be specified:
 
        --clear-env-vars
@@ -173,14 +181,6 @@ OPTIONAL FLAGS
        --min-instances=MIN_INSTANCES
           The minimum number of container instances of the Service to run or
           'default' to remove any minimum.
-
-       --no-traffic
-          True to avoid sending traffic to the revision beign deployed. Setting
-          this flag assigns any traffic assigned to the LATEST revision to the
-          specific revision bound to LATEST before the deployment. The effect
-          is that the revsion being deployed will not receive traffic. After a
-          deployment with this flag the LATEST revision will not recieve
-          traffic on future deployments.
 
        --[no-]use-http2
           Whether to use HTTP/2 for connections to the service. Use --use-http2

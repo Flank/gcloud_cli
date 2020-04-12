@@ -1,12 +1,14 @@
 NAME
-    gcloud compute routers nats - list, create, describe and delete Google
-        Compute Engine NATs
+    gcloud compute routers nats - list, create, describe, and delete Cloud NAT
 
 SYNOPSIS
     gcloud compute routers nats COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    List, create, describe and delete Google Compute Engine NATs.
+    List, create, describe, and delete Cloud NAT.
+
+    For more information about Cloud NAT, see the Cloud NAT documentation
+    (https://cloud.google.com/nat/docs/using-nat).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

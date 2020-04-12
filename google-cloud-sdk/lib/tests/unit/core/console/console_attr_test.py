@@ -21,6 +21,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import io
+import locale
 import sys
 
 from googlecloudsdk.core import log
@@ -96,13 +97,22 @@ class ConsoleAttrEncodingTests(ConsoleAttrTestBase):
     sys.stdout.encoding = 'UTF-8'
     log.Reset()
     attr = console_attr.GetConsoleAttr(reset=True)
-    self.assertEqual(attr.GetEncoding(), 'utf8')
+    locale_encoding = locale.getpreferredencoding()
+    if locale_encoding and 'cp1252' in locale_encoding:
+      self.assertEqual(attr.GetEncoding(), 'ascii')
+    else:
+      self.assertEqual(attr.GetEncoding(), 'utf8')
 
   def testEncodingStdOutWin(self):
     sys.stdout = mock.MagicMock()
     sys.stdout.encoding = 'CP437'
     attr = console_attr.GetConsoleAttr(reset=True)
     self.assertEqual(attr.GetEncoding(), 'cp437')
+
+    sys.stdout = mock.MagicMock()
+    sys.stdout.encoding = 'CP1252'
+    attr = console_attr.GetConsoleAttr(reset=True)
+    self.assertEqual(attr.GetEncoding(), 'ascii')
 
 
 class AsciiConsoleAttrTests(ConsoleAttrTestBase):

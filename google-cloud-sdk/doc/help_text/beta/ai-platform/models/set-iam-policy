@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud beta ai-platform models set-iam-policy MODEL POLICY_FILE
-        [GCLOUD_WIDE_FLAG ...]
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Sets the IAM policy for the given model as defined in a JSON or YAML
@@ -30,6 +30,16 @@ POSITIONAL ARGUMENTS
         The output of the get-iam-policy command is a valid file, as is any
         JSON or YAML file conforming to the structure of a Policy
         (https://cloud.google.com/iam/reference/rest/v1/Policy).
+
+FLAGS
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

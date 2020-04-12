@@ -3,9 +3,9 @@ NAME
 
 SYNOPSIS
     gcloud ml-engine local predict --model-dir=MODEL_DIR
-        (--json-instances=JSON_INSTANCES | --text-instances=TEXT_INSTANCES)
-        [--framework=FRAMEWORK] [--signature-name=SIGNATURE_NAME]
-        [GCLOUD_WIDE_FLAG ...]
+        (--json-instances=JSON_INSTANCES | --json-request=JSON_REQUEST
+          | --text-instances=TEXT_INSTANCES) [--framework=FRAMEWORK]
+        [--signature-name=SIGNATURE_NAME] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud ml-engine local predict performs prediction locally with the given
@@ -29,6 +29,20 @@ REQUIRED FLAGS
               {"images": [0.0, ..., 0.1], "key": 3}
               {"images": [0.0, ..., 0.1], "key": 2}
               ...
+
+          This flag accepts "-" for stdin.
+
+       --json-request=JSON_REQUEST
+          Path to a local file containing the body of JSON request.
+
+          An example of a JSON request:
+
+              {
+                "instances": [
+                  {"x": [1, 2], "y": [3, 4]},
+                  {"x": [-1, -2], "y": [-3, -4]}
+                ]
+              }
 
           This flag accepts "-" for stdin.
 

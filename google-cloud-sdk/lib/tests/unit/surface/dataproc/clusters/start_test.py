@@ -44,12 +44,14 @@ class ClusterStartUnitTestBeta(unit_base.DataprocUnitTestBase,
       region = self.REGION
     if not (response or exception):
       response = self.MakeOperation()
+    start_cluster_request = self.messages.StartClusterRequest(
+        requestId=self.REQUEST_ID)
     self.mock_client.projects_regions_clusters.Start.Expect(
         self.messages.DataprocProjectsRegionsClustersStartRequest(
             clusterName=cluster_name,
             region=region,
             projectId=self.Project(),
-            requestId=self.REQUEST_ID),
+            startClusterRequest=start_cluster_request),
         response=response,
         exception=exception)
 

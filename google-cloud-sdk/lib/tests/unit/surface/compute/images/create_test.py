@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.compute import csek_utils
-from googlecloudsdk.api_lib.compute import image_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
@@ -55,6 +54,30 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
 
   def SetUp(self):
     self.SelectApi(self.api_version)
+    self.dir = file_utils.TemporaryDirectory()
+    self._createTestInitialStateFiles()
+
+  def _createTestInitialStateFiles(self):
+    self.platform_key_path = self._createSingleTestInitialStateFile(
+        _PK_FILE_NAME, _X509_FILE_SUFFIX)
+    self.key_exchange_key_path = self._createSingleTestInitialStateFile(
+        _KEK_FILE_NAME, _BIN_FILE_SUFFIX)
+    self.key_database_path_1 = self._createSingleTestInitialStateFile(
+        _DB_FILE_NAME_1, _X509_FILE_SUFFIX)
+    self.key_database_path_2 = self._createSingleTestInitialStateFile(
+        _DB_FILE_NAME_2, _BIN_FILE_SUFFIX)
+    self.forbidden_key_database_path = self._createSingleTestInitialStateFile(
+        _DBX_FILE_NAME, _X509_FILE_SUFFIX)
+    self.x509_enum = self.messages.FileContentBuffer.\
+        FileTypeValueValuesEnum('X509')
+    self.bin_enum = self.messages.FileContentBuffer.\
+        FileTypeValueValuesEnum('BIN')
+
+  def _createSingleTestInitialStateFile(self, file_name, suffix):
+    # create a temporary file in self.dir, set the content equals to file_name.
+    path = os.path.join(self.dir.path, file_name.decode('utf-8') + suffix)
+    file_utils.WriteBinaryFileContents(path, _FILE_CONTENT, overwrite=False)
+    return path
 
   def testAllFlags(self):
     self.Run("""
@@ -543,24 +566,6 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
 
     self.CheckRequests()
 
-  def testCheckGuestOsFeaturesEnum(self):
-    enums = list(
-        self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
-    enums.remove('FEATURE_TYPE_UNSPECIFIED')
-
-    # Note: SECURE_BOOT still exists in the API, but it is deprecated and has no
-    # effect.
-    enums.remove('SECURE_BOOT')
-
-    enums.sort()
-
-    # Update the list in the image_utils module if this test fails because of an
-    # API regen update mismatch. See b/72110252 for example.
-    choices = list(image_utils.GUEST_OS_FEATURES)
-    choices.sort()
-
-    self.assertEqual(enums, choices)
-
   def testForceImageCreationFromDisk(self):
     self.Run("""
         compute images create my-image
@@ -896,6 +901,43 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
               project='my-project'))],
     )
 
+  def testShieldedInstanceInitialState(self):
+    self.Run("""
+        compute images create my-image
+          --source-uri gs://31dd/source-image
+          --platform-key-file %s --key-exchange-key-file %s
+          --signature-database-file %s,%s --forbidden-database-file %s
+        """ % (self.platform_key_path, self.key_exchange_key_path,
+               self.key_database_path_1, self.key_database_path_2,
+               self.forbidden_key_database_path))
+
+    self.CheckRequests(
+        [(self.compute.images,
+          'Insert',
+          self.messages.ComputeImagesInsertRequest(
+              image=self.messages.Image(
+                  name='my-image',
+                  shieldedInstanceInitialState={
+                      'pk': self.messages.FileContentBuffer(
+                          content=_FILE_CONTENT, fileType=self.x509_enum),
+                      'keks': [
+                          self.messages.FileContentBuffer(
+                              content=_FILE_CONTENT, fileType=self.bin_enum)],
+                      'dbs': [
+                          self.messages.FileContentBuffer(
+                              content=_FILE_CONTENT, fileType=self.x509_enum),
+                          self.messages.FileContentBuffer(
+                              content=_FILE_CONTENT, fileType=self.bin_enum)],
+                      'dbxs': [
+                          self.messages.FileContentBuffer(
+                              content=_FILE_CONTENT, fileType=self.x509_enum)],
+                  },
+                  rawDisk=self.messages.Image.RawDiskValue(
+                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
+                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
+              project='my-project'))],
+    )
+
 
 class ImagesCreateBetaTest(ImagesCreateTest):
   """Tests for features only available in beta."""
@@ -903,9 +945,6 @@ class ImagesCreateBetaTest(ImagesCreateTest):
   def PreSetUp(self):
     self.api_version = 'beta'
     self.track = calliope_base.ReleaseTrack.BETA
-
-  def SetUp(self):
-    self.SelectApi(self.api_version)
 
   # CSEK Features
   def testCreateImageFromDiskCsekEncryptedRsaWrapped(self):
@@ -998,22 +1037,6 @@ class ImagesCreateBetaTest(ImagesCreateTest):
 
     self.CheckRequests()
 
-  def testCheckGuestOsFeaturesEnum(self):
-    enums = list(
-        self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
-    enums.remove('FEATURE_TYPE_UNSPECIFIED')
-
-    # Note: SECURE_BOOT still exists in the API, but it is deprecated and has no
-    # effect.
-    enums.remove('SECURE_BOOT')
-
-    enums.sort()
-
-    choices = list(image_utils.GUEST_OS_FEATURES_BETA)
-    choices.sort()
-
-    self.assertEqual(enums, choices)
-
   def testForceImageCreationFromDisk(self):
     self.Run("""
         compute images create my-image
@@ -1043,33 +1066,6 @@ class ImagesCreateAlphaTest(ImagesCreateBetaTest):
   def PreSetUp(self):
     self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def SetUp(self):
-    self.SelectApi(self.api_version)
-    self.dir = file_utils.TemporaryDirectory()
-    self._createTestInitialStateFiles()
-
-  def _createSingleTestInitialStateFile(self, file_name, suffix):
-    # create a temporary file in self.dir, set the content equals to file_name.
-    path = os.path.join(self.dir.path, file_name.decode('utf-8') + suffix)
-    file_utils.WriteBinaryFileContents(path, _FILE_CONTENT, overwrite=False)
-    return path
-
-  def _createTestInitialStateFiles(self):
-    self.platform_key_path = self._createSingleTestInitialStateFile(
-        _PK_FILE_NAME, _X509_FILE_SUFFIX)
-    self.key_exchange_key_path = self._createSingleTestInitialStateFile(
-        _KEK_FILE_NAME, _BIN_FILE_SUFFIX)
-    self.key_database_path_1 = self._createSingleTestInitialStateFile(
-        _DB_FILE_NAME_1, _X509_FILE_SUFFIX)
-    self.key_database_path_2 = self._createSingleTestInitialStateFile(
-        _DB_FILE_NAME_2, _BIN_FILE_SUFFIX)
-    self.forbidden_key_database_path = self._createSingleTestInitialStateFile(
-        _DBX_FILE_NAME, _X509_FILE_SUFFIX)
-    self.x509_enum = self.messages.FileContentBuffer.\
-        FileTypeValueValuesEnum('X509')
-    self.bin_enum = self.messages.FileContentBuffer.\
-        FileTypeValueValuesEnum('BIN')
 
   # Guest OS Features
   def testCreateGuestImageWithOsFeatures(self):
@@ -1138,59 +1134,6 @@ class ImagesCreateAlphaTest(ImagesCreateBetaTest):
           """)
 
     self.CheckRequests()
-
-  def testCheckGuestOsFeaturesEnum(self):
-    enums = list(
-        self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
-    enums.remove('FEATURE_TYPE_UNSPECIFIED')
-
-    # Note: SECURE_BOOT still exists in the API, but it is deprecated and has no
-    # effect.
-    enums.remove('SECURE_BOOT')
-
-    enums.sort()
-
-    choices = list(image_utils.GUEST_OS_FEATURES_ALPHA)
-    choices.sort()
-
-    self.assertEqual(enums, choices)
-
-  def testShieldedInstanceInitialState(self):
-    self.Run("""
-        compute images create my-image
-          --source-uri gs://31dd/source-image
-          --platform-key-file %s --key-exchange-key-file %s
-          --signature-database-file %s,%s --forbidden-database-file %s
-        """ % (self.platform_key_path, self.key_exchange_key_path,
-               self.key_database_path_1, self.key_database_path_2,
-               self.forbidden_key_database_path))
-
-    self.CheckRequests(
-        [(self.compute.images,
-          'Insert',
-          self.messages.ComputeImagesInsertRequest(
-              image=self.messages.Image(
-                  name='my-image',
-                  shieldedInstanceInitialState={
-                      'pk': self.messages.FileContentBuffer(
-                          content=_FILE_CONTENT, fileType=self.x509_enum),
-                      'keks': [
-                          self.messages.FileContentBuffer(
-                              content=_FILE_CONTENT, fileType=self.bin_enum)],
-                      'dbs': [
-                          self.messages.FileContentBuffer(
-                              content=_FILE_CONTENT, fileType=self.x509_enum),
-                          self.messages.FileContentBuffer(
-                              content=_FILE_CONTENT, fileType=self.bin_enum)],
-                      'dbxs': [
-                          self.messages.FileContentBuffer(
-                              content=_FILE_CONTENT, fileType=self.x509_enum)],
-                  },
-                  rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL_DOMAIN_SPLIT),
-                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
-              project='my-project'))],
-    )
 
 
 if __name__ == '__main__':

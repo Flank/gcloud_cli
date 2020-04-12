@@ -87,9 +87,10 @@ OPTIONAL FLAGS
         used.
 
      --forbidden-database-file=[DBX_VALUE,...]
-        Comma-separated list of file paths pointing to revoked X.509
-        certificates or raw binary files to be added to the forbidden signature
-        database (dbx) when creating a shielded instance from this image.
+        Comma-separated list of file paths that point to revoked X.509
+        certificates or raw binary files. When you create a shielded VM from
+        this image, these certificates or files are added to the forbidden
+        signature database (dbx).
 
      --force
         By default, image creation fails when it is created from a disk that is
@@ -106,33 +107,16 @@ OPTIONAL FLAGS
 
      --guest-os-features=[GUEST_OS_FEATURE,...]
         This parameter enables one or more features for VM instances that use
-        the image for their boot disks. The following features are available:
-
-        * MULTI_IP_SUBNET - For configuring interfaces with a netmask other
-          than /32.
-
-        * UEFI_COMPATIBLE - Enables UEFI booting, which is an alternative
-          system boot method. Most public images use the GRUB bootloader as
-          their primary boot method.
-
-        * VIRTIO_SCSI_MULTIQUEUE - Enables multiqueue SCSI capabilities for
-          Local SSD devices. This option is an alternative to NVMe.
-          + For Linux images, you can enable VIRTIO_SCSI_MULTIQUEUE on images
-            with kernel versions 3.17 and higher.
-          + For Windows images, you can enable VIRTIO_SCSI_MULTIQUEUE on
-            images with driver version 1.2.0.1621 or higher.
-
-        * WINDOWS - Required for Windows Server images. Newer public images
-          for Windows server include the WINDOWS parameter to indicate that it
-          is a Windows image.
-
-    GUEST_OS_FEATURE must be one of: MULTI_IP_SUBNET, UEFI_COMPATIBLE,
-    VIRTIO_SCSI_MULTIQUEUE, WINDOWS, GVNIC.
+        the image for their boot disks. See
+        https://cloud.google.com/compute/docs/images/create-delete-deprecate-private-images#guest-os-features
+        for descriptions of the supported features. GUEST_OS_FEATURE must be
+        one of: BARE_METAL_LINUX_COMPATIBLE, GVNIC, MULTI_IP_SUBNET,
+        UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
 
      --key-exchange-key-file=[KEK_VALUE,...]
-        Comma-separated list of file paths pointing to X.509 certificates or
-        raw binary files to be used as key exchange keys (KEK) when creating a
-        shielded instance from this image.
+        Comma-separated list of file paths that point to X.509 certificates or
+        raw binary files. When you create a shielded VM from this image, these
+        certificates or files are used as key exchange keys (KEK).
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -146,9 +130,9 @@ OPTIONAL FLAGS
         Comma-separated list of URIs to license resources.
 
      --platform-key-file=PLATFORM_KEY_FILE
-        File path pointing to an X.509 certificate or raw binary file to be
-        used as the platform key (PK) when creating a shielded instance from
-        this image.
+        File path that points to an X.509 certificate or raw binary file. When
+        you create a shielded VM from this image, this certificate or raw
+        binary file is used as the platform key (PK).
 
      --require-csek-key-create
         Refuse to create images not protected by a user managed key in the key
@@ -162,9 +146,10 @@ OPTIONAL FLAGS
         to disable.
 
      --signature-database-file=[DB_VALUE,...]
-        Comma-separated list of file paths pointing to valid X.509 certificates
-        or raw binary files to be added to the signature database (db) when
-        creating a shielded instance from this image.
+        Comma-separated list of file paths that point to valid X.509
+        certificates or raw binary files. When you create a shielded VM from
+        this image, these certificates or files are added to the signature
+        database (db).
 
      --source-disk-zone=SOURCE_DISK_ZONE
         Zone of the source disk to operate on. If not specified and the

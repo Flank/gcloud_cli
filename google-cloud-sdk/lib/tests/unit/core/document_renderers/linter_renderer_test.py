@@ -23,9 +23,11 @@ from googlecloudsdk.core.document_renderers import linter_renderer
 from googlecloudsdk.core.document_renderers import render_document
 from tests.lib import parameterized
 from tests.lib.core.document_renderers import test_base
+import six
 
 
 class LinterRendererTests(test_base.Markdown, parameterized.TestCase):
+  test_linter_renderer = linter_renderer.LinterRenderer()
 
   def testGoodCommand(self):
     markdown = textwrap.dedent("""\
@@ -62,50 +64,7 @@ class LinterRendererTests(test_base.Markdown, parameterized.TestCase):
     meta_data = render_document.CommandMetaData(is_group=False)
     self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
 
-  def testNoSections(self):
-    markdown = textwrap.dedent("""\
-    """)
-    expected = textwrap.dedent("""\
-      # EXAMPLE_PRESENT_CHECK FAILED: You have not included an example in the"""
-                               """ Examples section.
-    """)
-    meta_data = render_document.CommandMetaData(is_group=False)
-    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
-
-  def testNoExampleAlpha(self):
-    markdown = textwrap.dedent("""\
-      # NAME
-
-      gcloud alpha fake command - fake alpha command to test not throwing """
-                               """examples error
-    """)
-    expected = textwrap.dedent("""\
-      # NAME_PRONOUN_CHECK SUCCESS
-      # NAME_DESCRIPTION_CHECK SUCCESS
-      # NAME_LENGTH_CHECK SUCCESS
-      There are no errors for the NAME section.
-    """)
-    meta_data = render_document.CommandMetaData(is_group=False)
-    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
-
-  def testNoExampleNotAlpha(self):
-    markdown = textwrap.dedent("""\
-      # NAME
-
-      gcloud fake command - fake command to test throwing examples error
-    """)
-    expected = textwrap.dedent("""\
-      # NAME_PRONOUN_CHECK SUCCESS
-      # NAME_DESCRIPTION_CHECK SUCCESS
-      # NAME_LENGTH_CHECK SUCCESS
-      There are no errors for the NAME section.
-      # EXAMPLE_PRESENT_CHECK FAILED: You have not included an example in the"""
-                               """ Examples section.
-    """)
-    meta_data = render_document.CommandMetaData(is_group=False)
-    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
-
-  def testExampleCheckNotAlphaMultilineCommandName(self):
+  def testMultilineCommandNameExampleCheck(self):
     markdown = textwrap.dedent("""\
       # NAME
 
@@ -135,37 +94,22 @@ class LinterRendererTests(test_base.Markdown, parameterized.TestCase):
     meta_data = render_document.CommandMetaData(is_group=False)
     self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
 
-  def testNameTooLong(self):
-    test_linter_renderer = linter_renderer.LinterRenderer()
-    markdown = textwrap.dedent("""\
-      # NAME
-
-      gcloud info - display information about the current gcloud environment and
-      this is making the name section description way too long and over the """
-                               """max length allowed
-    """)
-    expected = textwrap.dedent("""\
-      # NAME_PRONOUN_CHECK SUCCESS
-      # NAME_DESCRIPTION_CHECK SUCCESS
-      # NAME_LENGTH_CHECK FAILED: Please shorten the name section description"""
-                               ' to less than ' +
-                               str(test_linter_renderer._NAME_WORD_LIMIT) +
-                               """ words.
-    """)
-    meta_data = render_document.CommandMetaData(is_group=True)
-    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
-
-  def testNoNameExplanation(self):
-    markdown = textwrap.dedent("""\
-      # NAME
-      gcloud fake command -
-    """)
-    expected = textwrap.dedent("""\
-      # NAME_PRONOUN_CHECK SUCCESS
-      # NAME_DESCRIPTION_CHECK FAILED: Please add an explanation for the """
-                               """command.
-      # NAME_LENGTH_CHECK SUCCESS
-    """)
+  @parameterized.named_parameters(
+      ('name too long',
+       '# NAME\n\ngcloud info - display information about the current gcloud '
+       'environment and this is making the name section description way too '
+       'long and over the max length allowed',
+       '# NAME_PRONOUN_CHECK SUCCESS\n# NAME_DESCRIPTION_CHECK SUCCESS\n'
+       '# NAME_LENGTH_CHECK FAILED: Please shorten the name section description'
+       ' to less than'
+       ' ' + six.text_type(test_linter_renderer._NAME_WORD_LIMIT) + ' words.\n'
+      ),
+      ('no name explanation',
+       '# NAME\ngcloud fake command -\n',
+       '# NAME_PRONOUN_CHECK SUCCESS\n# NAME_DESCRIPTION_CHECK FAILED: Please '
+       'add an explanation for the command.\n# NAME_LENGTH_CHECK SUCCESS\n')
+  )
+  def testNameSection(self, markdown, expected):
     meta_data = render_document.CommandMetaData(is_group=True)
     self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
 
@@ -174,11 +118,11 @@ class LinterRendererTests(test_base.Markdown, parameterized.TestCase):
       ('Repeated', 'he he', 'he'),
       ('Newline', 'Me\n', 'me'),
       ('Multiple pronouns', 'me he we', 'he\nme\nwe')
-      )
+  )
   def testPersonalPronoun(self, help_text, pronouns):
     markdown = textwrap.dedent("""\
       # NAME
-      gcloud fake command - this is a brief summary
+      gcloud fake command group - this is a brief summary
 
       # DESCRIPTION
       this is the description section that has personal pronouns..."""
@@ -345,10 +289,47 @@ class LinterRendererTests(test_base.Markdown, parameterized.TestCase):
       There are no errors for the NAME section.
       # DESCRIPTION_PRONOUN_CHECK SUCCESS
       There are no errors for the DESCRIPTION section.
-      # EXAMPLE_PRESENT_CHECK FAILED: You have not included an example in the"""
-                               """ Examples section.
     """)
-    meta_data = render_document.CommandMetaData(is_group=False)
+    meta_data = render_document.CommandMetaData(is_group=True)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
+
+  @parameterized.named_parameters(
+      ('topic command no example',
+       '# NAME\ngcloud topic fake topic to describe - short description for the'
+       ' fake idea.\n',
+       '# NAME_PRONOUN_CHECK SUCCESS\n# NAME_DESCRIPTION_CHECK'
+       ' SUCCESS\n# NAME_LENGTH_CHECK SUCCESS\nThere are no errors for the NAME'
+       ' section.\n',
+       False),
+      ('alpha no example',
+       '# NAME\n\ngcloud alpha fake command - fake alpha command to test not '
+       'throwing examples error',
+       '# NAME_PRONOUN_CHECK SUCCESS\n# NAME_DESCRIPTION_CHECK SUCCESS\n'
+       '# NAME_LENGTH_CHECK SUCCESS\nThere are no errors for the NAME '
+       'section.\n',
+       False),
+      ('no sections', '',
+       '# EXAMPLE_PRESENT_CHECK FAILED: You have not included an example in '
+       'the Examples section.\n',
+       False),
+      ('GA no example',
+       '# NAME\ngcloud fake command - fake command to test throwing examples '
+       'error',
+       '# NAME_PRONOUN_CHECK SUCCESS\n# NAME_DESCRIPTION_CHECK SUCCESS\n'
+       '# NAME_LENGTH_CHECK SUCCESS\nThere are no errors for the NAME section.'
+       '\n# EXAMPLE_PRESENT_CHECK FAILED: You have not included an example in '
+       'the Examples section.\n',
+       False),
+      ('GA command group no example',
+       '# NAME\ngcloud fake command group - short description of group.',
+       '# NAME_PRONOUN_CHECK SUCCESS\n# NAME_DESCRIPTION_CHECK SUCCESS\n'
+       '# NAME_LENGTH_CHECK SUCCESS\nThere are no errors for the NAME '
+       'section.\n',
+       True),
+  )
+
+  def testNoExamples(self, markdown, expected, is_group):
+    meta_data = render_document.CommandMetaData(is_group=is_group)
     self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
 
 

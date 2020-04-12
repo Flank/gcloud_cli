@@ -6,8 +6,13 @@ SYNOPSIS
     gcloud beta compute firewall-rules COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) List, create, update, and delete Google Compute Engine firewall
-    rules.
+    (BETA) Read and manipulate VPC firewall rules.
+
+    For more information about firewall rules, see the firewall rules
+    documentation (https://cloud.google.com/vpc/docs/firewalls).
+
+    See also: Firewall rules API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/firewalls).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

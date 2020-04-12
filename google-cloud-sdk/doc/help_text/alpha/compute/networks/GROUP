@@ -1,12 +1,18 @@
 NAME
-    gcloud alpha compute networks - list, create, and delete Google Compute
-        Engine networks
+    gcloud alpha compute networks - list, create, and delete Compute Engine
+        networks
 
 SYNOPSIS
     gcloud alpha compute networks GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List, create, and delete Google Compute Engine networks.
+    (ALPHA) Read and manipulate VPC networks.
+
+    For more information about networks, see the networks documentation
+    (https://cloud.google.com/vpc/docs/vpc).
+
+    See also: Networks API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/networks).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,11 +26,11 @@ GROUPS
     GROUP is one of the following:
 
      peerings
-        (ALPHA) List, create, delete, and update Google Compute Engine network
-        peerings.
+        (ALPHA) List, create, delete, and update VPC Network Peering.
 
      subnets
-        (ALPHA) List, describe, and delete Google Compute Engine subnetworks.
+        (ALPHA) List, describe, and delete, and update Compute Engine
+        subnetworks.
 
 COMMANDS
     COMMAND is one of the following:

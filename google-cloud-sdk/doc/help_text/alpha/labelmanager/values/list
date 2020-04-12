@@ -3,7 +3,7 @@ NAME
         specified parent LabelKey
 
 SYNOPSIS
-    gcloud alpha labelmanager values list
+    gcloud alpha labelmanager values list [--show-deleted=SHOW_DELETED]
         [--label-key=LABEL_KEY : --label-parent=LABEL_PARENT]
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
@@ -13,6 +13,9 @@ DESCRIPTION
     name along with the label-parent.
 
 FLAGS
+     --show-deleted=SHOW_DELETED
+        Show deleted resources when listing.
+
      LabelKey.
 
        --label-key=LABEL_KEY

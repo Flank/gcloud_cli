@@ -30,8 +30,8 @@ summary:
   - stderr: |-
       Starting Cloud Build to build and deploy to the target Google Kubernetes Engine cluster...
 
-      Created \[https://cloudbuild.googleapis.com/v1/projects/$$project$$/builds/.*\].
-      Logs are available at \[https://console.cloud.google.com/gcr/builds/.*?project=.*\].
+      Created \[https://cloudbuild.googleapis.com/.*$$project$$/.+\].
+      Logs are available at \[https://console.cloud.google.com/.+\].
       $
   - stdout: |-
       .*DONE
@@ -69,7 +69,6 @@ summary:
         The following clusters will be deleted.
          - [$$cluster$$] in [$$location$$]
     - input: y
-
 actions:
 - define_reference:
     reference: project
@@ -200,6 +199,8 @@ actions:
                 - --output=output
                 - --annotation=gcb-build-id=$BUILD_ID,$_K8S_ANNOTATIONS
                 - --expose=$_EXPOSE_PORT
+                - --create-application-cr
+                - --links="Build details=https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID"
                 id: Prepare deploy
                 name: gcr.io/cloud-builders/gke-deploy
               - args:
@@ -276,6 +277,8 @@ actions:
                   - --output=output
                   - --annotation=gcb-build-id=a186b89c-53b7-47ad-940a-cc28cb3b4b00,
                   - --expose=80
+                  - --create-application-cr
+                  - --links="Build details=https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID"
                   id: Prepare deploy
                 - name: gcr.io/cloud-builders/gsutil
                   args:
@@ -370,6 +373,8 @@ actions:
               - --output=output
               - --annotation=gcb-build-id=$BUILD_ID
               - --expose=$_EXPOSE_PORT
+              - --create-application-cr
+              - --links="Build details=https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID"
               id: Prepare deploy
               name: gcr.io/cloud-builders/gke-deploy
             - args:

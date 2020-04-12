@@ -77,9 +77,7 @@ EXAMPLES
             --instance=example-instance
 
 NOTES
-    This command is currently in BETA and may change without notice. These
-    variants are also available:
-
-        $ gcloud spanner backups get-iam-policy
-        $ gcloud alpha spanner backups get-iam-policy
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
 

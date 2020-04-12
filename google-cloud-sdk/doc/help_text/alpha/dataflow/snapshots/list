@@ -3,20 +3,20 @@ NAME
         a project in the specified region, optionally filtered by job ID
 
 SYNOPSIS
-    gcloud alpha dataflow snapshots list [--job-id=JOB_ID] [--region=REGION_ID]
+    gcloud alpha dataflow snapshots list --region=REGION_ID [--job-id=JOB_ID]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) List all Cloud Dataflow snapshots in a project in the specified
     region, optionally filtered by job ID.
 
-FLAGS
+REQUIRED FLAGS
+     --region=REGION_ID
+        The region ID of the snapshot and job's regional endpoint.
+
+OPTIONAL FLAGS
      --job-id=JOB_ID
         The job ID to use to filter the snapshots list.
-
-     --region=REGION_ID
-        The region ID of the snapshot and job's regional endpoint. Defaults to
-        'us-central1'.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -26,10 +26,21 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To list all Cloud Dataflow snapshots in the us-central1 region, run:
+
+        $ gcloud alpha dataflow snapshots list --region=us-central1
+
+    To list all Cloud Dataflow snapshots for a job, run:
+
+        $ gcloud alpha dataflow snapshots list --job-id=JOB_ID \
+            --region=JOB_REGION
+
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta dataflow snapshots list
 

@@ -7,7 +7,14 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Create or manipulate partner interconnect attachments.
+    Create or manipulate Partner Interconnect attachments.
+
+    For more information about interconnect attachments for Partner
+    Interconnect, see the documentation for Partner interconnect attachments
+    (https://cloud.google.com/interconnect/docs/how-to/dedicated/creating-vlan-attachments).
+
+    See also: Interconnect attachments API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/interconnectAttachments).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

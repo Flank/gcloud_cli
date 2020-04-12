@@ -82,17 +82,16 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.StartDictPatch('os.environ', {'DISPLAY': ':1'})
 
   def GetFakeCred(self, account):
-    cred_mock = mock.MagicMock()
-    cred_mock.id_token = {'email': account}
-    cred_mock.access_token = ''
-    cred_mock.client_id = ''
-    cred_mock.client_secret = ''
-    cred_mock.refresh_token = ''
-    cred_mock.token_expiry = ''
-    cred_mock.token_uri = ''
-    cred_mock.user_agent = ''
-    cred_mock.revoke_uri = ''
-    return cred_mock
+    return client.OAuth2Credentials(
+        id_token={'email': account},
+        access_token='',
+        client_id='',
+        client_secret='',
+        refresh_token='',
+        token_expiry='',
+        token_uri='',
+        user_agent=''
+    )
 
   def Login(self, more_args=''):
     return self.Run('beta auth application-default login {more_args}'.format(

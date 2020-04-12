@@ -25,6 +25,9 @@ COMMANDS
      pig
         Add a Pig job to the workflow template.
 
+     presto
+        Add a Presto job to the workflow template.
+
      pyspark
         Add a PySpark job to the workflow template.
 

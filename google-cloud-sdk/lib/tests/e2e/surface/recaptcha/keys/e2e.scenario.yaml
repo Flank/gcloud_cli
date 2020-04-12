@@ -34,7 +34,61 @@ summary:
       Listed 0 items.
 - execute:
   - command: |
-      recaptcha keys create --labels=foo=bar --display-name testKey --web --allow-all-domains --allow-amp-traffic --integration-type=SCORE
+      recaptcha keys create --labels="foo=bar,cleanup=$$recaptcha-key-test-ios$$"
+      --display-name testKeyiOS --ios --bundle-ids=com.test.google
+  - stderr: |
+      Created [$$site-key-ios$$].
+- execute:
+  - command: |
+      recaptcha keys update $$site-key-ios$$ --labels=foo=baz,cleanup=$$recaptcha-key-test-ios$$ --display-name updated-key --ios --bundle-ids=com.userguard.google.test
+  - stderr: |
+      Updated key [$$site-key-ios$$].
+- execute:
+  - command: |
+      recaptcha keys list --filter=name:$$site-key-ios$$
+  - stdout: |
+      SITE_KEY                                  DISPLAY_NAME
+      $$site-key-ios$$  updated-key
+- execute:
+  - command: |
+      recaptcha keys delete $$site-key-ios$$ -q
+  - stderr: |
+      Deleted key [$$site-key-ios$$].
+- execute:
+  - command: |
+      recaptcha keys list --filter=name:$$site-key-ios$$
+  - stderr: |
+      Listed 0 items.
+- execute:
+  - command: |
+      recaptcha keys create --labels="foo=bar,cleanup=$$recaptcha-key-test-android$$"
+      --display-name testKeyAndroid --android --package-names=com.test.google
+  - stderr: |
+      Created [$$site-key-android$$].
+- execute:
+  - command: |
+      recaptcha keys update $$site-key-android$$ --labels=foo=baz,cleanup=$$recaptcha-key-test-android$$ --android --display-name="WaitingForLove" --package-names=com.userguard.test
+  - stderr: |
+      Updated key [$$site-key-android$$].
+- execute:
+  - command: |
+      recaptcha keys list --filter=name:$$site-key-android$$
+  - stdout: |
+      SITE_KEY                                  DISPLAY_NAME
+      $$site-key-android$$  WaitingForLove
+- execute:
+  - command: |
+      recaptcha keys delete $$site-key-android$$ -q
+  - stderr: |
+      Deleted key [$$site-key-android$$].
+- execute:
+  - command: |
+      recaptcha keys list --filter=name:$$site-key-android$$
+  - stderr: |
+      Listed 0 items.
+- execute:
+  - command: |
+      recaptcha keys create --labels="foo=bar,cleanup=$$recaptcha-key-test-all-domains$$" --display-name testKey --web --allow-all-domains --allow-amp-traffic --integration-type=SCORE
   - stderr: |
       Created [$$site-key-all-domains$$].
 - execute:
@@ -56,38 +110,18 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '350'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            projectNumber: '462803083913'
-            projectId: cloud-sdk-integration-testing
-            lifecycleState: ACTIVE
-            name: Cloud SDK Integration Testing
-            labels:
-              service-account-downloaded-notification-opt-out: 'true'
-            createTime: '2014-09-30T14:51:18.935Z'
-            parent:
-              type: folder
-              id: '396521612403'
-    - api_call:
-        expect_request:
-          uri: https://recaptchaenterprise.googleapis.com/v1/projects/462803083913/keys?alt=json
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys?alt=json
           method: POST
           headers: {}
           body:
             json:
               displayName: testKey
               labels:
+                cleanup: $$recaptcha-key-test$$
                 foo: bar
               webSettings:
+                allowAllDomains: false
+                allowAmpTraffic: false
                 allowedDomains:
                 - google.com
                 challengeSecurityPreference: BALANCE
@@ -107,7 +141,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/462803083913/keys/6LeIzt4UAAAAACopspcbMFkNIIcis7AMSf3jDZcq
+            name: projects/462803083913/keys/6LcSl-QUAAAAAF-GU3G67FIgAFWGxrrZ2Qb6jfFV
             displayName: testKey
             webSettings:
               allowAllDomains: false
@@ -117,8 +151,8 @@ actions:
               integrationType: CHECKBOX
               challengeSecurityPreference: BALANCE
             labels:
-              foo: bar
               cleanup: $$recaptcha-key-test$$
+              foo: bar
     - expect_stderr: |
         Created [$$site-key$$].
     - expect_exit:
@@ -130,38 +164,17 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '350'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            projectNumber: '462803083913'
-            projectId: cloud-sdk-integration-testing
-            lifecycleState: ACTIVE
-            name: Cloud SDK Integration Testing
-            labels:
-              service-account-downloaded-notification-opt-out: 'true'
-            createTime: '2014-09-30T14:51:18.935Z'
-            parent:
-              type: folder
-              id: '396521612403'
-    - api_call:
-        expect_request:
-          uri: https://recaptchaenterprise.googleapis.com/v1/projects/462803083913/keys/$$site-key$$?alt=json&updateMask=displayName%2Clabels%2CwebSettings.allowAmpTraffic%2CwebSettings.allowedDomains%2CwebSettings.challengeSecurityPreference
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys/$$site-key$$?alt=json&updateMask=displayName%2Clabels%2CwebSettings.allowAmpTraffic%2CwebSettings.allowedDomains%2CwebSettings.challengeSecurityPreference
           method: PATCH
           headers: {}
           body:
             json:
               displayName: updated-key
               labels:
+                cleanup: $$recaptcha-key-test$$
                 foo: baz
               webSettings:
+                allowAllDomains: false
                 allowAmpTraffic: true
                 allowedDomains:
                 - google.com
@@ -173,7 +186,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/462803083913/keys/6LeIzt4UAAAAACopspcbMFkNIIcis7AMSf3jDZcq
+            name: projects/462803083913/keys/6LcSl-QUAAAAAF-GU3G67FIgAFWGxrrZ2Qb6jfFV
             displayName: updated-key
             webSettings:
               allowAllDomains: false
@@ -185,7 +198,7 @@ actions:
             labels:
               foo: baz
               cleanup: $$recaptcha-key-test$$
-            createTime: '2020-03-05T16:05:18Z'
+            createTime: '2020-03-27T17:59:21Z'
     - expect_stderr: |
         Updated key [$$site-key$$].
     - expect_stdout: |
@@ -198,42 +211,19 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
             cache-control: private
-            content-length: '350'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            projectNumber: '462803083913'
-            projectId: cloud-sdk-integration-testing
-            lifecycleState: ACTIVE
-            name: Cloud SDK Integration Testing
-            labels:
-              service-account-downloaded-notification-opt-out: 'true'
-            createTime: '2014-09-30T14:51:18.935Z'
-            parent:
-              type: folder
-              id: '396521612403'
-    - api_call:
-        expect_request:
-          uri: https://recaptchaenterprise.googleapis.com/v1/projects/462803083913/keys?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '581'
+            content-length: '982'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             keys:
-            - name: projects/462803083913/keys/6LeIzt4UAAAAACopspcbMFkNIIcis7AMSf3jDZcq
+            - name: projects/462803083913/keys/6LcSl-QUAAAAAF-GU3G67FIgAFWGxrrZ2Qb6jfFV
               displayName: updated-key
               webSettings:
                 allowAllDomains: false
@@ -243,9 +233,18 @@ actions:
                 integrationType: CHECKBOX
                 challengeSecurityPreference: USABILITY
               labels:
-                cleanup: $$recaptcha-key-test$$
                 foo: baz
-              createTime: '2020-03-05T16:05:18Z'
+                cleanup: $$recaptcha-key-test$$
+              createTime: '2020-03-27T17:59:21Z'
+            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
+              displayName: updated-key
+              iosSettings:
+                allowedBundleIds:
+                - com.userguard.google.test
+              labels:
+                foo: baz
+                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
+              createTime: '2020-03-27T17:42:53Z'
             nextPageToken: ''
     - expect_stdout: |
         SITE_KEY                                  DISPLAY_NAME
@@ -305,49 +304,166 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
             cache-control: private
-            content-length: '350'
+            content-length: '443'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            projectNumber: '462803083913'
-            projectId: cloud-sdk-integration-testing
-            lifecycleState: ACTIVE
-            name: Cloud SDK Integration Testing
-            labels:
-              service-account-downloaded-notification-opt-out: 'true'
-            createTime: '2014-09-30T14:51:18.935Z'
-            parent:
-              type: folder
-              id: '396521612403'
-    - api_call:
-        expect_request:
-          uri: https://recaptchaenterprise.googleapis.com/v1/projects/462803083913/keys?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '40'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            keys: []
+            keys:
+            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
+              displayName: updated-key
+              iosSettings:
+                allowedBundleIds:
+                - com.userguard.google.test
+              labels:
+                foo: baz
+                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
+              createTime: '2020-03-27T17:42:53Z'
             nextPageToken: ''
     - expect_stderr: |
         Listed 0 items.
     - expect_exit:
         code: 0
+- generate_resource_id:
+    reference: recaptcha-key-test-ios
+    prefix: recaptcha-key-test-ios
 - execute_command:
     command: |
-      recaptcha keys create --labels=foo=bar --display-name testKey --web --allow-all-domains --allow-amp-traffic --integration-type=SCORE
+      recaptcha keys create --labels="foo=bar,cleanup=$$recaptcha-key-test-ios$$"
+      --display-name testKeyiOS --ios --bundle-ids=com.test.google
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              displayName: testKeyiOS
+              iosSettings:
+                allowedBundleIds:
+                - com.test.google
+              labels:
+                cleanup: $$recaptcha-key-test-ios$$
+                foo: bar
+        expect_response:
+          extract_references:
+          - field: name
+            reference: site-key-ios
+            modifiers:
+              basename: true
+          body:
+            json: {}
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '293'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/462803083913/keys/6LdslOQUAAAAAC0VWIlYr0YyYRXALg7UrG__y3BJ
+            displayName: testKeyiOS
+            iosSettings:
+              allowedBundleIds:
+              - com.test.google
+            labels:
+              cleanup: $$recaptcha-key-test-ios$$
+              foo: bar
+    - expect_stderr: |
+        Created [$$site-key-ios$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys update $$site-key-ios$$ --labels=foo=baz,cleanup=$$recaptcha-key-test-ios$$ --display-name updated-key --ios --bundle-ids=com.userguard.google.test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys/$$site-key-ios$$?alt=json&updateMask=displayName%2CiosSettings.allowedBundleIds%2Clabels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              displayName: updated-key
+              iosSettings:
+                allowedBundleIds:
+                - com.userguard.google.test
+              labels:
+                cleanup: $$recaptcha-key-test-ios$$
+                foo: baz
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '344'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/462803083913/keys/6LdslOQUAAAAAC0VWIlYr0YyYRXALg7UrG__y3BJ
+            displayName: updated-key
+            iosSettings:
+              allowedBundleIds:
+              - com.userguard.google.test
+            labels:
+              cleanup: $$recaptcha-key-test-ios$$
+              foo: baz
+            createTime: '2020-03-27T17:59:23Z'
+    - expect_stderr: |
+        Updated key [$$site-key-ios$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys list --filter=name:$$site-key-ios$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '844'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            keys:
+            - name: projects/462803083913/keys/6LdslOQUAAAAAC0VWIlYr0YyYRXALg7UrG__y3BJ
+              displayName: updated-key
+              iosSettings:
+                allowedBundleIds:
+                - com.userguard.google.test
+              labels:
+                cleanup: $$recaptcha-key-test-ios$$
+                foo: baz
+              createTime: '2020-03-27T17:59:23Z'
+            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
+              displayName: updated-key
+              iosSettings:
+                allowedBundleIds:
+                - com.userguard.google.test
+              labels:
+                foo: baz
+                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
+              createTime: '2020-03-27T17:42:53Z'
+            nextPageToken: ''
+    - expect_stdout: |
+        SITE_KEY                                  DISPLAY_NAME
+        $$site-key-ios$$  updated-key
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys delete $$site-key-ios$$ -q
+    cleanup_for: recaptcha-key-test-ios
+    validation_only: true
     events:
     - api_call:
         expect_request:
@@ -374,15 +490,247 @@ actions:
               id: '396521612403'
     - api_call:
         expect_request:
-          uri: https://recaptchaenterprise.googleapis.com/v1/projects/462803083913/keys?alt=json
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/462803083913/keys/$$site-key$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Deleted key [$$site-key-ios$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys list --filter=name:$$site-key-ios$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '443'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            keys:
+            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
+              displayName: updated-key
+              iosSettings:
+                allowedBundleIds:
+                - com.userguard.google.test
+              labels:
+                foo: baz
+                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
+              createTime: '2020-03-27T17:42:53Z'
+            nextPageToken: ''
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0
+- generate_resource_id:
+    reference: recaptcha-key-test-android
+    prefix: recaptcha-key-test-android
+- execute_command:
+    command: |
+      recaptcha keys create --labels="foo=bar,cleanup=$$recaptcha-key-test-android$$"
+      --display-name testKeyAndroid --android --package-names=com.test.google
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              androidSettings:
+                allowedPackageNames:
+                - com.test.google
+              displayName: testKeyAndroid
+              labels:
+                cleanup: $$recaptcha-key-test-android$$
+                foo: bar
+        expect_response:
+          extract_references:
+          - field: name
+            reference: site-key-android
+            modifiers:
+              basename: true
+          body:
+            json: {}
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '308'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/462803083913/keys/6LdtlOQUAAAAAGZrD6Nbvf3rLlFlO6tw_0V_MEhi
+            displayName: testKeyAndroid
+            androidSettings:
+              allowedPackageNames:
+              - com.test.google
+            labels:
+              cleanup: $$recaptcha-key-test-android$$
+              foo: bar
+    - expect_stderr: |
+        Created [$$site-key-android$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys update $$site-key-android$$ --labels=foo=baz,cleanup=$$recaptcha-key-test-android$$ --android --display-name="WaitingForLove" --package-names=com.userguard.test
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys/$$site-key-android$$?alt=json&updateMask=androidSettings.allowedPackageNames%2CdisplayName%2Clabels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              androidSettings:
+                allowedPackageNames:
+                - com.userguard.test
+              displayName: WaitingForLove
+              labels:
+                cleanup: $$recaptcha-key-test-android$$
+                foo: baz
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '351'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/462803083913/keys/6LdtlOQUAAAAAGZrD6Nbvf3rLlFlO6tw_0V_MEhi
+            displayName: WaitingForLove
+            androidSettings:
+              allowedPackageNames:
+              - com.userguard.test
+            labels:
+              foo: baz
+              cleanup: $$recaptcha-key-test-android$$
+            createTime: '2020-03-27T17:59:24Z'
+    - expect_stderr: |
+        Updated key [$$site-key-android$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys list --filter=name:$$site-key-android$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '851'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            keys:
+            - name: projects/462803083913/keys/6LdtlOQUAAAAAGZrD6Nbvf3rLlFlO6tw_0V_MEhi
+              displayName: WaitingForLove
+              androidSettings:
+                allowedPackageNames:
+                - com.userguard.test
+              labels:
+                cleanup: $$recaptcha-key-test-android$$
+                foo: baz
+              createTime: '2020-03-27T17:59:24Z'
+            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
+              displayName: updated-key
+              iosSettings:
+                allowedBundleIds:
+                - com.userguard.google.test
+              labels:
+                foo: baz
+                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
+              createTime: '2020-03-27T17:42:53Z'
+            nextPageToken: ''
+    - expect_stdout: |
+        SITE_KEY                                  DISPLAY_NAME
+        $$site-key-android$$  WaitingForLove
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys delete $$site-key-android$$ -q
+    cleanup_for: recaptcha-key-test-android
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted key [$$site-key-android$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      recaptcha keys list --filter=name:$$site-key-android$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '443'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            keys:
+            - name: projects/462803083913/keys/6LcyluQUAAAAAJTVqVOp2FMLwer8hDYZm5KQPUg3
+              displayName: updated-key
+              iosSettings:
+                allowedBundleIds:
+                - com.userguard.google.test
+              labels:
+                foo: baz
+                cleanup: recaptcha-key-test-ios-20200327-174253-8d1o
+              createTime: '2020-03-27T17:42:53Z'
+            nextPageToken: ''
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: recaptcha-key-test-all-domains
+    prefix: recaptcha-key-test-all-domains
+- execute_command:
+    command: |
+      recaptcha keys create --labels="foo=bar,cleanup=$$recaptcha-key-test-all-domains$$" --display-name testKey --web --allow-all-domains --allow-amp-traffic --integration-type=SCORE
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys?alt=json
           method: POST
           headers: {}
           body:
             json:
               displayName: testKey
               labels:
+                cleanup: $$recaptcha-key-test-all-domains$$
                 foo: bar
               webSettings:
+                allowAllDomains: true
+                allowAmpTraffic: true
                 integrationType: SCORE
         expect_response:
           extract_references:
@@ -395,11 +743,11 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '367'
+            content-length: '437'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/462803083913/keys/6Le6AN8UAAAAADYx7-XxGhhpGv31bwwXdq6blmsc
+            name: projects/462803083913/keys/6LcGmeQUAAAAANlkwlr4QW7Qa1lIVy4LmTLdmofJ
             displayName: testKey
             webSettings:
               allowAllDomains: true
@@ -409,6 +757,7 @@ actions:
               challengeSecurityPreference: CHALLENGE_SECURITY_PREFERENCE_UNSPECIFIED
             labels:
               foo: bar
+              cleanup: $$recaptcha-key-test-all-domains$$
     - expect_stderr: |
         Created [$$site-key-all-domains$$].
     - expect_exit:
@@ -416,36 +765,15 @@ actions:
 - execute_command:
     command: |
       recaptcha keys delete $$site-key-all-domains$$
+    cleanup_for: recaptcha-key-test-all-domains
+    validation_only: true
     events:
     - expect_prompt_continue:
         message: You are about to delete key [$$site-key-all-domains$$]
         user_input: y
     - api_call:
         expect_request:
-          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '350'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            projectNumber: '462803083913'
-            projectId: cloud-sdk-integration-testing
-            lifecycleState: ACTIVE
-            name: Cloud SDK Integration Testing
-            labels:
-              service-account-downloaded-notification-opt-out: 'true'
-            createTime: '2014-09-30T14:51:18.935Z'
-            parent:
-              type: folder
-              id: '396521612403'
-    - api_call:
-        expect_request:
-          uri: https://recaptchaenterprise.googleapis.com/v1/projects/462803083913/keys/$$site-key-all-domains$$?alt=json
+          uri: https://recaptchaenterprise.googleapis.com/v1/projects/cloud-sdk-integration-testing/keys/$$site-key-all-domains$$?alt=json
           method: DELETE
           headers: {}
           body: null

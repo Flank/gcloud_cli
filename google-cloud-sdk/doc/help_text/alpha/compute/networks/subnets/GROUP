@@ -1,12 +1,18 @@
 NAME
-    gcloud alpha compute networks subnets - list, describe, and delete Google
-        Compute Engine subnetworks
+    gcloud alpha compute networks subnets - list, describe, and delete, and
+        update Compute Engine subnetworks
 
 SYNOPSIS
     gcloud alpha compute networks subnets COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List, describe, and delete Google Compute Engine subnetworks.
+    (ALPHA) Read and manipulate VPC subnetworks.
+
+    For more information about VPC, see the VPC documentation
+    (https://cloud.google.com/vpc/docs/vpc).
+
+    See also: Subnetworks API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/subnetworks).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

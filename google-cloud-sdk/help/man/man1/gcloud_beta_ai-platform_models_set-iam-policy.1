@@ -11,7 +11,7 @@ gcloud beta ai\-platform models set\-iam\-policy \- set the IAM policy for a mod
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ai\-platform models set\-iam\-policy\fR \fIMODEL\fR \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ai\-platform models set\-iam\-policy\fR \fIMODEL\fR \fIPOLICY_FILE\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -51,6 +51,22 @@ Path to a local JSON or YAML formatted file containing a valid policy.
 The output of the \f5get\-iam\-policy\fR command is a valid file, as is any JSON
 or YAML file conforming to the structure of a Policy
 (https://cloud.google.com/iam/reference/rest/v1/Policy).
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Google Cloud region of the regional endpoint to use for this command. If
+unspecified, the command uses the global endpoint of the AI Platform Training
+and Prediction API.
+
+Learn more about regional endpoints and see a list of available regions:
+https://cloud.google.com/ai\-platform/prediction/docs/regional\-endpoints
 
 
 .RE

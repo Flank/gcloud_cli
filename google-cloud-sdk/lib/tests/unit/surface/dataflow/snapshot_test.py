@@ -25,10 +25,13 @@ from tests.lib.surface.dataflow import base
 
 
 class SnapshotTest(base.DataflowMockingTestBase,
-                   sdk_test_base.WithOutputCapture):
+                   sdk_test_base.WithOutputCapture): pass
+
+
+class SnapshotTestBeta(SnapshotTest):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testCreateSnapshot(self):
     self.MockCreateSnapshot(
@@ -49,6 +52,12 @@ class SnapshotTest(base.DataflowMockingTestBase,
     response = self.Run('dataflow snapshots list --job-id=job1'
                         ' --region=us-central1')
     self.assertEqual(response.snapshots[0].sourceJobId, 'job1')
+
+
+class SnapshotTestAlpha(SnapshotTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

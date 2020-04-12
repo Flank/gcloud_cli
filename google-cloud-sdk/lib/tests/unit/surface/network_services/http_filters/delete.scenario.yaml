@@ -1,0 +1,34 @@
+title: network-services http-filters delete tests
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: network-services http-filters delete myhttpfilter --location=global
+  - prompt:
+    - message: You are about to delete http filter [myhttpfilter]
+    - input: y
+  - stderr: |
+      Deleted http filter [myhttpfilter].
+actions:
+- execute_command:
+    command: network-services http-filters delete myhttpfilter --location=global
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete http filter [myhttpfilter]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://networkservices.googleapis.com/v1alpha1/projects/fake-project/locations/global/httpFilters/myhttpfilter?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+            }
+    - expect_stderr: |
+        Deleted http filter [myhttpfilter].
+    - expect_exit:
+        code: 0

@@ -27,24 +27,25 @@ FLAGS
         be identical to those in the previous call.
 
      --query=QUERY
-        The query statement.
+        The query statement. To learn how to construct a query, see
+        https://cloud.google.com/asset-inventory/docs/searching-iam-policies#how_to_construct_a_query.
 
         Examples:
-        * To find all Cloud IAM policies in your organization that contain
-          amy@mycompany.com: policy:"amy@mydomain.com"
-        * To find all Cloud IAM policies in your organization that contain
-          owner role: policy:"roles/owner"
-        * To find all Cloud IAM policies in your organization which have
-          myuser@mycompany.com in the owner role: policy:("roles/owner"
+        * To find all Cloud IAM policy bindings in your organization that
+          contain amy@mycompany.com: policy : "amy@mydomain.com"
+        * To find all Cloud IAM policy bindings in your organization that
+          contain the Owner role: policy : "roles/owner"
+        * To find all Cloud IAM policy bindings in your organization that
+          have myuser@mycompany.com in the Owner role: policy : ("roles/owner"
           "myuser@mycompany.com")
-        * To find all Cloud IAM policies in your organization which have
-          myuser@mycompany.com in the owner role or youruser@mycompany.com in
-          the viewer role: policy:(("roles/owner" "myuser@mycompany.com") OR
-          ("roles/viewer" "youruser@mycompany.com"))
-        * To find all Cloud IAM policies that are set on a resource:
-          resource: "projects/123"
-        * To find all Cloud IAM policies of resources that match a query.
-          resource: "proj"
+        * To find all Cloud IAM policy bindings in your organization that
+          have myuser@mycompany.com in the owner role or youruser@mycompany.com
+          in the Viewer role: policy : (("roles/owner" "myuser@mycompany.com")
+          OR ("roles/viewer" "youruser@mycompany.com"))
+        * To find all Cloud IAM policy bindings that are set on a resource:
+          resource : "projects/123"
+        * To find all Cloud IAM policy bindings that are set on resources
+          whose names contain substring "proj": resource : "*proj*"
 
      --scope=SCOPE
         The search result scope is limited within a project, folder, or
@@ -77,7 +78,8 @@ EXAMPLES
     cloudasset.assets.searchAllIamPolicies permission, run:
 
         $ gcloud beta asset search-all-iam-policies \
-          --scope='organizations/123' --query='policy:"amy@mydomain.com"'
+          --scope='organizations/123' \
+          --query='policy : "amy@mydomain.com"'
 
 NOTES
     This command is currently in BETA and may change without notice.

@@ -2039,21 +2039,10 @@ class ResourceTransformRealRegistryTest(test_case.Base):
   def testTransformRegistryCompute(self):
     transforms = resource_transform.GetTransforms('compute.instances')
     expected = [
-        'firewall_rule',
-        'image_alias',
-        'location',
-        'location_scope',
-        'machine_type',
-        'name',
-        'next_maintenance',
-        'operation_http_status',
-        'project',
-        'quota',
-        'scoped_suffixes',
-        'status',
-        'type_suffix',
-        'vpn_tunnel_gateway',
-        'zone'
+        'firewall_rule', 'image_alias', 'location', 'location_scope',
+        'machine_type', 'name', 'next_maintenance', 'operation_http_status',
+        'org_firewall_rule', 'project', 'quota', 'scoped_suffixes', 'status',
+        'type_suffix', 'vpn_tunnel_gateway', 'zone'
     ]
     self.assertEqual(expected, sorted(transforms.keys()))
 

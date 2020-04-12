@@ -7,6 +7,12 @@ SYNOPSIS
 DESCRIPTION
     (BETA) List, create, and delete Cloud TPUs.
 
+    For more information about Cloud TPUs, see the Cloud TPUs documentation
+    (https://cloud.google.com/tpu/docs/tpus).
+
+    See also: Cloud TPUs API
+    (https://cloud.google.com/tpu/docs/reference/rest/).
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,

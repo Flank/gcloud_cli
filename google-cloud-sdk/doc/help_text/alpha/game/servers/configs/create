@@ -47,9 +47,8 @@ REQUIRED FLAGS
         Path to a JSON or YAML file that contains fleet configs. The fleet spec
         field in configs file follows Agones Fleet custom resource. Please see
         https://github.com/googleforgames/agones/blob/master/examples/simple-udp/fleet.yaml
-        for example and
-        https://github.com/googleforgames/agones/blob/master/pkg/apis/agones/v1/fleet.go
-        for Fleet Spec definition.
+        for example and https://agones.dev/site/docs/reference/fleet/ for Fleet
+        Spec definition.
 
 OPTIONAL FLAGS
      --async
@@ -72,8 +71,7 @@ OPTIONAL FLAGS
         autoscaler spec field in configs file follows Agones Fleet Autoscaler
         custom resource. Please see
         https://github.com/googleforgames/agones/blob/master/examples/simple-udp/fleetautoscaler.yaml
-        for example and
-        https://github.com/googleforgames/agones/blob/master/pkg/apis/autoscaling/v1/fleetautoscaler.go
+        for example and https://agones.dev/site/docs/reference/fleetautoscaler/
         for Fleet Autoscaler Spec definition. Scaling config file can also
         specifies schedules. Contents of a sample yaml file:
 

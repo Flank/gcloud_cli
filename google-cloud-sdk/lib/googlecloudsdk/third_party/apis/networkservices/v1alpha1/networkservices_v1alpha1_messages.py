@@ -176,6 +176,8 @@ class EndpointConfigSelector(_messages.Message):
       the matched endpoints. Refer to Authorization. If this field is not
       specified, authorization is disabled(no authz checks) for this endpoint.
     createTime: Output only. The timestamp when the resource was created.
+    description: Optional. A free-text description of the resource. Max length
+      1024 characters.
     endpointMatcher: Required. A matcher that selects endpoints to which the
       policies should be applied.
     httpFilters: Optional. HTTP filters configuration for the endpoint.
@@ -231,13 +233,14 @@ class EndpointConfigSelector(_messages.Message):
   authentication = _messages.StringField(1)
   authorization = _messages.StringField(2)
   createTime = _messages.StringField(3)
-  endpointMatcher = _messages.MessageField('EndpointMatcher', 4)
-  httpFilters = _messages.MessageField('HttpFilters', 5)
-  labels = _messages.MessageField('LabelsValue', 6)
-  name = _messages.StringField(7)
-  trafficPortSelector = _messages.MessageField('TrafficPortSelector', 8)
-  type = _messages.EnumField('TypeValueValuesEnum', 9)
-  updateTime = _messages.StringField(10)
+  description = _messages.StringField(4)
+  endpointMatcher = _messages.MessageField('EndpointMatcher', 5)
+  httpFilters = _messages.MessageField('HttpFilters', 6)
+  labels = _messages.MessageField('LabelsValue', 7)
+  name = _messages.StringField(8)
+  trafficPortSelector = _messages.MessageField('TrafficPortSelector', 9)
+  type = _messages.EnumField('TypeValueValuesEnum', 10)
+  updateTime = _messages.StringField(11)
 
 
 class EndpointMatcher(_messages.Message):
@@ -304,6 +307,8 @@ class HttpFilter(_messages.Message):
       that the filter expects for its configuration. For example:
       'type.googleapis.com/envoy.config.wasm.v2.WasmService'.
     createTime: Output only. The timestamp when the resource was created.
+    description: Optional. A free-text description of the resource. Max length
+      1024 characters.
     filterName: Required. Name of the HTTP filter defined in the `config`
       field. It is used by the xDS API client to identify specific filter
       implementation the `config` must be applied to.  It is different from
@@ -343,10 +348,11 @@ class HttpFilter(_messages.Message):
   config = _messages.StringField(1)
   configTypeUrl = _messages.StringField(2)
   createTime = _messages.StringField(3)
-  filterName = _messages.StringField(4)
-  labels = _messages.MessageField('LabelsValue', 5)
-  name = _messages.StringField(6)
-  updateTime = _messages.StringField(7)
+  description = _messages.StringField(4)
+  filterName = _messages.StringField(5)
+  labels = _messages.MessageField('LabelsValue', 6)
+  name = _messages.StringField(7)
+  updateTime = _messages.StringField(8)
 
 
 class HttpFilters(_messages.Message):
@@ -371,30 +377,30 @@ class ListEndpointConfigSelectorsResponse(_messages.Message):
   r"""Response returned by the ListEndpointConfigSelectors method.
 
   Fields:
+    endpointConfigSelectors: List of EndpointConfigSelector resources.
     nextPageToken: If there might be more results than those appearing in this
       response, then `next_page_token` is included. To get the next set of
       results, call this method again using the value of `next_page_token` as
       `page_token`.
-    resources: List of EndpointConfigSelector resources.
   """
 
-  nextPageToken = _messages.StringField(1)
-  resources = _messages.MessageField('EndpointConfigSelector', 2, repeated=True)
+  endpointConfigSelectors = _messages.MessageField('EndpointConfigSelector', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
 
 
 class ListHttpFiltersResponse(_messages.Message):
   r"""Response returned by the ListHttpFilters method.
 
   Fields:
+    httpFilters: List of HttpFilter resources.
     nextPageToken: If there might be more results than those appearing in this
       response, then `next_page_token` is included. To get the next set of
       results, call this method again using the value of `next_page_token` as
       `page_token`.
-    resources: List of HttpFilter resources.
   """
 
-  nextPageToken = _messages.StringField(1)
-  resources = _messages.MessageField('HttpFilter', 2, repeated=True)
+  httpFilters = _messages.MessageField('HttpFilter', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
 
 
 class ListLocationsResponse(_messages.Message):
@@ -678,11 +684,11 @@ class NetworkservicesProjectsLocationsEndpointConfigSelectorsPatchRequest(_messa
     name: Required. Name of the EndpointConfigSelector resource. It matches
       pattern `projects/*/locations/global/endpointConfigSelectors/<endpoint_c
       onfig_selector>`.
-    updateMask: Field mask is used to specify the fields to be overwritten in
-      the EndpointConfigSelector resource by the update. The fields specified
-      in the update_mask are relative to the resource, not the full request. A
-      field will be overwritten if it is in the mask. If the user does not
-      provide a mask then all fields will be overwritten.
+    updateMask: Optional. Field mask is used to specify the fields to be
+      overwritten in the EndpointConfigSelector resource by the update. The
+      fields specified in the update_mask are relative to the resource, not
+      the full request. A field will be overwritten if it is in the mask. If
+      the user does not provide a mask then all fields will be overwritten.
   """
 
   endpointConfigSelector = _messages.MessageField('EndpointConfigSelector', 1)

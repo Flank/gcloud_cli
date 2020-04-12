@@ -11,7 +11,7 @@ gcloud beta ml\-engine operations wait \- wait for an AI Platform operation to c
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ml\-engine operations wait\fR \fIOPERATION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ml\-engine operations wait\fR \fIOPERATION\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -31,6 +31,22 @@ operation response).
 .TP 2m
 \fIOPERATION\fR
 Name of the operation.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Google Cloud region of the regional endpoint to use for this command. If
+unspecified, the command uses the global endpoint of the AI Platform Training
+and Prediction API.
+
+Learn more about regional endpoints and see a list of available regions:
+https://cloud.google.com/ai\-platform/prediction/docs/regional\-endpoints
 
 
 .RE

@@ -104,17 +104,16 @@ class DataprocIntegrationTestBase(
         '--network {network} '
         '--timeout {timeout} '
         '--zone {zone} '
-        '{args} '
-    ).format(
-        name=self.cluster_name,
-        master_machine=self.MASTER_MACHINE_TYPE,
-        worker_machine=self.WORKER_MACHINE_TYPE,
-        master_disk_size=self.MASTER_DISK_SIZE,
-        worker_disk_size=self.WORKER_DISK_SIZE,
-        network=self.NETWORK,
-        zone=self.zone,
-        timeout=self.CREATE_TIMEOUT,
-        args=args))
+        '{args} ').format(
+            name=self.cluster_name,
+            master_machine=self.MASTER_MACHINE_TYPE,
+            worker_machine=self.WORKER_MACHINE_TYPE,
+            master_disk_size=self.MASTER_DISK_SIZE,
+            worker_disk_size=self.WORKER_DISK_SIZE,
+            network=self.NETWORK,
+            zone=self.zone,
+            timeout=self.CREATE_TIMEOUT,
+            args=args))
     self.assertEqual(self.cluster_name, result.clusterName)
     self.assertEqual(self.messages.ClusterStatus.StateValueValuesEnum.RUNNING,
                      result.status.state)

@@ -22,6 +22,7 @@ import datetime
 import textwrap
 
 from googlecloudsdk.core.credentials import creds
+from googlecloudsdk.core.credentials import reauth
 from tests.lib import test_case
 
 from oauth2client import client
@@ -84,6 +85,13 @@ class CredentialsTestBase(test_case.Base):
           "type": "service_account_p12"
         }""")
 
+  GOOGLE_AUTH_USER_ACCOUNT_INFO = {
+      'refresh_token': 'file-token',
+      'client_id': 'foo.apps.googleusercontent.com',
+      'client_secret': 'file-secret',
+      'quota_project_id': 'quota-project-id'
+  }
+
   def MakeUserCredentials(self):
     """Returns a user credentials."""
     expiry = datetime.datetime(2001, 2, 3, 14, 15, 16)
@@ -120,6 +128,10 @@ class CredentialsTestBase(test_case.Base):
     credentials.expiry = expiry
     credentials.id_tokenb64 = 'id-token'
     return credentials
+
+  def MakeUserAccountCredentialsGoogleAuth(self):
+    return reauth.UserCredWithReauth.from_authorized_user_info(
+        self.GOOGLE_AUTH_USER_ACCOUNT_INFO, scopes=['scope1'])
 
   def MakeP12ServiceAccountCredentials(self):
     """Returns P12 service account credentials."""

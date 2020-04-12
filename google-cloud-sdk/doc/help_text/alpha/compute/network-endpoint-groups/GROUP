@@ -1,12 +1,19 @@
 NAME
-    gcloud alpha compute network-endpoint-groups - read and manipulate Google
-        Compute Engine network endpoint groups
+    gcloud alpha compute network-endpoint-groups - read and manipulate Compute
+        Engine network endpoint groups
 
 SYNOPSIS
     gcloud alpha compute network-endpoint-groups COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read and manipulate Google Compute Engine network endpoint groups.
+    (ALPHA) Read and manipulate network endpoint groups.
+
+    For more information about network endpoint groups, see the network
+    endpoint groups documentation
+    (https://cloud.google.com/load-balancing/docs/negs/).
+
+    See also: Network endpoint groups API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/networkEndpointGroups).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

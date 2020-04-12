@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import json
+
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.container.hub import agent_util
@@ -25,9 +27,12 @@ from googlecloudsdk.command_lib.container.hub import api_util
 from googlecloudsdk.command_lib.container.hub import exclusivity_util
 from googlecloudsdk.command_lib.container.hub import kube_util
 from googlecloudsdk.command_lib.projects import util as p_util
+from googlecloudsdk.core import exceptions
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.container.hub.memberships import base
+
+TEST_BUCKET_ISSUER_URL = 'https://storage.googleapis.com/gke-issuer-0'
 
 
 def TestDataFile(*args):
@@ -381,6 +386,123 @@ class UnregisterTestAlpha(UnregisterTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testDeleteWIMembershipContextManageBucket(self):
+    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_kubernetes_client.DeleteNamespace.return_value = None
+    self.mock_kubernetes_client.CheckClusterAdminPermissions.return_value = True
+    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
+        'gke-connect-12321'
+    ]
+    self.StartObjectPatch(
+        kube_util, 'IsGKECluster', return_value=False)
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
+    mock_delete_membership_resource = self.StartObjectPatch(
+        exclusivity_util, 'DeleteMembershipResources')
+    mock_delete_connect_namespace = self.StartObjectPatch(
+        agent_util, 'DeleteConnectNamespace')
+    self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
+
+    self.mock_kubernetes_client.GetOpenIDConfiguration.return_value = json.dumps(
+        {'issuer': TEST_BUCKET_ISSUER_URL})
+    mock_delete_bucket = self.StartObjectPatch(
+        api_util, 'DeleteWorkloadIdentityBucket')
+
+    self.RunCommand([
+        'my-cluster', '--kubeconfig=' + self.kubeconfig,
+        '--context=test-context', '--project=fake-project',
+        '--manage-workload-identity-bucket',
+    ])
+
+    self.mock_kubernetes_client.GetOpenIDConfiguration.assert_called_once_with()
+    mock_delete_bucket.assert_called_once_with(TEST_BUCKET_ISSUER_URL)
+
+    mock_delete_connect_namespace.assert_called_once()
+    mock_delete_membership.assert_called_with(
+        'projects/fake-project/locations/global/memberships/my-cluster',
+        self.track)
+    mock_delete_membership_resource.assert_called_once()
+
+  def testDeleteWIMembershipContextManageBucketDiscoveryException(self):
+    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_kubernetes_client.DeleteNamespace.return_value = None
+    self.mock_kubernetes_client.CheckClusterAdminPermissions.return_value = True
+    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
+        'gke-connect-12321'
+    ]
+    self.StartObjectPatch(
+        kube_util, 'IsGKECluster', return_value=False)
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
+    mock_delete_membership_resource = self.StartObjectPatch(
+        exclusivity_util, 'DeleteMembershipResources')
+    mock_delete_connect_namespace = self.StartObjectPatch(
+        agent_util, 'DeleteConnectNamespace')
+    self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
+
+    self.mock_kubernetes_client.GetOpenIDConfiguration.side_effect = exceptions.Error(
+        'Oops!')
+    mock_delete_bucket = self.StartObjectPatch(
+        api_util, 'DeleteWorkloadIdentityBucket')
+
+    # Test that the command works and only bucket deletion is skipped.
+    self.RunCommand([
+        'my-cluster', '--kubeconfig=' + self.kubeconfig,
+        '--context=test-context', '--project=fake-project',
+        '--manage-workload-identity-bucket',
+    ])
+
+    self.mock_kubernetes_client.GetOpenIDConfiguration.assert_called_once_with()
+    mock_delete_bucket.assert_not_called()
+
+    mock_delete_connect_namespace.assert_called_once()
+    mock_delete_membership.assert_called_with(
+        'projects/fake-project/locations/global/memberships/my-cluster',
+        self.track)
+    mock_delete_membership_resource.assert_called_once()
+
+  def testDeleteWIMembershipContextManageBucketDeleteException(self):
+    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_kubernetes_client.DeleteNamespace.return_value = None
+    self.mock_kubernetes_client.CheckClusterAdminPermissions.return_value = True
+    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
+        'gke-connect-12321'
+    ]
+    self.StartObjectPatch(
+        kube_util, 'IsGKECluster', return_value=False)
+    mock_delete_membership = self.StartObjectPatch(api_util, 'DeleteMembership')
+    mock_delete_membership_resource = self.StartObjectPatch(
+        exclusivity_util, 'DeleteMembershipResources')
+    mock_delete_connect_namespace = self.StartObjectPatch(
+        agent_util, 'DeleteConnectNamespace')
+    self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
+    self.StartObjectPatch(
+        exclusivity_util, 'GetMembershipCROwnerID', return_value=None)
+
+    self.mock_kubernetes_client.GetOpenIDConfiguration.return_value = json.dumps(
+        {'issuer': TEST_BUCKET_ISSUER_URL})
+    mock_delete_bucket = self.StartObjectPatch(
+        api_util, 'DeleteWorkloadIdentityBucket')
+    mock_delete_bucket.side_effect = exceptions.Error('Oops!')
+
+    # Test that the command works and only bucket deletion is skipped.
+    self.RunCommand([
+        'my-cluster', '--kubeconfig=' + self.kubeconfig,
+        '--context=test-context', '--project=fake-project',
+        '--manage-workload-identity-bucket',
+    ])
+
+    self.mock_kubernetes_client.GetOpenIDConfiguration.assert_called_once_with()
+    mock_delete_bucket.assert_called_with(TEST_BUCKET_ISSUER_URL)
+
+    mock_delete_connect_namespace.assert_called_once()
+    mock_delete_membership.assert_called_with(
+        'projects/fake-project/locations/global/memberships/my-cluster',
+        self.track)
+    mock_delete_membership_resource.assert_called_once()
 
 if __name__ == '__main__':
   test_case.main()

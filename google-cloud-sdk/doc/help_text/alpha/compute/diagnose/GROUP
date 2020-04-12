@@ -1,13 +1,12 @@
 NAME
-    gcloud alpha compute diagnose - debugging tools for Google Compute Engine
-        virtual machine instances
+    gcloud alpha compute diagnose - debugging tools for Compute Engine virtual
+        machine instances
 
 SYNOPSIS
     gcloud alpha compute diagnose COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Debugging tools for Google Compute Engine virtual machine
-    instances.
+    (ALPHA) Debugging tools for Compute Engine virtual machine instances.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

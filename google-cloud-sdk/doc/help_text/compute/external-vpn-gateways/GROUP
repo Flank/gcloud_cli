@@ -1,12 +1,19 @@
 NAME
-    gcloud compute external-vpn-gateways - read and manipulate Google Compute
-        Engine External VPN Gateways
+    gcloud compute external-vpn-gateways - list, create, delete and update
+        External VPN Gateways
 
 SYNOPSIS
     gcloud compute external-vpn-gateways COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    List, create, delete and update External VPN Gateways.
+    Read and manipulate external VPN gateways for Cloud VPN.
+
+    For more information about external VPN Gateways, see the external VPN
+    Gateways documentation
+    (https://cloud.google.com/vpn/docs/concepts/overview#external-vpn-gateway-definition).
+
+    See also: External VPN Gateways API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/externalVpnGateways).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

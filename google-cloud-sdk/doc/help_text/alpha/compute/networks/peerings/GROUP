@@ -1,13 +1,12 @@
 NAME
     gcloud alpha compute networks peerings - list, create, delete, and update
-        Google Compute Engine network peerings
+        VPC Network Peering
 
 SYNOPSIS
     gcloud alpha compute networks peerings COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List, create, delete, and update Google Compute Engine network
-    peerings.
+    (ALPHA) List, create, delete, and update VPC Network Peering.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

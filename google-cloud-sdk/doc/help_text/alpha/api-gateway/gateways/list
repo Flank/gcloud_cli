@@ -55,6 +55,15 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To list all gateways, run:
+
+        $ gcloud alpha api-gateway gateways list
+
+    To list all gateways within the 'us-central1' location:
+
+        $ gcloud alpha api-gateway gateways list --location=us-central1
+
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change

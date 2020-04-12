@@ -35,7 +35,6 @@ from googlecloudsdk.command_lib.run import flags
 from googlecloudsdk.command_lib.run import name_generator
 from googlecloudsdk.command_lib.run import resource_args
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.util import times
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
@@ -46,13 +45,23 @@ from tests.lib.surface.run import base
 import mock
 
 
+class _TestArgumentParser(argparse.ArgumentParser):
+  """Overrides error to increase testability.
+
+  Replaces exiting with raising ArgumentError.
+  """
+
+  def error(self, message='', context=None, reproduce=False):
+    del context, reproduce
+    raise flags.ArgumentError(message)
+
+
 class ServerlessFlagsTest(base.ServerlessSurfaceBase, parameterized.TestCase):
 
   def testGenerateDefaultServiceName(self):
     self.StartObjectPatch(os.path, 'isdir')
-    self.assertEqual('foo',
-                     resource_args.GenerateServiceName(
-                         'gcr.io/images/foo:latest'))
+    self.assertEqual(
+        'foo', resource_args.GenerateServiceName('gcr.io/images/foo:latest'))
 
   def testServiceBeginDash(self):
     args = mock.Mock()
@@ -121,8 +130,8 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
         clear_tags=None,
         to_latest=None,
         to_revisions=None)
-    self.service = service.Service.New(
-        self.mock_serverless_client, self.namespace.namespacesId)
+    self.service = service.Service.New(self.mock_serverless_client,
+                                       self.namespace.namespacesId)
     self.service.name = 'myservice'
     self.metadata = self.service.metadata
     self.StartObjectPatch(
@@ -188,37 +197,45 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
                                            self.metadata)
     self.assertEqual(dict(**labels), {'ghi': 'baz'})
 
-  @parameterized.parameters(['4s', '8m16s'])
-  def testValidTimeoutDuration(self, timeout):
-    self.args.timeout = timeout
+  @parameterized.parameters([('4s', 4), ('8m16s', 8 * 60 + 16)])
+  def testValidTimeoutDuration(self, timeout, expect_seconds):
+    parser = _TestArgumentParser()
+    flags.AddTimeoutFlag(parser)
+    parser.parse_args(['--timeout', timeout], self.args)
     self._GetAndApplyChanges()
     self.assertEqual(len(self.changes), 1)
-    self.assertEqual(
-        self.service.template.timeout,
-        int(times.ParseDuration(timeout).total_seconds))
+    self.assertEqual(self.service.template.timeout, expect_seconds)
 
   @parameterized.parameters(['2', '5'])
   def testValidTimeoutNumber(self, timeout):
-    self.args.timeout = timeout
+    parser = _TestArgumentParser()
+    flags.AddTimeoutFlag(parser)
+    parser.parse_args(['--timeout', timeout], self.args)
     self._GetAndApplyChanges()
     self.assertEqual(len(self.changes), 1)
     self.assertEqual(self.service.template.timeout, int(timeout))
 
   @parameterized.parameters(['2.0', '@^$%4', 'abcd'])
   def testInvalidTimeoutDurationSyntaxError(self, timeout):
-    self.args.timeout = timeout
-    with self.assertRaises(times.DurationSyntaxError):
+    parser = _TestArgumentParser()
+    flags.AddTimeoutFlag(parser)
+    with self.assertRaises(flags.ArgumentError):
+      parser.parse_args(['--timeout', timeout], self.args)
       self._GetAndApplyChanges()
 
   @parameterized.parameters(['0', '-1'])
   def testInvalidTimeoutArgError(self, timeout):
-    self.args.timeout = timeout
+    parser = _TestArgumentParser()
+    flags.AddTimeoutFlag(parser)
     with self.assertRaises(flags.ArgumentError):
+      parser.parse_args(['--timeout', timeout], self.args)
       self._GetAndApplyChanges()
 
   def testCloudSqlApiEnablement(self):
     properties.VALUES.core.should_prompt_to_enable_api.Set(True)
     self.StartObjectPatch(flags, '_HasCloudSQLChanges', return_value=True)
+    self.StartObjectPatch(
+        flags, '_EnabledCloudSqlApiRequired', return_value=True)
     api_mock = self.StartObjectPatch(flags, 'PromptToEnableApi')
     self._GetAndApplyChanges()
     api_mock.assert_any_call(flags._CLOUD_SQL_API_SERVICE_TOKEN)
@@ -232,6 +249,8 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
   def testCloudSqlApiEnablementFailsOpen(self, exception):
     properties.VALUES.core.should_prompt_to_enable_api.Set(True)
     self.StartObjectPatch(flags, '_HasCloudSQLChanges', return_value=True)
+    self.StartObjectPatch(
+        flags, '_EnabledCloudSqlApiRequired', return_value=True)
     api_mock = self.StartObjectPatch(flags, 'PromptToEnableApi')
     api_mock.side_effect = exception
     self._GetAndApplyChanges()
@@ -244,6 +263,8 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
   def testCloudSqlAdminApiEnablementFailsOpen(self, exception):
     properties.VALUES.core.should_prompt_to_enable_api.Set(True)
     self.StartObjectPatch(flags, '_HasCloudSQLChanges', return_value=True)
+    self.StartObjectPatch(
+        flags, '_EnabledCloudSqlApiRequired', return_value=True)
     api_mock = self.StartObjectPatch(flags, 'PromptToEnableApi')
     api_mock.side_effect = [None, exception]
     self._GetAndApplyChanges()
@@ -255,8 +276,7 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
   def testRevisionSuffix(self, suffix):
     self.args.revision_suffix = suffix
     self._GetAndApplyChanges()
-    self.assertEqual(self.service.template.name, 'myservice-{}'.format(
-        suffix))
+    self.assertEqual(self.service.template.name, 'myservice-{}'.format(suffix))
     self.assertEqual(len(self.changes), 1)
 
   @parameterized.parameters(['suffix', 'revision-1'])
@@ -264,8 +284,7 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     self.args.revision_suffix = suffix
     self.service.template.name = 'myservice-oldname'
     self._GetAndApplyChanges()
-    self.assertEqual(self.service.template.name, 'myservice-{}'.format(
-        suffix))
+    self.assertEqual(self.service.template.name, 'myservice-{}'.format(suffix))
     self.assertEqual(len(self.changes), 1)
 
   def testScalingAdd(self):
@@ -275,9 +294,11 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     self.args.max_instances = flags._ScaleValue('2')
     self._GetAndApplyChanges()
     got = {a.key: a.value for a in additional_properties}
-    self.assertEqual(got, {
-        u'autoscaling.knative.dev/maxScale': '2',
-        u'autoscaling.knative.dev/minScale': '1'})
+    self.assertEqual(
+        got, {
+            u'autoscaling.knative.dev/maxScale': '2',
+            u'autoscaling.knative.dev/minScale': '1'
+        })
 
   def testScalingDelete(self):
     additional_properties = (
@@ -310,29 +331,37 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     self.assertEqual(got, {u'autoscaling.knative.dev/maxScale': '3'})
 
   def testTrafficToLatest(self):
-    self.service.spec_traffic['r1'] = [traffic.NewTrafficTarget(
-        self.serverless_messages, 'r1', 100)]
+    self.service.spec_traffic['r1'] = [
+        traffic.NewTrafficTarget(self.serverless_messages, 'r1', 100)
+    ]
     self.args.to_latest = True
     self.args.to_revisions = None
     self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
     self._GetAndApplyChanges()
     expect = {
-        traffic.LATEST_REVISION_KEY: [traffic.NewTrafficTarget(
-            self.serverless_messages, traffic.LATEST_REVISION_KEY, 100)]}
+        traffic.LATEST_REVISION_KEY: [
+            traffic.NewTrafficTarget(self.serverless_messages,
+                                     traffic.LATEST_REVISION_KEY, 100)
+        ]
+    }
     self.assertEqual(self.service.spec_traffic, expect)
 
   def testTrafficToRevision(self):
-    self.service.spec_traffic[
-        traffic.LATEST_REVISION_KEY] = [traffic.NewTrafficTarget(
-            self.serverless_messages, traffic.LATEST_REVISION_KEY, 100)]
+    self.service.spec_traffic[traffic.LATEST_REVISION_KEY] = [
+        traffic.NewTrafficTarget(self.serverless_messages,
+                                 traffic.LATEST_REVISION_KEY, 100)
+    ]
     self.args.to_latest = False
     self.args.to_revisions = {'r1': 60}
     self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
     self._GetAndApplyChanges()
     expect = {
-        traffic.LATEST_REVISION_KEY: [traffic.NewTrafficTarget(
-            self.serverless_messages, traffic.LATEST_REVISION_KEY, 40)],
-        'r1': [traffic.NewTrafficTarget(self.serverless_messages, 'r1', 60)]}
+        traffic.LATEST_REVISION_KEY: [
+            traffic.NewTrafficTarget(self.serverless_messages,
+                                     traffic.LATEST_REVISION_KEY, 40)
+        ],
+        'r1': [traffic.NewTrafficTarget(self.serverless_messages, 'r1', 60)]
+    }
     self.assertEqual(self.service.spec_traffic, expect)
 
   def testTrafficTagsSet(self):
@@ -424,17 +453,19 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     self._GetAndApplyChanges()
     self.assertDictEqual({'/my/path': 'mysecret-genr8d'},
                          dict(self.service.template.volume_mounts.secrets))
-    self.assertDictEqual({
-        'mysecret-genr8d':
-            self.serverless_messages.SecretVolumeSource(
-                secretName='mysecret')
-    }, dict(self.service.template.volumes.secrets))
-    self.assertDictEqual({
-        'VAR':
-            self.serverless_messages.EnvVarSource(
-                secretKeyRef=self.serverless_messages.SecretKeySelector(
-                    name='mysecret', key='key'))
-    }, dict(self.service.template.env_vars.secrets))
+    self.assertDictEqual(
+        {
+            'mysecret-genr8d':
+                self.serverless_messages.SecretVolumeSource(
+                    secretName='mysecret')
+        }, dict(self.service.template.volumes.secrets))
+    self.assertDictEqual(
+        {
+            'VAR':
+                self.serverless_messages.EnvVarSource(
+                    secretKeyRef=self.serverless_messages.SecretKeySelector(
+                        name='mysecret', key='key'))
+        }, dict(self.service.template.env_vars.secrets))
 
   def testConfigMaps(self):
     self.args.set_config_maps = {'/my/path': 'myconfig', 'VAR': 'myconfig:key'}
@@ -442,17 +473,18 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     self._GetAndApplyChanges()
     self.assertDictEqual({'/my/path': 'myconfig-genr8d'},
                          dict(self.service.template.volume_mounts.config_maps))
-    self.assertDictEqual({
-        'myconfig-genr8d':
-            self.serverless_messages.ConfigMapVolumeSource(
-                name='myconfig')
-    }, dict(self.service.template.volumes.config_maps))
-    self.assertDictEqual({
-        'VAR':
-            self.serverless_messages.EnvVarSource(
-                configMapKeyRef=self.serverless_messages.ConfigMapKeySelector(
-                    name='myconfig', key='key'))
-    }, dict(self.service.template.env_vars.config_maps))
+    self.assertDictEqual(
+        {
+            'myconfig-genr8d':
+                self.serverless_messages.ConfigMapVolumeSource(name='myconfig')
+        }, dict(self.service.template.volumes.config_maps))
+    self.assertDictEqual(
+        {
+            'VAR':
+                self.serverless_messages.EnvVarSource(
+                    configMapKeyRef=self.serverless_messages
+                    .ConfigMapKeySelector(name='myconfig', key='key'))
+        }, dict(self.service.template.env_vars.config_maps))
 
   @parameterized.parameters('1', '123', '7', '65535', 'default')
   def testContainerPortValidValues(self, port_str):
@@ -463,8 +495,8 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     self.assertFalse(flags._PortValue(port_str))
 
 
-class GetRegionTest(base.ServerlessBase,
-                    cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
+class GetRegionTest(base.ServerlessBase, cli_test_base.CliTestBase,
+                    sdk_test_base.WithFakeAuth):
   """Test getting region under different configs and flags."""
 
   def SetUp(self):
@@ -476,8 +508,7 @@ class GetRegionTest(base.ServerlessBase,
     self.assertEqual('region1', flags.GetRegion(self.args, prompt=True))
 
   def testGetFromServerlessConfig(self):
-    self.assertEqual(
-        'serverless-config-region', flags.GetRegion(self.args))
+    self.assertEqual('serverless-config-region', flags.GetRegion(self.args))
 
   def testGetFromPrompt(self):
     with mock.patch(
@@ -521,13 +552,17 @@ class GetPlatformTest(base.ServerlessBase):
   def testGetFromFlag(self):
     properties.VALUES.run.platform.Set('gke')
     self.parser.parse_args(['--platform', 'managed'], self.args)
-    self.assertEqual('managed', flags.GetAndValidatePlatform(
-        self.args, calliope_base.ReleaseTrack.GA, flags.Product.RUN))
+    self.assertEqual(
+        'managed',
+        flags.GetAndValidatePlatform(self.args, calliope_base.ReleaseTrack.GA,
+                                     flags.Product.RUN))
 
   def testGetFromProperty(self):
     properties.VALUES.run.platform.Set('gke')
-    self.assertEqual('gke', flags.GetAndValidatePlatform(
-        self.args, calliope_base.ReleaseTrack.GA, flags.Product.RUN))
+    self.assertEqual(
+        'gke',
+        flags.GetAndValidatePlatform(self.args, calliope_base.ReleaseTrack.GA,
+                                     flags.Product.RUN))
 
   def testInvalidProperty(self):
     properties.VALUES.run.platform.Set('invalid')
@@ -628,8 +663,7 @@ class ValidationsTest(test_case.TestCase):
   def testVerifyGKEFlagsMinInstanceGA(self):
     args = parser_extensions.Namespace(min_instances=None)
     args.min_instances = 3
-    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA,
-                         flags.Product.RUN)
+    flags.VerifyGKEFlags(args, calliope_base.ReleaseTrack.GA, flags.Product.RUN)
 
   def testVerifyGKEFlagsMinInstanceBeta(self):
     args = parser_extensions.Namespace(min_instances=None)
@@ -713,22 +747,53 @@ class ValidationsTest(test_case.TestCase):
 
   def testVerifyOnePlatformFlagsNoTrafficGA(self):
     args = parser_extensions.Namespace(no_traffic=None)
-    with self.assertRaises(exceptions.ConfigurationError):
-      args.no_traffic = True
-      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
-                                   flags.Product.RUN)
+    args.no_traffic = True
+    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
+                                 flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsNoTrafficBeta(self):
     args = parser_extensions.Namespace(no_traffic=None)
-    with self.assertRaises(exceptions.ConfigurationError):
-      args.no_traffic = True
-      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.BETA,
-                                   flags.Product.RUN)
+    args.no_traffic = True
+    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.BETA,
+                                 flags.Product.RUN)
 
   def testVerifyOnePlatformFlagsNoTrafficAlpha(self):
     args = parser_extensions.Namespace(no_traffic=None)
     args.no_traffic = True
     flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.ALPHA,
+                                 flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsTimeoutAlpha(self):
+    parser = argparse.ArgumentParser()
+    flags.AddTimeoutFlag(parser)
+    args = parser.parse_args(['--timeout', '1h'],
+                             parser_extensions.Namespace(timeout=None))
+    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.ALPHA,
+                                 flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsTimeoutBeta(self):
+    parser = argparse.ArgumentParser()
+    flags.AddTimeoutFlag(parser)
+    args = parser.parse_args(['--timeout', '45m'],
+                             parser_extensions.Namespace(timeout=None))
+    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.BETA,
+                                 flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsTimeoutGA(self):
+    parser = argparse.ArgumentParser()
+    flags.AddTimeoutFlag(parser)
+    args = parser.parse_args(['--timeout', '1h'],
+                             parser_extensions.Namespace(timeout=None))
+    with self.assertRaises(exceptions.ConfigurationError):
+      flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
+                                   flags.Product.RUN)
+
+  def testVerifyOnePlatformFlagsTimeoutGAOk(self):
+    parser = argparse.ArgumentParser()
+    flags.AddTimeoutFlag(parser)
+    args = parser.parse_args(['--timeout', '15m'],
+                             parser_extensions.Namespace(timeout=None))
+    flags.VerifyOnePlatformFlags(args, calliope_base.ReleaseTrack.GA,
                                  flags.Product.RUN)
 
   def testVerifyKubernetesFlagsAllowUnauthenticated(self):
@@ -781,8 +846,8 @@ class GetKubeconfigTest(test_case.TestCase):
   def testGetFromArgs(self):
     expected_config = kubeconfig.Kubeconfig.Default()
     expected_config.SetCurrentContext('context')
-    self.StartObjectPatch(kubeconfig.Kubeconfig, 'LoadFromFile',
-                          return_value=expected_config)
+    self.StartObjectPatch(
+        kubeconfig.Kubeconfig, 'LoadFromFile', return_value=expected_config)
     path = '/some/path'
     self.args.kubeconfig = path
     self.assertEqual(expected_config, flags.GetKubeconfig(self.args))
@@ -791,8 +856,8 @@ class GetKubeconfigTest(test_case.TestCase):
   def testGetFromDefault(self):
     expected_config = kubeconfig.Kubeconfig.Default()
     expected_config.SetCurrentContext('context')
-    self.StartObjectPatch(kubeconfig.Kubeconfig, 'LoadFromFile',
-                          return_value=expected_config)
+    self.StartObjectPatch(
+        kubeconfig.Kubeconfig, 'LoadFromFile', return_value=expected_config)
     self.assertEqual(expected_config, flags.GetKubeconfig(self.args))
     path_args, _ = kubeconfig.Kubeconfig.LoadFromFile.call_args
     self.assertTrue(path_args[0].endswith('/.kube/config'))
@@ -801,10 +866,9 @@ class GetKubeconfigTest(test_case.TestCase):
     config1 = kubeconfig.Kubeconfig.Default()
     cluster1 = kubeconfig.Cluster(
         'cluster1', 'https://1.1.1.1', ca_data='FAKE_CA_DATA')
-    cluster2 = kubeconfig.Cluster(
-        'cluster2', 'https://2.2.2.2', ca_data=None)
-    user = kubeconfig.User('user', cert_data='FAKECERTDATA',
-                           key_data='FAKE_KEY_DATA')
+    cluster2 = kubeconfig.Cluster('cluster2', 'https://2.2.2.2', ca_data=None)
+    user = kubeconfig.User(
+        'user', cert_data='FAKECERTDATA', key_data='FAKE_KEY_DATA')
     context = kubeconfig.Context('context', 'cluster1', 'user')
     config1.clusters['cluster1'] = cluster1
     config1.clusters['cluster2'] = cluster2
@@ -817,8 +881,8 @@ class GetKubeconfigTest(test_case.TestCase):
         'cluster1', 'https://2.2.2.2', ca_data=None)
     other_cluster2 = kubeconfig.Cluster(
         'other_cluster2', 'https://3.3.3.3', ca_data='FAKE_CA_DATA')
-    user = kubeconfig.User('user', cert_data='FAKECERTDATA',
-                           key_data='FAKE_KEY_DATA')
+    user = kubeconfig.User(
+        'user', cert_data='FAKECERTDATA', key_data='FAKE_KEY_DATA')
     other_context = kubeconfig.Context('other_context', 'cluster1', 'user')
     config2.clusters['cluster1'] = modified_cluster1
     config2.clusters['other_cluster2'] = other_cluster2
@@ -826,10 +890,7 @@ class GetKubeconfigTest(test_case.TestCase):
     config2.contexts['other_context'] = other_context
     config2.SetCurrentContext('other_context')
 
-    self.expected_configs = {
-        '/some/path1': config1,
-        '/some/path2': config2
-    }
+    self.expected_configs = {'/some/path1': config1, '/some/path2': config2}
 
     def _KubeconfigLoadFromFile(path):
       if path in self.expected_configs:
@@ -837,8 +898,10 @@ class GetKubeconfigTest(test_case.TestCase):
       else:
         raise kubeconfig.Error('Invalid path', path)
 
-    self.StartObjectPatch(kubeconfig.Kubeconfig, 'LoadFromFile',
-                          side_effect=_KubeconfigLoadFromFile)
+    self.StartObjectPatch(
+        kubeconfig.Kubeconfig,
+        'LoadFromFile',
+        side_effect=_KubeconfigLoadFromFile)
 
   def testGetFromEnvVar(self):
     self._SetUpEnvTest()
@@ -857,9 +920,10 @@ class GetKubeconfigTest(test_case.TestCase):
   def testGetFromEnvVarPartiallyInvalidPath(self):
     self._SetUpEnvTest()
     path = '/some/path1'
-    self.StartDictPatch(os.environ,
-                        {'KUBECONFIG': '/invalid/path{sep}{path}'.format(
-                            sep=os.pathsep, path=path)})
+    self.StartDictPatch(os.environ, {
+        'KUBECONFIG':
+            '/invalid/path{sep}{path}'.format(sep=os.pathsep, path=path)
+    })
     self.assertEqual(self.expected_configs[path],
                      flags.GetKubeconfig(self.args))
     kubeconfig.Kubeconfig.LoadFromFile.assert_any_call('/invalid/path')
@@ -870,9 +934,12 @@ class GetKubeconfigTest(test_case.TestCase):
     self._SetUpEnvTest()
     path_1 = '/some/path1'
     path_2 = '/some/path2'
-    self.StartDictPatch(os.environ,
-                        {'KUBECONFIG': '{path_1}{sep}{path_2}'.format(
-                            path_1=path_1, sep=os.pathsep, path_2=path_2)})
+    self.StartDictPatch(
+        os.environ, {
+            'KUBECONFIG':
+                '{path_1}{sep}{path_2}'.format(
+                    path_1=path_1, sep=os.pathsep, path_2=path_2)
+        })
     expected_config = self.expected_configs[path_1]
     expected_config.Merge(self.expected_configs[path_2])
     self.assertEqual(expected_config, flags.GetKubeconfig(self.args))

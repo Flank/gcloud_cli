@@ -1,12 +1,18 @@
 NAME
-    gcloud alpha compute images - list, create, and delete Google Compute
-        Engine images
+    gcloud alpha compute images - list, create, and delete Compute Engine
+        images
 
 SYNOPSIS
     gcloud alpha compute images GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List, create, and delete Google Compute Engine images.
+    (ALPHA) Create and manipulate Compute Engine images.
+
+    For more information about images, see the images documentation
+    (https://cloud.google.com/compute/docs/images).
+
+    See also: Images API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/images).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -71,7 +77,7 @@ COMMANDS
         (ALPHA) Set the IAM policy for a Google Compute Engine image.
 
      update
-        (ALPHA) Update a Google Compute Engine image.
+        (ALPHA) Update Google Compute Engine images.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

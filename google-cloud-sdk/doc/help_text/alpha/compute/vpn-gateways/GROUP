@@ -1,12 +1,19 @@
 NAME
-    gcloud alpha compute vpn-gateways - read and manipulate Google Compute
-        Engine Highly Available VPN Gateways
+    gcloud alpha compute vpn-gateways - read and manipulate Highly Available
+        VPN Gateways
 
 SYNOPSIS
     gcloud alpha compute vpn-gateways COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) read and manipulate Highly Available VPN Gateways.
+    (ALPHA) Read and manipulate highly available (HA) VPN gateways for Cloud
+    VPN.
+
+    For more information about HA VPN gateways, see Cloud VPN overview
+    (https://cloud.google.com/vpn/docs/concepts/overview).
+
+    See also: VPN Gateways API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/vpnGateways).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

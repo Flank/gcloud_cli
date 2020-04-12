@@ -9,8 +9,9 @@ SYNOPSIS
         [--machine-type=MACHINE_TYPE]
         [--num-integral-steps=NUM_INTEGRAL_STEPS; default=50]
         [--num-paths=NUM_PATHS; default=50] [--origin=ORIGIN]
-        [--python-version=PYTHON_VERSION] [--runtime-version=RUNTIME_VERSION]
-        [--service-account=SERVICE_ACCOUNT] [--staging-bucket=STAGING_BUCKET]
+        [--python-version=PYTHON_VERSION] [--region=REGION]
+        [--runtime-version=RUNTIME_VERSION] [--service-account=SERVICE_ACCOUNT]
+        [--staging-bucket=STAGING_BUCKET]
         [--package-uris=[PACKAGE_URI,...] --prediction-class=PREDICTION_CLASS]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -131,6 +132,15 @@ OPTIONAL FLAGS
         default version is 2.7. Python 3.5 is available when --runtime-version
         is set to 1.4 and above. Python 2.7 works with all supported runtime
         versions.
+
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
 
      --runtime-version=RUNTIME_VERSION
         AI Platform runtime version for this job. Defaults to a stable version,

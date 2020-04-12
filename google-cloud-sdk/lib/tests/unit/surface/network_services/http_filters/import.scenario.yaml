@@ -1,0 +1,62 @@
+title: network-services http-filters import tests
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: core/project my-project
+- execute:
+  - command: network-services http-filters import myhttpfilter --source='myhttpfilter.yaml'
+      --location=global
+  - error: "1: 'NoneType' object has no attribute 'name'"
+actions:
+- write_file:
+    path: myhttpfilter.yaml
+    contents: |
+      name: myhttpfilter
+      config: '{}'
+      configTypeUrl: istio.envoy.config.filter.http.jwt_auth.v2alpha1.JwtAuthentication
+      filterName: envoy.filters.http.jwt_authn
+- set_property:
+    core/project: my-project
+- execute_command:
+    command: network-services http-filters import myhttpfilter --source='myhttpfilter.yaml'
+      --location=global
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://networkservices.googleapis.com/v1alpha1/projects/my-project/locations/global/httpFilters/myhttpfilter?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+            body: |
+              {
+                "error": {
+                  "code": "404",
+                  "message": "Resource 'projects/traffic-director-ccfe-staging/locations/global/httpFilters/myhttpfilter' was not found",
+                  "status": "NOT_FOUND",
+                }
+              }
+    - expect_exit:
+        code: 1
+        message: "'NoneType' object has no attribute 'name'"
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://networkservices.googleapis.com/v1alpha1/projects/my-project/locations/global/httpFilters/myhttpfilter?alt=json
+          method: PATCH
+          headers: {}
+          body: |
+            {
+              config: '{}'
+              configTypeUrl: istio.envoy.config.filter.http.jwt_auth.v2alpha1.JwtAuthentication
+              filterName: envoy.filters.http.jwt_authn
+              name: myhttpfilter
+            }
+        return_response:
+          headers:
+            status: '200'
+    - expect_exit:
+        code: 0

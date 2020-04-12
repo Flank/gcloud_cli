@@ -24,7 +24,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://iamassist.googleapis.com/v1alpha2/simulator:replayRecentAccesses?alt=json
+          uri: https://iamassist.googleapis.com/v1alpha3/replays?alt=json
           method: POST
           body: [
             "policyOverlay": [
@@ -49,7 +49,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://iamassist.googleapis.com/v1alpha2/operations/simulator-fake-operation-id?alt=json
+          uri: https://iamassist.googleapis.com/v1alpha3/operations/simulator-fake-operation-id?alt=json
           method: GET
           body: null
         return_response:
@@ -63,7 +63,7 @@ actions:
             }
         repeatable: true
     - expect_progress_tracker:
-        message: Waiting for operation [simulator-fake-operation-id] to complete
+        message: Waiting for replay [simulator-fake-operation-id] to complete
         status: SUCCESS
     - expect_stdout: |
         {}

@@ -36,6 +36,10 @@ GROUPS
      metrics
         (ALPHA) A group of subcommands for working with Dataflow metrics.
 
+     snapshots
+        (ALPHA) A group of subcommands for working with Cloud Dataflow
+        snapshots.
+
      sql
         (ALPHA) A group of subcommands for working with Dataflow SQL.
 

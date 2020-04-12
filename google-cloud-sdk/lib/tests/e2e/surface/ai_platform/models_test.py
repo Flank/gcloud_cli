@@ -120,7 +120,6 @@ class MlPlatformModelsIntegrationTestGA(MlPlatformModelsIntegrationTest,
     self.AssertOutputNotContains(model)
 
 
-@test_case.Filters.skip('Flaking (500)', 'b/151910902')
 @parameterized.parameters('ml-engine', 'ai-platform')
 class MlPlatformModelsIntegrationTestBeta(MlPlatformModelsIntegrationTest,
                                           parameterized.TestCase):

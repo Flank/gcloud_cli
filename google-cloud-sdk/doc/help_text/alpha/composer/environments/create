@@ -197,8 +197,8 @@ FLAGS
           Cannot be specified unless '--enable-ip-alias' is also specified.
 
        --master-ipv4-cidr=MASTER_IPV4_CIDR
-          IPv4 CIDR range to use for the master network. This should have a
-          netmask of size /28.
+          IPv4 CIDR range to use for the cluste master network. This should
+          have a size of the netmask between 23 and 28.
 
           Cannot be specified unless '--enable-private-environnment' is also
           specified.

@@ -30,6 +30,7 @@ from googlecloudsdk.core.credentials import creds as c_creds
 from googlecloudsdk.core.credentials import gce as c_gce
 from googlecloudsdk.core.credentials import store
 from googlecloudsdk.core.util import times
+from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.core.credentials import credentials_test_base
@@ -488,8 +489,6 @@ gs_oauth2_refresh_token = fake-token
                            expected_creds_dict, expected_expired)
 
     store.Store(creds_stored, self.fake_account)
-    self.AssertFileNotExists(
-        config.Paths().LegacyCredentialsGSUtilPath(self.fake_account))
 
     # Load() refreshes expired tokens
     creds_loaded = store.Load(self.fake_account, use_google_auth=True)
@@ -531,9 +530,6 @@ gs_oauth2_refresh_token = fake-token
                            expected_creds_dict, expected_expired)
 
     store.Store(creds_stored, self.fake_account)
-    self.AssertFileNotExists(
-        config.Paths().LegacyCredentialsGSUtilPath(self.fake_account))
-
     # Load() refreshes expired tokens
     creds_loaded = store.Load(self.fake_account)
 
@@ -919,6 +915,155 @@ class DevshellTests(devshell_test_base.DevshellTestBase):
   def testThrowsExceptionInDevshell(self):
     with self.assertRaisesRegex(store.RevokeError, 'Cannot revoke'):
       store.Revoke('joe@example.com')
+
+
+@test_case.Filters.SkipOnKokoroAndLinuxPy3('pytest loads wrong module',
+                                           'b/151428720')
+class LegacyGeneratorTests(cli_test_base.CliTestBase,
+                           credentials_test_base.CredentialsTestBase):
+
+  def SetUp(self):
+    self.account = 'fake-account'
+    self.StartObjectPatch(
+        config, '_GetGlobalConfigDir', return_value=self.temp_path)
+    self.paths = config.Paths()
+
+    # Mocks the signer of service account credentials.
+    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
+    self.rsa_mock = self.StartObjectPatch(google_auth_crypt.RSASigner,
+                                          'from_service_account_info')
+
+    self.oauth2client_user_creds = self.MakeUserCredentials()
+    self.oauth2client_sv_creds = self.MakeServiceAccountCredentials()
+
+    self.google_auth_user_creds = self.MakeUserAccountCredentialsGoogleAuth()
+    self.google_auth_sv_creds = self.MakeServiceAccountCredentialsGoogleAuth()
+    self.gce_creds = oauth2client_gce.AppAssertionCredentials()
+
+    self.p12_creds = self.MakeP12ServiceAccountCredentials()
+
+  def testOauth2client_UserAccount(self):
+    store._LegacyGenerator(self.account,
+                           self.oauth2client_user_creds).WriteTemplate()
+    with open(self.paths.LegacyCredentialsAdcPath(self.account)) as f:
+      adc_file = json.load(f)
+    self.assertEqual(
+        json.loads("""
+       {
+         "client_id": "client_id",
+         "client_secret": "client_secret",
+         "refresh_token": "fake-token",
+         "type": "authorized_user"
+       }"""), adc_file)
+
+    self.AssertFileExistsWithContents(
+        """
+[OAuth2]
+client_id = {cid}
+client_secret = {secret}
+
+[Credentials]
+gs_oauth2_refresh_token = fake-token
+""".strip().format(
+    cid=config.CLOUDSDK_CLIENT_ID, secret=config.CLOUDSDK_CLIENT_NOTSOSECRET),
+        self.paths.LegacyCredentialsGSUtilPath(self.account))
+
+  def testOauth2client_ServiceAccount(self):
+    store._LegacyGenerator(self.account,
+                           self.oauth2client_sv_creds).WriteTemplate()
+    with open(self.paths.LegacyCredentialsAdcPath(self.account)) as f:
+      adc_file = json.load(f)
+    self.assertEqual(
+        json.loads("""
+       {
+         "client_email": "bar@developer.gserviceaccount.com",
+         "client_id": "bar.apps.googleusercontent.com",
+         "private_key": "-----BEGIN PRIVATE KEY-----\\nasdf\\n-----END PRIVATE KEY-----\\n",
+         "private_key_id": "key-id",
+         "type": "service_account"
+       }"""), adc_file)
+
+    self.AssertFileExistsWithContents(
+        """
+[Credentials]
+gs_service_key_file = {adc_path}
+""".strip().format(adc_path=self.paths.LegacyCredentialsAdcPath(self.account)),
+        self.paths.LegacyCredentialsGSUtilPath(self.account))
+
+  def testGoogleAuth_UserAccount(self):
+    store._LegacyGenerator(self.account,
+                           self.google_auth_user_creds).WriteTemplate()
+    with open(self.paths.LegacyCredentialsAdcPath(self.account)) as f:
+      adc_file = json.load(f)
+    self.assertEqual(
+        json.loads("""
+        {
+          "client_id": "foo.apps.googleusercontent.com",
+          "client_secret": "file-secret",
+          "refresh_token": "file-token",
+          "type": "authorized_user"
+        }"""), adc_file)
+    self.AssertFileExistsWithContents(
+        """
+[OAuth2]
+client_id = {cid}
+client_secret = {secret}
+
+[Credentials]
+gs_oauth2_refresh_token = file-token
+""".strip().format(
+    cid=config.CLOUDSDK_CLIENT_ID, secret=config.CLOUDSDK_CLIENT_NOTSOSECRET),
+        self.paths.LegacyCredentialsGSUtilPath(self.account))
+
+  def testGoogleAuth_ServiceAccount(self):
+    store._LegacyGenerator(self.account,
+                           self.google_auth_sv_creds).WriteTemplate()
+    with open(self.paths.LegacyCredentialsAdcPath(self.account)) as f:
+      adc_file = json.load(f)
+    self.assertEqual(
+        json.loads("""
+       {
+         "client_email": "bar@developer.gserviceaccount.com",
+         "client_id": "bar.apps.googleusercontent.com",
+         "private_key": "-----BEGIN PRIVATE KEY-----\\nasdf\\n-----END PRIVATE KEY-----\\n",
+         "private_key_id": "key-id",
+         "type": "service_account"
+       }"""), adc_file)
+
+    self.AssertFileExistsWithContents(
+        """
+[Credentials]
+gs_service_key_file = {adc_path}
+""".strip().format(adc_path=self.paths.LegacyCredentialsAdcPath(self.account)),
+        self.paths.LegacyCredentialsGSUtilPath(self.account))
+
+  def testP12(self):
+    store._LegacyGenerator(self.account, self.p12_creds).WriteTemplate()
+
+    p12_creds = service_account.ServiceAccountCredentials.from_p12_keyfile(
+        service_account_email='p12owner@developer.gserviceaccount.com',
+        filename=self.paths.LegacyCredentialsP12KeyPath(self.account),
+        private_key_password='key-password')
+    self.assertEqual(p12_creds._private_key_pkcs12,
+                     self.p12_creds._private_key_pkcs12)
+
+    self.AssertFileExistsWithContents(
+        """
+[Credentials]
+gs_service_client_id = {client_id}
+gs_service_key_file = {key_file}
+gs_service_key_file_password = {key_password}
+""".strip().format(
+    client_id='p12owner@developer.gserviceaccount.com',
+    key_file=self.paths.LegacyCredentialsP12KeyPath(self.account),
+    key_password='key-password'),
+        self.paths.LegacyCredentialsGSUtilPath(self.account))
+
+  def testUnSupportedCreds(self):
+    with self.AssertRaisesExceptionMatches(c_creds.CredentialFileSaveError,
+                                           'Unsupported credentials'):
+      store._LegacyGenerator(self.account, self.gce_creds).WriteTemplate()
 
 
 if __name__ == '__main__':

@@ -1,0 +1,201 @@
+title: surface unit test for beta asset export-iam-policy-analysis
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: asset export-iam-policy-analysis --organization "o1" --full-resource-name "//o1/f/p/r1"
+      --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
+      --expand-groups --expand-roles --output-group-edges
+      --output-path=gs://bucket-name/object-name
+  - stderr: |
+      Export in progress for root asset [organizations/o1].
+      Use [gcloud asset operations describe organizations/o1/operations/ExportIamPolicyAnalysis/001] to check the status of the operation.
+- execute:
+  - command: asset export-iam-policy-analysis --folder "f1" --identity "user:user1@foo.com"
+      --permissions "a.b.get,c.d.create"
+      --expand-resources --output-resource-edges --output-path=gs://bucket-name/object-name
+  - stderr: |
+      Export in progress for root asset [folders/f1].
+      Use [gcloud asset operations describe folders/f1/operations/ExportIamPolicyAnalysis/002] to check the status of the operation.
+- execute:
+  - command: asset export-iam-policy-analysis --folder "f1" --identity "user:user1@foo.com"
+      --roles "roles/cloudasset.r1,roles/cloudasset.r2"
+      --expand-resources --output-resource-edges --output-path=gs://bucket-name/object-name
+  - stderr: |
+      Export in progress for root asset [folders/f1].
+      Use [gcloud asset operations describe folders/f1/operations/ExportIamPolicyAnalysis/002] to check the status of the operation.
+actions:
+- execute_command:
+    command: asset export-iam-policy-analysis --organization "o1" --full-resource-name "//o1/f/p/r1"
+      --roles "roles/cloudasset.r1,roles/cloudasset.r2" --permissions "a.b.get,c.d.create"
+      --expand-groups --expand-roles --output-group-edges
+      --output-path=gs://bucket-name/object-name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1p4beta1/organizations/o1:exportIamPolicyAnalysis?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              analysisQuery:
+                accessSelector:
+                  permissions:
+                  - a.b.get
+                  - c.d.create
+                  roles:
+                  - roles/cloudasset.r1
+                  - roles/cloudasset.r2
+                resourceSelector:
+                  fullResourceName: //o1/f/p/r1
+              options:
+                expandGroups: true
+                expandRoles: true
+                outputGroupEdges: true
+              outputConfig:
+                gcsDestination:
+                  uri: gs://bucket-name/object-name
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/o1/operations/ExportIamPolicyAnalysis/001",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.asset.v1p4beta1.ExportIamPolicyAnalysisRequest",
+                "analysisQuery": {
+                  "parent": "organizations/o1",
+                  "resourceSelector": {
+                    "fullResourceName": "//o1/f/p/r1"
+                  },
+                  "accessSelector": {
+                    "roles": "roles/cloudasset.r1",
+                    "roles": "roles/cloudasset.r2",
+                    "permissions": "a.b.get",
+                    "permissions": "c.d.create"
+                  }
+                },
+                "outputConfig": {
+                  "gcsDestination": {
+                    "uri": "gs://bucket-name/object-name"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Export in progress for root asset [organizations/o1].
+        Use [gcloud asset operations describe organizations/o1/operations/ExportIamPolicyAnalysis/001] to check the status of the operation.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: asset export-iam-policy-analysis --folder "f1" --identity "user:user1@foo.com"
+      --permissions "a.b.get,c.d.create"
+      --expand-resources --output-resource-edges
+      --output-path=gs://bucket-name/object-name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1p4beta1/folders/f1:exportIamPolicyAnalysis?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              analysisQuery:
+                accessSelector:
+                  permissions:
+                  - a.b.get
+                  - c.d.create
+                identitySelector:
+                  identity: user:user1@foo.com
+              options:
+                expandResources: true
+                outputResourceEdges: true
+              outputConfig:
+                gcsDestination:
+                  uri: gs://bucket-name/object-name
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "folders/f1/operations/ExportIamPolicyAnalysis/002",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.asset.v1p4beta1.ExportIamPolicyAnalysisRequest",
+                "analysisQuery": {
+                  "parent": "folders/f1",
+                  "identitySelector": {
+                    "name": "user:user1@foo.com"
+                  },
+                  "accessSelector": {
+                    "permissions": "a.b.get",
+                    "permissions": "c.d.create"
+                  }
+                },
+                "outputConfig": {
+                  "gcsDestination": {
+                    "uri": "gs://bucket-name/object-name"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Export in progress for root asset [folders/f1].
+        Use [gcloud asset operations describe folders/f1/operations/ExportIamPolicyAnalysis/002] to check the status of the operation.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: asset export-iam-policy-analysis --folder "f1" --identity "user:user1@foo.com"
+      --roles "roles/cloudasset.r1,roles/cloudasset.r2"
+      --expand-resources --output-resource-edges
+      --output-path=gs://bucket-name/object-name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1p4beta1/folders/f1:exportIamPolicyAnalysis?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              analysisQuery:
+                accessSelector:
+                  roles:
+                  - roles/cloudasset.r1
+                  - roles/cloudasset.r2
+                identitySelector:
+                  identity: user:user1@foo.com
+              options:
+                expandResources: true
+                outputResourceEdges: true
+              outputConfig:
+                gcsDestination:
+                  uri: gs://bucket-name/object-name
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "folders/f1/operations/ExportIamPolicyAnalysis/002",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.asset.v1p4beta1.ExportIamPolicyAnalysisRequest",
+                "analysisQuery": {
+                  "parent": "folders/f1",
+                  "identitySelector": {
+                    "name": "user:user1@foo.com"
+                  },
+                  "accessSelector": {
+                    "roles": "roles/cloudasset.r1",
+                    "roles": "roles/cloudasset.r2"
+                  }
+                },
+                "outputConfig": {
+                  "gcsDestination": {
+                    "uri": "gs://bucket-name/object-name"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Export in progress for root asset [folders/f1].
+        Use [gcloud asset operations describe folders/f1/operations/ExportIamPolicyAnalysis/002] to check the status of the operation.
+    - expect_exit:
+        code: 0

@@ -5,8 +5,11 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute instances network-interfaces get-effective-firewalls
-        INSTANCE_NAME [--network-interface=NETWORK_INTERFACE; default="nic0"]
-        [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        INSTANCE_NAME [NAME ...]
+        [--network-interface=NETWORK_INTERFACE; default="nic0"]
+        [--regexp=REGEXP, -r REGEXP] [--zone=ZONE] [--filter=EXPRESSION]
+        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instances network-interfaces
@@ -26,9 +29,23 @@ POSITIONAL ARGUMENTS
         names, refer to the criteria documented under the field 'name' at:
         https://cloud.google.com/compute/docs/reference/rest/v1/instances
 
+     [NAME ...]
+        (DEPRECATED) If provided, show details for the specified names and/or
+        URIs of resources.
+
+        Argument NAME is deprecated. Use --filter="name=( 'NAME' ... )"
+        instead.
+
 FLAGS
      --network-interface=NETWORK_INTERFACE; default="nic0"
         The name of the network interface to get the effective firewalls.
+
+     --regexp=REGEXP, -r REGEXP
+        (DEPRECATED) Regular expression to filter the names of the results on.
+        Any names that do not match the entire regular expression will be
+        filtered out.
+
+        Flag --regexp is deprecated. Use --filter="name~'REGEXP'" instead.
 
      --zone=ZONE
         Zone of the instance to operate on. If not specified, the user may be
@@ -53,6 +70,35 @@ FLAGS
         Alternatively, the zone can be stored in the environment variable
         CLOUDSDK_COMPUTE_ZONE.
 
+LIST COMMAND FLAGS
+     --filter=EXPRESSION
+        Apply a Boolean filter EXPRESSION to each resource item to be listed.
+        If the expression evaluates True, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --limit=LIMIT
+        Maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --page-size=PAGE_SIZE
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is
+        determined by the service if it supports paging, otherwise it is
+        unlimited (no paging). Paging may be applied before or after --filter
+        and --limit depending on the service.
+
+     --sort-by=[FIELD,...]
+        Comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: --flatten, --sort-by, --filter, --limit.
+
+     --uri
+        Print a list of resource URIs instead of the default output.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -66,6 +112,8 @@ EXAMPLES
 
         $ gcloud alpha compute instances network-interfaces \
             get-effective-firewalls example-instance,
+    To show all fields of the firewall rules, please show in JSON format with
+    option --format=json
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

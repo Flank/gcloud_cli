@@ -7,7 +7,7 @@ SYNOPSIS
         (FHIR_STORE : --dataset=DATASET --location=LOCATION)
         [--disable-referential-integrity] [--disable-resource-versioning]
         [--enable-update-create] [--pubsub-topic=PUBSUB_TOPIC]
-        [GCLOUD_WIDE_FLAG ...]
+        [--version=VERSION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Creates a Cloud Healthcare API FHIR store.
@@ -62,6 +62,22 @@ FLAGS
         Note, a topic needs to be created before publishing or subscribing to
         it. For instructions on creating topics, refer to:
         https://cloud.google.com/pubsub/docs/admin#create_a_topic
+
+     --version=VERSION
+        The FHIR specification version that this FHIR store supports natively.
+        This field is immutable after store creation. Requests are rejected if
+        they contain FHIR resources of a different version. An empty value is
+        treated as STU3. VERSION must be one of:
+
+         dstu2
+            Draft Standard for Trial Use, Release 2
+            (https://www.hl7.org/fhir/DSTU2)
+
+         r4
+            Release 4 (https://www.hl7.org/fhir/R4)
+
+         stu3
+            Standard for Trial Use, Release 3 (https://www.hl7.org/fhir/STU3)
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

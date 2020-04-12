@@ -1,12 +1,17 @@
 NAME
-    gcloud compute networks - list, create, and delete Google Compute Engine
-        networks
+    gcloud compute networks - list, create, and delete Compute Engine networks
 
 SYNOPSIS
     gcloud compute networks GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    List, create, and delete Google Compute Engine networks.
+    Read and manipulate VPC networks.
+
+    For more information about networks, see the networks documentation
+    (https://cloud.google.com/vpc/docs/vpc).
+
+    See also: Networks API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/networks).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,10 +25,10 @@ GROUPS
     GROUP is one of the following:
 
      peerings
-        List, create, and delete Google Compute Engine network peerings.
+        List, create, and delete, and update VPC Network Peering.
 
      subnets
-        List, describe, and delete Google Compute Engine subnetworks.
+        List, describe, and delete, and update Compute Engine subnetworks.
 
      vpc-access
         Manage VPC Access Service resources.

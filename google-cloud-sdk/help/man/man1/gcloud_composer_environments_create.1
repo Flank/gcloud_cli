@@ -11,7 +11,7 @@ gcloud composer environments create \- create and initialize a Cloud Composer en
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ |\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ |\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR] [\fB\-\-cloud\-sql\-ipv4\-cidr\fR=\fICLOUD_SQL_IPV4_CIDR\fR\ \fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-environment\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR\ \fB\-\-web\-server\-ipv4\-cidr\fR=\fIWEB_SERVER_IPV4_CIDR\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR\ \fB\-\-cluster\-secondary\-range\-name\fR=\fICLUSTER_SECONDARY_RANGE_NAME\fR\ \fB\-\-enable\-ip\-alias\fR\ \fB\-\-services\-ipv4\-cidr\fR=\fISERVICES_IPV4_CIDR\fR\ \fB\-\-services\-secondary\-range\-name\fR=\fISERVICES_SECONDARY_RANGE_NAME\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -177,6 +177,104 @@ portion, the patch version can be omitted and the current
 version will be selected. The version numbers that are used will
 be stored.
 .RE
+
+.RE
+.sp
+.TP 2m
+
+Private Clusters
+
+.RS 2m
+.TP 2m
+\fB\-\-cloud\-sql\-ipv4\-cidr\fR=\fICLOUD_SQL_IPV4_CIDR\fR
+IPv4 CIDR range to use for the Cloud SQL network. This should have a size of the
+netmask not greater than 24.
+
+Cannot be specified unless '\-\-enable\-private\-environnment' is also
+specified.
+
+.TP 2m
+\fB\-\-enable\-private\-endpoint\fR
+Environment cluster is managed using the private IP address of the master API
+endpoint. Therefore access to the master endpoint must be from internal IP
+addresses.
+
+If not specified, the master API endpoint will be accessible by its public IP
+address.
+
+Cannot be specified unless '\-\-enable\-private\-environnment' is also
+specified.
+
+.TP 2m
+\fB\-\-enable\-private\-environment\fR
+Environment cluster is created with no public IP addresses on the cluster nodes.
+
+If not specified, cluster nodes will be assigned public IP addresses.
+
+Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
+
+.TP 2m
+\fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR
+IPv4 CIDR range to use for the cluste master network. This should have a size of
+the netmask between 23 and 28.
+
+Cannot be specified unless '\-\-enable\-private\-environnment' is also
+specified.
+
+.TP 2m
+\fB\-\-web\-server\-ipv4\-cidr\fR=\fIWEB_SERVER_IPV4_CIDR\fR
+IPv4 CIDR range to use for the Airflow web server network. This should have a
+size of the netmask between 24 and 29.
+
+Cannot be specified unless '\-\-enable\-private\-environnment' is also
+specified.
+
+.RE
+.sp
+.TP 2m
+
+IP Alias (VPC\-native)
+
+.RS 2m
+.TP 2m
+\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR
+IP address range for the pods in this cluster in CIDR notation (e.g.
+10.0.0.0/14).
+
+Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
+
+.TP 2m
+\fB\-\-cluster\-secondary\-range\-name\fR=\fICLUSTER_SECONDARY_RANGE_NAME\fR
+Secondary range to be used as the source for pod IPs. Alias ranges will be
+allocated from this secondary range. NAME must be the name of an existing
+secondary range in the cluster subnetwork.
+
+Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
+
+.TP 2m
+\fB\-\-enable\-ip\-alias\fR
+Enable use of alias IPs (https://cloud.google.com/compute/docs/alias\-ip/) for
+Pod IPs. This will require at least two secondary ranges in the subnetwork, one
+for the pod IPs and another to reserve space for the services range.
+
+.TP 2m
+\fB\-\-services\-ipv4\-cidr\fR=\fISERVICES_IPV4_CIDR\fR
+IP range for the services IPs.
+
+Can be specified as a netmask size (e.g. '/20') or as in CIDR notion (e.g.
+\'10.100.0.0/20'). If given as a netmask size, the IP range will be chosen
+automatically from the available space in the network.
+
+If unspecified, the services CIDR range will be chosen with a default mask size.
+
+Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
+
+.TP 2m
+\fB\-\-services\-secondary\-range\-name\fR=\fISERVICES_SECONDARY_RANGE_NAME\fR
+Secondary range to be used for services (e.g. ClusterIPs). NAME must be the name
+of an existing secondary range in the cluster subnetwork.
+
+Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
 
 .RE
 .sp

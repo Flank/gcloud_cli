@@ -1,21 +1,20 @@
 NAME
-    gcloud beta compute - create and manipulate Google Compute Engine resources
+    gcloud beta compute - create and manipulate Compute Engine resources
 
 SYNOPSIS
     gcloud beta compute GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) The gcloud compute command group lets you create, configure and
-    manipulate Google Compute Engine virtual machines.
+    (BETA) The gcloud compute command group lets you create, configure, and
+    manipulate Compute Engine virtual machine (VM) instances.
 
-    With Compute Engine you can create and run virtual machines on Google
-    infrastructure. Compute Engine offers scale, performance, and value that
-    allows you to easily launch large compute clusters on Google's
-    infrastructure.
+    With Compute Engine, you can create and run VMs on Google's infrastructure.
+    Compute Engine offers scale, performance, and value that lets you launch
+    large compute clusters on Google's infrastructure.
 
-    More information on Compute Engine can be found here:
-    https://cloud.google.com/compute/ and detailed documentation can be found
-    here: https://cloud.google.com/compute/docs/
+    For more information about Compute Engine, see the Compute Engine overview
+    (https://cloud.google.com/compute/) and the Compute Engine user
+    documentation (https://cloud.google.com/compute/docs/).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -29,10 +28,10 @@ GROUPS
     GROUP is one of the following:
 
      accelerator-types
-        (BETA) Read Google Compute Engine accelerator types.
+        (BETA) Read Compute Engine accelerator types.
 
      addresses
-        (BETA) Read and manipulate Google Compute Engine addresses.
+        (BETA) Read and manipulate Compute Engine addresses.
 
      backend-buckets
         (BETA) Read and manipulate backend buckets.
@@ -41,20 +40,19 @@ GROUPS
         (BETA) List, create, and delete backend services.
 
      commitments
-        (BETA) Manage Google Compute Engine commitments.
+        (BETA) Manage Compute Engine commitments.
 
      diagnose
-        (BETA) Debugging tools for Google Compute Engine virtual machine
-        instances.
+        (BETA) Debugging tools for Compute Engine virtual machine instances.
 
      disk-types
-        (BETA) Read Google Compute Engine virtual disk types.
+        (BETA) Read Compute Engine virtual disk types.
 
      disks
-        (BETA) Read and manipulate Google Compute Engine disks.
+        (BETA) Read and manipulate Compute Engine disks.
 
      external-vpn-gateways
-        (BETA) Read and manipulate Google Compute Engine External VPN Gateways.
+        (BETA) List, create, delete and update External VPN Gateways.
 
      firewall-rules
         (BETA) List, create, update, and delete Google Compute Engine firewall
@@ -76,36 +74,34 @@ GROUPS
         instances.
 
      images
-        (BETA) List, create, and delete Google Compute Engine images.
+        (BETA) List, create, and delete Compute Engine images.
 
      instance-groups
-        (BETA) Read and manipulate Google Compute Engine instance groups.
+        (BETA) Read and manipulate Compute Engine instance groups.
 
      instance-templates
-        (BETA) Read and manipulate Google Compute Engine instances templates.
+        (BETA) Read and manipulate Compute Engine instances templates.
 
      instances
-        (BETA) Read and manipulate Google Compute Engine virtual machine
-        instances.
+        (BETA) Read and manipulate Compute Engine virtual machine instances.
 
      interconnects
-        (BETA) Read and manipulate Google Compute Engine interconnects.
+        (BETA) Read and manipulate Compute Engine interconnects.
 
      machine-images
-        (BETA) Read and manage Google Compute Engine machine image resources.
+        (BETA) Read and manage Compute Engine machine image resources.
 
      machine-types
         (BETA) Read Google Compute Engine virtual machine types.
 
      network-endpoint-groups
-        (BETA) Read and manipulate Google Compute Engine network endpoint
-        groups.
+        (BETA) Read and manipulate Compute Engine network endpoint groups.
 
      networks
-        (BETA) List, create, and delete Google Compute Engine networks.
+        (BETA) List, create, and delete Compute Engine networks.
 
      operations
-        (BETA) Read and manipulate Google Compute Engine operations.
+        (BETA) Read and manipulate Compute Engine operations.
 
      org-security-policies
         (BETA) Manage Google Compute Engine organization security policies.
@@ -114,7 +110,7 @@ GROUPS
         (BETA) Manage OS Config tasks for Compute Engine VM instances.
 
      os-login
-        (BETA) Create and manipulate Google Compute Engine OS Login resources.
+        (BETA) Create and manipulate Compute Engine OS Login resources.
 
      packet-mirrorings
         (BETA) Manage Google Compute Engine packet mirroring resources.
@@ -123,40 +119,37 @@ GROUPS
         (BETA) Read and manipulate project-level data like quotas and metadata.
 
      regions
-        (BETA) List Google Compute Engine regions.
+        (BETA) List Compute Engine regions.
 
      reservations
         (BETA) Manage Compute Engine reservations.
 
      resource-policies
-        (BETA) Manage Google Compute Engine Resource Policies.
+        (BETA) Manage Compute Engine Resource Policies.
 
      routers
-        (BETA) List, create, and delete Google Compute Engine routers.
+        (BETA) List, create, and delete Compute Engine routers.
 
      routes
         (BETA) Read and manipulate routes.
 
      security-policies
-        (BETA) Read and manipulate Google Compute Engine security policies.
-        Security policies are used to control access to Google Cloud HTTP/HTTPS
-        load balancers.
+        (BETA) Read and manipulate Cloud Armor security policies.
 
      shared-vpc
         (BETA) Configure shared VPC.
 
      snapshots
-        (BETA) List, describe, and delete Google Compute Engine snapshots.
+        (BETA) List, describe, and delete Compute Engine snapshots.
 
      sole-tenancy
         (BETA) Read and manage Compute Engine sole-tenancy resources.
 
      ssl-certificates
-        (BETA) List, create, and delete Google Compute Engine SSL certificates.
+        (BETA) List, create, and delete Compute Engine SSL certificates.
 
      ssl-policies
-        (BETA) List, create, delete and update Google Compute Engine SSL
-        policies.
+        (BETA) List, create, delete and update Compute Engine SSL policies.
 
      target-http-proxies
         (BETA) List, create, and delete target HTTP proxies.
@@ -165,8 +158,7 @@ GROUPS
         (BETA) List, create, and delete target HTTPS proxies.
 
      target-instances
-        (BETA) Read and manipulate Google Compute Engine virtual target
-        instances.
+        (BETA) Read and manipulate Compute Engine virtual target instances.
 
      target-pools
         (BETA) Control Compute Engine target pools for network load balancing.
@@ -178,7 +170,7 @@ GROUPS
         (BETA) List, create, and delete target TCP proxies.
 
      target-vpn-gateways
-        (BETA) read and manipulate Google Compute Engine Classic VPN Gateways.
+        (BETA) Read and manipulate classic VPN gateways.
 
      tpus
         (BETA) List, create, and delete Cloud TPUs.
@@ -187,14 +179,13 @@ GROUPS
         (BETA) List, create, and delete URL maps.
 
      vpn-gateways
-        (BETA) read and manipulate Google Compute Engine Highly Available VPN
-        Gateways.
+        (BETA) read and manipulate Highly Available VPN Gateways.
 
      vpn-tunnels
-        (BETA) Read and manipulate Google Compute Engine VPN Tunnels.
+        (BETA) Read and manipulate Compute Engine VPN tunnels.
 
      zones
-        (BETA) List Google Compute Engine zones.
+        (BETA) List Compute Engine zones.
 
 COMMANDS
     COMMAND is one of the following:

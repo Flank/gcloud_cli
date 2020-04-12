@@ -145,10 +145,11 @@ To find out which users have been granted the iam.serviceAccounts.actAs
 permission on a service account, run:
 
 .RS 2m
-$ gcloud beta asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID
-\-\-full\-resource\-name='//iam.googleapis.com/projects/YOUR_PROJ_ID/serviceAccounts/YOUR_SERVICE_ACCOUNT_UNIQUE_ID'
-\-\-permissions='iam.serviceAccounts.actAs'
+$ gcloud beta asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID \e
+    \-\-full\-resource\-name=YOUR_SERVICE_ACCOUNT_FULL_RESOURCE_NAME \e
+    \-\-permissions='iam.serviceAccounts.actAs'
 .RE
+
 
 To find out which resources a user can access, run:
 
@@ -161,9 +162,9 @@ To find out which roles or permissions a user has been granted on a project,
 run:
 
 .RS 2m
-$ gcloud beta asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID
-\-\-full\-resource\-name='//cloudresourcemanager.googleapis.com/projects/YOUR_PROJ_ID'
-\-\-identity='user:u1@foo.com'
+$ gcloud beta asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID \e
+    \-\-full\-resource\-name=YOUR_PROJECT_FULL_RESOURCE_NAME \e
+    \-\-identity='user:u1@foo.com'
 .RE
 
 

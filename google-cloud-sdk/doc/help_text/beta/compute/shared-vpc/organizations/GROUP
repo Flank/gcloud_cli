@@ -1,12 +1,12 @@
 NAME
     gcloud beta compute shared-vpc organizations - configure organizations for
-        cross-project networking (XPN)
+        Shared VPC networking
 
 SYNOPSIS
     gcloud beta compute shared-vpc organizations COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Configure organizations for cross-project networking (XPN).
+    (BETA) Configure organizations for Shared VPC networking.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

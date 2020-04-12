@@ -11,7 +11,7 @@ gcloud beta compute instance\-groups managed update\-autoscaling \- update autos
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute instance\-groups managed update\-autoscaling\fR \fINAME\fR [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute instance\-groups managed update\-autoscaling\fR \fINAME\fR [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-clear\-scale\-in\-control\fR\ |\ \fB\-\-scale\-in\-control\fR=[\fImax\-scaled\-in\-replicas\fR=\fIMAX\-SCALED\-IN\-REPLICAS\fR],[\fImax\-scaled\-in\-replicas\-percent\fR=\fIMAX\-SCALED\-IN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -78,6 +78,44 @@ To permit autoscaling to scale only up and not down.
 .sp
 
 
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-scale\-in\-control\fR
+If specified, the scale\-in\-control field will be cleared. Using this flag will
+remove any configuration set by \f5\-\-scale\-in\-control\fR flag.
+
+.TP 2m
+\fB\-\-scale\-in\-control\fR=[\fImax\-scaled\-in\-replicas\fR=\fIMAX\-SCALED\-IN\-REPLICAS\fR],[\fImax\-scaled\-in\-replicas\-percent\fR=\fIMAX\-SCALED\-IN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]
+Configuration that allows slower scale in so that even if Autoscaler recommends
+an abrupt scale in of a managed instance group, it will be throttled as
+specified by the parameters.
+
+.TP 2m
+\fBmax\-scaled\-in\-replicas\fR
+Maximum allowed number of VMs that can be deducted from the peak recommendation
+during the window. Possibly all these VMs can be deleted at once so the
+application needs to be prepared to lose that many VMs in one step. Mutually
+exclusive with 'max\-scaled\-in\-replicas\-percent'.
+
+.TP 2m
+\fBmax\-scaled\-in\-replicas\-percent\fR
+Maximum allowed percent of VMs that can be deducted from the peak recommendation
+during the window. Possibly all these VMs can be deleted at once so the
+application needs to be prepared to lose that many VMs in one step. Mutually
+exclusive with 'max\-scaled\-in\-replicas'.
+
+.TP 2m
+\fBtime\-window\fR
+How long back autoscaling should look when computing recommendations. The
+autoscaler will not resize below the maximum allowed deduction subtracted from
+the peak size observed in this period. Measured in seconds.
+
+.RE
+.sp
 .TP 2m
 
 At most one of these may be specified:

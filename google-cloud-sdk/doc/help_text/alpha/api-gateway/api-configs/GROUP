@@ -22,7 +22,7 @@ COMMANDS
         (ALPHA) Add a new config to an API.
 
      delete
-        (ALPHA) Deletes a Config from an API.
+        (ALPHA) Deletes a config from an API.
 
      describe
         (ALPHA) Show details about a specific API config.
@@ -31,7 +31,7 @@ COMMANDS
         (ALPHA) List configs for an API.
 
      update
-        (ALPHA) Update an API Gateway API.
+        (ALPHA) Update an API Gateway API config.
 
 NOTES
     This command is an internal implementation detail and may change or

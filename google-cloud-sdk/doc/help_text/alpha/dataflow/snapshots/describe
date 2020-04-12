@@ -3,7 +3,7 @@ NAME
         snapshot
 
 SYNOPSIS
-    gcloud alpha dataflow snapshots describe SNAPSHOT_ID [--region=REGION_ID]
+    gcloud alpha dataflow snapshots describe SNAPSHOT_ID --region=REGION_ID
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -13,9 +13,9 @@ POSITIONAL ARGUMENTS
      SNAPSHOT_ID
         ID of the Cloud Dataflow snapshot.
 
-FLAGS
+REQUIRED FLAGS
      --region=REGION_ID
-        Region ID of the snapshot regional endpoint. Defaults to 'us-central1'.
+        Region ID of the snapshot regional endpoint.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -25,10 +25,17 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To see details about a Cloud Dataflow snapshot, run:
+
+        $ gcloud alpha dataflow snapshots describe SNAPSHOT_ID \
+            --region=SNAPSHOT_REGION
+
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you may be trying to access an API with an
-    invitation-only early access whitelist.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta dataflow snapshots describe
 

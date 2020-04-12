@@ -44,12 +44,14 @@ class ClusterStopUnitTestBeta(unit_base.DataprocUnitTestBase,
       region = self.REGION
     if not (response or exception):
       response = self.MakeOperation()
+    stop_cluster_request = self.messages.StopClusterRequest(
+        requestId=self.REQUEST_ID)
     self.mock_client.projects_regions_clusters.Stop.Expect(
         self.messages.DataprocProjectsRegionsClustersStopRequest(
             clusterName=cluster_name,
             region=region,
             projectId=self.Project(),
-            requestId=self.REQUEST_ID),
+            stopClusterRequest=stop_cluster_request),
         response=response,
         exception=exception)
 

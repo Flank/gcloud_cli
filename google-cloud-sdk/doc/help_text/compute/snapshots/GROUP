@@ -1,12 +1,18 @@
 NAME
-    gcloud compute snapshots - list, describe, and delete Google Compute Engine
+    gcloud compute snapshots - list, describe, and delete Compute Engine
         snapshots
 
 SYNOPSIS
     gcloud compute snapshots COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    List, describe, and delete Google Compute Engine snapshots.
+    List, describe, and delete Compute Engine snapshots.
+
+    For more information about snapshots, see the snapshots documentation
+    (https://cloud.google.com/compute/docs/disks/create-snapshots).
+
+    See also: Snapshots API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/snapshots).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

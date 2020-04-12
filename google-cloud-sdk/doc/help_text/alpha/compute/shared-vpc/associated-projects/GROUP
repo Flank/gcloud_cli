@@ -1,13 +1,13 @@
 NAME
     gcloud alpha compute shared-vpc associated-projects - configure associated
-        projects for cross-project networking (XPN)
+        projects for Shared VPC networking
 
 SYNOPSIS
     gcloud alpha compute shared-vpc associated-projects COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Configure associated projects for cross-project networking (XPN).
+    (ALPHA) Configure associated projects for Shared VPC networking.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -116,7 +116,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F456
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F456&showDeleted=True
           method: GET
           body: None
         return_response:

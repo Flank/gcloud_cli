@@ -31,6 +31,9 @@ GROUPS
      pubsub
         (ALPHA) Manage your local pubsub emulator.
 
+     spanner
+        (ALPHA) Manage your local Spanner emulator.
+
 COMMANDS
     COMMAND is one of the following:
 

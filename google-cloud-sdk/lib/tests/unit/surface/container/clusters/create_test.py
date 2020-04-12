@@ -3071,6 +3071,28 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
+  def testEnableGvnic(self):
+    cluster_kwargs = {
+        'enableGvnic': True,
+    }
+    # Cluster create returns operation pending
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    expected_cluster.enableGvnic = True
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-gvnic '
+        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
@@ -3544,7 +3566,7 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
 
     cluster = self._MakeCluster(**cluster_kwargs)
     cluster.workloadIdentityConfig = self.messages.WorkloadIdentityConfig(
-        identityNamespace='{}.svc.id.goog'.format(self.PROJECT_ID))
+        workloadPool='{}.svc.id.goog'.format(self.PROJECT_ID))
     self.ExpectCreateCluster(cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.ExpectGetCluster(self._RunningClusterForVersion('1.14.2'))
@@ -3552,7 +3574,7 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
     self.Run(
         (self.clusters_command_base.format(self.ZONE) + ' create {cluster} '
          ' --enable-stackdriver-kubernetes'
-         ' --identity-namespace={project}.svc.id.goog'
+         ' --workload-pool={project}.svc.id.goog'
          ' --addons=ConfigConnector --quiet').format(
              cluster=self.CLUSTER_NAME, project=self.PROJECT_ID))
     self.AssertOutputContains('RUNNING')
@@ -3572,7 +3594,7 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
   def testCreateEnableAddonsConfigConnectorWithoutWorkloadIdentity(self):
     err_msg = ('The ConfigConnector-on-GKE addon (--addons=ConfigConnector) '
                'requires workload identity to be enabled via the '
-               '--identity-namespace=IDENTITY_NAMESPACE flag.')
+               '--workload-pool=WORKLOAD_POOL flag.')
     with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
       self.Run((
           self.clusters_command_base.format(self.ZONE) +
@@ -3850,6 +3872,7 @@ linuxConfig:
         '--quiet'.format(name=self.CLUSTER_NAME, flags=flags))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
+
 
 if __name__ == '__main__':
   test_case.main()

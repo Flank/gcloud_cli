@@ -26,6 +26,7 @@ from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as c_exceptions
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import properties
@@ -59,6 +60,17 @@ _DOCKER_BUILD_STEPS = [
         ])
 ]
 
+_DEFAULT_BUILDPACK_BUILDER = 'gcr.io/buildpacks/builder'
+
+_DOCKER_BUILD_STEPS_WITH_AR = [
+    core_apis.GetMessagesModule('cloudbuild', 'v1').BuildStep(
+        name='gcr.io/cloud-builders/docker',
+        args=[
+            'build', '--network', 'cloudbuild', '--no-cache', '-t',
+            'us-east1-docker.pkg.dev/my-project/image', '.'
+        ])
+]
+
 
 def _MakeConfig(images=None, timeout=None):
   config_contents = _CONFIG_STEPS
@@ -73,6 +85,9 @@ def _MakeConfig(images=None, timeout=None):
 # TODO(b/29358031): Move WithMockHttp somewhere more appropriate for unit tests.
 class SubmitTest(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
                  sdk_test_base.WithTempCWD):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.StartPatch('time.sleep')  # To speed up tests with polling
@@ -513,6 +528,58 @@ Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456
     self.AssertOutputContains(
         """\
 ID CREATE_TIME DURATION SOURCE IMAGES STATUS
+123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
+""".format(frozen_zip_filename=self.frozen_zip_filename),
+        normalize_space=True)
+    self.AssertErrContains('Logs are available at')
+    self.AssertErrContains('mockLogURL')
+    self.AssertErrNotContains('Logs can be found in the Cloud Console')
+
+  def testCreateSuccessWithArtifactRegistry(self):
+    b_out = self.cloudbuild_v1_messages.Build(
+        createTime='2016-03-31T19:12:32.838111Z',
+        id='123-456-789',
+        images=[
+            'us-east1-docker.pkg.dev/my-project/image',
+        ],
+        projectId='my-project',
+        status=self._statuses.QUEUED,
+        logsBucket='gs://my-project_cloudbuild/logs',
+        source=self.cloudbuild_v1_messages.Source(
+            storageSource=self.cloudbuild_v1_messages.StorageSource(
+                bucket='my-project_cloudbuild',
+                object=self.frozen_zip_filename,
+                generation=123,
+            )),
+        steps=_DOCKER_BUILD_STEPS_WITH_AR,
+        logUrl='mockLogURL',
+        timeout='600.000s',
+    )
+    b_in = self.cloudbuild_v1_messages.Build(
+        images=[
+            'us-east1-docker.pkg.dev/my-project/image',
+        ],
+        source=self.cloudbuild_v1_messages.Source(
+            storageSource=self.cloudbuild_v1_messages.StorageSource(
+                bucket='my-project_cloudbuild',
+                object=self.frozen_zip_filename,
+                generation=123,
+            )),
+        steps=_DOCKER_BUILD_STEPS_WITH_AR,
+    )
+    self.ExpectMessagesForSimpleBuild(b_in, b_out)
+
+    self._Run([
+        'builds', 'submit', 'gs://bucket/object.zip',
+        '--tag=us-east1-docker.pkg.dev/my-project/image', '--async'
+    ])
+    self.AssertErrContains(
+        """\
+Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789].
+""",
+        normalize_space=True)
+    self.AssertOutputContains(
+        """\
 123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
 """.format(frozen_zip_filename=self.frozen_zip_filename),
         normalize_space=True)
@@ -2725,6 +2792,342 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
 123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
 """.format(frozen_zip_filename=self.frozen_zip_filename),
         normalize_space=True)
+
+
+class SubmitTestBeta(SubmitTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class SubmitTestAlpha(SubmitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateConfigWithPack(self):
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket='my-project_cloudbuild'),
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
+    self.mocked_storage_v1.buckets.List.Expect(
+        self.storage_v1_messages.StorageBucketsListRequest(
+            project='my-project',
+            prefix='my-project_cloudbuild',
+        ),
+        response=self.storage_v1_messages.Buckets(
+            items=[self.storage_v1_messages.Bucket(
+                id='my-project_cloudbuild')]))
+    self.mocked_storage_v1.objects.Rewrite.Expect(
+        self.storage_v1_messages.StorageObjectsRewriteRequest(
+            destinationBucket='my-project_cloudbuild',
+            destinationObject=self.frozen_zip_filename,
+            sourceBucket='bucket',
+            sourceObject='object.zip',
+        ),
+        response=self.storage_v1_messages.RewriteResponse(
+            resource=self.storage_v1_messages.Object(
+                bucket='my-project_cloudbuild',
+                name=self.frozen_zip_filename,
+                generation=123,
+            ),
+            done=True,
+        ))
+
+    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
+        build=self.cloudbuild_v1_messages.Build(
+            createTime='2016-03-31T19:12:32.838111Z',
+            id='123-456-789',
+            images=[
+                'gcr.io/my-project/image',
+            ],
+            projectId='my-project',
+            status=self._statuses.QUEUED,
+            logsBucket='gs://my-project_cloudbuild/logs',
+            source=self.cloudbuild_v1_messages.Source(
+                storageSource=self.cloudbuild_v1_messages.StorageSource(
+                    bucket='my-project_cloudbuild',
+                    object=self.frozen_zip_filename,
+                    generation=123,
+                )),
+            steps=[
+                self.cloudbuild_v1_messages.BuildStep(
+                    name='gcr.io/k8s-skaffold/pack',
+                    entrypoint='pack',
+                    args=[
+                        'build', 'gcr.io/my-project/image', '--builder',
+                        _DEFAULT_BUILDPACK_BUILDER
+                    ],
+                ),
+            ]))
+
+    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
+        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
+            build=self.cloudbuild_v1_messages.Build(
+                images=[
+                    u'gcr.io/my-project/image',
+                ],
+                source=self.cloudbuild_v1_messages.Source(
+                    storageSource=self.cloudbuild_v1_messages.StorageSource(
+                        bucket='my-project_cloudbuild',
+                        object=self.frozen_zip_filename,
+                        generation=123,
+                    )),
+                steps=[
+                    core_apis.GetMessagesModule('cloudbuild', 'v1').BuildStep(
+                        name='gcr.io/k8s-skaffold/pack',
+                        entrypoint='pack',
+                        args=[
+                            'build', 'gcr.io/my-project/image', '--builder',
+                            _DEFAULT_BUILDPACK_BUILDER
+                        ],
+                    )
+                ],
+            ),
+            projectId='my-project',
+        ),
+        response=self.cloudbuild_v1_messages.Operation(
+            metadata=encoding.JsonToMessage(
+                self.cloudbuild_v1_messages.Operation.MetadataValue,
+                encoding.MessageToJson(op_metadata))))
+
+    self._Run([
+        'builds', 'submit', 'gs://bucket/object.zip',
+        '--pack=image=gcr.io/my-project/image', '--async'
+    ])
+    self.AssertErrContains(
+        """\
+Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789].
+""",
+        normalize_space=True)
+    self.AssertOutputContains(
+        """\
+ID CREATE_TIME DURATION SOURCE IMAGES STATUS
+123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
+""".format(frozen_zip_filename=self.frozen_zip_filename),
+        normalize_space=True)
+
+  def testCreateConfigWithPackAndBuilder(self):
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket='my-project_cloudbuild'),
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
+    self.mocked_storage_v1.buckets.List.Expect(
+        self.storage_v1_messages.StorageBucketsListRequest(
+            project='my-project',
+            prefix='my-project_cloudbuild',
+        ),
+        response=self.storage_v1_messages.Buckets(
+            items=[self.storage_v1_messages.Bucket(
+                id='my-project_cloudbuild')]))
+    self.mocked_storage_v1.objects.Rewrite.Expect(
+        self.storage_v1_messages.StorageObjectsRewriteRequest(
+            destinationBucket='my-project_cloudbuild',
+            destinationObject=self.frozen_zip_filename,
+            sourceBucket='bucket',
+            sourceObject='object.zip',
+        ),
+        response=self.storage_v1_messages.RewriteResponse(
+            resource=self.storage_v1_messages.Object(
+                bucket='my-project_cloudbuild',
+                name=self.frozen_zip_filename,
+                generation=123,
+            ),
+            done=True,
+        ))
+
+    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
+        build=self.cloudbuild_v1_messages.Build(
+            createTime='2016-03-31T19:12:32.838111Z',
+            id='123-456-789',
+            images=[
+                'gcr.io/my-project/image',
+            ],
+            projectId='my-project',
+            status=self._statuses.QUEUED,
+            logsBucket='gs://my-project_cloudbuild/logs',
+            source=self.cloudbuild_v1_messages.Source(
+                storageSource=self.cloudbuild_v1_messages.StorageSource(
+                    bucket='my-project_cloudbuild',
+                    object=self.frozen_zip_filename,
+                    generation=123,
+                )),
+            steps=[
+                self.cloudbuild_v1_messages.BuildStep(
+                    name='gcr.io/k8s-skaffold/pack',
+                    entrypoint='pack',
+                    args=[
+                        'build', 'gcr.io/my-project/image', '--builder',
+                        'cnbs/sample-builder:bionic'
+                    ],
+                ),
+            ]))
+
+    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
+        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
+            build=self.cloudbuild_v1_messages.Build(
+                images=[
+                    u'gcr.io/my-project/image',
+                ],
+                source=self.cloudbuild_v1_messages.Source(
+                    storageSource=self.cloudbuild_v1_messages.StorageSource(
+                        bucket='my-project_cloudbuild',
+                        object=self.frozen_zip_filename,
+                        generation=123,
+                    )),
+                steps=[
+                    core_apis.GetMessagesModule('cloudbuild', 'v1').BuildStep(
+                        name='gcr.io/k8s-skaffold/pack',
+                        entrypoint='pack',
+                        args=[
+                            'build', 'gcr.io/my-project/image', '--builder',
+                            'cnbs/sample-builder:bionic'
+                        ],
+                    )
+                ],
+            ),
+            projectId='my-project',
+        ),
+        response=self.cloudbuild_v1_messages.Operation(
+            metadata=encoding.JsonToMessage(
+                self.cloudbuild_v1_messages.Operation.MetadataValue,
+                encoding.MessageToJson(op_metadata))))
+
+    self._Run([
+        'builds', 'submit', 'gs://bucket/object.zip',
+        '--pack=image=gcr.io/my-project/image,builder=cnbs/sample-builder:bionic',
+        '--async'
+    ])
+    self.AssertErrContains(
+        """\
+Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789].
+""",
+        normalize_space=True)
+    self.AssertOutputContains(
+        """\
+ID CREATE_TIME DURATION SOURCE IMAGES STATUS
+123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
+""".format(frozen_zip_filename=self.frozen_zip_filename),
+        normalize_space=True)
+
+  def testCreateConfigWithPackAndBuilderAndEnvVars(self):
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket='my-project_cloudbuild'),
+        response=self.storage_v1_messages.Bucket(id='my-project_cloudbuild'))
+    self.mocked_storage_v1.buckets.List.Expect(
+        self.storage_v1_messages.StorageBucketsListRequest(
+            project='my-project',
+            prefix='my-project_cloudbuild',
+        ),
+        response=self.storage_v1_messages.Buckets(
+            items=[self.storage_v1_messages.Bucket(
+                id='my-project_cloudbuild')]))
+    self.mocked_storage_v1.objects.Rewrite.Expect(
+        self.storage_v1_messages.StorageObjectsRewriteRequest(
+            destinationBucket='my-project_cloudbuild',
+            destinationObject=self.frozen_zip_filename,
+            sourceBucket='bucket',
+            sourceObject='object.zip',
+        ),
+        response=self.storage_v1_messages.RewriteResponse(
+            resource=self.storage_v1_messages.Object(
+                bucket='my-project_cloudbuild',
+                name=self.frozen_zip_filename,
+                generation=123,
+            ),
+            done=True,
+        ))
+
+    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
+        build=self.cloudbuild_v1_messages.Build(
+            createTime='2016-03-31T19:12:32.838111Z',
+            id='123-456-789',
+            images=[
+                'gcr.io/my-project/image',
+            ],
+            projectId='my-project',
+            status=self._statuses.QUEUED,
+            logsBucket='gs://my-project_cloudbuild/logs',
+            source=self.cloudbuild_v1_messages.Source(
+                storageSource=self.cloudbuild_v1_messages.StorageSource(
+                    bucket='my-project_cloudbuild',
+                    object=self.frozen_zip_filename,
+                    generation=123,
+                )),
+            steps=[
+                self.cloudbuild_v1_messages.BuildStep(
+                    name='gcr.io/k8s-skaffold/pack',
+                    entrypoint='pack',
+                    args=[
+                        'build', 'gcr.io/my-project/image', '--builder',
+                        'cnbs/sample-builder:bionic', '--env',
+                        'foo=bar,hello=world'
+                    ],
+                ),
+            ]))
+
+    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
+        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
+            build=self.cloudbuild_v1_messages.Build(
+                images=[
+                    u'gcr.io/my-project/image',
+                ],
+                source=self.cloudbuild_v1_messages.Source(
+                    storageSource=self.cloudbuild_v1_messages.StorageSource(
+                        bucket='my-project_cloudbuild',
+                        object=self.frozen_zip_filename,
+                        generation=123,
+                    )),
+                steps=[
+                    core_apis.GetMessagesModule('cloudbuild', 'v1').BuildStep(
+                        name='gcr.io/k8s-skaffold/pack',
+                        entrypoint='pack',
+                        args=[
+                            'build', 'gcr.io/my-project/image', '--builder',
+                            'cnbs/sample-builder:bionic', '--env',
+                            'foo=bar,hello=world'
+                        ],
+                    )
+                ],
+            ),
+            projectId='my-project',
+        ),
+        response=self.cloudbuild_v1_messages.Operation(
+            metadata=encoding.JsonToMessage(
+                self.cloudbuild_v1_messages.Operation.MetadataValue,
+                encoding.MessageToJson(op_metadata))))
+
+    self._Run([
+        'builds', 'submit', 'gs://bucket/object.zip',
+        '--pack=^--^image=gcr.io/my-project/image--builder=cnbs/sample-builder:bionic--env=foo=bar,hello=world',
+        '--async'
+    ])
+    self.AssertErrContains(
+        """\
+Created [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789].
+""",
+        normalize_space=True)
+    self.AssertOutputContains(
+        """\
+ID CREATE_TIME DURATION SOURCE IMAGES STATUS
+123-456-789 2016-03-31T19:12:32+00:00 - gs://my-project_cloudbuild/{frozen_zip_filename} - QUEUED
+""".format(frozen_zip_filename=self.frozen_zip_filename),
+        normalize_space=True)
+
+  def testCreateConfigWithPackNoImage(self):
+    with self.assertRaises(c_exceptions.InvalidArgumentException):
+      self._Run([
+          'builds', 'submit', 'gs://bucket/object.zip',
+          '--pack=builder=cnbs/sample-builder:bionic', '--async'
+      ])
+
+  def testCreateConfigWithPackWithInvalidImage(self):
+    with self.assertRaises(c_exceptions.InvalidArgumentException):
+      self._Run([
+          'builds', 'submit', 'gs://bucket/object.zip',
+          '--pack=image=docker.io/image', '--async'
+      ])
 
 
 if __name__ == '__main__':

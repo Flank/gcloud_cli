@@ -60,21 +60,6 @@ class GetEffectiveFirewallsAlphaTest(sdk_test_base.WithFakeAuth,
 
     return instance, instance_ref
 
-  def _GetOperation(self, instance_ref):
-    operation_ref = self.resources.Parse(
-        'operation-1',
-        params={
-            'project': self.Project(),
-            'zone': instance_ref.zone
-        },
-        collection='compute.zoneOperations')
-    operation = self.messages.Operation(
-        name=operation_ref.Name(),
-        status=self.messages.Operation.StatusValueValuesEnum.DONE,
-        selfLink=operation_ref.SelfLink(),
-        targetLink=instance_ref.SelfLink())
-    return operation, operation_ref
-
   def _ExpectInstanceGetRequest(self, instance, instance_ref, exception=None):
     request_type = self.messages.ComputeInstancesGetRequest
 

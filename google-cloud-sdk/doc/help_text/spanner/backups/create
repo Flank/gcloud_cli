@@ -75,8 +75,6 @@ EXAMPLES
             --database=DATABASE --retention-period=2w
 
 NOTES
-    These variants are also available:
-
-        $ gcloud alpha spanner backups create
-        $ gcloud beta spanner backups create
+    This command is an internal implementation detail and may change or
+    disappear without notice.
 

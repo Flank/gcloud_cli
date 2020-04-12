@@ -609,17 +609,75 @@ class Sqlite3Tests(sdk_test_base.WithLogCapture,
                            'attempt to write to read-only database')
 
 
-class ADCTests(cli_test_base.CliTestBase,
-               credentials_test_base.CredentialsTestBase):
+class ADCTestsOauth2client(cli_test_base.CliTestBase,
+                           credentials_test_base.CredentialsTestBase):
 
   def SetUp(self):
     self.adc_file_path = os.path.join(self.temp_path,
                                       'application_default_credentials.json')
     self.StartObjectPatch(
         config, 'ADCFilePath', return_value=self.adc_file_path)
-    self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+    # Mocks the signer of service account credentials.
+    signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+    self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
+
     self.user_creds = creds.FromJson(self.USER_CREDENTIALS_JSON)
     self.service_creds = creds.FromJson(self.SERVICE_ACCOUNT_CREDENTIALS_JSON)
+    self.p12_service_creds = self.MakeP12ServiceAccountCredentials()
+
+  def testDumpADCToFile_UserCreds(self):
+    adc = creds.ADC(self.user_creds)
+    adc.DumpADCToFile()
+    self.AssertFileEquals(self.USER_CREDENTIALS_JSON, self.adc_file_path)
+
+  def testDumpADCToFile_ServiceCreds(self):
+    adc = creds.ADC(self.service_creds)
+    adc.DumpADCToFile()
+    self.AssertFileEquals(self.SERVICE_ACCOUNT_CREDENTIALS_JSON,
+                          self.adc_file_path)
+
+  def testDumpExtendedADCToFile_UserCreds(self):
+    adc = creds.ADC(self.user_creds)
+    adc.DumpExtendedADCToFile(quota_project='my project')
+    self.AssertFileEquals(self.EXTENDED_USER_CREDENTIALS_JSON,
+                          self.adc_file_path)
+
+  def testDumpExtendedADCToFile_ServiceCreds(self):
+    adc = creds.ADC(self.service_creds)
+    with self.AssertRaisesExceptionRegexp(creds.CredentialFileSaveError,
+                                          'The credential is not .*'):
+      adc.DumpExtendedADCToFile(quota_project='my project')
+
+  def testDumpExtendedADCToFile_QuotaProjectNotFound(self):
+    self.StartObjectPatch(creds, 'GetQuotaProject', return_value=None)
+    adc = creds.ADC(self.user_creds)
+    adc.DumpExtendedADCToFile()
+    self.AssertFileEquals(self.USER_CREDENTIALS_JSON, self.adc_file_path)
+    self.AssertErrContains('Cannot find a project')
+
+  def testDumpADCToFile_P12ServiceAccount(self):
+    with self.AssertRaisesExceptionMatches(creds.ADCError,
+                                           'Cannot convert credentials'):
+      adc = creds.ADC(self.p12_service_creds)
+      adc.DumpADCToFile()
+
+
+@test_case.Filters.SkipOnKokoroAndLinuxPy3('pytest loads wrong module',
+                                           'b/151428720')
+class ADCTestsGoogleAuth(cli_test_base.CliTestBase,
+                         credentials_test_base.CredentialsTestBase):
+
+  def SetUp(self):
+    self.adc_file_path = os.path.join(self.temp_path,
+                                      'application_default_credentials.json')
+    self.StartObjectPatch(
+        config, 'ADCFilePath', return_value=self.adc_file_path)
+    # Mocks the signer of service account credentials.
+    self.rsa_mock = self.StartObjectPatch(google_auth_crypt.RSASigner,
+                                          'from_service_account_info')
+
+    self.user_creds = self.MakeUserAccountCredentialsGoogleAuth()
+    self.service_creds = self.MakeServiceAccountCredentialsGoogleAuth()
 
   def testDumpADCToFile_UserCreds(self):
     adc = creds.ADC(self.user_creds)

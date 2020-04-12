@@ -1,11 +1,17 @@
 NAME
-    gcloud alpha compute commitments - manage Google Compute Engine commitments
+    gcloud alpha compute commitments - manage Compute Engine commitments
 
 SYNOPSIS
     gcloud alpha compute commitments COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage Google Compute Engine commitments.
+    (ALPHA) Manage Compute Engine commitments.
+
+    For more information about commitments, see the commitments documentation
+    (https://cloud.google.com/compute/docs/instances/signing-up-committed-use-discounts).
+
+    See also: Commitments API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/regionCommitments).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

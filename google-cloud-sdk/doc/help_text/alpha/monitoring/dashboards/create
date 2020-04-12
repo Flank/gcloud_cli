@@ -91,7 +91,7 @@ EXAMPLES
         $ gcloud alpha monitoring dashboards create \
             --config-from-file=MY-FILE
 
-        Sample contents of MY-FILE:
+    Sample contents of MY-FILE:
 
         displayName: New Dashboard
         gridLayout:
@@ -103,7 +103,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud monitoring dashboards create
         $ gcloud beta monitoring dashboards create
 

@@ -7,6 +7,12 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) Manage Compute Engine reservations.
 
+    For more information about reservations, see the reservations documentation
+    (https://cloud.google.com/compute/docs/instances/reserving-zonal-resources).
+
+    See also: Reservations API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/reservations).
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,

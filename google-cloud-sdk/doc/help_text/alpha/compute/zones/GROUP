@@ -1,11 +1,17 @@
 NAME
-    gcloud alpha compute zones - list Google Compute Engine zones
+    gcloud alpha compute zones - list Compute Engine zones
 
 SYNOPSIS
     gcloud alpha compute zones COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List Google Compute Engine zones.
+    (ALPHA) List Compute Engine zones.
+
+    For more information about zones, see the zones documentation
+    (https://cloud.google.com/compute/docs/regions-zones/).
+
+    See also: Zones API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/zones).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -19,15 +19,20 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.artifacts import exceptions as ar_exceptions
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.artifacts import base
 
 
-class NpmTests(base.ARTestBase):
+class NpmTestsBeta(base.ARTestBase):
+
+  def PreSetUp(self):
+    super(NpmTestsBeta, self).PreSetUp()
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testNpm(self):
     cmd = ' '.join([
-        'beta', 'artifacts', 'print-settings', 'npm', '--repository=my-repo',
+        'artifacts', 'print-settings', 'npm', '--repository=my-repo',
         '--location=us'
     ])
     self.SetListLocationsExpect('us')
@@ -51,7 +56,7 @@ registry=https://us-npm.pkg.dev/fake-project/my-repo/
 
   def testNpmWithScope(self):
     cmd = ' '.join([
-        'beta', 'artifacts', 'print-settings', 'npm', '--repository=my-repo',
+        'artifacts', 'print-settings', 'npm', '--repository=my-repo',
         '--scope=@my-scope', '--location=asia'
     ])
     self.SetListLocationsExpect('asia')
@@ -74,14 +79,14 @@ Please insert following snippet into your .npmrc
         normalize_space=True)
 
   def testMissingRepo(self):
-    cmd = ' '.join(['beta', 'artifacts', 'print-settings', 'npm'])
+    cmd = ' '.join(['artifacts', 'print-settings', 'npm'])
     with self.assertRaises(ar_exceptions.InvalidInputValueError):
       self.Run(cmd)
     self.AssertErrContains('Failed to find attribute [repository]')
 
   def testInvalidLocation(self):
     cmd = ' '.join([
-        'beta', 'artifacts', 'print-settings', 'npm', '--repository=my-repo',
+        'artifacts', 'print-settings', 'npm', '--repository=my-repo',
         '--location=invalid'
     ])
     self.SetListLocationsExpect('us')
@@ -92,7 +97,7 @@ Please insert following snippet into your .npmrc
 
   def testInvalidRepoType(self):
     cmd = ' '.join([
-        'beta', 'artifacts', 'print-settings', 'npm', '--repository=my-repo',
+        'artifacts', 'print-settings', 'npm', '--repository=my-repo',
         '--location=us'
     ])
     self.SetListLocationsExpect('us')
@@ -101,6 +106,13 @@ Please insert following snippet into your .npmrc
     with self.assertRaises(ar_exceptions.InvalidInputValueError):
       self.Run(cmd)
     self.AssertErrContains('Invalid repository type DOCKER. Valid type is NPM')
+
+
+class NpmTestsAlpha(NpmTestsBeta):
+
+  def PreSetUp(self):
+    super(NpmTestsAlpha, self).PreSetUp()
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

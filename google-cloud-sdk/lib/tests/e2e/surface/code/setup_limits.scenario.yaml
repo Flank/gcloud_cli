@@ -41,7 +41,7 @@ actions:
                   - containerPort: 8080
                   resources:
                     limits:
-                      cpu: 0.4
+                      cpu: '0.4'
                       memory: 209715200
                 terminationGracePeriodSeconds: 0
           ---

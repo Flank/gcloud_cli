@@ -146,48 +146,76 @@ class ReadInstancesFromArgsTest(base.MlBetaPlatformTestBase):
   def testReadInstancesFromArgs_NoInstances(self):
     with self.AssertRaisesExceptionMatches(
         predict_utilities.InvalidInstancesFileError,
-        'Exactly one of --json-instances and --text-instances must be '
-        'specified.'):
-      predict_utilities.ReadInstancesFromArgs(None, None)
+        'Exactly one of --json-request, --json-instances and --text-instances '
+        'must be specified.'):
+      predict_utilities.ReadInstancesFromArgs(None, None, None)
 
-  def testReadInstancesFromArgs_BothInstances(self):
+  def testReadInstancesFromArgs_MoreThanOneType(self):
     with self.AssertRaisesExceptionMatches(
         predict_utilities.InvalidInstancesFileError,
-        'Exactly one of --json-instances and --text-instances must be '
-        'specified.'):
-      predict_utilities.ReadInstancesFromArgs('foo.json', 'bar.txt')
+        'Exactly one of --json-request, --json-instances and --text-instances '
+        'must be specified.'):
+      predict_utilities.ReadInstancesFromArgs(None, 'foo.json', 'bar.txt')
+    with self.AssertRaisesExceptionMatches(
+        predict_utilities.InvalidInstancesFileError,
+        'Exactly one of --json-request, --json-instances and --text-instances '
+        'must be specified.'):
+      predict_utilities.ReadInstancesFromArgs('foo.json', None, 'bar.txt')
+    with self.AssertRaisesExceptionMatches(
+        predict_utilities.InvalidInstancesFileError,
+        'Exactly one of --json-request, --json-instances and --text-instances '
+        'must be specified.'):
+      predict_utilities.ReadInstancesFromArgs('foo.json', 'bar.json', None)
+    with self.AssertRaisesExceptionMatches(
+        predict_utilities.InvalidInstancesFileError,
+        'Exactly one of --json-request, --json-instances and --text-instances '
+        'must be specified.'):
+      predict_utilities.ReadInstancesFromArgs('foo.json', 'baz.json', 'bar.txt')
+
+  def testReadInstancesFromArgs_JsonRequest(self):
+    request_file = self.Touch(self.temp_path, 'request.json',
+                              contents=b'{"instances": [{"a": "b"}]}\n')
+    self.assertEqual(
+        predict_utilities.ReadInstancesFromArgs(request_file, None, None),
+        [{'a': 'b'}])
+
+  def testReadInstancesFromArgs_JsonRequestStdin(self):
+    self.WriteInput('{"instances": [{"a": "b"}]}')
+    self.assertEqual(
+        predict_utilities.ReadInstancesFromArgs('-', None, None),
+        [{'a': 'b'}])
 
   def testReadInstancesFromArgs_Json(self):
     instances_file = self.Touch(self.temp_path, 'instances.json',
                                 contents=b'{"a": "b"}\n')
     self.assertEqual(
-        predict_utilities.ReadInstancesFromArgs(instances_file, None),
+        predict_utilities.ReadInstancesFromArgs(None, instances_file, None),
         [{'a': 'b'}])
 
   def testReadInstancesFromArgs_JsonStdin(self):
     self.WriteInput('{"a": "b"}')
     self.assertEqual(
-        predict_utilities.ReadInstancesFromArgs('-', None),
+        predict_utilities.ReadInstancesFromArgs(None, '-', None),
         [{'a': 'b'}])
 
   def testReadInstancesFromArgs_Text(self):
     instances_file = self.Touch(self.temp_path, 'instances.txt',
                                 contents=b'foo\nbar')
     self.assertEqual(
-        predict_utilities.ReadInstancesFromArgs(None, instances_file),
+        predict_utilities.ReadInstancesFromArgs(None, None, instances_file),
         ['foo', 'bar'])
 
   def testReadInstancesFromArgs_WithBOM(self):
     instances_file = self.Touch(self.temp_path, 'instances.json',
                                 contents=b'\xef\xbb\xbf{"a": "b"}\n')
     self.assertEqual(
-        predict_utilities.ReadInstancesFromArgs(instances_file, None),
+        predict_utilities.ReadInstancesFromArgs(None, instances_file, None),
         [{'a': 'b'}])
 
   def testReadInstancesFromArgs_TextStdin(self):
     self.WriteInput('foo\nbar')
     self.assertEqual(
-        predict_utilities.ReadInstancesFromArgs(None, '-'),
+        predict_utilities.ReadInstancesFromArgs(None, None, '-'),
         ['foo', 'bar'])
 
 

@@ -11,7 +11,7 @@ gcloud alpha compute instances network\-interfaces get\-effective\-firewalls \- 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances network\-interfaces get\-effective\-firewalls\fR \fIINSTANCE_NAME\fR [\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR;\ default="nic0"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances network\-interfaces get\-effective\-firewalls\fR \fIINSTANCE_NAME\fR [\fINAME\fR\ ...] [\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR;\ default="nic0"] [\fB\-\-regexp\fR=\fIREGEXP\fR,\ \fB\-r\fR\ \fIREGEXP\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -41,6 +41,14 @@ Name of the instance to operate on. For details on valid instance names, refer
 to the criteria documented under the field 'name' at:
 https://cloud.google.com/compute/docs/reference/rest/v1/instances
 
+.TP 2m
+[\fINAME\fR ...]
+(DEPRECATED) If provided, show details for the specified names and/or URIs of
+resources.
+
+Argument \f5NAME\fR is deprecated. Use \f5\-\-filter="name=( 'NAME' ... )"\fR
+instead.
+
 
 .RE
 .sp
@@ -51,6 +59,14 @@ https://cloud.google.com/compute/docs/reference/rest/v1/instances
 .TP 2m
 \fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR; default="nic0"
 The name of the network interface to get the effective firewalls.
+
+.TP 2m
+\fB\-\-regexp\fR=\fIREGEXP\fR, \fB\-r\fR \fIREGEXP\fR
+(DEPRECATED) Regular expression to filter the names of the results on. Any names
+that do not match the entire regular expression will be filtered out.
+
+Flag \f5\-\-regexp\fR is deprecated. Use \f5\-\-filter="name~'REGEXP'"\fR
+instead.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
@@ -85,6 +101,46 @@ Alternatively, the zone can be stored in the environment variable
 .RE
 .sp
 
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-uri\fR
+Print a list of resource URIs instead of the default output.
+
+
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-billing\-project,
@@ -103,6 +159,8 @@ To get the effective firewalls of instance with name example\-instance, run:
 .RS 2m
 $ gcloud alpha compute instances network\-interfaces \e
     get\-effective\-firewalls example\-instance,
+To show all fields of the firewall rules, please show in JSON format with option
+\-\-format=json
 .RE
 
 

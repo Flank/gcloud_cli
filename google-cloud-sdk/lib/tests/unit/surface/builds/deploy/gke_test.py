@@ -169,7 +169,9 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
             '--output=output',
             '--annotation=gcb-build-id=$BUILD_ID,${}'.format(
                 build_util._K8S_ANNOTATIONS_SUB_VAR),
-            '--expose=${}'.format(build_util._EXPOSE_PORT_SUB_VAR)
+            '--expose=${}'.format(build_util._EXPOSE_PORT_SUB_VAR),
+            '--create-application-cr',
+            '--links="Build details=https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID"',
         ],
     ))
     steps.append(self.build_msg.BuildStep(

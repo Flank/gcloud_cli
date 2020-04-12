@@ -29,6 +29,9 @@ COMMANDS
      enable
         (ALPHA) Enable MultiClusterIngress Feature.
 
+     update
+        (ALPHA) Update MultiClusterIngress Feature.
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

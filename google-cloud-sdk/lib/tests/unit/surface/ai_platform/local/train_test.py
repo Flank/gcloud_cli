@@ -31,6 +31,8 @@ from tests.lib.surface.ml_engine import base
 class LocalTrainTestBase(object):
 
   def SetUp(self):
+    self.get_primary_node_mock = self.StartObjectPatch(
+        local_train, 'GetPrimaryNodeName', return_value='master')
     self.run_mock = self.StartObjectPatch(local_train, 'RunDistributed',
                                           return_value=0)
     self.make_proc_mock = self.StartObjectPatch(local_train, 'MakeProcess',
@@ -115,6 +117,20 @@ class LocalTrainTestBase(object):
         os.getcwd(),
         args=['foo', '--job-dir', self.temp_path],
         task_type='master')
+
+  def testLocalTrainSingleWorkerChief(self, module_name):
+    self.get_primary_node_mock.return_value = 'chief'
+
+    self.Run(
+        '{} local train --module-name test_package.test_task '
+        '--package-path test_package/ --job-dir gs://foo/bar/ -- foo'.format(
+            module_name))
+
+    self.make_proc_mock.assert_called_once_with(
+        'test_package.test_task',
+        os.getcwd(),
+        args=['foo', '--job-dir', 'gs://foo/bar/'],
+        task_type='chief')
 
 
 class LocalTrainGaTest(LocalTrainTestBase, base.MlGaPlatformTestBase):

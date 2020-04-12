@@ -18,19 +18,19 @@ summary:
   - command: labelmanager bindings create test --label-key="env" --label-parent="organizations/999"
       --resource="//cloudresourcemanager.googleapis.com/projects/12345"
   - stdout: |
-      label_value: labelValues/789
+      labelValue: labelValues/789
       name: labelBindings/somename
       resource: //cloudresourcemanager.googleapis.com/projects/12345
 - execute:
   - command: labelmanager bindings create test --label-key="labelKeys/123" --resource="//cloudresourcemanager.googleapis.com/projects/12345"
   - stdout: |
-      label_value: labelValues/789
+      labelValue: labelValues/789
       name: labelBindings/somename
       resource: //cloudresourcemanager.googleapis.com/projects/12345
 - execute:
   - command: labelmanager bindings create labelValues/789 --resource="//cloudresourcemanager.googleapis.com/projects/12345"
   - stdout: |
-      label_value: labelValues/789
+      labelValue: labelValues/789
       name: labelBindings/somename
       resource: //cloudresourcemanager.googleapis.com/projects/12345
 actions:
@@ -40,7 +40,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F999
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F999&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -61,7 +61,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F999
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F999&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -75,7 +75,7 @@ actions:
               name: labelKeys/456
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F123
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F123&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -96,7 +96,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F999
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F999&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -110,7 +110,7 @@ actions:
               name: labelKeys/456
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F123
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F123&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -128,17 +128,24 @@ actions:
           method: POST
           body:
             json:
-              label_value: labelValues/789
+              labelValue: labelValues/789
               resource: //cloudresourcemanager.googleapis.com/projects/12345
         return_response:
           headers:
             status: '200'
-          body:
-            label_value: labelValues/789
-            name: labelBindings/somename
-            resource: //cloudresourcemanager.googleapis.com/projects/12345
+          body: |
+            {
+              "done": true,
+              "name": "operations/clb.12345",
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelBinding",
+                "name": "labelBindings/somename",
+                "labelValue": "labelValues/789",
+                "resource": "//cloudresourcemanager.googleapis.com/projects/12345"
+              }
+            }
     - expect_stdout: |
-        label_value: labelValues/789
+        labelValue: labelValues/789
         name: labelBindings/somename
         resource: //cloudresourcemanager.googleapis.com/projects/12345
     - expect_exit:
@@ -148,7 +155,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F123
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F123&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -166,17 +173,24 @@ actions:
           method: POST
           body:
             json:
-              label_value: labelValues/789
+              labelValue: labelValues/789
               resource: //cloudresourcemanager.googleapis.com/projects/12345
         return_response:
           headers:
             status: '200'
-          body:
-            label_value: labelValues/789
-            name: labelBindings/somename
-            resource: //cloudresourcemanager.googleapis.com/projects/12345
+          body: |
+            {
+              "done": true,
+              "name": "operations/clb.12345",
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelBinding",
+                "name": "labelBindings/somename",
+                "labelValue": "labelValues/789",
+                "resource": "//cloudresourcemanager.googleapis.com/projects/12345"
+              }
+            }
     - expect_stdout: |
-        label_value: labelValues/789
+        labelValue: labelValues/789
         name: labelBindings/somename
         resource: //cloudresourcemanager.googleapis.com/projects/12345
     - expect_exit:
@@ -190,17 +204,24 @@ actions:
           method: POST
           body:
             json:
-              label_value: labelValues/789
+              labelValue: labelValues/789
               resource: //cloudresourcemanager.googleapis.com/projects/12345
         return_response:
           headers:
             status: '200'
-          body:
-            label_value: labelValues/789
-            name: labelBindings/somename
-            resource: //cloudresourcemanager.googleapis.com/projects/12345
+          body: |
+            {
+              "done": true,
+              "name": "operations/clb.12345",
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelBinding",
+                "name": "labelBindings/somename",
+                "labelValue": "labelValues/789",
+                "resource": "//cloudresourcemanager.googleapis.com/projects/12345"
+              }
+            }
     - expect_stdout: |
-        label_value: labelValues/789
+        labelValue: labelValues/789
         name: labelBindings/somename
         resource: //cloudresourcemanager.googleapis.com/projects/12345
     - expect_exit:

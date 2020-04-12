@@ -1,12 +1,18 @@
 NAME
-    gcloud alpha compute routers - list, create, and delete Google Compute
-        Engine routers
+    gcloud alpha compute routers - list, create, and delete Compute Engine
+        routers
 
 SYNOPSIS
     gcloud alpha compute routers GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List, create, and delete Google Compute Engine routers.
+    (ALPHA) List, create, and delete Cloud Routers.
+
+    For more information about Cloud Routers, see the Cloud Router
+    documentation (https://cloud.google.com/router/docs/concepts/overview).
+
+    See also: Routers API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/routers).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,7 +26,7 @@ GROUPS
     GROUP is one of the following:
 
      nats
-        (ALPHA) List, create, describe and delete Google Compute Engine NATs.
+        (ALPHA) List, create, describe, and delete Cloud NAT.
 
 COMMANDS
     COMMAND is one of the following:

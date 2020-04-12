@@ -41,8 +41,7 @@ class DatabasesDdlDescribeTest(base.SpannerTestBase):
         response=self.msgs.GetDatabaseDdlResponse(
             statements=['CREATE TABLE foo', 'CREATE TABLE bar']))
     self.Run('spanner databases ddl describe mydb --instance myins')
-    self.AssertOutputContains('CREATE TABLE foo')
-    self.AssertOutputContains('CREATE TABLE bar')
+    self.AssertOutputContains('CREATE TABLE foo;\n\nCREATE TABLE bar;\n\n')
 
   def testDescribeWithDefaultInstance(self):
     self.client.projects_instances_databases.GetDdl.Expect(

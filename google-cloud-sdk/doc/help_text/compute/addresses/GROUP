@@ -1,12 +1,17 @@
 NAME
-    gcloud compute addresses - read and manipulate Google Compute Engine
-        addresses
+    gcloud compute addresses - read and manipulate Compute Engine addresses
 
 SYNOPSIS
     gcloud compute addresses COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Read and manipulate Google Compute Engine addresses.
+    Read and manipulate Compute Engine addresses.
+
+    For more information about addresses, see the addresses documentation
+    (https://cloud.google.com/compute/docs/ip-addresses/).
+
+    See also: Addresses API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/addresses).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

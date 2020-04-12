@@ -154,7 +154,7 @@ class TestingErrorReporting(cli_test_base.CliTestBase):
         args[3],
         {'content-length': content_length, 'content-type': 'application/json',
          'accept-encoding': 'gzip, deflate', 'accept': 'application/json',
-         'user-agent': 'x_Tw5K8nnjoRAqULM9PFAC2b'})
+         'user-agent': 'google-cloud-sdk'})
 
     self.AssertErrContains('gcloud crashed')
     self.AssertErrContains('If you would like to report this issue, please run '
@@ -188,7 +188,7 @@ class TestingErrorReporting(cli_test_base.CliTestBase):
         args[3],
         {'content-length': content_length, 'content-type': 'application/json',
          'accept-encoding': 'gzip, deflate', 'accept': 'application/json',
-         'user-agent': 'x_Tw5K8nnjoRAqULM9PFAC2b'})
+         'user-agent': 'google-cloud-sdk'})
 
   def testDisableMetricsDontSendErrorReport(self):
     crash_handling.HandleGcloudCrash(Exception())

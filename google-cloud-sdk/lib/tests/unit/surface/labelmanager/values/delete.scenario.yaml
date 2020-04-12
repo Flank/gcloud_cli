@@ -1,56 +1,13 @@
 title: LabelManager - LabelValues - Delete test
 release_tracks: [ALPHA]
-summary:
-# This summary is generated automatically on update and should not be edited.
-- execute:
-  - command: labelmanager values delete prod --label-key="env" --label-parent="organizations/1"
-      --async
-  - stdout: |
-      done: true
-      name: operations/dlv.12345
-      response:
-        '@type': type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelValue
-        displayName: prod
-        name: labelValues/112
-        parent: labelKeys/11
-        state: DELETE_REQUESTED
-- execute:
-  - command: labelmanager values delete prod --label-key="labelKeys/11" --async
-  - stdout: |
-      done: true
-      name: operations/dlv.12345
-      response:
-        '@type': type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelValue
-        displayName: prod
-        name: labelValues/112
-        parent: labelKeys/11
-        state: DELETE_REQUESTED
-- execute:
-  - command: labelmanager values delete labelValues/112
-  - progress_tracker:
-    - message: Waiting for LabelValue [labelValues/112] to be deleted with [operations/dlv.12345]
-    - status: SUCCESS
-  - stdout: |
-      displayName: prod
-      name: labelValues/112
-      parent: labelKeys/11
-      state: DELETE_REQUESTED
-- execute:
-  - command: labelmanager values delete staging --label-key="env" --label-parent="organizations/1"
-  - error: '1: Invalid display_name for LabelValue [staging] in parent [labelKeys/11]'
-- execute:
-  - command: labelmanager values delete labelValues/112 --async
-  - error: '1: User [fake_account] does not have permission to access labelValue [112]
-      (or it may not exist): The caller does not have permission'
 
 actions:
 - execute_command:
     command: labelmanager values delete prod --label-key="env" --label-parent="organizations/1"
-      --async
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F1
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F1&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -64,7 +21,7 @@ actions:
               name: labelKeys/12
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F11
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F11&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -97,22 +54,18 @@ actions:
               }
             }
     - expect_stdout: |
-        done: true
-        name: operations/dlv.12345
-        response:
-          '@type': type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelValue
-          displayName: prod
-          name: labelValues/112
-          parent: labelKeys/11
-          state: DELETE_REQUESTED
+        displayName: prod
+        name: labelValues/112
+        parent: labelKeys/11
+        state: DELETE_REQUESTED
     - expect_exit:
         code: 0
 - execute_command:
-    command: labelmanager values delete prod --label-key="labelKeys/11" --async
+    command: labelmanager values delete prod --label-key="labelKeys/11"
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F11
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F11&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -144,76 +97,6 @@ actions:
                 "parent": "labelKeys/11"
               }
             }
-    - expect_stdout: |
-        done: true
-        name: operations/dlv.12345
-        response:
-          '@type': type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelValue
-          displayName: prod
-          name: labelValues/112
-          parent: labelKeys/11
-          state: DELETE_REQUESTED
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: labelmanager values delete labelValues/112
-    events:
-    - api_call:
-        expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues/112?alt=json
-          method: DELETE
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "done": true,
-              "name": "operations/dlv.12345",
-              "response": {
-                "@type": "type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelValue",
-                "displayName": "prod",
-                "name": "labelValues/112",
-                "state": "DELETE_REQUESTED",
-                "parent": "labelKeys/11"
-              }
-            }
-    - api_call:
-        expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/operations/dlv.12345?alt=json
-          method: GET
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body: |
-            {
-              "done": true,
-              "name": "operations/dlv.12345",
-              "response": {
-                "@type": "type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelValue",
-                "displayName": "prod",
-                "name": "labelValues/112",
-                "state": "DELETE_REQUESTED",
-                "parent": "labelKeys/11"
-              }
-            }
-    - expect_progress_tracker:
-        message: Waiting for LabelValue [labelValues/112] to be deleted with [operations/dlv.12345]
-        status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues/112?alt=json
-          method: GET
-          body: null
-        return_response:
-          headers:
-            status: '200'
-          body:
-            displayName: prod
-            name: labelValues/112
-            state: DELETE_REQUESTED
-            parent: labelKeys/11
     - expect_stdout: |
         displayName: prod
         name: labelValues/112
@@ -226,7 +109,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F1
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelKeys?alt=json&parent=organizations%2F1&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -240,7 +123,7 @@ actions:
               name: labelKeys/12
     - api_call:
         expect_request:
-          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F11
+          uri: https://labelmanager.googleapis.com/v1alpha1/labelValues?alt=json&parent=labelKeys%2F11&showDeleted=True
           method: GET
           body: None
         return_response:
@@ -256,7 +139,7 @@ actions:
         code: 1
         message: Invalid display_name for LabelValue [staging] in parent [labelKeys/11]
 - execute_command:
-    command: labelmanager values delete labelValues/112 --async
+    command: labelmanager values delete labelValues/112
     events:
     - api_call:
         expect_request:

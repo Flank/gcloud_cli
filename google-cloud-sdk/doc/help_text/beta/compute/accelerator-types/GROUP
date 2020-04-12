@@ -1,12 +1,18 @@
 NAME
-    gcloud beta compute accelerator-types - read Google Compute Engine
-        accelerator types
+    gcloud beta compute accelerator-types - read Compute Engine accelerator
+        types
 
 SYNOPSIS
     gcloud beta compute accelerator-types COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Read Google Compute Engine accelerator types.
+    (BETA) Read Compute Engine accelerator types.
+
+    For more information about accelerator types, see the GPU documentation
+    (https://cloud.google.com/compute/docs/gpus/).
+
+    See also: Accelerator types API
+    (https://cloud.google.com/compute/docs/reference/rest/v1/acceleratorTypes).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

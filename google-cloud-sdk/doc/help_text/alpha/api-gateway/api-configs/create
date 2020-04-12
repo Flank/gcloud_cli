@@ -11,6 +11,8 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) Add a new config to an API.
 
+    NOTE: If the specified API does not exist it will be created.
+
 POSITIONAL ARGUMENTS
      Api config resource - Name for API Config which will be created. The
      arguments in this group can be used to specify the attributes of this
@@ -69,6 +71,12 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+EXAMPLES
+    To create an API config for the API 'my-api' with an OpenAPI spec, run:
+
+        $ gcloud alpha api-gateway api-configs create my-config \
+            --api=my-api --openapi-spec=path/to/openapi_spec.yaml
 
 NOTES
     This command is an internal implementation detail and may change or

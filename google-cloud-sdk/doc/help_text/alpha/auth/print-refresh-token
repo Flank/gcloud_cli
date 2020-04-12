@@ -1,16 +1,16 @@
 NAME
-    gcloud alpha auth print-refresh-token - a command that prints the access
+    gcloud alpha auth print-refresh-token - a command that prints the refresh
         token for the current account
 
 SYNOPSIS
     gcloud alpha auth print-refresh-token [ACCOUNT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) A command that prints the access token for the current account.
+    (ALPHA) A command that prints the refresh token for the current account.
 
 POSITIONAL ARGUMENTS
      [ACCOUNT]
-        The account to get the access token for. Leave empty for the active
+        The account to get the refresh token for. Leave empty for the active
         account.
 
 GCLOUD WIDE FLAGS

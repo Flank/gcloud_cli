@@ -1,22 +1,20 @@
 NAME
-    gcloud alpha compute - create and manipulate Google Compute Engine
-        resources
+    gcloud alpha compute - create and manipulate Compute Engine resources
 
 SYNOPSIS
     gcloud alpha compute GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) The gcloud compute command group lets you create, configure and
-    manipulate Google Compute Engine virtual machines.
+    (ALPHA) The gcloud compute command group lets you create, configure, and
+    manipulate Compute Engine virtual machine (VM) instances.
 
-    With Compute Engine you can create and run virtual machines on Google
-    infrastructure. Compute Engine offers scale, performance, and value that
-    allows you to easily launch large compute clusters on Google's
-    infrastructure.
+    With Compute Engine, you can create and run VMs on Google's infrastructure.
+    Compute Engine offers scale, performance, and value that lets you launch
+    large compute clusters on Google's infrastructure.
 
-    More information on Compute Engine can be found here:
-    https://cloud.google.com/compute/ and detailed documentation can be found
-    here: https://cloud.google.com/compute/docs/
+    For more information about Compute Engine, see the Compute Engine overview
+    (https://cloud.google.com/compute/) and the Compute Engine user
+    documentation (https://cloud.google.com/compute/docs/).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -30,10 +28,10 @@ GROUPS
     GROUP is one of the following:
 
      accelerator-types
-        (ALPHA) Read Google Compute Engine accelerator types.
+        (ALPHA) Read Compute Engine accelerator types.
 
      addresses
-        (ALPHA) Read and manipulate Google Compute Engine addresses.
+        (ALPHA) Read and manipulate Compute Engine addresses.
 
      backend-buckets
         (ALPHA) Read and manipulate backend buckets.
@@ -42,21 +40,19 @@ GROUPS
         (ALPHA) List, create, and delete backend services.
 
      commitments
-        (ALPHA) Manage Google Compute Engine commitments.
+        (ALPHA) Manage Compute Engine commitments.
 
      diagnose
-        (ALPHA) Debugging tools for Google Compute Engine virtual machine
-        instances.
+        (ALPHA) Debugging tools for Compute Engine virtual machine instances.
 
      disk-types
-        (ALPHA) Read Google Compute Engine virtual disk types.
+        (ALPHA) Read Compute Engine virtual disk types.
 
      disks
-        (ALPHA) Read and manipulate Google Compute Engine disks.
+        (ALPHA) Read and manipulate Compute Engine disks.
 
      external-vpn-gateways
-        (ALPHA) Read and manipulate Google Compute Engine External VPN
-        Gateways.
+        (ALPHA) List, create, delete and update External VPN Gateways.
 
      firewall-rules
         (ALPHA) List, create, update, and delete Google Compute Engine firewall
@@ -78,36 +74,34 @@ GROUPS
         instances.
 
      images
-        (ALPHA) List, create, and delete Google Compute Engine images.
+        (ALPHA) List, create, and delete Compute Engine images.
 
      instance-groups
-        (ALPHA) Read and manipulate Google Compute Engine instance groups.
+        (ALPHA) Read and manipulate Compute Engine instance groups.
 
      instance-templates
-        (ALPHA) Read and manipulate Google Compute Engine instances templates.
+        (ALPHA) Read and manipulate Compute Engine instances templates.
 
      instances
-        (ALPHA) Read and manipulate Google Compute Engine virtual machine
-        instances.
+        (ALPHA) Read and manipulate Compute Engine virtual machine instances.
 
      interconnects
-        (ALPHA) Read and manipulate Google Compute Engine interconnects.
+        (ALPHA) Read and manipulate Compute Engine interconnects.
 
      machine-images
-        (ALPHA) Read and manage Google Compute Engine machine image resources.
+        (ALPHA) Read and manage Compute Engine machine image resources.
 
      machine-types
         (ALPHA) Read Google Compute Engine virtual machine types.
 
      network-endpoint-groups
-        (ALPHA) Read and manipulate Google Compute Engine network endpoint
-        groups.
+        (ALPHA) Read and manipulate Compute Engine network endpoint groups.
 
      networks
-        (ALPHA) List, create, and delete Google Compute Engine networks.
+        (ALPHA) List, create, and delete Compute Engine networks.
 
      operations
-        (ALPHA) Read and manipulate Google Compute Engine operations.
+        (ALPHA) Read and manipulate Compute Engine operations.
 
      org-security-policies
         (ALPHA) Manage Google Compute Engine organization security policies.
@@ -116,7 +110,7 @@ GROUPS
         (ALPHA) Manage OS Config tasks for Compute Engine VM instances.
 
      os-login
-        (ALPHA) Create and manipulate Google Compute Engine OS Login resources.
+        (ALPHA) Create and manipulate Compute Engine OS Login resources.
 
      packet-mirrorings
         (ALPHA) Manage Google Compute Engine packet mirroring resources.
@@ -132,41 +126,37 @@ GROUPS
         (ALPHA) Manage public delegated prefix resources.
 
      regions
-        (ALPHA) List Google Compute Engine regions.
+        (ALPHA) List Compute Engine regions.
 
      reservations
         (ALPHA) Manage Compute Engine reservations.
 
      resource-policies
-        (ALPHA) Manage Google Compute Engine Resource Policies.
+        (ALPHA) Manage Compute Engine Resource Policies.
 
      routers
-        (ALPHA) List, create, and delete Google Compute Engine routers.
+        (ALPHA) List, create, and delete Compute Engine routers.
 
      routes
         (ALPHA) Read and manipulate routes.
 
      security-policies
-        (ALPHA) Read and manipulate Google Compute Engine security policies.
-        Security policies are used to control access to Google Cloud HTTP/HTTPS
-        load balancers.
+        (ALPHA) Read and manipulate Cloud Armor security policies.
 
      shared-vpc
         (ALPHA) Configure shared VPC.
 
      snapshots
-        (ALPHA) List, describe, and delete Google Compute Engine snapshots.
+        (ALPHA) List, describe, and delete Compute Engine snapshots.
 
      sole-tenancy
         (ALPHA) Read and manage Compute Engine sole-tenancy resources.
 
      ssl-certificates
-        (ALPHA) List, create, and delete Google Compute Engine SSL
-        certificates.
+        (ALPHA) List, create, and delete Compute Engine SSL certificates.
 
      ssl-policies
-        (ALPHA) List, create, delete and update Google Compute Engine SSL
-        policies.
+        (ALPHA) List, create, delete and update Compute Engine SSL policies.
 
      target-grpc-proxies
         (ALPHA) Manage Google Compute Engine target gRPC proxy resources.
@@ -178,8 +168,7 @@ GROUPS
         (ALPHA) List, create, and delete target HTTPS proxies.
 
      target-instances
-        (ALPHA) Read and manipulate Google Compute Engine virtual target
-        instances.
+        (ALPHA) Read and manipulate Compute Engine virtual target instances.
 
      target-pools
         (ALPHA) Control Compute Engine target pools for network load balancing.
@@ -191,7 +180,7 @@ GROUPS
         (ALPHA) List, create, and delete target TCP proxies.
 
      target-vpn-gateways
-        (ALPHA) read and manipulate Google Compute Engine Classic VPN Gateways.
+        (ALPHA) Read and manipulate classic VPN gateways.
 
      tpus
         (ALPHA) List, create, and delete Cloud TPUs.
@@ -200,14 +189,13 @@ GROUPS
         (ALPHA) List, create, and delete URL maps.
 
      vpn-gateways
-        (ALPHA) read and manipulate Google Compute Engine Highly Available VPN
-        Gateways.
+        (ALPHA) read and manipulate Highly Available VPN Gateways.
 
      vpn-tunnels
-        (ALPHA) Read and manipulate Google Compute Engine VPN Tunnels.
+        (ALPHA) Read and manipulate Compute Engine VPN tunnels.
 
      zones
-        (ALPHA) List Google Compute Engine zones.
+        (ALPHA) List Compute Engine zones.
 
 COMMANDS
     COMMAND is one of the following:

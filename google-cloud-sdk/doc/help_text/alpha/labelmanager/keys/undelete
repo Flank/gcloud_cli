@@ -4,8 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha labelmanager keys undelete
-        [LABEL_KEY_ID : --label-parent=LABEL_PARENT] [--async]
-        [GCLOUD_WIDE_FLAG ...]
+        [LABEL_KEY_ID : --label-parent=LABEL_PARENT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Undeletes the LabelKey resource given the LabelKey's display name
@@ -26,11 +25,6 @@ POSITIONAL ARGUMENTS
           Parent of the LabelKey. This must be the form organizations/{org_id}.
           This field is required if LABEL_KEY_ID is a display name instead of a
           numeric id.
-
-FLAGS
-     --async
-        Return immediately, without waiting for the operation in progress to
-        complete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

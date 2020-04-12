@@ -234,13 +234,6 @@ class PerimetersUpdateTestBeta(PerimetersUpdateTestGA):
     self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
-
-class PerimetersUpdateTestAlpha(PerimetersUpdateTestGA):
-
-  def PreSetUp(self):
-    self.api_version = 'v1alpha'
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def testUpdate_AddServiceFilterFields(self):
     self.SetUpForAPI(self.api_version)
 
@@ -302,6 +295,13 @@ class PerimetersUpdateTestAlpha(PerimetersUpdateTestGA):
                       '   --enable-vpc-accessible-services ')
 
     self.assertEqual(result, perimeter_after)
+
+
+class PerimetersUpdateTestAlpha(PerimetersUpdateTestBeta):
+
+  def PreSetUp(self):
+    self.api_version = 'v1alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

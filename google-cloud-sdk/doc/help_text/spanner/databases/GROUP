@@ -51,9 +51,6 @@ COMMANDS
      remove-iam-policy-binding
         Remove IAM policy binding of a Cloud Spanner database.
 
-     restore
-        Restore a Cloud Spanner database.
-
      set-iam-policy
         Set the IAM policy for a Cloud Spanner database.
 

@@ -44,9 +44,7 @@ EXAMPLES
             --instance=INSTANCE_NAME
 
 NOTES
-    This command is currently in BETA and may change without notice. These
-    variants are also available:
-
-        $ gcloud spanner backups delete
-        $ gcloud alpha spanner backups delete
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
 

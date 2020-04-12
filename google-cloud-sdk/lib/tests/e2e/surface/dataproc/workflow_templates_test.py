@@ -62,6 +62,7 @@ class WorkflowTemplatesE2ETest(e2e_base.DataprocIntegrationTestBase,
           - hdfs:///tmp/terasort-input
       placement:
         managedCluster:
+          clusterName: "workflow-template-gcloud-e2e"
           config:
             gceClusterConfig:
               zoneUri: {zone}

@@ -2,9 +2,9 @@ NAME
     gcloud alpha ml-engine versions list - list existing AI Platform versions
 
 SYNOPSIS
-    gcloud alpha ml-engine versions list --model=MODEL [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha ml-engine versions list --model=MODEL [--region=REGION]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) List existing AI Platform versions.
@@ -12,6 +12,16 @@ DESCRIPTION
 REQUIRED FLAGS
      --model=MODEL
         Name of the model.
+
+FLAGS
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

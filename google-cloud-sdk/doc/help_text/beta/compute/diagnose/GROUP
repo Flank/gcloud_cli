@@ -1,12 +1,12 @@
 NAME
-    gcloud beta compute diagnose - debugging tools for Google Compute Engine
-        virtual machine instances
+    gcloud beta compute diagnose - debugging tools for Compute Engine virtual
+        machine instances
 
 SYNOPSIS
     gcloud beta compute diagnose COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Debugging tools for Google Compute Engine virtual machine instances.
+    (BETA) Debugging tools for Compute Engine virtual machine instances.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

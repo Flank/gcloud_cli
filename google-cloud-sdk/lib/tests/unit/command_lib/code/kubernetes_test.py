@@ -60,7 +60,7 @@ class StartMinikubeTest(SdkPathTestCase):
           # Assert "minikube start" is not called.
           check_call.assert_not_called()
 
-    check_call.assert_called_once_with(Matcher(lambda cmd: "stop" in cmd))
+    self.assertIn("stop", check_call.call_args[0][0])
 
   def testNotYetRunning(self):
     with mock.patch.object(subprocess, "Popen") as popen:
@@ -69,12 +69,10 @@ class StartMinikubeTest(SdkPathTestCase):
         popen.return_value.communicate.return_value = (status, None)
 
         with kubernetes.Minikube("cluster-name"):
-          check_call.assert_called_once_with(
-              Matcher(lambda cmd: "cluster-name" in cmd))
-          check_call.assert_called_once_with(
-              Matcher(lambda cmd: "start" in cmd))
+          self.assertIn("cluster-name", check_call.call_args[0][0])
+          self.assertIn("start", check_call.call_args[0][0])
 
-    check_call.assert_called_with(Matcher(lambda cmd: "stop" in cmd))
+    self.assertIn("stop", check_call.call_args[0][0])
 
   def testDriver(self):
     with mock.patch.object(subprocess, "Popen") as popen:
@@ -83,10 +81,9 @@ class StartMinikubeTest(SdkPathTestCase):
         popen.return_value.communicate.return_value = (status, None)
 
         with kubernetes.Minikube("cluster-name", vm_driver="my-driver"):
-          check_call.assert_called_once_with(
-              Matcher(lambda cmd: "--vm-driver=my-driver" in cmd))
+          self.assertIn("--vm-driver=my-driver", check_call.call_args[0][0])
 
-    check_call.assert_called_with(Matcher(lambda cmd: "stop" in cmd))
+    self.assertIn("stop", check_call.call_args[0][0])
 
   def testDockerDriver(self):
     with mock.patch.object(subprocess, "Popen") as popen:
@@ -96,11 +93,15 @@ class StartMinikubeTest(SdkPathTestCase):
 
         with kubernetes.Minikube("cluster-name", vm_driver="docker"):
           check_call.assert_called_once_with(
-              Matcher(lambda cmd: "--vm-driver=docker" in cmd))
+              Matcher(lambda cmd: "--vm-driver=docker" in cmd),
+              stdout=mock.ANY,
+              stderr=mock.ANY)
           check_call.assert_called_once_with(
-              Matcher(lambda cmd: "--container-runtime=docker" in cmd))
+              Matcher(lambda cmd: "--container-runtime=docker" in cmd),
+              stdout=mock.ANY,
+              stderr=mock.ANY)
 
-    check_call.assert_called_with(Matcher(lambda cmd: "stop" in cmd))
+    self.assertIn("stop", check_call.call_args[0][0])
 
 
 class MinikubeClusterTest(SdkPathTestCase):
@@ -142,10 +143,9 @@ class StartKindTest(SdkPathTestCase):
 
     self.assertEqual(popen.call_args[0][0],
                      [self.PATH_TO_KIND, "get", "clusters"])
-    check_call.assert_called_once_with(Matcher(lambda cmd: "delete" in cmd))
+    self.assertIn("delete", check_call.call_args[0][0])
 
   def testNotYetRunning(self):
-
     with mock.patch.object(subprocess, "Popen") as popen:
       with mock.patch.object(subprocess, "check_call") as check_call:
         popen.return_value.communicate.return_value = ("", None)
@@ -153,9 +153,11 @@ class StartKindTest(SdkPathTestCase):
         with kubernetes.KindClusterContext("cluster-name"):
           check_call.assert_called_once_with([
               self.PATH_TO_KIND, "create", "cluster", "--name", "cluster-name"
-          ])
+          ],
+                                             stdout=mock.ANY,
+                                             stderr=mock.ANY)
 
-    check_call.assert_called_with(Matcher(lambda cmd: "delete" in cmd))
+    self.assertIn("delete", check_call.call_args[0][0])
 
 
 class KubeNamespace(SdkPathTestCase):
@@ -181,11 +183,11 @@ class KubeNamespace(SdkPathTestCase):
         popen.return_value.communicate.return_value = (namespaces, None)
 
         with kubernetes.KubeNamespace("b"):
-          check_call.assert_called_with(
-              [self.PATH_TO_KUBECTL, "create", "namespace", "b"])
+          self.assertEqual(check_call.call_args[0][0],
+                           [self.PATH_TO_KUBECTL, "create", "namespace", "b"])
 
-        check_call.assert_called_with(
-            [self.PATH_TO_KUBECTL, "delete", "namespace", "b"])
+        self.assertEqual(check_call.call_args_list[1][0][0],
+                         [self.PATH_TO_KUBECTL, "delete", "namespace", "b"])
 
   def testCallWithContext(self):
     with mock.patch.object(subprocess, "Popen") as popen:
@@ -194,17 +196,16 @@ class KubeNamespace(SdkPathTestCase):
         popen.return_value.communicate.return_value = (namespaces, None)
 
         with kubernetes.KubeNamespace("b", "my-context"):
-          popen.assert_called_with([
+          self.assertEqual(popen.call_args[0][0], [
               self.PATH_TO_KUBECTL, "--context", "my-context", "get",
               "namespaces", "-o", "name"
-          ],
-                                   stdout=subprocess.PIPE)
-          check_call.assert_called_with([
+          ])
+          self.assertEqual(check_call.call_args_list[0][0][0], [
               self.PATH_TO_KUBECTL, "--context", "my-context", "create",
               "namespace", "b"
           ])
 
-        check_call.assert_called_with([
+        self.assertEqual(check_call.call_args_list[1][0][0], [
             self.PATH_TO_KUBECTL, "--context", "my-context", "delete",
             "namespace", "b"
         ])

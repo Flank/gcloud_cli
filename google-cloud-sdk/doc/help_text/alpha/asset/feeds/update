@@ -87,7 +87,8 @@ OPTIONAL FLAGS
        --content-type=CONTENT_TYPE
           Asset content type to overwrite the existing one. To read more see:
           https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/overview#asset_content_type.
-          CONTENT_TYPE must be one of: resource, iam-policy.
+          CONTENT_TYPE must be one of: resource, iam-policy, org-policy,
+          access-policy.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

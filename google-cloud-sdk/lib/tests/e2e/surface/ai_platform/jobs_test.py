@@ -63,6 +63,7 @@ class MlJobsTests(e2e_base.WithServiceAuth, parameterized.TestCase):
          '    --region us-central1 '
          '    --module-name trainer.task '
          '    --packages {package} '
+         '    --master-image-uri gcr.io/deeplearning-platform-release/tf2-cpu '
          '    --async').format(bucket_url=self.BUCKET_REF.ToUrl(),
                                package=package), module_name):
       # Cancel immediately so we don't do any real work

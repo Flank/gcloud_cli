@@ -16,7 +16,7 @@ class HealthcareV1beta1(base_api.BaseApiClient):
   _VERSION = u'v1beta1'
   _CLIENT_ID = '1042881264118.apps.googleusercontent.com'
   _CLIENT_SECRET = 'x_Tw5K8nnjoRAqULM9PFAC2b'
-  _USER_AGENT = 'x_Tw5K8nnjoRAqULM9PFAC2b'
+  _USER_AGENT = u'google-cloud-sdk'
   _CLIENT_CLASS_NAME = u'HealthcareV1beta1'
   _URL_VERSION = u'v1beta1'
   _API_KEY = None
@@ -2114,7 +2114,7 @@ if the input data contains invalid references or if some resources fail to
 be imported, the FHIR store might be left in a state that violates
 referential integrity.
 
-The import process does not trigger PubSub notification or BigQuery
+The import process does not trigger Cloud Pub/Sub notification or BigQuery
 streaming update, regardless of how those are configured on the FHIR store.
 
 If a resource with the specified ID already exists, the most recent

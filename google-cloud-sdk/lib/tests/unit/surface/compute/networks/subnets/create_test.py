@@ -241,6 +241,54 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
              project='my-project'))
     ],)
 
+  def testCreateWithFlowLogsFilterExpr(self):
+    """Test creating a subnet with a filter expr for flow logs."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1 --enable-flow-logs
+        --logging-filter-expr 'src_location.asn != 36647'
+        """)
+
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  privateIpGoogleAccess=False,
+                  logConfig=self.messages.SubnetworkLogConfig(
+                      enable=True, filterExpr='src_location.asn != 36647')),
+              region='us-central1',
+              project='my-project'))],)
+
+  def testCreateWithFlowLogsCustomMetadata(self):
+    """Test creating a subnet with custom metadata fields for flow logs."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1 --enable-flow-logs
+        --logging-metadata custom --logging-metadata-fields
+         'src_instance,dest_instance'
+        """)
+
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  privateIpGoogleAccess=False,
+                  logConfig=self.messages.SubnetworkLogConfig(
+                      enable=True,
+                      metadata=(self.messages.SubnetworkLogConfig
+                                .MetadataValueValuesEnum.CUSTOM_METADATA),
+                      metadataFields=['src_instance', 'dest_instance'])),
+              region='us-central1',
+              project='my-project'))],)
+
 
 class SubnetsCreateTestBeta(SubnetsCreateTest):
 
@@ -355,54 +403,6 @@ class SubnetsCreateTestAlpha(SubnetsCreateTest):
              region='us-central1',
              project='my-project'))
     ],)
-
-  def testCreateWithFlowLogsFilterExpr(self):
-    """Test creating a subnet with a filter expr for flow logs."""
-    self.Run("""
-        compute networks subnets create my-subnet --network my-network
-        --range 10.240.0.0/16 --region us-central1 --enable-flow-logs
-        --logging-filter-expr 'src_location.asn != 36647'
-        """)
-
-    self.CheckRequests(
-        [(self.compute.subnetworks, 'Insert',
-          self.messages.ComputeSubnetworksInsertRequest(
-              subnetwork=self.messages.Subnetwork(
-                  name='my-subnet',
-                  network=self.compute_uri +
-                  '/projects/my-project/global/networks/my-network',
-                  ipCidrRange='10.240.0.0/16',
-                  privateIpGoogleAccess=False,
-                  logConfig=self.messages.SubnetworkLogConfig(
-                      enable=True, filterExpr='src_location.asn != 36647')),
-              region='us-central1',
-              project='my-project'))],)
-
-  def testCreateWithFlowLogsCustomMetadata(self):
-    """Test creating a subnet with custom metadata fields for flow logs."""
-    self.Run("""
-        compute networks subnets create my-subnet --network my-network
-        --range 10.240.0.0/16 --region us-central1 --enable-flow-logs
-        --logging-metadata custom --logging-metadata-fields
-         'src_instance,dest_instance'
-        """)
-
-    self.CheckRequests(
-        [(self.compute.subnetworks, 'Insert',
-          self.messages.ComputeSubnetworksInsertRequest(
-              subnetwork=self.messages.Subnetwork(
-                  name='my-subnet',
-                  network=self.compute_uri +
-                  '/projects/my-project/global/networks/my-network',
-                  ipCidrRange='10.240.0.0/16',
-                  privateIpGoogleAccess=False,
-                  logConfig=self.messages.SubnetworkLogConfig(
-                      enable=True,
-                      metadata=(self.messages.SubnetworkLogConfig
-                                .MetadataValueValuesEnum.CUSTOM_METADATA),
-                      metadataFields=['src_instance', 'dest_instance'])),
-              region='us-central1',
-              project='my-project'))],)
 
   def testCreateWithPrivateV6AccessEnabled(self):
     """Test creating a subnet with --enable-private-v6-access."""

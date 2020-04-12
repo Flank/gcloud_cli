@@ -36,6 +36,12 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To show details about an API config, run:
+
+        $ gcloud alpha api-gateway api-configs describe my-config \
+            --api=my-api
+
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change

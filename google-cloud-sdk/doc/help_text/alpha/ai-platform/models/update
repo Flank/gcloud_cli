@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha ai-platform models update MODEL [--description=DESCRIPTION]
-        [--update-labels=[KEY=VALUE,...]]
+        [--region=REGION] [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -17,6 +17,15 @@ POSITIONAL ARGUMENTS
 FLAGS
      --description=DESCRIPTION
         The description of the model.
+
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
 
      --update-labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to update. If a label exists its value is

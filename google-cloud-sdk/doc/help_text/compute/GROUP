@@ -1,21 +1,20 @@
 NAME
-    gcloud compute - create and manipulate Google Compute Engine resources
+    gcloud compute - create and manipulate Compute Engine resources
 
 SYNOPSIS
     gcloud compute GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    The gcloud compute command group lets you create, configure and manipulate
-    Google Compute Engine virtual machines.
+    The gcloud compute command group lets you create, configure, and manipulate
+    Compute Engine virtual machine (VM) instances.
 
-    With Compute Engine you can create and run virtual machines on Google
-    infrastructure. Compute Engine offers scale, performance, and value that
-    allows you to easily launch large compute clusters on Google's
-    infrastructure.
+    With Compute Engine, you can create and run VMs on Google's infrastructure.
+    Compute Engine offers scale, performance, and value that lets you launch
+    large compute clusters on Google's infrastructure.
 
-    More information on Compute Engine can be found here:
-    https://cloud.google.com/compute/ and detailed documentation can be found
-    here: https://cloud.google.com/compute/docs/
+    For more information about Compute Engine, see the Compute Engine overview
+    (https://cloud.google.com/compute/) and the Compute Engine user
+    documentation (https://cloud.google.com/compute/docs/).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -29,10 +28,10 @@ GROUPS
     GROUP is one of the following:
 
      accelerator-types
-        Read Google Compute Engine accelerator types.
+        Read Compute Engine accelerator types.
 
      addresses
-        Read and manipulate Google Compute Engine addresses.
+        Read and manipulate Compute Engine addresses.
 
      backend-buckets
         Read and manipulate backend buckets.
@@ -41,19 +40,19 @@ GROUPS
         List, create, and delete backend services.
 
      commitments
-        Manage Google Compute Engine commitments.
+        Manage Compute Engine commitments.
 
      diagnose
-        Debugging tools for Google Compute Engine virtual machine instances.
+        Debugging tools for Compute Engine virtual machine instances.
 
      disk-types
-        Read Google Compute Engine virtual disk types.
+        Read Compute Engine virtual disk types.
 
      disks
-        Read and manipulate Google Compute Engine disks.
+        Read and manipulate Compute Engine disks.
 
      external-vpn-gateways
-        Read and manipulate Google Compute Engine External VPN Gateways.
+        List, create, delete and update External VPN Gateways.
 
      firewall-rules
         List, create, update, and delete Google Compute Engine firewall rules.
@@ -71,37 +70,37 @@ GROUPS
         Read and manipulate HTTPS health checks for load balanced instances.
 
      images
-        List, create, and delete Google Compute Engine images.
+        List, create, and delete Compute Engine images.
 
      instance-groups
-        Read and manipulate Google Compute Engine instance groups.
+        Read and manipulate Compute Engine instance groups.
 
      instance-templates
-        Read and manipulate Google Compute Engine instances templates.
+        Read and manipulate Compute Engine instances templates.
 
      instances
-        Read and manipulate Google Compute Engine virtual machine instances.
+        Read and manipulate Compute Engine virtual machine instances.
 
      interconnects
-        Read and manipulate Google Compute Engine interconnects.
+        Read and manipulate Compute Engine interconnects.
 
      machine-types
         Read Google Compute Engine virtual machine types.
 
      network-endpoint-groups
-        Read and manipulate Google Compute Engine network endpoint groups.
+        Read and manipulate Compute Engine network endpoint groups.
 
      networks
-        List, create, and delete Google Compute Engine networks.
+        List, create, and delete Compute Engine networks.
 
      operations
-        Read and manipulate Google Compute Engine operations.
+        Read and manipulate Compute Engine operations.
 
      os-config
         Manage OS Config tasks for Compute Engine VM instances.
 
      os-login
-        Create and manipulate Google Compute Engine OS Login resources.
+        Create and manipulate Compute Engine OS Login resources.
 
      packet-mirrorings
         Manage Google Compute Engine packet mirroring resources.
@@ -110,39 +109,37 @@ GROUPS
         Read and manipulate project-level data like quotas and metadata.
 
      regions
-        List Google Compute Engine regions.
+        List Compute Engine regions.
 
      reservations
         Manage Compute Engine reservations.
 
      resource-policies
-        Manage Google Compute Engine Resource Policies.
+        Manage Compute Engine Resource Policies.
 
      routers
-        List, create, and delete Google Compute Engine routers.
+        List, create, and delete Compute Engine routers.
 
      routes
         Read and manipulate routes.
 
      security-policies
-        Read and manipulate Google Compute Engine security policies. Security
-        policies are used to control access to Google Cloud HTTP/HTTPS load
-        balancers.
+        Read and manipulate Cloud Armor security policies.
 
      shared-vpc
         Configure shared VPC.
 
      snapshots
-        List, describe, and delete Google Compute Engine snapshots.
+        List, describe, and delete Compute Engine snapshots.
 
      sole-tenancy
         Read and manage Compute Engine sole-tenancy resources.
 
      ssl-certificates
-        List, create, and delete Google Compute Engine SSL certificates.
+        List, create, and delete Compute Engine SSL certificates.
 
      ssl-policies
-        List, create, delete and update Google Compute Engine SSL policies.
+        List, create, delete and update Compute Engine SSL policies.
 
      target-http-proxies
         List, create, and delete target HTTP proxies.
@@ -151,7 +148,7 @@ GROUPS
         List, create, and delete target HTTPS proxies.
 
      target-instances
-        Read and manipulate Google Compute Engine virtual target instances.
+        Read and manipulate Compute Engine virtual target instances.
 
      target-pools
         Control Compute Engine target pools for network load balancing.
@@ -163,7 +160,7 @@ GROUPS
         List, create, and delete target TCP proxies.
 
      target-vpn-gateways
-        read and manipulate Google Compute Engine Classic VPN Gateways.
+        Read and manipulate classic VPN gateways.
 
      tpus
         List, create, and delete Cloud TPUs.
@@ -172,14 +169,13 @@ GROUPS
         List, create, and delete URL maps.
 
      vpn-gateways
-        read and manipulate Google Compute Engine Highly Available VPN
-        Gateways.
+        read and manipulate Highly Available VPN Gateways.
 
      vpn-tunnels
-        Read and manipulate Google Compute Engine VPN Tunnels.
+        Read and manipulate Compute Engine VPN tunnels.
 
      zones
-        List Google Compute Engine zones.
+        List Compute Engine zones.
 
 COMMANDS
     COMMAND is one of the following:

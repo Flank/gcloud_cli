@@ -1,12 +1,12 @@
 NAME
-    gcloud alpha api-gateway api-configs delete - deletes a Config from an API
+    gcloud alpha api-gateway api-configs delete - deletes a config from an API
 
 SYNOPSIS
     gcloud alpha api-gateway api-configs delete (API_CONFIG : --api=API)
         [--async] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Deletes a Config from an API.
+    (ALPHA) Deletes a config from an API.
 
 POSITIONAL ARGUMENTS
      Api config resource - Name for API Config which will be deleted. The
@@ -39,6 +39,11 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+EXAMPLES
+    To delete an API Config 'my-config' in 'my-api', run:
+
+        $ gcloud alpha api-gateway api-configs delete my-config --api=my-api
 
 NOTES
     This command is an internal implementation detail and may change or

@@ -16,7 +16,7 @@ class DataprocV1beta2(base_api.BaseApiClient):
   _VERSION = u'v1beta2'
   _CLIENT_ID = '1042881264118.apps.googleusercontent.com'
   _CLIENT_SECRET = 'x_Tw5K8nnjoRAqULM9PFAC2b'
-  _USER_AGENT = 'x_Tw5K8nnjoRAqULM9PFAC2b'
+  _USER_AGENT = u'google-cloud-sdk'
   _CLIENT_CLASS_NAME = u'DataprocV1beta2'
   _URL_VERSION = u'v1beta2'
   _API_KEY = None
@@ -1027,9 +1027,9 @@ class DataprocV1beta2(base_api.BaseApiClient):
         method_id=u'dataproc.projects.regions.clusters.start',
         ordered_params=[u'projectId', u'region', u'clusterName'],
         path_params=[u'clusterName', u'projectId', u'region'],
-        query_params=[u'clusterUuid', u'requestId'],
+        query_params=[],
         relative_path=u'v1beta2/projects/{projectId}/regions/{region}/clusters/{clusterName}:start',
-        request_field='',
+        request_field=u'startClusterRequest',
         request_type_name=u'DataprocProjectsRegionsClustersStartRequest',
         response_type_name=u'Operation',
         supports_download=False,
@@ -1053,9 +1053,9 @@ class DataprocV1beta2(base_api.BaseApiClient):
         method_id=u'dataproc.projects.regions.clusters.stop',
         ordered_params=[u'projectId', u'region', u'clusterName'],
         path_params=[u'clusterName', u'projectId', u'region'],
-        query_params=[u'clusterUuid', u'requestId'],
+        query_params=[],
         relative_path=u'v1beta2/projects/{projectId}/regions/{region}/clusters/{clusterName}:stop',
-        request_field='',
+        request_field=u'stopClusterRequest',
         request_type_name=u'DataprocProjectsRegionsClustersStopRequest',
         response_type_name=u'Operation',
         supports_download=False,

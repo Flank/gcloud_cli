@@ -1,13 +1,13 @@
 NAME
     gcloud beta compute shared-vpc associated-projects - configure associated
-        projects for cross-project networking (XPN)
+        projects for Shared VPC networking
 
 SYNOPSIS
     gcloud beta compute shared-vpc associated-projects COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Configure associated projects for cross-project networking (XPN).
+    (BETA) Configure associated projects for Shared VPC networking.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

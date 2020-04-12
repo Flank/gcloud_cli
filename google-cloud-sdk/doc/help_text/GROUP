@@ -163,7 +163,7 @@ GROUPS
         Create and manage Cloud Composer Environments.
 
      compute
-        Create and manipulate Google Compute Engine resources.
+        Create and manipulate Compute Engine resources.
 
      config
         View and edit Cloud SDK properties.
@@ -230,6 +230,9 @@ GROUPS
 
      ml-engine
         Manage AI Platform jobs and models.
+
+     monitoring
+        Manage Stackdriver Monitoring dashboards.
 
      network-management
         Manage Network Management resources.

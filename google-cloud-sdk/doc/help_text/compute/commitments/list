@@ -70,6 +70,11 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To list commitments, run:
+
+        $ gcloud compute commitments list
+
 NOTES
     These variants are also available:
 

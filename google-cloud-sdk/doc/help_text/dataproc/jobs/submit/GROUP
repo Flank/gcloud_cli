@@ -44,6 +44,9 @@ COMMANDS
      pig
         Submit a Pig job to a cluster.
 
+     presto
+        Submit a Presto job to a cluster.
+
      pyspark
         Submit a PySpark job to a cluster.
 

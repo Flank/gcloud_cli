@@ -41,15 +41,36 @@ def _GetUri(model):
   return ref.SelfLink()
 
 
+def _AddListArgs(parser, hide_region_flag=True):
+  parser.display_info.AddFormat(_DEFAULT_FORMAT)
+  parser.display_info.AddUriFunc(_GetUri)
+  flags.GetRegionArg(hidden=hide_region_flag).AddToParser(parser)
+
+
+def _Run(args):
+  with endpoint_util.MlEndpointOverrides(region=args.region):
+    return models_util.List(models.ModelsClient())
+
+
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class List(base.ListCommand):
   """List existing AI Platform models."""
 
   @staticmethod
   def Args(parser):
-    parser.display_info.AddFormat(_DEFAULT_FORMAT)
-    parser.display_info.AddUriFunc(_GetUri)
-    flags.GetRegionArg('model').AddToParser(parser)
+    _AddListArgs(parser)
 
   def Run(self, args):
-    with endpoint_util.MlEndpointOverrides(region=args.region):
-      return models_util.List(models.ModelsClient())
+    return _Run(args)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
+class ListBeta(base.ListCommand):
+  """List existing AI Platform models."""
+
+  @staticmethod
+  def Args(parser):
+    _AddListArgs(parser, hide_region_flag=False)
+
+  def Run(self, args):
+    return _Run(args)
