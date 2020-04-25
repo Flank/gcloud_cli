@@ -103,7 +103,7 @@ class InstancesCreateGaTest(create_test_base.InstancesCreateTestBase,
                                network_ref=None):
     image_ref = (
         image_ref or
-        self.GetImageRef('family/debian-9', project='debian-cloud'))
+        self.GetImageRef('family/debian-10', project='debian-cloud'))
     machine_type_ref = (
         machine_type_ref or self.GetMachineTypeRef('n1-standard-1'))
     network_ref = self.GetNetworkRef('default')

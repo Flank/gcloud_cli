@@ -3,9 +3,9 @@ NAME
         model
 
 SYNOPSIS
-    gcloud beta ai-platform models get-iam-policy MODEL [--region=REGION]
-        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
-        [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
+    gcloud beta ai-platform models get-iam-policy MODEL [--filter=EXPRESSION]
+        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Gets the IAM policy for the given model.
@@ -22,16 +22,6 @@ POSITIONAL ARGUMENTS
 
        MODEL
           ID of the model or fully qualified identifier for the model.
-
-FLAGS
-     --region=REGION
-        Google Cloud region of the regional endpoint to use for this command.
-        If unspecified, the command uses the global endpoint of the AI Platform
-        Training and Prediction API.
-
-        Learn more about regional endpoints and see a list of available
-        regions:
-        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

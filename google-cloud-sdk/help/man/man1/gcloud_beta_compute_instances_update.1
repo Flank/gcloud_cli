@@ -72,10 +72,13 @@ Enables monitoring and attestation of the boot integrity of the instance. The
 attestation is performed against the integrity policy baseline. This baseline is
 initially derived from the implicitly trusted boot image when the instance is
 created. This baseline can be updated by using
-\f5\-\-shielded\-vm\-learn\-integrity\-policy\fR. Changes to this setting (via
-the update command) will only take effect after stopping and starting the
-instance. Use \fB\-\-shielded\-integrity\-monitoring\fR to enable and
-\fB\-\-no\-shielded\-integrity\-monitoring\fR to disable.
+\f5\-\-shielded\-vm\-learn\-integrity\-policy\fR. On Shielded VMs, integrity
+monitoring is enabled by default. For information about how to modify Shielded
+VM options, see
+https://cloud.google.com/compute/docs/instances/modifying\-shielded\-vm. Changes
+to this setting with the update command only take effect after stopping and
+starting the instance. Use \fB\-\-shielded\-integrity\-monitoring\fR to enable
+and \fB\-\-no\-shielded\-integrity\-monitoring\fR to disable.
 
 .TP 2m
 \fB\-\-shielded\-learn\-integrity\-policy\fR
@@ -86,18 +89,22 @@ installation.
 
 .TP 2m
 \fB\-\-[no\-]shielded\-secure\-boot\fR
-The instance will boot with secure boot enabled. Changes to this setting (via
-the update command) will only take effect after stopping and starting the
-instance. Use \fB\-\-shielded\-secure\-boot\fR to enable and
+The instance boots with secure boot enabled. On Shielded VMs, Secure Boot is not
+enabled by default. For information about how to modify Shielded VM options, see
+https://cloud.google.com/compute/docs/instances/modifying\-shielded\-vm. Changes
+to this setting with the update command only take effect after stopping and
+starting the instance. Use \fB\-\-shielded\-secure\-boot\fR to enable and
 \fB\-\-no\-shielded\-secure\-boot\fR to disable.
 
 .TP 2m
 \fB\-\-[no\-]shielded\-vtpm\fR
-The instance will boot with the TPM (Trusted Platform Module) enabled. A TPM is
-a hardware module that can be used for different security operations such as
-remote attestation, encryption and sealing of keys. Changes to this setting (via
-the update command) will only take effect after stopping and starting the
-instance. Use \fB\-\-shielded\-vtpm\fR to enable and
+The instance boots with the TPM (Trusted Platform Module) enabled. A TPM is a
+hardware module that can be used for different security operations such as
+remote attestation, encryption, and sealing of keys. On Shielded VMs, vTPM is
+enabled by default. For information about how to modify Shielded VM options, see
+https://cloud.google.com/compute/docs/instances/modifying\-shielded\-vm. Changes
+to this setting with the update command only take effect after stopping and
+starting the instance. Use \fB\-\-shielded\-vtpm\fR to enable and
 \fB\-\-no\-shielded\-vtpm\fR to disable.
 
 .TP 2m

@@ -151,6 +151,7 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
           http=mock.ANY,
           progress_tracker=None,
           followup_overrides=None,
-          log_result=True)
+          log_result=True,
+          timeout=None)
 
     self.addCleanup(check_requests)

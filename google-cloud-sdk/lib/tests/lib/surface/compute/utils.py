@@ -35,7 +35,7 @@ SAMPLE_WRAPPED_CSEK_KEY = ('ea2QS4AIhWKprsmuk/mh7g3vdBDGiTcSynFASvJC/rs/3BmOnW'
                            'NXyY/jOKRDrtg+AyKWjg0FifmjCvzZ0pYC+DCM6jJIc9IsX6Kp'
                            '4gNhJTPfzXCvhviqUNGM6xMMXUvq4fCaBoaHOdm66w==')
 
-DEBIAN_IMAGE_FAMILY = 'debian-9'
+DEBIAN_IMAGE_FAMILY = 'debian-10'
 
 
 class CsekKeyStore(object):

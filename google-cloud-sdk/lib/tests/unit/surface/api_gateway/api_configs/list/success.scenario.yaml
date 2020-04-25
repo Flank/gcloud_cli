@@ -6,16 +6,16 @@ summary:
   - command: |
       api-gateway api-configs list
   - stdout: |
-      NAME                                                               DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
-      /projects/asdfasdf/locations/global/apis/apiName/configs/config1   Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05.040425833Z
-      /projects/asdfasdf/locations/global/apis/apiName2/configs/config2  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05.040425833Z
+      CONFIG_ID  API_ID    DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
+      config1    apiName   Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05
+      config2    apiName2  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05
 - execute:
   - command: |
       api-gateway api-configs list --api apiName
   - stdout: |
-      NAME                                                              DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
-      /projects/asdfasdf/locations/global/apis/apiName/configs/config1  Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05.040425833Z
-      /projects/asdfasdf/locations/global/apis/apiName/configs/config2  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05.040425833Z
+      CONFIG_ID  API_ID   DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
+      config1    apiName  Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05
+      config2    apiName  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05
 actions:
 - execute_command:
     command: |
@@ -45,9 +45,9 @@ actions:
               serviceRollout:
                 rolloutId: someRoulloutId2
     - expect_stdout: |
-        NAME                                                               DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
-        /projects/asdfasdf/locations/global/apis/apiName/configs/config1   Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05.040425833Z
-        /projects/asdfasdf/locations/global/apis/apiName2/configs/config2  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05.040425833Z
+        CONFIG_ID  API_ID    DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
+        config1    apiName   Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05
+        config2    apiName2  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05
     - expect_exit:
         code: 0
 - execute_command:
@@ -78,8 +78,8 @@ actions:
               serviceRollout:
                 rolloutId: someRoulloutId2
     - expect_stdout: |
-        NAME                                                              DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
-        /projects/asdfasdf/locations/global/apis/apiName/configs/config1  Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05.040425833Z
-        /projects/asdfasdf/locations/global/apis/apiName/configs/config2  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05.040425833Z
+        CONFIG_ID  API_ID   DISPLAY_NAME       ROLLOUT_ID       STATE     CREATE_TIME
+        config1    apiName  Config Numero Uno  someRoulloutId   ACTIVE    2019-11-04T21:12:05
+        config2    apiName  Config Numero Dos  someRoulloutId2  CREATING  2019-11-04T21:12:05
     - expect_exit:
         code: 0

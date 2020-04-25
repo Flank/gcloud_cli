@@ -58,8 +58,8 @@ class ConnectionContextTest(test_case.TestCase, parameterized.TestCase):
 
   @parameterized.parameters(
       (flags.Product.RUN, base.ReleaseTrack.ALPHA, None, 'v1'),
-      (flags.Product.RUN, base.ReleaseTrack.BETA, None, 'v1alpha1'),
-      (flags.Product.RUN, base.ReleaseTrack.GA, None, 'v1alpha1'),
+      (flags.Product.RUN, base.ReleaseTrack.BETA, None, 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.GA, None, 'v1'),
       (flags.Product.RUN, base.ReleaseTrack.ALPHA, 'v1alpha1', 'v1alpha1'),
       (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, None, 'v1alpha1'),
       (flags.Product.EVENTS, base.ReleaseTrack.BETA, None, 'v1alpha1'),
@@ -81,8 +81,8 @@ class ConnectionContextTest(test_case.TestCase, parameterized.TestCase):
 
   @parameterized.parameters(
       (flags.Product.RUN, base.ReleaseTrack.ALPHA, None, 'v1'),
-      (flags.Product.RUN, base.ReleaseTrack.BETA, None, 'v1alpha1'),
-      (flags.Product.RUN, base.ReleaseTrack.GA, None, 'v1alpha1'),
+      (flags.Product.RUN, base.ReleaseTrack.BETA, None, 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.GA, None, 'v1'),
       (flags.Product.RUN, base.ReleaseTrack.ALPHA, 'v1alpha1', 'v1alpha1'),
       (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, None, 'v1alpha1'),
       (flags.Product.EVENTS, base.ReleaseTrack.BETA, None, 'v1alpha1'),

@@ -146,7 +146,7 @@ class SSHTest(e2e_instances_test_base.InstancesTestBase):
     # Make sure that we can connect to the instance using
     # --strict-host-key-checking=yes on the first connection, since the keys
     # should have been delivered via the guest attributes.
-    message = 'Finished running startup scripts.'
+    message = 'GCEMetadataScripts: Starting startup scripts'
     booted = self.WaitForBoot(self.instance_name, message, retries=10,
                               polling_interval=10)
     self.assertTrue(booted, msg='Instance failed to boot before timeout.')

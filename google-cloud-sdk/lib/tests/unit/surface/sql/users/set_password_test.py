@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 import getpass
 
 from googlecloudsdk.api_lib.util import apis
-from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
@@ -51,14 +50,6 @@ class _BaseUsersSetPasswordTest(object):
     self.Run('sql users set-password --instance my_instance my_username '
              '--host my_host --password my_password')
     self.AssertErrContains('Updating Cloud SQL user')
-
-  # TODO(b/110486599): Remove this when the argument is removed.
-  def testPositionalHostError(self):
-    with self.assertRaisesRegex(cli_test_base.MockArgumentError,
-                                'Positional argument deprecated_host has been '
-                                'removed'):
-      self.Run('sql users set-password --instance my_instance '
-               'my_username my_host --password my_password')
 
   def testSetPasswordWithNoHostArgument(self):
     msgs = apis.GetMessagesModule('sql', 'v1beta4')

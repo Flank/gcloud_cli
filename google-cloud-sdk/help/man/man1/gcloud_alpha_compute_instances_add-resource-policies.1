@@ -21,12 +21,6 @@ gcloud alpha compute instances add\-resource\-policies \- add resource policies 
 resource policies to Google Compute Engine virtual instances. These policies
 define time windows in which live migrations take place.
 
-For information on how to create resource policies, see:
-
-.RS 2m
-$ gcloud alpha compute resource\-policies create \-\-help
-.RE
-
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -101,10 +95,32 @@ Run \fB$ gcloud help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To add resource policy \f5\fIpol1\fR\fR to instance \f5\fIinst1\fR\fR, run this:
+
+.RS 2m
+$ gcloud alpha compute instances add\-resource\-policies inst1 \e
+    \-\-resource\-policies=pol1
+.RE
+
+For information on how to create resource policies, see:
+
+.RS 2m
+$ gcloud compute resource\-policies create \-\-help
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud compute instances add\-resource\-policies
+$ gcloud beta compute instances add\-resource\-policies
+.RE
 

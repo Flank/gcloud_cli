@@ -52,7 +52,7 @@ REQUIRED FLAGS
 
         For more information about the alpha version, see:
         https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.servicePerimeters
-        For more information about the beta version, see:
+        For other versions, see:
         https://cloud.google.com/access-context-manager/docs/reference/rest/v1/accessPolicies.servicePerimeters
 
 OPTIONAL FLAGS
@@ -78,7 +78,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud access-context-manager perimeters replace-all
         $ gcloud beta access-context-manager perimeters replace-all
 

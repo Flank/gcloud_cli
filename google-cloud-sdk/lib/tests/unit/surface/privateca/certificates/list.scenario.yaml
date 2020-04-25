@@ -8,9 +8,9 @@ summary:
       privateca certificates list
   - stdout: |
       NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-      my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-      my-cert   my-ca2  europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-      my-cert2  my-ca   us-central-1  ACTIVE                         2020-03-22T15:14:00.105-07:00
+      my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+      my-cert   my-ca2  europe-west1  REVOKED                        2020-03-22T22:14Z
+      my-cert2  my-ca   us-central-1  ACTIVE                         2020-03-22T22:14Z
 - execute:
   - command: |
       privateca certificates list
@@ -21,52 +21,52 @@ summary:
       privateca certificates list --issuer-location europe-west1
   - stdout: |
       NAME     ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-      my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-      my-cert  my-ca2  europe-west1  ACTIVE                         2020-03-22T15:14:00.105-07:00
+      my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+      my-cert  my-ca2  europe-west1  ACTIVE                         2020-03-22T22:14Z
 - execute:
   - command: |
       privateca certificates list --issuer-location europe-west1 --limit 1
   - stdout: |
       NAME     ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-      my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
+      my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
 - execute:
   - command: |
       privateca certificates list --issuer-location europe-west1 --page-size 1
   - stdout: |
       NAME     ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-      my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
+      my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
 
       NAME     ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-      my-cert  my-ca2  europe-west1  ACTIVE                         2020-03-22T15:14:00.105-07:00
+      my-cert  my-ca2  europe-west1  ACTIVE                         2020-03-22T22:14Z
 - execute:
   - command: |
       privateca certificates list --issuer-location europe-west1 --issuer my-ca
   - stdout: |
       NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-      my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-      my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T15:14:00.105-07:00
+      my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+      my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T22:14Z
 - execute:
   - command: |
       privateca certificates list --issuer-location europe-west1 --issuer my-ca --sort-by ~name
   - stdout: |
       NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-      my-cert3  my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-      my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T15:14:00.105-07:00
-      my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
+      my-cert3  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+      my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T22:14Z
+      my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
 - execute:
   - command: |
       privateca certificates list --issuer projects/foo/locations/europe-west1/certificateAuthorities/my-ca
   - stdout: |
       NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-      my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-      my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T15:14:00.105-07:00
+      my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+      my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T22:14Z
 - execute:
   - command: |
       privateca certificates list --filter="revocation_details.revocation_state:SUPERSEDED"
   - stdout: |
       NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-      my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-      my-cert3  my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
+      my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+      my-cert3  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
 - execute:
   - command: |
       privateca certificates list --issuer my-ca
@@ -94,7 +94,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   },
                   "revocation_details": {
@@ -106,7 +106,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca2/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   },
                   "revocation_details": {
@@ -118,7 +118,7 @@ actions:
                   "name": "projects/foo/locations/us-central-1/certificateAuthorities/my-ca/certificates/my-cert2",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   }
                 }
@@ -128,9 +128,9 @@ actions:
             }
     - expect_stdout: |
         NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-        my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-        my-cert   my-ca2  europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-        my-cert2  my-ca   us-central-1  ACTIVE                         2020-03-22T15:14:00.105-07:00
+        my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+        my-cert   my-ca2  europe-west1  REVOKED                        2020-03-22T22:14Z
+        my-cert2  my-ca   us-central-1  ACTIVE                         2020-03-22T22:14Z
     - expect_exit:
         code: 0
 - execute_command:
@@ -176,7 +176,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   },
                   "revocation_details": {
@@ -188,7 +188,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca2/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   }
                 }
@@ -198,8 +198,8 @@ actions:
             }
     - expect_stdout: |
         NAME     ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-        my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-        my-cert  my-ca2  europe-west1  ACTIVE                         2020-03-22T15:14:00.105-07:00
+        my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+        my-cert  my-ca2  europe-west1  ACTIVE                         2020-03-22T22:14Z
     - expect_exit:
         code: 0
 - execute_command:
@@ -222,7 +222,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   },
                   "revocation_details": {
@@ -234,7 +234,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca2/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   }
                 }
@@ -244,7 +244,7 @@ actions:
             }
     - expect_stdout: |
         NAME     ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-        my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
+        my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
     - expect_exit:
         code: 0
 - execute_command:
@@ -267,7 +267,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   },
                   "revocation_details": {
@@ -279,7 +279,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca2/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   }
                 }
@@ -289,10 +289,10 @@ actions:
             }
     - expect_stdout: |
         NAME     ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-        my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
+        my-cert  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
 
         NAME     ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-        my-cert  my-ca2  europe-west1  ACTIVE                         2020-03-22T15:14:00.105-07:00
+        my-cert  my-ca2  europe-west1  ACTIVE                         2020-03-22T22:14Z
     - expect_exit:
         code: 0
 - execute_command:
@@ -315,7 +315,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   },
                   "revocation_details": {
@@ -327,7 +327,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert2",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   }
                 }
@@ -337,11 +337,10 @@ actions:
             }
     - expect_stdout: |
         NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-        my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-        my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T15:14:00.105-07:00
+        my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+        my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T22:14Z
     - expect_exit:
         code: 0
-
 - execute_command:
     command: |
       privateca certificates list --issuer-location europe-west1 --issuer my-ca --sort-by ~name
@@ -362,7 +361,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   },
                   "revocation_details": {
@@ -374,7 +373,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert2",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   }
                 },
@@ -382,7 +381,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert3",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   },
                   "revocation_details": {
@@ -396,9 +395,9 @@ actions:
             }
     - expect_stdout: |
         NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-        my-cert3  my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-        my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T15:14:00.105-07:00
-        my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
+        my-cert3  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+        my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T22:14Z
+        my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
     - expect_exit:
         code: 0
 - execute_command:
@@ -421,7 +420,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   },
                   "revocation_details": {
@@ -433,7 +432,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert2",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   }
                 }
@@ -443,8 +442,8 @@ actions:
             }
     - expect_stdout: |
         NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-        my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-        my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T15:14:00.105-07:00
+        my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+        my-cert2  my-ca   europe-west1  ACTIVE                         2020-03-22T22:14Z
     - expect_exit:
         code: 0
 - execute_command:
@@ -467,7 +466,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   },
                   "revocation_details": {
@@ -479,7 +478,7 @@ actions:
                   "name": "projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert3",
                   "certificate_description" : {
                     "subject_description": {
-                      "not_after_time": "2020-03-22T15:14:00.105-07:00"
+                      "notAfterTime": "2020-03-22T15:14:00.105-07:00"
                     }
                   },
                   "revocation_details": {
@@ -493,8 +492,8 @@ actions:
             }
     - expect_stdout: |
         NAME      ISSUER  LOCATION      REVOCATION_STATUS  NOT_BEFORE  NOT_AFTER
-        my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
-        my-cert3  my-ca   europe-west1  REVOKED                        2020-03-22T15:14:00.105-07:00
+        my-cert   my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
+        my-cert3  my-ca   europe-west1  REVOKED                        2020-03-22T22:14Z
     - expect_exit:
         code: 0
 - execute_command:

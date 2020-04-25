@@ -273,7 +273,7 @@ When enabled, Kubernetes service accounts will be able to act as Cloud IAM
 Service Accounts, through the provided workload pool.
 
 Currently, the only accepted workload pool is the workload pool of the Cloud
-project containing the cluster, \f5PROJECT_NAME.svc.id.goog\fR.
+project containing the cluster, \f5PROJECT_ID.svc.id.goog\fR.
 
 For more information on Workload Identity, see
 
@@ -661,10 +661,10 @@ Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]
-The list of CIDR blocks (up to 50) that are allowed to connect to Kubernetes
-master through HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30). Can not be
-specified unless \f5\-\-enable\-master\-authorized\-networks\fR is also
-specified.
+The list of CIDR blocks (up to 100 for private cluster, 50 for public cluster)
+that are allowed to connect to Kubernetes master through HTTPS. Specified in
+CIDR notation (e.g. 1.2.3.4/30). Cannot be specified unless
+\f5\-\-enable\-master\-authorized\-networks\fR is also specified.
 
 .TP 2m
 \fB\-\-node\-pool\fR=\fINODE_POOL\fR

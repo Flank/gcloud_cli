@@ -76,6 +76,10 @@ GROUPS
      images
         (ALPHA) List, create, and delete Compute Engine images.
 
+     in-place-snapshots
+        (ALPHA) Create, list and delete Google Compute Engine in place
+        snapshots.
+
      instance-groups
         (ALPHA) Read and manipulate Compute Engine instance groups.
 

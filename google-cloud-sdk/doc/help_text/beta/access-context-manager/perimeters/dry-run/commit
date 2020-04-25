@@ -7,10 +7,14 @@ SYNOPSIS
         [--policy=policy] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) A commit operation on a Service Perimeter involves copying its
-    dry-run mode configuration (spec) to that Service Perimeter's enforcement
-    mode configration (status). This command performs this operation for all
-    Service Perimeters in the user's Access Policy.
+    (BETA) (DEPRECATED) This command has been renamed to enforce-all. Please
+    use gcloud alpha access-context-manager perimeters dry-run enforce-all
+    instead.
+
+    A commit operation on a Service Perimeter involves copying its dry-run mode
+    configuration (spec) to that Service Perimeter's enforcement mode
+    configration (status). This command performs this operation for all Service
+    Perimeters in the user's Access Policy.
 
     Note: Only Service Perimeters with an explicit dry-run mode configuration
     are affected by this operation. The overall commit operation succeeds once

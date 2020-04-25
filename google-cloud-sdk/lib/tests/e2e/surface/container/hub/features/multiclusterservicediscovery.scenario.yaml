@@ -5,7 +5,7 @@ summary:
 - execute:
   - command: |
       container hub features $$feature$$ describe
-      --format "text(featureState,multiclusterservicediscoveryFeatureSpec,name)"
+      --format "text(featureState.lifecycleState,multiclusterservicediscoveryFeatureSpec,name)"
   - stdout: |
         featureState.lifecycleState:             ENABLED
         multiclusterservicediscoveryFeatureSpec: {}
@@ -19,7 +19,7 @@ actions:
 - execute_command:
     command: |
       container hub features $$feature$$ describe
-      --format "text(featureState,multiclusterservicediscoveryFeatureSpec,name)"
+      --format "text(featureState.lifecycleState,multiclusterservicediscoveryFeatureSpec,name)"
     events:
     - api_call:
         expect_request:

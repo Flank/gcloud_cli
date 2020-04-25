@@ -17,10 +17,14 @@ gcloud alpha access\-context\-manager perimeters dry\-run commit \- commit the d
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR A commit operation on a Service Perimeter involves copying its
-dry\-run mode configuration (\f5spec\fR) to that Service Perimeter's enforcement
-mode configration (\f5status\fR). This command performs this operation for
-\fBall\fR Service Perimeters in the user's Access Policy.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR This command has been renamed to
+\f5enforce\-all\fR. Please use \f5gcloud alpha access\-context\-manager
+perimeters dry\-run enforce\-all\fR instead.
+
+A commit operation on a Service Perimeter involves copying its dry\-run mode
+configuration (\f5spec\fR) to that Service Perimeter's enforcement mode
+configration (\f5status\fR). This command performs this operation for \fBall\fR
+Service Perimeters in the user's Access Policy.
 
 Note: Only Service Perimeters with an explicit dry\-run mode configuration are
 affected by this operation. The overall commit operation succeeds once the

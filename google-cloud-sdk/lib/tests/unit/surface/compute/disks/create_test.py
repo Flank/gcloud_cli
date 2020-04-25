@@ -776,6 +776,42 @@ class DisksCreateTestAlpha(DisksCreateTestBeta):
               zone='central2-a'))],
     )
 
+  def testCreateDiskWithSourceInPlaceSnapshot(self):
+    self.Run("""
+        compute disks create testdisk --zone central2-a
+         --source-in-place-snapshot sourceIPS
+    """)
+
+    self.CheckRequests(self.zone_get_request,
+                       [(self.compute.disks, 'Insert',
+                         self.messages.ComputeDisksInsertRequest(
+                             disk=self.messages.Disk(
+                                 name='testdisk',
+                                 sizeGb=500,
+                                 sourceInPlaceSnapshot=self.compute_uri +
+                                 '/projects/my-project/zones/'
+                                 'central2-a/inPlaceSnapshots/sourceIPS'),
+                             project='my-project',
+                             zone='central2-a'))])
+
+  def testCreateDiskWithSourceInPlaceSnapshotWithZone(self):
+    self.Run("""
+        compute disks create testdisk --zone central2-a
+         --source-in-place-snapshot sourceIPS --source-in-place-snapshot-zone central2-a
+    """)
+
+    self.CheckRequests(self.zone_get_request,
+                       [(self.compute.disks, 'Insert',
+                         self.messages.ComputeDisksInsertRequest(
+                             disk=self.messages.Disk(
+                                 name='testdisk',
+                                 sizeGb=500,
+                                 sourceInPlaceSnapshot=self.compute_uri +
+                                 '/projects/my-project/zones/'
+                                 'central2-a/inPlaceSnapshots/sourceIPS'),
+                             project='my-project',
+                             zone='central2-a'))])
+
 
 class DisksCreateTestWithCsekKeys(test_base.BaseTest):
 
@@ -1455,6 +1491,65 @@ class RegionalDisksCreateTestAlpha(RegionalDisksCreateTestBeta):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.api_version = 'alpha'
+
+  def SetUp(self):
+    self.make_requests.side_effect = iter([
+        [],
+        [
+            self.messages.Region(name='central2',),
+        ],
+        [],
+    ])
+
+  def testCreateDiskWithSourceInPlaceSnapshot(self):
+    self.Run("""
+        compute disks create testdisk --region central2 --replica-zones central2-b,central2-c
+         --source-in-place-snapshot sourceIPS
+    """)
+
+    self.CheckRequests([], [
+        (self.compute.regions, 'Get',
+         self.messages.ComputeRegionsGetRequest(
+             project='my-project', region='central2'))
+    ], [(self.compute.regionDisks, 'Insert',
+         self.messages.ComputeRegionDisksInsertRequest(
+             disk=self.messages.Disk(
+                 name='testdisk',
+                 sizeGb=500,
+                 sourceInPlaceSnapshot=self.compute_uri +
+                 '/projects/my-project/regions/'
+                 'central2/inPlaceSnapshots/sourceIPS',
+                 replicaZones=[
+                     self.compute_uri + '/projects/my-project/zones/central2-b',
+                     self.compute_uri + '/projects/my-project/zones/central2-c'
+                 ]),
+             project='my-project',
+             region='central2'))])
+
+  def testCreateDiskWithSourceInPlaceSnapshotWithRegion(self):
+    self.Run("""
+        compute disks create testdisk --region central2 --replica-zones central2-b,central2-c
+         --source-in-place-snapshot sourceIPS --source-in-place-snapshot-region central2
+    """)
+
+    self.CheckRequests([], [
+        (self.compute.regions, 'Get',
+         self.messages.ComputeRegionsGetRequest(
+             project='my-project', region='central2'))
+    ], [(self.compute.regionDisks, 'Insert',
+         self.messages.ComputeRegionDisksInsertRequest(
+             disk=self.messages.Disk(
+                 name='testdisk',
+                 sizeGb=500,
+                 sourceInPlaceSnapshot=self.compute_uri +
+                 '/projects/my-project/regions/'
+                 'central2/inPlaceSnapshots/sourceIPS',
+                 replicaZones=[
+                     self.compute_uri + '/projects/my-project/zones/central2-b',
+                     self.compute_uri + '/projects/my-project/zones/central2-c'
+                 ]),
+             project='my-project',
+             region='central2'))])
 
 
 class RegionalDisksCreateTestStandardTemplateGA(test_base.BaseTest):

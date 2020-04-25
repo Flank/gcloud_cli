@@ -212,9 +212,9 @@ FLAGS
         CLOUDSDK_COMPUTE_REGION.
 
      --runtime-version=RUNTIME_VERSION
-        AI Platform runtime version for this job. Defaults to a stable version,
-        which is defined in documentation along with the list of supported
-        versions:
+        AI Platform runtime version for this job. Must be specified unless
+        --master-image-uri is specified instead. It is defined in documentation
+        along with the list of supported versions:
         https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
 
      --scale-tier=SCALE_TIER

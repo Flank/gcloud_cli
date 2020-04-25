@@ -630,7 +630,7 @@ class GlobalForwardingRulesCreateTestAlpha(GlobalForwardingRulesCreateTestBeta):
         r'\[--target-https-proxy\] or \[--target-grpc-proxy\] for an '
         r'INTERNAL_SELF_MANAGED \[--load-balancing-scheme\].')
     self.exactly_one_target_msg = (
-        'Exactly one of (--backend-service | '
+        'Exactly one of (--backend-service | --target-google-apis-bundle | '
         '--target-grpc-proxy | --target-http-proxy | --target-https-proxy | '
         '--target-instance | --target-pool | --target-ssl-proxy | '
         '--target-tcp-proxy | --target-vpn-gateway) must be specified.')

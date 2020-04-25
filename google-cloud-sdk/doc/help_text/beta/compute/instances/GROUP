@@ -49,6 +49,9 @@ COMMANDS
      add-metadata
         (BETA) Add or update instance metadata.
 
+     add-resource-policies
+        (BETA) Add resource policies to Google Compute Engine VM instances.
+
      add-tags
         (BETA) Add tags to Google Compute Engine virtual machine instances.
 

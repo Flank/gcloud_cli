@@ -343,6 +343,23 @@ class ConfigTest(cli_test_base.CliTestBase):
     self.AssertOutputContains('account: mushroom', normalize_space=True)
     self.AssertOutputNotContains('cluster: my_cluster', normalize_space=True)
 
+  def testContextAwareUseClientCertificate_True(self):
+    self.Run('config set context_aware/use_client_certificate True')
+    self.AssertErrContains('Some services may not support client certificate '
+                           'authorization in this version of gcloud.')
+
+  def testContextAwareUseClientCertificate_False(self):
+    self.Run('config set context_aware/use_client_certificate False')
+    self.AssertErrNotContains(
+        'Some services may not support client certificate '
+        'authorization in this version of gcloud.')
+
+  def testContextAwareUseClientCertificate_Unset(self):
+    self.Run('config unset context_aware/use_client_certificate')
+    self.AssertErrNotContains(
+        'Some services may not support client certificate '
+        'authorization in this version of gcloud.')
+
 
 if __name__ == '__main__':
   cli_test_base.main()

@@ -38,8 +38,8 @@ summary:
   - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
 - execute:
-  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
-      --format 'value(machineType)'
+  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1
+      AND name:$$manager$$' --format 'value(machineType)'
   - stdout: |
       n1-standard-1
       n1-standard-1
@@ -64,8 +64,8 @@ summary:
   - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
 - execute:
-  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:f1-micro AND name:$$manager$$'
-      --format 'value(machineType)'
+  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:f1-micro
+      AND name:$$manager$$' --format 'value(machineType)'
   - stdout: |
       f1-micro
       f1-micro
@@ -77,8 +77,8 @@ summary:
       f1-micro
       f1-micro
 - execute:
-  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
-      --format 'value(machineType)'
+  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1
+      AND name:$$manager$$' --format 'value(machineType)'
   - stdout: |
       n1-standard-1
       n1-standard-1
@@ -132,7 +132,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
+          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10?alt=json
           method: GET
           headers: {}
           body: null
@@ -178,7 +178,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9
+                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10
                   mode: READ_WRITE
                   type: PERSISTENT
                 machineType: n1-standard-1
@@ -297,7 +297,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
+          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10?alt=json
           method: GET
           headers: {}
           body: null
@@ -343,7 +343,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9
+                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10
                   mode: READ_WRITE
                   type: PERSISTENT
                 machineType: f1-micro
@@ -614,8 +614,8 @@ actions:
 
 - execute_command:
     # There should be 12 instances in this MIG with the original machine type.
-    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
-      --format 'value(machineType)'
+    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1
+      AND name:$$manager$$' --format 'value(machineType)'
     validation_only: true
     events:
     - expect_stdout: |
@@ -817,8 +817,8 @@ actions:
 
 - execute_command:
     # 9 instances should have changed machine type.
-    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:f1-micro AND name:$$manager$$'
-      --format 'value(machineType)'
+    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:f1-micro
+      AND name:$$manager$$' --format 'value(machineType)'
     validation_only: true
     events:
     - expect_stdout: |
@@ -835,8 +835,8 @@ actions:
         code: 0
 - execute_command:
     # 3 instances should have stayed the same.
-    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
-      --format 'value(machineType)'
+    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1
+      AND name:$$manager$$' --format 'value(machineType)'
     validation_only: true
     events:
     - expect_stdout: |

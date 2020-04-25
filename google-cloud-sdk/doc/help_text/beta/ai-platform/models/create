@@ -4,8 +4,7 @@ NAME
 SYNOPSIS
     gcloud beta ai-platform models create MODEL [--description=DESCRIPTION]
         [--enable-console-logging] [--enable-logging]
-        [--labels=[KEY=VALUE,...]]
-        [--region=REGION | --regions=REGION,[REGION,...]]
+        [--labels=[KEY=VALUE,...]] [--regions=REGION,[REGION,...]]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -37,24 +36,11 @@ FLAGS
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
 
-     At most one of these may be specified:
+     --regions=REGION,[REGION,...]
+        The Google Cloud region where the model will be deployed (currently
+        only a single region is supported).
 
-       --region=REGION
-          Google Cloud region of the regional endpoint to use for this command.
-          If unspecified, the command uses the global endpoint of the AI
-          Platform Training and Prediction API.
-
-          If you specify this flag, do not specify --regions.
-
-          Learn more about regional endpoints and see a list of available
-          regions:
-          https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
-
-       --regions=REGION,[REGION,...]
-          The Google Cloud region where the model will be deployed (currently
-          only a single region is supported).
-
-          Defaults to 'us-central1'.
+        Defaults to 'us-central1'.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

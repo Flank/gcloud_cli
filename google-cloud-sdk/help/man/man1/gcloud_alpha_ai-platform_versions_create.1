@@ -11,7 +11,7 @@ gcloud alpha ai\-platform versions create \- create a new AI Platform version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ai\-platform versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-explanation\-method\fR=\fIEXPLANATION_METHOD\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR;\ default=50] [\fB\-\-num\-paths\fR=\fINUM_PATHS\fR;\ default=50] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ai\-platform versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-explanation\-method\fR=\fIEXPLANATION_METHOD\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR;\ default=50] [\fB\-\-num\-paths\fR=\fINUM_PATHS\fR;\ default=50] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -168,18 +168,10 @@ version is 2.7. Python 3.5 is available when \f5\-\-runtime\-version\fR is set
 to 1.4 and above. Python 2.7 works with all supported runtime versions.
 
 .TP 2m
-\fB\-\-region\fR=\fIREGION\fR
-Google Cloud region of the regional endpoint to use for this command. If
-unspecified, the command uses the global endpoint of the AI Platform Training
-and Prediction API.
-
-Learn more about regional endpoints and see a list of available regions:
-https://cloud.google.com/ai\-platform/prediction/docs/regional\-endpoints
-
-.TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
-AI Platform runtime version for this job. Defaults to a stable version, which is
-defined in documentation along with the list of supported versions:
+AI Platform runtime version for this job. Must be specified unless
+\-\-master\-image\-uri is specified instead. It is defined in documentation
+along with the list of supported versions:
 https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
 
 .TP 2m

@@ -24,7 +24,6 @@ import json
 
 from googlecloudsdk.core.credentials import reauth
 from tests.lib import cli_test_base
-from tests.lib import test_case
 import mock
 
 from oauth2client.contrib import reauth as oauth2client_reauth
@@ -62,7 +61,7 @@ def _RefreshHttpResponseMissingScopes():
       'refresh_token': 'new_refresh_token',
       'expires_in': 3600,
       'id_token': 'new_id_token',
-      'scopes': 'scope1'
+      'scope': 'scope1'
   }
   content = six.ensure_binary(json.dumps(response_json))
   return _MockResponse(200, content)
@@ -93,8 +92,6 @@ def _RefreshHttpResponseRequireReauth():
 _AUTH_REQUEST_HEADER = {'content-type': 'application/x-www-form-urlencoded'}
 
 
-@test_case.Filters.SkipOnKokoroAndLinuxPy3('pytest loads wrong module',
-                                           'b/151428720')
 class GoogleAuthUserCredsRefreshTest(cli_test_base.CliTestBase):
 
   def SetUp(self):
@@ -163,7 +160,7 @@ class GoogleAuthUserCredsRefreshTest(cli_test_base.CliTestBase):
         ('client_secret', 'client_secret'),
         ('refresh_token', 'refresh_token'),
         ('scope', 'scope1 scope2'),
-        ('rapt_token', 'valid_rapt_token'),
+        ('rapt', 'valid_rapt_token'),
     ]
     self.http_request.assert_called_with(
         method='POST',
@@ -179,8 +176,6 @@ class GoogleAuthUserCredsRefreshTest(cli_test_base.CliTestBase):
       self.creds.refresh(self.http_request)
 
 
-@test_case.Filters.SkipOnKokoroAndLinuxPy3('pytest loads wrong module',
-                                           'b/151428720')
 class GoogleAuthUserCredsRefreshWithReauthTest(cli_test_base.CliTestBase):
 
   def SetUp(self):
@@ -241,7 +236,7 @@ class GoogleAuthUserCredsRefreshWithReauthTest(cli_test_base.CliTestBase):
         ('scope', 'scope1 scope2'),
     ]
     body2 = copy.deepcopy(body1)
-    body2.append(('rapt_token', 'valid_rapt_token'))
+    body2.append(('rapt', 'valid_rapt_token'))
     calls = [
         mock.call(
             method='POST',
@@ -276,7 +271,7 @@ class GoogleAuthUserCredsRefreshWithReauthTest(cli_test_base.CliTestBase):
         ('scope', 'scope1 scope2'),
     ]
     body2 = copy.deepcopy(body1)
-    body2.append(('rapt_token', 'valid_rapt_token'))
+    body2.append(('rapt', 'valid_rapt_token'))
     calls = [
         mock.call(
             method='POST',
@@ -309,7 +304,7 @@ class GoogleAuthUserCredsRefreshWithReauthTest(cli_test_base.CliTestBase):
         ('scope', 'scope1 scope2'),
     ]
     body2 = copy.deepcopy(body1)
-    body2.append(('rapt_token', 'valid_rapt_token'))
+    body2.append(('rapt', 'valid_rapt_token'))
     calls = [
         mock.call(
             method='POST',

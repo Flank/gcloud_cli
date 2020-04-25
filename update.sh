@@ -5,7 +5,7 @@
 #
 # gsutil ls -l gs://cloud-sdk-release/for_packagers/linux > list.txt
 
-VERSION=288.0.0
+VERSION=290.0.0
 SDK_TESTS=google-cloud-sdk-tests_$VERSION.orig.tar.gz
 SDK=google-cloud-sdk_$VERSION.orig.tar.gz
 

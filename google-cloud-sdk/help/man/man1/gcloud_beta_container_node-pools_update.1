@@ -11,7 +11,7 @@ gcloud beta container node\-pools update \- updates a node pool in a running clu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container node\-pools update\fR \fINAME\fR (\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR\ |\ \fB\-\-enable\-autoprovisioning\fR\ \fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR\ |\ \fB\-\-enable\-autorepair\fR\ \fB\-\-enable\-autoupgrade\fR\ |\ \fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR\ \fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR) [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container node\-pools update\fR \fINAME\fR (\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-workload\-metadata\fR=\fIWORKLOAD_METADATA\fR\ |\ \fB\-\-enable\-autoprovisioning\fR\ \fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR\ |\ \fB\-\-enable\-autorepair\fR\ \fB\-\-enable\-autoupgrade\fR\ |\ \fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR\ \fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR) [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -55,9 +55,9 @@ $ gcloud beta container node\-pools update node\-pool\-1 \e
 .RE
 
 .TP 2m
-\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR
+\fB\-\-workload\-metadata\fR=\fIWORKLOAD_METADATA\fR
 Type of metadata server available to pods running in the node pool.
-\fIWORKLOAD_METADATA_FROM_NODE\fR must be one of:
+\fIWORKLOAD_METADATA\fR must be one of:
 
 .RS 2m
 .TP 2m

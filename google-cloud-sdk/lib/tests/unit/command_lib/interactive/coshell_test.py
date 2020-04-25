@@ -603,8 +603,8 @@ class MingWCoshellOnUnixTest(_CoshellTestBase):
     self.AssertOutputContains('original ::\n')
     self.AssertOutputContains('updated :bar:\n')
 
-  @test_case.Filters.SkipInDebPackage('Flakes', 'b/67582029')
-  @test_case.Filters.SkipInRpmPackage('Flakes', 'b/67582029')
+  @test_case.Filters.DoNotRunInRpmPackage('unnecessary - b/65456434, post 6')
+  @test_case.Filters.DoNotRunInDebPackage('unnecessary - b/65456434, post 6')
   def testMinGWCoshellExit(self):
     with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('exit')

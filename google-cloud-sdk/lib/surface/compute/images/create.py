@@ -31,6 +31,8 @@ from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import resources
 import six
 
+POLL_TIMEOUT = 36000  # 10 hours is recommended by PD team b/131850402#comment20
+
 
 def _Args(parser, messages, supports_force_create=False):
   """Set Args based on Release Track."""
@@ -197,7 +199,7 @@ class Create(base.CreateCommand):
       request.forceCreate = True
 
     return client.MakeRequests([(client.apitools_client.images, 'Insert',
-                                 request)])
+                                 request)], timeout=POLL_TIMEOUT)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -256,7 +258,7 @@ Create.detailed_help = {
         projects.
 
         To learn more about creating image tarballs, visit
-        [](https://cloud.google.com/compute/docs/creating-custom-image)
+        [](https://cloud.google.com/compute/docs/creating-custom-image).
         """,
     'EXAMPLES':
         """\

@@ -35,6 +35,12 @@ actions:
                 - env:
                   - name: PORT
                     value: '8080'
+                  - name: K_CONFIGURATION
+                    value: dev
+                  - name: K_REVISION
+                    value: dev-0001
+                  - name: K_SERVICE
+                    value: blahblah
                   - name: a
                     value: b
                   - name: c

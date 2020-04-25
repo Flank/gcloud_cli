@@ -11,7 +11,7 @@ gcloud alpha compute disks create \- create Google Compute Engine persistent dis
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-erase\-windows\-vss\-signature\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-multi\-writer\fR] [\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR;\ default="4096"] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR\ |\ \fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ \fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-erase\-windows\-vss\-signature\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-multi\-writer\fR] [\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR;\ default="4096"] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR\ |\ \fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ \fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR\ |\ \fB\-\-source\-in\-place\-snapshot\fR=\fISOURCE_IN_PLACE_SNAPSHOT\fR\ \fB\-\-source\-in\-place\-snapshot\-region\fR=\fISOURCE_IN_PLACE_SNAPSHOT_REGION\fR\ |\ \fB\-\-source\-in\-place\-snapshot\-zone\fR=\fISOURCE_IN_PLACE_SNAPSHOT_ZONE\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -242,6 +242,33 @@ $ gcloud config unset compute/zone
 Alternatively, the zone can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
 
+.RE
+.sp
+.TP 2m
+
+Source in place snapshot options
+
+.RS 2m
+.TP 2m
+\fB\-\-source\-in\-place\-snapshot\fR=\fISOURCE_IN_PLACE_SNAPSHOT\fR
+Source in place snapshot used to create the disks.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-source\-in\-place\-snapshot\-region\fR=\fISOURCE_IN_PLACE_SNAPSHOT_REGION\fR
+Region of the source in place snapshot to operate on. Overrides the default
+\fBcompute/region\fR property value for this command invocation.
+
+.TP 2m
+\fB\-\-source\-in\-place\-snapshot\-zone\fR=\fISOURCE_IN_PLACE_SNAPSHOT_ZONE\fR
+Zone of the source in place snapshot to operate on. Overrides the default
+\fBcompute/zone\fR property value for this command invocation.
+
+.RE
 .RE
 .RE
 .sp

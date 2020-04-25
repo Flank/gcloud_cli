@@ -58,6 +58,8 @@ EXAMPLES
     policy file format and contents.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice.
+    These variants are also available:
+
+        $ gcloud alpha spanner backups set-iam-policy
+        $ gcloud beta spanner backups set-iam-policy
 

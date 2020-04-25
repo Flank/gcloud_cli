@@ -298,6 +298,8 @@ class _Sections(object):
       Cloud SDK.
     lifesciences: Section, The section containing lifesciencs properties for the
       Cloud SDK.
+    memcache: Section, The section containing memcache properties for the Cloud
+      SDK.
     metrics: Section, The section containing metrics properties for the Cloud
       SDK.
     ml_engine: Section, The section containing ml_engine properties for the
@@ -358,6 +360,7 @@ class _Sections(object):
     self.healthcare = _SectionHealthcare()
     self.interactive = _SectionInteractive()
     self.lifesciences = _SectionLifeSciences()
+    self.memcache = _SectionMemcache()
     self.metrics = _SectionMetrics()
     self.ml_engine = _SectionMlEngine()
     self.notebooks = _SectionNotebooks()
@@ -404,9 +407,11 @@ class _Sections(object):
         self.healthcare,
         self.interactive,
         self.lifesciences,
+        self.memcache,
         self.metrics,
         self.ml_engine,
         self.notebooks,
+        self.pubsub,
         self.proxy,
         self.redis,
         self.run,
@@ -1519,9 +1524,20 @@ class _SectionPubsub(_Section):
     self.legacy_output = self._AddBool(
         'legacy_output',
         default=False,
+        internal=True,
+        hidden=True,
         help_text=('Use the legacy output for beta pubsub commands. The legacy '
                    'output from beta is being deprecated. This property will '
                    'eventually be removed.'))
+    self.zone = self._Add(
+        'lite_zone',
+        # TODO(b/152969311): Create a Completer for the active zones.
+        # TODO(b/149560300): Add this to
+        # https://cloud.google.com/sdk/docs/properties.
+        help_text='Default zone to use when working with zonal Pub/Sub Lite '
+        'resources. When a `--zone` flag is required but not provided, '
+        'the command will fall back to this value, if set.',
+        hidden=True)
 
 
 class _SectionComposer(_Section):
@@ -1807,6 +1823,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.policytroubleshooter = self._Add('policytroubleshooter')
     self.privateca = self._Add('privateca')
     self.pubsub = self._Add('pubsub')
+    self.pubsublite = self._Add('pubsublite')
     self.recommender = self._Add('recommender')
     self.replicapoolupdater = self._Add('replicapoolupdater')
     self.runtimeconfig = self._Add('runtimeconfig')
@@ -1860,6 +1877,9 @@ class _SectionApiClientOverrides(_Section):
     self.appengine = self._Add('appengine')
     self.cloudidentity = self._Add('cloudidentity')
     self.compute = self._Add('compute')
+    self.compute_alpha = self._Add('compute/alpha')
+    self.compute_beta = self._Add('compute/beta')
+    self.compute_v1 = self._Add('compute/v1')
     self.container = self._Add('container')
     self.speech = self._Add('speech')
     self.sql = self._Add('sql')
@@ -1929,6 +1949,18 @@ class _SectionContextAware(_Section):
         validator=ExistingAbsoluteFilepathValidator,
         help_text='File path for auto discovery configuration file.',
         hidden=True)
+
+
+class _SectionMemcache(_Section):
+  """Contains the properties for the 'memcache' section."""
+
+  def __init__(self):
+    super(_SectionMemcache, self).__init__('memcache')
+    self.region = self._Add(
+        'region',
+        help_text='Default region to use when working with Cloud Memorystore '
+        'for Memcached resources. When a `region` is required but not provided '
+        'by a flag, the command will fall back to this value, if set.')
 
 
 class _SectionRedis(_Section):

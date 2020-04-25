@@ -4,17 +4,19 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute instances create $$instance$$ --zone=us-central1-f --format="yaml(name,zone)"
-  - stderr: |
+  - stderr: |-
       Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
-  - stdout: |
+      $
+  - stdout: |-
       ---
       name: $$instance$$
-      zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+      zone: https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+      $
 - execute:
   - command: compute instances set-iam-policy $$instance$$ --zone=us-central1-f policy.json
       --format="yaml(bindings)"
   - stderr: |
-      Updated IAM policy for instance [$$instance$$\].
+      Updated IAM policy for instance [$$instance$$].
   - stdout: |
       bindings:
       - members:
@@ -34,8 +36,9 @@ summary:
         The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
          - [$$instance$$] in [us-central1-f]
     - input: y
-  - stderr: |
+  - stderr: |-
       Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
@@ -137,7 +140,7 @@ actions:
               - autoDelete: true
                 boot: true
                 initializeParams:
-                  sourceImage: https://$$compute-uri$$/$$api-version$$/projects/debian-cloud/global/images/family/debian-9
+                  sourceImage: https://$$compute-uri$$/$$api-version$$/projects/debian-cloud/global/images/family/debian-10
                 mode: READ_WRITE
                 type: PERSISTENT
               machineType: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
@@ -294,7 +297,7 @@ actions:
               - user:testuser@google.com
             etag: BwWCW59AmjQ=
     - expect_stderr: |
-          Updated IAM policy for instance [$$instance$$].
+        Updated IAM policy for instance [$$instance$$].
     - expect_stdout: |
         bindings:
         - members:

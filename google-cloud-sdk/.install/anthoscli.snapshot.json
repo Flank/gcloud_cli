@@ -2,43 +2,43 @@
   "components": [
     {
       "dependencies": [
-        "anthoscli-darwin-x86", 
-        "anthoscli-darwin-x86_64", 
-        "anthoscli-linux-x86", 
-        "anthoscli-linux-x86_64", 
-        "anthoscli-windows-x86", 
+        "anthoscli-darwin-x86",
+        "anthoscli-darwin-x86_64",
+        "anthoscli-linux-x86",
+        "anthoscli-linux-x86_64",
+        "anthoscli-windows-x86",
         "anthoscli-windows-x86_64"
-      ], 
+      ],
       "details": {
-        "description": "The cli for Anthos infrastructure.", 
+        "description": "The cli for Anthos infrastructure.",
         "display_name": "anthoscli"
-      }, 
-      "id": "anthoscli", 
-      "is_configuration": false, 
-      "is_hidden": true, 
-      "is_required": false, 
+      },
+      "id": "anthoscli",
+      "is_configuration": false,
+      "is_hidden": true,
+      "is_required": false,
       "platform": {
         "architectures": [
-          "x86", 
+          "x86",
           "x86_64"
-        ], 
+        ],
         "operating_systems": [
-          "LINUX", 
-          "MACOSX", 
+          "LINUX",
+          "MACOSX",
           "WINDOWS"
         ]
-      }, 
+      },
       "version": {
-        "build_number": 0, 
+        "build_number": 0,
         "version_string": ""
       }
     }
-  ], 
-  "revision": 20200403135304, 
+  ],
+  "revision": 20200421142158,
   "schema_version": {
-    "no_update": false, 
-    "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz", 
+    "no_update": false,
+    "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
-  }, 
-  "version": "288.0.0"
+  },
+  "version": "290.0.0"
 }

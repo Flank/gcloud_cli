@@ -97,6 +97,34 @@ class AssetUtilsTest(cli_test_base.CliTestBase, parameterized.TestCase):
         utils.GetParentNameForGetHistory(None, 'project_id'),
         'projects/project_id')
 
+  def testVerifyScopeForSearch_OneLevel(self):
+    with self.AssertRaisesExceptionRegexp(
+        gcloud_exceptions.InvalidArgumentException,
+        '.*A valid scope should be.*'):
+      utils.VerifyScopeForSearch('projects123')
+
+  def testVerifyScopeForSearch_ThreeLevel(self):
+    with self.AssertRaisesExceptionRegexp(
+        gcloud_exceptions.InvalidArgumentException,
+        '.*A valid scope should be.*'):
+      utils.VerifyScopeForSearch('abc/def/123')
+
+  def testVerifyScopeForSearch_Prefix(self):
+    with self.AssertRaisesExceptionRegexp(
+        gcloud_exceptions.InvalidArgumentException,
+        '.*A valid scope should be.*'):
+      utils.VerifyScopeForSearch('/projects/123')
+
+  def testVerifyScopeForSearch_Suffix(self):
+    with self.AssertRaisesExceptionRegexp(
+        gcloud_exceptions.InvalidArgumentException,
+        '.*A valid scope should be.*'):
+      utils.VerifyScopeForSearch('projects/123/')
+
+  @parameterized.parameters(('organizations/123'), ('folders/1234'),
+                            ('projects/12345'), ('projects/abc'), ('123/456'))
+  def testVerifyScopeForSearch_Normal(self, scope):
+    utils.VerifyScopeForSearch(scope)
 
 if __name__ == '__main__':
   test_case.main()

@@ -40,9 +40,6 @@ GROUPS
         (ALPHA) A group of subcommands for working with Cloud Dataflow
         snapshots.
 
-     sql
-        (ALPHA) A group of subcommands for working with Dataflow SQL.
-
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

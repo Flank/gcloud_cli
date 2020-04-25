@@ -4,32 +4,35 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute networks create $$network1$$ --subnet-mode custom --format 'yaml(name,x_gcloud_subnet_mode)'
-  - stderr: |
-      Created [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
-  - stdout:
-      matches: ^(---\s)?name:\s$$network1$$\s+x_gcloud_subnet_mode:\sCUSTOM$
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
+      $
+  - stdout: ^(---\s)?name:\s$$network1$$\s+x_gcloud_subnet_mode:\sCUSTOM$
 - execute:
   - command: compute networks subnets create $$subnet1$$ --region us-central1 --network
       $$network1$$ --range 10.0.3.0/24 --format 'text(name,network,ipCidrRange)'
-  - stderr: |
-      Created [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
-  - stdout: |
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
+      $
+  - stdout: |-
       ---
       ipCidrRange: 10.0.3.0/24
       name:        $$subnet1$$
-      network:     https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
+      network:     https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
+      $
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --network-interface
       subnet=$$subnet1$$,aliases=/32  --format='yaml(networkInterfaces[].subnetwork,
       networkInterfaces[].aliasIpRanges)'
-  - stderr: |
-      Created [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
   - stdout: |-
       ---
       networkInterfaces:
       - aliasIpRanges:
         - ipCidrRange: 10.0.3.*/32
-        subnetwork: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
+        subnetwork: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
       $
 - execute:
   - command: compute instances network-interfaces update $$instance$$ --zone us-central1-f
@@ -42,7 +45,7 @@ summary:
       networkInterfaces[].aliasIpRanges)'
   - stdout: |
       networkInterfaces:
-      - subnetwork: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
+      - subnetwork: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
 - execute:
   - command: compute instances network-interfaces update $$instance$$ --zone us-central1-f
       --aliases /32
@@ -56,20 +59,23 @@ summary:
       networkInterfaces:
       - aliasIpRanges:
         - ipCidrRange: 10.0.3.*/32
-        subnetwork: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
+        subnetwork: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
       $
 - execute:
   - command: compute instances delete $$instance$$ --zone us-central1-f --quiet
-  - stderr: |
-      Deleted [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
 - execute:
   - command: compute networks subnets delete $$subnet1$$ --region us-central1 --quiet
-  - stderr: |
-      Deleted [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
+      $
 - execute:
   - command: compute networks delete $$network1$$ --quiet
-  - stderr: |
-      Deleted [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
@@ -283,7 +289,7 @@ actions:
               - autoDelete: true
                 boot: true
                 initializeParams:
-                  sourceImage: https://$$compute-uri$$/alpha/projects/debian-cloud/global/images/family/debian-9
+                  sourceImage: https://$$compute-uri$$/alpha/projects/debian-cloud/global/images/family/debian-10
                 mode: READ_WRITE
                 type: PERSISTENT
               machineType: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1

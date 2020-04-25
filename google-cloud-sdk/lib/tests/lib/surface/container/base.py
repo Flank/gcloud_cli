@@ -405,6 +405,8 @@ class TestBase(cli_test_base.CliTestBase):
     policy = self.messages.IPAllocationPolicy()
     if 'useIpAliases' in kwargs:
       policy.useIpAliases = kwargs['useIpAliases']
+    if 'useRoutes' in kwargs:
+      policy.useRoutes = kwargs['useRoutes']
     if 'createSubnetwork' in kwargs:
       policy.createSubnetwork = kwargs['createSubnetwork']
     if 'subnetworkName' in kwargs:

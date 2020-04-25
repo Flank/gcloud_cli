@@ -77,7 +77,7 @@ class EquivalenceTest(test_base.BaseTest):
         help='Google Cloud Platform project ID to use for this invocation.',
         action=actions.StoreProperty(properties.VALUES.core.project))
     self.registry = resources.Registry()
-    self.compute_client = client_adapter.ClientAdapter(api_default_version='v1')
+    self.compute_client = client_adapter.ClientAdapter(api_version='v1')
     self.client = self.compute_client.apitools_client
     self.messages = self.compute_client.messages
 

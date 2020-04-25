@@ -6,9 +6,9 @@ summary:
   - command: |
       api-gateway apis list
   - stdout: |
-      NAME                                                       DISPLAY_NAME  MANAGED_SERVICE                                  STATE
-      /projects/fake-project/locations/global/apis/apiNumeroUno  Api One       apiNumeroUno.apigateway.fake-project.cloud.goog  ACTIVE
-      /projects/fake-project/locations/global/apis/apiNumeroDos  Api Two       apiNumeroDos.apigateway.fake-project.cloud.goog  ACTIVE
+      API_ID  DISPLAY_NAME  MANAGED_SERVICE                                  STATE   CREATE_TIME
+      apis    Api One       apiNumeroUno.apigateway.fake-project.cloud.goog  ACTIVE  2019-11-04T21:12:05
+      apis    Api Two       apiNumeroDos.apigateway.fake-project.cloud.goog  ACTIVE  2019-11-04T21:12:05
 actions:
 - execute_command:
     command: |
@@ -38,8 +38,8 @@ actions:
               apiController:
                 managedService: apiNumeroDos.apigateway.fake-project.cloud.goog
     - expect_stdout: |
-        NAME                                                       DISPLAY_NAME  MANAGED_SERVICE                                  STATE
-        /projects/fake-project/locations/global/apis/apiNumeroUno  Api One       apiNumeroUno.apigateway.fake-project.cloud.goog  ACTIVE
-        /projects/fake-project/locations/global/apis/apiNumeroDos  Api Two       apiNumeroDos.apigateway.fake-project.cloud.goog  ACTIVE
+        API_ID  DISPLAY_NAME  MANAGED_SERVICE                                  STATE   CREATE_TIME
+        apis    Api One       apiNumeroUno.apigateway.fake-project.cloud.goog  ACTIVE  2019-11-04T21:12:05
+        apis    Api Two       apiNumeroDos.apigateway.fake-project.cloud.goog  ACTIVE  2019-11-04T21:12:05
     - expect_exit:
         code: 0

@@ -6,8 +6,9 @@ summary:
 - execute:
   - command: compute instances create $$instance$$ --create-disk source-snapshot=donotdeletefore2e
       --zone us-central1-f --format="text(name,status)"
-  - stderr: |
+  - stderr: |-
       Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
   - stdout: |
       ---
       name:   $$instance$$
@@ -19,8 +20,9 @@ summary:
         The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
          - [$$instance$$] in [us-central1-f]
     - input: y
-  - stderr: |
+  - stderr: |-
       Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
@@ -1293,7 +1295,7 @@ actions:
               - autoDelete: true
                 boot: true
                 initializeParams:
-                  sourceImage: https://$$compute-uri$$/v1/projects/debian-cloud/global/images/family/debian-9
+                  sourceImage: https://$$compute-uri$$/v1/projects/debian-cloud/global/images/family/debian-10
                 mode: READ_WRITE
                 type: PERSISTENT
               - autoDelete: true

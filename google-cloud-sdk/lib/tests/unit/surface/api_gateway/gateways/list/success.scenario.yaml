@@ -6,17 +6,17 @@ summary:
   - command: |
       api-gateway gateways list --location us-central1
   - stdout: |
-      NAME                                                                  DISPLAY_NAME     STATE
-      projects/fake-project/locations/us-central1/gateways/a-gateway        A Gateway        ACTIVE
-      projects/fake-project/locations/us-central1/gateways/another-gateway  Another Gateway  UPDATING
+      GATEWAY_ID       LOCATION     DISPLAY_NAME     STATE     CREATE_TIME          UPDATE_TIME
+      a-gateway        us-central1  A Gateway        ACTIVE    2020-03-05T17:47:37  2020-03-05T17:47:37
+      another-gateway  us-central1  Another Gateway  UPDATING  2020-03-05T17:47:37  2020-03-05T17:47:37
 - execute:
   - command: |
       api-gateway gateways list
   - stdout: |
-      NAME                                                                    DISPLAY_NAME     STATE
-      projects/fake-project/locations/us-central1/gateways/a-gateway          A Gateway        ACTIVE
-      projects/fake-project/locations/us-central1/gateways/another-gateway    Another Gateway  UPDATING
-      projects/fake-project/locations/us-central2/gateways/another-gateway-2  Another Gateway  UPDATING
+      GATEWAY_ID         LOCATION     DISPLAY_NAME     STATE     CREATE_TIME          UPDATE_TIME
+      a-gateway          us-central1  A Gateway        ACTIVE    2020-03-05T17:47:37  2020-03-05T17:47:37
+      another-gateway    us-central1  Another Gateway  UPDATING  2020-03-05T17:47:37  2020-03-05T17:47:37
+      another-gateway-2  us-central2  Another Gateway  UPDATING  2020-03-05T17:47:37  2020-03-05T17:47:37
 actions:
 - execute_command:
     command: |
@@ -38,17 +38,21 @@ actions:
               apiConfig: projects/fake-project/locations/global/apis/api-name/config/conf
               state: ACTIVE
               defaultHostname: a-gateway.fake-project.us-central1.gateway.cloud
+              createTime: '2020-03-05T17:47:37.834054637Z'
+              updateTime: '2020-03-05T17:47:37.834054637Z'
             - name: projects/fake-project/locations/us-central1/gateways/another-gateway
               displayName: Another Gateway
               apiConfig: projects/fake-project/locations/global/apis/api-name/config/conf
               state: UPDATING
               defaultHostname: another-gateway.fake-project.us-central1.gateway.cloud
+              createTime: '2020-03-05T17:47:37.834054637Z'
+              updateTime: '2020-03-05T17:47:37.834054637Z'
             nextPageToken: null
             unreachableLocations: null
     - expect_stdout: |
-        NAME                                                                  DISPLAY_NAME     STATE
-        projects/fake-project/locations/us-central1/gateways/a-gateway        A Gateway        ACTIVE
-        projects/fake-project/locations/us-central1/gateways/another-gateway  Another Gateway  UPDATING
+        GATEWAY_ID       LOCATION     DISPLAY_NAME     STATE     CREATE_TIME          UPDATE_TIME
+        a-gateway        us-central1  A Gateway        ACTIVE    2020-03-05T17:47:37  2020-03-05T17:47:37
+        another-gateway  us-central1  Another Gateway  UPDATING  2020-03-05T17:47:37  2020-03-05T17:47:37
     - expect_exit:
         code: 0
 - execute_command:
@@ -71,22 +75,28 @@ actions:
               apiConfig: projects/fake-project/locations/global/apis/api-name/config/conf
               state: ACTIVE
               defaultHostname: a-gateway.fake-project.us-central1.gateway.cloud
+              createTime: '2020-03-05T17:47:37.834054637Z'
+              updateTime: '2020-03-05T17:47:37.834054637Z'
             - name: projects/fake-project/locations/us-central1/gateways/another-gateway
               displayName: Another Gateway
               apiConfig: projects/fake-project/locations/global/apis/api-name/config/conf
               state: UPDATING
               defaultHostname: another-gateway.fake-project.us-central1.gateway.cloud
+              createTime: '2020-03-05T17:47:37.834054637Z'
+              updateTime: '2020-03-05T17:47:37.834054637Z'
             - name: projects/fake-project/locations/us-central2/gateways/another-gateway-2
               displayName: Another Gateway
               apiConfig: projects/fake-project/locations/global/apis/api-name/config/conf
               state: UPDATING
               defaultHostname: another-gateway.fake-project.us-central2.gateway.cloud
+              createTime: '2020-03-05T17:47:37.834054637Z'
+              updateTime: '2020-03-05T17:47:37.834054637Z'
             nextPageToken: null
             unreachableLocations: null
     - expect_stdout: |
-        NAME                                                                    DISPLAY_NAME     STATE
-        projects/fake-project/locations/us-central1/gateways/a-gateway          A Gateway        ACTIVE
-        projects/fake-project/locations/us-central1/gateways/another-gateway    Another Gateway  UPDATING
-        projects/fake-project/locations/us-central2/gateways/another-gateway-2  Another Gateway  UPDATING
+        GATEWAY_ID         LOCATION     DISPLAY_NAME     STATE     CREATE_TIME          UPDATE_TIME
+        a-gateway          us-central1  A Gateway        ACTIVE    2020-03-05T17:47:37  2020-03-05T17:47:37
+        another-gateway    us-central1  Another Gateway  UPDATING  2020-03-05T17:47:37  2020-03-05T17:47:37
+        another-gateway-2  us-central2  Another Gateway  UPDATING  2020-03-05T17:47:37  2020-03-05T17:47:37
     - expect_exit:
         code: 0

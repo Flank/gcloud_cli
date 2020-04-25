@@ -56,7 +56,7 @@ def DefaultNetworkOf(api_version):
 
 def DefaultImageOf(api_version):
   return ('https://compute.googleapis.com/compute/{ver}/projects/debian-cloud/'
-          'global/images/family/debian-9').format(ver=api_version)
+          'global/images/family/debian-10').format(ver=api_version)
 
 
 def NvdimmDiskTypeOf(api_version):

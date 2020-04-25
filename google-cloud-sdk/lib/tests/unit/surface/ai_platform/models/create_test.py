@@ -94,14 +94,6 @@ class CreateSurfaceTestBeta(base.MlBetaPlatformTestBase, CreateSurfaceTestGA):
     self.Run('{} models create myModel --enable-console-logging'.format(
         module_name))
 
-  def testConflictingRegionFlag(self, module_name):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --region: At most one of --region | --regions '
-        'may be specified'):
-      self.Run(
-          '{} models create myModel --region regionA --regions regionB'
-          .format(module_name))
-
 
 class CreateSurfaceTestAlpha(base.MlAlphaPlatformTestBase,
                              CreateSurfaceTestBeta):

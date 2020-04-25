@@ -218,15 +218,19 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
     return self.Run('access-context-manager perimeters dry-run reset '
                     '    {}'.format(perimeter_id))
 
+  def _EnforceDryRunPerimeter(self, perimeter_id):
+    return self.Run('access-context-manager perimeters dry-run enforce '
+                    '    {}'.format(perimeter_id))
+
   def _DropDryRunPerimeter(self, perimeter_id):
     return self.Run('access-context-manager perimeters dry-run drop '
                     '    {}'.format(perimeter_id))
 
-  def _CommitDryRunConfig(self):
+  def _CommitDryRunConfig(self, command_name='commit'):
     full_policy_id = self._GetTestPolicyId()
     just_policy_number = full_policy_id[full_policy_id.find('/') + 1:]
-    return self.Run('access-context-manager perimeters dry-run commit '
-                    ' --policy {}'.format(just_policy_number))
+    return self.Run('access-context-manager perimeters dry-run {} '
+                    ' --policy {}'.format(command_name, just_policy_number))
 
   def _DescribeDryRunPerimeter(self, perimeter_id):
     return self.Run('access-context-manager perimeters dry-run describe '
@@ -270,16 +274,16 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
             self.assertEqual(custom_level.title,
                              'My Custom Level ' + custom_level_id)
         # pylint: enable=using-constant-test
-        with self._CreateCustomLevel() as level_id:
-          level = self._DescribeLevel(level_id)
-          self.assertEqual(level.title, 'My Level ' + level_id)
-          self._UpdateCustomLevel(level_id, 'My Level Redux ' + level_id)
-          level = self._DescribeLevel(level_id)
-          self.assertEqual(level.title, 'My Level Redux ' + level_id)
       with self._CreateBasicLevel() as level_id:
         level = self._DescribeLevel(level_id)
         self.assertEqual(level.title, 'My Level ' + level_id)
         self._UpdateBasicLevel(level_id, 'My Level Redux ' + level_id)
+        level = self._DescribeLevel(level_id)
+        self.assertEqual(level.title, 'My Level Redux ' + level_id)
+      with self._CreateCustomLevel() as level_id:
+        level = self._DescribeLevel(level_id)
+        self.assertEqual(level.title, 'My Level ' + level_id)
+        self._UpdateCustomLevel(level_id, 'My Level Redux ' + level_id)
         level = self._DescribeLevel(level_id)
         self.assertEqual(level.title, 'My Level Redux ' + level_id)
       with self._CreatePerimeter() as perimeter_id:
@@ -329,6 +333,55 @@ vpcAccessibleServices:
 """.format(perimeter=perimeter_id))
     finally:
       self._DestroyPerimeter(perimeter_id)
+
+  def testServicePerimeterDryRunCreateAndUpdateWithInheritance(self):
+    if (self.track is not calliope_base.ReleaseTrack.ALPHA and
+        self.track is not calliope_base.ReleaseTrack.BETA):
+      return
+    perimeter_id = _GetResourceName('DRY_RUN_PERIMETER')
+    policy_id = self._GetTestPolicyId()
+    with self._SetPolicyProperty(policy_id):
+      with self._CreateBasicLevel() as level_id:
+        try:
+          self.Run('access-context-manager perimeters create'
+                   '    --perimeter-type regular '
+                   '    --title "My Perimeter {perimeter}" '
+                   '    --restricted-services "storage.googleapis.com" '
+                   '    --access-levels "{level_id}" '
+                   '   {perimeter}'.format(
+                       level_id=level_id, perimeter=perimeter_id))
+          self._DescribeDryRunPerimeter(perimeter_id)
+          self._UpdateDryRunPerimeter(perimeter_id, 'bigtable.googleapis.com')
+          self._DescribeDryRunPerimeter(perimeter_id)
+          # This is the combined output of the two 'describe' calls.
+          self.AssertOutputEquals("""\
+This Service Perimeter does not have an explicit dry-run mode configuration. The enforcement config will be used as the dry-run mode configuration.
+name: {perimeter}
+title: My Perimeter {perimeter}
+type: PERIMETER_TYPE_REGULAR
+resources:
+   NONE
+restrictedServices:
+   storage.googleapis.com
+accessLevels:
+   accessPolicies/{policy_id}/accessLevels/{level_id}
+vpcAccessibleServices:
+   NONE
+name: {perimeter}
+title: My Perimeter {perimeter}
+type: PERIMETER_TYPE_REGULAR
+resources:
+   NONE
+restrictedServices:
+  +bigtable.googleapis.com
+   storage.googleapis.com
+accessLevels:
+   accessPolicies/{policy_id}/accessLevels/{level_id}
+vpcAccessibleServices:
+   NONE
+""".format(perimeter=perimeter_id, level_id=level_id, policy_id=policy_id))
+        finally:
+          self._DestroyPerimeter(perimeter_id)
 
   def testServicePerimeterDryRunCreateAndDelete(self):
     if (self.track is not calliope_base.ReleaseTrack.ALPHA and
@@ -417,6 +470,46 @@ This Service Perimeter has no dry-run or enforcement mode config.
     finally:
       self._DestroyPerimeter(perimeter_id)
 
+  def testServicePerimeterDryRunCreateAndEnforce(self):
+    if (self.track is not calliope_base.ReleaseTrack.ALPHA and
+        self.track is not calliope_base.ReleaseTrack.BETA):
+      return
+    perimeter_id = _GetResourceName('DRY_RUN_PERIMETER')
+    try:
+      with self._SetPolicyProperty(self._GetTestPolicyId()):
+        self._CreateDryRunPerimeter(perimeter_id)
+        self._DescribeDryRunPerimeter(perimeter_id)
+        self._EnforceDryRunPerimeter(perimeter_id)
+        self._DescribeDryRunPerimeter(perimeter_id)
+        # This is the combined output of the two 'describe' calls.
+        self.AssertOutputEquals("""\
+name: {perimeter}
+title: My Perimeter {perimeter}
+type: PERIMETER_TYPE_REGULAR
+resources:
+   NONE
+restrictedServices:
+  +bigquery.googleapis.com
+accessLevels:
+   NONE
+vpcAccessibleServices:
+   NONE
+This Service Perimeter does not have an explicit dry-run mode configuration. The enforcement config will be used as the dry-run mode configuration.
+name: {perimeter}
+title: My Perimeter {perimeter}
+type: PERIMETER_TYPE_REGULAR
+resources:
+   NONE
+restrictedServices:
+   bigquery.googleapis.com
+accessLevels:
+   NONE
+vpcAccessibleServices:
+   NONE
+""".format(perimeter=perimeter_id))
+    finally:
+      self._DestroyPerimeter(perimeter_id)
+
   def testServicePerimeterDryRunCreateAndCommit(self):
     if (self.track is not calliope_base.ReleaseTrack.ALPHA and
         self.track is not calliope_base.ReleaseTrack.BETA):
@@ -444,13 +537,44 @@ vpcAccessibleServices:
     finally:
       self._DestroyPerimeter(perimeter_id)
 
+  def testServicePerimeterDryRunCreateAndEnforceAll(self):
+    if (self.track is not calliope_base.ReleaseTrack.ALPHA and
+        self.track is not calliope_base.ReleaseTrack.BETA):
+      return
+    perimeter_id = _GetResourceName('DRY_RUN_PERIMETER')
+    try:
+      with self._SetPolicyProperty(self._GetTestPolicyId()):
+        self._CreateDryRunPerimeter(perimeter_id)
+        self._CommitDryRunConfig('enforce-all')
+        self._DescribeDryRunPerimeter(perimeter_id)
+        self.AssertOutputEquals("""\
+This Service Perimeter does not have an explicit dry-run mode configuration. The enforcement config will be used as the dry-run mode configuration.
+name: {perimeter}
+title: My Perimeter {perimeter}
+type: PERIMETER_TYPE_REGULAR
+resources:
+   NONE
+restrictedServices:
+   bigquery.googleapis.com
+accessLevels:
+   NONE
+vpcAccessibleServices:
+   NONE
+""".format(perimeter=perimeter_id))
+    finally:
+      self._DestroyPerimeter(perimeter_id)
 
+
+@test_case.Filters.skipAlways('Generates too much traffic to ACM',
+                              'b/152875046')
 class AccessContextManagerE2eTestsBeta(AccessContextManagerE2eTests):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
 
+@test_case.Filters.skipAlways('Generates too much traffic to ACM',
+                              'b/152875046')
 class AccessContextManagerE2eTestsAlpha(AccessContextManagerE2eTests):
 
   def SetUp(self):

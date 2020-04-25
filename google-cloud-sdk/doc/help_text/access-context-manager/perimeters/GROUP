@@ -35,6 +35,9 @@ COMMANDS
      list
         List service perimeters.
 
+     replace-all
+        Replace all existing service perimeters.
+
      update
         Update an existing access zone.
 

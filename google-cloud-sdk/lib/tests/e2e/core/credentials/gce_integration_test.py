@@ -27,6 +27,7 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 import oauth2client
+import google.auth.compute_engine as google_auth_gce
 
 
 class GCEIntegrationTest(cli_test_base.CliTestBase):
@@ -60,12 +61,27 @@ class GCEIntegrationTest(cli_test_base.CliTestBase):
     cred = store.AcquireFromGCE()
     self.assertIsInstance(
         cred, oauth2client.contrib.gce.AppAssertionCredentials)
+    self.assertIsNotNone(cred.access_token)
+    self.assertFalse(cred.access_token_expired)
+
+    cred = store.AcquireFromGCE(use_google_auth=True)
+    self.assertIsInstance(cred, google_auth_gce.Credentials)
+    self.assertIsNotNone(cred.token)
+    self.assertFalse(cred.expired)
 
   @sdk_test_base.Filters.RunOnlyOnGCE
   def testGCEIdTokenMinting(self):
     cred = store.AcquireFromGCE()
     self.assertIsInstance(
         cred, oauth2client.contrib.gce.AppAssertionCredentials)
+    self.assertIsNotNone(cred.access_token)
+    self.assertFalse(cred.access_token_expired)
+
+    cred = store.AcquireFromGCE(use_google_auth=True)
+    self.assertIsInstance(cred, google_auth_gce.Credentials)
+    self.assertIsNotNone(cred.token)
+    self.assertFalse(cred.expired)
+
     token = gce.Metadata().GetIdToken('foo')
     self.assertIsNotNone(token)
 

@@ -102,7 +102,6 @@ class UpdateTest(memcache_test_base.InstancesUnitTestBase):
         self.wait_operation_relative_name))
 
 
-@test_case.Filters.SkipOnPy3('Flaking due to labels order', 'b/150677175')
 class UpdateParametersTest(memcache_test_base.InstancesUnitTestBase):
 
   def PreSetUp(self):
@@ -112,10 +111,7 @@ class UpdateParametersTest(memcache_test_base.InstancesUnitTestBase):
     operation = self.messages.Operation(name=self.wait_operation_relative_name)
     expected_instance = self.messages.Instance(
         name=self.instance_relative_name,
-        parameters=self.MakeParameters({
-            u'a': u'b',
-            u'c': u'd'
-        }))
+        parameters=self.MakeParameters({'idle_timeout': '1'}))
     self.expected_instance = expected_instance
 
     param_req = self.messages.UpdateParametersRequest(
@@ -144,7 +140,7 @@ class UpdateParametersTest(memcache_test_base.InstancesUnitTestBase):
     self.SetUpInstances()
     self._ExpectUpdateParameters()
     actual_instance = self.Run('memcache instances update {} --region {} '
-                               '--parameters a=b,c=d '.format(
+                               '--parameters idle-timeout=1 '.format(
                                    self.instance_id, self.region_id))
 
     self.assertEqual(actual_instance, self.expected_instance)
@@ -154,7 +150,7 @@ class UpdateParametersTest(memcache_test_base.InstancesUnitTestBase):
     self.SetUpInstances()
     self._ExpectUpdateParameters()
     actual_instance = self.Run('memcache instances update {} --region {} '
-                               '--parameters a=b,c=d '.format(
+                               '--parameters idle-timeout=1 '.format(
                                    self.instance_relative_name, self.region_id))
 
     self.assertEqual(actual_instance, self.expected_instance)
@@ -164,7 +160,7 @@ class UpdateParametersTest(memcache_test_base.InstancesUnitTestBase):
     self.SetUpInstances()
     self._ExpectUpdateParameters(is_async=True)
     self.Run('memcache instances update {} --region {} '
-             '--parameters a=b,c=d '
+             '--parameters idle-timeout=1 '
              '--async -q '.format(self.instance_id, self.region_id))
     self.AssertErrContains('Check operation [{}] for status.'.format(
         self.wait_operation_relative_name))

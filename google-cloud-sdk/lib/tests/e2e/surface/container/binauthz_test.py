@@ -170,14 +170,10 @@ class BinauthzTest(
         '3356AA351744C9E234E7ABA534760FCB7CD7EF32'
     ])
     self.RunBinauthz([
-        'attestors',
-        'public-keys',
-        'add',
-        '--attestor',
-        attestor_id,
-        '--pgp-public-key-file',
-        pgp_key_path
-    ], track=calliope_base.ReleaseTrack.BETA)
+        'attestors', 'public-keys', 'add', '--attestor', attestor_id,
+        '--pgp-public-key-file', pgp_key_path
+    ],
+                     track=calliope_base.ReleaseTrack.GA)
     self.RunBinauthz([
         'attestors',
         'public-keys',
@@ -187,20 +183,14 @@ class BinauthzTest(
         '--keyversion',
         ('projects/{proj}/locations/us-west1/keyRings/foo/cryptoKeys/bar/cryptoKeyVersions/1'
          .format(proj=self.Project())),
-    ], track=calliope_base.ReleaseTrack.BETA)
+    ],
+                     track=calliope_base.ReleaseTrack.GA)
     self.RunBinauthz([
-        'attestors',
-        'public-keys',
-        'add',
-        '--attestor',
-        attestor_id,
-        '--pkix-public-key-file',
-        pkix_key_path,
-        '--pkix-public-key-algorithm',
-        'ecdsa-p256-sha256',
-        '--public-key-id-override',
-        '//example.com'
-    ], track=calliope_base.ReleaseTrack.BETA)
+        'attestors', 'public-keys', 'add', '--attestor', attestor_id,
+        '--pkix-public-key-file', pkix_key_path, '--pkix-public-key-algorithm',
+        'ecdsa-p256-sha256', '--public-key-id-override', '//example.com'
+    ],
+                     track=calliope_base.ReleaseTrack.GA)
 
   def GetOccurrence(self, occurrence_name):
     return self.ca_client.projects_occurrences.Get(

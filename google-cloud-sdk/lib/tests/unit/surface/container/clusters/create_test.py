@@ -2224,12 +2224,28 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
+  def testCreateNoEnableIpAlias(self):
+    cluster_kwargs = {}
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(useRoutes=True)
+    expected_cluster.ipAllocationPolicy = policy
+    # Cluster create returns operation pending
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--no-enable-ip-alias'.format(name=self.CLUSTER_NAME))
+
   def testCreateAllowRouteOverlap(self):
     cluster_kwargs = {
         'clusterIpv4Cidr': '10.1.0.0/16',
     }
     expected_cluster = self._MakeCluster(**cluster_kwargs)
-    policy = self._MakeIPAllocationPolicy(allowRouteOverlap=True)
+    policy = self._MakeIPAllocationPolicy(
+        allowRouteOverlap=True, useRoutes=True)
     expected_cluster.ipAllocationPolicy = policy
     # Cluster create returns operation pending
     self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
@@ -2829,6 +2845,61 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
               ' --addons=NodeLocalDNS --quiet').format(self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
 
+  def testCreateEnableAddonsConfigConnector(self):
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=True),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=True),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                configConnectorConfig=self.msgs.ConfigConnectorConfig(
+                    enabled=True)),
+        'clusterTelemetry':
+            self.msgs.ClusterTelemetry(
+                type=self.msgs.ClusterTelemetry.TypeValueValuesEnum.ENABLED),
+    }
+
+    cluster = self._MakeCluster(**cluster_kwargs)
+    cluster.workloadIdentityConfig = self.messages.WorkloadIdentityConfig(
+        workloadPool='{}.svc.id.goog'.format(self.PROJECT_ID))
+    self.ExpectCreateCluster(cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.15.11-gke.5'))
+
+    self.Run(
+        (self.clusters_command_base.format(self.ZONE) + ' create {cluster} '
+         ' --enable-stackdriver-kubernetes'
+         ' --workload-pool={project}.svc.id.goog'
+         ' --addons=ConfigConnector --quiet').format(
+             cluster=self.CLUSTER_NAME, project=self.PROJECT_ID))
+    self.AssertOutputContains('RUNNING')
+
+  def testCreateEnableAddonsConfigConnectorWithoutStackdriverKubernetes(self):
+    logging = 'Cloud Logging'
+    monitoring = 'Cloud Monitoring'
+    err_msg = (
+        'The ConfigConnector-on-GKE addon (--addons=ConfigConnector) requires '
+        '%s and %s to be enabled via the --enable-stackdriver-kubernetes flag.'
+    ) % (logging, monitoring)
+    with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
+      self.Run(
+          (self.clusters_command_base.format(self.ZONE) +
+           ' create {0} --addons=ConfigConnector').format(self.CLUSTER_NAME))
+
+  def testCreateEnableAddonsConfigConnectorWithoutWorkloadIdentity(self):
+    err_msg = ('The ConfigConnector-on-GKE addon (--addons=ConfigConnector) '
+               'requires workload identity to be enabled via the '
+               '--workload-pool=WORKLOAD_POOL flag.')
+    with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
+      self.Run((
+          self.clusters_command_base.format(self.ZONE) +
+          ' create {0} --addons=ConfigConnector --enable-stackdriver-kubernetes'
+      ).format(self.CLUSTER_NAME))
+
   def testCreateEnableAddonsApplicationManager(self):
     cluster_kwargs = {
         'addonsConfig':
@@ -3022,8 +3093,10 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
         'clusterTelemetry':
             self.msgs.ClusterTelemetry(
                 type=self.msgs.ClusterTelemetry.TypeValueValuesEnum.DISABLED),
-        'loggingService': None,
-        'monitoringService': None,
+        'loggingService':
+            None,
+        'monitoringService':
+            None,
     }
     CreateTestGA.testCreateNoDefaults(self, cluster_kwargs)
 
@@ -3545,61 +3618,6 @@ Cloud Build for Anthos (--addons=CloudBuild) requires Cloud Logging and Cloud Mo
     self.Run((self.clusters_command_base.format(self.ZONE) + ' create {0} '
               ' --addons=NodeLocalDNS --quiet').format(self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
-
-  def testCreateEnableAddonsConfigConnector(self):
-    cluster_kwargs = {
-        'addonsConfig':
-            self.msgs.AddonsConfig(
-                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=True),
-                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
-                    disabled=True),
-                kubernetesDashboard=self.msgs.KubernetesDashboard(
-                    disabled=True),
-                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
-                    disabled=True),
-                configConnectorConfig=self.msgs.ConfigConnectorConfig(
-                    enabled=True)),
-        'clusterTelemetry':
-            self.msgs.ClusterTelemetry(
-                type=self.msgs.ClusterTelemetry.TypeValueValuesEnum.ENABLED),
-    }
-
-    cluster = self._MakeCluster(**cluster_kwargs)
-    cluster.workloadIdentityConfig = self.messages.WorkloadIdentityConfig(
-        workloadPool='{}.svc.id.goog'.format(self.PROJECT_ID))
-    self.ExpectCreateCluster(cluster, self._MakeOperation())
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.ExpectGetCluster(self._RunningClusterForVersion('1.14.2'))
-
-    self.Run(
-        (self.clusters_command_base.format(self.ZONE) + ' create {cluster} '
-         ' --enable-stackdriver-kubernetes'
-         ' --workload-pool={project}.svc.id.goog'
-         ' --addons=ConfigConnector --quiet').format(
-             cluster=self.CLUSTER_NAME, project=self.PROJECT_ID))
-    self.AssertOutputContains('RUNNING')
-
-  def testCreateEnableAddonsConfigConnectorWithoutStackdriverKubernetes(self):
-    logging = 'Cloud Logging'
-    monitoring = 'Cloud Monitoring'
-    err_msg = (
-        'The ConfigConnector-on-GKE addon (--addons=ConfigConnector) requires '
-        '%s and %s to be enabled via the --enable-stackdriver-kubernetes flag.'
-    ) % (logging, monitoring)
-    with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
-      self.Run(
-          (self.clusters_command_base.format(self.ZONE) +
-           ' create {0} --addons=ConfigConnector').format(self.CLUSTER_NAME))
-
-  def testCreateEnableAddonsConfigConnectorWithoutWorkloadIdentity(self):
-    err_msg = ('The ConfigConnector-on-GKE addon (--addons=ConfigConnector) '
-               'requires workload identity to be enabled via the '
-               '--workload-pool=WORKLOAD_POOL flag.')
-    with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
-      self.Run((
-          self.clusters_command_base.format(self.ZONE) +
-          ' create {0} --addons=ConfigConnector --enable-stackdriver-kubernetes'
-      ).format(self.CLUSTER_NAME))
 
   def testCreateEnableAddonsApplicationManager(self):
     cluster_kwargs = {

@@ -64,8 +64,9 @@ class MachineImageImportTestBeta(ovf_import_test_base.OVFimportTestBase):
                            http=None,
                            errors=None,
                            batch_url=None,
-                           log_result=None):
-      del requests, errors_to_collect, progress_tracker, followup_overrides, http, errors, batch_url, log_result
+                           log_result=None,
+                           timeout=None):
+      del requests, errors_to_collect, progress_tracker, followup_overrides, http, errors, batch_url, log_result, timeout
       # For the call to daisy_utils.ValidateZone
       raise exceptions.ToolException('')
 

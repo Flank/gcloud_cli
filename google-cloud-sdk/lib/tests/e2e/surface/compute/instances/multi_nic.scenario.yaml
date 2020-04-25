@@ -4,70 +4,74 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute networks create $$network1$$ --subnet-mode custom --format 'yaml(name,x_gcloud_subnet_mode)'
-  - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
-  - stdout: |
-      ---
-      name: $$network1$$
-      x_gcloud_subnet_mode: CUSTOM
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
+      $
+  - stdout: ^(---\s)?name:\s$$network1$$\s+x_gcloud_subnet_mode:\sCUSTOM$
 - execute:
   - command: compute networks subnets create $$subnet1$$ --region us-central1 --network
       $$network1$$ --range 10.0.1.0/24 --format 'text(name,network,ipCidrRange)'
-  - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
+      $
   - stdout: |
       ---
       ipCidrRange: 10.0.1.0/24
       name:        $$subnet1$$
-      network:     https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
+      network:     https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
 - execute:
   - command: compute networks create $$network2$$ --subnet-mode custom --format 'yaml(name,x_gcloud_subnet_mode)'
-  - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$\].
-  - stdout: |
-      ---
-      name: $$network2$$
-      x_gcloud_subnet_mode: CUSTOM
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$\].
+      $
+  - stdout: ^(---\s)?name:\s$$network2$$\s+x_gcloud_subnet_mode:\sCUSTOM$
 - execute:
   - command: compute networks subnets create $$subnet2$$ --region us-central1 --network
       $$network2$$ --range 10.0.2.0/24 --format 'text(name,network,ipCidrRange)'
-  - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet2$$\].
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet2$$\].
+      $
   - stdout: |
       ---
       ipCidrRange: 10.0.2.0/24
       name:        $$subnet2$$
-      network:     https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$
+      network:     https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --network-interface
       subnet=$$subnet1$$ --network-interface subnet=$$subnet2$$,address='' --format='yaml(networkInterfaces[].subnetwork)'
-  - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
   - stdout: |
       ---
       networkInterfaces:
-      - subnetwork: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
-      - subnetwork: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet2$$
+      - subnetwork: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
+      - subnetwork: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet2$$
 - execute:
   - command: compute instances delete $$instance$$ --zone us-central1-f --quiet
-  - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
 - execute:
   - command: compute networks subnets delete $$subnet1$$ --region us-central1 --quiet
-  - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
+      $
 - execute:
   - command: compute networks subnets delete $$subnet2$$ --region us-central1 --quiet
-  - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet2$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet2$$\].
+      $
 - execute:
   - command: compute networks delete $$network1$$ --quiet
-  - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
+      $
 - execute:
   - command: compute networks delete $$network2$$ --quiet
-  - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
@@ -437,7 +441,7 @@ actions:
               - autoDelete: true
                 boot: true
                 initializeParams:
-                  sourceImage: https://$$compute-uri$$/$$api-version$$/projects/debian-cloud/global/images/family/debian-9
+                  sourceImage: https://$$compute-uri$$/$$api-version$$/projects/debian-cloud/global/images/family/debian-10
                 mode: READ_WRITE
                 type: PERSISTENT
               machineType: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1

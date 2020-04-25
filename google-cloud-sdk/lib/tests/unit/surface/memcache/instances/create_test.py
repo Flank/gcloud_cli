@@ -24,7 +24,6 @@ from tests.lib import test_case
 from tests.lib.surface.memcache import memcache_test_base
 
 
-@test_case.Filters.SkipOnPy3('Flaking due to labels order', 'b/150677175')
 class CreateTest(memcache_test_base.InstancesUnitTestBase):
 
   def PreSetUp(self):
@@ -64,7 +63,9 @@ class CreateTest(memcache_test_base.InstancesUnitTestBase):
         cpuCount=3, memorySizeMb=2000)
     instance.nodeCount = 5
     instance.zones = ['us-central1-a', 'us-central1-b']
-    instance.parameters = self.MakeParameters({'a': 'b', 'c': 'd'})
+    instance.parameters = self.MakeParameters({
+        'idle_timeout': '1'
+    })
     return instance
 
   def testCreate(self):
@@ -81,12 +82,10 @@ class CreateTest(memcache_test_base.InstancesUnitTestBase):
              '--node-memory 2000mb '
              '--zones {} '
              '--memcached-version 1.5 '
-             '--parameters a=b,c=d '.format(self.instance_id, self.region_id,
-                                            instance.authorizedNetwork,
-                                            instance.displayName,
-                                            instance.nodeCount,
-                                            instance.nodeConfig.cpuCount,
-                                            ','.join(instance.zones)))
+             '--parameters idle-timeout=1'.format(
+                 self.instance_id, self.region_id, instance.authorizedNetwork,
+                 instance.displayName, instance.nodeCount,
+                 instance.nodeConfig.cpuCount, ','.join(instance.zones)))
 
   def testCreate_UsingRelativeName(self):
     self.SetUpForTrack()
@@ -102,12 +101,10 @@ class CreateTest(memcache_test_base.InstancesUnitTestBase):
              '--node-memory 2000mb '
              '--zones {} '
              '--memcached-version 1.5 '
-             '--parameters a=b,c=d '.format(self.instance_ref.RelativeName(),
-                                            instance.authorizedNetwork,
-                                            instance.displayName,
-                                            instance.nodeCount,
-                                            instance.nodeConfig.cpuCount,
-                                            ','.join(instance.zones)))
+             '--parameters idle-timeout=1'.format(
+                 self.instance_ref.RelativeName(), instance.authorizedNetwork,
+                 instance.displayName, instance.nodeCount,
+                 instance.nodeConfig.cpuCount, ','.join(instance.zones)))
 
   def testCreate_Async(self):
     self.SetUpForTrack()
@@ -123,7 +120,7 @@ class CreateTest(memcache_test_base.InstancesUnitTestBase):
              '--node-memory 2000mb '
              '--zones {} '
              '--memcached-version 1.5 '
-             '--parameters a=b,c=d '
+             '--parameters idle-timeout=1 '
              '--async -q '.format(self.instance_ref.RelativeName(),
                                   instance.authorizedNetwork,
                                   instance.displayName, instance.nodeCount,

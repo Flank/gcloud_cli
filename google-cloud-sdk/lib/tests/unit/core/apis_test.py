@@ -108,6 +108,22 @@ class ApisTest(sdk_test_base.SdkBase):
     resolved_version = apis.ResolveVersion('sql')
     self.assertEqual(overridden_version, resolved_version)
 
+  def testResolveVersionWithVersionOverride(self):
+    overridden_version = 'staging_alpha'
+    properties.VALUES.api_client_overrides.compute_alpha.Set(overridden_version)
+    resolved_version = apis.ResolveVersion('compute', api_version='alpha')
+    self.assertEqual(overridden_version, resolved_version)
+
+  def testResolveVersionWithAPIAndVersionOverride(self):
+    # API specific override should take precedence over full surface override.
+    overridden_version = 'v1_staging'
+    overridden_api_version = 'alpha_staging'
+    properties.VALUES.api_client_overrides.compute.Set(overridden_version)
+    properties.VALUES.api_client_overrides.compute_alpha.Set(
+        overridden_api_version)
+    resolved_version = apis.ResolveVersion('compute', api_version='alpha')
+    self.assertEqual(overridden_api_version, resolved_version)
+
   def testResolveVersionWithoutOverride(self):
     resolved_version = apis.ResolveVersion('compute')
     self.assertEqual('v1', resolved_version)
@@ -141,16 +157,16 @@ class ApisTest(sdk_test_base.SdkBase):
 
   def testGetDefaultClient(self):
     client = apis.GetClientInstance('compute', 'v1', no_http=True)
-    self.assertTrue(isinstance(client, compute_v1_client.ComputeV1))
+    self.assertIsInstance(client, compute_v1_client.ComputeV1)
 
   def testGetDefaultClientWithOverride(self):
     properties.VALUES.api_client_overrides.compute.Set('alpha')
     client = apis.GetClientInstance('compute', 'v1', no_http=True)
-    self.assertTrue(isinstance(client, compute_alpha_client.ComputeAlpha))
+    self.assertIsInstance(client, compute_alpha_client.ComputeAlpha)
 
   def testGetClientForSpecificVersion(self):
     client = apis.GetClientInstance('compute', 'alpha', no_http=True)
-    self.assertTrue(isinstance(client, compute_alpha_client.ComputeAlpha))
+    self.assertIsInstance(client, compute_alpha_client.ComputeAlpha)
 
   def testGetClientWithEndpointOverride(self):
     override = 'https://www-googleapis-test.sandbox.google.com/compute/v1/'

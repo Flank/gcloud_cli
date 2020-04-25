@@ -5,8 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha container node-pools update NAME
         (--node-locations=ZONE,[ZONE,...]
-          | --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
-          | --enable-autoprovisioning
+          | --workload-metadata=WORKLOAD_METADATA | --enable-autoprovisioning
           --enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES
           | --enable-autorepair --enable-autoupgrade
           | --max-surge-upgrade=MAX_SURGE_UPGRADE
@@ -37,9 +36,9 @@ REQUIRED FLAGS
               $ gcloud alpha container node-pools update node-pool-1 \
                   --node-locations=us-central1-a,us-central1-b
 
-       --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
+       --workload-metadata=WORKLOAD_METADATA
           Type of metadata server available to pods running in the node pool.
-          WORKLOAD_METADATA_FROM_NODE must be one of:
+          WORKLOAD_METADATA must be one of:
 
            EXPOSED
               [DEPRECATED] Pods running in this node pool have access to the

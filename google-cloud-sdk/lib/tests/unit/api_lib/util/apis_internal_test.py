@@ -95,11 +95,6 @@ class EffectiveApiEndpointTest(cli_test_base.CliTestBase):
                           '_GetApiDef').return_value = self.redis_v1_api_def
     endpoint = apis_internal._GetEffectiveApiEndpoint('redis', 'v1')
     self.assertEqual(endpoint, self.redis_v1_endpoint)
-    self.AssertErrContains(
-        'redis_v1 does not support client certificate authorization on this '
-        'version of gcloud. The request will be executed without using a '
-        'client certificate. '
-        'Please run $ gcloud topic client-certificate for more information.')
 
   def testClientCertPropertyOn_EnableMTLS(self):
     self.StartObjectPatch(

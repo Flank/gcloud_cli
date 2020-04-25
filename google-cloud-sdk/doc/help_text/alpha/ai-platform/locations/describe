@@ -27,10 +27,6 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
-API REFERENCE
-    This command uses the ml/v1 API. The full documentation for this API can be
-    found at: https://cloud.google.com/ml/
-
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

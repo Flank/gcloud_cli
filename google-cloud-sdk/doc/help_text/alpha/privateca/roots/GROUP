@@ -30,6 +30,12 @@ COMMANDS
      describe
         (ALPHA) Get metadata for a root Certificate Authority.
 
+     disable
+        (ALPHA) Disable a root certificate authority.
+
+     enable
+        (ALPHA) Enable a root certificate authority.
+
      get-iam-policy
         (ALPHA) Get the IAM policy for a root certificate authority.
 

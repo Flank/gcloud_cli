@@ -119,7 +119,9 @@ EXAMPLES
     policy role and member types.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud spanner backups remove-iam-policy-binding
+        $ gcloud alpha spanner backups remove-iam-policy-binding
 

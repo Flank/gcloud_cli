@@ -6,20 +6,20 @@ summary:
   - command: |
       api-gateway operations list --location global
   - stdout: |
-      NAME                                                              DONE  CANCELLED  CREATE_TIME          VERB    TARGET
-      projects/fake-project/locations/global/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+      OPERATION_ID    LOCATION  DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+      fake-operation  global    True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
 - execute:
   - command: |
       api-gateway operations list --location projects/project/locations/global
   - stdout: |
-      NAME                                                              DONE  CANCELLED  CREATE_TIME          VERB    TARGET
-      projects/fake-project/locations/global/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+      OPERATION_ID    LOCATION  DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+      fake-operation  global    True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
 - execute:
   - command: api-gateway operations list
   - stdout: |
-      NAME                                                                   DONE  CANCELLED  CREATE_TIME          VERB    TARGET
-      projects/fake-project/locations/us-central1/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/us-central1/apis/fake-api
-      projects/fake-project/locations/global/operations/fake-operation       True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+      OPERATION_ID    LOCATION     DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+      fake-operation  us-central1  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/us-central1/apis/fake-api
+      fake-operation  global       True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
 actions:
 - execute_command:
     command: |
@@ -63,8 +63,8 @@ actions:
               ]
             }
     - expect_stdout: |
-        NAME                                                              DONE  CANCELLED  CREATE_TIME          VERB    TARGET
-        projects/fake-project/locations/global/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+        OPERATION_ID    LOCATION  DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+        fake-operation  global    True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
     - expect_exit:
         code: 0
 - execute_command:
@@ -109,8 +109,8 @@ actions:
               ]
             }
     - expect_stdout: |
-        NAME                                                              DONE  CANCELLED  CREATE_TIME          VERB    TARGET
-        projects/fake-project/locations/global/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+        OPERATION_ID    LOCATION  DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+        fake-operation  global    True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
     - expect_exit:
         code: 0
 - execute_command:
@@ -177,8 +177,8 @@ actions:
                 ]
               }
     - expect_stdout: |
-        NAME                                                                   DONE  CANCELLED  CREATE_TIME          VERB    TARGET
-        projects/fake-project/locations/us-central1/operations/fake-operation  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/us-central1/apis/fake-api
-        projects/fake-project/locations/global/operations/fake-operation       True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
+        OPERATION_ID    LOCATION     DONE  CANCELLED  CREATE_TIME          VERB    TARGET
+        fake-operation  us-central1  True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/us-central1/apis/fake-api
+        fake-operation  global       True  False      2019-11-12T17:11:58  create  projects/fake-project/locations/global/apis/fake-api
     - expect_exit:
         code: 0

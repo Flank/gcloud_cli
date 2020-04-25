@@ -23,13 +23,11 @@ import collections
 import copy
 import os
 
-from apitools.base.py import encoding as api_encoding
 from googlecloudsdk import calliope
 from googlecloudsdk.api_lib.dataproc import dataproc as dp
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.command_lib.export import util as export_util
-from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import files
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
@@ -44,11 +42,6 @@ class UtilUnitTest(unit_base.DataprocUnitTestBase):
     self.dataproc_mock = dp.Dataproc(self.track)
     self.dataproc_mock._client = self.mock_client
     self.dataproc_mock._messages = self.messages
-    self.autoscaling_policy_schema_path = export_util.GetSchemaPath(
-        'dataproc',
-        self.dataproc_mock.api_version,
-        'AutoscalingPolicy',
-        for_help=False)
 
 
 class UtilUnitTestBeta(UtilUnitTest, base.DataprocTestBaseBeta,
@@ -172,10 +165,7 @@ class UtilUnitTestBeta(UtilUnitTest, base.DataprocTestBaseBeta,
 
     file_name = os.path.join(self.temp_path, 'template.yaml')
     with files.FileWriter(file_name) as stream:
-      export_util.Export(
-          message=policy,
-          stream=stream,
-          schema_path=self.autoscaling_policy_schema_path)
+      export_util.Export(message=policy, stream=stream)
 
     expected_policy = copy.deepcopy(policy)
     expected_policy.name = None
@@ -190,9 +180,7 @@ class UtilUnitTestBeta(UtilUnitTest, base.DataprocTestBaseBeta,
     policy = self.MakeAutoscalingPolicy('cool-project', 'cool-region',
                                         'cool-policy')
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     expected_policy = copy.deepcopy(policy)
     expected_policy.name = None
@@ -205,47 +193,13 @@ class UtilUnitTestBeta(UtilUnitTest, base.DataprocTestBaseBeta,
 
   def testReadAutoscalingPolicy_invalid(self):
     self.WriteInput('foo: bar')
-    with self.assertRaises(exceptions.ValidationError):
-      util.ReadAutoscalingPolicy(
-          dataproc=self.dataproc_mock,
-          policy_id='cool-policy',
-      )
-
-  def testReadAutoscalingPolicy_errorsIfIdSet(self):
-    policy = self.MakeAutoscalingPolicy('cool-project', 'cool-region',
-                                        'cool-policy')
-    # We can't use export_util.export here, because it will obey the schema and
-    # exclude the id field. Instead, delete the name field and write out yaml
-    # containing id directly.
-    policy.id = 'cool-policy'
-    message_dict = api_encoding.MessageToPyValue(policy)
-    del message_dict['name']
-    self.WriteInput(yaml.dump(message_dict))
-
-    # id is not allowed in import
-    with self.assertRaises(exceptions.ValidationError):
-      util.ReadAutoscalingPolicy(
-          dataproc=self.dataproc_mock,
-          policy_id='cool-policy',
-      )
-
-  def testReadAutoscalingPolicy_errorsIfNameSet(self):
-    policy = self.MakeAutoscalingPolicy('cool-project', 'cool-region',
-                                        'cool-policy')
-    # We can't use export_util.export here, because it will obey the schema and
-    # exclude the name field. Instead, delete the id field and write out yaml
-    # containing name directly.
-    policy.name = 'projects/cool-project/regions/cool-region/autoscalingPolicies/cool-policy'
-    message_dict = api_encoding.MessageToPyValue(policy)
-    del message_dict['id']
-    self.WriteInput(yaml.dump(message_dict))
-
-    # name is not allowed in import
-    with self.assertRaises(exceptions.ValidationError):
-      util.ReadAutoscalingPolicy(
-          dataproc=self.dataproc_mock,
-          policy_id='cool-policy',
-      )
+    policy_read = util.ReadAutoscalingPolicy(
+        dataproc=self.dataproc_mock,
+        policy_id='cool-policy',
+    )
+    # Invalid fields are ignored, so you end up with a mostly empty message
+    self.AssertMessagesEqual(
+        self.messages.AutoscalingPolicy(id='cool-policy'), policy_read)
 
   def testReadAutoscalingPolicy_handlesUnsetIdAndName(self):
     policy = self.MakeAutoscalingPolicy('cool-project', 'cool-region',
@@ -254,9 +208,7 @@ class UtilUnitTestBeta(UtilUnitTest, base.DataprocTestBaseBeta,
     policy.id = None
     policy.name = None
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     expected_policy = copy.deepcopy(policy)
     expected_policy.id = 'cool-policy'  # gets set to correct value
@@ -285,9 +237,7 @@ class UtilUnitTestBeta(UtilUnitTest, base.DataprocTestBaseBeta,
     policy.basicAlgorithm.cooldownPeriod = duration
     policy.basicAlgorithm.yarnConfig.gracefulDecommissionTimeout = duration
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     expected_policy = copy.deepcopy(policy)
     expected_policy.id = 'cool-policy'
@@ -309,9 +259,7 @@ class UtilUnitTestBeta(UtilUnitTest, base.DataprocTestBaseBeta,
     policy.basicAlgorithm.cooldownPeriod = None
     policy.basicAlgorithm.yarnConfig.gracefulDecommissionTimeout = '1h'
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     expected_policy = copy.deepcopy(policy)
     expected_policy.id = 'cool-policy'
@@ -342,9 +290,7 @@ class UtilUnitTestBeta(UtilUnitTest, base.DataprocTestBaseBeta,
     policy.name = None
     policy.basicAlgorithm.cooldownPeriod = illegal_duration
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     with self.assertRaises(argparse.ArgumentTypeError):
       util.ReadAutoscalingPolicy(
@@ -365,9 +311,7 @@ class UtilUnitTestBeta(UtilUnitTest, base.DataprocTestBaseBeta,
     policy.name = None
     policy.basicAlgorithm.yarnConfig.gracefulDecommissionTimeout = illegal_duration
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     with self.assertRaises(argparse.ArgumentTypeError):
       util.ReadAutoscalingPolicy(

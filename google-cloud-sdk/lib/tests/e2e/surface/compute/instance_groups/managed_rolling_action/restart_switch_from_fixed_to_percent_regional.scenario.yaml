@@ -5,8 +5,9 @@ summary:
 - execute:
   - command: compute instance-templates create $$template1$$ --machine-type n1-standard-1
       --format 'text(name,properties.machineType)'
-  - stderr: |
-      Created [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+      $
   - stdout: |
       ---
       name:                   $$template1$$
@@ -15,31 +16,33 @@ summary:
   - command: compute instance-groups managed create $$manager$$ --region us-central1
       --base-instance-name $$manager$$ --size 10 --template $$template1$$ --format
       'text(name,region,targetSize)'
-  - stderr: |
-      Created [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
-  - stdout: |
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+      $
+  - stdout: |-
       ---
       name:       $$manager$$
-      region:     https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1
+      region:     https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1
       targetSize: 10
+      $
 - execute:
   - command: compute instance-groups managed rolling-action restart $$manager$$ --max-unavailable=3
       --format=disable --region us-central1
-  - stderr: |
-      Updated [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
-
+  - stderr: |-
+      Updated \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+      $
 - execute:
   - command: compute instance-groups managed rolling-action restart $$manager$$ --max-unavailable=25%
       --format=disable --region us-central1
-  - stderr: |
-      Updated [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
-
+  - stderr: |-
+      Updated \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+      $
 - execute:
   - command: compute instance-groups managed rolling-action restart $$manager$$ --max-unavailable=4
       --format=disable --region us-central1
-  - stderr: |
-      Updated [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
-
+  - stderr: |-
+      Updated \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+      $
 - execute:
   - command: compute instance-groups managed delete $$manager$$ --region us-central1
   - prompt:
@@ -47,8 +50,9 @@ summary:
         The following region instance group managers will be deleted:
          - [$$manager$$] in [us-central1]
     - input: y
-  - stderr: |
-      Deleted [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+      $
   - progress_tracker:
     - message: Deleting Managed Instance Group
     - status: SUCCESS
@@ -59,8 +63,9 @@ summary:
         The following instance templates will be deleted:
          - [$$template1$$]
     - input: y
-  - stderr: |
-      Deleted [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
@@ -74,7 +79,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
+          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10?alt=json
           method: GET
           headers: {}
           body: null
@@ -120,7 +125,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9
+                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10
                   mode: READ_WRITE
                   type: PERSISTENT
                 machineType: n1-standard-1

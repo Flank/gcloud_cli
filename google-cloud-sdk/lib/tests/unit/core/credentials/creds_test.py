@@ -224,11 +224,7 @@ class StoreOperationsTests(sdk_test_base.SdkBase,
   def testStoreOauth2client_RefreshOauth2client_UserCreds(self):
     creds_stored = self.MakeUserCredentials()
     expected_loaded_type = creds.CredentialType.USER_ACCOUNT
-    # Credentails cache does not currently support user credentails.
-    # TODO(b/147893169): Changes expected_loaded_type_google_auth to
-    # creds.CredentialTypeGoogleAuth.USER_ACCOUNT once credentials cache is
-    # ready to support google-auth user credentials.
-    expected_loaded_type_google_auth = creds.CredentialType.USER_ACCOUNT
+    expected_loaded_type_google_auth = creds.CredentialTypeGoogleAuth.USER_ACCOUNT
     expected_loaded_dict = {
         'access_token': 'access-token',
         'client_id': 'client_id',
@@ -238,7 +234,14 @@ class StoreOperationsTests(sdk_test_base.SdkBase,
         'rapt_token': 'rapt_token5',
         'user_agent': 'user_agent',
     }
-    expected_loaded_dict_google_auth = expected_loaded_dict.copy()
+    expected_loaded_dict_google_auth = {
+        'token': 'access-token',
+        'client_id': 'client_id',
+        'client_secret': 'client_secret',
+        'refresh_token': 'fake-token',
+        'token_uri': 'https://oauth2.googleapis.com/token',
+        'rapt_token': 'rapt_token5',
+    }
     refresh_google_auth = False
 
     self.TestStoreOperations(creds_stored, expected_loaded_type,
@@ -313,11 +316,7 @@ class StoreOperationsTests(sdk_test_base.SdkBase,
   def testStoreOauth2client_RefreshGoogleAuth_UserCreds(self):
     creds_stored = self.MakeUserCredentials()
     expected_loaded_type = creds.CredentialType.USER_ACCOUNT
-    # Credentails cache does not currently support user credentails.
-    # TODO(b/147893169): Changes expected_loaded_type_google_auth to
-    # creds.CredentialTypeGoogleAuth.USER_ACCOUNT once credentials cache is
-    # ready to support google-auth user credentials.
-    expected_loaded_type_google_auth = creds.CredentialType.USER_ACCOUNT
+    expected_loaded_type_google_auth = creds.CredentialTypeGoogleAuth.USER_ACCOUNT
     expected_loaded_dict = {
         'access_token': 'access-token',
         'client_id': 'client_id',
@@ -327,7 +326,70 @@ class StoreOperationsTests(sdk_test_base.SdkBase,
         'rapt_token': 'rapt_token5',
         'user_agent': 'user_agent',
     }
-    expected_loaded_dict_google_auth = expected_loaded_dict.copy()
+    expected_loaded_dict_google_auth = {
+        'token': 'access-token',
+        'client_id': 'client_id',
+        'client_secret': 'client_secret',
+        'refresh_token': 'fake-token',
+        'token_uri': 'https://oauth2.googleapis.com/token',
+        'rapt_token': 'rapt_token5',
+    }
+    refresh_google_auth = True
+
+    self.TestStoreOperations(creds_stored, expected_loaded_type,
+                             expected_loaded_type_google_auth,
+                             expected_loaded_dict,
+                             expected_loaded_dict_google_auth,
+                             refresh_google_auth)
+
+  def testStoreGoogleAuth_RefreshOauth2client_UserCreds(self):
+    creds_stored = self.MakeUserAccountCredentialsGoogleAuth()
+    expected_loaded_type = creds.CredentialType.USER_ACCOUNT
+    expected_loaded_type_google_auth = creds.CredentialTypeGoogleAuth.USER_ACCOUNT
+    expected_loaded_dict = {
+        'access_token': None,
+        'client_id': 'foo.apps.googleusercontent.com',
+        'client_secret': 'file-secret',
+        'refresh_token': 'file-token',
+        'token_uri': 'https://oauth2.googleapis.com/token',
+        'scopes': set(['scope1'])
+    }
+    expected_loaded_dict_google_auth = {
+        'token': None,
+        'client_id': 'foo.apps.googleusercontent.com',
+        'client_secret': 'file-secret',
+        'refresh_token': 'file-token',
+        'token_uri': 'https://oauth2.googleapis.com/token',
+        'scopes': ['scope1']
+    }
+    refresh_google_auth = False
+
+    self.TestStoreOperations(creds_stored, expected_loaded_type,
+                             expected_loaded_type_google_auth,
+                             expected_loaded_dict,
+                             expected_loaded_dict_google_auth,
+                             refresh_google_auth)
+
+  def testStoreGoogleAuth_RefreshGoogleAuth_UserCreds(self):
+    creds_stored = self.MakeUserAccountCredentialsGoogleAuth()
+    expected_loaded_type = creds.CredentialType.USER_ACCOUNT
+    expected_loaded_type_google_auth = creds.CredentialTypeGoogleAuth.USER_ACCOUNT
+    expected_loaded_dict = {
+        'access_token': None,
+        'client_id': 'foo.apps.googleusercontent.com',
+        'client_secret': 'file-secret',
+        'refresh_token': 'file-token',
+        'token_uri': 'https://oauth2.googleapis.com/token',
+        'scopes': set(['scope1'])
+    }
+    expected_loaded_dict_google_auth = {
+        'token': None,
+        'client_id': 'foo.apps.googleusercontent.com',
+        'client_secret': 'file-secret',
+        'refresh_token': 'file-token',
+        'token_uri': 'https://oauth2.googleapis.com/token',
+        'scopes': ['scope1']
+    }
     refresh_google_auth = True
 
     self.TestStoreOperations(creds_stored, expected_loaded_type,
@@ -662,8 +724,6 @@ class ADCTestsOauth2client(cli_test_base.CliTestBase,
       adc.DumpADCToFile()
 
 
-@test_case.Filters.SkipOnKokoroAndLinuxPy3('pytest loads wrong module',
-                                           'b/151428720')
 class ADCTestsGoogleAuth(cli_test_base.CliTestBase,
                          credentials_test_base.CredentialsTestBase):
 

@@ -13,7 +13,7 @@ DESCRIPTION
     Compute Engine.
 
     By default, images are exported in the Compute Engine format, which is a
-    'disk.raw' file that is tarred and gzipped.
+    disk.raw file that is tarred and gzipped.
 
     The --export-format flag exports the image to a format supported by QEMU
     using qemu-img. Valid formats include 'vmdk', 'vhdx', 'vpc', 'vdi', and
@@ -21,8 +21,7 @@ DESCRIPTION
 
 REQUIRED FLAGS
      --destination-uri=DESTINATION_URI
-        The Google Cloud Storage URI destination for the exported virtual disk
-        file.
+        The Cloud Storage URI destination for the exported virtual disk file.
 
      Exactly one of these must be specified:
 
@@ -62,8 +61,8 @@ OPTIONAL FLAGS
 
      --network=NETWORK
         The name of the network in your project to use for the image export.
-        The network must have access to Google Cloud Storage. If not specified,
-        the network named default is used.
+        The network must have access to Cloud Storage. If not specified, the
+        network named default is used.
 
      --subnet=SUBNET
         Name of the subnetwork in your project to use for the image export. If
@@ -91,12 +90,12 @@ GCLOUD WIDE FLAGS
     Run $ gcloud help for details.
 
 EXAMPLES
-    To export a VMDK file 'my-image' from a project 'my-project' to a Cloud
-    Storage bucket 'my-bucket', run:
+    To export a VMDK file my-image from a project my-project to a Cloud Storage
+    bucket my-bucket, run:
 
         $ gcloud alpha compute images export --image=my-image \
             --destination-uri=gs://my-bucket/my-image.vmdk \
-            --image=my-image --format=vmdk --project=my-project
+            --export-format=vmdk --project=my-project
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

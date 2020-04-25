@@ -684,12 +684,22 @@ Created \
 
   def testWorkloadMetadataGCEMetadata(self):
     self._testWorkloadMetadata(
+        '--workload-metadata=gce_metadata',
+        self.messages.WorkloadMetadataConfig(
+            mode=self.messages.WorkloadMetadataConfig.\
+                ModeValueValuesEnum.GCE_METADATA))
+    self._testWorkloadMetadata(
         '--workload-metadata-from-node=gce_metadata',
         self.messages.WorkloadMetadataConfig(
             mode=self.messages.WorkloadMetadataConfig.\
                 ModeValueValuesEnum.GCE_METADATA))
 
   def testWorkloadMetadataGKEMetadata(self):
+    self._testWorkloadMetadata(
+        '--workload-metadata=gke_metadata',
+        self.messages.WorkloadMetadataConfig(
+            mode=self.messages.WorkloadMetadataConfig.\
+                ModeValueValuesEnum.GKE_METADATA))
     self._testWorkloadMetadata(
         '--workload-metadata-from-node=gke_metadata',
         self.messages.WorkloadMetadataConfig(
@@ -702,7 +712,15 @@ Created \
                '--cluster {clusterName}'.format(
                    base=self.node_pools_command_base.format(self.ZONE),
                    name=self.NODE_POOL_NAME,
-                   flags='--workload-metadata-from-node=mode_unspecified',
+                   flags='--workload-metadata=mode_unspecified',
+                   clusterName=self.CLUSTER_NAME))
+      self.AssertErrContains('Invalid choice')
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run('{base} create {name} {flags} '
+               '--cluster {clusterName}'.format(
+                   base=self.node_pools_command_base.format(self.ZONE),
+                   name=self.NODE_POOL_NAME,
+                   flags='--workload-metadata_from_node=mode_unspecified',
                    clusterName=self.CLUSTER_NAME))
       self.AssertErrContains('Invalid choice')
 
@@ -864,6 +882,14 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
                 NodeMetadataValueValuesEnum.GKE_METADATA_SERVER))
 
   def testWorkloadMetadataUnspecified(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run('{base} create {name} {flags} '
+               '--cluster {clusterName}'.format(
+                   base=self.node_pools_command_base.format(self.ZONE),
+                   name=self.NODE_POOL_NAME,
+                   flags='--workload-metadata=unspecified',
+                   clusterName=self.CLUSTER_NAME))
+      self.AssertErrContains('Invalid choice')
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.Run('{base} create {name} {flags} '
                '--cluster {clusterName}'.format(

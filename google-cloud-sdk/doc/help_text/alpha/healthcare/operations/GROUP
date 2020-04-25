@@ -18,6 +18,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     cancel
+        (ALPHA) Cancel a Cloud Healthcare API operation.
+
      describe
         (ALPHA) Describe a Cloud Healthcare API operation.
 

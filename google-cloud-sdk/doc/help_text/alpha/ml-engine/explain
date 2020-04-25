@@ -4,8 +4,8 @@ NAME
 SYNOPSIS
     gcloud alpha ml-engine explain --model=MODEL
         (--json-instances=JSON_INSTANCES | --json-request=JSON_REQUEST
-          | --text-instances=TEXT_INSTANCES) [--region=REGION]
-        [--version=VERSION] [GCLOUD_WIDE_FLAG ...]
+          | --text-instances=TEXT_INSTANCES) [--version=VERSION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha ml-engine explain sends an explain request to AI
@@ -58,15 +58,6 @@ REQUIRED FLAGS
           This flag accepts "-" for stdin.
 
 OPTIONAL FLAGS
-     --region=REGION
-        Google Cloud region of the regional endpoint to use for this command.
-        If unspecified, the command uses the global endpoint of the AI Platform
-        Training and Prediction API.
-
-        Learn more about regional endpoints and see a list of available
-        regions:
-        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
-
      --version=VERSION
         Model version to be used.
 

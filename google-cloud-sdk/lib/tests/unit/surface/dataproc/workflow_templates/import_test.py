@@ -22,7 +22,6 @@ import copy
 import os
 
 from googlecloudsdk import calliope
-from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core import properties
@@ -115,10 +114,19 @@ class WorkflowTemplateImportUnitTest(unit_base.DataprocUnitTestBase,
       self.RunDataproc('workflow-templates import foo', set_region=False)
 
   def testImportWorkflowTemplatesInvalid(self):
+    expected_request = self.messages.WorkflowTemplate(id=self.WORKFLOW_TEMPLATE)
+
+    self.ExpectGetWorkflowTemplate(
+        exception=self.MakeHttpError(status_code=404), region=self.REGION)
+
+    self.ExpectCreateWorkflowTemplate(
+        workflow_template=expected_request,
+        exception=self.MakeHttpError(status_code=400),
+        parent=self.WorkflowTemplateParentName(region=self.REGION))
+
     self.WriteInput('foo: bar')
-    with self.AssertRaisesExceptionMatches(
-        exceptions.ValidationError, "Additional properties are not allowed "
-        "('foo' was unexpected)"):
+
+    with self.AssertRaisesHttpExceptionMatches('Invalid request'):
       self.RunDataproc('workflow-templates import {0}'.format(
           self.WORKFLOW_TEMPLATE))
 
@@ -227,11 +235,7 @@ class WorkflowTemplateImportUnitTest(unit_base.DataprocUnitTestBase,
     # Write test template to file.
     file_name = os.path.join(self.temp_path, 'template.yaml')
     with files.FileWriter(file_name) as stream:
-      export_util.Export(
-          message=provided_template,
-          stream=stream,
-          schema_path=export_util.GetSchemaPath(
-              'dataproc', 'v1', 'WorkflowTemplate'))
+      export_util.Export(message=provided_template, stream=stream)
 
     self.ExpectGetWorkflowTemplate(
         name=self.WorkflowTemplateName(region='us-test1'),

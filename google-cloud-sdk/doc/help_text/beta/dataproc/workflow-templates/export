@@ -31,11 +31,9 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --destination=DESTINATION
-        Path to a YAML file where the workflow template configuration will be
-        exported. The exported data will not contain any output-only fields.
-        Alternatively, you may omit this flag to write to standard output. A
-        schema describing the export/import format can be found in:
-        $CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1beta2/WorkflowTemplate.yaml.
+        Path to a YAML file where the configuration will be exported. The
+        exported data will not contain any output-only fields. Alternatively,
+        you may omit this flag to write to standard output.
 
      --version=VERSION
         The version of the workflow template.

@@ -89,17 +89,17 @@ class DevTest(test_case.TestCase):
 
     mock_kind.assert_called()
 
-  def testSelectKindDefaultOnLinux(self):
+  def testSelectMinikubeDefaultOnLinux(self):
     args = self.parser.parse_args(self.COMMON_ARGS)
     cmd = dev.Dev(None, None)
 
-    with mock.patch.object(kubernetes, 'KindClusterContext') as mock_kind:
+    with mock.patch.object(kubernetes, 'Minikube') as mock_minikube:
       with mock.patch.object(platforms.OperatingSystem,
                              'Current') as mock_current:
         mock_current.return_value = platforms.OperatingSystem.LINUX
         cmd.Run(args)
 
-    mock_kind.assert_called()
+    mock_minikube.assert_called()
 
   def testSelectExternal(self):
     args = self.parser.parse_args(['--kube-context=context'] + self.COMMON_ARGS)

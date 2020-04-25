@@ -69,8 +69,9 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
                            http=None,
                            errors=None,
                            batch_url=None,
-                           log_result=None):
-      del errors_to_collect, progress_tracker, followup_overrides, http, errors, batch_url, log_result
+                           log_result=None,
+                           timeout=None):
+      del errors_to_collect, progress_tracker, followup_overrides, http, errors, batch_url, log_result, timeout
 
       # Easier to check type of the request using strings due to different
       # release tracks having different implementations for each request type

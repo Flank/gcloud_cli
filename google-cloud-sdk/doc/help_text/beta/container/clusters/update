@@ -11,12 +11,13 @@ SYNOPSIS
           | --enable-autoscaling | --enable-binauthz
           | --enable-intra-node-visibility | --enable-legacy-authorization
           | --enable-logging-monitoring-system-only
-          | --enable-master-authorized-networks | --enable-network-policy
-          | --enable-pod-security-policy | --enable-shielded-nodes
-          | --enable-stackdriver-kubernetes | --enable-vertical-pod-autoscaling
-          | --generate-password | --maintenance-window=START_TIME
-          | --release-channel=CHANNEL | --remove-labels=[KEY,...]
-          | --set-password | --start-credential-rotation | --start-ip-rotation
+          | --enable-master-authorized-networks | --enable-master-global-access
+          | --enable-network-policy | --enable-pod-security-policy
+          | --enable-shielded-nodes | --enable-stackdriver-kubernetes
+          | --enable-vertical-pod-autoscaling | --generate-password
+          | --maintenance-window=START_TIME | --release-channel=CHANNEL
+          | --remove-labels=[KEY,...] | --set-password
+          | --start-credential-rotation | --start-ip-rotation
           | --update-addons=[ADDON=ENABLED|DISABLED,...]
           | --update-labels=[KEY=VALUE,...] | --workload-pool=WORKLOAD_POOL
           | --additional-zones=[ZONE,...] | --node-locations=ZONE,[ZONE,...]
@@ -151,6 +152,11 @@ REQUIRED FLAGS
           public internet (0.0.0.0/0) is allowed to connect to Kubernetes
           master through HTTPS.
 
+       --enable-master-global-access
+          Use with private clusters to allow access to the master's private
+          endpoint from any Google Cloud region or on-premises environment
+          regardless of the private cluster's region.
+
        --enable-network-policy
           Enable network policy enforcement for this cluster. If you are
           enabling network policy on an existing cluster the network policy
@@ -275,7 +281,8 @@ REQUIRED FLAGS
           HttpLoadBalancing=ENABLED|DISABLED
           KubernetesDashboard=ENABLED|DISABLED Istio=ENABLED|DISABLED
           ApplicationManager=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
-          CloudRun=ENABLED|DISABLED NodeLocalDNS=ENABLED|DISABLED
+          CloudRun=ENABLED|DISABLED ConfigConnector=ENABLED|DISABLED
+          NodeLocalDNS=ENABLED|DISABLED
           GcePersistentDiskCsiDriver=ENABLED|DISABLED
 
        --update-labels=[KEY=VALUE,...]
@@ -293,7 +300,7 @@ REQUIRED FLAGS
           Cloud IAM Service Accounts, through the provided workload pool.
 
           Currently, the only accepted workload pool is the workload pool of
-          the Cloud project containing the cluster, PROJECT_NAME.svc.id.goog.
+          the Cloud project containing the cluster, PROJECT_ID.svc.id.goog.
 
           For more information on Workload Identity, see
 
@@ -689,10 +696,10 @@ OPTIONAL FLAGS
                     --istio-config=auth=MTLS_PERMISSIVE
 
      --master-authorized-networks=NETWORK,[NETWORK,...]
-        The list of CIDR blocks (up to 50) that are allowed to connect to
-        Kubernetes master through HTTPS. Specified in CIDR notation (e.g.
-        1.2.3.4/30). Can not be specified unless
-        --enable-master-authorized-networks is also specified.
+        The list of CIDR blocks (up to 100 for private cluster, 50 for public
+        cluster) that are allowed to connect to Kubernetes master through
+        HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30). Cannot be
+        specified unless --enable-master-authorized-networks is also specified.
 
      --node-pool=NODE_POOL
         Node pool to be updated.

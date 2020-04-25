@@ -399,6 +399,12 @@ AVAILABLE PROPERTIES
             resources. When a --location flag is required but not provided, the
             command will fall back to this value.
 
+     memcache
+         region
+            Default region to use when working with Cloud Memorystore for
+            Memcached resources. When a region is required but not provided by
+            a flag, the command will fall back to this value, if set.
+
      ml_engine
          local_python
             Full path to the Python interpreter to use for Cloud ML Engine

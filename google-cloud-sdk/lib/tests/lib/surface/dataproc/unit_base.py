@@ -28,7 +28,6 @@ from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.dataproc import clusters
-from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core.resource import resource_printer_base
 from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
@@ -136,9 +135,6 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
 
     self.StartPatch('googlecloudsdk.api_lib.dataproc.util.GetUniqueId'
                    ).return_value = self.REQUEST_ID
-
-    self.autoscaling_policy_schema_path = export_util.GetSchemaPath(
-        'dataproc', self.api_version, 'AutoscalingPolicy', for_help=False)
 
   def SetOs(self, os):
     platform_patch = self.StartPatch(

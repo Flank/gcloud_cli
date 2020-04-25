@@ -17,10 +17,14 @@ gcloud alpha access\-context\-manager perimeters dry\-run reset \- reset the dry
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Removes the explicit dry\-run mode configuration for a Service
-Perimeter. After this operation, the effective dry\-run mode configuration is
-implicitly inherited from the enforcement mode configuration. No audit logs will
-be generated in this state.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR This command has been renamed to \f5drop\fR.
+Please use \f5gcloud alpha access\-context\-manager perimeters dry\-run drop\fR
+instead.
+
+Removes the explicit dry\-run mode configuration for a Service Perimeter. After
+this operation, the effective dry\-run mode configuration is implicitly
+inherited from the enforcement mode configuration. No audit logs will be
+generated in this state.
 
 
 

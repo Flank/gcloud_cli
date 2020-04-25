@@ -72,7 +72,8 @@ This field is not applicable to external addresses.
 \fB\-\-purpose\fR=\fIPURPOSE\fR
 The purpose of the address resource. This field is not applicable to external
 addresses. \fIPURPOSE\fR must be one of: \fBVPC_PEERING\fR,
-\fBSHARED_LOADBALANCER_VIP\fR, \fBGCE_ENDPOINT\fR.
+\fBSHARED_LOADBALANCER_VIP\fR, \fBGCE_ENDPOINT\fR,
+\fBPRIVATE_SERVICE_CONNECT\fR.
 
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
@@ -200,6 +201,17 @@ To reserve any IP range with prefix length '16' from the network 'default' for
 $ gcloud alpha compute addresses create IP\-RANGE\-1 \-\-global \e
     \-\-prefix\-length=16 \-\-purpose=VPC_PEERING \e
   \-\-network=default
+.RE
+
+.RS 2m
+To reserve an address from network 'default' for PRIVATE_SERVICE_CONNECT,
+run:
+.RE
+
+.RS 2m
+$ gcloud alpha compute addresses create IP\-RESOURCE\-URI \-\-global \e
+    \-\-addresses=10.110.0.0 \e
+  \-\-purpose=PRIVATE_SERVICE_CONNECT \-\-network=default
 .RE
 
 

@@ -52,7 +52,7 @@ class OrgSecurityPoliciesDeleteBetaTest(sdk_test_base.WithFakeAuth,
     return self.messages.Operation(
         name=operation_name,
         status=status,
-        selfLink='https://compute.googleapis.com/compute/{0}/projects/locations/'
+        selfLink='https://compute.googleapis.com/compute/{0}/locations/'
         'global/operations/{1}'.format(self.api_version, operation_name),
         targetLink=resource_uri)
 

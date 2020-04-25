@@ -211,6 +211,7 @@ apis:
   cloudkms:
     v1:
       discovery_doc: cloudkms_v1.json
+      enable_mtls: true
       default: true
   cloudresourcemanager:
     v1beta1:
@@ -297,6 +298,7 @@ apis:
     v1:
       discovery_doc: container_v1.json
       default: true
+      enable_mtls: true
       resources:
         projects.zones:
           path: projects/{projectId}/zones/{zoneId}
@@ -347,6 +349,9 @@ apis:
   dataflow:
     v1b3:
       discovery_doc: dataflow_v1b3.json
+      resources:
+        projects:
+          path: projects/{projectId}
   datafusion:
     v1beta1:
       discovery_doc: datafusion_v1beta1.json
@@ -461,6 +466,8 @@ apis:
       discovery_doc: healthcare_v1alpha2.json
     v1beta1:
       discovery_doc: healthcare_v1beta1.json
+    v1:
+      discovery_doc: healthcare_v1.json
       default: true
   oslogin:
     v1alpha:
@@ -628,6 +635,12 @@ apis:
       resources:
         projects.snapshots:
           path: projects/{projectsId}/snapshots/{snapshotsId}
+  pubsublite:
+    v1:
+      discovery_doc: pubsublite_v1.json
+      resources:
+        admin.projects.locations.topics.subscriptions:
+          path: admin/projects/{projectsId}/locations/{locationsId}/topics/{topicsId}/subscriptions
   recaptchaenterprise:
     v1:
       discovery_doc: recaptchaenterprise_v1.json
@@ -640,6 +653,9 @@ apis:
     v1:
       discovery_doc: redis_v1.json
       default: true
+  resourcesettings:
+    v1alpha1:
+      discovery_doc: resourcesettings_v1alpha1.json
   run:
     v1alpha1:
       discovery_doc: run_v1alpha1.json
@@ -763,6 +779,8 @@ apis:
       default: true
     v1:
       discovery_doc: tpu_v1.json
+    v2alpha1:
+      discovery_doc: tpu_v2alpha1.json
   videointelligence:
     v1:
       discovery_doc: videointelligence_v1.json

@@ -20,8 +20,7 @@ SYNOPSIS
         [--node-version=NODE_VERSION] [--num-nodes=NUM_NODES; default=3]
         [--preemptible] [--sandbox=[type=TYPE]]
         [--shielded-integrity-monitoring] [--shielded-secure-boot]
-        [--tags=TAG,[TAG,...]]
-        [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
+        [--tags=TAG,[TAG,...]] [--workload-metadata=WORKLOAD_METADATA]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--region=REGION | --zone=ZONE, -z ZONE]
         [--reservation=RESERVATION --reservation-affinity=RESERVATION_AFFINITY]
@@ -316,9 +315,9 @@ FLAGS
         https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create
         for examples.
 
-     --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
+     --workload-metadata=WORKLOAD_METADATA
         Type of metadata server available to pods running in the node pool.
-        WORKLOAD_METADATA_FROM_NODE must be one of:
+        WORKLOAD_METADATA must be one of:
 
          GCE_METADATA
             Pods running in this node pool have access to the node's underlying

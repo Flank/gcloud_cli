@@ -415,7 +415,7 @@ projects/my-project/global/machineImages/machine-image-1",
     # googlecloudsdk.api_lib.compute.request_helper.MakeRequests.
     required_method_args = set(['requests', 'http', 'batch_url', 'errors'])
     optional_method_args = set(
-        ['progress_tracker', 'followup_overrides', 'log_result'])
+        ['progress_tracker', 'followup_overrides', 'log_result', 'timeout'])
 
     for (_, _, expected), (_, actual) in zip(
         expected_calls, self.make_requests.call_args_list):

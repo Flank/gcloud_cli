@@ -3,11 +3,12 @@ NAME
 
 SYNOPSIS
     gcloud alpha run deploy [[SERVICE] --namespace=NAMESPACE]
-        [--args=[ARG,...]] [--async] [--command=[COMMAND,...]]
-        [--concurrency=CONCURRENCY] [--cpu=CPU] [--image=IMAGE]
-        [--max-instances=MAX_INSTANCES] [--memory=MEMORY]
+        [--args=[ARG,...]] [--async] [--clear-vpc-connector]
+        [--command=[COMMAND,...]] [--concurrency=CONCURRENCY] [--cpu=CPU]
+        [--image=IMAGE] [--max-instances=MAX_INSTANCES] [--memory=MEMORY]
         [--min-instances=MIN_INSTANCES] [--platform=PLATFORM] [--port=PORT]
         [--service-account=SERVICE_ACCOUNT] [--timeout=TIMEOUT] [--no-traffic]
+        [--vpc-connector=VPC_CONNECTOR]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
@@ -50,6 +51,9 @@ FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
+
+     --clear-vpc-connector
+        Remove the VPC connector for this Service.
 
      --command=[COMMAND,...]
         Entrypoint for the container image. If not specified, the container
@@ -126,6 +130,9 @@ FLAGS
         that the revsion being deployed will not receive traffic. After a
         deployment with this flag the LATEST revision will not receive traffic
         on future deployments.
+
+     --vpc-connector=VPC_CONNECTOR
+        Set a VPC connector for this Service.
 
      At most one of these may be specified:
 

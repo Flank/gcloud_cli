@@ -153,7 +153,8 @@ class MakeRequestsTest(test_case.TestCase):
         progress_tracker=None,
         warnings=[],
         errors=[],
-        log_result=True)
+        log_result=True,
+        timeout=None)
 
   def testWithAsynchronousAndSynchronousRequests(self):
     operations = [
@@ -232,7 +233,8 @@ class MakeRequestsTest(test_case.TestCase):
         progress_tracker=None,
         warnings=[],
         errors=[],
-        log_result=True)
+        log_result=True,
+        timeout=None)
 
   def testWithSingleZoneMutation(self):
     operations = [self.messages.Operation(targetLink='my-instance',
@@ -283,7 +285,8 @@ class MakeRequestsTest(test_case.TestCase):
         progress_tracker=None,
         warnings=[],
         errors=[],
-        log_result=True)
+        log_result=True,
+        timeout=None)
 
   def testWithProgressTracker(self):
     operations = [self.messages.Operation(targetLink='my-instance',
@@ -337,7 +340,8 @@ class MakeRequestsTest(test_case.TestCase):
         progress_tracker=mock_progress_tracker,
         warnings=[],
         errors=[],
-        log_result=True)
+        log_result=True,
+        timeout=None)
 
   def testWithSingleRegionMutation(self):
     operations = [
@@ -389,7 +393,8 @@ class MakeRequestsTest(test_case.TestCase):
         progress_tracker=None,
         warnings=[],
         errors=[],
-        log_result=True)
+        log_result=True,
+        timeout=None)
 
   def testWithSingleGlobalMutation(self):
     operations = [
@@ -440,7 +445,8 @@ class MakeRequestsTest(test_case.TestCase):
         progress_tracker=None,
         warnings=[],
         errors=[],
-        log_result=True)
+        log_result=True,
+        timeout=None)
 
   def testThatListRequestsCannotBeMixedWithNonListRequests(self):
     requests = [

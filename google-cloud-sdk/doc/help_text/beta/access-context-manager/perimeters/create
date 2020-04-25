@@ -4,10 +4,10 @@ NAME
 
 SYNOPSIS
     gcloud beta access-context-manager perimeters create
-        (PERIMETER : --policy=POLICY) --resources=[RESOURCES,...] --title=TITLE
+        (PERIMETER : --policy=POLICY) --title=TITLE
         [--access-levels=[LEVEL,...]] [--async] [--description=DESCRIPTION]
         [--perimeter-type=PERIMETER_TYPE; default="regular"]
-        [--restricted-services=[SERVICE,...]]
+        [--resources=[RESOURCES,...]] [--restricted-services=[SERVICE,...]]
         [--enable-vpc-accessible-services
           --vpc-allowed-services=[VPC_SERVICE,...]] [GCLOUD_WIDE_FLAG ...]
 
@@ -28,10 +28,6 @@ POSITIONAL ARGUMENTS
           The ID of the access policy.
 
 REQUIRED FLAGS
-     --resources=[RESOURCES,...]
-        Comma-separated list of resources (currently only projects, in the form
-        projects/<projectnumber>) in this perimeter.
-
      --title=TITLE
         Short human-readable title for the service perimeter.
 
@@ -64,6 +60,10 @@ OPTIONAL FLAGS
             data amongst themselves.
 
             A project may belong to at most one regular service perimeter.
+
+     --resources=[RESOURCES,...]
+        Comma-separated list of resources (currently only projects, in the form
+        projects/<projectnumber>) in this perimeter.
 
      --restricted-services=[SERVICE,...]
         Comma-separated list of services to which the perimeter boundary does

@@ -21,7 +21,7 @@ gcloud alpha compute images export \- export a Compute Engine image
 images from Compute Engine.
 
 By default, images are exported in the Compute Engine format, which is a
-\'disk.raw' file that is tarred and gzipped.
+\f5disk.raw\fR file that is tarred and gzipped.
 
 The \f5\-\-export\-format\fR flag exports the image to a format supported by
 QEMU using qemu\-img. Valid formats include 'vmdk', 'vhdx', 'vpc', 'vdi', and
@@ -34,7 +34,7 @@ QEMU using qemu\-img. Valid formats include 'vmdk', 'vhdx', 'vpc', 'vdi', and
 .RS 2m
 .TP 2m
 \fB\-\-destination\-uri\fR=\fIDESTINATION_URI\fR
-The Google Cloud Storage URI destination for the exported virtual disk file.
+The Cloud Storage URI destination for the exported virtual disk file.
 
 .TP 2m
 
@@ -94,7 +94,7 @@ num>.cloudbuild\-logs.googleusercontent.com/\fR is created and used.
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
 The name of the network in your project to use for the image export. The network
-must have access to Google Cloud Storage. If not specified, the network named
+must have access to Cloud Storage. If not specified, the network named
 \f5default\fR is used.
 
 .TP 2m
@@ -132,13 +132,13 @@ Run \fB$ gcloud help\fR for details.
 
 .SH "EXAMPLES"
 
-To export a VMDK file 'my\-image' from a project 'my\-project' to a Cloud
-Storage bucket 'my\-bucket', run:
+To export a VMDK file \f5\fImy\-image\fR\fR from a project
+\f5\fImy\-project\fR\fR to a Cloud Storage bucket \f5\fImy\-bucket\fR\fR, run:
 
 .RS 2m
 $ gcloud alpha compute images export \-\-image=my\-image \e
     \-\-destination\-uri=gs://my\-bucket/my\-image.vmdk \e
-    \-\-image=my\-image \-\-format=vmdk \-\-project=my\-project
+    \-\-export\-format=vmdk \-\-project=my\-project
 .RE
 
 

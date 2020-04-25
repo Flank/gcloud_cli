@@ -35,6 +35,12 @@ COMMANDS
      describe
         (ALPHA) Get metadata for a subordinate Certificate Authority.
 
+     disable
+        (ALPHA) Disable a subordinate certificate authority.
+
+     enable
+        (ALPHA) Enable a subordinate certificate authority.
+
      get-csr
         (ALPHA) Get the CSR for a subordinate certificate authority that has
         not yet been activated.

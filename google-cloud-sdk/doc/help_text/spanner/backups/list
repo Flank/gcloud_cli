@@ -75,6 +75,8 @@ EXAMPLES
             --database=DATABASE
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice.
+    These variants are also available:
+
+        $ gcloud alpha spanner backups list
+        $ gcloud beta spanner backups list
 

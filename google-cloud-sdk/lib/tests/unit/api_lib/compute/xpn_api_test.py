@@ -57,7 +57,7 @@ class XpnApiTest(test_base.BaseTest):
     self.messages = self.mock_client.MESSAGES_MODULE
     self.xpn_client = xpn_api.XpnClient(
         compute_client=client_adapter.ClientAdapter(
-            api_default_version=_DEFAULT_API_VERSION, client=self.mock_client))
+            api_version=_DEFAULT_API_VERSION, client=self.mock_client))
 
   def _MakeProject(self, name=None):
     project_status_enum = self.messages.Project.XpnProjectStatusValueValuesEnum

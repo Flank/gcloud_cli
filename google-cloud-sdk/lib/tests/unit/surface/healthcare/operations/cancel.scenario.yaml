@@ -1,0 +1,70 @@
+title: operations cancel test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: healthcare operations cancel my-operation --location us-central1 --dataset=my-dataset
+  - prompt:
+    - message: |
+        You are about to cancel [my-operation].
+    - input: y
+  - stdout: |
+      {}
+- execute:
+  - command: healthcare operations cancel projects/my-project/locations/us-central1/datasets/my-dataset/operations/my-operation
+  - prompt:
+    - message: |
+        You are about to cancel [my-operation].
+    - input: y
+  - stdout: |
+      {}
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
+- execute_command:
+    # Test basic execution
+    command: healthcare operations cancel my-operation --location us-central1 --dataset=my-dataset
+    events:
+    - expect_prompt_continue:
+        message: |
+          You are about to cancel [my-operation].
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/my-operation:cancel?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Test specifying full resource path
+    command: healthcare operations cancel projects/my-project/locations/us-central1/datasets/my-dataset/operations/my-operation
+    events:
+    - expect_prompt_continue:
+        message: |
+          You are about to cancel [my-operation].
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/my-project/locations/us-central1/datasets/my-dataset/operations/my-operation:cancel?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0

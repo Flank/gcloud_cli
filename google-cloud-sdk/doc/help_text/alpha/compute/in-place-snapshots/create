@@ -1,0 +1,132 @@
+NAME
+    gcloud alpha compute in-place-snapshots create - create Google Compute
+        Engine in-place snapshots
+
+SYNOPSIS
+    gcloud alpha compute in-place-snapshots create IN_PLACE_SNAPSHOT_NAME
+        [--labels=[KEY=VALUE,...]] [--region=REGION | --zone=ZONE]
+        [--source-disk=SOURCE_DISK : --source-disk-region=SOURCE_DISK_REGION
+          | --source-disk-zone=SOURCE_DISK_ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create Google Compute Engine in-place snapshots.
+
+POSITIONAL ARGUMENTS
+     IN_PLACE_SNAPSHOT_NAME
+        Name of the in place snapshot to create.
+
+FLAGS
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          Region of the in place snapshot to create. If not specified, you may
+          be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+       --zone=ZONE
+          Zone of the in place snapshot to create. If not specified and the
+          compute/zone property isn't set, you may be prompted to select a
+          zone.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/zone property:
+
+              $ gcloud config set compute/zone ZONE
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/zone
+
+          Alternatively, the zone can be stored in the environment variable
+          CLOUDSDK_COMPUTE_ZONE.
+
+     Source disk options
+
+       --source-disk=SOURCE_DISK
+          Source disk used to create the in-place snapshot. This flag must be
+          specified if any of the other arguments in this group are specified.
+
+       At most one of these may be specified:
+
+         --source-disk-region=SOURCE_DISK_REGION
+            Region of the source disk to operate on. If not specified, you may
+            be prompted to select a region.
+
+            To avoid prompting when this flag is omitted, you can set the
+            compute/region property:
+
+                $ gcloud config set compute/region REGION
+
+            A list of regions can be fetched by running:
+
+                $ gcloud compute regions list
+
+            To unset the property, run:
+
+                $ gcloud config unset compute/region
+
+            Alternatively, the region can be stored in the environment variable
+            CLOUDSDK_COMPUTE_REGION.
+
+         --source-disk-zone=SOURCE_DISK_ZONE
+            Zone of the source disk to operate on. If not specified and the
+            compute/zone property isn't set, you may be prompted to select a
+            zone.
+
+            To avoid prompting when this flag is omitted, you can set the
+            compute/zone property:
+
+                $ gcloud config set compute/zone ZONE
+
+            A list of zones can be fetched by running:
+
+                $ gcloud compute zones list
+
+            To unset the property, run:
+
+                $ gcloud config unset compute/zone
+
+            Alternatively, the zone can be stored in the environment variable
+            CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

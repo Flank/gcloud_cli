@@ -30,6 +30,9 @@ GROUPS
      jobs
         A group of subcommands for working with Dataflow jobs.
 
+     sql
+        A group of subcommands for working with Dataflow SQL.
+
 NOTES
     These variants are also available:
 

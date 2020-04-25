@@ -26,11 +26,14 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
-     configmanagement
+     config-management
         (ALPHA) Manage Config Management feature.
 
      features
         (ALPHA) Manage features on all Hub memberships(registered clusters).
+
+     ingress
+        (ALPHA) Manage MultiClusterIngress Feature.
 
      memberships
         (ALPHA) Manage memberships of all your GKE and other Kubernetes cluster

@@ -13,7 +13,10 @@ SYNOPSIS
         [--resource-policies=[RESOURCE_POLICY,...]] [--size=SIZE] [--type=TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT
-          | --source-disk=SOURCE_DISK --source-disk-zone=SOURCE_DISK_ZONE]
+          | --source-disk=SOURCE_DISK --source-disk-zone=SOURCE_DISK_ZONE
+          | --source-in-place-snapshot=SOURCE_IN_PLACE_SNAPSHOT
+          --source-in-place-snapshot-region=SOURCE_IN_PLACE_SNAPSHOT_REGION
+          | --source-in-place-snapshot-zone=SOURCE_IN_PLACE_SNAPSHOT_ZONE]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
           --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -205,6 +208,22 @@ FLAGS
 
             Alternatively, the zone can be stored in the environment variable
             CLOUDSDK_COMPUTE_ZONE.
+
+       Source in place snapshot options
+
+         --source-in-place-snapshot=SOURCE_IN_PLACE_SNAPSHOT
+            Source in place snapshot used to create the disks.
+
+         At most one of these may be specified:
+
+           --source-in-place-snapshot-region=SOURCE_IN_PLACE_SNAPSHOT_REGION
+              Region of the source in place snapshot to operate on. Overrides
+              the default compute/region property value for this command
+              invocation.
+
+           --source-in-place-snapshot-zone=SOURCE_IN_PLACE_SNAPSHOT_ZONE
+              Zone of the source in place snapshot to operate on. Overrides the
+              default compute/zone property value for this command invocation.
 
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the disk. The arguments in this group can be used to

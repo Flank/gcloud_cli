@@ -31,8 +31,8 @@ COMMANDS
     COMMAND is one of the following:
 
      commit
-        (BETA) Commit the dry-run mode configuration for all Service
-        Perimeters.
+        (BETA) (DEPRECATED) Commit the dry-run mode configuration for all
+        Service Perimeters.
 
      create
         (BETA) Create a dry-run mode configuration for a new or existing
@@ -47,12 +47,20 @@ COMMANDS
      drop
         (BETA) Reset the dry-run mode configuration of a Service Perimeter.
 
+     enforce
+        (BETA) Enforces a Service Perimeter's dry-run configuration.
+
+     enforce-all
+        (BETA) Enforces the dry-run mode configuration for all Service
+        Perimeters.
+
      list
         (BETA) List the effective dry-run configuration across all Service
         Perimeters.
 
      reset
-        (BETA) Reset the dry-run mode configuration of a Service Perimeter.
+        (BETA) (DEPRECATED) Reset the dry-run mode configuration of a Service
+        Perimeter.
 
      update
         (BETA) Update the dry-run mode configuration for a Service Perimeter.

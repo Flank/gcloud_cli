@@ -39,12 +39,12 @@ class ZonesTest(accesscontextmanager.Base):
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
 
-  def _ExpectGet(self, name):
+  def _ExpectGet(self, name, perimeter=None):
     m = self.messages
     get_req_type = (
         m.AccesscontextmanagerAccessPoliciesServicePerimetersGetRequest)
     self.client.accessPolicies_servicePerimeters.Get.Expect(
-        get_req_type(name=name), {})
+        get_req_type(name=name), perimeter or {})
 
   def _ExpectPatch(self, perimeter_ref, perimeter_update, update_mask):
     perimeter_name = perimeter_ref.RelativeName()
@@ -76,6 +76,23 @@ class ZonesTest(accesscontextmanager.Base):
         perimeter_ref,
         resources=['projects/123', 'projects/456'],
         restricted_services=['bigquery.googleapis.com'])
+
+  def testEnforceDryRunConfig(self):
+    self.SetUpForAPI(self.api_version)
+    client = zones.Client(self.client)
+    perimeter_before = self.messages.ServicePerimeter(
+        status=None,
+        useExplicitDryRunSpec=True,
+        spec=self.messages.ServicePerimeterConfig(resources=['projects/123']))
+    perimeter_update = self.messages.ServicePerimeter(
+        useExplicitDryRunSpec=False,
+        spec=None,
+        status=self.messages.ServicePerimeterConfig(resources=['projects/123']))
+    perimeter_ref = FakePerimeterRef()
+    self._ExpectGet(perimeter_ref.RelativeName(), perimeter_before)
+    self._ExpectPatch(perimeter_ref, perimeter_update,
+                      'spec,status,useExplicitDryRunSpec')
+    client.EnforceDryRunConfig(perimeter_ref)
 
   def testUnsetSpec_unsetUseExplictDryRunSpecFlag(self):
     self.SetUpForAPI(self.api_version)

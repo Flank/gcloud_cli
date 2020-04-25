@@ -193,7 +193,7 @@ class UnregisterTest(base.MembershipsTestBase):
         exclusivity_util, 'GetMembershipCROwnerID', return_value='fake-project')
     self.RunCommand([
         'my-cluster',
-        '--gke-uri=//container.googleapis.com/projects/project/zones/zone/clusters/cluster',
+        '--gke-uri=https://container.googleapis.com/projects/project/zones/zone/clusters/cluster',
         '--project=fake-project',
     ])
     mock_delete_connect_namespace.assert_called_once()
@@ -221,7 +221,7 @@ class UnregisterTest(base.MembershipsTestBase):
         exclusivity_util, 'GetMembershipCROwnerID', return_value='fake-project')
     self.RunCommand([
         'my-cluster',
-        '--gke-uri=//container.googleapis.com/projects/project/regions/region/clusters/cluster',
+        '--gke-uri=https://container.googleapis.com/projects/project/regions/region/clusters/cluster',
         '--project=fake-project',
     ])
     mock_delete_connect_namespace.assert_called_once()

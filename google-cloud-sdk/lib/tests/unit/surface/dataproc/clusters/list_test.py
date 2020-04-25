@@ -177,6 +177,7 @@ class ClustersListUnitTestBeta(ClustersListUnitTest, base.DataprocTestBaseBeta):
     self.AssertOutputContains(
         '{0} GKE RUNNING {1}'.format(self.CLUSTER_NAME, self.ZONE),
         normalize_space=True)
+    self.AssertOutputNotContains('clusters/my-cluster')
 
   def testBeta(self):
     self.assertEqual(self.messages, self._beta_messages)

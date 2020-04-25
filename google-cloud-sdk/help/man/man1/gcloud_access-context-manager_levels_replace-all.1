@@ -1,0 +1,141 @@
+
+.TH "GCLOUD_ACCESS\-CONTEXT\-MANAGER_LEVELS_REPLACE\-ALL" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud access\-context\-manager levels replace\-all \- replace all existing access levels
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud access\-context\-manager levels replace\-all\fR [\fIPOLICY\fR] \fB\-\-source\-file\fR=\fISOURCE_FILE\fR [\fB\-\-etag\fR=\fIETAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Replace all existing access level in specified access policy with access levels
+specified in a file.
+
+
+.SH "EXAMPLES"
+
+.RS 2m
+To replace all levels within a policy, using etag:
+$ gcloud access\-context\-manager levels replace\-all \e
+    my\-policy\-number \e
+    \-\-source\-file=path\-to\-file\-containing\-all\-replacement\-access\-lev\e
+els.yaml \-\-etag=optional\-latest\-etag\-of\-policy
+.RE
+
+.RS 2m
+To replace all levels within a policy, without using etag:
+$ gcloud access\-context\-manager levels replace\-all \e
+    my\-policy\-number \e
+    \-\-source\-file=path\-to\-file\-containing\-all\-replacement\-access\-lev\e
+els.yaml
+.RE
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Policy resource \- The access policy that contains the levels you want to
+replace. This represents a Cloud resource.
+
+.RS 2m
+.TP 2m
+[\fIPOLICY\fR]
+ID of the policy or fully qualified identifier for the policy.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\-file\fR=\fISOURCE_FILE\fR
+Path to a file containing a list of access levels.
+
+An access level file is a YAML\-formatted list of access levels, which are YAML
+objects representing a Basic or Custom level as described in the API reference.
+For example:
+
+.RS 2m
+\- name: accessPolicies/my_policy/accessLevels/my_level
+  title: My Basic Level
+  description: Basic level for foo.
+  basic:
+    combiningFunction: AND
+    conditions:
+    \- ipSubnetworks:
+      \- 192.168.100.14/24
+      \- 2001:db8::/48
+    \- members
+      \- user1:user1@example.com
+\- name: accessPolicies/my_policy/accessLevels/my_other_level
+  title: My Other Custom Level
+  description: Custom level for bar.
+  custom:
+    expr:
+      expression: "origin.region_code in ['US', 'CA']"
+.RE
+
+For more information about the alpha version, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1alpha/accessPolicies.accessLevels
+For other versions, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1/accessPolicies.accessLevels
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-etag\fR=\fIETAG\fR
+An etag which specifies the version of the Access Policy. Only etags that
+represent the latest version of the Access Policy will be accepted.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBaccesscontextmanager/v1\fR API. The full documentation
+for this API can be found at:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha access\-context\-manager levels replace\-all
+$ gcloud beta access\-context\-manager levels replace\-all
+.RE
+

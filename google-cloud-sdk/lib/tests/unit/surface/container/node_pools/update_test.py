@@ -288,7 +288,7 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones\
     self.ExpectGetNodePool(pool.name, response=pool)
     self.Run(cmdbase.format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
 
-  def testWorkloadMetadataFromNode(self):
+  def testWorkloadMetadata(self):
     enum = self.messages.WorkloadMetadataConfig.ModeValueValuesEnum
     state_string_names = {
         enum.GCE_METADATA: 'GCE_METADATA',
@@ -313,7 +313,7 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones\
       self.ExpectGetNodePool(pool.name, response=pool)
 
       command = ('{command_base} update {node_pool} --cluster={cluster} '
-                 '--workload-metadata-from-node={to_state}').format(
+                 '--workload-metadata={to_state}').format(
                      command_base=self.node_pools_command_base.format(
                          self.ZONE),
                      node_pool=pool.name,

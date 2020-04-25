@@ -2,33 +2,33 @@
   "components": [
     {
       "data": {
-        "contents_checksum": "0b4e9d8e6394dc841aece07ca4da91920a460cbd7ec22495be4a2b4f46635b4d", 
-        "source": "", 
+        "contents_checksum": "0b4e9d8e6394dc841aece07ca4da91920a460cbd7ec22495be4a2b4f46635b4d",
+        "source": "",
         "type": "tar"
-      }, 
+      },
       "dependencies": [
         "core"
-      ], 
+      ],
       "details": {
-        "description": "Beta version of gcloud commands.", 
+        "description": "Beta version of gcloud commands.",
         "display_name": "gcloud Beta Commands"
-      }, 
-      "id": "beta", 
-      "is_configuration": false, 
-      "is_hidden": false, 
-      "is_required": false, 
-      "platform": {}, 
+      },
+      "id": "beta",
+      "is_configuration": false,
+      "is_hidden": false,
+      "is_required": false,
+      "platform": {},
       "version": {
-        "build_number": 20200403135304, 
-        "version_string": "2020.04.03"
+        "build_number": 20200421142158,
+        "version_string": "2020.04.21"
       }
     }
-  ], 
-  "revision": 20200403135304, 
+  ],
+  "revision": 20200421142158,
   "schema_version": {
-    "no_update": false, 
-    "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz", 
+    "no_update": false,
+    "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
-  }, 
-  "version": "288.0.0"
+  },
+  "version": "290.0.0"
 }

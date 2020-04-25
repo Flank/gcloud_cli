@@ -250,6 +250,7 @@ class RegisterTest(base.MembershipsTestBase):
   def testInvalidServiceAccountKeyFile(self):
     self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
     self.mock_kubernetes_client.GetNamespaceUID.return_value = TEST_UID
+    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = None
     self.StartObjectPatch(
         kube_util, 'IsGKECluster', return_value=False)
 
@@ -411,31 +412,6 @@ class RegisterTest(base.MembershipsTestBase):
                                                    'my-cluster', None,
                                                    TEST_UID, self.track, None)
     mock_deploy_connect.assert_not_called()
-
-  def testCreateMembershipWithClusterLink(self):
-    self.mock_kubernetes_client.__enter__.return_value.CheckClusterAdminPermissions.return_value = True
-    self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID
-    self.mock_kubernetes_client.__enter__.return_value.processor.gke_cluster_self_link = '//container.googleapis.com/projects/project/locations/location/clusters/cluster'
-    self.StartObjectPatch(kube_util, 'IsGKECluster', return_value=False)
-    # Mock to create a new membership.
-    mock_create_membership = self.MockOutCreateMembershipNotFound()
-    self.mockValidateExclusivitySucceed()
-
-    # The GKE cluster selflink is passed into the membership resource that is
-    # created. this test is not concerned about exceptions thrown during the
-    # command, only that the parameters that CreateMembership() is called with
-    # are valid.
-    with self.assertRaises(Exception):
-      self.RunCommand([
-          'my-cluster', '--kubeconfig=' + self.kubeconfig,
-          '--context=test-context',
-          '--service-account-key-file=' + self.serviceaccount_file
-      ])
-
-    mock_create_membership.assert_called_once_with('fake-project', 'my-cluster',
-                                                   'my-cluster',
-                                                   '//container.googleapis.com/projects/project/locations/location/clusters/cluster',  # pylint: disable=line-too-long
-                                                   TEST_UID, self.track, None)
 
   def testCreateMembershipWithExternalID(self):
     self.mock_kubernetes_client.__enter__.return_value.GetNamespaceUID.return_value = TEST_UID

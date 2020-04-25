@@ -131,24 +131,30 @@ actions:
             }
     - expect_stdout: |
         ---
-        accesses:
-        - permissions: a.b.get
-          role: roles/cloudasset.r1
-        identities:
-        - name: serviceAccount:service-001@gcp-sa-cloudasset.iam.gserviceaccount.com
-        resources:
-        - fullResourceName: //cloudresourcemanager.googleapis.com/o1
-        - fullResourceName: //cloudresourcemanager.googleapis.com/f1
-        ---
-        accesses:
-        - permissions: c.d.create
-          role: roles/cloudasset.r1
-        identities:
-        - name: serviceAccount:service-001@gcp-sa-cloudasset.iam.gserviceaccount.com
-        resources:
-        - fullResourceName: //cloudresourcemanager.googleapis.com/o2
-        - fullResourceName: //cloudresourcemanager.googleapis.com/f2
-        - fullResourceName: //cloudresourcemanager.googleapis.com/p2
+        ACLs:
+        - accesses:
+          - permissions: a.b.get
+            role: roles/cloudasset.r1
+          identities:
+          - name: serviceAccount:service-001@gcp-sa-cloudasset.iam.gserviceaccount.com
+          resources:
+          - fullResourceName: //cloudresourcemanager.googleapis.com/o1
+          - fullResourceName: //cloudresourcemanager.googleapis.com/f1
+        - accesses:
+          - permissions: c.d.create
+            role: roles/cloudasset.r1
+          identities:
+          - name: serviceAccount:service-001@gcp-sa-cloudasset.iam.gserviceaccount.com
+          resources:
+          - fullResourceName: //cloudresourcemanager.googleapis.com/o2
+          - fullResourceName: //cloudresourcemanager.googleapis.com/f2
+          - fullResourceName: //cloudresourcemanager.googleapis.com/p2
+        policy:
+          attachedResource: //cloudresourcemanager.googleapis.com/o1
+          binding:
+            members:
+            - serviceAccount:service-001@gcp-sa-cloudasset.iam.gserviceaccount.com
+            role: roles/cloudasset.r1
     - expect_stderr: |
         Your analysis request is fully explored. The ACLs matching your requests are listed per IAM policy binding, so there could be duplications.
     - expect_exit:

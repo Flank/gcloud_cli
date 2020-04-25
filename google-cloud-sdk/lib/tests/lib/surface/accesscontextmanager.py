@@ -192,11 +192,9 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
                 self.messages.Condition(ipSubnetworks=['127.0.0.1/24']),
                 self.messages.Condition(members=['user:example@example.com']),
             ]),
-        createTime=None,
         description=description,
         name=name,
-        title=title,
-        updateTime=None)
+        title=title)
 
   def _MakeCustomLevel(self,
                        name,
@@ -206,11 +204,9 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     return self.messages.AccessLevel(
         custom=self.messages.CustomLevel(
             expr=self.messages.Expr(expression=expression)),
-        createTime=None,
         description=description,
         name=name,
-        title=title,
-        updateTime=None)
+        title=title)
 
   def _MakePerimeter(
       self,

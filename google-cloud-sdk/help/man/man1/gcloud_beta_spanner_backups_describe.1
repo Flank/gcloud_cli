@@ -1,0 +1,89 @@
+
+.TH "GCLOUD_BETA_SPANNER_BACKUPS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta spanner backups describe \- retrieves information about a backup
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta spanner backups describe\fR (\fIBACKUP\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Retrieves information about a backup.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Backup resource \- Cloud Spanner backup to describe. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the argument [backup] on the command line with a
+fully specified name; set the property [core/project]; provide the argument
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIBACKUP\fR
+ID of the backup or fully qualified identifier for the backup. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+The name of the Cloud Spanner instance.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBspanner/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/spanner/
+
+
+
+.SH "EXAMPLES"
+
+To describe a backup, run:
+
+.RS 2m
+$ gcloud beta spanner backups describe BACKUP_ID \e
+    \-\-instance=INSTANCE_NAME
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud spanner backups describe
+$ gcloud alpha spanner backups describe
+.RE
+

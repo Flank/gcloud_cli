@@ -959,5 +959,55 @@ class GlobalPeeringRangesCreateAlphaTest(GlobalPeeringRangesCreateBetaTest):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 
+class CreatPscVipAlphaTest(test_base.BaseTest):
+
+  def PreSetUp(self):
+    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def SetUp(self):
+    self.SelectApi(self.api_version)
+
+  def testCreatePscVip(self):
+    self.Run("""
+        compute addresses create
+          address-1
+          --global
+          --network=default
+          --addresses 10.100.1.1
+          --purpose PRIVATE_SERVICE_CONNECT
+        """)
+
+    self.CheckRequests(
+        [(self.compute.globalAddresses, 'Insert',
+          self.messages.ComputeGlobalAddressesInsertRequest(
+              address=self.messages.Address(
+                  address='10.100.1.1',
+                  name='address-1',
+                  addressType=self.messages.Address.AddressTypeValueValuesEnum
+                  .INTERNAL,
+                  network='https://compute.googleapis.com/compute/{}/'
+                  'projects/my-project/global/networks/default'.format(
+                      self.api_version),
+                  purpose=self.messages.Address.PurposeValueValuesEnum
+                  .PRIVATE_SERVICE_CONNECT,
+              ),
+              project='my-project',
+          ))],)
+    self.AssertOutputEquals('')
+    self.AssertErrEquals('')
+
+  def testPscWithRegionalAddress(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      self.Run("""
+        compute addresses create
+          address-1
+          --addresses 10.100.1.1
+          --purpose PRIVATE_SERVICE_CONNECT
+          --network=default
+          --region='us-central1'
+          """)
+
+
 if __name__ == '__main__':
   test_case.main()

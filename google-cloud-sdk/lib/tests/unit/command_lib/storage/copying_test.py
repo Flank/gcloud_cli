@@ -304,8 +304,6 @@ class CopyingTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
       ('Dot', '.'),
       ('DotDot', '..'),
   ])
-  @test_case.Filters.SkipOnWindows(
-      'Need to sort out the slash/backslash issue.', 'b/120033753')
   def testInterestingPathsRecursiveError(self, bad_path):
     source = self._Abs('gs://bucket1/')
     dest = self._Abs('some/dir/')

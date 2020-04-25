@@ -5,8 +5,9 @@ summary:
 - execute:
   - command: compute instance-templates create $$template1$$ --machine-type n1-standard-1
       --format 'text(name,properties.machineType)'
-  - stderr: |
-      Created [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+      $
   - stdout: |
       ---
       name:                   $$template1$$
@@ -14,8 +15,9 @@ summary:
 - execute:
   - command: compute instance-templates create $$template2$$ --machine-type f1-micro
       --format 'text(name,properties.machineType)'
-  - stderr: |
-      Created [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$\].
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$\].
+      $
   - stdout: |
       ---
       name:                   $$template2$$
@@ -24,13 +26,15 @@ summary:
   - command: compute instance-groups managed create $$manager$$ --region us-central1
       --base-instance-name $$manager$$ --size 5 --template $$template1$$ --format
       'text(name,region,targetSize)'
-  - stderr: |
-      Created [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
-  - stdout: |
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+      $
+  - stdout: |-
       ---
       name:       $$manager$$
-      region:     https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1
+      region:     https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1
       targetSize: 5
+      $
 - execute:
   - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
@@ -38,14 +42,15 @@ summary:
   - command: compute instance-groups managed rolling-action start-update $$manager$$
       --type proactive --canary-version template=$$template2$$,target-size=3 --version
       template=$$template1$$ --region us-central1 --format=disable
-  - stderr: |
-      Updated [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
-
+  - stderr: |-
+      Updated \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+      $
 - execute:
   - command: compute instance-groups managed rolling-action stop-proactive-update
       $$manager$$ --region us-central1 --format=disable
-  - stderr: |
-      Updated [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+  - stderr: |-
+      Updated \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+      $
 - execute:
   - command: compute instance-groups managed delete $$manager$$ --region us-central1
   - prompt:
@@ -53,8 +58,9 @@ summary:
         The following region instance group managers will be deleted:
          - [$$manager$$] in [us-central1]
     - input: y
-  - stderr: |
-      Deleted [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
+      $
   - progress_tracker:
     - message: Deleting Managed Instance Group
     - status: SUCCESS
@@ -65,8 +71,9 @@ summary:
         The following instance templates will be deleted:
          - [$$template1$$]
     - input: y
-  - stderr: |
-      Deleted [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+      $
 - execute:
   - command: compute instance-templates delete $$template2$$
   - prompt:
@@ -74,8 +81,9 @@ summary:
         The following instance templates will be deleted:
          - [$$template2$$]
     - input: y
-  - stderr: |
-      Deleted [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
@@ -89,7 +97,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
+          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10?alt=json
           method: GET
           headers: {}
           body: null
@@ -135,7 +143,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9
+                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10
                   mode: READ_WRITE
                   type: PERSISTENT
                 machineType: n1-standard-1
@@ -254,7 +262,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
+          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10?alt=json
           method: GET
           headers: {}
           body: null
@@ -300,7 +308,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9
+                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10
                   mode: READ_WRITE
                   type: PERSISTENT
                 machineType: f1-micro

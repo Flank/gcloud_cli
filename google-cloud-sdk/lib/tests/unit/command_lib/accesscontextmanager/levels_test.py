@@ -171,89 +171,53 @@ class LevelsTestGA(test_case.TestCase):
             description='Basic level for bar.')
     ])
 
+  def testCustomParseMissingFile(self):
+    with self.assertRaisesRegex(yaml.FileLoadError, 'Failed to load'):
+      levels.ParseCustomLevel(self.api_version)('does-not-exist.yaml')
+
+  def testCustomParseInvalidYaml(self):
+    path = self._MakeFile(':')
+    with self.assertRaisesRegex(yaml.YAMLParseError, 'Failed to parse YAML'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testCustomParseEmpty(self):
+    path = self._MakeFile('')
+    with self.assertRaisesRegex(levels.ParseError, 'File is empty'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testCustomParseValidYamlInvalidObjectEncodeError(self):
+    path = self._MakeFile('test')
+    with self.assertRaisesRegex(levels.ParseError, 'Invalid format'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testCustomParseValidYamlInvalidObjectUnrecognizedField(self):
+    path = self._MakeFile('invalid-expression: "value"')
+    with self.assertRaisesRegex(levels.ParseError,
+                                r'Unrecognized fields: \[invalid-expression\]'):
+      levels.ParseCustomLevel(self.api_version)(path)
+
+  def testParseSuccess(self):
+    path = self._MakeFile("""\
+        expression: "inIpRange(origin.ip, ['127.0.0.1/24']"
+        """)
+
+    expr = levels.ParseCustomLevel(self.api_version)(path)
+
+    self.assertEqual(
+        expr,
+        self.messages.Expr(expression="inIpRange(origin.ip, ['127.0.0.1/24']"))
+
 
 class LevelsTestBeta(LevelsTestGA):
 
   def PreSetUp(self):
     self.api_version = 'v1'
 
-  def testCustomParseMissingFile(self):
-    with self.assertRaisesRegex(yaml.FileLoadError, 'Failed to load'):
-      levels.ParseCustomLevel(self.api_version)('does-not-exist.yaml')
-
-  def testCustomParseInvalidYaml(self):
-    path = self._MakeFile(':')
-    with self.assertRaisesRegex(yaml.YAMLParseError, 'Failed to parse YAML'):
-      levels.ParseCustomLevel(self.api_version)(path)
-
-  def testCustomParseEmpty(self):
-    path = self._MakeFile('')
-    with self.assertRaisesRegex(levels.ParseError, 'File is empty'):
-      levels.ParseCustomLevel(self.api_version)(path)
-
-  def testCustomParseValidYamlInvalidObjectEncodeError(self):
-    path = self._MakeFile('test')
-    with self.assertRaisesRegex(levels.ParseError, 'Invalid format'):
-      levels.ParseCustomLevel(self.api_version)(path)
-
-  def testCustomParseValidYamlInvalidObjectUnrecognizedField(self):
-    path = self._MakeFile('invalid-expression: "value"')
-    with self.assertRaisesRegex(levels.ParseError,
-                                r'Unrecognized fields: \[invalid-expression\]'):
-      levels.ParseCustomLevel(self.api_version)(path)
-
-  def testParseSuccess(self):
-    path = self._MakeFile("""\
-        expression: "inIpRange(origin.ip, ['127.0.0.1/24']"
-        """)
-
-    expr = levels.ParseCustomLevel(self.api_version)(path)
-
-    self.assertEqual(
-        expr,
-        self.messages.Expr(expression="inIpRange(origin.ip, ['127.0.0.1/24']"))
-
 
 class LevelsTestAlpha(LevelsTestGA):
 
   def PreSetUp(self):
     self.api_version = 'v1alpha'
-
-  def testCustomParseMissingFile(self):
-    with self.assertRaisesRegex(yaml.FileLoadError, 'Failed to load'):
-      levels.ParseCustomLevel(self.api_version)('does-not-exist.yaml')
-
-  def testCustomParseInvalidYaml(self):
-    path = self._MakeFile(':')
-    with self.assertRaisesRegex(yaml.YAMLParseError, 'Failed to parse YAML'):
-      levels.ParseCustomLevel(self.api_version)(path)
-
-  def testCustomParseEmpty(self):
-    path = self._MakeFile('')
-    with self.assertRaisesRegex(levels.ParseError, 'File is empty'):
-      levels.ParseCustomLevel(self.api_version)(path)
-
-  def testCustomParseValidYamlInvalidObjectEncodeError(self):
-    path = self._MakeFile('test')
-    with self.assertRaisesRegex(levels.ParseError, 'Invalid format'):
-      levels.ParseCustomLevel(self.api_version)(path)
-
-  def testCustomParseValidYamlInvalidObjectUnrecognizedField(self):
-    path = self._MakeFile('invalid-expression: "value"')
-    with self.assertRaisesRegex(levels.ParseError,
-                                r'Unrecognized fields: \[invalid-expression\]'):
-      levels.ParseCustomLevel(self.api_version)(path)
-
-  def testParseSuccess(self):
-    path = self._MakeFile("""\
-        expression: "inIpRange(origin.ip, ['127.0.0.1/24']"
-        """)
-
-    expr = levels.ParseCustomLevel(self.api_version)(path)
-
-    self.assertEqual(
-        expr,
-        self.messages.Expr(expression="inIpRange(origin.ip, ['127.0.0.1/24']"))
 
 
 if __name__ == '__main__':

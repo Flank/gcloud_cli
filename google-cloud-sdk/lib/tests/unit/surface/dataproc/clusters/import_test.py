@@ -24,7 +24,6 @@ import os
 
 from googlecloudsdk import calliope
 
-from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core import properties
@@ -132,10 +131,14 @@ class ClustersImportUnitTestGA(ClustersImportUnitTest):
           'clusters import {0}'.format(self.CLUSTER_NAME), set_region=False)
 
   def testImportClustersInvalid(self):
+    expected_request = self.messages.Cluster(
+        projectId=self.Project(), clusterName=self.CLUSTER_NAME)
     self.WriteInput('foo: bar')
-    with self.AssertRaisesExceptionMatches(
-        exceptions.ValidationError,
-        "Additional properties are not allowed ('foo' was unexpected)"):
+    self.ExpectCreateCluster(
+        cluster=expected_request, exception=self.MakeHttpError(status_code=400))
+    # Ignores the invalid properties and passes the request for server-side
+    # validation.
+    with self.AssertRaisesHttpExceptionMatches('Invalid request'):
       self.RunDataproc('clusters import {0}'.format(self.CLUSTER_NAME))
 
   def testImportClustersHttpError(self):

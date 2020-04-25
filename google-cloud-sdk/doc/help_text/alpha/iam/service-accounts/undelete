@@ -12,7 +12,7 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      ACCOUNT_ID
         The deleted service account's unique ID must be provided when using the
-        undelete command. Unique IDs are a 22 digit number, such as
+        undelete command. Unique IDs are a 21 digit number, such as
         103271949540120710052.
 
 GCLOUD WIDE FLAGS

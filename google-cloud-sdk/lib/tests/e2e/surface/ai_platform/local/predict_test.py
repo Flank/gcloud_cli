@@ -138,7 +138,6 @@ class ScikitLearnPredictTest(base.MlGaPlatformTestBase):
 # path and it should be treated as a high-priority issue.
 @sdk_test_base.Filters.RunOnlyInBundle
 @test_case.Filters.RunOnlyIf(xgboost_available, xgboost_reason)
-@test_case.Filters.SkipOnPy3('Missing libraries', 'b/147415841')
 @parameterized.parameters('ml-engine', 'ai-platform')
 class XgboostPredictTest(base.MlGaPlatformTestBase):
   """e2e tests for ai-platform local predict command using xgboost."""

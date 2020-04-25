@@ -222,7 +222,7 @@ actions:
               - autoDelete: true
                 boot: true
                 initializeParams:
-                  sourceImage: https://$$compute-uri$$/v1/projects/debian-cloud/global/images/family/debian-9
+                  sourceImage: https://$$compute-uri$$/v1/projects/debian-cloud/global/images/family/debian-10
                 mode: READ_WRITE
                 type: PERSISTENT
               machineType: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/machineTypes/n1-standard-1
@@ -858,7 +858,7 @@ actions:
               - autoDelete: true
                 boot: true
                 initializeParams:
-                  sourceImage: https://$$compute-uri$$/v1/projects/debian-cloud/global/images/family/debian-9
+                  sourceImage: https://$$compute-uri$$/v1/projects/debian-cloud/global/images/family/debian-10
                 mode: READ_WRITE
                 type: PERSISTENT
               machineType: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/machineTypes/n1-standard-1

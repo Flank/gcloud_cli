@@ -529,7 +529,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
                             'maven_no_appyaml')
     with file_utils.TemporaryDirectory() as staging_area:
       # Create a stager with an empty staging directory.
-      stager = staging.GetBetaStager(staging_area)
+      stager = staging.GetStager(staging_area)
       # Call the staging phase:
       staging_dir = stager.Stage(
           os.path.join(app_dir, 'pom.xml'), app_dir, 'java-maven-project',
@@ -550,7 +550,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
                             'maven_with_appyaml')
     with file_utils.TemporaryDirectory() as staging_area:
       # Create a stager with an empty staging directory.
-      stager = staging.GetBetaStager(staging_area)
+      stager = staging.GetStager(staging_area)
       # Call the staging phase:
       staging_dir = stager.Stage(app_dir, app_dir, 'java-maven-project',
                                  env.STANDARD)
@@ -577,7 +577,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
                             'maven_gae_java8')
     with file_utils.TemporaryDirectory() as staging_area:
       # Create a stager with an empty staging directory.
-      stager = staging.GetBetaStager(staging_area)
+      stager = staging.GetStager(staging_area)
       with self.assertRaises(staging.MavenPomNotSupported):
         stager.Stage(app_dir, app_dir, 'java-maven-project', env.STANDARD)
 

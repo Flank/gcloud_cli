@@ -18,7 +18,8 @@ SYNOPSIS
         [--enable-cloud-monitoring] [--enable-cloud-run-alpha]
         [--enable-intra-node-visibility] [--enable-ip-alias]
         [--enable-kubernetes-alpha] [--enable-legacy-authorization]
-        [--enable-logging-monitoring-system-only] [--enable-network-policy]
+        [--enable-logging-monitoring-system-only]
+        [--enable-master-global-access] [--enable-network-policy]
         [--enable-pod-security-policy] [--enable-shielded-nodes]
         [--enable-stackdriver-kubernetes] [--enable-vertical-pod-autoscaling]
         [--image-type=IMAGE_TYPE] [--issue-client-certificate]
@@ -38,8 +39,7 @@ SYNOPSIS
         [--services-secondary-range-name=NAME]
         [--shielded-integrity-monitoring] [--shielded-secure-boot]
         [--subnetwork=SUBNETWORK] [--tags=TAG,[TAG,...]]
-        [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
-        [--workload-pool=WORKLOAD_POOL]
+        [--workload-metadata=WORKLOAD_METADATA] [--workload-pool=WORKLOAD_POOL]
         [--additional-zones=ZONE,[ZONE,...] | --node-locations=ZONE,[ZONE,...]]
         [[--enable-autoprovisioning
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
@@ -104,7 +104,7 @@ FLAGS
         HttpLoadBalancing, HorizontalPodAutoscaling. ADDON must be one of:
         HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
         NetworkPolicy, CloudRun, Istio, ApplicationManager, NodeLocalDNS,
-        GcePersistentDiskCsiDriver.
+        GcePersistentDiskCsiDriver, ConfigConnector.
 
      --allow-route-overlap
         Allows the provided cluster CIDRs to overlap with existing routes that
@@ -305,6 +305,11 @@ FLAGS
 
      --enable-logging-monitoring-system-only
         Enable Stackdriver Kubernetes system-only monitoring and logging.
+
+     --enable-master-global-access
+        Use with private clusters to allow access to the master's private
+        endpoint from any Google Cloud region or on-premises environment
+        regardless of the private cluster's region.
 
      --enable-network-policy
         Enable network policy enforcement for this cluster. If you are enabling
@@ -602,9 +607,9 @@ FLAGS
         https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create
         for examples.
 
-     --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
+     --workload-metadata=WORKLOAD_METADATA
         Type of metadata server available to pods running in the node pool.
-        WORKLOAD_METADATA_FROM_NODE must be one of:
+        WORKLOAD_METADATA must be one of:
 
          EXPOSED
             [DEPRECATED] Pods running in this node pool have access to the
@@ -642,7 +647,7 @@ FLAGS
         IAM Service Accounts, through the provided workload pool.
 
         Currently, the only accepted workload pool is the workload pool of the
-        Cloud project containing the cluster, PROJECT_NAME.svc.id.goog.
+        Cloud project containing the cluster, PROJECT_ID.svc.id.goog.
 
         For more information on Workload Identity, see
 
@@ -869,10 +874,11 @@ FLAGS
           master through HTTPS.
 
        --master-authorized-networks=NETWORK,[NETWORK,...]
-          The list of CIDR blocks (up to 50) that are allowed to connect to
-          Kubernetes master through HTTPS. Specified in CIDR notation (e.g.
-          1.2.3.4/30). Can not be specified unless
-          --enable-master-authorized-networks is also specified.
+          The list of CIDR blocks (up to 100 for private cluster, 50 for public
+          cluster) that are allowed to connect to Kubernetes master through
+          HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30). Cannot be
+          specified unless --enable-master-authorized-networks is also
+          specified.
 
      Exports cluster's usage of cloud resources
 

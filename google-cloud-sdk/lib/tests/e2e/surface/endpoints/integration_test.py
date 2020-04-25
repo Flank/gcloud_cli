@@ -61,7 +61,6 @@ def _get_docker_config(*unused_args, **kwargs):
   return old_path, False
 
 
-@test_case.Filters.skip('rate/quota issues', 'b/151331743')
 class EndpointsIntegrationTest(e2e_base.WithServiceAuth):
   """Tests basic functionality of the ServiceManagement V1 client."""
 

@@ -4,9 +4,8 @@ NAME
 SYNOPSIS
     gcloud beta ai-platform predict --model=MODEL
         (--json-instances=JSON_INSTANCES | --json-request=JSON_REQUEST
-          | --text-instances=TEXT_INSTANCES) [--region=REGION]
-        [--signature-name=SIGNATURE_NAME] [--version=VERSION]
-        [GCLOUD_WIDE_FLAG ...]
+          | --text-instances=TEXT_INSTANCES) [--signature-name=SIGNATURE_NAME]
+        [--version=VERSION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta ai-platform predict sends a prediction request to AI
@@ -62,15 +61,6 @@ REQUIRED FLAGS
           This flag accepts "-" for stdin.
 
 OPTIONAL FLAGS
-     --region=REGION
-        Google Cloud region of the regional endpoint to use for this command.
-        If unspecified, the command uses the global endpoint of the AI Platform
-        Training and Prediction API.
-
-        Learn more about regional endpoints and see a list of available
-        regions:
-        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
-
      --signature-name=SIGNATURE_NAME
         The name of the signature defined in the SavedModel to use for this
         job. Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in

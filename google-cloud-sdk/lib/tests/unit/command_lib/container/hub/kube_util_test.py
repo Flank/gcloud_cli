@@ -24,6 +24,7 @@ import argparse
 
 from googlecloudsdk.api_lib.container import kubeconfig as kconfig
 from googlecloudsdk.api_lib.container import util as c_util
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.container.hub import exclusivity_util
 from googlecloudsdk.command_lib.container.hub import kube_util
 from googlecloudsdk.core import exceptions
@@ -76,24 +77,66 @@ class MembershipCRTest(sdk_test_base.SdkBase, parameterized.TestCase):
                      exclusivity_util.GetMembershipCROwnerID(self.mock_client))
 
 
-class GKEClusterSelfLinkTest(sdk_test_base.SdkBase, parameterized.TestCase):
+class ISGKEClusterTest(sdk_test_base.SdkBase, parameterized.TestCase):
 
   def SetUp(self):
     self.mock_kubernetes_client = self.StartPatch(
         'googlecloudsdk.command_lib.container.hub.kube_util.KubernetesClient')()
 
-  def testISGKECluster(self):
+  def testWithSelfLink(self):
+    self.mock_kubernetes_client.processor.gke_cluster_self_link = 'my-gke-self-link'
+    self.assertTrue(kube_util.IsGKECluster(self.mock_kubernetes_client))
+
+  def testWithResourceField(self):
+    self.mock_kubernetes_client.processor.gke_cluster_self_link = None
     self.mock_kubernetes_client.GetResourceField.side_effect = [
         ('instance_id', None),
         ('gce://project-id/vm_zone/instance_id', None),
     ]
     self.assertTrue(kube_util.IsGKECluster(self.mock_kubernetes_client))
 
-  def testNoInstanceID(self):
+  def testNoSelfLinkNoInstanceID(self):
+    self.mock_kubernetes_client.processor.gke_cluster_self_link = False
     self.mock_kubernetes_client.GetResourceField.return_value = (None, None)
+    self.assertFalse(kube_util.IsGKECluster(self.mock_kubernetes_client))
 
-    gke_cluster_self_link = kube_util.IsGKECluster(self.mock_kubernetes_client)
-    self.assertFalse(gke_cluster_self_link)
+
+class ValidateClusterIdentifierFlags(sdk_test_base.SdkBase,
+                                     parameterized.TestCase):
+
+  def SetUp(self):
+    self.mock_kubernetes_client = self.StartPatch(
+        'googlecloudsdk.command_lib.container.hub.kube_util.KubernetesClient')()
+    self.parser = argparse.ArgumentParser()
+    self.parser.add_argument('--gke-uri')
+    self.parser.add_argument('--gke-cluster')
+    self.parser.add_argument('--context')
+
+  def testGKEURI(self):
+    self.StartObjectPatch(kube_util, 'IsGKECluster', return_value=False)
+    args = self.parser.parse_args(['--gke-uri', 'my-gke-uri'])
+    with self.assertRaisesRegex(
+        calliope_exceptions.InvalidArgumentException,
+        '(--gke-uri).*(use --context for non GKE clusters)'):
+      kube_util.ValidateClusterIdentifierFlags(self.mock_kubernetes_client,
+                                               args)
+
+  def testGKECluster(self):
+    self.StartObjectPatch(kube_util, 'IsGKECluster', return_value=False)
+    args = self.parser.parse_args(['--gke-cluster', 'my-gke-cluster'])
+    with self.assertRaisesRegex(
+        calliope_exceptions.InvalidArgumentException,
+        '(--gke-cluster).*(use --context for non GKE clusters)'):
+      kube_util.ValidateClusterIdentifierFlags(self.mock_kubernetes_client,
+                                               args)
+
+  def testNonGKECluster(self):
+    self.StartObjectPatch(kube_util, 'IsGKECluster', return_value=True)
+    args = self.parser.parse_args(['--context', 'my-context'])
+    with self.assertRaisesRegex(calliope_exceptions.InvalidArgumentException,
+                                '--context cannot be used for GKE clusters.'):
+      kube_util.ValidateClusterIdentifierFlags(self.mock_kubernetes_client,
+                                               args)
 
 
 class ClusterAdminRBACRoleTest(sdk_test_base.SdkBase, parameterized.TestCase):
@@ -663,5 +706,3 @@ class KubernetesClientWIReleaseTracksTest(
 
 if __name__ == '__main__':
   test_case.main()
-
-

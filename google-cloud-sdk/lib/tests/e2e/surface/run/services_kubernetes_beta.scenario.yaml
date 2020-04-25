@@ -37,7 +37,7 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services/$$service-name$$\?alt=json
           method: GET
           headers: {}
           body: null
@@ -64,12 +64,12 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services\?alt=json
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services\?alt=json
           method: POST
           headers: {}
           body:
             json:
-              apiVersion: serving.knative.dev/v1alpha1
+              apiVersion: serving.knative.dev/v1
               kind: Service
               metadata:
                 annotations:
@@ -88,7 +88,7 @@ actions:
             content-type: application/json
             status: '201'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/v1
             kind: Service
             metadata:
               annotations:
@@ -101,7 +101,7 @@ actions:
               name: $$service-name$$
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/$$service-name$$
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
@@ -123,7 +123,7 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services/$$service-name$$\?alt=json
           method: GET
           headers: {}
           body: null
@@ -134,7 +134,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/v1
             kind: Service
             metadata:
               annotations:
@@ -147,7 +147,7 @@ actions:
               name: $$service-name$$
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/$$service-name$$
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
@@ -198,7 +198,7 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services/$$service-name$$\?alt=json
           method: GET
           headers: {}
           body: null
@@ -209,7 +209,7 @@ actions:
             content-type: application/json
             status: '200'
           body:
-            apiVersion: serving.knative.dev/v1alpha1
+            apiVersion: serving.knative.dev/v1
             kind: Service
             metadata:
               annotations:
@@ -222,7 +222,7 @@ actions:
               name: $$service-name$$
               namespace: default
               resourceVersion: '51639050'
-              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              selfLink: /apis/serving.knative.dev/v1/namespaces/default/services/$$service-name$$
               uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
               template:
@@ -279,7 +279,7 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+            matches: https://.*/apis/serving.knative.dev/v1/namespaces/default/services/$$service-name$$\?alt=json
           method: DELETE
           headers: {}
           body: null

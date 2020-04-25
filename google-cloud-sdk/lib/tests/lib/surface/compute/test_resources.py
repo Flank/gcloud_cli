@@ -2623,6 +2623,57 @@ SNAPSHOTS = [
         status=messages.Snapshot.StatusValueValuesEnum.READY),
 ]
 
+
+def MakeInPlaceSnapshots(msgs, api):
+  """Creates a set of in-place snapshots messages for the given API version.
+
+  Args:
+    msgs: The compute messages API handle.
+    api: The API version for which to create the instances.
+
+  Returns:
+    A list of message objects representing in-place snapshots.
+  """
+  prefix = _COMPUTE_PATH + '/' + api + '/projects/my-project'
+  zone_scope = prefix + '/zones/zone-1'
+  region_scope = prefix + '/regions/region-1'
+
+  return [
+      alpha_messages.InPlaceSnapshot(
+          diskSizeGb=10,
+          name='ips-1',
+          selfLink=(zone_scope + '/inPlacesnapshots/ips-1'),
+          sourceDisk=(zone_scope + '/disks/disk-1'),
+          status=alpha_messages.InPlaceSnapshot.StatusValueValuesEnum.READY,
+          zone=zone_scope),
+      alpha_messages.InPlaceSnapshot(
+          diskSizeGb=10,
+          name='ips-2',
+          selfLink=(zone_scope + '/inPlacesnapshots/ips-2'),
+          sourceDisk=(zone_scope + '/disks/disk-2'),
+          status=alpha_messages.InPlaceSnapshot.StatusValueValuesEnum.READY,
+          zone=zone_scope),
+      alpha_messages.InPlaceSnapshot(
+          diskSizeGb=10,
+          name='ips-3',
+          selfLink=(region_scope + '/inPlacesnapshots/ips-3'),
+          sourceDisk=(region_scope + '/disks/disk-3'),
+          status=alpha_messages.InPlaceSnapshot.StatusValueValuesEnum.READY,
+          region=region_scope),
+      alpha_messages.InPlaceSnapshot(
+          diskSizeGb=10,
+          name='ips-4',
+          selfLink=(region_scope + '/inPlacesnapshots/ips-4'),
+          sourceDisk=(region_scope + '/disks/disk-4'),
+          status=alpha_messages.InPlaceSnapshot.StatusValueValuesEnum.READY,
+          region=region_scope),
+  ]
+
+
+IN_PLACE_SNAPSHOT_V1 = MakeInPlaceSnapshots(messages, 'v1')
+IN_PLACE_SNAPSHOT_BETA = MakeInPlaceSnapshots(beta_messages, 'beta')
+IN_PLACE_SNAPSHOT_ALPHA = MakeInPlaceSnapshots(alpha_messages, 'alpha')
+
 SSL_CERTIFICATES = [
     messages.SslCertificate(
         name='ssl-cert-1',

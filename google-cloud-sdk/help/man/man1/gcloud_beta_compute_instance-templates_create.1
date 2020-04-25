@@ -524,17 +524,24 @@ Enables monitoring and attestation of the boot integrity of the instance. The
 attestation is performed against the integrity policy baseline. This baseline is
 initially derived from the implicitly trusted boot image when the instance is
 created. This baseline can be updated by using
-\f5\-\-shielded\-vm\-learn\-integrity\-policy\fR.
+\f5\-\-shielded\-vm\-learn\-integrity\-policy\fR. On Shielded VMs, integrity
+monitoring is enabled by default. For information about how to modify Shielded
+VM options, see
+https://cloud.google.com/compute/docs/instances/modifying\-shielded\-vm.
 
 .TP 2m
 \fB\-\-shielded\-secure\-boot\fR
-The instance will boot with secure boot enabled.
+The instance boots with secure boot enabled. On Shielded VMs, Secure Boot is not
+enabled by default. For information about how to modify Shielded VM options, see
+https://cloud.google.com/compute/docs/instances/modifying\-shielded\-vm.
 
 .TP 2m
 \fB\-\-shielded\-vtpm\fR
-The instance will boot with the TPM (Trusted Platform Module) enabled. A TPM is
-a hardware module that can be used for different security operations such as
-remote attestation, encryption and sealing of keys.
+The instance boots with the TPM (Trusted Platform Module) enabled. A TPM is a
+hardware module that can be used for different security operations such as
+remote attestation, encryption, and sealing of keys. On Shielded VMs, vTPM is
+enabled by default. For information about how to modify Shielded VM options, see
+https://cloud.google.com/compute/docs/instances/modifying\-shielded\-vm.
 
 .TP 2m
 \fB\-\-source\-instance\fR=\fISOURCE_INSTANCE\fR
@@ -705,7 +712,7 @@ instead of an image, the latest non\-deprecated image associated with that
 family is used. It is best practice to use \f5\-\-image\-family\fR when the
 latest version of an image is needed.
 
-By default, \f5\fIdebian\-9\fR\fR is assumed for this flag.
+By default, \f5\fIdebian\-10\fR\fR is assumed for this flag.
 
 .RE
 .sp

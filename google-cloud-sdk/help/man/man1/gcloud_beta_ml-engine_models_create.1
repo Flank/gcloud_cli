@@ -11,7 +11,7 @@ gcloud beta ml\-engine models create \- create a new AI Platform model
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ml\-engine models create\fR \fIMODEL\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-console\-logging\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-regions\fR=\fIREGION\fR,[\fIREGION\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ml\-engine models create\fR \fIMODEL\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-console\-logging\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-regions\fR=\fIREGION\fR,[\fIREGION\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -61,22 +61,6 @@ only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
 
 .TP 2m
-
-At most one of these may be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-region\fR=\fIREGION\fR
-Google Cloud region of the regional endpoint to use for this command. If
-unspecified, the command uses the global endpoint of the AI Platform Training
-and Prediction API.
-
-If you specify this flag, do not specify \f5\-\-regions\fR.
-
-Learn more about regional endpoints and see a list of available regions:
-https://cloud.google.com/ai\-platform/prediction/docs/regional\-endpoints
-
-.TP 2m
 \fB\-\-regions\fR=\fIREGION\fR,[\fIREGION\fR,...]
 The Google Cloud region where the model will be deployed (currently only a
 single region is supported).
@@ -84,7 +68,6 @@ single region is supported).
 Defaults to 'us\-central1'.
 
 
-.RE
 .RE
 .sp
 

@@ -43,7 +43,7 @@ COMMANDS
         (BETA) Update Memorystore Redis instances.
 
      upgrade
-        (BETA) Upgrade a Memorystore Redis instance to a specified Redis
+        (BETA) Upgrade a Memorystore for Redis instance to a specified Redis
         version.
 
 EXAMPLES

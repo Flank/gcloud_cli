@@ -5,8 +5,9 @@ summary:
 - execute:
   - command: compute instance-templates create $$template1$$ --machine-type n1-standard-1
       --format 'text(name,properties.machineType)'
-  - stderr: |
-      Created [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+      $
   - stdout: |
       ---
       name:                   $$template1$$
@@ -14,8 +15,9 @@ summary:
 - execute:
   - command: compute instance-templates create $$template2$$ --machine-type f1-micro
       --format 'text(name,properties.machineType)'
-  - stderr: |
-      Created [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$\].
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$\].
+      $
   - stdout: |
       ---
       name:                   $$template2$$
@@ -24,8 +26,9 @@ summary:
   - command: compute instance-groups managed create $$manager$$ --zone us-central1-f
       --base-instance-name $$manager$$ --size 3 --template $$template1$$ --format
       'text(name,region,targetSize)'
-  - stderr: |
-      Created [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$\].
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$\].
+      $
   - stdout: |
       ---
       name:       $$manager$$
@@ -34,8 +37,8 @@ summary:
   - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
 - execute:
-  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
-      --format 'value(machineType)'
+  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1
+      AND name:$$manager$$' --format 'value(machineType)'
   - stdout: |
       n1-standard-1
       n1-standard-1
@@ -54,11 +57,12 @@ summary:
   - command: compute instance-groups managed rolling-action start-update $$manager$$
       --type opportunistic --version template=$$template2$$ --format=disable --zone
       us-central1-f
-  - stderr: |
-      Updated [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$\].
+  - stderr: |-
+      Updated \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$\].
+      $
 - execute:
-  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
-      --format 'value(machineType)'
+  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1
+      AND name:$$manager$$' --format 'value(machineType)'
   - stdout: |
       n1-standard-1
       n1-standard-1
@@ -76,14 +80,15 @@ summary:
 - execute:
   - command: compute instance-groups managed rolling-action restart $$manager$$ --max-unavailable=100%
       --format=disable --zone us-central1-f
-  - stderr: |
-      Updated [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$\].
+  - stderr: |-
+      Updated \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$\].
+      $
 - execute:
   - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --zone us-central1-f --no-user-output-enabled
 - execute:
-  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:f1-micro AND name:$$manager$$'
-      --format 'value(machineType)'
+  - command: compute instances list --zones '$$list_zones$$' --filter 'machineType:f1-micro
+      AND name:$$manager$$' --format 'value(machineType)'
   - stdout: |
       f1-micro
       f1-micro
@@ -108,8 +113,9 @@ summary:
         The following instance group managers will be deleted:
          - [$$manager$$] in [us-central1-f]
     - input: y
-  - stderr: |
-      Deleted [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$\].
+      $
   - progress_tracker:
     - message: Deleting Managed Instance Group
     - status: SUCCESS
@@ -120,8 +126,9 @@ summary:
         The following instance templates will be deleted:
          - [$$template1$$]
     - input: y
-  - stderr: |
-      Deleted [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
+      $
 - execute:
   - command: compute instance-templates delete $$template2$$
   - prompt:
@@ -129,8 +136,9 @@ summary:
         The following instance templates will be deleted:
          - [$$template2$$]
     - input: y
-  - stderr: |
-      Deleted [https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template2$$\].
+      $
 actions:
 - define_reference:
     reference: list_zones
@@ -147,7 +155,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
+          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10?alt=json
           method: GET
           headers: {}
           body: null
@@ -214,7 +222,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9
+                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10
                   mode: READ_WRITE
                   type: PERSISTENT
                 machineType: n1-standard-1
@@ -334,7 +342,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
+          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10?alt=json
           method: GET
           headers: {}
           body: null
@@ -401,7 +409,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9
+                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-10
                   mode: READ_WRITE
                   type: PERSISTENT
                 machineType: f1-micro
@@ -1076,8 +1084,8 @@ actions:
         code: 0
 - execute_command:
     # There should be 3 instances in this MIG with the original machine type.
-    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
-      --format 'value(machineType)'
+    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1
+      AND name:$$manager$$' --format 'value(machineType)'
     validation_only: true
     events:
     - expect_stdout: |
@@ -1277,8 +1285,8 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1 AND name:$$manager$$'
-      --format 'value(machineType)'
+    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:n1-standard-1
+      AND name:$$manager$$' --format 'value(machineType)'
     validation_only: true
     events:
     - expect_stdout: |
@@ -1498,8 +1506,8 @@ actions:
         code: 0
 - execute_command:
     # The 3 instances should have changed machine type.
-    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:f1-micro AND name:$$manager$$'
-      --format 'value(machineType)'
+    command: compute instances list --zones '$$list_zones$$' --filter 'machineType:f1-micro
+      AND name:$$manager$$' --format 'value(machineType)'
     validation_only: true
     events:
     - expect_stdout: |

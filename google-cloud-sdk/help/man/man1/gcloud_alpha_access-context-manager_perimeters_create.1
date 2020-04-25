@@ -11,7 +11,7 @@ gcloud alpha access\-context\-manager perimeters create \- create a new service 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha access\-context\-manager perimeters create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-resources\fR=[\fIRESOURCES\fR,...] \fB\-\-title\fR=\fITITLE\fR [\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR;\ default="regular"] [\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fB\-\-enable\-vpc\-accessible\-services\fR\ \fB\-\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha access\-context\-manager perimeters create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-title\fR=\fITITLE\fR [\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR;\ default="regular"] [\fB\-\-resources\fR=[\fIRESOURCES\fR,...]] [\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fB\-\-enable\-vpc\-accessible\-services\fR\ \fB\-\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -49,11 +49,6 @@ The ID of the access policy.
 .SH "REQUIRED FLAGS"
 
 .RS 2m
-.TP 2m
-\fB\-\-resources\fR=[\fIRESOURCES\fR,...]
-Comma\-separated list of resources (currently only projects, in the form
-\f5projects/<projectnumber>\fR) in this perimeter.
-
 .TP 2m
 \fB\-\-title\fR=\fITITLE\fR
 Short human\-readable title for the service perimeter.
@@ -102,6 +97,11 @@ A project may belong to at most one regular service perimeter.
 .RE
 .sp
 
+
+.TP 2m
+\fB\-\-resources\fR=[\fIRESOURCES\fR,...]
+Comma\-separated list of resources (currently only projects, in the form
+\f5projects/<projectnumber>\fR) in this perimeter.
 
 .TP 2m
 \fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]

@@ -106,7 +106,6 @@ class CompletionCacheTest(core_completer_test_base.CoreCompleterBase):
                      table.modified, int(table.restricted)))
     return sorted(tables)
 
-  @test_case.Filters.SkipOnWindows('winerror 32 on TearDown', 'b/24905560')
   def testCacheNoCreateNotFound(self):
     self.DeleteCache()
     with self.assertRaisesRegex(
@@ -426,7 +425,6 @@ class CompletionCacheTest(core_completer_test_base.CoreCompleterBase):
          ('test.project.zone.ace', 2, 2, 1, 12345680, 0)],
         self.GetTableList())
 
-  @test_case.Filters.SkipOnWindows('winerror 32 on TearDown', 'b/24905560')
   def testCacheCompleterRowToTemplate(self):
     completer = ZeroRequiredResourceCompleter(cache=self.cache)
 
@@ -448,4 +446,4 @@ class CompletionCacheTest(core_completer_test_base.CoreCompleterBase):
 
 
 if __name__ == '__main__':
-  core_completer_test_base.main()
+  test_case.main()

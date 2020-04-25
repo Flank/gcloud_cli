@@ -60,6 +60,8 @@ class StorageUtilsTest(sdk_test_base.WithFakeAuth):
     self.client.buckets.Insert.Expect(
         request=self.messages.StorageBucketsInsertRequest(
             project='foo',
+            predefinedDefaultObjectAcl=self.messages.StorageBucketsInsertRequest
+            .PredefinedDefaultObjectAclValueValuesEnum.publicRead,
             bucket=self.messages.Bucket(
                 name=expected_bucket_name,
                 location='us-west1',

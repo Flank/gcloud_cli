@@ -8,6 +8,11 @@ summary:
     - message: You are about to delete endpoint config selector [myecs]
     - input: y
   - stderr: |
+      Delete request issued for: [myecs]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
       Deleted endpoint config selector [myecs].
 actions:
 - execute_command:
@@ -17,6 +22,7 @@ actions:
         message: You are about to delete endpoint config selector [myecs]
         user_input: y
     - api_call:
+        poll_operation: true
         expect_request:
           uri: https://networkservices.googleapis.com/v1alpha1/projects/fake-project/locations/global/endpointConfigSelectors/myecs?alt=json
           method: DELETE
@@ -27,7 +33,26 @@ actions:
             status: '200'
           body: |
             {
+              "name": "projects/fake-project/locations/global/operations/operation-1586452654466-5a2decaec2553-bec03e43-d4e7b5a9",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.networkservices.v1alpha1.OperationMetadata",
+                "createTime": "2020-04-09T17:17:34.517846126Z",
+                "endTime": "2020-04-09T17:17:35.351450770Z",
+                "target": "projects/fake-project/locations/global/endponitConfigSelectors/myecs",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
             }
+    - expect_stderr: |
+        Delete request issued for: [myecs]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
     - expect_stderr: |
         Deleted endpoint config selector [myecs].
     - expect_exit:

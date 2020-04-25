@@ -91,6 +91,19 @@ def ExecutePythonTool(tool_dir, exec_name, *args):
     if bq_py:
       py_path = bq_py
 
+  if exec_name == 'dev_appserver.py':
+    # Hard code the python to 'python2' which should exist on most Unix based
+    # systems, on windows let python be discovered in execution_utils
+    if platforms.OperatingSystem.Current() != platforms.OperatingSystem.WINDOWS:
+      py_path = 'python2'
+
+    # Set this ENV var if python2 is not the name of the python2 binary on the
+    # system.
+    devapp_env_py = encoding.GetEncodedValue(os.environ,
+                                             'CLOUDSDK_DEVAPPSERVER_PYTHON')
+    if devapp_env_py:
+      py_path = devapp_env_py
+
   _ExecuteTool(
       execution_utils.ArgsForPythonTool(
           _FullPath(tool_dir, exec_name), *args, python=py_path))

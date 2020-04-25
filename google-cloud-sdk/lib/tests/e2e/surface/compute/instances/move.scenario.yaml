@@ -3,9 +3,10 @@ release_tracks: [GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: compute instances create $$instance$$ --zone us-central1-f
-  - stderr: |
-      Created [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+  - command: compute instances create $$instance$$ --zone us-central1-f --image-family debian-9 --image-project debian-cloud
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
   - stdout: .*$$instance$$.*us-central1-f.*n1-standard-1.*RUNNING.*$
 - execute:
   - command: compute instances move $$instance$$ --zone us-central1-f --destination-zone
@@ -26,8 +27,9 @@ summary:
         The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
          - [$$instance$$] in [us-central1-a]
     - input: y
-  - stderr: |
-      Deleted [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance$$\].
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
@@ -37,14 +39,14 @@ actions:
     prefix: gcloud-compute-instance-move-test
 
 - execute_command:
-    command: compute instances create $$instance$$ --zone us-central1-f
+    command: compute instances create $$instance$$ --zone us-central1-f --image-family debian-9 --image-project debian-cloud
     events:
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -71,7 +73,7 @@ actions:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           omit_fields:
           - commonInstanceMetadata
@@ -160,7 +162,7 @@ actions:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -272,7 +274,7 @@ actions:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance$$?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private, max-age=0, must-revalidate, no-transform
@@ -365,7 +367,7 @@ actions:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance$$?alt=json
           method: DELETE
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             Cache-Control: private, max-age=0

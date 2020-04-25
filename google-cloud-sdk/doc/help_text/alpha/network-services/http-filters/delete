@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha network-services http-filters delete
-        (HTTP_FILTER : --location=LOCATION) [GCLOUD_WIDE_FLAG ...]
+        (HTTP_FILTER : --location=LOCATION) [--async] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Delete the specified http filter.
@@ -24,6 +24,11 @@ POSITIONAL ARGUMENTS
 
        --location=LOCATION
           The location Id.
+
+FLAGS
+     --async
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

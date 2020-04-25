@@ -16,12 +16,6 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
-GROUPS
-    GROUP is one of the following:
-
-     multiclusteringress
-        (ALPHA) Manage MultiClusterIngress Feature.
-
 EXAMPLES
     Manage features on all Hub memberships(registered clusters):
 

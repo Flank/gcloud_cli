@@ -18,47 +18,18 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import os
-import textwrap
 
 from googlecloudsdk.command_lib.auth import auth_util
 from googlecloudsdk.core import config
 from googlecloudsdk.core.credentials import creds
 from tests.lib import cli_test_base
+from tests.lib.core.credentials import credentials_test_base
+
+from google.auth import crypt as google_auth_crypt
 
 
-def _GetJsonUserADC():
-  return textwrap.dedent("""\
-      {
-        "client_id": "foo.apps.googleusercontent.com",
-        "client_secret": "file-secret",
-        "refresh_token": "file-token",
-        "type": "authorized_user"
-      }""")
-
-
-def _GetJsonServiceADC():
-  return textwrap.dedent("""\
-      {
-        "client_email": "bar@developer.gserviceaccount.com",
-        "client_id": "bar.apps.googleusercontent.com",
-        "private_key": "-----BEGIN PRIVATE KEY-----\\nasdf\\n-----END PRIVATE KEY-----\\n",
-        "private_key_id": "key-id",
-        "type": "service_account"
-      }""")
-
-
-def _GetJsonUserExtendedADC():
-  return textwrap.dedent("""\
-      {
-        "client_id": "foo.apps.googleusercontent.com",
-        "client_secret": "file-secret",
-        "quota_project_id": "fake-project",
-        "refresh_token": "file-token",
-        "type": "authorized_user"
-      }""")
-
-
-class TestAuthUtils(cli_test_base.CliTestBase):
+class TestAuthUtils(cli_test_base.CliTestBase,
+                    credentials_test_base.CredentialsTestBase):
 
   def SetUp(self):
     self.adc_file_path = os.path.join(self.temp_path,
@@ -68,22 +39,44 @@ class TestAuthUtils(cli_test_base.CliTestBase):
     self.StartObjectPatch(
         config, 'ADCFilePath', return_value=self.adc_file_path)
     self.StartPatch('oauth2client.crypt.Signer', autospec=True)
+    self.StartObjectPatch(creds, 'GetQuotaProject', return_value='my project')
+
+    # Mocks the signer of google-auth credentials.
+    self.StartObjectPatch(google_auth_crypt.RSASigner,
+                          'from_service_account_info')
 
   def testWriteGcloudCredentialsToADC_UserCreds(self):
-    auth_util.WriteGcloudCredentialsToADC(creds.FromJson(_GetJsonUserADC()))
+    auth_util.WriteGcloudCredentialsToADC(
+        creds.FromJson(self.USER_CREDENTIALS_JSON))
     self.AssertErrEquals('')
-    self.AssertFileEquals(_GetJsonUserADC(), self.adc_file_path)
+    self.AssertFileEquals(self.USER_CREDENTIALS_JSON, self.adc_file_path)
+    self.mock_prompt.assert_called()
+
+  def testWriteGcloudCredentialsToADC_GoogleAuthUserCreds(self):
+    auth_util.WriteGcloudCredentialsToADC(
+        self.MakeUserAccountCredentialsGoogleAuth())
+    self.AssertErrEquals('')
+    self.AssertFileEquals(self.USER_CREDENTIALS_JSON, self.adc_file_path)
     self.mock_prompt.assert_called()
 
   def testWriteGcloudCredentialsToADC_UserCredsWithQuotaProject(self):
     auth_util.WriteGcloudCredentialsToADC(
-        creds.FromJson(_GetJsonUserADC()), add_quota_project=True)
+        creds.FromJson(self.USER_CREDENTIALS_JSON), add_quota_project=True)
     self.AssertErrEquals('')
-    self.AssertFileEquals(_GetJsonUserExtendedADC(), self.adc_file_path)
+    self.AssertFileEquals(self.EXTENDED_USER_CREDENTIALS_JSON,
+                          self.adc_file_path)
     self.mock_prompt.assert_called()
 
   def testWriteGcloudCredentialsToADC_ServiceCreds(self):
-    auth_util.WriteGcloudCredentialsToADC(creds.FromJson(_GetJsonServiceADC()))
+    auth_util.WriteGcloudCredentialsToADC(
+        creds.FromJson(self.SERVICE_ACCOUNT_CREDENTIALS_JSON))
+    self.AssertErrContains('Credentials cannot be written')
+    self.AssertFileNotExists(self.adc_file_path)
+    self.mock_prompt.assert_not_called()
+
+  def testWriteGcloudCredentialsToADC_GoogleAuthServiceCreds(self):
+    auth_util.WriteGcloudCredentialsToADC(
+        self.MakeServiceAccountCredentialsGoogleAuth())
     self.AssertErrContains('Credentials cannot be written')
     self.AssertFileNotExists(self.adc_file_path)
     self.mock_prompt.assert_not_called()
@@ -92,9 +85,19 @@ class TestAuthUtils(cli_test_base.CliTestBase):
     self.assertIsNone(auth_util.GetQuotaProjectFromADC())
 
   def testGetQuotaProjectFromADC_NoQuotaProject(self):
-    creds.ADC(creds.FromJson(_GetJsonUserADC())).DumpADCToFile()
+    creds.ADC(creds.FromJson(self.USER_CREDENTIALS_JSON)).DumpADCToFile()
+    self.assertIsNone(auth_util.GetQuotaProjectFromADC())
+
+  def testGetQuotaProjectFromADC_GoogleAuthNoQuotaProject(self):
+    creds.ADC(self.MakeUserAccountCredentialsGoogleAuth()).DumpADCToFile()
     self.assertIsNone(auth_util.GetQuotaProjectFromADC())
 
   def testGetQuotaProjectFromADC_QuotaProjectExists(self):
-    creds.ADC(creds.FromJson(_GetJsonUserADC())).DumpExtendedADCToFile()
-    self.assertEqual(auth_util.GetQuotaProjectFromADC(), 'fake-project')
+    creds.ADC(creds.FromJson(
+        self.USER_CREDENTIALS_JSON)).DumpExtendedADCToFile()
+    self.assertEqual(auth_util.GetQuotaProjectFromADC(), 'my project')
+
+  def testGetQuotaProjectFromADC_GoogleAuthQuotaProjectExists(self):
+    creds.ADC(
+        self.MakeUserAccountCredentialsGoogleAuth()).DumpExtendedADCToFile()
+    self.assertEqual(auth_util.GetQuotaProjectFromADC(), 'my project')

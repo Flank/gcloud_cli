@@ -22,6 +22,7 @@ import datetime
 import os
 
 from googlecloudsdk.core.credentials import creds as c_creds
+from googlecloudsdk.core.credentials import reauth
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.core.credentials import credentials_test_base
@@ -30,7 +31,6 @@ from oauth2client import client
 from oauth2client import crypt
 from oauth2client import service_account
 from google.auth import crypt as google_auth_crypt
-from google.oauth2 import credentials
 from google.oauth2 import service_account as google_auth_aservice_account
 
 
@@ -39,7 +39,7 @@ def _MakeEmptyUserCredentialsOauth2client():
 
 
 def _MakeEmptyUserCredentialsGoogleAuth():
-  return credentials.Credentials(None)
+  return reauth.UserCredWithReauth(None)
 
 
 def _MakeEmptyServiceAccountCredentialsOauth2client():
@@ -82,7 +82,7 @@ class AccessTokenStoreTests(sdk_test_base.SdkBase,
                             credentials_test_base.CredentialsTestBase):
   """Tests for AccessTokenStore and AccessTokenStoreGoogleAuth.
 
-  This class tests the interoperations between the AccessTokenStore and the
+  This class tests the inter-operations between the AccessTokenStore and the
   AccessTokenStoreGoogleAuth and covers the following 4 cases,
   1. Puts via AccessTokenStore and gets via AccessTokenStore: an example of
      this case is, the cache is first populated by the refresh of oauth2client
@@ -129,11 +129,11 @@ class AccessTokenStoreTests(sdk_test_base.SdkBase,
                           expected_creds_got_dict, empty_creds_builder):
     """Tests interoperations of AccessTokenStore and AccessTokenStoreGoogleAuth.
 
-    This test run through the following steps:
+    This test runs through the following steps:
     1. Creates store_get for getting credentials. Gets credentials from the
        empty cache and verifies the returned credentials are empty.
     2. Creates store_put for putting credentials. Puts creds_put into the cache.
-    3. Gets credetnails from the cache which is populated in step 2 and verifies
+    3. Gets credentials from the cache which is populated in step 2 and verifies
        the returned credentials matches the expected values.
     4. Deletes the credentials from the cache. Gets credentials from the empty
        cache and verifies the returned credentials are empty.
@@ -234,10 +234,73 @@ class AccessTokenStoreTests(sdk_test_base.SdkBase,
         'token': 'access-token',
         'expiry': datetime.datetime(2001, 2, 3, 14, 15, 16),
         'rapt_token': 'rapt_token5',
+        'id_token': 'id-token',
         'id_tokenb64': 'id-token',
     }
     empty_creds_builder = _MakeEmptyUserCredentialsGoogleAuth
 
+    self.TestStoreOperations(store_put_builder, store_get_builder, creds_put,
+                             expected_creds_got_dict, empty_creds_builder)
+
+  def testStoreViaAccessTokenStoreGoogleAuth_LoadViaAccessTokenStore_UserCreds(
+      self):
+    store_put_builder = c_creds.AccessTokenStoreGoogleAuth
+    store_get_builder = c_creds.AccessTokenStore
+    empty_creds_builder = _MakeEmptyUserCredentialsOauth2client
+
+    creds_put = self.MakeUserAccountCredentialsGoogleAuth()
+    expected_creds_got_dict = {
+        'access_token': None,
+        'token_expiry': datetime.datetime(2001, 2, 3, 14, 15, 16),
+        'rapt_token': None,
+        'id_tokenb64': None
+    }
+    self.TestStoreOperations(store_put_builder, store_get_builder, creds_put,
+                             expected_creds_got_dict, empty_creds_builder)
+
+    creds_put = self.MakeUserAccountCredentialsGoogleAuth()
+    creds_put.token = 'access-token'
+    creds_put.expiry = datetime.datetime(2001, 2, 3, 14, 15, 16)
+    creds_put._rapt_token = 'rapt-token'
+    creds_put._id_token = 'id-token'
+
+    expected_creds_got_dict = {
+        'access_token': 'access-token',
+        'token_expiry': datetime.datetime(2001, 2, 3, 14, 15, 16),
+        'rapt_token': 'rapt-token',
+        'id_tokenb64': 'id-token'
+    }
+    self.TestStoreOperations(store_put_builder, store_get_builder, creds_put,
+                             expected_creds_got_dict, empty_creds_builder)
+
+  def testStoreViaAccessTokenStoreGoogleAuth_LoadViaAccessTokenStoreGoogleAuth_UserCreds(  # pylint: disable=line-too-long
+      self):
+    store_put_builder = c_creds.AccessTokenStoreGoogleAuth
+    store_get_builder = c_creds.AccessTokenStoreGoogleAuth
+    empty_creds_builder = _MakeEmptyUserCredentialsGoogleAuth
+
+    creds_put = self.MakeUserAccountCredentialsGoogleAuth()
+    expected_creds_got_dict = {
+        'token': None,
+        'expiry': datetime.datetime(2001, 2, 3, 14, 15, 16),
+        'rapt_token': None,
+        'id_token': None,
+    }
+    self.TestStoreOperations(store_put_builder, store_get_builder, creds_put,
+                             expected_creds_got_dict, empty_creds_builder)
+
+    creds_put = self.MakeUserAccountCredentialsGoogleAuth()
+    creds_put.token = 'access-token'
+    creds_put.expiry = datetime.datetime(2001, 2, 3, 14, 15, 16)
+    creds_put._rapt_token = 'rapt-token'
+    creds_put._id_token = 'id-token'
+
+    expected_creds_got_dict = {
+        'token': 'access-token',
+        'expiry': datetime.datetime(2001, 2, 3, 14, 15, 16),
+        'rapt_token': 'rapt-token',
+        'id_token': 'id-token'
+    }
     self.TestStoreOperations(store_put_builder, store_get_builder, creds_put,
                              expected_creds_got_dict, empty_creds_builder)
 

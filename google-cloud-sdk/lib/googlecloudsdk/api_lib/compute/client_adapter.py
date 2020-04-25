@@ -49,9 +49,9 @@ class ClientAdapter(object):
   """Encapsulates compute apitools interactions."""
   _API_NAME = 'compute'
 
-  def __init__(self, api_default_version='v1', no_http=False, client=None):
-    self._api_version = core_apis.ResolveVersion(self._API_NAME,
-                                                 api_default_version)
+  def __init__(self, api_version=None, no_http=False, client=None):
+    self._api_version = core_apis.ResolveVersion(
+        self._API_NAME, api_version=api_version)
     self._client = client or core_apis.GetClientInstance(
         self._API_NAME, self._api_version, no_http=no_http)
 
@@ -82,7 +82,8 @@ class ClientAdapter(object):
                    errors_to_collect=None,
                    progress_tracker=None,
                    followup_overrides=None,
-                   log_result=True):
+                   log_result=True,
+                   timeout=None):
     """Sends given request in batch mode."""
     errors = errors_to_collect if errors_to_collect is not None else []
     objects = list(
@@ -93,7 +94,8 @@ class ClientAdapter(object):
             errors=errors,
             progress_tracker=progress_tracker,
             followup_overrides=followup_overrides,
-            log_result=log_result))
+            log_result=log_result,
+            timeout=timeout))
     if errors_to_collect is None and errors:
       utils.RaiseToolException(
           errors, error_message='Could not fetch resource:')

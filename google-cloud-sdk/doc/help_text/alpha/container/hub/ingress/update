@@ -1,0 +1,30 @@
+NAME
+    gcloud alpha container hub ingress update - update MultiClusterIngress
+        Feature
+
+SYNOPSIS
+    gcloud alpha container hub ingress update
+        [--config-membership=CONFIG_MEMBERSHIP] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command updates MultiClusterIngress Feature in Hub.
+
+FLAGS
+     --config-membership=CONFIG_MEMBERSHIP
+        Membership resource representing the cluster which hosts the
+        MultiClusterIngress and MultiClusterService CustomResourceDefinitions.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

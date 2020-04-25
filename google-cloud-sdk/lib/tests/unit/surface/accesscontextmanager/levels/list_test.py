@@ -58,7 +58,7 @@ class LevelsListTestGA(accesscontextmanager.Base):
     return combined_list
 
   def _MakeLevelsPerTrack(self):
-    return self._MakeLevels(basic_num=3, custom_num=0)
+    return self._MakeLevels(basic_num=3, custom_num=3)
 
   def _ExpectList(self, levels, policy):
     policy_name = 'accessPolicies/{}'.format(policy)
@@ -102,6 +102,9 @@ class LevelsListTestGA(accesscontextmanager.Base):
         level0  My level #0  Basic
         level1  My level #1  Basic
         level2  My level #2  Basic
+        customlevel0  My custom level #0  Custom
+        customlevel1  My custom level #1  Custom
+        customlevel2  My custom level #2  Custom
         """,
         normalize_space=True)
 
@@ -120,58 +123,12 @@ class LevelsListTestBeta(LevelsListTestGA):
     self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
-  def _MakeLevelsPerTrack(self):
-    return self._MakeLevels(basic_num=3, custom_num=3)
-
-  def testList_Format(self):
-    self.SetUpForAPI(self.api_version)
-    properties.VALUES.core.user_output_enabled.Set(True)
-    levels = self._MakeLevelsPerTrack()
-    self._ExpectList(levels, '123')
-
-    self.Run('access-context-manager levels list --policy 123')
-
-    self.AssertOutputEquals(
-        """\
-        NAME    TITLE        LEVEL_TYPE
-        level0  My level #0  Basic
-        level1  My level #1  Basic
-        level2  My level #2  Basic
-        customlevel0  My custom level #0  Custom
-        customlevel1  My custom level #1  Custom
-        customlevel2  My custom level #2  Custom
-        """,
-        normalize_space=True)
-
 
 class LevelsListTestAlpha(LevelsListTestGA):
 
   def PreSetUp(self):
     self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def _MakeLevelsPerTrack(self):
-    return self._MakeLevels(basic_num=3, custom_num=3)
-
-  def testList_Format(self):
-    self.SetUpForAPI(self.api_version)
-    properties.VALUES.core.user_output_enabled.Set(True)
-    levels = self._MakeLevelsPerTrack()
-    self._ExpectList(levels, '123')
-
-    self.Run('access-context-manager levels list --policy 123')
-
-    self.AssertOutputEquals(
-        """\
-        NAME    TITLE        LEVEL_TYPE
-        level0  My level #0  Basic
-        level1  My level #1  Basic
-        level2  My level #2  Basic
-        customlevel0  My custom level #0  Custom
-        customlevel1  My custom level #1  Custom
-        customlevel2  My custom level #2  Custom
-        """,
-        normalize_space=True)
 
 
 if __name__ == '__main__':

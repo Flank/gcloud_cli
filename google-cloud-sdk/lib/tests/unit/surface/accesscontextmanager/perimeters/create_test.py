@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 from six import text_type
@@ -55,13 +54,6 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
         m.AccesscontextmanagerAccessPoliciesServicePerimetersGetRequest)
     self.client.accessPolicies_servicePerimeters.Get.Expect(
         get_req_type(name=perimeter.name), perimeter)
-
-  def testCreate_MissingRequired(self):
-    self.SetUpForAPI(self.api_version)
-    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
-                                           'Must be specified'):
-      self.Run('access-context-manager perimeters create my_perimeter '
-               '    --policy 123 --title "My Title"')
 
   def testCreate(self):
     self.SetUpForAPI(self.api_version)

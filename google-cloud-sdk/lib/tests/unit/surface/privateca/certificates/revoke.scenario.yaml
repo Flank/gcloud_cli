@@ -6,12 +6,16 @@ summary:
 - execute:
   - command: |
       privateca certificates revoke --certificate my-cert --issuer my-ca --issuer-location europe-west1
-  - stdout: |
+  - stderr: |
+      Publishing a new Certificate Revocation List.
+  - stderr: |
       Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
 - execute:
   - command: |
       privateca certificates revoke --serial-number FFF --issuer-location europe-west1 --issuer my-ca --reason key-compromise
-  - stdout: |
+  - stderr: |
+      Publishing a new Certificate Revocation List.
+  - stderr: |
       Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
 - execute:
   - command: |
@@ -44,7 +48,33 @@ actions:
                 revocationState: REVOCATION_REASON_UNSPECIFIED
                 revocationTime: '2020-04-17T15:14:00.105-07:00'
               name: projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
-    - expect_stdout: |
+    - expect_stderr: |
+        Publishing a new Certificate Revocation List.
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities/my-ca:publishCrl?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            pem_crl: |
+              -----BEGIN X509 CRL-----
+              MIICBDCBuQIBATBBBgkqhkiG9w0BAQowNKAPMA0GCWCGSAFlAwQCAQUAoRwwGgYJ
+              KoZIhvcNAQEIMA0GCWCGSAFlAwQCAQUAogMCASAwIDEPMA0GA1UEChMGR29vZ2xl
+              MQ0wCwYDVQQDEwRSb290Fw0yMDA0MTQyMTU1MDBaFw0yMDA0MjEyMTU1MDBaMACg
+              LzAtMAoGA1UdFAQDAgECMB8GA1UdIwQYMBaAFBWapWnbMp3mpRESFwBhvDmbzF2g
+              MEEGCSqGSIb3DQEBCjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgw
+              DQYJYIZIAWUDBAIBBQCiAwIBIAOCAQEAvrhNWeaKuqA9NzAjp55u8cUNQaCSIZ+T
+              mqxZGqmMjvUyv6tD4DbTYYY9hw12GMol5RF0/BM7wSq+pM75CYyE+uImw2reHzpd
+              RuHRbjERkwT3JlKqZTPGQlZyRAQVxlLlCfH5qNeUWODoRNqUcKYf0OKknY743mQc
+              QjhAm1aZwEoRTMsmjIQPT3fcyV8yoBpUBGs3QKZPkwH1zbaJYi8IuROL2GRH8Wx/
+              ula+ns96xSpZ+0a1RUvMrn+EY6V14YYxZyi4Kx/WpwJExF9DljRe2GE9hI00PyP8
+              SJQxJwdlkqSaaME2DkivdOayC90WFQ+YZkI4r5uLt60muPWMsLvkrg==
+              -----END X509 CRL-----
+    - expect_stderr: |
         Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
     - expect_exit:
         code: 0
@@ -86,7 +116,33 @@ actions:
                 revocationState: KEY_COMPROMISE
                 revocationTime: '2020-04-17T15:14:00.105-07:00'
               name: projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert
-    - expect_stdout: |
+    - expect_stderr: |
+        Publishing a new Certificate Revocation List.
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/europe-west1/certificateAuthorities/my-ca:publishCrl?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            pem_crl: |
+              -----BEGIN X509 CRL-----
+              MIICBDCBuQIBATBBBgkqhkiG9w0BAQowNKAPMA0GCWCGSAFlAwQCAQUAoRwwGgYJ
+              KoZIhvcNAQEIMA0GCWCGSAFlAwQCAQUAogMCASAwIDEPMA0GA1UEChMGR29vZ2xl
+              MQ0wCwYDVQQDEwRSb290Fw0yMDA0MTQyMTU1MDBaFw0yMDA0MjEyMTU1MDBaMACg
+              LzAtMAoGA1UdFAQDAgECMB8GA1UdIwQYMBaAFBWapWnbMp3mpRESFwBhvDmbzF2g
+              MEEGCSqGSIb3DQEBCjA0oA8wDQYJYIZIAWUDBAIBBQChHDAaBgkqhkiG9w0BAQgw
+              DQYJYIZIAWUDBAIBBQCiAwIBIAOCAQEAvrhNWeaKuqA9NzAjp55u8cUNQaCSIZ+T
+              mqxZGqmMjvUyv6tD4DbTYYY9hw12GMol5RF0/BM7wSq+pM75CYyE+uImw2reHzpd
+              RuHRbjERkwT3JlKqZTPGQlZyRAQVxlLlCfH5qNeUWODoRNqUcKYf0OKknY743mQc
+              QjhAm1aZwEoRTMsmjIQPT3fcyV8yoBpUBGs3QKZPkwH1zbaJYi8IuROL2GRH8Wx/
+              ula+ns96xSpZ+0a1RUvMrn+EY6V14YYxZyi4Kx/WpwJExF9DljRe2GE9hI00PyP8
+              SJQxJwdlkqSaaME2DkivdOayC90WFQ+YZkI4r5uLt60muPWMsLvkrg==
+              -----END X509 CRL-----
+    - expect_stderr: |
         Revoked certificate [projects/foo/locations/europe-west1/certificateAuthorities/my-ca/certificates/my-cert] at 2020-04-17T15:14:00.105-07:00.
     - expect_exit:
         code: 0

@@ -52,7 +52,7 @@ class OrgSecurityPoliciesAssociationsCreateBetaTest(sdk_test_base.WithFakeAuth,
     return self.messages.Operation(
         name=operation_name,
         status=status,
-        selfLink='https://compute.googleapis.com/compute/{0}/projects/locations/'
+        selfLink='https://compute.googleapis.com/compute/{0}/locations/'
         'global/operations/{1}'.format(self.api_version, operation_name),
         targetLink=resource_uri)
 
@@ -77,7 +77,7 @@ class OrgSecurityPoliciesAssociationsCreateBetaTest(sdk_test_base.WithFakeAuth,
         self._GetOperationMessage(
             operation_name='org-12345-operation-myop',
             status=self.messages.Operation.StatusValueValuesEnum.DONE,
-            resource_uri='https://compute.googleapis.com/compute/{0}/projects/'
+            resource_uri='https://compute.googleapis.com/compute/{0}/'
             'locations/global/securityPolicies/{1}'.format(
                 self.api_version, '12345678910')))
     self.mock_client.organizationSecurityPolicies.Get.Expect(

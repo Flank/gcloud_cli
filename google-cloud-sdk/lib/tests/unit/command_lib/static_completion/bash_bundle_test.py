@@ -23,13 +23,10 @@ import os
 from googlecloudsdk.core import config
 from googlecloudsdk.core import execution_utils
 from tests.lib import sdk_test_base
-from tests.lib import test_case
 
 
-@test_case.Filters.SkipOnWindows('Need to enable completion tests on Windows',
-                                 'b/24905560')
-# requires gcloud to run
-@sdk_test_base.Filters.RunOnlyInBundle
+@sdk_test_base.Filters.RunOnlyInBundle  # requires gcloud installation to run
+@sdk_test_base.Filters.DoNotRunOnWindows('This tests a Linux shell script.')
 class CompletionBundle(sdk_test_base.BundledBase):
   """Bundle tests to ensure completion_test.sh script works in a bundle."""
 

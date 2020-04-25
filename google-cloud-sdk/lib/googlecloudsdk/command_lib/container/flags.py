@@ -1003,11 +1003,13 @@ internet (0.0.0.0/0) is allowed to connect to Kubernetes master through HTTPS.
       '--master-authorized-networks',
       type=arg_parsers.ArgList(min_length=1),
       metavar='NETWORK',
-      help='The list of CIDR blocks (up to {max}) that are allowed to connect '
+      help='The list of CIDR blocks (up to {max_private} for private cluster, '
+      '{max_public} for public cluster) that are allowed to connect '
       'to Kubernetes master through HTTPS. Specified in CIDR notation (e.g. '
-      '1.2.3.4/30). Can not be specified unless '
+      '1.2.3.4/30). Cannot be specified unless '
       '`--enable-master-authorized-networks` is also specified.'.format(
-          max=api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS))
+          max_private=api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS_PRIVATE,
+          max_public=api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS_PUBLIC))
 
 
 def AddNetworkPolicyFlags(parser, hidden=False):
@@ -1615,8 +1617,8 @@ CPU platform selection is available only in selected zones.
       '--min-cpu-platform', metavar='PLATFORM', hidden=hidden, help=help_text)
 
 
-def AddWorkloadMetadataFromNodeFlag(parser, use_mode=True):
-  """Adds the --workload-metadata-from-node flag to the parser.
+def AddWorkloadMetadataFlag(parser, use_mode=True):
+  """Adds the --workload-metadata flag to the parser.
 
   Args:
     parser: A given parser.
@@ -1657,8 +1659,16 @@ def AddWorkloadMetadataFromNodeFlag(parser, use_mode=True):
     })
 
   parser.add_argument(
+      '--workload-metadata',
+      default=None,
+      choices=choices,
+      type=lambda x: x.upper(),
+      help='Type of metadata server available to pods running in the node pool.'
+  )
+  parser.add_argument(
       '--workload-metadata-from-node',
       default=None,
+      hidden=True,
       choices=choices,
       type=lambda x: x.upper(),
       help='Type of metadata server available to pods running in the node pool.'
@@ -2118,7 +2128,7 @@ When enabled, Kubernetes service accounts will be able to act as Cloud IAM
 Service Accounts, through the provided workload pool.
 
 Currently, the only accepted workload pool is the workload pool of
-the Cloud project containing the cluster, `PROJECT_NAME.svc.id.goog`.
+the Cloud project containing the cluster, `PROJECT_ID.svc.id.goog`.
 
 For more information on Workload Identity, see
 
@@ -2136,7 +2146,7 @@ When enabled, Kubernetes service accounts will be able to act as Cloud IAM
 Service Accounts, through the provided identity namespace.
 
 Currently, the only accepted identity namespace is the identity namespace of
-the Cloud project containing the cluster, `PROJECT_NAME.svc.id.goog`.
+the Cloud project containing the cluster, `PROJECT_ID.svc.id.goog`.
 
 For more information on Workload Identity, see
 
@@ -2937,7 +2947,6 @@ private cluster's region.
       '--enable-master-global-access',
       help=help_text,
       default=None,
-      hidden=True,
       action='store_true')
 
 

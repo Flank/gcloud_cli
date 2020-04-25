@@ -32,7 +32,7 @@ class LevelsReplaceAllTest(accesscontextmanager.Base):
 
   def PreSetUp(self):
     self.api_version = 'v1'
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -173,6 +173,13 @@ class LevelsReplaceAllTestAlpha(LevelsReplaceAllTest):
   def PreSetUp(self):
     self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class LevelsReplaceAllTestBeta(LevelsReplaceAllTest):
+
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

@@ -137,8 +137,8 @@ LOCAL_SSD_INCORRECT_FORMAT_ERROR_MSG = """\
 Invalid local SSD format [{err_format}] for argument --local-ssd-volumes. Valid formats are fs, block
 """
 
-UNKNOWN_WORKLOAD_METADATA_FROM_NODE_ERROR_MSG = """\
-Invalid option '{option}' for '--workload-metadata-from-node' (must be one of 'gce_metadata', 'gke_metadata').
+UNKNOWN_WORKLOAD_METADATA_ERROR_MSG = """\
+Invalid option '{option}' for '--workload-metadata' (must be one of 'gce_metadata', 'gke_metadata').
 """
 
 ALLOW_ROUTE_OVERLAP_WITHOUT_EXPLICIT_NETWORK_MODE = """\
@@ -239,7 +239,8 @@ MAX_NODES_PER_POOL = 1000
 
 MAX_CONCURRENT_NODE_COUNT = 20
 
-MAX_AUTHORIZED_NETWORKS_CIDRS = 50
+MAX_AUTHORIZED_NETWORKS_CIDRS_PRIVATE = 100
+MAX_AUTHORIZED_NETWORKS_CIDRS_PUBLIC = 50
 
 INGRESS = 'HttpLoadBalancing'
 HPA = 'HorizontalPodAutoscaling'
@@ -266,9 +267,13 @@ AUTOPROVISIONING_LOCATIONS = 'autoprovisioningLocations'
 DEFAULT_ADDONS = [INGRESS, HPA]
 ADDONS_OPTIONS = DEFAULT_ADDONS + [DASHBOARD, NETWORK_POLICY, CLOUDRUN]
 BETA_ADDONS_OPTIONS = ADDONS_OPTIONS + [
-    ISTIO, APPLICATIONMANAGER, NODELOCALDNS, GCEPDCSIDRIVER
+    ISTIO,
+    APPLICATIONMANAGER,
+    NODELOCALDNS,
+    GCEPDCSIDRIVER,
+    CONFIGCONNECTOR,
 ]
-ALPHA_ADDONS_OPTIONS = BETA_ADDONS_OPTIONS + [CONFIGCONNECTOR, CLOUDBUILD]
+ALPHA_ADDONS_OPTIONS = BETA_ADDONS_OPTIONS + [CLOUDBUILD]
 
 
 def CheckResponse(response):
@@ -443,6 +448,7 @@ class CreateClusterOptions(object):
       accelerators=None,
       enable_binauthz=None,
       min_cpu_platform=None,
+      workload_metadata=None,
       workload_metadata_from_node=None,
       maintenance_window=None,
       enable_pod_security_policy=None,
@@ -558,6 +564,7 @@ class CreateClusterOptions(object):
     self.accelerators = accelerators
     self.enable_binauthz = enable_binauthz
     self.min_cpu_platform = min_cpu_platform
+    self.workload_metadata = workload_metadata
     self.workload_metadata_from_node = workload_metadata_from_node
     self.maintenance_window = maintenance_window
     self.enable_pod_security_policy = enable_pod_security_policy
@@ -797,6 +804,7 @@ class CreateNodePoolOptions(object):
                disk_type=None,
                accelerators=None,
                min_cpu_platform=None,
+               workload_metadata=None,
                workload_metadata_from_node=None,
                max_pods_per_node=None,
                sandbox=None,
@@ -836,6 +844,7 @@ class CreateNodePoolOptions(object):
     self.disk_type = disk_type
     self.accelerators = accelerators
     self.min_cpu_platform = min_cpu_platform
+    self.workload_metadata = workload_metadata
     self.workload_metadata_from_node = workload_metadata_from_node
     self.max_pods_per_node = max_pods_per_node
     self.sandbox = sandbox
@@ -861,6 +870,7 @@ class UpdateNodePoolOptions(object):
                max_nodes=None,
                min_nodes=None,
                enable_autoprovisioning=None,
+               workload_metadata=None,
                workload_metadata_from_node=None,
                node_locations=None,
                max_surge_upgrade=None,
@@ -871,6 +881,7 @@ class UpdateNodePoolOptions(object):
     self.max_nodes = max_nodes
     self.min_nodes = min_nodes
     self.enable_autoprovisioning = enable_autoprovisioning
+    self.workload_metadata = workload_metadata
     self.workload_metadata_from_node = workload_metadata_from_node
     self.node_locations = node_locations
     self.max_surge_upgrade = max_surge_upgrade
@@ -886,7 +897,8 @@ class UpdateNodePoolOptions(object):
             self.enable_autoupgrade is not None)
 
   def IsUpdateNodePoolRequest(self):
-    return (self.workload_metadata_from_node is not None or
+    return (self.workload_metadata is not None or
+            self.workload_metadata_from_node is not None or
             self.node_locations is not None or
             self.max_surge_upgrade is not None or
             self.max_unavailable_upgrade is not None)
@@ -2024,7 +2036,20 @@ class APIAdapter(object):
 
   def _AddWorkloadMetadataToNodeConfig(self, node_config, options, messages):
     """Adds WorkLoadMetadata to NodeConfig."""
-    if options.workload_metadata_from_node is not None:
+    if options.workload_metadata is not None:
+      option = options.workload_metadata
+      if option == 'GCE_METADATA':
+        node_config.workloadMetadataConfig = messages.WorkloadMetadataConfig(
+            mode=messages.WorkloadMetadataConfig.ModeValueValuesEnum
+            .GCE_METADATA)
+      elif option == 'GKE_METADATA':
+        node_config.workloadMetadataConfig = messages.WorkloadMetadataConfig(
+            mode=messages.WorkloadMetadataConfig.ModeValueValuesEnum
+            .GKE_METADATA)
+      else:
+        raise util.Error(
+            UNKNOWN_WORKLOAD_METADATA_ERROR_MSG.format(option=option))
+    elif options.workload_metadata_from_node is not None:
       option = options.workload_metadata_from_node
       if option == 'GCE_METADATA':
         node_config.workloadMetadataConfig = messages.WorkloadMetadataConfig(
@@ -2049,7 +2074,7 @@ class APIAdapter(object):
             .NodeMetadataValueValuesEnum.GKE_METADATA_SERVER)
       else:
         raise util.Error(
-            UNKNOWN_WORKLOAD_METADATA_FROM_NODE_ERROR_MSG.format(option=option))
+            UNKNOWN_WORKLOAD_METADATA_ERROR_MSG.format(option=option))
 
   def SetNetworkPolicyCommon(self, options):
     """Returns a SetNetworkPolicy operation."""
@@ -2376,7 +2401,7 @@ class APIAdapter(object):
             node_pool_ref.nodePoolId,
         ))
 
-    if options.workload_metadata_from_node is not None:
+    if options.workload_metadata is not None or options.workload_metadata_from_node is not None:
       self._AddWorkloadMetadataToNodeConfig(update_request, options,
                                             self.messages)
     elif options.node_locations is not None:
@@ -2838,6 +2863,13 @@ class V1Beta1Adapter(V1Adapter):
     else:
       cluster.clusterTelemetry = None
 
+    if not options.enable_ip_alias and options.enable_ip_alias is not None:
+      if cluster.ipAllocationPolicy is None:
+        cluster.ipAllocationPolicy = self.messages.IPAllocationPolicy(
+            useRoutes=True)
+      else:
+        cluster.ipAllocationPolicy.useRoutes = True
+
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
         cluster=cluster)
@@ -3205,6 +3237,12 @@ class V1Alpha1Adapter(V1Beta1Adapter):
         raise util.Error(
             DATAPATH_PROVIDER_ILL_SPECIFIED_ERROR_MSG.format(
                 provider=options.datapath_provider))
+    if not options.enable_ip_alias and options.enable_ip_alias is not None:
+      if cluster.ipAllocationPolicy is None:
+        cluster.ipAllocationPolicy = self.messages.IPAllocationPolicy(
+            useRoutes=True)
+      else:
+        cluster.ipAllocationPolicy.useRoutes = True
 
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),

@@ -395,7 +395,8 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
         secondaryWorkerBootDiskType='pd-standard',
         internalIpOnly=True,
         imageUri=image_uri,
-        zoneUri=zone)
+        zoneUri=zone,
+        enableHttpPortAccess=True)
     self.AddMinCpuPlatform(managed_cluster, master_min_cpu_platform,
                            worker_min_cpu_platform)
 
@@ -419,7 +420,8 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                '--master-min-cpu-platform="{master_min_cpu_platform}" '
                '--worker-min-cpu-platform="{worker_min_cpu_platform}" '
                '--no-address '
-               '--zone {zone} ').format(
+               '--zone {zone} '
+               '--enable-component-gateway ').format(
                    template=self.WORKFLOW_TEMPLATE,
                    cluster_name=cluster_name,
                    master_accelerator_type=master_accelerator_type,

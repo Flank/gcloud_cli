@@ -33,10 +33,7 @@ summary:
 actions:
 - define_reference:
     reference: api-version
-    track_values:
-      GA: v1alpha1
-      BETA: v1alpha1
-      ALPHA: v1
+    value: v1
 - set_property:
     # container/use_client_certificate: true
     # auth/disable_ssl_validation: true

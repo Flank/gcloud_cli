@@ -18,16 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import instances_test_base as test_base
 
 
 class InstancesAddResourcePoliciesTest(test_base.TestBase):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def _CheckAddRequest(self, policy_names):
     add_request = self.messages.ComputeInstancesAddResourcePoliciesRequest(

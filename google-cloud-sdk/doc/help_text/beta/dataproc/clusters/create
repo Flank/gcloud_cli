@@ -442,8 +442,9 @@ FLAGS
      At most one of these may be specified:
 
        --image=IMAGE
-          The full custom image URI or the custom image name that will be used
-          to create a cluster.
+          The custom image used to create the cluster. It can be the image
+          name, the image URI, or the image family URI, which selects the
+          latest image from the family.
 
        --image-version=VERSION
           The image version to use for the cluster. Defaults to the latest

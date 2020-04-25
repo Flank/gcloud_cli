@@ -2,39 +2,39 @@
   "components": [
     {
       "data": {
-        "contents_checksum": "45fe00a477373d04bc99865e240029b1390dce07ffd9fde0f0e9b80a59b326fc", 
-        "source": "", 
+        "contents_checksum": "45fe00a477373d04bc99865e240029b1390dce07ffd9fde0f0e9b80a59b326fc",
+        "source": "",
         "type": "tar"
-      }, 
+      },
       "dependencies": [
-        "core", 
-        "gcloud-deps-darwin-x86", 
-        "gcloud-deps-darwin-x86_64", 
-        "gcloud-deps-linux-x86", 
-        "gcloud-deps-linux-x86_64", 
-        "gcloud-deps-windows-x86", 
+        "core",
+        "gcloud-deps-darwin-x86",
+        "gcloud-deps-darwin-x86_64",
+        "gcloud-deps-linux-x86",
+        "gcloud-deps-linux-x86_64",
+        "gcloud-deps-windows-x86",
         "gcloud-deps-windows-x86_64"
-      ], 
+      ],
       "details": {
-        "description": "Set of third_party gcloud cli dependencies.", 
+        "description": "Set of third_party gcloud cli dependencies.",
         "display_name": "gcloud cli dependencies"
-      }, 
-      "id": "gcloud-deps", 
-      "is_configuration": false, 
-      "is_hidden": true, 
-      "is_required": false, 
-      "platform": {}, 
+      },
+      "id": "gcloud-deps",
+      "is_configuration": false,
+      "is_hidden": true,
+      "is_required": false,
+      "platform": {},
       "version": {
-        "build_number": 20200403135304, 
-        "version_string": "2020.04.03"
+        "build_number": 20200421142158,
+        "version_string": "2020.04.21"
       }
     }
-  ], 
-  "revision": 20200403135304, 
+  ],
+  "revision": 20200421142158,
   "schema_version": {
-    "no_update": false, 
-    "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz", 
+    "no_update": false,
+    "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
-  }, 
-  "version": "288.0.0"
+  },
+  "version": "290.0.0"
 }

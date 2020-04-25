@@ -41,6 +41,8 @@ DESCRIPTION
 
       SERVICE     VERSION  NOTES
        ---        ---      ---
+      cloudkms    v1
+      container   v1
       pubsub      v1
       spanner     v1
       ---         ---      ---

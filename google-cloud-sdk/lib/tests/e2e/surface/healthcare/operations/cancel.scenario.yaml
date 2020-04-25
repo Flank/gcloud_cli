@@ -1,0 +1,121 @@
+title: cloud healthcare operations cancel scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: healthcare datasets create --location us-central1 $$test-dataset$$
+  - stderr: |
+      Create request issued for: [$$test-dataset$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created dataset [$$test-dataset$$].
+- execute:
+  - command: healthcare operations cancel --location us-central1 --dataset $$test-dataset$$
+      $$operation$$
+  - prompt:
+    - message: |
+        You are about to cancel [$$operation-basename$$].
+    - input: y
+  - error: '1: INVALID_ARGUMENT: operation has already completed.*$'
+- execute:
+  - command: healthcare datasets delete $$test-dataset$$ --location us-central1
+  - prompt:
+    - message: You are about to delete dataset [$$test-dataset$$]
+    - input: y
+  - stderr: |
+      Deleted dataset [$$test-dataset$$].
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
+- generate_resource_id:
+    reference: test-dataset
+    prefix: gcloud-test-dataset
+- execute_command:
+    command: healthcare datasets create --location us-central1 $$test-dataset$$
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-central1/datasets?alt=json&datasetId=$$test-dataset$$
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '159'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/gcloud-test-dataset-20200407-195538-2a41/operations/10526233935698984961
+    - expect_stderr: |
+        Create request issued for: [$$test-dataset$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '127'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/datasets/$$test-dataset$$
+    - expect_stderr: |
+        Created dataset [$$test-dataset$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: healthcare operations cancel --location us-central1 --dataset $$test-dataset$$
+      $$operation$$
+    events:
+    - expect_prompt_continue:
+        message: |
+          You are about to cancel [$$operation-basename$$].
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/$$operation$$:cancel?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '454'
+            content-type: application/json; charset=UTF-8
+            status: '400'
+          body:
+            error:
+              code: 400
+              message: operation has already completed
+              status: INVALID_ARGUMENT
+    # We e2e test cancelling an already completed operation to avoid race conditions in the test.
+    - expect_exit:
+        code: 1
+        message:
+          matches: |-
+            INVALID_ARGUMENT: operation has already completed.*
+- execute_command:
+    command: healthcare datasets delete $$test-dataset$$ --location us-central1
+    cleanup_for: test-dataset
+    validation_only: true
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete dataset [$$test-dataset$$]
+        user_input: y
+    - expect_stderr: |
+        Deleted dataset [$$test-dataset$$].
+    - expect_exit:
+        code: 0

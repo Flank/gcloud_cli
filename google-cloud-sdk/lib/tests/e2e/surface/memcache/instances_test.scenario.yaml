@@ -3,9 +3,9 @@ release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: memcache instances create $$memcache-instance$$ --region us-central1
-      --authorized-network "projects/cloud-sdk-integration-testing/global/networks/do-not-delete-vpc-peering-test-network"
-      --node-count 1 --node-cpu 1 --node-memory 1GB
+  - command: memcache instances create $$memcache-instance$$ --region=us-central1
+      --authorized-network="projects/cloud-sdk-integration-testing/global/networks/do-not-delete-vpc-peering-test-network"
+      --node-count=1 --node-cpu=1 --node-memory=1GB
   - stderr: |
       Create request issued for: [$$memcache-instance$$]
   - progress_tracker:
@@ -16,16 +16,16 @@ summary:
       Created instance [$$memcache-instance$$].
   - stdout: .*$$memcache-instance$$.*$
 - execute:
-  - command: memcache instances list --region "us-central1" --filter "name:$$memcache-instance$$"
-      --format "text(name,parameters,memcacheNodes[].parameters)"
+  - command: memcache instances list --region=us-central1 --filter="name:$$memcache-instance$$"
+      --format="text(name,parameters,memcacheNodes[].parameters)"
   - stdout: |
       ---
       memcacheNodes[0].parameters: {}
       name:                        projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$memcache-instance$$
       parameters:                  {}
 - execute:
-  - command: memcache instances update $$memcache-instance$$ --region "us-central1"
-      --display-name "a_fancy_memcache_instance" --format "text(displayName)"
+  - command: memcache instances update $$memcache-instance$$ --region=us-central1
+      --display-name="a_fancy_memcache_instance" --format="text(displayName)"
   - stderr: |
       Request issued for: [$$memcache-instance$$]
   - progress_tracker:
@@ -36,8 +36,8 @@ summary:
   - stdout: |
       displayName: a_fancy_memcache_instance
 - execute:
-  - command: memcache instances update $$memcache-instance$$ --region us-central1
-      --parameters protocol=ascii --format "text(parameters.params,memcacheNodes[].parameters)"
+  - command: memcache instances update $$memcache-instance$$ --region=us-central1
+      --parameters=protocol=ascii --format="text(parameters.params,memcacheNodes[].parameters)"
   - stderr: |
       Request issued for: [$$memcache-instance$$]
   - progress_tracker:
@@ -49,8 +49,8 @@ summary:
       memcacheNodes[0].parameters: {}
       parameters.params.protocol:  ascii
 - execute:
-  - command: memcache instances apply-parameters $$memcache-instance$$ --region us-central1
-      --apply-all --format "text(parameters.params,memcacheNodes[].parameters.params)"
+  - command: memcache instances apply-parameters $$memcache-instance$$ --region=us-central1
+      --apply-all --format="text(parameters.params,memcacheNodes[].parameters.params)"
   - stderr: |
       Request issued for: [$$memcache-instance$$]
   - progress_tracker:
@@ -60,14 +60,14 @@ summary:
       memcacheNodes[0].parameters.params.protocol: ascii
       parameters.params.protocol:                  ascii
 - execute:
-  - command: memcache instances describe $$memcache-instance$$ --region "us-central1"
-      --format "text(displayName,parameters.params,memcacheNodes[].parameters.params)"
+  - command: memcache instances describe $$memcache-instance$$ --region=us-central1
+      --format="text(displayName,parameters.params,memcacheNodes[].parameters.params)"
   - stdout: |
       displayName:                                 a_fancy_memcache_instance
       memcacheNodes[0].parameters.params.protocol: ascii
       parameters.params.protocol:                  ascii
 - execute:
-  - command: memcache instances delete $$memcache-instance$$ --region us-central1
+  - command: memcache instances delete $$memcache-instance$$ --region=us-central1
   - prompt:
     - message: |
         You are about to delete instance [$$memcache-instance$$] in [us-central1].
@@ -87,9 +87,9 @@ actions:
     prefix: memcache-instance
 
 - execute_command:
-    command: memcache instances create $$memcache-instance$$ --region us-central1
-      --authorized-network "projects/cloud-sdk-integration-testing/global/networks/do-not-delete-vpc-peering-test-network"
-      --node-count 1 --node-cpu 1 --node-memory 1GB
+    command: memcache instances create $$memcache-instance$$ --region=us-central1
+      --authorized-network="projects/cloud-sdk-integration-testing/global/networks/do-not-delete-vpc-peering-test-network"
+      --node-count=1 --node-cpu=1 --node-memory=1GB
     events:
     - api_call:
         expect_request:
@@ -179,8 +179,8 @@ actions:
         code: 0
 
 - execute_command:
-    command: memcache instances list --region "us-central1" --filter "name:$$memcache-instance$$"
-      --format "text(name,parameters,memcacheNodes[].parameters)"
+    command: memcache instances list --region=us-central1 --filter="name:$$memcache-instance$$"
+      --format="text(name,parameters,memcacheNodes[].parameters)"
     events:
     - api_call:
         expect_request:
@@ -229,8 +229,8 @@ actions:
         code: 0
 
 - execute_command:
-    command: memcache instances update $$memcache-instance$$ --region "us-central1"
-      --display-name "a_fancy_memcache_instance" --format "text(displayName)"
+    command: memcache instances update $$memcache-instance$$ --region=us-central1
+      --display-name="a_fancy_memcache_instance" --format="text(displayName)"
     events:
     - api_call:
         expect_request:
@@ -307,8 +307,8 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: memcache instances update $$memcache-instance$$ --region us-central1
-      --parameters protocol=ascii --format "text(parameters.params,memcacheNodes[].parameters)"
+    command: memcache instances update $$memcache-instance$$ --region=us-central1
+      --parameters=protocol=ascii --format="text(parameters.params,memcacheNodes[].parameters)"
     events:
     - api_call:
         expect_request:
@@ -392,8 +392,8 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: memcache instances apply-parameters $$memcache-instance$$ --region us-central1
-      --apply-all --format "text(parameters.params,memcacheNodes[].parameters.params)"
+    command: memcache instances apply-parameters $$memcache-instance$$ --region=us-central1
+      --apply-all --format="text(parameters.params,memcacheNodes[].parameters.params)"
     events:
     - api_call:
         expect_request:
@@ -476,8 +476,8 @@ actions:
         code: 0
 
 - execute_command:
-    command: memcache instances describe $$memcache-instance$$ --region "us-central1"
-      --format "text(displayName,parameters.params,memcacheNodes[].parameters.params)"
+    command: memcache instances describe $$memcache-instance$$ --region=us-central1
+      --format="text(displayName,parameters.params,memcacheNodes[].parameters.params)"
     events:
     - api_call:
         expect_request:
@@ -531,7 +531,7 @@ actions:
         code: 0
 
 - execute_command:
-    command: memcache instances delete $$memcache-instance$$ --region us-central1
+    command: memcache instances delete $$memcache-instance$$ --region=us-central1
     cleanup_for: memcache-instance
     events:
     - expect_prompt_continue:

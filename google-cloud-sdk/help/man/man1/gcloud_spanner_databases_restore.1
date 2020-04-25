@@ -1,0 +1,125 @@
+
+.TH "GCLOUD_SPANNER_DATABASES_RESTORE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud spanner databases restore \- restore a Cloud Spanner database
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud spanner databases restore\fR (\fB\-\-destination\-database\fR=\fIDESTINATION_DATABASE\fR\ :\ \fB\-\-destination\-instance\fR=\fIDESTINATION_INSTANCE\fR) (\fB\-\-source\-backup\fR=\fISOURCE_BACKUP\fR\ :\ \fB\-\-source\-instance\fR=\fISOURCE_INSTANCE\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Restores from a backup to a new Cloud Spanner database.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Database resource \- TEXT The arguments in this group can be used to specify the
+attributes of this resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: provide
+the argument [\-\-destination\-database] on the command line with a fully
+specified name; provide the argument [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\-database\fR=\fIDESTINATION_DATABASE\fR
+ID of the database or fully qualified identifier for the database. This flag
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-destination\-instance\fR=\fIDESTINATION_INSTANCE\fR
+The Cloud Spanner instance for the database.
+
+.RE
+.sp
+.TP 2m
+
+Backup resource \- TEXT The arguments in this group can be used to specify the
+attributes of this resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: provide
+the argument [\-\-source\-backup] on the command line with a fully specified
+name; provide the argument [\-\-project] on the command line; set the property
+[core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-source\-backup\fR=\fISOURCE_BACKUP\fR
+ID of the backup or fully qualified identifier for the backup. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-source\-instance\fR=\fISOURCE_INSTANCE\fR
+The Cloud Spanner instance for the backup.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To restore a backup, run:
+
+.RS 2m
+$ gcloud spanner databases restore \-\-source\-backup=BACKUP_ID \e
+    \-\-source\-instance=SOURCE_INSTANCE \e
+    \-\-destination\-database=DATABASE \e
+    \-\-destination\-instance=INSTANCE_NAME
+.RE
+
+To restore a backup using relative names, run:
+
+.RS 2m
+$ gcloud spanner databases restore \e
+    \-\-source\-backup=projects/PROJECT_ID/instances/\e
+SOURCE_INSTANCE_ID/backups/BACKUP_ID \e
+    \-\-destination\-database=projects/PROJECT_ID/instances/\e
+SOURCE_INSTANCE_ID/databases/DATABASE_ID
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha spanner databases restore
+$ gcloud beta spanner databases restore
+.RE
+

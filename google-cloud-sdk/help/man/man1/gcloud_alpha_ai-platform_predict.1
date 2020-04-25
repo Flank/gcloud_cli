@@ -11,7 +11,7 @@ gcloud alpha ai\-platform predict \- run AI Platform online prediction
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ai\-platform predict\fR \fB\-\-model\fR=\fIMODEL\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-json\-request\fR=\fIJSON_REQUEST\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ai\-platform predict\fR \fB\-\-model\fR=\fIMODEL\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-json\-request\fR=\fIJSON_REQUEST\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -96,15 +96,6 @@ This flag accepts "\-" for stdin.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
-.TP 2m
-\fB\-\-region\fR=\fIREGION\fR
-Google Cloud region of the regional endpoint to use for this command. If
-unspecified, the command uses the global endpoint of the AI Platform Training
-and Prediction API.
-
-Learn more about regional endpoints and see a list of available regions:
-https://cloud.google.com/ai\-platform/prediction/docs/regional\-endpoints
-
 .TP 2m
 \fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR
 The name of the signature defined in the SavedModel to use for this job.

@@ -49,6 +49,14 @@ class LocationsDescribeTest(base.MlAlphaPlatformTestBase):
     result = self.Run('{} locations describe loc1'.format(module_name))
     self.assertEqual(self.loc1, result)
 
+  def testDescribeRegional(self, module_name):
+    self._ExpectDescribe()
+    result = self.Run(
+        '{} locations describe loc1 --region us-central1'.format(module_name))
+    self.AssertErrContains(
+        'Using endpoint [https://us-central1-ml.googleapis.com/]')
+    self.assertEqual(self.loc1, result)
+
   def testDescribeFormat(self, module_name):
     properties.VALUES.core.user_output_enabled.Set(True)
     self._ExpectDescribe()

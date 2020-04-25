@@ -43,7 +43,7 @@ COMMANDS
         (ALPHA) Update Memorystore Redis instances.
 
      upgrade
-        (ALPHA) Upgrade a Memorystore Redis instance to a specified Redis
+        (ALPHA) Upgrade a Memorystore for Redis instance to a specified Redis
         version.
 
 EXAMPLES

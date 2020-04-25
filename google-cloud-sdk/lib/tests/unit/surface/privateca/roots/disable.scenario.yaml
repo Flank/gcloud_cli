@@ -1,0 +1,70 @@
+title: privateca roots disable scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: privateca roots disable ca --location europe-west1
+  - stderr: |
+      Disabled Root CA [projects/fake-project/locations/europe-west1/certificateAuthorities/ca].
+- execute:
+  - command: privateca roots disable ca --location europe-west1
+  - error: '1: Cannot perform roots command on Subordinate CA. Please use the `privateca
+      subordinates` command group instead.'
+actions:
+- execute_command:
+    command: privateca roots disable ca --location europe-west1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+            state: ENABLED
+            type: SELF_SIGNED
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca:disable?alt=json
+          method: POST
+          headers: {}
+          body:
+            text:
+              matches: '.*"requestId": "[a-f0-9-]+".*'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            done: true
+            response:
+              name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+              state: DISABLED
+              type: SELF_SIGNED
+    - expect_stderr: |
+        Disabled Root CA [projects/fake-project/locations/europe-west1/certificateAuthorities/ca].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: privateca roots disable ca --location europe-west1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://privateca.googleapis.com/v1alpha1/projects/fake-project/locations/europe-west1/certificateAuthorities/ca?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/europe-west1/certificateAuthorities/ca
+            state: DISABLED
+            type: SUBORDINATE
+    - expect_exit:
+        code: 1
+        message: Cannot perform roots command on Subordinate CA. Please use the `privateca
+          subordinates` command group instead.

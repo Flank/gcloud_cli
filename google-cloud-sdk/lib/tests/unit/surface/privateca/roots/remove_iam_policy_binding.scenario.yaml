@@ -29,8 +29,8 @@ summary:
 actions:
 # remove binding without condition to a policy without condition
 - execute_command:
-    command: privateca roots remove-iam-policy-binding my-ca --location europe
-      --member=user:owner@gmail.com --role=roles/owner
+    command: privateca roots remove-iam-policy-binding my-ca --location europe --member=user:owner@gmail.com
+      --role=roles/owner
     events:
     - api_call:
         expect_request:
@@ -133,7 +133,7 @@ actions:
               policy:
                 bindings:
                 - role: roles/owner
-                  members: ['user:newowner@gmail.com']
+                  members: [user:newowner@gmail.com]
                 etag: etag
                 version: 1
         return_response:

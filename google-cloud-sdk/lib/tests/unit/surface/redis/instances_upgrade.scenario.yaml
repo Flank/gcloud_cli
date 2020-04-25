@@ -20,7 +20,7 @@ summary:
       name: projects/fake-project/locations/us-central1/operations/operation-1551468081387-5830d4fdf16e7-f758f2e0-52970515
 actions:
 - execute_command:
-    command: redis instances upgrade my-redis-instance --region=us-central1 --redis-version=redis_4_0 --async
+    command: redis instances upgrade my-redis-instance --region=us-central1 --redis-version=redis_5_0 --async
     events:
     - expect_prompt_continue:
         message: 'WARNING: Upgrading will cause a full cache flush for Basic Tier instances and a failover for Standard Tier instances. The instance will also be temporarily unavailable. To prevent data loss, back up your instance before continuing. For more information, see "Behavior during version upgrade" section in the official Memorystore for Redis documentation.'
@@ -32,7 +32,7 @@ actions:
           headers: {}
           body:
             json:
-              redisVersion: REDIS_4_0
+              redisVersion: REDIS_5_0
         return_response:
           headers:
             status: '200'

@@ -118,6 +118,47 @@ class LevelsUpdateTestGA(accesscontextmanager.Base):
           ' --policy accessPolicy/123')
     self.assertIn('set to the policy number', text_type(ex.exception))
 
+  def testUpdateCustom_InvalidSpec(self):
+    self.SetUpForAPI(self.api_version)
+    with self.AssertRaisesExceptionMatches(
+        yaml.FileLoadError, r'Failed to load YAML from [not-found]'):
+      self.Run('access-context-manager levels update my_level --policy 123 '
+               '    --custom-level-spec not-found')
+
+  def testUpdateCustom_BasicSpecSpecified(self):
+    self.SetUpForAPI(self.api_version)
+    basic_level_spec_path = self.Touch(
+        self.temp_path, 'basic.yaml', contents=self.BASIC_LEVEL_SPEC)
+    custom_level_spec_path = self.Touch(
+        self.temp_path, 'custom.yaml', contents=self.CUSTOM_LEVEL_SPEC)
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           r'At most one of'):
+      self.Run('access-context-manager levels update my_level --policy 123 '
+               '     --title "My Level"'
+               '     --description "Very long description of my level" '
+               '     --basic-level-spec {}'
+               '     --custom-level-spec {}'.format(basic_level_spec_path,
+                                                    custom_level_spec_path))
+
+  def testUpdateCustom_AllParams(self):
+    self.SetUpForAPI(self.api_version)
+    level = self._MakeCustomLevel(
+        None,
+        title='My Level',
+        description='Very long description of my level',
+        expression="inIpRange(origin.ip, ['127.0.0.1/24']")
+    self._ExpectPatch('my_level', level, '123', 'custom,description,title')
+    level_spec_path = self.Touch(
+        self.temp_path, '', contents=self.CUSTOM_LEVEL_SPEC)
+
+    results = self.Run(
+        'access-context-manager levels update my_level --policy 123 '
+        '     --title "My Level"'
+        '     --description "Very long description of my level" '
+        '     --custom-level-spec {}'.format(level_spec_path))
+
+    self.assertEqual(results, level)
+
 
 class LevelsUpdateTestBeta(LevelsUpdateTestGA):
 
@@ -125,94 +166,12 @@ class LevelsUpdateTestBeta(LevelsUpdateTestGA):
     self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
 
-  def testUpdateCustom_InvalidSpec(self):
-    self.SetUpForAPI(self.api_version)
-    with self.AssertRaisesExceptionMatches(
-        yaml.FileLoadError, r'Failed to load YAML from [not-found]'):
-      self.Run('access-context-manager levels update my_level --policy 123 '
-               '    --custom-level-spec not-found')
-
-  def testUpdateCustom_BasicSpecSpecified(self):
-    self.SetUpForAPI(self.api_version)
-    basic_level_spec_path = self.Touch(
-        self.temp_path, 'basic.yaml', contents=self.BASIC_LEVEL_SPEC)
-    custom_level_spec_path = self.Touch(
-        self.temp_path, 'custom.yaml', contents=self.CUSTOM_LEVEL_SPEC)
-    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
-                                           r'At most one of'):
-      self.Run('access-context-manager levels update my_level --policy 123 '
-               '     --title "My Level"'
-               '     --description "Very long description of my level" '
-               '     --basic-level-spec {}'
-               '     --custom-level-spec {}'.format(basic_level_spec_path,
-                                                    custom_level_spec_path))
-
-  def testUpdateCustom_AllParams(self):
-    self.SetUpForAPI(self.api_version)
-    level = self._MakeCustomLevel(
-        None,
-        title='My Level',
-        description='Very long description of my level',
-        expression="inIpRange(origin.ip, ['127.0.0.1/24']")
-    self._ExpectPatch('my_level', level, '123', 'custom,description,title')
-    level_spec_path = self.Touch(
-        self.temp_path, '', contents=self.CUSTOM_LEVEL_SPEC)
-
-    results = self.Run(
-        'access-context-manager levels update my_level --policy 123 '
-        '     --title "My Level"'
-        '     --description "Very long description of my level" '
-        '     --custom-level-spec {}'.format(level_spec_path))
-
-    self.assertEqual(results, level)
-
 
 class LevelsUpdateTestAlpha(LevelsUpdateTestGA):
 
   def PreSetUp(self):
     self.api_version = 'v1alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testUpdateCustom_InvalidSpec(self):
-    self.SetUpForAPI(self.api_version)
-    with self.AssertRaisesExceptionMatches(
-        yaml.FileLoadError, r'Failed to load YAML from [not-found]'):
-      self.Run('access-context-manager levels update my_level --policy 123 '
-               '    --custom-level-spec not-found')
-
-  def testUpdateCustom_BasicSpecSpecified(self):
-    self.SetUpForAPI(self.api_version)
-    basic_level_spec_path = self.Touch(
-        self.temp_path, 'basic.yaml', contents=self.BASIC_LEVEL_SPEC)
-    custom_level_spec_path = self.Touch(
-        self.temp_path, 'custom.yaml', contents=self.CUSTOM_LEVEL_SPEC)
-    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
-                                           r'At most one of'):
-      self.Run('access-context-manager levels update my_level --policy 123 '
-               '     --title "My Level"'
-               '     --description "Very long description of my level" '
-               '     --basic-level-spec {}'
-               '     --custom-level-spec {}'.format(basic_level_spec_path,
-                                                    custom_level_spec_path))
-
-  def testUpdateCustom_AllParams(self):
-    self.SetUpForAPI(self.api_version)
-    level = self._MakeCustomLevel(
-        None,
-        title='My Level',
-        description='Very long description of my level',
-        expression="inIpRange(origin.ip, ['127.0.0.1/24']")
-    self._ExpectPatch('my_level', level, '123', 'custom,description,title')
-    level_spec_path = self.Touch(
-        self.temp_path, '', contents=self.CUSTOM_LEVEL_SPEC)
-
-    results = self.Run(
-        'access-context-manager levels update my_level --policy 123 '
-        '     --title "My Level"'
-        '     --description "Very long description of my level" '
-        '     --custom-level-spec {}'.format(level_spec_path))
-
-    self.assertEqual(results, level)
 
 
 if __name__ == '__main__':

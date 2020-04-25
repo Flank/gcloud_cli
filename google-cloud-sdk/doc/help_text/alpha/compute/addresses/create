@@ -50,7 +50,7 @@ FLAGS
      --purpose=PURPOSE
         The purpose of the address resource. This field is not applicable to
         external addresses. PURPOSE must be one of: VPC_PEERING,
-        SHARED_LOADBALANCER_VIP, GCE_ENDPOINT.
+        SHARED_LOADBALANCER_VIP, GCE_ENDPOINT, PRIVATE_SERVICE_CONNECT.
 
      --subnet=SUBNET
         If specified, the subnet name in which the address(es) should be
@@ -146,6 +146,13 @@ EXAMPLES
         $ gcloud alpha compute addresses create IP-RANGE-1 --global \
             --prefix-length=16 --purpose=VPC_PEERING \
           --network=default
+
+        To reserve an address from network 'default' for PRIVATE_SERVICE_CONNECT,
+        run:
+
+        $ gcloud alpha compute addresses create IP-RESOURCE-URI --global \
+            --addresses=10.110.0.0 \
+          --purpose=PRIVATE_SERVICE_CONNECT --network=default
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -43,6 +43,8 @@ EXAMPLES
         $ gcloud spanner backups describe BACKUP_ID --instance=INSTANCE_NAME
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice.
+    These variants are also available:
+
+        $ gcloud alpha spanner backups describe
+        $ gcloud beta spanner backups describe
 

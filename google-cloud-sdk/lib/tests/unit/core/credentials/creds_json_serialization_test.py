@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests for serializating & serializating credentials to and from JSON."""
+"""Tests for credentials serialization & deserialization to and from JSON."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -20,8 +20,10 @@ from __future__ import unicode_literals
 
 import base64
 import json
+import textwrap
 
 from googlecloudsdk.core.credentials import creds
+from googlecloudsdk.core.credentials import reauth
 from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from tests.lib.core.credentials import credentials_test_base
@@ -39,6 +41,24 @@ class CredsSerializationTests(credentials_test_base.CredentialsTestBase):
     json_data = self.USER_CREDENTIALS_JSON
     credentials = creds.FromJson(json_data)
     self.assertMultiLineEqual(json_data, creds.ToJson(credentials))
+
+  def testToJson_UserAccountGoogleAuth(self):
+    credentials = self.MakeUserAccountCredentialsGoogleAuth()
+    expected_json = textwrap.dedent("""\
+        {
+          "client_id": "foo.apps.googleusercontent.com",
+          "client_secret": "file-secret",
+          "refresh_token": "file-token",
+          "revoke_uri": "https://accounts.google.com/o/oauth2/revoke",
+          "scopes": [
+            "scope1"
+          ],
+          "token_uri": "https://oauth2.googleapis.com/token",
+          "type": "authorized_user"
+        }""")
+
+    self.assertMultiLineEqual(expected_json,
+                              creds.ToJsonGoogleAuth(credentials))
 
   def testToJson_ServiceAccount(self):
     self.StartPatch('oauth2client.crypt.Signer', autospec=True)
@@ -96,6 +116,24 @@ class CredsSerializationTests(credentials_test_base.CredentialsTestBase):
 
     creds_type = creds.CredentialType.FromCredentials(credentials)
     self.assertEqual(creds.CredentialType.USER_ACCOUNT, creds_type)
+
+  def testFromJson_UserAccountGoogleAuth(self):
+    json_blob = textwrap.dedent("""\
+        {
+          "client_id": "foo.apps.googleusercontent.com",
+          "client_secret": "file-secret",
+          "refresh_token": "file-token",
+          "scopes": [
+            "scope1"
+          ],
+          "token_uri": "https://oauth2.googleapis.com/token",
+          "type": "authorized_user"
+        }""")
+    expected_credentials = creds.FromJsonGoogleAuth(json_blob)
+    expected_credentials_dict = json.loads(json_blob)
+    del expected_credentials_dict['type']
+    self.assertIsInstance(expected_credentials, reauth.UserCredWithReauth)
+    self.AssertCredentialsEqual(expected_credentials, expected_credentials_dict)
 
   def testFromJson_ServiceAccount(self):
     self.StartPatch('oauth2client.crypt.Signer', autospec=True)

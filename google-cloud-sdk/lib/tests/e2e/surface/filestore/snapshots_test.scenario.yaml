@@ -1017,6 +1017,7 @@ actions:
       us-east1 --format 'table(name,sourceInstance,sourceFileShare,state)'
     events:
     - api_call:
+        repeatable: true
         expect_request:
           uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$?alt=json
           method: GET

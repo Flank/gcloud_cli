@@ -1,0 +1,907 @@
+title: Create and delete a Cloud Audit Logs trigger
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: run/platform managed
+- set_property: run/region us-central1
+- execute:
+  - command: run deploy $$my-service$$ --image gcr.io/knative-samples/helloworld-nodejs
+      --allow-unauthenticated
+  - stderr: 'Is None: False'
+  - staged_progress_tracker:
+    - message: Deploying new service...
+    - status: SUCCESS
+  - stderr: 'Is None: False'
+- execute:
+  - command: events triggers create $$my-trigger$$ --type com.google.cloud.auditlog.event
+      --parameters "methodName=method,serviceName=service,resourceName=resource" --target-service
+      $$my-service$$
+  - staged_progress_tracker:
+    - message: Initializing trigger...
+    - status: SUCCESS
+- execute:
+  - command: events triggers list
+  - stdout: .*$$my-trigger$$.*$
+- execute:
+  - command: events triggers describe $$my-trigger$$
+  - stdout: 'Is None: False'
+- execute:
+  - command: events triggers delete $$my-trigger$$
+  - prompt:
+    - input: y
+  - stderr: 'Is None: False'
+- execute:
+  - command: run services delete $$my-service$$
+  - prompt:
+    - input: y
+  - stderr: 'Is None: False'
+actions:
+
+- set_property:
+    run/platform: managed
+
+- set_property:
+    run/region: us-central1
+
+- generate_resource_id:
+    reference: my-service
+    prefix: service
+
+- execute_command:
+    command: run deploy $$my-service$$ --image gcr.io/knative-samples/helloworld-nodejs
+      --allow-unauthenticated
+    validation_only: true
+    events:
+    - expect_stderr:
+        is_none: false
+    - expect_staged_progress_tracker:
+        message: Deploying new service...
+        status: SUCCESS
+    - expect_stderr:
+        is_none: false
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: my-trigger
+    prefix: trigger
+
+- execute_command:
+    command: events triggers create $$my-trigger$$ --type com.google.cloud.auditlog.event
+      --parameters "methodName=method,serviceName=service,resourceName=resource" --target-service
+      $$my-service$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions?alt=json&labelSelector=duck.knative.dev%2Fsource%3Dtrue&parent=namespaces%2Fcloud-sdk-integration-testing
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '4017'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: apiextensions.k8s.io/v1beta1
+            kind: CustomResourceDefinitionList
+            metadata:
+              selfLink: /apis/apiextensions.k8s.io/v1beta1/namespaces/462803083913/crds
+            items:
+            - apiVersion: apiextensions.k8s.io/v1beta1
+              kind: CustomResourceDefinition
+              metadata:
+                name: cloudpubsubsources.events.cloud.google.com
+                namespace: '462803083913'
+                selfLink: /apis/apiextensions.k8s.io/v1beta1/namespaces/462803083913/customresourcedefinitions/cloudpubsubsources.events.cloud.google.com
+                labels:
+                  duck.knative.dev/source: 'true'
+                  cloud.googleapis.com/location: ''
+                annotations:
+                  registry.knative.dev/eventTypes: '[{"type":"com.google.cloud.pubsub.topic.publish","description":"This
+                    event is sent when a message is published to a Cloud Pub/Sub topic."}]'
+              spec:
+                group: events.cloud.google.com
+                version: v1alpha1
+                names:
+                  plural: cloudpubsubsources
+                  kind: CloudPubSubSource
+                  categories:
+                  - all
+                  - knative
+                  - cloudpubsubsource
+                validation:
+                  openAPIV3Schema:
+                    properties:
+                      spec:
+                        required:
+                        - topic
+                        properties:
+                          topic:
+                            description: ID of the Cloud Pub/Sub Topic to Subscribe
+                              to. It must be in the form of the unique identifier
+                              within the project, not the entire name. E.g. it must
+                              be 'laconia', not 'projects/my-gcp-project/topics/laconia'.
+                            type: string
+            - apiVersion: apiextensions.k8s.io/v1beta1
+              kind: CustomResourceDefinition
+              metadata:
+                name: cloudauditlogssources.events.cloud.google.com
+                namespace: '462803083913'
+                selfLink: /apis/apiextensions.k8s.io/v1beta1/namespaces/462803083913/customresourcedefinitions/cloudauditlogssources.events.cloud.google.com
+                labels:
+                  duck.knative.dev/source: 'true'
+                  cloud.googleapis.com/location: ''
+                annotations:
+                  registry.knative.dev/eventTypes: '[{"type":"com.google.cloud.auditlog.event","description":"This
+                    event is sent when a cloud audit log is emitted."}]'
+              spec:
+                group: events.cloud.google.com
+                version: v1alpha1
+                names:
+                  plural: cloudauditlogssources
+                  kind: CloudAuditLogsSource
+                  categories:
+                  - all
+                  - knative
+                  - cloudauditlogssource
+                validation:
+                  openAPIV3Schema:
+                    properties:
+                      spec:
+                        required:
+                        - serviceName
+                        - methodName
+                        properties:
+                          serviceName:
+                            description: The GCP service providing audit logs.
+                            type: string
+                          methodName:
+                            description: The name of the service method or operation.
+                              For API calls, this should be the name of the API method.
+                            type: string
+                          resourceName:
+                            description: The resource or collection that is the target
+                              of the operation. The name is a scheme-less URI, not
+                              including the API service name. If omitted, audit log
+                              events matching service and method will be pulled for
+                              all resources.
+                            type: string
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers/$$my-trigger$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '996'
+            content-type: application/json; charset=UTF-8
+            status: '404'
+          body:
+            error:
+              code: 404
+              message: Resource '$$my-trigger$$' of kind 'TRIGGER' in region 'us-central1'
+                in project 'cloud-sdk-integration-testing' does not exist.
+              status: NOT_FOUND
+              details:
+              - '@type': type.googleapis.com/google.rpc.DebugInfo
+                detail: |-
+                  [ORIGINAL ERROR] generic::not_found: userFacingMessage: Resource '$$my-trigger$$' of kind 'TRIGGER' in region 'us-central1' in project 'cloud-sdk-integration-testing' does not exist.;
+                  com.google.cloud.eventprocessing.serverless.error.NotFoundException: userFacingMessage: Resource '$$my-trigger$$' of kind 'TRIGGER' in region 'us-central1' in project 'cloud-sdk-integration-testing' does not exist.;  Code: NOT_FOUND [google.rpc.error_details_ext] { message: "Resource \'$$my-trigger$$\' of kind \'TRIGGER\' in region \'us-central1\' in project \'cloud-sdk-integration-testing\' does not exist." }
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              apiVersion: eventing.knative.dev/v1alpha1
+              kind: Trigger
+              metadata:
+                annotations:
+                  knative-eventing-injection: enabled
+                labels: {}
+                name: $$my-trigger$$
+                namespace: cloud-sdk-integration-testing
+              spec:
+                broker: default
+                filter:
+                  attributes:
+                    type: com.google.cloud.auditlog.event
+                subscriber:
+                  ref:
+                    apiVersion: serving.knative.dev/v1alpha1
+                    kind: Service
+                    name: $$my-service$$
+              status: {}
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1501'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: eventing.knative.dev/v1alpha1
+            kind: Trigger
+            metadata:
+              name: $$my-trigger$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers/$$my-trigger$$
+              uid: 175115fd-fea0-4c25-a725-cd53791dad89
+              resourceVersion: AAWiUEvM+rY
+              generation: 1
+              creationTimestamp: '2020-04-02T15:17:16.361398Z'
+              labels:
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                knative.dev/dependency: '{"apiVersion": "events.cloud.google.com/v1alpha1",
+                  "kind": "CloudAuditLogsSource", "name": "source-for-$$my-trigger$$",
+                  "namespace": "cloud-sdk-integration-testing"}'
+                eventing.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                eventing.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                knative-eventing-injection: enabled
+            spec:
+              broker: default
+              filter:
+                attributes:
+                  knsourcetrigger: link0.006498815041823924
+                  type: com.google.cloud.auditlog.event
+              subscriber:
+                ref:
+                  kind: Service
+                  name: $$my-service$$
+                  apiVersion: eventing.knative.dev/v1alpha1
+            status: {}
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/events.cloud.google.com/v1alpha1/namespaces/cloud-sdk-integration-testing/cloudauditlogssources?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              apiVersion: events.cloud.google.com/v1alpha1
+              kind: CloudAuditLogsSource
+              metadata:
+                annotations: {}
+                labels: {}
+                name: source-for-$$my-trigger$$
+                namespace: cloud-sdk-integration-testing
+                ownerReferences:
+                - apiVersion: eventing.knative.dev/v1alpha1
+                  controller: true
+                  kind: Trigger
+                  name: $$my-trigger$$
+              spec:
+                ceOverrides:
+                  extensions: {}
+                methodName: method
+                resourceName: resource
+                serviceName: service
+                sink:
+                  ref:
+                    apiVersion: eventing.knative.dev/v1alpha1
+                    kind: Broker
+                    name: default
+              status: {}
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1011'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: events.cloud.google.com/v1alpha1
+            kind: CloudAuditLogsSource
+            metadata:
+              name: source-for-$$my-trigger$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/events.cloud.google.com/v1alpha1/namespaces/cloud-sdk-integration-testing/cloudauditlogssources/source-for-$$my-trigger$$
+              uid: 0f6fbb89-6aa9-4dca-9eff-9a46fc687a9b
+              resourceVersion: AAWiUEvP0KU
+              generation: 1
+              creationTimestamp: '2020-04-02T15:17:16.547237Z'
+              labels:
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                events.cloud.google.com/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                events.cloud.google.com/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            spec:
+              serviceName: service
+              methodName: method
+              resourceName: resource
+            status: {}
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/events.cloud.google.com/v1alpha1/namespaces/cloud-sdk-integration-testing/cloudauditlogssources/source-for-$$my-trigger$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1266'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: events.cloud.google.com/v1alpha1
+            kind: CloudAuditLogsSource
+            metadata:
+              name: source-for-$$my-trigger$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/events.cloud.google.com/v1alpha1/namespaces/cloud-sdk-integration-testing/cloudauditlogssources/source-for-$$my-trigger$$
+              uid: 0f6fbb89-6aa9-4dca-9eff-9a46fc687a9b
+              resourceVersion: AAWiUEvQUKA
+              generation: 1
+              creationTimestamp: '2020-04-02T15:17:16.547237Z'
+              labels:
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                events.cloud.google.com/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                events.cloud.google.com/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            spec:
+              serviceName: service
+              methodName: method
+              resourceName: resource
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                message: CloudAuditLogsSource source is created or updated.
+                lastTransitionTime: '2020-04-02T15:17:16.580Z'
+              observedGeneration: 1
+        repeatable: true
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers/$$my-trigger$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2240'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: eventing.knative.dev/v1alpha1
+            kind: Trigger
+            metadata:
+              name: $$my-trigger$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers/$$my-trigger$$
+              uid: 175115fd-fea0-4c25-a725-cd53791dad89
+              resourceVersion: AAWiUEvhgvg
+              generation: 1
+              creationTimestamp: '2020-04-02T15:17:16.361398Z'
+              labels:
+                serving.knative.dev/service: $$my-service$$
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                knative.dev/dependency: '{"apiVersion": "events.cloud.google.com/v1alpha1",
+                  "kind": "CloudAuditLogsSource", "name": "source-for-$$my-trigger$$",
+                  "namespace": "cloud-sdk-integration-testing"}'
+                eventing.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                eventing.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                knative-eventing-injection: enabled
+            spec:
+              broker: default
+              filter:
+                attributes:
+                  knsourcetrigger: link0.006498815041823924
+                  type: com.google.cloud.auditlog.event
+              subscriber:
+                ref:
+                  kind: Service
+                  name: $$my-service$$
+                  apiVersion: eventing.knative.dev/v1alpha1
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:17.706Z'
+              - type: DependencyReady
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:17.706Z'
+              - type: Subscribed
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:17.706Z'
+              - type: SubscriberResolved
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:16.425Z'
+              observedGeneration: 1
+              subscriberUri: https://$$my-service$$-ixwc4imo7a-uc.a.run.app
+        repeatable: true
+    - expect_staged_progress_tracker:
+        message: Initializing trigger...
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: events triggers list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2763'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: eventing.knative.dev/v1alpha1
+            kind: TriggerList
+            metadata:
+              selfLink: /apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers
+              resourceVersion: '1585840637707000'
+            items:
+            - apiVersion: eventing.knative.dev/v1alpha1
+              kind: Trigger
+              metadata:
+                name: $$my-trigger$$
+                namespace: cloud-sdk-integration-testing
+                selfLink: /apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers/$$my-trigger$$
+                uid: 175115fd-fea0-4c25-a725-cd53791dad89
+                resourceVersion: AAWiUEvhgvg
+                generation: 1
+                creationTimestamp: '2020-04-02T15:17:16.361398Z'
+                labels:
+                  serving.knative.dev/service: $$my-service$$
+                  cloud.googleapis.com/location: us-central1
+                annotations:
+                  knative.dev/dependency: '{"apiVersion": "events.cloud.google.com/v1alpha1",
+                    "kind": "CloudAuditLogsSource", "name": "source-for-$$my-trigger$$",
+                    "namespace": "cloud-sdk-integration-testing"}'
+                  eventing.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                  eventing.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                  knative-eventing-injection: enabled
+              spec:
+                broker: default
+                filter:
+                  attributes:
+                    knsourcetrigger: link0.006498815041823924
+                    type: com.google.cloud.auditlog.event
+                subscriber:
+                  ref:
+                    kind: Service
+                    name: $$my-service$$
+                    apiVersion: eventing.knative.dev/v1alpha1
+              status:
+                conditions:
+                - type: Ready
+                  status: 'True'
+                  lastTransitionTime: '2020-04-02T15:17:17.706Z'
+                - type: DependencyReady
+                  status: 'True'
+                  lastTransitionTime: '2020-04-02T15:17:17.706Z'
+                - type: Subscribed
+                  status: 'True'
+                  lastTransitionTime: '2020-04-02T15:17:17.706Z'
+                - type: SubscriberResolved
+                  status: 'True'
+                  lastTransitionTime: '2020-04-02T15:17:16.425Z'
+                observedGeneration: 1
+                subscriberUri: https://$$my-service$$-ixwc4imo7a-uc.a.run.app
+    - expect_stdout:
+        matches: .*$$my-trigger$$.*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: events triggers describe $$my-trigger$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers/$$my-trigger$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2240'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: eventing.knative.dev/v1alpha1
+            kind: Trigger
+            metadata:
+              name: $$my-trigger$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers/$$my-trigger$$
+              uid: 175115fd-fea0-4c25-a725-cd53791dad89
+              resourceVersion: AAWiUEvhgvg
+              generation: 1
+              creationTimestamp: '2020-04-02T15:17:16.361398Z'
+              labels:
+                serving.knative.dev/service: $$my-service$$
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                knative.dev/dependency: '{"apiVersion": "events.cloud.google.com/v1alpha1",
+                  "kind": "CloudAuditLogsSource", "name": "source-for-$$my-trigger$$",
+                  "namespace": "cloud-sdk-integration-testing"}'
+                eventing.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                eventing.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                knative-eventing-injection: enabled
+            spec:
+              broker: default
+              filter:
+                attributes:
+                  knsourcetrigger: link0.006498815041823924
+                  type: com.google.cloud.auditlog.event
+              subscriber:
+                ref:
+                  kind: Service
+                  name: $$my-service$$
+                  apiVersion: eventing.knative.dev/v1alpha1
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:17.706Z'
+              - type: DependencyReady
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:17.706Z'
+              - type: Subscribed
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:17.706Z'
+              - type: SubscriberResolved
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:16.425Z'
+              observedGeneration: 1
+              subscriberUri: https://$$my-service$$-ixwc4imo7a-uc.a.run.app
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions?alt=json&labelSelector=duck.knative.dev%2Fsource%3Dtrue&parent=namespaces%2Fcloud-sdk-integration-testing
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '4017'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: apiextensions.k8s.io/v1beta1
+            kind: CustomResourceDefinitionList
+            metadata:
+              selfLink: /apis/apiextensions.k8s.io/v1beta1/namespaces/462803083913/crds
+            items:
+            - apiVersion: apiextensions.k8s.io/v1beta1
+              kind: CustomResourceDefinition
+              metadata:
+                name: cloudpubsubsources.events.cloud.google.com
+                namespace: '462803083913'
+                selfLink: /apis/apiextensions.k8s.io/v1beta1/namespaces/462803083913/customresourcedefinitions/cloudpubsubsources.events.cloud.google.com
+                labels:
+                  duck.knative.dev/source: 'true'
+                  cloud.googleapis.com/location: ''
+                annotations:
+                  registry.knative.dev/eventTypes: '[{"type":"com.google.cloud.pubsub.topic.publish","description":"This
+                    event is sent when a message is published to a Cloud Pub/Sub topic."}]'
+              spec:
+                group: events.cloud.google.com
+                version: v1alpha1
+                names:
+                  plural: cloudpubsubsources
+                  kind: CloudPubSubSource
+                  categories:
+                  - all
+                  - knative
+                  - cloudpubsubsource
+                validation:
+                  openAPIV3Schema:
+                    properties:
+                      spec:
+                        required:
+                        - topic
+                        properties:
+                          topic:
+                            description: ID of the Cloud Pub/Sub Topic to Subscribe
+                              to. It must be in the form of the unique identifier
+                              within the project, not the entire name. E.g. it must
+                              be 'laconia', not 'projects/my-gcp-project/topics/laconia'.
+                            type: string
+            - apiVersion: apiextensions.k8s.io/v1beta1
+              kind: CustomResourceDefinition
+              metadata:
+                name: cloudauditlogssources.events.cloud.google.com
+                namespace: '462803083913'
+                selfLink: /apis/apiextensions.k8s.io/v1beta1/namespaces/462803083913/customresourcedefinitions/cloudauditlogssources.events.cloud.google.com
+                labels:
+                  duck.knative.dev/source: 'true'
+                  cloud.googleapis.com/location: ''
+                annotations:
+                  registry.knative.dev/eventTypes: '[{"type":"com.google.cloud.auditlog.event","description":"This
+                    event is sent when a cloud audit log is emitted."}]'
+              spec:
+                group: events.cloud.google.com
+                version: v1alpha1
+                names:
+                  plural: cloudauditlogssources
+                  kind: CloudAuditLogsSource
+                  categories:
+                  - all
+                  - knative
+                  - cloudauditlogssource
+                validation:
+                  openAPIV3Schema:
+                    properties:
+                      spec:
+                        required:
+                        - serviceName
+                        - methodName
+                        properties:
+                          serviceName:
+                            description: The GCP service providing audit logs.
+                            type: string
+                          methodName:
+                            description: The name of the service method or operation.
+                              For API calls, this should be the name of the API method.
+                            type: string
+                          resourceName:
+                            description: The resource or collection that is the target
+                              of the operation. The name is a scheme-less URI, not
+                              including the API service name. If omitted, audit log
+                              events matching service and method will be pulled for
+                              all resources.
+                            type: string
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/events.cloud.google.com/v1alpha1/namespaces/cloud-sdk-integration-testing/cloudauditlogssources/source-for-$$my-trigger$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1266'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: events.cloud.google.com/v1alpha1
+            kind: CloudAuditLogsSource
+            metadata:
+              name: source-for-$$my-trigger$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/events.cloud.google.com/v1alpha1/namespaces/cloud-sdk-integration-testing/cloudauditlogssources/source-for-$$my-trigger$$
+              uid: 0f6fbb89-6aa9-4dca-9eff-9a46fc687a9b
+              resourceVersion: AAWiUEvQUKA
+              generation: 1
+              creationTimestamp: '2020-04-02T15:17:16.547237Z'
+              labels:
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                events.cloud.google.com/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                events.cloud.google.com/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            spec:
+              serviceName: service
+              methodName: method
+              resourceName: resource
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                message: CloudAuditLogsSource source is created or updated.
+                lastTransitionTime: '2020-04-02T15:17:16.580Z'
+              observedGeneration: 1
+    - expect_stdout:
+        is_none: false
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: events triggers delete $$my-trigger$$
+    cleanup_for: my-trigger
+    events:
+    - expect_prompt_continue:
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers/$$my-trigger$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2240'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: eventing.knative.dev/v1alpha1
+            kind: Trigger
+            metadata:
+              name: $$my-trigger$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers/$$my-trigger$$
+              uid: 175115fd-fea0-4c25-a725-cd53791dad89
+              resourceVersion: AAWiUEvhgvg
+              generation: 1
+              creationTimestamp: '2020-04-02T15:17:16.361398Z'
+              labels:
+                serving.knative.dev/service: $$my-service$$
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                knative.dev/dependency: '{"apiVersion": "events.cloud.google.com/v1alpha1",
+                  "kind": "CloudAuditLogsSource", "name": "source-for-$$my-trigger$$",
+                  "namespace": "cloud-sdk-integration-testing"}'
+                eventing.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                eventing.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                knative-eventing-injection: enabled
+            spec:
+              broker: default
+              filter:
+                attributes:
+                  knsourcetrigger: link0.006498815041823924
+                  type: com.google.cloud.auditlog.event
+              subscriber:
+                ref:
+                  kind: Service
+                  name: $$my-service$$
+                  apiVersion: eventing.knative.dev/v1alpha1
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:17.706Z'
+              - type: DependencyReady
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:17.706Z'
+              - type: Subscribed
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:17.706Z'
+              - type: SubscriberResolved
+                status: 'True'
+                lastTransitionTime: '2020-04-02T15:17:16.425Z'
+              observedGeneration: 1
+              subscriberUri: https://$$my-service$$-ixwc4imo7a-uc.a.run.app
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions?alt=json&labelSelector=duck.knative.dev%2Fsource%3Dtrue&parent=namespaces%2Fcloud-sdk-integration-testing
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '4017'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: apiextensions.k8s.io/v1beta1
+            kind: CustomResourceDefinitionList
+            metadata:
+              selfLink: /apis/apiextensions.k8s.io/v1beta1/namespaces/462803083913/crds
+            items:
+            - apiVersion: apiextensions.k8s.io/v1beta1
+              kind: CustomResourceDefinition
+              metadata:
+                name: cloudpubsubsources.events.cloud.google.com
+                namespace: '462803083913'
+                selfLink: /apis/apiextensions.k8s.io/v1beta1/namespaces/462803083913/customresourcedefinitions/cloudpubsubsources.events.cloud.google.com
+                labels:
+                  duck.knative.dev/source: 'true'
+                  cloud.googleapis.com/location: ''
+                annotations:
+                  registry.knative.dev/eventTypes: '[{"type":"com.google.cloud.pubsub.topic.publish","description":"This
+                    event is sent when a message is published to a Cloud Pub/Sub topic."}]'
+              spec:
+                group: events.cloud.google.com
+                version: v1alpha1
+                names:
+                  plural: cloudpubsubsources
+                  kind: CloudPubSubSource
+                  categories:
+                  - all
+                  - knative
+                  - cloudpubsubsource
+                validation:
+                  openAPIV3Schema:
+                    properties:
+                      spec:
+                        required:
+                        - topic
+                        properties:
+                          topic:
+                            description: ID of the Cloud Pub/Sub Topic to Subscribe
+                              to. It must be in the form of the unique identifier
+                              within the project, not the entire name. E.g. it must
+                              be 'laconia', not 'projects/my-gcp-project/topics/laconia'.
+                            type: string
+            - apiVersion: apiextensions.k8s.io/v1beta1
+              kind: CustomResourceDefinition
+              metadata:
+                name: cloudauditlogssources.events.cloud.google.com
+                namespace: '462803083913'
+                selfLink: /apis/apiextensions.k8s.io/v1beta1/namespaces/462803083913/customresourcedefinitions/cloudauditlogssources.events.cloud.google.com
+                labels:
+                  duck.knative.dev/source: 'true'
+                  cloud.googleapis.com/location: ''
+                annotations:
+                  registry.knative.dev/eventTypes: '[{"type":"com.google.cloud.auditlog.event","description":"This
+                    event is sent when a cloud audit log is emitted."}]'
+              spec:
+                group: events.cloud.google.com
+                version: v1alpha1
+                names:
+                  plural: cloudauditlogssources
+                  kind: CloudAuditLogsSource
+                  categories:
+                  - all
+                  - knative
+                  - cloudauditlogssource
+                validation:
+                  openAPIV3Schema:
+                    properties:
+                      spec:
+                        required:
+                        - serviceName
+                        - methodName
+                        properties:
+                          serviceName:
+                            description: The GCP service providing audit logs.
+                            type: string
+                          methodName:
+                            description: The name of the service method or operation.
+                              For API calls, this should be the name of the API method.
+                            type: string
+                          resourceName:
+                            description: The resource or collection that is the target
+                              of the operation. The name is a scheme-less URI, not
+                              including the API service name. If omitted, audit log
+                              events matching service and method will be pulled for
+                              all resources.
+                            type: string
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/events.cloud.google.com/v1alpha1/namespaces/cloud-sdk-integration-testing/cloudauditlogssources/source-for-$$my-trigger$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/eventing.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/triggers/$$my-trigger$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr:
+        is_none: false
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: run services delete $$my-service$$
+    validation_only: true
+    cleanup_for: my-service
+    events:
+    - expect_prompt_continue:
+        user_input: y
+    - expect_stderr:
+        is_none: false
+    - expect_exit:
+        code: 0

@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core.console import console_io
-from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
@@ -46,14 +45,6 @@ class _BaseUsersDeleteTest(object):
     self.Run('sql users delete --instance my_instance my_username '
              '--host my_host')
     self.assertEqual(prompt_mock.call_count, 1)
-
-  # TODO(b/110486599): Remove this when the argument is removed.
-  def testPositionalHostError(self):
-    with self.assertRaisesRegex(cli_test_base.MockArgumentError,
-                                'Positional argument deprecated_host has been '
-                                'removed'):
-      self.Run('sql users delete --instance my_instance '
-               'my_username my_host --password my_password')
 
   def testDeleteWithNoHostArgument(self):
     prompt_mock = self.StartObjectPatch(

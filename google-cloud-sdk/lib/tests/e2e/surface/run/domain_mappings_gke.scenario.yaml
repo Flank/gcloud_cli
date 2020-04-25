@@ -48,9 +48,7 @@ actions:
 # used instead.
 - define_reference:
     reference: api-version
-    track_values:
-      BETA: v1alpha1
-      ALPHA: v1
+    value: v1
 - set_property:
     run/platform: gke
 - define_reference:

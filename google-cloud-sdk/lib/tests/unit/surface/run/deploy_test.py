@@ -35,8 +35,7 @@ from tests.lib.surface.run import base
 import mock
 
 
-class ServerlessDeployTest(base.ServerlessSurfaceBase,
-                           parameterized.TestCase):
+class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
@@ -61,15 +60,18 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
     self.AssertErrContains(
         'Service [{serv}] revision [{rev}] has been deployed '
         'and is serving 100 percent of traffic at {url}'.format(
-            serv=serv,
-            rev='rev.1',
-            url='https://foo-bar.baz'))
+            serv=serv, rev='rev.1', url='https://foo-bar.baz'))
 
   def testDeployWithService(self):
     self.Run('run deploy my-service --image=gcr.io/thing/stuff')
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('my-service'), [self.app], mock.ANY,
-        asyn=False, allow_unauthenticated=None, prefetch=self.service)
+        self._ServiceRef('my-service'), [self.app],
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
     args, _ = self.operations.ReleaseService.call_args
     tracker = args[2]
     self.assertNotIn('RoutesReady', tracker)
@@ -94,7 +96,9 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
         mock.ANY,
         asyn=False,
         allow_unauthenticated=None,
-        prefetch=self.service)
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
     args, _ = self.operations.ReleaseService.call_args
     tracker = args[2]
     self.assertNotIn('RoutesReady', tracker)
@@ -107,8 +111,13 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
     self.service.spec_traffic.SetPercent(traffic.LATEST_REVISION_KEY, 100)
     self.Run('run deploy my-service --image=gcr.io/thing/stuff')
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('my-service'), [self.app], mock.ANY,
-        asyn=False, allow_unauthenticated=None, prefetch=self.service)
+        self._ServiceRef('my-service'), [self.app],
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
     args, _ = self.operations.ReleaseService.call_args
     tracker = args[2]
     self.assertIn('RoutesReady', tracker)
@@ -134,16 +143,26 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
     self.WriteInput('\n')
     self.Run('run deploy --region se-arboga --image=gcr.io/thing/stuff')
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('stuff', 'se-arboga'), [self.app], mock.ANY,
-        asyn=False, allow_unauthenticated=None, prefetch=self.service)
+        self._ServiceRef('stuff', 'se-arboga'), [self.app],
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployWithImage(self):
     self.WriteInput('\n')
     self.Run('run deploy --image gcr.io/image')
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('image'), [self.app], mock.ANY,
-        asyn=False, allow_unauthenticated=None, prefetch=self.service)
+        self._ServiceRef('image'), [self.app],
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
     self.AssertErrContains('Deploying container')
     self._AssertSuccessMessage('image')
 
@@ -151,8 +170,13 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
     self.WriteInput('\n')
     self.Run('run deploy --image gcr.io/image --async')
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('image'), [self.app], mock.ANY,
-        asyn=True, allow_unauthenticated=None, prefetch=self.service)
+        self._ServiceRef('image'), [self.app],
+        mock.ANY,
+        asyn=True,
+        allow_unauthenticated=None,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
     self.AssertErrContains('Deploying container')
     self.AssertErrContains('Service [image] is deploying asynchronously')
 
@@ -164,18 +188,31 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
         env_vars_to_update={'k1 with spaces': 'v1'})
     self.operations.ReleaseService.assert_called_once_with(
         self._ServiceRef('stuff'), [self.app, self.env_changes],
-        mock.ANY, asyn=False, allow_unauthenticated=None, prefetch=self.service)
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployWithSetEnvVars(self):
     self.Run('run deploy --image=gcr.io/thing/stuff '
              '--set-env-vars="k1 with spaces"=v1,k2="v 2"')
     self.env_mock.assert_called_once_with(
-        env_vars_to_update={'k1 with spaces': 'v1', 'k2': 'v 2'},
+        env_vars_to_update={
+            'k1 with spaces': 'v1',
+            'k2': 'v 2'
+        },
         clear_others=True)
     self.operations.ReleaseService.assert_called_once_with(
         self._ServiceRef('stuff'), [self.app, self.env_changes],
-        mock.ANY, asyn=False, allow_unauthenticated=None, prefetch=self.service)
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployWithRemoveEnvVars(self):
@@ -183,7 +220,12 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
     self.env_mock.assert_called_once_with(env_vars_to_remove=['k 1', 'k2'])
     self.operations.ReleaseService.assert_called_once_with(
         self._ServiceRef('stuff'), [self.app, self.env_changes],
-        mock.ANY, asyn=False, allow_unauthenticated=None, prefetch=self.service)
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployWithClearEnvVars(self):
@@ -191,18 +233,31 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
     self.env_mock.assert_called_once_with(clear_others=True)
     self.operations.ReleaseService.assert_called_once_with(
         self._ServiceRef('stuff'), [self.app, self.env_changes],
-        mock.ANY, asyn=False, allow_unauthenticated=None, prefetch=self.service)
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployWithUpdateRemoveEnvVars(self):
     self.Run('run deploy --image=gcr.io/thing/stuff --remove-env-vars="k 1",k2 '
              '--update-env-vars=k2="v 2","k 3"=v3')
     self.env_mock.assert_called_with(
-        env_vars_to_update={'k2': 'v 2', 'k 3': 'v3'},
+        env_vars_to_update={
+            'k2': 'v 2',
+            'k 3': 'v3'
+        },
         env_vars_to_remove=['k 1', 'k2'])
     self.operations.ReleaseService.assert_called_once_with(
         self._ServiceRef('stuff'), [self.app, self.env_changes],
-        mock.ANY, asyn=False, allow_unauthenticated=None, prefetch=self.service)
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
     self._AssertSuccessMessage('stuff')
 
   def testDeployToCluster(self):
@@ -228,18 +283,20 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
              '--region se-arboga --concurrency 7')
     positional, _ = self.operations.ReleaseService.call_args
     mutators = positional[1]
-    self.assertTrue(any(
-        isinstance(x, config_changes.ConcurrencyChanges)
-        and x._concurrency == 7 for x in mutators))
+    self.assertTrue(
+        any(
+            isinstance(x, config_changes.ConcurrencyChanges) and
+            x._concurrency == 7 for x in mutators))
 
   def testDeployWithIAMServiceAccount(self):
     self.Run('run deploy my-service --image=gcr.io/thing/stuff '
              '--region se-arboga --service-account thing@stuff.org')
     positional, _ = self.operations.ReleaseService.call_args
     mutators = positional[1]
-    self.assertTrue(any(
-        isinstance(x, config_changes.ServiceAccountChanges)
-        and x._service_account == 'thing@stuff.org' for x in mutators))
+    self.assertTrue(
+        any(
+            isinstance(x, config_changes.ServiceAccountChanges) and
+            x._service_account == 'thing@stuff.org' for x in mutators))
 
   def testDeployWithEverything(self):
 
@@ -251,9 +308,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
     self.assertIn(self.app, mutators)
     self.assertIn(self.env_changes, mutators)
 
-  @parameterized.named_parameters(
-      ('private', '--connectivity=internal'),
-      ('public', '--connectivity=external'))
+  @parameterized.named_parameters(('private', '--connectivity=internal'),
+                                  ('public', '--connectivity=external'))
   def testDeployConnectivityVisibility(self, visibility_flag):
     """Test the connectivity visibility flags succeed when deploying to a cluster."""
     self.Run('run deploy --image gcr.io/image --namespace mynamespace '
@@ -263,9 +319,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
     self.AssertErrContains('in namespace [mynamespace] of cluster [mycluster]')
     self._AssertSuccessMessage('image')
 
-  @parameterized.named_parameters(
-      ('private', '--connectivity=internal'),
-      ('public', '--connectivity=external'))
+  @parameterized.named_parameters(('private', '--connectivity=internal'),
+                                  ('public', '--connectivity=external'))
   def testDeployConnectivityVisibilityNoCluster(self, visibility_flag):
     """Test that the connectivity visibility flags raises if not using a cluster."""
     with self.assertRaises(serverless_exceptions.ConfigurationError):
@@ -274,22 +329,31 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
   def testDeployConnectivityOtherValue(self):
     """Test that --connectivity must take the value internal or external."""
     with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run('run deploy --image gcr.io/image '
-               '--connectivity semivisible')
+      self.Run('run deploy --image gcr.io/image ' '--connectivity semivisible')
 
   def testDeployWithAllowUnauthenticated(self):
     """Test the --allow-unauthenticated flag."""
     self.Run('run deploy --image gcr.io/image --allow-unauthenticated')
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('image'), [self.app], mock.ANY,
-        asyn=False, allow_unauthenticated=True, prefetch=self.service)
+        self._ServiceRef('image'), [self.app],
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=True,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
 
   def testDeployWithNoAllowUnauthenticated(self):
     """Test the --no-allow-unauthenticated flag."""
     self.Run('run deploy --image gcr.io/image --no-allow-unauthenticated')
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('image'), [self.app], mock.ANY,
-        asyn=False, allow_unauthenticated=False, prefetch=self.service)
+        self._ServiceRef('image'), [self.app],
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=False,
+        prefetch=self.service,
+        build_log_url=None,
+        build_op_ref=None)
 
   def testAllowUnauthenticatedFailsWithCluster(self):
     """Test that --allow-unauthenticated fails when operating on GKE."""
@@ -300,31 +364,39 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase,
 
   def testPromptAllowUnauthYes(self):
     """Test that user is prompted to allow unauth access and says yes."""
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
     self.operations.CanSetIamPolicyBinding.return_value = True
     self.operations.GetService.side_effect = [None, self.service]
     self.WriteInput('\ny\n')
     self.Run('run deploy --image gcr.io/image')
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('image'), [self.app], mock.ANY,
-        asyn=False, allow_unauthenticated=True, prefetch=None)
-    self.AssertErrContains(
-        'Allow unauthenticated invocations to [image]')
+        self._ServiceRef('image'), [self.app],
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=True,
+        prefetch=None,
+        build_log_url=None,
+        build_op_ref=None)
+    self.AssertErrContains('Allow unauthenticated invocations to [image]')
 
   def testPromptAllowUnauthNo(self):
     """Test that user is prompted to allow unauth access and says no."""
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
     self.operations.CanSetIamPolicyBinding.return_value = True
     self.operations.GetService.side_effect = [None, self.service]
     self.WriteInput('\nn\n')
     self.Run('run deploy --image gcr.io/image')
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('image'), [self.app], mock.ANY,
-        asyn=False, allow_unauthenticated=None, prefetch=None)
-    self.AssertErrContains(
-        'Allow unauthenticated invocations to [image]')
+        self._ServiceRef('image'), [self.app],
+        mock.ANY,
+        asyn=False,
+        allow_unauthenticated=None,
+        prefetch=None,
+        build_log_url=None,
+        build_op_ref=None)
+    self.AssertErrContains('Allow unauthenticated invocations to [image]')
 
 
 class ServerlessDeployTestBeta(ServerlessDeployTest):
@@ -344,6 +416,7 @@ class ServerlessDeployTestAlpha(ServerlessDeployTestBeta):
              '--service-account thing')
     positional, _ = self.operations.ReleaseService.call_args
     mutators = positional[1]
-    self.assertTrue(any(
-        isinstance(x, config_changes.ServiceAccountChanges)
-        and x._service_account == 'thing' for x in mutators))
+    self.assertTrue(
+        any(
+            isinstance(x, config_changes.ServiceAccountChanges) and
+            x._service_account == 'thing' for x in mutators))

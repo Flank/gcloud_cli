@@ -463,15 +463,24 @@ FLAGS
         instance. The attestation is performed against the integrity policy
         baseline. This baseline is initially derived from the implicitly
         trusted boot image when the instance is created. This baseline can be
-        updated by using --shielded-vm-learn-integrity-policy.
+        updated by using --shielded-vm-learn-integrity-policy. On Shielded VMs,
+        integrity monitoring is enabled by default. For information about how
+        to modify Shielded VM options, see
+        https://cloud.google.com/compute/docs/instances/modifying-shielded-vm.
 
      --shielded-secure-boot
-        The instance will boot with secure boot enabled.
+        The instance boots with secure boot enabled. On Shielded VMs, Secure
+        Boot is not enabled by default. For information about how to modify
+        Shielded VM options, see
+        https://cloud.google.com/compute/docs/instances/modifying-shielded-vm.
 
      --shielded-vtpm
-        The instance will boot with the TPM (Trusted Platform Module) enabled.
-        A TPM is a hardware module that can be used for different security
-        operations such as remote attestation, encryption and sealing of keys.
+        The instance boots with the TPM (Trusted Platform Module) enabled. A
+        TPM is a hardware module that can be used for different security
+        operations such as remote attestation, encryption, and sealing of keys.
+        On Shielded VMs, vTPM is enabled by default. For information about how
+        to modify Shielded VM options, see
+        https://cloud.google.com/compute/docs/instances/modifying-shielded-vm.
 
      --source-instance-template=SOURCE_INSTANCE_TEMPLATE
         The name of the instance template that the instance will be created
@@ -615,7 +624,7 @@ FLAGS
           practice to use --image-family when the latest version of an image is
           needed.
 
-          By default, debian-9 is assumed for this flag.
+          By default, debian-10 is assumed for this flag.
 
        --source-snapshot=SOURCE_SNAPSHOT
           The name of the source disk snapshot that the instance boot disk will

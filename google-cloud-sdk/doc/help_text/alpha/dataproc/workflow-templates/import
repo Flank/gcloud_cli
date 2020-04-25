@@ -34,11 +34,9 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --source=SOURCE
-        Path to a YAML file containing workflow template configuration export
-        data. The YAML file must not contain any output-only fields.
-        Alternatively, you may omit this flag to read from standard input. A
-        schema describing the export/import format can be found in:
-        $CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1beta2/WorkflowTemplate.yaml.
+        Path to a YAML file containing configuration export data. The YAML file
+        must not contain any output-only fields. Alternatively, you may omit
+        this flag to read from standard input.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

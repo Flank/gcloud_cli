@@ -38,7 +38,7 @@ REQUIRED FLAGS
             Path to a file representing an expression that represents an access
             level.
 
-            The expression is in the Common Expression Langague (CEL) format.
+            The expression is in the Common Expression Language (CEL) format.
             For example:
 
                   expression: "origin.region_code in ['US', 'CA']"

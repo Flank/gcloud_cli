@@ -30,11 +30,11 @@ from tests.lib.surface.dataflow import base
 JOB_1_ID = base.JOB_1_ID
 
 
-class SqlQueryTestBeta(base.DataflowMockingTestBase,
-                       sdk_test_base.WithOutputCapture):
+class SqlQueryTestGA(base.DataflowMockingTestBase,
+                     sdk_test_base.WithOutputCapture):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.command = 'dataflow sql query'
@@ -212,8 +212,6 @@ class SqlQueryTestBeta(base.DataflowMockingTestBase,
     self.assertEqual(JOB_1_ID, result.job.id)
     self.assertEqual('myjob', result.job.name)
 
-  # Note: structs are not yet supported by Beam ZetaSQL.
-  # https://issues.apache.org/jira/browse/BEAM-9300
   def testQuery_withCommandLineStructParameter(self):
     self.expectParameters({
         'dryRun': 'false',
@@ -290,10 +288,10 @@ class SqlQueryTestBeta(base.DataflowMockingTestBase,
                '--parameters-file=params.txt'.format(self.command))
 
 
-class SqlQueryTestAlpha(SqlQueryTestBeta):
+class SqlQueryTestBeta(SqlQueryTestGA):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

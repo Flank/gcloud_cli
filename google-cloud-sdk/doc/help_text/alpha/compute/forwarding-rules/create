@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha compute forwarding-rules create NAME
         (--backend-service=BACKEND_SERVICE
+          | --target-google-apis-bundle=TARGET_GOOGLE_APIS_BUNDLE
           | --target-grpc-proxy=TARGET_GRPC_PROXY
           | --target-http-proxy=TARGET_HTTP_PROXY
           | --target-https-proxy=TARGET_HTTPS_PROXY
@@ -66,8 +67,8 @@ DESCRIPTION
 
     When creating a forwarding rule, exactly one of --target-instance,
     --target-pool, --target-http-proxy, --target-https-proxy,
-    --target-ssl-proxy, --target-tcp-proxy, --target-vpn-gateway or
-    --backend-service must be specified.
+    --target-ssl-proxy, --target-tcp-proxy, --target-vpn-gateway,
+    --target-google-apis-bundle or --backend-service must be specified.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -78,6 +79,12 @@ REQUIRED FLAGS
 
        --backend-service=BACKEND_SERVICE
           Target backend service that receives the traffic.
+
+       --target-google-apis-bundle=TARGET_GOOGLE_APIS_BUNDLE
+          Target bundle of Google APIs that will receive forwarded trafficvia
+          Private Service Connect. Acceptable values are all-apis, meaning all
+          Google APIs, or vpc-sc, meaning just the APIs that support VPC
+          Service Controls
 
        --target-grpc-proxy=TARGET_GRPC_PROXY
           Target gRPC proxy that receives the traffic.

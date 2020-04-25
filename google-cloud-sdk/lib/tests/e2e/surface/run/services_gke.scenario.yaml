@@ -32,10 +32,7 @@ summary:
 actions:
 - define_reference:
     reference: api-version
-    track_values:
-      GA: v1alpha1
-      BETA: v1alpha1
-      ALPHA: v1
+    value: v1
 - define_reference:
     reference: cluster
     value: do-not-delete-knative-test-oldest

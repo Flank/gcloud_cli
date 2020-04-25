@@ -58,7 +58,7 @@ REQUIRED FLAGS
 
         For more information about the alpha version, see:
         https://cloud.google.com/access-context-manager/docs/reference/rest/v1alpha/accessPolicies.accessLevels
-        For more information about the beta version, see:
+        For other versions, see:
         https://cloud.google.com/access-context-manager/docs/reference/rest/v1/accessPolicies.accessLevels
 
 OPTIONAL FLAGS
@@ -81,8 +81,9 @@ API REFERENCE
     https://cloud.google.com/access-context-manager/docs/reference/rest/
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud access-context-manager levels replace-all
         $ gcloud alpha access-context-manager levels replace-all
 

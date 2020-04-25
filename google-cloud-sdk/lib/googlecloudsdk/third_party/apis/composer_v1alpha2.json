@@ -462,7 +462,7 @@
       "description": "The configuration of Cloud SQL instance that is used by the Apache Airflow\nsoftware.",
       "type": "object",
       "properties": {
-        "tier": {
+        "machineType": {
           "description": "Optional. Cloud SQL tier used by Airflow database.\nIf not specified, db-n1-standard-2 will be used.",
           "type": "string"
         }
@@ -484,6 +484,13 @@
           "description": "The page token used to query for the next page if one exists.",
           "type": "string"
         }
+      }
+    },
+    "RestartWebServerRequest": {
+      "id": "RestartWebServerRequest",
+      "description": "Restart Airflow web server.",
+      "type": "object",
+      "properties": {
       }
     },
     "ListImageVersionsResponse": {
@@ -865,6 +872,34 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Delete an environment."
+                },
+                "restartWebServer": {
+                  "id": "composer.projects.locations.environments.restartWebServer",
+                  "path": "v1alpha2/{+name}:restartWebServer",
+                  "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}:restartWebServer",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "name": {
+                      "description": "The resource name of the environment to restart the web server for, in the\nform:\n\"projects\/{projectId}\/locations\/{locationId}\/environments\/{environmentId}\"",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/environments\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "RestartWebServerRequest"
+                  },
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Restart Airflow web server."
                 }
               }
             },

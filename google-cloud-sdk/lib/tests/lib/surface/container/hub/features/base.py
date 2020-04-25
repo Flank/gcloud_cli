@@ -146,7 +146,7 @@ class FeaturesTestBase(cli_test_base.CliTestBase,
 
   def RunCommand(self, params):
     if hasattr(self, 'NO_FEATURE_PREFIX'):
-      prefix = ['container', 'hub', self.FEATURE_NAME]
+      prefix = ['container', 'hub', self.NO_FEATURE_PREFIX]
     else:
       prefix = ['container', 'hub', 'features', self.FEATURE_NAME]
     if isinstance(params, six.string_types):

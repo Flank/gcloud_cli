@@ -4,34 +4,40 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute instance-templates create $$instance-from-instance-template$$
-  - stderr: |
+  - stderr: |-
       Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$\].
+      $
   - stdout: .*$$instance-from-instance-template$$\s\sn1-standard-1.*$
 - execute:
   - command: compute instances create $$gcloud-compute-test$$ --source-instance-template
       $$instance-from-instance-template$$ --format=disable --zone=$$my-zone$$
-  - stderr: |
+  - stderr: |-
       Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$\].
+      $
 - execute:
   - command: compute instances create-with-container $$gcloud-compute-test-container$$
       --source-instance-template $$instance-from-instance-template$$ --format=disable
       --container-image=gcr.io/google-containers/busybox --zone=$$my-zone$$
-  - stderr: |
+  - stderr: |-
       Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$\].
+      $
 - execute:
   - command: compute instance-templates delete $$instance-from-instance-template$$
       --quiet
-  - stderr: |
+  - stderr: |-
       Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$\].
+      $
 - execute:
   - command: compute instances delete $$gcloud-compute-test$$ --zone $$my-zone$$ --quiet
-  - stderr: |
+  - stderr: |-
       Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$\].
+      $
 - execute:
   - command: compute instances delete $$gcloud-compute-test-container$$ --zone $$my-zone$$
       --quiet
-  - stderr: |
+  - stderr: |-
       Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
@@ -53,7 +59,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/alpha/projects/debian-cloud/global/images/family/debian-9?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/debian-cloud/global/images/family/debian-10?alt=json
           method: GET
           headers: {}
           body: null
@@ -97,7 +103,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://$$compute-uri$$/alpha/projects/debian-cloud/global/images/family/debian-9
+                    sourceImage: https://$$compute-uri$$/alpha/projects/debian-cloud/global/images/family/debian-10
                   mode: READ_WRITE
                   type: PERSISTENT
                 machineType: n1-standard-1

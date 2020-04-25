@@ -31,8 +31,11 @@ from googlecloudsdk.core import http
 from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.util import files
 from tests.lib import calliope_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.unit.calliope import testdata
+
+import mock
 
 
 class _MockResponse(object):
@@ -49,7 +52,7 @@ def _MockHttpResult(url):
 
 
 _BQ_COMMAND_OUTPUT = {
-    'bq.help': """\
+    'help': """\
 Python script for interacting with BigQuery.
 
 
@@ -94,7 +97,7 @@ query      Execute a query.
 Run 'bq --help' to get help for global flags.
 Run 'bq help <command>' to get help for <command>.
 """,
-    'bq.--help': """\
+    '--help': """\
 Python script for interacting with BigQuery.
 
 
@@ -134,7 +137,7 @@ gflags:
 Run 'bq help' to see the list of available commands.
 Run 'bq help <command>' to get help for <command>.
 """,
-    'bq.version': """\
+    'version': """\
 This is BigQuery CLI 2.0.27
 
 """,
@@ -157,7 +160,7 @@ class BqCliGeneratorTest(calliope_test_base.CalliopeTestBase):
 
 
 _GSUTIL_COMMAND_OUTPUT = {
-    'gsutil.--help': """\
+    '--help': """\
 Usage: gsutil [-D] [-DD] [-h header]... [-m] [-o] [-q] [command [opts...] args...]
 Available commands:
   acl             Get, set, or change bucket and/or object ACLs
@@ -168,7 +171,7 @@ Additional help topics:
 
 Use gsutil help <command or topic> for detailed help.
 """,
-    'gsutil.acl.--help': """\
+    'acl.--help': """\
 NAME
   acl - Get, set, or change bucket and/or object ACLs
 
@@ -243,7 +246,7 @@ SET OPTIONS
                 this flag is set. This option is implicitly set when running
                 "gsutil -m acl...".
 """,
-    'gsutil.acl.set.--help': """\
+    'acl.set.--help': """\
 NAME
   acl set - Get, set, or change bucket and/or object ACLs
 
@@ -280,7 +283,7 @@ SET OPTIONS
                 this flag is set. This option is implicitly set when running
                 "gsutil -m acl...".
 """,
-    'gsutil.help': """\
+    'help': """\
 NAME
   help - Get help about commands and topics
 
@@ -299,7 +302,7 @@ DESCRIPTION
   will provide a summary of all commands and additional topics on which
   help is available.
 """,
-    'gsutil.help.creds': """\
+    'help.creds': """\
 NAME
   creds - Credential Types Supporting Various Use Cases
 
@@ -329,7 +332,7 @@ SUPPORTED CREDENTIAL TYPES
     This is the preferred type of credentials for authenticating requests on
     behalf of a specific user (which is probably the most common use of gsutil).
 """,
-    'gsutil.help.options': """\
+    'help.options': """\
 NAME
   options - Top-Level Command-Line Options
 
@@ -351,7 +354,7 @@ OPTIONS
               running gsutil from a cron job that logs its output to a file, for
               which the only information desired in the log is failures.
 """,
-    'gsutil.version': """\
+    'version': """\
 gsutil version: 4.27
 """,
 }
@@ -373,7 +376,7 @@ class GsutilCliGeneratorTest(calliope_test_base.CalliopeTestBase):
 
 
 _KUBECTL_COMMAND_OUTPUT = {
-    'kubectl.--help': """\
+    '--help': """\
 kubectl controls the Kubernetes cluster manager.
 
 Find more information at https://github.com/kubernetes/kubernetes.
@@ -387,7 +390,7 @@ Troubleshooting and Debugging Commands:
 Use "kubectl <command> --help" for more information about a given command.
 Use "kubectl options" for a list of global command-line options (applies to all commands).
 """,
-    'kubectl.create.--help': """\
+    'create.--help': """\
 Create a resource by filename or stdin.
 
 JSON and YAML formats are accepted.
@@ -415,7 +418,7 @@ Usage:
 Use "kubectl <command> --help" for more information about a given command.
 Use "kubectl options" for a list of global command-line options (applies to all commands).
 """,
-    'kubectl.create.deployment.--help': """\
+    'create.deployment.--help': """\
 Create a deployment with the specified name.
 
 Aliases:
@@ -434,7 +437,7 @@ Usage:
 
 Use "kubectl options" for a list of global command-line options (applies to all commands).
 """,
-    'kubectl.describe.--help': """\
+    'describe.--help': """\
 Show details of a specific resource or group of resources. This command joins many API calls together to form a detailed description of a given resource or group of resources.
 
   $ kubectl describe TYPE NAME_PREFIX
@@ -459,14 +462,14 @@ Usage:
 
 Use "kubectl options" for a list of global command-line options (applies to all commands).
 """,
-    'kubectl.options': """\
+    'options': """\
 The following options can be passed to any command:
 
       --alsologtostderr=false: log to standard error as well as files
       --client-certificate='': Path to a client certificate file for TLS
       --vmodule=: comma-separated list of pattern=N settings for file-filtered logging
 """,
-    'kubectl.version.--client': """\
+    'version.--client': """\
 Client Version: version.Info{Major:"1", Minor:"7", GitVersion:"v1.7.6", GitCommit:"4bc5e7f9a6c25dc4c03d4d656f2cefd21540e28c", GitTreeState:"clean", BuildDate:"2017-09-14T06:55:55Z", GoVersion:"go1.8.3", Compiler:"gc", Platform:"linux/amd64"}
 """,
 }
@@ -775,50 +778,6 @@ SEE ALSO
 
 
 GNU coreutils 8.21                March 2016                             LS(1)
-""",
-    'bq.--help': """\
-Python script for interacting with BigQuery.
-
-
-USAGE: bq [--global_flags] <command> [--command_flags] [args]
-
-
-
-Global flags:
-
-bq_flags:
-  --api: API endpoint to talk to.
-    (default: 'https://www.googleapis.com')
-  --[no]debug_mode: Show tracebacks on Python exceptions.
-    (default: 'false')
-  --discovery_file: Filename for JSON document to read for discovery.
-    (default: '')
-  -q,--[no]quiet: If True, ignore status updates while jobs are running.
-    (default: 'false')
-  -sync,--[no]synchronous_mode: If True, wait for command completion before
-    returning, and use the job completion status for error codes. If False,
-    simply create the job, and use the success of job creation as the error
-    code.
-    (default: 'true')
-
-google.apputils.app:
-  --[no]helpxml: like --help, but generates XML output
-
-oauth2client.old_run:
-  --auth_host_name: Host name to use when running a local web server to handle
-    redirects during OAuth authorization.
-    (default: 'localhost')
-
-gflags:
-  --flagfile: Insert flag definitions from the given file into the command line.
-    (default: '')
-
-Run 'bq help' to see the list of available commands.
-Run 'bq help <command>' to get help for <command>.
-""",
-    'bq.version': """\
-This is BigQuery CLI 2.0.27
-
 """,
     'unicode': u'Ṳᾔḯ¢◎ⅾℯ',
 }
@@ -1281,7 +1240,7 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
         files,
         'FindExecutableOnPath',
         side_effect=
-        lambda command, allow_extensions=False: command in ('man', 'ls'))
+        lambda command, allow_extensions=False: command == 'man')
     self.StartObjectPatch(
         generate_cli_trees._ManCommandCollector,
         '_GetRawManPageText',
@@ -1299,7 +1258,7 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
         files,
         'FindExecutableOnPath',
         side_effect=
-        lambda command, allow_extensions=False: command in ('man', 'ls'))
+        lambda command, allow_extensions=False: command == 'man')
     self.StartObjectPatch(
         generate_cli_trees._ManCommandCollector,
         '_GetRawManPageText',
@@ -1323,7 +1282,7 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
         files,
         'FindExecutableOnPath',
         side_effect=
-        lambda command, allow_extensions=False: command in ('man', 'ls'))
+        lambda command, allow_extensions=False: command == 'man')
     self.StartObjectPatch(
         generate_cli_trees._ManCommandCollector,
         '_GetRawManPageText',
@@ -1331,16 +1290,6 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
     generate_cli_trees.LoadOrGenerate('ls')
     ls_json = os.path.join(cli_tree_config_dir, 'ls.json')
     self.AssertFileIsGolden(ls_json, __file__, 'ls-man.json')
-
-  def testManPageCliTreeGeneratorNoCommand(self):
-    self.StartObjectPatch(
-        files,
-        'FindExecutableOnPath',
-        side_effect=
-        lambda command, allow_extensions=False: command != 'no-such-command')
-    tree = generate_cli_trees.LoadOrGenerate('no-such-command', verbose=True)
-    self.assertIsNone(tree)
-    self.AssertErrContains('Command [no-such-command] not found.')
 
   def testManPageCliTreeGeneratorNoManCommandNoUrl(self):
     self.StartObjectPatch(
@@ -1351,63 +1300,64 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
     self.assertIsNone(tree)
     self.AssertErrContains('Generating the [ls] CLI tree')
 
-  def testMemoizeFailures(self):
-    try:
-      # Enable and reset failure memoization.
-      generate_cli_trees.CliTreeGenerator.MemoizeFailures(True)
-
-      self.StartObjectPatch(
-          files,
-          'FindExecutableOnPath',
-          side_effect=
-          lambda command, allow_extensions=False: command != 'no-such-command')
-
-      tree = generate_cli_trees.LoadOrGenerate('no-such-command', verbose=True)
-      self.assertIsNone(tree)
-      self.AssertErrContains('Command [no-such-command] not found.')
-
-      self.ClearErr()
-      tree = generate_cli_trees.LoadOrGenerate('no-such-command', verbose=True)
-      self.assertIsNone(tree)
-      self.AssertErrContains('No CLI tree generator for [no-such-command].')
-
-    finally:
-      # Disable and clear failure memoization.
-      generate_cli_trees.CliTreeGenerator.MemoizeFailures(False)
-
   def testManUrlCliTreeGenerator(self):
     cli_tree_config_dir = cli_tree.CliTreeConfigDir()
     os.makedirs(cli_tree_config_dir)
     self.StartObjectPatch(
         files,
         'FindExecutableOnPath',
-        side_effect=lambda command, allow_extensions=False: command == 'ls')
+        side_effect=lambda command, allow_extensions=False: command != 'man')
     mock_http = self.StartObjectPatch(http, 'HttpClient')
     mock_http.return_value.request.side_effect = _MockHttpResult
     generate_cli_trees.LoadOrGenerate('ls')
     ls_json = os.path.join(cli_tree_config_dir, 'ls.json')
     self.AssertFileIsGolden(ls_json, __file__, 'ls-url.json')
 
-  def testManUrlCliTreeGeneratorNoCommand(self):
-    self.StartObjectPatch(
-        files,
-        'FindExecutableOnPath',
-        side_effect=
-        lambda command, allow_extensions=False: command not in ('man', 'no-such-command'))  # pylint: disable=line-too-long
-    tree = generate_cli_trees.LoadOrGenerate('no-such-command', verbose=True)
-    self.assertIsNone(tree)
-    self.AssertErrContains('Command [no-such-command] not found.')
-
   def testManUrlCliTreeGeneratorNoUrl(self):
     self.StartObjectPatch(
         files,
         'FindExecutableOnPath',
-        side_effect=lambda command, allow_extensions=False: command == 'grep')
+        side_effect=lambda command, allow_extensions=False: command != 'man')
     mock_http = self.StartObjectPatch(http, 'HttpClient')
     mock_http.return_value.request.side_effect = _MockHttpResult
-    tree = generate_cli_trees.LoadOrGenerate('grep', verbose=True)
+    tree = generate_cli_trees.LoadOrGenerate('no-such-command', verbose=True)
     self.assertIsNone(tree)
-    self.AssertErrContains('Generating the [grep] CLI tree')
+    self.AssertErrContains('Generating the [no-such-command] CLI tree')
+
+
+class LoadOrGenerateTest(parameterized.TestCase,
+                         calliope_test_base.CalliopeTestBase):
+
+  @parameterized.parameters(
+      'gsutil',
+      'no-such-dir/gsutil',
+      'no-such-executable no-such-dir/gsutil')
+  @mock.patch.object(subprocess, 'Popen', side_effect=OSError('Error'))
+  def testCommandInvocationFailure(self, command, popen_mock):
+    tree = generate_cli_trees.LoadOrGenerate(command, verbose=True)
+    self.assertIsNone(tree)
+    self.AssertErrMatches(r'Command .+ could not be invoked:\nError')
+
+  @mock.patch.object(subprocess, 'check_output', side_effect=OSError('Error'))
+  @mock.patch.object(files, 'FindExecutableOnPath', return_value=True)
+  def testMemoizeFailures(self, find_executable_mock, check_output_mock):
+    try:
+      # Enable and reset failure memoization.
+      generate_cli_trees.CliTreeGenerator.MemoizeFailures(True)
+
+      tree = generate_cli_trees.LoadOrGenerate('no-such-command', verbose=True)
+      self.assertIsNone(tree)
+
+      self.ClearErr()
+      tree = generate_cli_trees.LoadOrGenerate('no-such-command', verbose=True)
+      self.assertIsNone(tree)
+      self.AssertErrContains(
+          'Skipping CLI tree generation for [no-such-command] due to previous '
+          'failure.')
+
+    finally:
+      # Disable and clear failure memoization.
+      generate_cli_trees.CliTreeGenerator.MemoizeFailures(False)
 
 
 class UpdateCliTreesTest(calliope_test_base.CalliopeTestBase):
@@ -1416,11 +1366,6 @@ class UpdateCliTreesTest(calliope_test_base.CalliopeTestBase):
     raise subprocess.CalledProcessError(16, ' '.join(cmd))
 
   def SetUp(self):
-    # TODO(b/69033748): disable until issues resolved
-    self.StartPropertyPatch(
-        generate_cli_trees,
-        '_DisableLongRunningCliTreeGeneration',
-        return_value=False)
     self.StartObjectPatch(
         generate_cli_trees.BqCliTreeGenerator,
         'Run',
@@ -1441,9 +1386,11 @@ class UpdateCliTreesTest(calliope_test_base.CalliopeTestBase):
         files,
         'FindExecutableOnPath',
         side_effect=
-        lambda command, allow_extensions=False: command in ('bq', 'gsutil', 'kubectl'))  # pylint: disable=line-too-long
+        lambda command, allow_extensions=False: command == 'man')
 
-  def testUpdateCliTrees(self):
+  @mock.patch.object(subprocess, 'Popen')
+  def testUpdateCliTrees(self, popen_mock):
+    popen_mock.return_value.communicate.return_value = (None, None)
     # The first update should create the trees.
     generate_cli_trees.UpdateCliTrees(
         commands=list(generate_cli_trees.GENERATORS.keys()),
@@ -1467,8 +1414,8 @@ class UpdateCliTreesTest(calliope_test_base.CalliopeTestBase):
 
   def testUpdateCliTreesUnknownCommand(self):
     with self.AssertRaisesExceptionMatches(
-        generate_cli_trees.NoCliTreeGeneratorForCommand,
-        'No CLI tree generators for [bar, foo].'):
+        generate_cli_trees.CliTreeGenerationError,
+        'CLI tree generation failed for [bar, foo].'):
       generate_cli_trees.UpdateCliTrees(
           commands=['bar', 'foo'],
           directory=self.temp_path)

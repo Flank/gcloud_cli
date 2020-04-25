@@ -38,7 +38,7 @@ DEFAULT_SCOPES = sorted([
 DEFAULT_MACHINE_TYPE = 'n1-standard-1'
 
 _DEFAULT_IMAGE = (
-    '{compute_uri}/projects/debian-cloud/global/images/family/debian-9')
+    '{compute_uri}/projects/debian-cloud/global/images/family/debian-10')
 
 _DEFAULT_NETWORK = ('{compute_uri}/projects/my-project/'
                     'global/networks/default')
@@ -76,7 +76,7 @@ class InstanceTemplatesCreateTestBase(test_base.BaseTest):
     self.make_requests.side_effect = iter([
         [
             self.messages.Image(
-                name='debian-9-stretch-v20170619',
+                name='debian-10-buster-v20200326',
                 selfLink=self._default_image),
         ],
         [],
@@ -85,7 +85,7 @@ class InstanceTemplatesCreateTestBase(test_base.BaseTest):
     self.get_default_image_requests = [
         (self.compute.images, 'GetFromFamily',
          self.messages.ComputeImagesGetFromFamilyRequest(
-             family='debian-9', project='debian-cloud'))
+             family='debian-10', project='debian-cloud'))
     ]
 
   def _MakeInstanceTemplate(self, **kwargs):

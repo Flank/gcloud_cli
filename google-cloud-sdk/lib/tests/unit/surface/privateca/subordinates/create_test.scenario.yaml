@@ -5,14 +5,14 @@ summary:
 - set_property: core/project foo
 - execute:
   - command: privateca subordinates create server-tls --issuer prod-root --issuer-location
-      us-west1 --subject "CN=Server TLS CA 1,O=Google" --reusable-config server-tls --kms-key-version
-      projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
+      us-east1 --subject "CN=Server TLS CA 1,O=Google" --reusable-config server-tls
+      --kms-key-version projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
   - stderr: |
-      Created Certificate Authority [projects/foo/locations/us-west1/certificateAuthorities/server-tls].
+      Created Certificate Authority [projects/foo/locations/us-east1/certificateAuthorities/server-tls].
 - execute:
   - command: privateca subordinates create server-tls --create-csr --csr-output-file
-      csr.pem --subject "CN=Server TLS CA 1,O=Google" --reusable-config server-tls --kms-key-version
-      projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
+      csr.pem --subject "CN=Server TLS CA 1,O=Google" --reusable-config server-tls
+      --kms-key-version projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
   - write_file: csr.pem
   - stderr: |
       Created Certificate Authority [projects/foo/locations/us-west1/certificateAuthorities/server-tls] and saved CSR to 'csr.pem'.
@@ -21,8 +21,8 @@ actions:
     core/project: foo
 - execute_command:
     command: privateca subordinates create server-tls --issuer prod-root --issuer-location
-      us-west1 --subject "CN=Server TLS CA 1,O=Google" --reusable-config server-tls --kms-key-version
-      projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
+      us-east1 --subject "CN=Server TLS CA 1,O=Google" --reusable-config server-tls
+      --kms-key-version projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
     events:
     - api_call:
         expect_request:
@@ -58,7 +58,7 @@ actions:
             - storage.buckets.create
     - api_call:
         expect_request:
-          uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1:testIamPermissions?alt=json
+          uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1:testIamPermissions?alt=json
           method: POST
           body:
             json:
@@ -72,7 +72,7 @@ actions:
             - cloudkms.cryptoKeys.setIamPolicy
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-west1/certificateAuthorities/prod-root:testIamPermissions?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-east1/certificateAuthorities/prod-root:testIamPermissions?alt=json
           method: POST
           body:
             json:
@@ -104,13 +104,15 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://storage.googleapis.com/storage/v1/b?alt=json&project=foo
+          uri: https://storage.googleapis.com/storage/v1/b?alt=json&predefinedDefaultObjectAcl=publicRead&project=foo
           method: POST
           body:
             text:
-              matches: .*privateca_content_[0-9a-f-]+.*
+              matches: '.*"name": "privateca_content_[0-9a-f-]+".*'
             json:
-              location: us-west1
+              location: us-east1
+              versioning:
+                enabled: true
         return_response:
           headers:
             status: '200'
@@ -124,6 +126,14 @@ actions:
              "timeCreated": "2020-02-12T20:10:10.558Z",
              "updated": "2020-02-12T20:10:10.558Z",
              "metageneration": "1",
+             "defaultObjectAcl": [
+              {
+               "kind": "storage#objectAccessControl",
+               "entity": "allUsers",
+               "role": "READER",
+               "etag": "CAE="
+              }
+             ],
              "iamConfiguration": {
               "bucketPolicyOnly": {
                "enabled": false
@@ -132,14 +142,17 @@ actions:
                "enabled": false
               }
              },
-             "location": "us-west1",
+             "location": "us-east1",
              "locationType": "region",
+             "versioning": {
+              "enabled": true
+             },
              "storageClass": "STANDARD",
              "etag": "CAE="
             }
     - api_call:
         expect_request:
-          uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1:getIamPolicy?alt=json&options.requestedPolicyVersion=3
+          uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1:getIamPolicy?alt=json&options.requestedPolicyVersion=3
           method: GET
           body: null
         return_response:
@@ -152,7 +165,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1:setIamPolicy?alt=json
+          uri: https://cloudkms.googleapis.com/v1/projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1:setIamPolicy?alt=json
           method: POST
           body:
             json:
@@ -268,15 +281,15 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://privateca\.googleapis\.com/v1alpha1/projects/foo/locations/us-west1/certificateAuthorities\?alt=json&certificateAuthorityId=server-tls&requestId=[^&]+
+            matches: https://privateca\.googleapis\.com/v1alpha1/projects/foo/locations/us-east1/certificateAuthorities\?alt=json&certificateAuthorityId=server-tls&requestId=[^&]+
           method: POST
           headers: {}
           body:
             json:
-              cloudKmsKeyVersion: projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
+              cloudKmsKeyVersion: projects/foo/locations/us-east1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
               config:
                 reusableConfig:
-                  reusableConfig: projects/privateca-data/locations/us-west1/reusableConfigs/server-tls
+                  reusableConfig: projects/privateca-data/locations/us-east1/reusableConfigs/server-tls
                 subjectConfig:
                   commonName: Server TLS CA 1
                   subject: {}
@@ -290,13 +303,13 @@ actions:
           headers:
             status: '200'
           body:
-            name: projects/foo/locations/us-west1/operations/operation-123
+            name: projects/foo/locations/us-east1/operations/operation-123
             done: true
             response:
-              name: projects/foo/locations/us-west1/certificateAuthorities/server-tls
+              name: projects/foo/locations/us-east1/certificateAuthorities/server-tls
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-west1/certificateAuthorities/server-tls:getCsr?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-east1/certificateAuthorities/server-tls:getCsr?alt=json
           method: GET
           body: null
         return_response:
@@ -326,11 +339,11 @@ actions:
     - api_call:
         expect_request:
           uri:
-            matches: https://privateca\.googleapis\.com/v1alpha1/projects/foo/locations/us-west1/certificateAuthorities/prod-root/certificates\?alt=json&certificateId=subordinate-\d{8}-[A-Z0-9]{3}-[A-Z0-9]{3}&requestId=[^&]+$
+            matches: https://privateca\.googleapis\.com/v1alpha1/projects/foo/locations/us-east1/certificateAuthorities/prod-root/certificates\?alt=json&certificateId=subordinate-\d{8}-[A-Z0-9]{3}-[A-Z0-9]{3}&requestId=[^&]+$
           method: POST
           body:
             text:
-              matches: .*projects/foo/locations/us-west1/certificateAuthorities/prod-root/certificates/subordinate-\d{8}-[A-Z0-9]{3}-[A-Z0-9]{3}.*
+              matches: .*projects/foo/locations/us-east1/certificateAuthorities/prod-root/certificates/subordinate-\d{8}-[A-Z0-9]{3}-[A-Z0-9]{3}.*
             json:
               lifetime: 315569261s
               pemCsr: |
@@ -359,7 +372,7 @@ actions:
           body:
             done: true
             response:
-              name: projects/foo/locations/us-west1/certificateAuthorities/prod-root/certificates/subordinate-20200220-ABC-DEF
+              name: projects/foo/locations/us-east1/certificateAuthorities/prod-root/certificates/subordinate-20200220-ABC-DEF
               pemCertificate: |
                 -----BEGIN CERTIFICATE-----
                 MIIEKDCCAtygAwIBAgIVAKDKBUAIdi0prnBNNn/6cS/r1mfIMEEGCSqGSIb3DQEB
@@ -416,7 +429,7 @@ actions:
                 -----END CERTIFICATE-----
     - api_call:
         expect_request:
-          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-west1/certificateAuthorities/server-tls:activate?alt=json
+          uri: https://privateca.googleapis.com/v1alpha1/projects/foo/locations/us-east1/certificateAuthorities/server-tls:activate?alt=json
           method: POST
           body:
             json:
@@ -480,13 +493,13 @@ actions:
             done: true
     - expect_stderr: >
         Created Certificate Authority
-        [projects/foo/locations/us-west1/certificateAuthorities/server-tls].
+        [projects/foo/locations/us-east1/certificateAuthorities/server-tls].
     - expect_exit:
         code: 0
 - execute_command:
     command: privateca subordinates create server-tls --create-csr --csr-output-file
-      csr.pem --subject "CN=Server TLS CA 1,O=Google" --reusable-config server-tls --kms-key-version
-      projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
+      csr.pem --subject "CN=Server TLS CA 1,O=Google" --reusable-config server-tls
+      --kms-key-version projects/foo/locations/us-west1/keyRings/kr1/cryptoKeys/k1/cryptoKeyVersions/1
     events:
     - api_call:
         expect_request:
@@ -554,13 +567,15 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://storage.googleapis.com/storage/v1/b?alt=json&project=foo
+          uri: https://storage.googleapis.com/storage/v1/b?alt=json&predefinedDefaultObjectAcl=publicRead&project=foo
           method: POST
           body:
             text:
-              matches: .*privateca_content_[0-9a-f-]+.*
+              matches: '.*"name": "privateca_content_[0-9a-f-]+".*'
             json:
               location: us-west1
+              versioning:
+                enabled: true
         return_response:
           headers:
             status: '200'
@@ -574,6 +589,14 @@ actions:
              "timeCreated": "2020-02-12T20:10:10.558Z",
              "updated": "2020-02-12T20:10:10.558Z",
              "metageneration": "1",
+             "defaultObjectAcl": [
+              {
+               "kind": "storage#objectAccessControl",
+               "entity": "allUsers",
+               "role": "READER",
+               "etag": "CAE="
+              }
+             ],
              "iamConfiguration": {
               "bucketPolicyOnly": {
                "enabled": false
@@ -584,6 +607,9 @@ actions:
              },
              "location": "us-west1",
              "locationType": "region",
+             "versioning": {
+              "enabled": true
+             },
              "storageClass": "STANDARD",
              "etag": "CAE="
             }

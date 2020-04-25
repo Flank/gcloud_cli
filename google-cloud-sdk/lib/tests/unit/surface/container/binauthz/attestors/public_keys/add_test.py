@@ -34,6 +34,7 @@ from tests.lib.surface.container.binauthz import base
 
 class AddTest(
     sdk_test_base.WithTempCWD,
+    base.WithMockKms,
     base.WithMockGaBinauthz,
     base.BinauthzTestBase,
 ):
@@ -41,7 +42,7 @@ class AddTest(
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
 
-  def testSuccess(self):
+  def testSuccessPgp(self):
     ascii_armored_key = textwrap.dedent("""
         -----BEGIN PGP PUBLIC KEY BLOCK-----
         aBcDeFg
@@ -57,6 +58,8 @@ class AddTest(
         asciiArmoredPgpPublicKey=ascii_armored_key,
         comment=None,
         id='0638AttestorDD940361EA2D7F14C58C124F0E663DA097')
+    # Handle multiple API versions: GA has userOwnedGrafeasNote,
+    # beta has has userOwnedDrydockNote (also below).
     try:
       attestor = self.messages.Attestor(
           name='projects/{}/attestors/{}'.format(proj, name),
@@ -96,164 +99,6 @@ class AddTest(
 
     self.assertEqual(response, new_pub_key)
 
-  def testAlreadyExists(self):
-    ascii_armored_key = textwrap.dedent("""
-        -----BEGIN PGP PUBLIC KEY BLOCK-----
-        aBcDeFg
-        aBcDeFg
-        aBcDeFg
-        -----END PGP PUBLIC KEY BLOCK-----
-    """)
-    fname = self.Touch(directory=self.cwd_path, contents=ascii_armored_key)
-
-    name = 'bar'
-    proj = self.Project()
-    new_pub_key = self.messages.AttestorPublicKey(
-        asciiArmoredPgpPublicKey=ascii_armored_key,
-        comment=None,
-        id='0638AttestorDD940361EA2D7F14C58C124F0E663DA097')
-    try:
-      attestor = self.messages.Attestor(
-          name='projects/{}/attestors/{}'.format(proj, name),
-          updateTime=None,
-          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
-              noteReference='projects/{}/notes/{}'.format(proj, name),
-              publicKeys=[new_pub_key],
-          ))
-    except AttributeError:
-      attestor = self.messages.Attestor(
-          name='projects/{}/attestors/{}'.format(proj, name),
-          updateTime=None,
-          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-              noteReference='projects/{}/notes/{}'.format(proj, name),
-              publicKeys=[new_pub_key],
-          ))
-
-    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
-        name=attestor.name)
-
-    self.mock_client.projects_attestors.Get.Expect(req, response=attestor)
-
-    with self.assertRaises(exceptions.AlreadyExistsError):
-      self.RunBinauthz(
-          'attestors public-keys add '
-          '--attestor={name} --pgp-public-key-file={fname}'.format(
-              name=name, fname=fname))
-
-  def testUnknownFile(self):
-    with self.assertRaises(cli_test_base.MockArgumentError):
-      self.RunBinauthz(
-          'attestors public-keys add '
-          '--attestor=any-old-name --pgp-public-key-file=not-a-real-file.pub')
-
-
-class AddBetaTest(
-    base.WithMockBetaBinauthz,
-    AddTest,
-):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def testAlreadyExists(self):
-    ascii_armored_key = textwrap.dedent("""
-        -----BEGIN PGP PUBLIC KEY BLOCK-----
-        aBcDeFg
-        aBcDeFg
-        aBcDeFg
-        -----END PGP PUBLIC KEY BLOCK-----
-    """)
-    fname = self.Touch(directory=self.cwd_path, contents=ascii_armored_key)
-
-    name = 'bar'
-    proj = self.Project()
-    new_pub_key = self.messages.AttestorPublicKey(
-        asciiArmoredPgpPublicKey=ascii_armored_key,
-        comment=None,
-        id='0638AttestorDD940361EA2D7F14C58C124F0E663DA097')
-    attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, name),
-        updateTime=None,
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, name),
-            publicKeys=[new_pub_key],
-        ))
-
-    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
-        name=attestor.name)
-
-    self.mock_client.projects_attestors.Get.Expect(req, response=attestor)
-
-    with self.assertRaises(exceptions.AlreadyExistsError):
-      self.RunBinauthz(
-          'attestors public-keys add '
-          '--attestor={name} --pgp-public-key-file={fname}'.format(
-              name=name, fname=fname))
-
-
-class AddAlphaTest(
-    sdk_test_base.WithTempCWD,
-    base.WithMockKms,
-    base.WithMockAlphaBinauthz,
-    base.BinauthzTestBase,
-):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testSuccessPgp(self):
-    ascii_armored_key = textwrap.dedent("""
-        -----BEGIN PGP PUBLIC KEY BLOCK-----
-        aBcDeFg
-        aBcDeFg
-        aBcDeFg
-        -----END PGP PUBLIC KEY BLOCK-----
-    """)
-    fname = self.Touch(directory=self.cwd_path, contents=ascii_armored_key)
-
-    name = 'bar'
-    proj = self.Project()
-    expected_output_pub_key = self.messages.AttestorPublicKey(
-        asciiArmoredPgpPublicKey=ascii_armored_key,
-        comment=None,
-        id='0638AttestorDD940361EA2D7F14C58C124F0E663DA097')
-    expected_input_pub_key = self.messages.AttestorPublicKey(
-        asciiArmoredPgpPublicKey=ascii_armored_key,
-        comment=None,
-        id=None)
-    attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, name),
-        updateTime=None,
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, name),
-            publicKeys=[],
-        ))
-
-    input_attestor = copy.deepcopy(attestor)
-    input_attestor.userOwnedDrydockNote.publicKeys.append(
-        expected_input_pub_key)
-
-    output_attestor = copy.deepcopy(attestor)
-    output_attestor.userOwnedDrydockNote.publicKeys.append(
-        expected_output_pub_key)
-    output_attestor.updateTime = times.FormatDateTime(
-        datetime.datetime.utcnow())
-
-    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
-        name=attestor.name)
-
-    self.mock_client.projects_attestors.Get.Expect(
-        req, response=copy.deepcopy(attestor))
-    self.mock_client.projects_attestors.Update.Expect(
-        input_attestor, response=output_attestor)
-
-    response = self.RunBinauthz(
-        'attestors public-keys add '
-        '--attestor={name} --pgp-public-key-file={fname}'.format(
-            name=name, fname=fname))
-
-    self.assertEqual(response, expected_output_pub_key)
-
   def testSuccessKms(self):
     pem = textwrap.dedent("""
         -----BEGIN PUBLIC KEY-----
@@ -271,27 +116,47 @@ class AddAlphaTest(
         pkixPublicKey=self.messages.PkixPublicKey(
             publicKeyPem=pem,
             signatureAlgorithm=(
-                self.messages.PkixPublicKey.
-                SignatureAlgorithmValueValuesEnum.ECDSA_P256_SHA256),
+                self.messages.PkixPublicKey.SignatureAlgorithmValueValuesEnum
+                .ECDSA_P256_SHA256),
         ),
         comment=None,
         id='//cloudkms.googleapis.com/v1/' + key_resource)
     expected_input_pub_key = expected_output_pub_key
-    attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, name),
-        updateTime=None,
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, name),
-            publicKeys=[],
-        ))
+
+    # Handle multiple API versions: GA has userOwnedGrafeasNote, beta has has
+    # userOwnedDrydockNote (also below).
+    try:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[],
+          ))
+    except AttributeError:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[],
+          ))
 
     input_attestor = copy.deepcopy(attestor)
-    input_attestor.userOwnedDrydockNote.publicKeys.append(
-        expected_input_pub_key)
+    try:
+      input_attestor.userOwnedGrafeasNote.publicKeys.append(
+          expected_input_pub_key)
+    except AttributeError:
+      input_attestor.userOwnedDrydockNote.publicKeys.append(
+          expected_input_pub_key)
 
     output_attestor = copy.deepcopy(attestor)
-    output_attestor.userOwnedDrydockNote.publicKeys.append(
-        expected_output_pub_key)
+    try:
+      output_attestor.userOwnedGrafeasNote.publicKeys.append(
+          expected_output_pub_key)
+    except AttributeError:
+      output_attestor.userOwnedDrydockNote.publicKeys.append(
+          expected_output_pub_key)
     output_attestor.updateTime = times.FormatDateTime(
         datetime.datetime.utcnow())
 
@@ -300,8 +165,8 @@ class AddAlphaTest(
         name=key_resource)
     resp = self.kms_messages.PublicKey(
         pem=pem,
-        algorithm=(self.kms_messages.PublicKey.AlgorithmValueValuesEnum.
-                   EC_SIGN_P256_SHA256))
+        algorithm=(self.kms_messages.PublicKey.AlgorithmValueValuesEnum
+                   .EC_SIGN_P256_SHA256))
     self.mock_kms_client.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions.GetPublicKey.Expect(
         req, response=resp)
 
@@ -335,8 +200,8 @@ class AddAlphaTest(
         pkixPublicKey=self.messages.PkixPublicKey(
             publicKeyPem=pem,
             signatureAlgorithm=(
-                self.messages.PkixPublicKey.
-                SignatureAlgorithmValueValuesEnum.ECDSA_P256_SHA256),
+                self.messages.PkixPublicKey.SignatureAlgorithmValueValuesEnum
+                .ECDSA_P256_SHA256),
         ),
         comment=None,
         id='ni://sha256;0638attestordd940361ea2d7f14c58c124f0e663da097')
@@ -344,26 +209,45 @@ class AddAlphaTest(
         pkixPublicKey=self.messages.PkixPublicKey(
             publicKeyPem=pem,
             signatureAlgorithm=(
-                self.messages.PkixPublicKey.
-                SignatureAlgorithmValueValuesEnum.ECDSA_P256_SHA256),
+                self.messages.PkixPublicKey.SignatureAlgorithmValueValuesEnum
+                .ECDSA_P256_SHA256),
         ),
         comment=None,
         id=None)
-    attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, name),
-        updateTime=None,
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, name),
-            publicKeys=[],
-        ))
+    # Handle multiple API versions: GA has userOwnedGrafeasNote, beta has has
+    # userOwnedDrydockNote (also below).
+    try:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[],
+          ))
+    except AttributeError:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[],
+          ))
 
     input_attestor = copy.deepcopy(attestor)
-    input_attestor.userOwnedDrydockNote.publicKeys.append(
-        expected_input_pub_key)
+    try:
+      input_attestor.userOwnedGrafeasNote.publicKeys.append(
+          expected_input_pub_key)
+    except AttributeError:
+      input_attestor.userOwnedDrydockNote.publicKeys.append(
+          expected_input_pub_key)
 
     output_attestor = copy.deepcopy(attestor)
-    output_attestor.userOwnedDrydockNote.publicKeys.append(
-        expected_output_pub_key)
+    try:
+      output_attestor.userOwnedGrafeasNote.publicKeys.append(
+          expected_output_pub_key)
+    except AttributeError:
+      output_attestor.userOwnedDrydockNote.publicKeys.append(
+          expected_output_pub_key)
     output_attestor.updateTime = times.FormatDateTime(
         datetime.datetime.utcnow())
 
@@ -406,21 +290,41 @@ class AddAlphaTest(
         comment=None,
         id=id_override)
     expected_input_pub_key = expected_output_pub_key
-    attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, name),
-        updateTime=None,
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, name),
-            publicKeys=[],
-        ))
+
+    # Handle multiple API versions: GA has userOwnedGrafeasNote, beta has has
+    # userOwnedDrydockNote (also below).
+    try:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[],
+          ))
+    except AttributeError:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[],
+          ))
 
     input_attestor = copy.deepcopy(attestor)
-    input_attestor.userOwnedDrydockNote.publicKeys.append(
-        expected_input_pub_key)
+    try:
+      input_attestor.userOwnedGrafeasNote.publicKeys.append(
+          expected_input_pub_key)
+    except AttributeError:
+      input_attestor.userOwnedDrydockNote.publicKeys.append(
+          expected_input_pub_key)
 
     output_attestor = copy.deepcopy(attestor)
-    output_attestor.userOwnedDrydockNote.publicKeys.append(
-        expected_output_pub_key)
+    try:
+      output_attestor.userOwnedGrafeasNote.publicKeys.append(
+          expected_output_pub_key)
+    except AttributeError:
+      output_attestor.userOwnedDrydockNote.publicKeys.append(
+          expected_input_pub_key)
     output_attestor.updateTime = times.FormatDateTime(
         datetime.datetime.utcnow())
 
@@ -449,87 +353,6 @@ class AddAlphaTest(
 
     self.assertEqual(response, expected_output_pub_key)
 
-  def testAlreadyExistsPgp(self):
-    ascii_armored_key = textwrap.dedent("""
-        -----BEGIN PGP PUBLIC KEY BLOCK-----
-        aBcDeFg
-        aBcDeFg
-        aBcDeFg
-        -----END PGP PUBLIC KEY BLOCK-----
-    """)
-    fname = self.Touch(directory=self.cwd_path, contents=ascii_armored_key)
-
-    name = 'bar'
-    proj = self.Project()
-    new_pub_key = self.messages.AttestorPublicKey(
-        asciiArmoredPgpPublicKey=ascii_armored_key,
-        comment=None,
-        id='0638AttestorDD940361EA2D7F14C58C124F0E663DA097')
-    attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, name),
-        updateTime=None,
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, name),
-            publicKeys=[new_pub_key],
-        ))
-
-    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
-        name=attestor.name)
-
-    self.mock_client.projects_attestors.Get.Expect(req, response=attestor)
-
-    with self.assertRaises(exceptions.AlreadyExistsError):
-      self.RunBinauthz(
-          'attestors public-keys add '
-          '--attestor={name} --pgp-public-key-file={fname}'.format(
-              name=name, fname=fname))
-
-  def testAlreadyExistsPkix(self):
-    pem = textwrap.dedent("""
-        -----BEGIN PUBLIC KEY-----
-        aBcDeFg
-        aBcDeFg
-        aBcDeFg
-        -----END PUBLIC KEY-----
-    """)
-    fname = self.Touch(directory=self.cwd_path, contents=pem)
-
-    name = 'bar'
-    proj = self.Project()
-    new_pub_key = self.messages.AttestorPublicKey(
-        pkixPublicKey=self.messages.PkixPublicKey(
-            publicKeyPem=pem,
-            signatureAlgorithm=(
-                self.messages.PkixPublicKey.
-                SignatureAlgorithmValueValuesEnum.ECDSA_P256_SHA256),
-        ),
-        comment=None,
-        id='ni://sha256;0638attestordd940361ea2d7f14c58c124f0e663da097')
-    attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, name),
-        updateTime=None,
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, name),
-            publicKeys=[new_pub_key],
-        ))
-
-    updated_attestor = copy.deepcopy(attestor)
-    updated_attestor.userOwnedDrydockNote.publicKeys.append(new_pub_key)
-    updated_attestor.updateTime = times.FormatDateTime(
-        datetime.datetime.utcnow())
-
-    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
-        name=attestor.name)
-    self.mock_client.projects_attestors.Get.Expect(req, response=attestor)
-
-    with self.assertRaises(exceptions.AlreadyExistsError):
-      self.RunBinauthz(
-          'attestors public-keys add '
-          '--pkix-public-key-algorithm=ecdsa-p256-sha256 '
-          '--public-key-id-override={id_override} '
-          '--attestor={name} --pkix-public-key-file={fname}'.format(
-              name=name, fname=fname, id_override=new_pub_key.id))
-
   def testOverridingPgpId(self):
     ascii_armored_key = textwrap.dedent("""
         -----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -547,11 +370,137 @@ class AddAlphaTest(
           '--attestor={name} --pgp-public-key-file={fname}'.format(
               name=name, fname=fname))
 
+  def testAlreadyExistsPgp(self):
+    ascii_armored_key = textwrap.dedent("""
+        -----BEGIN PGP PUBLIC KEY BLOCK-----
+        aBcDeFg
+        aBcDeFg
+        aBcDeFg
+        -----END PGP PUBLIC KEY BLOCK-----
+    """)
+    fname = self.Touch(directory=self.cwd_path, contents=ascii_armored_key)
+
+    name = 'bar'
+    proj = self.Project()
+    new_pub_key = self.messages.AttestorPublicKey(
+        asciiArmoredPgpPublicKey=ascii_armored_key,
+        comment=None,
+        id='0638AttestorDD940361EA2D7F14C58C124F0E663DA097')
+
+    # Handle multiple API versions: GA has userOwnedGrafeasNote, beta has has
+    # userOwnedDrydockNote (also below).
+    try:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[new_pub_key],
+          ))
+    except AttributeError:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[new_pub_key],
+          ))
+
+    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
+        name=attestor.name)
+
+    self.mock_client.projects_attestors.Get.Expect(req, response=attestor)
+
+    with self.assertRaises(exceptions.AlreadyExistsError):
+      self.RunBinauthz('attestors public-keys add '
+                       '--attestor={name} --pgp-public-key-file={fname}'.format(
+                           name=name, fname=fname))
+
   def testUnknownFile(self):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.RunBinauthz(
           'attestors public-keys add '
           '--attestor=any-old-name --pgp-public-key-file=not-a-real-file.pub')
+
+  def testAlreadyExistsPkix(self):
+    pem = textwrap.dedent("""
+        -----BEGIN PUBLIC KEY-----
+        aBcDeFg
+        aBcDeFg
+        aBcDeFg
+        -----END PUBLIC KEY-----
+    """)
+    fname = self.Touch(directory=self.cwd_path, contents=pem)
+
+    name = 'bar'
+    proj = self.Project()
+    new_pub_key = self.messages.AttestorPublicKey(
+        pkixPublicKey=self.messages.PkixPublicKey(
+            publicKeyPem=pem,
+            signatureAlgorithm=(
+                self.messages.PkixPublicKey.SignatureAlgorithmValueValuesEnum
+                .ECDSA_P256_SHA256),
+        ),
+        comment=None,
+        id='ni://sha256;0638attestordd940361ea2d7f14c58c124f0e663da097')
+
+    # Handle multiple API versions: GA has userOwnedGrafeasNote, beta has has
+    # userOwnedDrydockNote (also below).
+    try:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[new_pub_key],
+          ))
+    except AttributeError:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[new_pub_key],
+          ))
+
+    updated_attestor = copy.deepcopy(attestor)
+    try:
+      updated_attestor.userOwnedGrafeasNote.publicKeys.append(new_pub_key)
+    except AttributeError:
+      updated_attestor.userOwnedDrydockNote.publicKeys.append(new_pub_key)
+    updated_attestor.updateTime = times.FormatDateTime(
+        datetime.datetime.utcnow())
+
+    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
+        name=attestor.name)
+    self.mock_client.projects_attestors.Get.Expect(req, response=attestor)
+
+    with self.assertRaises(exceptions.AlreadyExistsError):
+      self.RunBinauthz(
+          'attestors public-keys add '
+          '--pkix-public-key-algorithm=ecdsa-p256-sha256 '
+          '--public-key-id-override={id_override} '
+          '--attestor={name} --pkix-public-key-file={fname}'.format(
+              name=name, fname=fname, id_override=new_pub_key.id))
+
+
+class AddBetaTest(
+    base.WithMockBetaBinauthz,
+    AddTest,
+):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class AddAlphaTest(
+    base.WithMockAlphaBinauthz,
+    AddBetaTest,
+):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

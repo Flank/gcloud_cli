@@ -24,16 +24,13 @@ import logging
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import e2e_utils
-from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 
-@test_case.Filters.skipAlways(
-    'Temporarily disabled until Arcus is fixed', 'b/145951117')
 class PublicDelegatedPrefixesTest(e2e_test_base.BaseTest):
   """Public Delegated Prefixes tests."""
 
-  # Special values that is treated as test by Arcus so it skips RPC steps.
+  # Special values that are treated as test by Arcus so it skips RPC steps.
   TEST_RANGE = '127.127.0.0/20'
   TEST_SUB_RANGE = '127.127.1.0/24'
   TEST_VERIFICATION_IP = '127.127.1.1'

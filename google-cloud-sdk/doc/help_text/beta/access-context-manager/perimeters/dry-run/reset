@@ -7,10 +7,13 @@ SYNOPSIS
         (PERIMETER : --policy=POLICY) [--async] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Removes the explicit dry-run mode configuration for a Service
-    Perimeter. After this operation, the effective dry-run mode configuration
-    is implicitly inherited from the enforcement mode configuration. No audit
-    logs will be generated in this state.
+    (BETA) (DEPRECATED) This command has been renamed to drop. Please use
+    gcloud alpha access-context-manager perimeters dry-run drop instead.
+
+    Removes the explicit dry-run mode configuration for a Service Perimeter.
+    After this operation, the effective dry-run mode configuration is
+    implicitly inherited from the enforcement mode configuration. No audit logs
+    will be generated in this state.
 
 POSITIONAL ARGUMENTS
      Perimeter resource - The service perimeter to reset. The arguments in this

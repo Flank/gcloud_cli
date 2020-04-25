@@ -153,19 +153,49 @@ class SqliteCredentialStoreTests(sdk_test_base.SdkBase,
     creds_stored = self.MakeUserCredentials()
 
     def VerifiyLoadedCredentials(creds_loaded):
-      creds_type = creds.CredentialType.FromCredentials(creds_loaded)
-      self.assertEqual(creds_type, creds.CredentialType.USER_ACCOUNT)
+      creds_type = creds.CredentialTypeGoogleAuth.FromCredentials(creds_loaded)
+      self.assertEqual(creds_type, creds.CredentialTypeGoogleAuth.USER_ACCOUNT)
       self.AssertCredentialsEqual(
           creds_loaded, {
               'client_id': 'client_id',
               'client_secret': 'client_secret',
               'refresh_token': 'fake-token',
-              'token_uri': 'token_uri',
-              'rapt_token': 'rapt_token5',
-              'user_agent': 'user_agent',
+              'token_uri': creds._TOKEN_URI,
           })
 
     self.TestStoreOperations(creds_stored, True, VerifiyLoadedCredentials)
+
+  def testStoreGoogleAuthLoadOauth2client_UserAccountCreds(self):
+    creds_stored = self.MakeUserAccountCredentialsGoogleAuth()
+
+    def VerifyLoadedCredentials(creds_loaded):
+      creds_type = creds.CredentialType.FromCredentials(creds_loaded)
+      self.assertEqual(creds_type, creds.CredentialType.USER_ACCOUNT)
+      self.AssertCredentialsEqual(
+          creds_loaded, {
+              'client_id': 'foo.apps.googleusercontent.com',
+              'client_secret': 'file-secret',
+              'refresh_token': 'file-token',
+              'token_uri': creds._TOKEN_URI,
+          })
+
+    self.TestStoreOperations(creds_stored, False, VerifyLoadedCredentials)
+
+  def testStoreGoogleAuthLoadGoogleAuth_UserAccountCreds(self):
+    creds_stored = self.MakeUserAccountCredentialsGoogleAuth()
+
+    def VerifyLoadedCredentials(creds_loaded):
+      creds_type = creds.CredentialTypeGoogleAuth.FromCredentials(creds_loaded)
+      self.assertEqual(creds_type, creds.CredentialTypeGoogleAuth.USER_ACCOUNT)
+      self.AssertCredentialsEqual(
+          creds_loaded, {
+              'client_id': 'foo.apps.googleusercontent.com',
+              'client_secret': 'file-secret',
+              'refresh_token': 'file-token',
+              'token_uri': creds._TOKEN_URI,
+          })
+
+    self.TestStoreOperations(creds_stored, True, VerifyLoadedCredentials)
 
   def testStoreOauth2clientLoadGoogleAuth_ServiceAccountCreds(self):
     creds_stored = self.MakeServiceAccountCredentials()

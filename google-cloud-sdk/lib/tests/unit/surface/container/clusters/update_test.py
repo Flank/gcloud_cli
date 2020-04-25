@@ -235,7 +235,7 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
   def testEnableMasterAuthorizedNetworksWithMaxSourceRanges(self):
     cidr_blocks = []
     msgs_cidr_blocks = []
-    for i in range(1, api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS + 1):
+    for i in range(1, api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS_PUBLIC + 1):
       cidr = '10.0.0.%d/32' % i
       cidr_blocks.append(cidr)
       msgs_cidr_blocks.append(self.msgs.CidrBlock(cidrBlock=cidr))
@@ -2269,6 +2269,22 @@ resourceLimits:
                 kalmConfig=self.msgs.KalmConfig(enabled=True))),
         flags='--update-addons ApplicationManager=ENABLED')
 
+  def testUpdateAddonsConfigConnector(self):
+    # test disabling ConfigConnector
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                configConnectorConfig=self.msgs.ConfigConnectorConfig(
+                    enabled=False))),
+        flags='--update-addons ConfigConnector=DISABLED')
+    # test enabling ConfigConnector
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                configConnectorConfig=self.msgs.ConfigConnectorConfig(
+                    enabled=True))),
+        flags='--update-addons ConfigConnector=ENABLED')
+
   @parameterized.parameters(True, False)
   def testTpuUpdate(self, enabled):
     self._TestUpdate(
@@ -2402,22 +2418,6 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
             desiredAddonsConfig=self.msgs.AddonsConfig(
                 kalmConfig=self.msgs.KalmConfig(enabled=True))),
         flags='--update-addons ApplicationManager=ENABLED')
-
-  def testUpdateAddonsConfigConnector(self):
-    # test disabling ConfigConnector
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(
-            desiredAddonsConfig=self.msgs.AddonsConfig(
-                configConnectorConfig=self.msgs.ConfigConnectorConfig(
-                    enabled=False))),
-        flags='--update-addons ConfigConnector=DISABLED')
-    # test enabling ConfigConnector
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(
-            desiredAddonsConfig=self.msgs.AddonsConfig(
-                configConnectorConfig=self.msgs.ConfigConnectorConfig(
-                    enabled=True))),
-        flags='--update-addons ConfigConnector=ENABLED')
 
   def testUpdateAddonsCloudBuild(self):
     # test disabling CloudBuild

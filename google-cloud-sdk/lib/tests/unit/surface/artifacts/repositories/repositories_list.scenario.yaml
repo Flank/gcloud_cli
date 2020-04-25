@@ -52,9 +52,9 @@ summary:
       gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
       gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
 
-           CONTAINER_REGISTRY
-      REPOSITORY  FORMAT  LOCATION
-      us.gcr.io   DOCKER  us
+                CONTAINER_REGISTRY
+      HOSTNAME            LOCATION
+      us.gcr.io           us
 - execute:
   - command: artifacts repositories list --location=us --project=my-domain.com:my-project
   - stderr: ^Listing items under project my-domain.com:my-project..*$
@@ -66,9 +66,9 @@ summary:
       gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
       gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
 
-           CONTAINER_REGISTRY
-      REPOSITORY  FORMAT  LOCATION
-      us.gcr.io   DOCKER  us
+                CONTAINER_REGISTRY
+      HOSTNAME            LOCATION
+      us.gcr.io           us
 actions:
 - execute_command:
     command: artifacts repositories list --location=us-west1
@@ -250,9 +250,9 @@ actions:
         gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
         gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
 
-             CONTAINER_REGISTRY
-        REPOSITORY  FORMAT  LOCATION
-        us.gcr.io   DOCKER  us
+                  CONTAINER_REGISTRY
+        HOSTNAME            LOCATION
+        us.gcr.io           us
     - expect_exit:
         code: 0
 - execute_command:
@@ -315,8 +315,8 @@ actions:
         gcloud-repo2  MAVEN   test         us        2019-05-17T15:30:40  2019-05-17T15:30:40
         gcloud-repo3  NPM                  us        2019-05-20T14:36:22  2019-05-20T14:36:22
 
-             CONTAINER_REGISTRY
-        REPOSITORY  FORMAT  LOCATION
-        us.gcr.io   DOCKER  us
+                  CONTAINER_REGISTRY
+        HOSTNAME            LOCATION
+        us.gcr.io           us
     - expect_exit:
         code: 0

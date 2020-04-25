@@ -46,9 +46,7 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
 
     policy = self.MakeAutoscalingPolicy('fake-project', region, 'policy-1')
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     expected_request_policy = copy.deepcopy(policy)
     expected_request_policy.name = None
@@ -83,9 +81,7 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
   def testImportAutoscalingPolicies_create_withoutRegionProperty(self):
     policy = self.MakeAutoscalingPolicy('fake-project', 'foobar', 'policy-1')
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     # No region is specified via flag or config.
     regex = r'Failed to find attribute \[region\]'
@@ -96,9 +92,7 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
     policy = self.MakeAutoscalingPolicy('cool-project', 'cool-region',
                                         'policy-1')
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     expected_request_policy = copy.deepcopy(policy)
     expected_request_policy.name = None
@@ -122,9 +116,7 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
     policy = self.MakeAutoscalingPolicy('fake-project', 'antarctica-north42',
                                         'policy-1')
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     expected_request_policy = copy.deepcopy(policy)
     expected_request_policy.name = None
@@ -146,9 +138,7 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
     policy = self.MakeAutoscalingPolicy('fake-project', 'cool-region',
                                         'policy-1')
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     expected_request_policy = copy.deepcopy(policy)
     expected_request_policy.name = None
@@ -172,9 +162,7 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
     policy = self.MakeAutoscalingPolicy('cool-project', 'cool-region',
                                         'policy-1')
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     expected_request_policy = copy.deepcopy(policy)
     expected_request_policy.name = None
@@ -198,9 +186,7 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
     policy = self.MakeAutoscalingPolicy('fake-project', 'antarctica-north42',
                                         'policy-1')
 
-    self.WriteInput(
-        export_util.Export(
-            message=policy, schema_path=self.autoscaling_policy_schema_path))
+    self.WriteInput(export_util.Export(message=policy))
 
     expected_request_policy = copy.deepcopy(policy)
     expected_request_policy.name = None
@@ -229,7 +215,7 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
       export_util.Export(
           message=policy,
           stream=stream,
-          schema_path=self.autoscaling_policy_schema_path)
+      )
 
     expected_request_policy = copy.deepcopy(policy)
     expected_request_policy.name = None

@@ -7,11 +7,11 @@ summary:
 - execute:
   - command: privateca roots list
   - stdout: |
-      NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
-      ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
-      ca2   europe    ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
-      ca1   us        DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
-      ca2   us        ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+      NAME  LOCATION  STATE     NOT_BEFORE         NOT_AFTER
+      ca1   europe    DISABLED  2018-10-17T22:14Z  2020-10-17T22:14Z
+      ca2   europe    ENABLED   2020-01-01T17:10Z  2021-01-01T17:10Z
+      ca1   us        DISABLED  2018-10-17T22:14Z  2020-10-17T22:14Z
+      ca2   us        ENABLED   2020-01-01T17:10Z  2021-01-01T17:10Z
 - execute:
   - command: privateca roots list --location asia
   - stderr: |
@@ -19,27 +19,27 @@ summary:
 - execute:
   - command: privateca roots list --location us
   - stdout: |
-      NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
-      ca1   us        DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
-      ca2   us        ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+      NAME  LOCATION  STATE     NOT_BEFORE         NOT_AFTER
+      ca1   us        DISABLED  2018-10-17T22:14Z  2020-10-17T22:14Z
+      ca2   us        ENABLED   2020-01-01T17:10Z  2021-01-01T17:10Z
 - execute:
   - command: privateca roots list --location europe --limit 1
   - stdout: |
-      NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
-      ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+      NAME  LOCATION  STATE     NOT_BEFORE         NOT_AFTER
+      ca1   europe    DISABLED  2018-10-17T22:14Z  2020-10-17T22:14Z
 - execute:
   - command: privateca roots list --location europe --page-size 1
   - stdout: |
-      NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
-      ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+      NAME  LOCATION  STATE     NOT_BEFORE         NOT_AFTER
+      ca1   europe    DISABLED  2018-10-17T22:14Z  2020-10-17T22:14Z
 
-      NAME  LOCATION  STATE    NOT_BEFORE                     NOT_AFTER
-      ca2   europe    ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+      NAME  LOCATION  STATE    NOT_BEFORE         NOT_AFTER
+      ca2   europe    ENABLED  2020-01-01T17:10Z  2021-01-01T17:10Z
 - execute:
   - command: privateca roots list --location europe --sort-by ~name --limit 1
   - stdout: |
-      NAME  LOCATION  STATE    NOT_BEFORE                     NOT_AFTER
-      ca2   europe    ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+      NAME  LOCATION  STATE    NOT_BEFORE         NOT_AFTER
+      ca2   europe    ENABLED  2020-01-01T17:10Z  2021-01-01T17:10Z
 - execute:
   - command: privateca roots list --filter state=ENABLED
   - stderr: |
@@ -74,8 +74,8 @@ actions:
                   "state": "DISABLED",
                   "ca_certificate_description": {
                     "subjectDescription": {
-                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
-                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                      "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
+                      "notAfterTime": "2020-10-17T15:14:00.105-07:00"
                     }
                   }
                 },
@@ -87,8 +87,8 @@ actions:
                   "state": "ENABLED",
                   "ca_certificate_description": {
                     "subjectDescription": {
-                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
-                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
                     }
                   }
                 },
@@ -100,8 +100,8 @@ actions:
                   "state": "DISABLED",
                   "ca_certificate_description": {
                     "subjectDescription": {
-                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
-                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                      "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
+                      "notAfterTime": "2020-10-17T15:14:00.105-07:00"
                     }
                   }
                 },
@@ -113,8 +113,8 @@ actions:
                   "state": "ENABLED",
                   "ca_certificate_description": {
                     "subjectDescription": {
-                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
-                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
                     }
                   }
                 }
@@ -123,11 +123,11 @@ actions:
               "unreachable_locations": []
             }
     - expect_stdout: |
-        NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
-        ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
-        ca2   europe    ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
-        ca1   us        DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
-        ca2   us        ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+        NAME  LOCATION  STATE     NOT_BEFORE         NOT_AFTER
+        ca1   europe    DISABLED  2018-10-17T22:14Z  2020-10-17T22:14Z
+        ca2   europe    ENABLED   2020-01-01T17:10Z  2021-01-01T17:10Z
+        ca1   us        DISABLED  2018-10-17T22:14Z  2020-10-17T22:14Z
+        ca2   us        ENABLED   2020-01-01T17:10Z  2021-01-01T17:10Z
     - expect_exit:
         code: 0
 - execute_command:
@@ -173,8 +173,8 @@ actions:
                   "state": "DISABLED",
                   "ca_certificate_description": {
                     "subjectDescription": {
-                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
-                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                      "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
+                      "notAfterTime": "2020-10-17T15:14:00.105-07:00"
                     }
                   }
                 },
@@ -186,8 +186,8 @@ actions:
                   "state": "ENABLED",
                   "ca_certificate_description": {
                     "subjectDescription": {
-                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
-                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
                     }
                   }
                 }
@@ -196,9 +196,9 @@ actions:
               "unreachable_locations": []
             }
     - expect_stdout: |
-        NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
-        ca1   us        DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
-        ca2   us        ENABLED   2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+        NAME  LOCATION  STATE     NOT_BEFORE         NOT_AFTER
+        ca1   us        DISABLED  2018-10-17T22:14Z  2020-10-17T22:14Z
+        ca2   us        ENABLED   2020-01-01T17:10Z  2021-01-01T17:10Z
     - expect_exit:
         code: 0
 - execute_command:
@@ -223,8 +223,8 @@ actions:
                   "state": "DISABLED",
                   "ca_certificate_description": {
                     "subjectDescription": {
-                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
-                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                      "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
+                      "notAfterTime": "2020-10-17T15:14:00.105-07:00"
                     }
                   }
                 },
@@ -236,8 +236,8 @@ actions:
                   "state": "ENABLED",
                   "ca_certificate_description": {
                     "subjectDescription": {
-                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
-                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
                     }
                   }
                 }
@@ -246,8 +246,8 @@ actions:
               "unreachable_locations": []
             }
     - expect_stdout: |
-        NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
-        ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+        NAME  LOCATION  STATE     NOT_BEFORE         NOT_AFTER
+        ca1   europe    DISABLED  2018-10-17T22:14Z  2020-10-17T22:14Z
     - expect_exit:
         code: 0
 - execute_command:
@@ -272,8 +272,8 @@ actions:
                   "state": "DISABLED",
                   "ca_certificate_description": {
                     "subjectDescription": {
-                      "not_before_time": "2018-10-17T15:14:00.105-07:00",
-                      "not_after_time": "2020-10-17T15:14:00.105-07:00"
+                      "notBeforeTime": "2018-10-17T15:14:00.105-07:00",
+                      "notAfterTime": "2020-10-17T15:14:00.105-07:00"
                     }
                   }
                 },
@@ -285,8 +285,8 @@ actions:
                   "state": "ENABLED",
                   "ca_certificate_description": {
                     "subjectDescription": {
-                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
-                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
                     }
                   }
                 }
@@ -295,11 +295,11 @@ actions:
               "unreachable_locations": []
             }
     - expect_stdout: |
-        NAME  LOCATION  STATE     NOT_BEFORE                     NOT_AFTER
-        ca1   europe    DISABLED  2018-10-17T15:14:00.105-07:00  2020-10-17T15:14:00.105-07:00
+        NAME  LOCATION  STATE     NOT_BEFORE         NOT_AFTER
+        ca1   europe    DISABLED  2018-10-17T22:14Z  2020-10-17T22:14Z
 
-        NAME  LOCATION  STATE    NOT_BEFORE                     NOT_AFTER
-        ca2   europe    ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+        NAME  LOCATION  STATE    NOT_BEFORE         NOT_AFTER
+        ca2   europe    ENABLED  2020-01-01T17:10Z  2021-01-01T17:10Z
     - expect_exit:
         code: 0
 - execute_command:
@@ -324,8 +324,8 @@ actions:
                   "state": "ENABLED",
                   "ca_certificate_description": {
                     "subjectDescription": {
-                      "not_before_time": "2020-01-01T10:10:00.100-07:00",
-                      "not_after_time": "2021-01-01T10:10:00.100-07:00"
+                      "notBeforeTime": "2020-01-01T10:10:00.100-07:00",
+                      "notAfterTime": "2021-01-01T10:10:00.100-07:00"
                     }
                   }
                 }
@@ -334,8 +334,8 @@ actions:
               "unreachable_locations": []
             }
     - expect_stdout: |
-        NAME  LOCATION  STATE    NOT_BEFORE                     NOT_AFTER
-        ca2   europe    ENABLED  2020-01-01T10:10:00.100-07:00  2021-01-01T10:10:00.100-07:00
+        NAME  LOCATION  STATE    NOT_BEFORE         NOT_AFTER
+        ca2   europe    ENABLED  2020-01-01T17:10Z  2021-01-01T17:10Z
     - expect_exit:
         code: 0
 - execute_command:

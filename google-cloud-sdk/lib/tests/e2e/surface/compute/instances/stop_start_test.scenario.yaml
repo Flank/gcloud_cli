@@ -6,8 +6,9 @@ summary:
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --format="text(name,
       status)"
-  - stderr: |
+  - stderr: |-
       Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
   - stdout: |
       ---
       name:   $$instance$$
@@ -17,8 +18,9 @@ summary:
   - progress_tracker:
     - message: Stopping instance(s) $$instance$$
     - status: SUCCESS
-  - stderr: |
-      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+  - stderr: |-
+      Updated \[https://.*/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
 - execute:
   - command: compute instances describe $$instance$$ --zone us-central1-f --format="text(name,
       status)"
@@ -30,8 +32,11 @@ summary:
   - progress_tracker:
     - message: Starting instance(s) $$instance$$
     - status: SUCCESS
-  - stderr: |
-      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+  - stderr: |-
+      Updated \[https://.*/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      Instance internal IP is .*
+      Instance external IP is .*
+      $
 - execute:
   - command: compute instances describe $$instance$$ --zone us-central1-f --format="text(name,
       status)"
@@ -40,8 +45,9 @@ summary:
       status: RUNNING
 - execute:
   - command: compute instances delete $$instance$$ --zone us-central1-f --quiet
-  - stderr: |
+  - stderr: |-
       Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
@@ -132,7 +138,7 @@ actions:
               disks:
               - type: PERSISTENT
                 initializeParams:
-                  sourceImage: https://$$compute-uri$$/$$api-version$$/projects/debian-cloud/global/images/family/debian-9
+                  sourceImage: https://$$compute-uri$$/$$api-version$$/projects/debian-cloud/global/images/family/debian-10
                 autoDelete: true
                 mode: READ_WRITE
                 boot: true

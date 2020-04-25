@@ -1,0 +1,107 @@
+title: Create, describe, list, and delete a Lite topic
+release_tracks: [ALPHA, BETA]
+actions:
+- generate_resource_id:
+    reference: my-topic
+    prefix: lite-topic
+
+- set_property:
+    api_endpoint_overrides/pubsublite: https://staging-pubsublite.sandbox.googleapis.com/
+
+- execute_command:
+    command: pubsub lite-topics create $$my-topic$$ --zone us-central1-a --partitions 1 --per-partition-bytes 30GiB
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
+          method: GET
+          body:
+            json:
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "projectNumber": "462803083913",
+              "projectId": "cloud-sdk-integration-testing",
+              "lifecycleState": "ACTIVE",
+              "name": "cloud-sdk-integration-testing",
+              "createTime": "2019-07-19T15:49:12.034Z",
+              "parent": {
+                "type": "folder",
+                "id": "54321"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://us-central1-staging-pubsublite.sandbox.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics?alt=json&topicId=$$my-topic$$
+          method: POST
+          body:
+            json:
+              partitionConfig:
+                count: '1'
+                scale: 1
+              retentionConfig:
+                perPartitionBytes: '32212254720'
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/462803083913/locations/us-central1-a/topics/$$my-topic$$",
+              "partitionConfig": {
+                "count": "1",
+                "scale": 1
+              },
+              "retentionConfig": {
+                "perPartitionBytes": "32212254720"
+              }
+            }
+    - expect_stderr: |
+        Created [$$my-topic$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      pubsub lite-topics delete $$my-topic$$ --zone us-central1-a
+    cleanup_for: my-topic
+    events:
+    - expect_prompt_continue:
+        user_input: y
+        message: 'You are about to delete topic [$$my-topic$$]'
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
+          method: GET
+          body:
+            json:
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "projectNumber": "462803083913",
+              "projectId": "cloud-sdk-integration-testing",
+              "lifecycleState": "ACTIVE",
+              "name": "cloud-sdk-integration-testing",
+              "createTime": "2019-07-19T15:49:12.034Z",
+              "parent": {
+                "type": "folder",
+                "id": "54321"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://us-central1-staging-pubsublite.sandbox.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics/$$my-topic$$?alt=json
+          method: DELETE
+          body:
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {}
+    - expect_stderr: |
+        Deleted topic [$$my-topic$$].
+    - expect_exit:
+        code: 0

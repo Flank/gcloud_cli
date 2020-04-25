@@ -26,8 +26,6 @@ from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
-import six
-
 
 class UnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   """Base class for `gcloud memcache` unit tests."""
@@ -90,18 +88,15 @@ class InstancesUnitTestBase(UnitTestBase):
     return self.messages.Instance()
 
   def MakeLabels(self, labels_dict):
-    labels = self.messages.Instance.LabelsValue()
-    for k, v in sorted(six.iteritems(labels_dict)):
-      labels.additionalProperties.append(
-          self.messages.Instance.LabelsValue.AdditionalProperty(
-              key=k, value=v))
-    return labels
+    return encoding.DictToAdditionalPropertyMessage(
+        labels_dict, self.messages.Instance.LabelsValue,
+        sort_items=True)
 
   def MakeParameters(self, parameters_dict):
-    params = encoding.DictToMessage(
-        parameters_dict, self.messages.MemcacheParameters.ParamsValue)
-    parameters = self.messages.MemcacheParameters(params=params)
-    return parameters
+    params = encoding.DictToAdditionalPropertyMessage(
+        parameters_dict, self.messages.MemcacheParameters.ParamsValue,
+        sort_items=True)
+    return self.messages.MemcacheParameters(params=params)
 
 
 class OperationsUnitTestBase(UnitTestBase):
