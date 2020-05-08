@@ -21,6 +21,9 @@ COMMANDS
      add-iam-policy-binding
         (ALPHA) Add an IAM policy binding to a Cloud Bigtable table.
 
+     describe
+        (ALPHA) Retrieves information about a table.
+
      get-iam-policy
         (ALPHA) Get an IAM policy on a Cloud Bigtable table.
 

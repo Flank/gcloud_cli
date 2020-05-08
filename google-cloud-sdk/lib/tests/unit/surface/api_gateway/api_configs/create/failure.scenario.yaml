@@ -18,7 +18,7 @@ summary:
       api-gateway api-configs create testName --api apiName
   - stderr: |
       ERROR: (gcloud.alpha.api-gateway.api-configs.create) Exactly one of (--grpc-files | --openapi-spec) must be specified.
-      Usage: gcloud alpha api-gateway api-configs create (API_CONFIG : --api=API) (--grpc-files=[FILE,...] | --openapi-spec=OPENAPI_SPEC) [optional flags]
+      Usage: gcloud alpha api-gateway api-configs create (API_CONFIG : --api=API) (--grpc-files=[FILE,...] | --openapi-spec=[FILE,...]) [optional flags]
         optional flags may be  --api | --async | --backend-auth-service-account |
                                --display-name | --grpc-files | --help | --labels |
                                --openapi-spec
@@ -128,7 +128,7 @@ actions:
     events:
     - expect_stderr: |
         ERROR: (gcloud.alpha.api-gateway.api-configs.create) Exactly one of (--grpc-files | --openapi-spec) must be specified.
-        Usage: gcloud alpha api-gateway api-configs create (API_CONFIG : --api=API) (--grpc-files=[FILE,...] | --openapi-spec=OPENAPI_SPEC) [optional flags]
+        Usage: gcloud alpha api-gateway api-configs create (API_CONFIG : --api=API) (--grpc-files=[FILE,...] | --openapi-spec=[FILE,...]) [optional flags]
           optional flags may be  --api | --async | --backend-auth-service-account |
                                  --display-name | --grpc-files | --help | --labels |
                                  --openapi-spec

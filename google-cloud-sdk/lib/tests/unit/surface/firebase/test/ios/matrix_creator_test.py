@@ -69,7 +69,7 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
             'branch': 'my-branch',
             'buildNumber': '1234',
         },
-    )
+        test_special_entitlements=True)
 
     creator = self.CreateMatrixCreator(args)
     req = creator._BuildTestMatrixRequest('request-id-123')
@@ -99,6 +99,7 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
     test = spec.iosXcTest
     self.assertEqual(test.testsZip.gcsPath, 'gs://kfc/2018-02-24/ios-test.zip')
     self.assertEqual(test.xctestrun.gcsPath, 'gs://kfc/2018-02-24/myxctestrun')
+    self.assertEqual(test.testSpecialEntitlements, True)
 
     client_details = matrix.clientInfo.clientInfoDetails
     client_detail1 = TESTING_V1_MESSAGES.ClientInfoDetail(

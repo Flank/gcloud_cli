@@ -19,18 +19,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
 from tests.lib.surface.bigtable import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CreateCommandTest(base.BigtableV2TestBase,
-                        waiter_test_base.CloudOperationsBase):
+class CreateCommandTestGA(base.BigtableV2TestBase,
+                          waiter_test_base.CloudOperationsBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.svc = self.client.projects_instances.Create
@@ -70,8 +68,7 @@ class CreateCommandTest(base.BigtableV2TestBase,
                         self.Project())))
         ]))
 
-  def testCreateAsync(self, track):
-    self.track = track
+  def testCreateAsync(self):
     self.svc.Expect(
         request=self.production_msg,
         response=self.msgs.Operation(name='operations/theop'))
@@ -81,18 +78,16 @@ class CreateCommandTest(base.BigtableV2TestBase,
         'thedisplayname --async --instance-type PRODUCTION')
     self.AssertErrContains(
         'Create in progress for bigtable instance theinstance '
-        '[https://bigtableadmin.googleapis.com/v2/operations/theop].\n')
+        '[operations/theop].\n')
     self.AssertOutputEquals('')
 
-  def testCreateDisplayNameRequired(self, track):
-    self.track = track
+  def testCreateDisplayNameRequired(self):
     with self.AssertRaisesArgumentError():
       self.Run('bigtable instances create theinstance --cluster thecluster '
                '--cluster-num-nodes 5 --cluster-zone us-central1-b '
                '--instance-type PRODUCTION')
 
-  def testCreateWait(self, track):
-    self.track = track
+  def testCreateWait(self):
     self.client.projects_instances.Create.Expect(
         request=self.production_msg,
         response=self.msgs.Operation(name='operations/longlong', done=False),)
@@ -113,8 +108,7 @@ name: p/theinstance
 state: READY
 """)
 
-  def testCreateDevelopment(self, track):
-    self.track = track
+  def testCreateDevelopment(self):
     self.client.projects_instances.Create.Expect(
         request=self.development_msg,
         response=self.msgs.Operation(name='operations/longlong', done=False),)
@@ -135,13 +129,24 @@ name: p/theinstance
 state: READY
 """)
 
-  def testErrorResponse(self, track):
-    self.track = track
+  def testErrorResponse(self):
     with self.AssertHttpResponseError(self.svc, self.production_msg):
       self.Run(
           'bigtable instances create theinstance --cluster thecluster '
           '--cluster-num-nodes 5 --cluster-zone us-central1-b --display-name '
           'thedisplayname --async')
+
+
+class CreateCommandTestBeta(CreateCommandTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CreateCommandTestAlpha(CreateCommandTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

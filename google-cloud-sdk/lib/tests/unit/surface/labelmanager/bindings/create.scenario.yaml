@@ -1,7 +1,3 @@
-filters:
-  skipAlways:
-    reason: API change
-    bug: b/147828581
 title: LabelManager - LabelBindings - Create test
 release_tracks: [ALPHA]
 summary:

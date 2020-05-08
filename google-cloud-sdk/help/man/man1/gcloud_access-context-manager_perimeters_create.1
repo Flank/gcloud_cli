@@ -11,7 +11,7 @@ gcloud access\-context\-manager perimeters create \- create a new service perime
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud access\-context\-manager perimeters create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-title\fR=\fITITLE\fR [\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR;\ default="regular"] [\fB\-\-resources\fR=[\fIRESOURCES\fR,...]] [\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud access\-context\-manager perimeters create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-title\fR=\fITITLE\fR [\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR;\ default="regular"] [\fB\-\-resources\fR=[\fIRESOURCES\fR,...]] [\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fB\-\-enable\-vpc\-accessible\-services\fR\ \fB\-\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -107,6 +107,17 @@ Comma\-separated list of resources (currently only projects, in the form
 \fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]
 Comma\-separated list of services to which the perimeter boundary \fBdoes\fR
 apply (for example, \f5storage.googleapis.com\fR).
+
+.TP 2m
+\fB\-\-enable\-vpc\-accessible\-services\fR
+Whether to restrict API calls within the perimeter to those in the
+vpc\-allowed\-services list.
+
+.TP 2m
+\fB\-\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]
+Comma\-separated list of APIs accessible from within the Service Perimeter. In
+order to include all restricted services, use reference "RESTRICTED\-SERVICES".
+Requires vpc\-accessible\-services be enabled.
 
 
 .RE

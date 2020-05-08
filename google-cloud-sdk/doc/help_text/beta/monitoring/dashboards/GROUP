@@ -1,12 +1,15 @@
 NAME
-    gcloud beta monitoring dashboards - manage Stackdriver Monitoring
-        dashboards
+    gcloud beta monitoring dashboards - manage Cloud Monitoring dashboards
 
 SYNOPSIS
     gcloud beta monitoring dashboards COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Manage Stackdriver Monitoring dashboards.
+    (BETA) The gcloud beta monitoring dashboards group lets you manage
+    Monitoring dashboards.
+
+    More information on managing dashboards can be found here:
+    https://cloud.google.com/monitoring/dashboards/api-dashboard
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -20,19 +23,19 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (BETA) Create a new Stackdriver Monitoring dashboard.
+        (BETA) Create a new Cloud Monitoring dashboard.
 
      delete
-        (BETA) Delete a Stackdriver Monitoring dashboard.
+        (BETA) Delete a Cloud Monitoring dashboard.
 
      describe
-        (BETA) Describe a Stackdriver Monitoring dashboard.
+        (BETA) Describe a Cloud Monitoring dashboard.
 
      list
-        (BETA) List Stackdriver Monitoring dashboards.
+        (BETA) List Cloud Monitoring dashboards.
 
      update
-        (BETA) Update a Stackdriver Monitoring dashboard.
+        (BETA) Update a Cloud Monitoring dashboard.
 
 NOTES
     This command is currently in BETA and may change without notice. These

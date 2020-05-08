@@ -27,6 +27,12 @@ COMMANDS
      connect
         (BETA) Connect to a service via VPC peering for a project network.
 
+     disable-vpc-service-controls
+        (BETA) Disable VPC Service Controls for a connection.
+
+     enable-vpc-service-controls
+        (BETA) Enable VPC Service Controls for a connection.
+
      list
         (BETA) List connections to a service via VPC peering for a project
         network.

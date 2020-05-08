@@ -1,5 +1,5 @@
 title: compute instances resume with a csek that doesn't match
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 
 summary:
 # This summary is generated automatically on update and should not be edited.
@@ -8,6 +8,12 @@ summary:
   - error: "1: HTTPError 400: The encryption key provided for 'projects/fake-project/zones/us-central1-a/disks/z4'\
       \ does not match the key that it was encrypted with."
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
 - write_file:
     path: key.json
     contents: |
@@ -23,7 +29,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z4?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-a/instances/z4?alt=json
           method: GET
           headers: {}
           body: null
@@ -46,14 +52,14 @@ actions:
               interface: SCSI
               kind: compute#attachedDisk
               licenses:
-              - https://compute.googleapis.com/compute/alpha/projects/bct-staging-functional/global/licenses/debian-9-stretch
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/bct-staging-functional/global/licenses/debian-9-stretch
               mode: READ_WRITE
-              source: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/disks/z4
+              source: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-a/disks/z4
               type: PERSISTENT
             id: '6026542934805002612'
             kind: compute#instance
             labelFingerprint: 42WmSpB8rSM=
-            machineType: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/machineTypes/n1-standard-1
+            machineType: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-a/machineTypes/n1-standard-1
             metadata:
               fingerprint: Tewg-kYB2-A=
               kind: compute#metadata
@@ -68,13 +74,13 @@ actions:
               fingerprint: mOeOYLUc0OA=
               kind: compute#networkInterface
               name: nic0
-              network: https://compute.googleapis.com/compute/alpha/projects/fake-project/global/networks/default
+              network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/default
               networkIP: 10.240.0.2
             scheduling:
               automaticRestart: true
               onHostMaintenance: MIGRATE
               preemptible: false
-            selfLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z4
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-a/instances/z4
             serviceAccounts:
             - email: 341306109951-compute@developer.gserviceaccount.com
               scopes:
@@ -89,11 +95,11 @@ actions:
             status: RUNNING
             tags:
               fingerprint: 42WmSpB8rSM=
-            zone: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
+            zone: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-a
 
     - api_call:
         expect_request:
-          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z4/resume?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-a/instances/z4/resume?alt=json
           method: POST
           headers: {}
           body:
@@ -101,7 +107,7 @@ actions:
               disks:
               - diskEncryptionKey:
                   rawKey: acXTX3rxrKAFTF0tYVLvydU1riRZTvUNC4g5I11NY2c=
-                source: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/disks/z4
+                source: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-a/disks/z4
         return_response:
           headers:
             status: '400'

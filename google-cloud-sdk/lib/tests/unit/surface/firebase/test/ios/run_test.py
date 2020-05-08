@@ -68,7 +68,7 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
                 self.testing_msgs.ClientInfoDetail(
                     key='Cloud SDK Version', value=config.CLOUD_SDK_VERSION),
                 self.testing_msgs.ClientInfoDetail(
-                    key='Release Track', value=str('GA')),
+                    key='Release Track', value='GA'),
             ]),
         environmentMatrix=self.testing_msgs.EnvironmentMatrix(
             iosDeviceList=self.testing_msgs.IosDeviceList(iosDevices=devices)),
@@ -83,7 +83,8 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
                 testsZip=self.testing_msgs
                 .FileReference(gcsPath='gs://{db}/{uo}/{tz}'.format(
                     db=self.results_bucket, uo=self.results_dir, tz=TEST_ZIP)),
-                xcodeVersion=xcode_version),
+                xcodeVersion=xcode_version,
+                testSpecialEntitlements=False),
             iosTestSetup=self.testing_msgs.IosTestSetup(),
             disableVideoRecording=False,
             testTimeout=timeout),

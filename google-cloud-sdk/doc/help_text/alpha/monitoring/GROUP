@@ -1,13 +1,13 @@
 NAME
-    gcloud alpha monitoring - manage Stackdriver Monitoring alerting policies,
+    gcloud alpha monitoring - manage Cloud Monitoring alerting policies,
         dashboards, and notification channels
 
 SYNOPSIS
     gcloud alpha monitoring GROUP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage Stackdriver Monitoring alerting policies, dashboards, and
-    notification channels.
+    (ALPHA) Manage Monitoring alerting policies, dashboards, and notification
+    channels.
 
     More information can be found here:
       o https://cloud.google.com/monitoring/api/v3/
@@ -27,16 +27,16 @@ GROUPS
     GROUP is one of the following:
 
      channel-descriptors
-        (ALPHA) Read Stackdriver Monitoring notification channel descriptors.
+        (ALPHA) Read Cloud Monitoring notification channel descriptors.
 
      channels
-        (ALPHA) Manage Stackdriver Monitoring notification channels.
+        (ALPHA) Manage Cloud Monitoring notification channels.
 
      dashboards
-        (ALPHA) Manage Stackdriver Monitoring dashboards.
+        (ALPHA) Manage Cloud Monitoring dashboards.
 
      policies
-        (ALPHA) Manage Stackdriver Monitoring alerting policies.
+        (ALPHA) Manage Cloud Monitoring alerting policies.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

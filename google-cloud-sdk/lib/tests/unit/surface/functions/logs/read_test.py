@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import extra_types
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -55,7 +56,9 @@ class FunctionsGetLogsTest(base.FunctionsTestBase):
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def _createLogEntry(self, severity, function_name, execution_id, timestamp,
-                      text):
+                      text, json_message=None):
+    if (text is None) == (json_message is None):
+      self.fail('Exactly one of text and jsonMessage should be None')
     resource_labels = self.logging_msgs.MonitoredResource.LabelsValue(
         additionalProperties=[
             self.logging_msgs.MonitoredResource.LabelsValue.AdditionalProperty(
@@ -66,10 +69,19 @@ class FunctionsGetLogsTest(base.FunctionsTestBase):
         additionalProperties=[
             self.logging_msgs.LogEntry.LabelsValue.AdditionalProperty(
                 key='execution_id', value=execution_id)])
+    json_payload = None
+    if json_message is not None:
+      json_payload = self.logging_msgs.LogEntry.JsonPayloadValue()
+      json_payload.additionalProperties = [
+          self.logging_msgs.LogEntry.JsonPayloadValue.AdditionalProperty(
+              key='message',
+              value=extra_types.JsonValue(string_value=json_message))
+      ]
 
     return self.logging_msgs.LogEntry(
         severity=self.logging_msgs.LogEntry.SeverityValueValuesEnum(severity),
-        resource=resource, labels=labels, timestamp=timestamp, textPayload=text)
+        resource=resource, labels=labels, timestamp=timestamp, textPayload=text,
+        jsonPayload=json_payload)
 
   def _createLogFilter(self, function_name=None, execution_id=None,
                        min_severity=None, start_time=None, end_time=None,
@@ -256,6 +268,21 @@ class FunctionsGetLogsTest(base.FunctionsTestBase):
         r'^I\s+f-2\s+e-2\s+2015-10-02\s+12:34:56.789\s+two$')
     self.AssertOutputMatches(
         r'^D\s+f-3\s+e-3\s+2015-10-03\s+12:34:56.789\s+three$')
+
+  def testJsonLogEntry(self):
+    log_entries = [
+        self._createLogEntry('CRITICAL', 'f-1', 'e-1',
+                             '2015-10-01T12:34:56.789012345Z', text=None,
+                             json_message='one')
+    ]
+    output_log_lines = [
+        self._createOutputLogLine('CRITICAL', 'f-1', 'e-1',
+                                  '2015-10-01 12:34:56.789', 'one')
+    ]
+    log_filter = self._createLogFilter(region='us-central1')
+    self._setListLogEntriesResponse(log_filter, 'desc', 20, log_entries)
+    result = self.Run('functions logs read')
+    self._checkResult(result, output_log_lines)
 
 
 class FunctionsGetLogsWithoutProjectTest(base.FunctionsTestBase):

@@ -286,7 +286,6 @@ actions:
         user_input: y
         message: 'You are about to delete device: [$$my-device$$]'
     - api_call:
-        repeatable: true
         expect_request:
           uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices/$$my-device$$?alt=json
           method: DELETE

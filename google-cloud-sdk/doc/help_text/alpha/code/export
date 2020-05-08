@@ -10,7 +10,8 @@ SYNOPSIS
         [--image-name=IMAGE_NAME]
         [--kubernetes-file=KUBERNETES_FILE; default="pods_and_services.yaml"]
         [--local-port=LOCAL_PORT] [--memory-limit=MEMORY_LIMIT]
-        [--service-account=SERVICE_ACCOUNT] [--service-name=SERVICE_NAME]
+        [--service-name=SERVICE_NAME]
+        [--application-default-credential | --service-account=SERVICE_ACCOUNT]
         [--env-vars=[KEY=VALUE,...] | --env-vars-file=FILE_PATH]
         [--skaffold-file=SKAFFOLD_FILE; default="skaffold.yaml"
           | --no-skaffold-file] [GCLOUD_WIDE_FLAG ...]
@@ -60,12 +61,18 @@ FLAGS
         suffix. Valid unit suffixes are "B", "KB", "MB", "GB", "TB", "KiB",
         "MiB", "GiB", "TiB", or "PiB".
 
-     --service-account=SERVICE_ACCOUNT
-        When connecting to Google Cloud Platform services, use a service
-        account key.
-
      --service-name=SERVICE_NAME
         Name of the service.
+
+     At most one of these may be specified:
+
+       --application-default-credential
+          When connecting to Google Cloud Platform services, use the
+          application default credential.
+
+       --service-account=SERVICE_ACCOUNT
+          When connecting to Google Cloud Platform services, use a service
+          account key.
 
      At most one of these may be specified:
 

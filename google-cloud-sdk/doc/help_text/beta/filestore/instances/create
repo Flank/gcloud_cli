@@ -3,9 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud beta filestore instances create (INSTANCE : --zone=ZONE)
-        --file-share=[capacity=CAPACITY],[name=NAME],
-          [source-snapshot=SOURCE-SNAPSHOT],
-          [source-snapshot-region=SOURCE-SNAPSHOT-REGION]
+        --file-share=[capacity=CAPACITY],[name=NAME]
         --network=[name=NAME],[reserved-ip-range=RESERVED-IP-RANGE] [--async]
         [--description=DESCRIPTION] [--labels=[KEY=VALUE,...]]
         [--location=LOCATION] [--tier=TIER; default="STANDARD"]
@@ -32,7 +30,7 @@ POSITIONAL ARGUMENTS
           The zone of the instance.
 
 REQUIRED FLAGS
-     --file-share=[capacity=CAPACITY],[name=NAME],[source-snapshot=SOURCE-SNAPSHOT],[source-snapshot-region=SOURCE-SNAPSHOT-REGION]
+     --file-share=[capacity=CAPACITY],[name=NAME]
         File share configuration for an instance. Specifying both name and
         capacity is required.
 

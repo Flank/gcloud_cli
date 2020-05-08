@@ -80,10 +80,6 @@ class OrgSecurityPoliciesAssociationsCreateBetaTest(sdk_test_base.WithFakeAuth,
             resource_uri='https://compute.googleapis.com/compute/{0}/'
             'locations/global/securityPolicies/{1}'.format(
                 self.api_version, '12345678910')))
-    self.mock_client.organizationSecurityPolicies.Get.Expect(
-        self.messages.ComputeOrganizationSecurityPoliciesGetRequest(
-            securityPolicy='12345678910'),
-        response=self.CreateTestOrgSecurityPolicyMessage())
     self.Run('compute org-security-policies associations create '
              '--name association-name '
              '--organization 12345 '

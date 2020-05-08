@@ -102,7 +102,7 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
     op = self.msgs.GoogleLongrunningOperation(name='my-op')
     self.client.projects_models_versions.Patch.Expect(
         self._MakePatchRequest(self.version_ref, version,
-                               update_mask=['labels', 'description']),
+                               update_mask=['description', 'labels']),
         op)
 
     label_update = labels_util.UpdateResult(True, labels_field)

@@ -368,8 +368,8 @@ class EnvVarRedeployTest(DeployE2ETestBase):
       describe_result = self.Run('functions describe {}'.format(
           function_name))
       updated_env_vars = self._ParseEnvVars(describe_result)
-      self.assertEquals('bar', updated_env_vars.get('FOO'))
-      self.assertEquals('boo', updated_env_vars.get('BAZ'))
+      self.assertEqual('bar', updated_env_vars.get('FOO'))
+      self.assertEqual('boo', updated_env_vars.get('BAZ'))
 
 
 class MiscWorkflowTest(DeployE2ETestBase):
@@ -392,6 +392,24 @@ class MiscWorkflowTest(DeployE2ETestBase):
       log_retryer = retry.Retryer(exponential_sleep_multiplier=2)
       log_retryer.RetryOnException(self._RunAndCheckLog,
                                    [function_name], sleep_ms=10)
+
+  def testDeploy_buildInCustomerProject_showsStackdriverLog(self):
+    """Test deploy with build in customer project (runtime = nodejs10) and output log."""
+    with self._DeployFunction('--trigger-http',
+                              source=self.function_path,
+                              runtime='nodejs10') as function_name:
+      self.Run('functions call {}'.format(function_name))
+      self.AssertOutputContains(function_name)
+      self.AssertErrContains('For Cloud Build Stackdriver Logs, visit:')
+
+  def testDeploy_buildInTenantProject_noStackdriverLog(self):
+    """Test deploy with build in tenant project and output log."""
+    with self._DeployFunction('--trigger-http',
+                              source=self.function_path,
+                              runtime='nodejs6') as function_name:
+      self.Run('functions call {}'.format(function_name))
+      self.AssertOutputContains(function_name)
+      self.AssertErrNotContains('For Cloud Build Stackdriver Logs, visit:')
 
 
 if __name__ == '__main__':

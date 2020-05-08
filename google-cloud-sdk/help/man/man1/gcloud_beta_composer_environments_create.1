@@ -312,6 +312,13 @@ Allows all IP addresses to access the Airflow web server.
 Specifies a list of IPv4 or IPv6 ranges that will be allowed to access the
 Airflow web server. By default, all IPs are allowed to access the web server.
 
+This is a repeated argument that can be specified multiple times to specify
+multiple IP ranges. (e.g.
+\-\-web\-server\-allow\-ip=ip_range=130.211.160.0/28,description="office
+network"
+\-\-web\-server\-allow\-ip=ip_range=130.211.114.0/28,description="legacy
+network")
+
 .TP 2m
 \fBip_range\fR
 IPv4 or IPv6 range of addresses allowed to access the Airflow web server.

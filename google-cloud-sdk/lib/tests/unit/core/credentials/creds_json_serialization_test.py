@@ -23,7 +23,7 @@ import json
 import textwrap
 
 from googlecloudsdk.core.credentials import creds
-from googlecloudsdk.core.credentials import reauth
+from googlecloudsdk.core.credentials import google_auth_credentials as c_google_auth
 from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from tests.lib.core.credentials import credentials_test_base
@@ -132,7 +132,8 @@ class CredsSerializationTests(credentials_test_base.CredentialsTestBase):
     expected_credentials = creds.FromJsonGoogleAuth(json_blob)
     expected_credentials_dict = json.loads(json_blob)
     del expected_credentials_dict['type']
-    self.assertIsInstance(expected_credentials, reauth.UserCredWithReauth)
+    self.assertIsInstance(expected_credentials,
+                          c_google_auth.UserCredWithReauth)
     self.AssertCredentialsEqual(expected_credentials, expected_credentials_dict)
 
   def testFromJson_ServiceAccount(self):

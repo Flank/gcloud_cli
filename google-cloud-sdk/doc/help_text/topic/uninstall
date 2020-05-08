@@ -7,6 +7,9 @@ Uninstalling Google Cloud SDK
     Note: For installations completed using an OS package (such as apt-get,
     yum, etc.), uninstall Cloud SDK via the OS package manager.
 
+    Note: For Windows installations, execute the uninstaller.exe found under
+    your Cloud SDK directory.
+
     To completely remove Cloud SDK, follow these instructions:
 
       o Locate your installation directory by running:

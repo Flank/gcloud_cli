@@ -85,8 +85,9 @@ EXAMPLES
             --schema-type=analytics --recursive-depth=3
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud healthcare fhir-stores export bq
         $ gcloud alpha healthcare fhir-stores export bq
 

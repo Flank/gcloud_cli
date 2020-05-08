@@ -28,12 +28,54 @@ from googlecloudsdk.api_lib.events import source
 from googlecloudsdk.api_lib.events import trigger
 from googlecloudsdk.api_lib.run import secret
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.api_lib.util import apis_internal
+from googlecloudsdk.command_lib.events import eventflow_operations
 from googlecloudsdk.command_lib.events import exceptions
 from googlecloudsdk.command_lib.events import stages
 from googlecloudsdk.command_lib.events import util
 from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core.console import progress_tracker
+from tests.lib import test_case
 from tests.lib.surface.run import base
+
+import mock
+
+
+class EventflowConnectTest(test_case.TestCase):
+  """Tests eventflow_operations.Connect()."""
+
+  def SetUp(self):
+    self.mock_client = mock.Mock()
+    self.StartObjectPatch(
+        apis_internal, '_GetClientInstance', return_value=self.mock_client)
+
+  def testConnectAnthos(self):
+    mock_context = mock.Mock()
+    mock_context.__enter__ = mock.Mock(return_value=mock_context)
+    mock_context.__exit__ = mock.Mock(return_value=False)
+    mock_context.supports_one_platform = False
+    mock_context.region = None
+
+    with eventflow_operations.Connect(mock_context) as eventflow_client:
+      self.assertEqual(eventflow_client._client, self.mock_client)
+      self.assertEqual(eventflow_client._core_client, self.mock_client)
+      self.assertEqual(eventflow_client._crd_client, self.mock_client)
+      self.assertEqual(eventflow_client._op_client, self.mock_client)
+      self.assertIsNone(eventflow_client._region)
+
+  def testConnectManaged(self):
+    mock_context = mock.Mock()
+    mock_context.__enter__ = mock.Mock(return_value=mock_context)
+    mock_context.__exit__ = mock.Mock(return_value=False)
+    mock_context.supports_one_platform = True
+    mock_context.region = base.DEFAULT_REGION
+
+    with eventflow_operations.Connect(mock_context) as eventflow_client:
+      self.assertEqual(eventflow_client._client, self.mock_client)
+      self.assertIsNone(eventflow_client._core_client)
+      self.assertEqual(eventflow_client._crd_client, self.mock_client)
+      self.assertEqual(eventflow_client._op_client, self.mock_client)
+      self.assertEqual(eventflow_client._region, base.DEFAULT_REGION)
 
 
 class EventflowOperationsTest(base.ServerlessBase):

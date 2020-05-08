@@ -11,7 +11,7 @@ gcloud alpha ai\-platform versions create \- create a new AI Platform version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ai\-platform versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-explanation\-method\fR=\fIEXPLANATION_METHOD\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR;\ default=50] [\fB\-\-num\-paths\fR=\fINUM_PATHS\fR;\ default=50] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ai\-platform versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-explanation\-method\fR=\fIEXPLANATION_METHOD\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR;\ default=50] [\fB\-\-num\-paths\fR=\fINUM_PATHS\fR;\ default=50] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -75,10 +75,10 @@ Return immediately, without waiting for the operation in progress to complete.
 .TP 2m
 \fB\-\-config\fR=\fICONFIG\fR
 Path to a YAML configuration file containing configuration parameters for the
-Version (https://cloud.google.com/ml/reference/rest/v1/projects.models.versions)
+version (https://cloud.google.com/ml/reference/rest/v1/projects.models.versions)
 to create.
 
-The file is in YAML format. Note that not all attributes of a Version are
+The file is in YAML format. Note that not all attributes of a version are
 configurable; available attributes (with example values) are:
 
 .RS 2m
@@ -96,11 +96,11 @@ labels:
 The name of the version must always be specified via the required VERSION
 argument.
 
-Only one of manualScaling or autoScaling must be specified. If both are
-specified in same yaml file an error will be returned.
+Only one of manualScaling or autoScaling can be specified. If both are specified
+in same yaml file an error will be returned.
 
-If an option is specified both in the configuration file and via command line
-arguments, the command line arguments override the configuration file.
+If an option is specified both in the configuration file and via command\-line
+arguments, the command\-line arguments override the configuration file.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -166,6 +166,18 @@ In the latter case the files will be uploaded to Google Cloud Storage and a
 Version of Python used when creating the version. If not set, the default
 version is 2.7. Python 3.5 is available when \f5\-\-runtime\-version\fR is set
 to 1.4 and above. Python 2.7 works with all supported runtime versions.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Google Cloud region of the regional endpoint to use for this command. If
+unspecified, the command uses the global endpoint of the AI Platform Training
+and Prediction API.
+
+Learn more about regional endpoints and see a list of available regions:
+https://cloud.google.com/ai\-platform/prediction/docs/regional\-endpoints
+
+\fIREGION\fR must be one of: \fBasia\-east1\fR, \fBeurope\-west4\fR,
+\fBus\-central1\fR.
 
 .TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR

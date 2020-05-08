@@ -34,6 +34,7 @@ ios-group:
   timeout: 25m
   xctestrun-file: .xctestrun2
   xcode-version: 9.1.1
+  test-special-entitlements: no
 
 ios-xctest:
   type: xctest

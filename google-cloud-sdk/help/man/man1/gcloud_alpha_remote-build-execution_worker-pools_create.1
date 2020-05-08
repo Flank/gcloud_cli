@@ -11,7 +11,7 @@ gcloud alpha remote\-build\-execution worker\-pools create \- create a worker po
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha remote\-build\-execution worker\-pools create\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default=200] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR;\ default="pd\-standard"] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-2"] [\fB\-\-max\-concurrent\-actions\fR=\fIMAX_CONCURRENT_ACTIONS\fR;\ default=1] [\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR] [\fB\-\-network\-access\fR=\fINETWORK_ACCESS\fR;\ default="public"] [\fB\-\-reserved\fR] [\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha remote\-build\-execution worker\-pools create\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) (\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR\ |\ \fB\-\-autoscale\-max\-size\fR=\fIAUTOSCALE_MAX_SIZE\fR\ \fB\-\-autoscale\-min\-size\fR=\fIAUTOSCALE_MIN_SIZE\fR) [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default=200] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR;\ default="pd\-standard"] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-2"] [\fB\-\-max\-concurrent\-actions\fR=\fIMAX_CONCURRENT_ACTIONS\fR;\ default=1] [\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR] [\fB\-\-network\-access\fR=\fINETWORK_ACCESS\fR;\ default="public"] [\fB\-\-reserved\fR] [\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -54,10 +54,35 @@ Instance name.
 
 .RS 2m
 .TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR
 Number of workers that should be in the worker pool.
 
+.TP 2m
 
+Either both or none of autoscale\-min\-size and autoscale\-max\-size should be
+set.
+
+
+.RS 2m
+.TP 2m
+\fB\-\-autoscale\-max\-size\fR=\fIAUTOSCALE_MAX_SIZE\fR
+The maximal number of autoscale workers. Must be equal to or greater than
+autoscale\-min\-size. This flag must be specified if any of the other arguments
+in this group are specified.
+
+.TP 2m
+\fB\-\-autoscale\-min\-size\fR=\fIAUTOSCALE_MIN_SIZE\fR
+The minimal number of autoscale workers. Must be greater than 0. This flag must
+be specified if any of the other arguments in this group are specified.
+
+
+.RE
+.RE
 .RE
 .sp
 

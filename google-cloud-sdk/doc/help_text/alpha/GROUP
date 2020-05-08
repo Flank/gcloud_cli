@@ -266,8 +266,8 @@ GROUPS
         (ALPHA) Manage AI Platform jobs and models.
 
      monitoring
-        (ALPHA) Manage Stackdriver Monitoring alerting policies, dashboards,
-        and notification channels.
+        (ALPHA) Manage Cloud Monitoring alerting policies, dashboards, and
+        notification channels.
 
      network-services
         (ALPHA) Manage Network Services resources.

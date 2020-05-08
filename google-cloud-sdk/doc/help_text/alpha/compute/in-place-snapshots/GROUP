@@ -28,6 +28,9 @@ COMMANDS
      delete
         (ALPHA) Delete Google Compute Engine in-place snapshots.
 
+     describe
+        (ALPHA) Describe a Google Compute Engine in-place snapshot.
+
      list
         (ALPHA) List Google Compute Engine persistent in-place snapshots.
 

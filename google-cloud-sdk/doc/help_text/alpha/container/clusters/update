@@ -37,8 +37,11 @@ SYNOPSIS
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
           | --autoprovisioning-locations=ZONE,[ZONE,...] --max-cpu=MAX_CPU
           --max-memory=MAX_MEMORY --min-cpu=MIN_CPU --min-memory=MIN_MEMORY
-          --autoprovisioning-scopes=[SCOPE,...]
+          --autoprovisioning-max-surge-upgrade=AUTOPROVISIONING_MAX_SURGE_UPGRADE --autoprovisioning-max-unavailable-upgrade=AUTOPROVISIONING_MAX_UNAVAILABLE_UPGRADE --autoprovisioning-scopes=[SCOPE,
+          ...]
           --autoprovisioning-service-account=AUTOPROVISIONING_SERVICE_ACCOUNT
+          --enable-autoprovisioning-autorepair
+          --enable-autoprovisioning-autoupgrade
           [--max-accelerator=[type=TYPE,count=COUNT,...]
           : --min-accelerator=[type=TYPE,count=COUNT,...]]]
           | --enable-tpu --enable-tpu-service-networking | --tpu-ipv4-cidr=CIDR
@@ -543,16 +546,14 @@ REQUIRED FLAGS
               information on defaults, look at:
               https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
 
-              Note: Node Upgrade settings are implemented only in Beta and
-              Alpha. Node Upgrade settings are specified under the field
+              Node Upgrade settings are specified under the field
               'upgradeSettings', which has the following fields:
               maxSurgeUpgrade: Number of extra (surge) nodes to be created on
               each upgrade of an autoprovisioned node pool.
               maxUnavailableUpgrade: Number of nodes that can be unavailable at
               the same time on each upgrade of an autoprovisioned node pool.
 
-              Note: Node Management settings are implemented only in Beta and
-              Alpha. Node Management settings are specified under the field
+              Node Management settings are specified under the field
               'nodeManagement', which has the following fields:
               enableAutoUpgrade: A boolean field that indicates if node
               autoupgrade is enabled for autoprovisioned node pools.
@@ -598,6 +599,19 @@ REQUIRED FLAGS
                 Minimum number of gigabytes of memory to which the cluster can
                 scale.
 
+             Flags to specify upgrade settings for autoprovisioned nodes:
+
+               --autoprovisioning-max-surge-upgrade=AUTOPROVISIONING_MAX_SURGE_UPGRADE
+                  Number of extra (surge) nodes to be created on each upgrade
+                  of an autoprovisioned node pool. This flag must be specified
+                  if any of the other arguments in this group are specified.
+
+               --autoprovisioning-max-unavailable-upgrade=AUTOPROVISIONING_MAX_UNAVAILABLE_UPGRADE
+                  Number of nodes that can be unavailable at the same time on
+                  each upgrade of an autoprovisioned node pool. This flag must
+                  be specified if any of the other arguments in this group are
+                  specified.
+
              Flags to specify identity for autoprovisioned nodes:
 
                --autoprovisioning-scopes=[SCOPE,...]
@@ -610,6 +624,21 @@ REQUIRED FLAGS
                   The Google Cloud Platform Service Account to be used by node
                   VMs in autoprovisioned node pools. If not specified, the
                   project default service account is used.
+
+             Flags to specify node management settings for autoprovisioned
+             nodes:
+
+               --enable-autoprovisioning-autorepair
+                  Enable node autorepair for autoprovisioned node pools. Use
+                  --no-enable-autoprovisioning-autorepair to disable. This flag
+                  must be specified if any of the other arguments in this group
+                  are specified.
+
+               --enable-autoprovisioning-autoupgrade
+                  Enable node autoupgrade for autoprovisioned node pools. Use
+                  --no-enable-autoprovisioning-autoupgrade to disable. This
+                  flag must be specified if any of the other arguments in this
+                  group are specified.
 
              Arguments to set limits on accelerators:
 

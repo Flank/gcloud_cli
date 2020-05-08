@@ -684,14 +684,14 @@ class InstancesCreateWithContainerTest(
         [m.Zone(name='central2-a'),
          m.Zone(name='central2-b'),
          m.Zone(name='central2-c')],
-        [m.MachineType(
-            creationTimestamp='2013-09-06T17:54:10.636-07:00',
-            guestCpus=int(10),
-            memoryMb=int(1000))],
         [m.Image(
             name=self.cos_image_name,
             selfLink=self.cos_image_path,
             creationTimestamp='2016-06-06T18:52:15.455-07:00')],
+        [m.MachineType(
+            creationTimestamp='2013-09-06T17:54:10.636-07:00',
+            guestCpus=int(10),
+            memoryMb=int(1000))],
         [],
     ])
     self.Run("""
@@ -704,13 +704,13 @@ class InstancesCreateWithContainerTest(
         """)
     self.CheckRequests(
         self.zone_get_request,
+        self.cos_images_list_request,
         [(self.compute.machineTypes,
           'Get',
           m.ComputeMachineTypesGetRequest(
               machineType='n1-custom-10-1000',
               project='my-project',
               zone='central2-a'))],
-        self.cos_images_list_request,
         [(self.compute.instances,
           'Insert',
           m.ComputeInstancesInsertRequest(
@@ -737,14 +737,14 @@ class InstancesCreateWithContainerTest(
         [m.Zone(name='central2-a'),
          m.Zone(name='central2-b'),
          m.Zone(name='central2-c')],
-        [m.MachineType(
-            creationTimestamp='2013-09-06T17:54:10.636-07:00',
-            guestCpus=int(10),
-            memoryMb=int(1000))],
         [m.Image(
             name=self.cos_image_name,
             selfLink=self.cos_image_path,
             creationTimestamp='2016-06-06T18:52:15.455-07:00')],
+        [m.MachineType(
+            creationTimestamp='2013-09-06T17:54:10.636-07:00',
+            guestCpus=int(10),
+            memoryMb=int(1000))],
         [],
     ])
     self.Run("""
@@ -757,13 +757,13 @@ class InstancesCreateWithContainerTest(
         """)
     self.CheckRequests(
         self.zone_get_request,
+        self.cos_images_list_request,
         [(self.compute.machineTypes,
           'Get',
           m.ComputeMachineTypesGetRequest(
               machineType='custom-10-1000-ext',
               project='my-project',
               zone='central2-a'))],
-        self.cos_images_list_request,
         [(self.compute.instances,
           'Insert',
           m.ComputeInstancesInsertRequest(

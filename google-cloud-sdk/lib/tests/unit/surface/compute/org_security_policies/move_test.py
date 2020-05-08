@@ -73,10 +73,6 @@ class OrgSecurityPoliciesMoveBetaTest(sdk_test_base.WithFakeAuth,
             resource_uri='https://compute.googleapis.com/compute/{0}/'
             'locations/global/securityPolicies/{1}'.format(
                 self.api_version, '999999999999')))
-    self.mock_client.organizationSecurityPolicies.Get.Expect(
-        self.messages.ComputeOrganizationSecurityPoliciesGetRequest(
-            securityPolicy='999999999999'),
-        response=self.CreateTestOrgSecurityPolicyMessage())
     self.Run('compute org-security-policies move 999999999999 --organization '
              '12345')
     self.AssertOutputEquals('')

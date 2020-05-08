@@ -4,8 +4,10 @@ NAME
 
 SYNOPSIS
     gcloud alpha remote-build-execution worker-pools create
-        (WORKERPOOL : --instance=INSTANCE) --worker-count=WORKER_COUNT
-        [--async] [--disk-size=DISK_SIZE; default=200]
+        (WORKERPOOL : --instance=INSTANCE)
+        (--worker-count=WORKER_COUNT | --autoscale-max-size=AUTOSCALE_MAX_SIZE
+          --autoscale-min-size=AUTOSCALE_MIN_SIZE) [--async]
+        [--disk-size=DISK_SIZE; default=200]
         [--disk-type=DISK_TYPE; default="pd-standard"]
         [--labels=[KEY=VALUE,...]]
         [--machine-type=MACHINE_TYPE; default="n1-standard-2"]
@@ -36,8 +38,23 @@ POSITIONAL ARGUMENTS
           Instance name.
 
 REQUIRED FLAGS
-     --worker-count=WORKER_COUNT
-        Number of workers that should be in the worker pool.
+     Exactly one of these must be specified:
+
+       --worker-count=WORKER_COUNT
+          Number of workers that should be in the worker pool.
+
+       Either both or none of autoscale-min-size and autoscale-max-size should
+       be set.
+
+         --autoscale-max-size=AUTOSCALE_MAX_SIZE
+            The maximal number of autoscale workers. Must be equal to or
+            greater than autoscale-min-size. This flag must be specified if any
+            of the other arguments in this group are specified.
+
+         --autoscale-min-size=AUTOSCALE_MIN_SIZE
+            The minimal number of autoscale workers. Must be greater than 0.
+            This flag must be specified if any of the other arguments in this
+            group are specified.
 
 OPTIONAL FLAGS
      --async

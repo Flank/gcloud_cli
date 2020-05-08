@@ -76,8 +76,9 @@ EXAMPLES
         $ gcloud beta healthcare fhir-stores list --dataset=test-dataset
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud healthcare fhir-stores list
         $ gcloud alpha healthcare fhir-stores list
 

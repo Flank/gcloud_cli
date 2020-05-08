@@ -122,6 +122,9 @@ COMMANDS
      reset
         (BETA) Reset a virtual machine instance.
 
+     resume
+        (BETA) Resume a virtual machine instance.
+
      set-disk-auto-delete
         (BETA) Set auto-delete behavior for disks.
 
@@ -147,6 +150,9 @@ COMMANDS
 
      stop
         (BETA) Stop a virtual machine instance.
+
+     suspend
+        (BETA) Suspend a virtual machine instance.
 
      tail-serial-port-output
         (BETA) Periodically fetch new output from a virtual machine instance's

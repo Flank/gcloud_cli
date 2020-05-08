@@ -22,7 +22,7 @@ import datetime
 import os
 
 from googlecloudsdk.core.credentials import creds as c_creds
-from googlecloudsdk.core.credentials import reauth
+from googlecloudsdk.core.credentials import google_auth_credentials as c_google_auth  # pylint: disable=line-too-long
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.core.credentials import credentials_test_base
@@ -39,7 +39,7 @@ def _MakeEmptyUserCredentialsOauth2client():
 
 
 def _MakeEmptyUserCredentialsGoogleAuth():
-  return reauth.UserCredWithReauth(None)
+  return c_google_auth.UserCredWithReauth(None)
 
 
 def _MakeEmptyServiceAccountCredentialsOauth2client():

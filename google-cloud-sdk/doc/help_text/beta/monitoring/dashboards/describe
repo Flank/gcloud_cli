@@ -1,12 +1,12 @@
 NAME
-    gcloud beta monitoring dashboards describe - describe a Stackdriver
-        Monitoring dashboard
+    gcloud beta monitoring dashboards describe - describe a Cloud Monitoring
+        dashboard
 
 SYNOPSIS
     gcloud beta monitoring dashboards describe DASHBOARD [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Describe a Stackdriver Monitoring dashboard.
+    (BETA) Describe a Monitoring dashboard.
 
 POSITIONAL ARGUMENTS
      Dashboard resource - The dashboard to describe. This represents a Cloud

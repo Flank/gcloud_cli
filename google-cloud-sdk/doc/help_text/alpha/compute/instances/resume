@@ -61,9 +61,16 @@ GCLOUD WIDE FLAGS
 
     Run $ gcloud help for details.
 
+EXAMPLES
+    To resume an instance named test-instance, run:
+
+        $ gcloud alpha compute instances resume test-instance
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute instances resume
 

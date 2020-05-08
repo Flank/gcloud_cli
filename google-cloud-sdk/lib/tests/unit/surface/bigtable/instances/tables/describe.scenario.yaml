@@ -1,0 +1,135 @@
+title: table describe unit test
+release_tracks: [ALPHA]
+actions:
+- set_property:
+    core/project: cloud-sdk-integration-testing
+- execute_command:
+    command: bigtable instances tables describe do-not-delete-table --instance cloud-bigtable-static-instance
+    events:
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table?alt=json&view=SCHEMA_VIEW
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+            columnFamilies:
+              do-not-delete-family: {}
+              cf1: {}
+            granularity: MILLIS
+    - expect_stdout: |
+        columnFamilies:
+          cf1: {}
+          do-not-delete-family: {}
+        granularity: MILLIS
+        name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: bigtable instances tables describe do-not-delete-table --instance cloud-bigtable-static-instance
+      --view schema
+    events:
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table?alt=json&view=SCHEMA_VIEW
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+            columnFamilies:
+              do-not-delete-family: {}
+              cf1: {}
+            granularity: MILLIS
+    - expect_stdout: |
+        columnFamilies:
+          cf1: {}
+          do-not-delete-family: {}
+        granularity: MILLIS
+        name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: bigtable instances tables describe do-not-delete-table --instance cloud-bigtable-static-instance
+      --view name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table?alt=json&view=NAME_ONLY
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+    - expect_stdout: |
+        name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: bigtable instances tables describe do-not-delete-table --instance cloud-bigtable-static-instance
+      --view replication
+    events:
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table?alt=json&view=REPLICATION_VIEW
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+            clusterStates:
+              cloud-bigtable-static-cluster:
+                replicationState: READY
+    - expect_stdout: |
+        clusterStates:
+          cloud-bigtable-static-cluster:
+            replicationState: READY
+        name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: bigtable instances tables describe do-not-delete-table --instance cloud-bigtable-static-instance
+      --view full
+    events:
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table?alt=json&view=FULL
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+            clusterStates:
+              cloud-bigtable-static-cluster:
+                replicationState: READY
+            columnFamilies:
+              do-not-delete-family: {}
+              cf1: {}
+            granularity: MILLIS
+    - expect_stdout: |
+        clusterStates:
+          cloud-bigtable-static-cluster:
+            replicationState: READY
+        columnFamilies:
+          cf1: {}
+          do-not-delete-family: {}
+        granularity: MILLIS
+        name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+    - expect_exit:
+        code: 0

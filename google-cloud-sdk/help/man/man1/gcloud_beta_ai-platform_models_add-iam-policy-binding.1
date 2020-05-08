@@ -11,7 +11,7 @@ gcloud beta ai\-platform models add\-iam\-policy\-binding \- add IAM policy bind
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ai\-platform models add\-iam\-policy\-binding\fR \fIMODEL\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ai\-platform models add\-iam\-policy\-binding\fR \fIMODEL\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -60,6 +60,25 @@ authenticated with a Google account or a service account.
 .TP 2m
 \fB\-\-role\fR=\fIROLE\fR
 Define the role of the member.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Google Cloud region of the regional endpoint to use for this command. If
+unspecified, the command uses the global endpoint of the AI Platform Training
+and Prediction API.
+
+Learn more about regional endpoints and see a list of available regions:
+https://cloud.google.com/ai\-platform/prediction/docs/regional\-endpoints
+
+\fIREGION\fR must be one of: \fBasia\-east1\fR, \fBeurope\-west4\fR,
+\fBus\-central1\fR.
 
 
 .RE

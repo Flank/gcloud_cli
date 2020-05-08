@@ -16,6 +16,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import base64
 import copy
 import os.path
 import textwrap
@@ -23,6 +24,7 @@ import textwrap
 from apitools.base.py import exceptions as apitools_exceptions
 from apitools.base.py.testing import mock as apitools_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.command_lib.auth import auth_util
 from googlecloudsdk.command_lib.code import flags
 from googlecloudsdk.command_lib.code import local
 from googlecloudsdk.core import properties
@@ -37,6 +39,31 @@ import six
 
 IAM_MESSAGE_MODULE = core_apis.GetMessagesModule('iam', 'v1')
 CRM_MESSAGE_MODULE = core_apis.GetMessagesModule('cloudresourcemanager', 'v1')
+
+
+class TestDataType(local.DataObject):
+  NAMES = ['a', 'b', 'c']
+
+
+class DataObjectTest(test_case.TestCase):
+
+  def testDataObject(self):
+    obj = TestDataType(a=4, b=5, c=6)
+
+    self.assertEqual(obj.a, 4)
+    self.assertEqual(obj.b, 5)
+    self.assertEqual(obj.c, 6)
+
+  def testDataObjectMissingB(self):
+    obj = TestDataType(a=4, c=6)
+
+    self.assertEqual(obj.a, 4)
+    self.assertIsNone(obj.b)
+    self.assertEqual(obj.c, 6)
+
+  def testInvalidNames(self):
+    with self.assertRaises(ValueError):
+      TestDataType(a=4, d=7)
 
 
 class IamTest(cli_test_base.CliTestBase, test_case.WithInput):
@@ -265,10 +292,9 @@ class IamTest(cli_test_base.CliTestBase, test_case.WithInput):
             - containerPort: 8080
     """)
     deployment = yaml.load(yaml_text)
-    secret_generator = local.SecretGenerator(
-        'fake-account@project.iam.gserviceaccount.com')
-    secret_generator.ModifyDeployment(deployment)
-    secret_generator.ModifyContainer(
+    credential_generator = local.CredentialGenerator(lambda: None)
+    credential_generator.ModifyDeployment(deployment)
+    credential_generator.ModifyContainer(
         deployment['spec']['template']['spec']['containers'][0])
 
     expected_yaml_text = textwrap.dedent("""\
@@ -301,6 +327,35 @@ class IamTest(cli_test_base.CliTestBase, test_case.WithInput):
               secretName: local-development-credential
     """)
     self.assertEqual(deployment, yaml.load(expected_yaml_text))
+
+  def testCreateSecret(self):
+    credential_generator = local.CredentialGenerator(lambda: 'abcdef')
+
+    configs = credential_generator.CreateConfigs()
+
+    expected = {
+        'apiVersion': 'v1',
+        'data': {
+            'local_development_service_account.json':
+                six.ensure_text(base64.b64encode(six.ensure_binary('abcdef')))
+        },
+        'kind': 'Secret',
+        'metadata': {
+            'name': 'local-development-credential'
+        },
+        'type': 'Opaque'
+    }
+    self.assertEqual(configs, [expected])
+
+
+class GetUserCredentialTest(test_case.TestCase):
+
+  def testADCNotPresent(self):
+    with mock.patch.object(auth_util, 'GetADCAsJson') as get_adc:
+      get_adc.return_value = None
+
+      with self.assertRaises(local.ADCMissingError):
+        local.GetUserCredential()
 
 
 class EnvironmentVariables(test_case.TestCase):

@@ -65,10 +65,10 @@ API REFERENCE
 EXAMPLES
     To add an IAM policy binding for the role of
     'roles/privateca.certificateManager' for the user 'test-user@gmail.com' on
-    the CA 'prod-root' with the location 'us', run:
+    the CA 'prod-root' with the location 'us-west1', run:
 
         $ gcloud alpha privateca roots add-iam-policy-binding prod-root \
-          --location 'us' \
+          --location 'us-west1' \
           --member 'user:test-user@gmail.com' \
           --role 'roles/privateca.certificateManager'
 

@@ -114,7 +114,8 @@ reported.
 \fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR
 Can only be specified if VPC Flow Logs for this subnetwork is enabled.
 Configures whether metadata fields should be added to the reported logs. Default
-is to include all metadata. \fILOGGING_METADATA\fR must be one of: \fBcustom\fR,
+is to include all metadata. Note that "include\-all" does not include GKE
+annotations. \fILOGGING_METADATA\fR must be one of: \fBcustom\fR,
 \fBexclude\-all\fR, \fBinclude\-all\fR.
 
 .TP 2m
@@ -127,8 +128,9 @@ fields that should be added to reported logs.
 \fB\-\-metadata\fR=\fIMETADATA\fR
 Can only be specified if VPC Flow Logs for this subnetwork is enabled.
 Configures whether metadata fields should be added to the reported logs. Default
-is to include all metadata. \fIMETADATA\fR must be one of:
-\fBexclude\-all\-metadata\fR, \fBinclude\-all\-metadata\fR.
+is to include all metadata. Note that "include\-all" does not include GKE
+annotations. \fIMETADATA\fR must be one of: \fBexclude\-all\-metadata\fR,
+\fBinclude\-all\-metadata\fR.
 
 .TP 2m
 \fB\-\-private\-ipv6\-google\-access\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]

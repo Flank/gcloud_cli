@@ -1,6 +1,5 @@
 NAME
-    gcloud beta monitoring dashboards list - list Stackdriver Monitoring
-        dashboards
+    gcloud beta monitoring dashboards list - list Cloud Monitoring dashboards
 
 SYNOPSIS
     gcloud beta monitoring dashboards list [--filter=EXPRESSION]
@@ -8,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) List Stackdriver Monitoring dashboards.
+    (BETA) List Monitoring dashboards.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

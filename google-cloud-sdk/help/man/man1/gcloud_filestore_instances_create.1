@@ -11,7 +11,7 @@ gcloud filestore instances create \- create a Cloud Filestore instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud filestore instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR],[\fIsource\-snapshot\fR=\fISOURCE\-SNAPSHOT\fR],[\fIsource\-snapshot\-region\fR=\fISOURCE\-SNAPSHOT\-REGION\fR] \fB\-\-network\fR=[\fIname\fR=\fINAME\fR],[\fIreserved\-ip\-range\fR=\fIRESERVED\-IP\-RANGE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-tier\fR=\fITIER\fR;\ default="STANDARD"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud filestore instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR] \fB\-\-network\fR=[\fIname\fR=\fINAME\fR],[\fIreserved\-ip\-range\fR=\fIRESERVED\-IP\-RANGE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-tier\fR=\fITIER\fR;\ default="STANDARD"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,7 +53,7 @@ The zone of the instance.
 
 .RS 2m
 .TP 2m
-\fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR],[\fIsource\-snapshot\fR=\fISOURCE\-SNAPSHOT\fR],[\fIsource\-snapshot\-region\fR=\fISOURCE\-SNAPSHOT\-REGION\fR]
+\fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR]
 File share configuration for an instance. Specifying both \f5name\fR and
 \f5capacity\fR is required.
 

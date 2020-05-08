@@ -95,7 +95,8 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
   def GetNetworkStepForImport(self, network=None, subnet=None,
                               include_zone=True, from_image=False,
                               include_storage_location=False,
-                              family=None, description=None):
+                              family=None, description=None,
+                              sysprep_windows=False):
 
     import_vars = []
 
@@ -133,6 +134,9 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
 
     if family:
       daisy_utils.AppendArg(import_vars, 'family', family)
+
+    if sysprep_windows:
+      daisy_utils.AppendBoolArg(import_vars, 'sysprep_windows')
 
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
@@ -1025,6 +1029,38 @@ class ImageImportTestBeta(ImageImportTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def testSysprepFlagIsPropagated(self):
+    self.PrepareDaisyMocksWithRegionalBucket(
+        self.GetNetworkStepForImport(sysprep_windows=True))
+    self.AddStorageRewriteMock()
+
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --os ubuntu-1604
+             --zone my-region-c
+             --sysprep-windows
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains("""\
+        [import-image] output
+        """, normalize_space=True)
+
+  def testSysprepFlagHasNegative(self):
+    self.PrepareDaisyMocksWithRegionalBucket(
+        self.GetNetworkStepForImport(sysprep_windows=False))
+    self.AddStorageRewriteMock()
+
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --os ubuntu-1604
+             --zone my-region-c
+             --no-sysprep-windows
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains("""\
+        [import-image] output
+        """, normalize_space=True)
 
   def testWindowsByolMapping(self):
     target_workflow = '../workflows/image_import/import_from_image.wf.json'

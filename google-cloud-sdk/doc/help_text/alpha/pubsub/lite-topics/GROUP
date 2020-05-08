@@ -24,6 +24,18 @@ COMMANDS
      delete
         (ALPHA) Delete a Pub/Sub Lite topic.
 
+     describe
+        (ALPHA) Describe a Pub/Sub Lite topic.
+
+     list
+        (ALPHA) List Pub/Sub Lite topics.
+
+     list-subscriptions
+        (ALPHA) List Pub/Sub Lite subscriptions for a given Lite topic.
+
+     update
+        (ALPHA) Update a Pub/Sub Lite topic.
+
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change

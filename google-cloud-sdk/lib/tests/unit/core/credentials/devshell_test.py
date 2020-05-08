@@ -123,6 +123,18 @@ class ProxiedAuthTests(sdk_test_base.SdkBase):
     accounts = c_store.AvailableAccounts()
     self.assertIn('joe@example.com', accounts)
 
+  def testStoreLoadDevShellCredentialsGoogleAuth(self):
+    creds = c_store.Load(use_google_auth=True)
+    self.assertIsInstance(creds, devshell.DevShellCredentialsGoogleAuth)
+    self.assertEqual(creds.token, 'sometoken')
+    self.assertGreater(creds.expiry, datetime.datetime.utcnow())
+    self.assertLess(
+        creds.expiry,
+        datetime.datetime.utcnow() + datetime.timedelta(seconds=1800))
+
+    accounts = c_store.AvailableAccounts()
+    self.assertIn('joe@example.com', accounts)
+
   def testDevShellCredentialsGoogleAuthConversion(self):
     creds = c_store.Load()
     self.assertIsInstance(creds, devshell.DevshellCredentials)

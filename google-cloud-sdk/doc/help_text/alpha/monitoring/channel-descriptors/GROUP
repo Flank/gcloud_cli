@@ -1,12 +1,12 @@
 NAME
-    gcloud alpha monitoring channel-descriptors - read Stackdriver Monitoring
+    gcloud alpha monitoring channel-descriptors - read Cloud Monitoring
         notification channel descriptors
 
 SYNOPSIS
     gcloud alpha monitoring channel-descriptors COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage Stackdriver Monitoring notification channel descriptors.
+    (ALPHA) Manage Monitoring notification channel descriptors.
 
     More information can be found here:
     https://cloud.google.com/monitoring/api/v3/

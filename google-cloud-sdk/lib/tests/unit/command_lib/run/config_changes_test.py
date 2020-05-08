@@ -74,6 +74,13 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
             key=key,
             name=name))
 
+  def testEndpointVisibility(self):
+    endpoint_vis_change = config_changes.EndpointVisibilityChange(True)
+    self.resource = endpoint_vis_change.Adjust(self.resource)
+    self.assertDictEqual({service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL},
+                         dict(self.resource.labels))
+    self.assertDictEqual({}, dict(self.template.labels))
+
   def testEnvLiteralUpdate(self):
     self.template.env_vars.literals.update({'k1': 'v1', 'k2': 'v2'})
     env_change = config_changes.EnvVarLiteralChanges(

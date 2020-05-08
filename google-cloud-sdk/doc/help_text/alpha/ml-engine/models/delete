@@ -2,11 +2,24 @@ NAME
     gcloud alpha ml-engine models delete - delete an existing AI Platform model
 
 SYNOPSIS
-    gcloud alpha ml-engine models delete MODEL [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha ml-engine models delete MODEL [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
 
 POSITIONAL ARGUMENTS
      MODEL
         Name of the model.
+
+FLAGS
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
+
+        REGION must be one of: asia-east1, europe-west4, us-central1.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

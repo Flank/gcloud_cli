@@ -1,6 +1,5 @@
 NAME
-    gcloud alpha monitoring dashboards list - list Stackdriver Monitoring
-        dashboards
+    gcloud alpha monitoring dashboards list - list Cloud Monitoring dashboards
 
 SYNOPSIS
     gcloud alpha monitoring dashboards list [--filter=EXPRESSION]
@@ -8,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List Stackdriver Monitoring dashboards.
+    (ALPHA) List Monitoring dashboards.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

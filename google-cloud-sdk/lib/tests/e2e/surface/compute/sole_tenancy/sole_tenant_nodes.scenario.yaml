@@ -1,7 +1,3 @@
-filters:
-  skip:
-    reason: not enough resources in zone/region
-    bug: b/153452767
 title: Create a sole-tenant node
 release_tracks: [GA]
 summary:

@@ -1,5 +1,5 @@
 title: healthcare hl7v2-stores remove-iam-policy-binding-condition scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -25,6 +25,7 @@ actions:
     track_values:
       ALPHA: v1alpha2
       BETA: v1beta1
+      GA: v1
 # remove binding with condition to a policy with condition
 - execute_command:
     command: healthcare hl7v2-stores remove-iam-policy-binding my-store --location=us-central1

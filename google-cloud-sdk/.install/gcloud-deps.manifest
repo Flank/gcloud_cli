@@ -1524,11 +1524,13 @@ lib/third_party/rsa/asn1.py
 lib/third_party/rsa/common.py
 lib/third_party/rsa/core.py
 lib/third_party/rsa/key.py
+lib/third_party/rsa/machine_size.py
 lib/third_party/rsa/pem.py
 lib/third_party/rsa/pkcs1.py
+lib/third_party/rsa/pkcs1_v2.py
+lib/third_party/rsa/prime.py
 lib/third_party/rsa/randnum.py
 lib/third_party/rsa/transform.py
-lib/third_party/rsa/varblock.py
 lib/third_party/ruamel/LICENSE
 lib/third_party/ruamel/__init__.py
 lib/third_party/ruamel/yaml/__init__.py

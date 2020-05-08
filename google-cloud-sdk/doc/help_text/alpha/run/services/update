@@ -8,6 +8,7 @@ SYNOPSIS
         [--concurrency=CONCURRENCY] [--cpu=CPU] [--max-instances=MAX_INSTANCES]
         [--memory=MEMORY] [--min-instances=MIN_INSTANCES] [--platform=PLATFORM]
         [--port=PORT] [--service-account=SERVICE_ACCOUNT] [--timeout=TIMEOUT]
+        [--no-traffic]
         [--clear-env-vars | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...] --labels=[KEY=VALUE,...]
@@ -116,6 +117,14 @@ FLAGS
         duration; for example, "10m5s" is ten minutes, and five seconds. If you
         don't specify a unit, seconds is assumed. For example, "10" is 10
         seconds.
+
+     --no-traffic
+        True to avoid sending traffic to the revision being deployed. Setting
+        this flag assigns any traffic assigned to the LATEST revision to the
+        specific revision bound to LATEST before the deployment. The effect is
+        that the revsion being deployed will not receive traffic. After a
+        deployment with this flag the LATEST revision will not receive traffic
+        on future deployments.
 
      At most one of these may be specified:
 

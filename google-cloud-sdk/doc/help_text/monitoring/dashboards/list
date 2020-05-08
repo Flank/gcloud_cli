@@ -1,5 +1,5 @@
 NAME
-    gcloud monitoring dashboards list - list Stackdriver Monitoring dashboards
+    gcloud monitoring dashboards list - list Cloud Monitoring dashboards
 
 SYNOPSIS
     gcloud monitoring dashboards list [--filter=EXPRESSION] [--limit=LIMIT]
@@ -7,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    List Stackdriver Monitoring dashboards.
+    List Monitoring dashboards.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

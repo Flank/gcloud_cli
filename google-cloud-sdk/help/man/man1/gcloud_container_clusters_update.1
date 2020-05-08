@@ -11,7 +11,7 @@ gcloud container clusters update \- update cluster settings for an existing cont
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-database\-encryption\-key\fR=\fIDATABASE_ENCRYPTION_KEY\fR\ |\ \fB\-\-disable\-database\-encryption\fR\ |\ \fB\-\-disable\-workload\-identity\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-intra\-node\-visibility\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-shielded\-nodes\fR\ |\ \fB\-\-enable\-stackdriver\-kubernetes\fR\ |\ \fB\-\-enable\-vertical\-pod\-autoscaling\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fISTART_TIME\fR\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-workload\-pool\fR=\fIWORKLOAD_POOL\fR\ |\ \fB\-\-clear\-maintenance\-window\fR\ |\ \fB\-\-remove\-maintenance\-exclusion\fR=\fINAME\fR\ |\ [\fB\-\-add\-maintenance\-exclusion\-end\fR=\fITIME_STAMP\fR\ :\ \fB\-\-add\-maintenance\-exclusion\-name\fR=\fINAME\fR\ \fB\-\-add\-maintenance\-exclusion\-start\fR=\fITIME_STAMP\fR]\ |\ \fB\-\-maintenance\-window\-end\fR=\fITIME_STAMP\fR\ \fB\-\-maintenance\-window\-recurrence\fR=\fIRRULE\fR\ \fB\-\-maintenance\-window\-start\fR=\fITIME_STAMP\fR\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ \fB\-\-autoprovisioning\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ \fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ \fB\-\-autoprovisioning\-scopes\fR=[\fISCOPE\fR,...]\ \fB\-\-autoprovisioning\-service\-account\fR=\fIAUTOPROVISIONING_SERVICE_ACCOUNT\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-database\-encryption\-key\fR=\fIDATABASE_ENCRYPTION_KEY\fR\ |\ \fB\-\-disable\-database\-encryption\fR\ |\ \fB\-\-disable\-workload\-identity\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-intra\-node\-visibility\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-shielded\-nodes\fR\ |\ \fB\-\-enable\-stackdriver\-kubernetes\fR\ |\ \fB\-\-enable\-vertical\-pod\-autoscaling\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fISTART_TIME\fR\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-workload\-pool\fR=\fIWORKLOAD_POOL\fR\ |\ \fB\-\-clear\-maintenance\-window\fR\ |\ \fB\-\-remove\-maintenance\-exclusion\fR=\fINAME\fR\ |\ [\fB\-\-add\-maintenance\-exclusion\-end\fR=\fITIME_STAMP\fR\ :\ \fB\-\-add\-maintenance\-exclusion\-name\fR=\fINAME\fR\ \fB\-\-add\-maintenance\-exclusion\-start\fR=\fITIME_STAMP\fR]\ |\ \fB\-\-maintenance\-window\-end\fR=\fITIME_STAMP\fR\ \fB\-\-maintenance\-window\-recurrence\fR=\fIRRULE\fR\ \fB\-\-maintenance\-window\-start\fR=\fITIME_STAMP\fR\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ \fB\-\-autoprovisioning\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ \fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ \fB\-\-autoprovisioning\-max\-surge\-upgrade\fR=\fIAUTOPROVISIONING_MAX_SURGE_UPGRADE\fR\ \fB\-\-autoprovisioning\-max\-unavailable\-upgrade\fR=\fIAUTOPROVISIONING_MAX_UNAVAILABLE_UPGRADE\fR\ \fB\-\-autoprovisioning\-scopes\fR=[\fISCOPE\fR,...]\ \fB\-\-autoprovisioning\-service\-account\fR=\fIAUTOPROVISIONING_SERVICE_ACCOUNT\fR\ \fB\-\-enable\-autoprovisioning\-autorepair\fR\ \fB\-\-enable\-autoprovisioning\-autoupgrade\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -476,17 +476,15 @@ pools. Multiple scopes can be specified, separated by commas. For information on
 defaults, look at:
 https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#\-\-scopes
 
-Note: Node Upgrade settings are implemented only in Beta and Alpha. Node Upgrade
-settings are specified under the field 'upgradeSettings', which has the
-following fields: maxSurgeUpgrade: Number of extra (surge) nodes to be created
-on each upgrade of an autoprovisioned node pool. maxUnavailableUpgrade: Number
-of nodes that can be unavailable at the same time on each upgrade of an
+Node Upgrade settings are specified under the field 'upgradeSettings', which has
+the following fields: maxSurgeUpgrade: Number of extra (surge) nodes to be
+created on each upgrade of an autoprovisioned node pool. maxUnavailableUpgrade:
+Number of nodes that can be unavailable at the same time on each upgrade of an
 autoprovisioned node pool.
 
-Note: Node Management settings are implemented only in Beta and Alpha. Node
-Management settings are specified under the field 'nodeManagement', which has
-the following fields: enableAutoUpgrade: A boolean field that indicates if node
-autoupgrade is enabled for autoprovisioned node pools. enableAutoRepair: A
+Node Management settings are specified under the field 'nodeManagement', which
+has the following fields: enableAutoUpgrade: A boolean field that indicates if
+node autoupgrade is enabled for autoprovisioned node pools. enableAutoRepair: A
 boolean field that indicates if node autorepair is enabled for autoprovisioned
 node pools.
 
@@ -536,6 +534,25 @@ Minimum number of gigabytes of memory to which the cluster can scale.
 
 .TP 2m
 
+Flags to specify upgrade settings for autoprovisioned nodes:
+
+.RS 2m
+.TP 2m
+\fB\-\-autoprovisioning\-max\-surge\-upgrade\fR=\fIAUTOPROVISIONING_MAX_SURGE_UPGRADE\fR
+Number of extra (surge) nodes to be created on each upgrade of an
+autoprovisioned node pool. This flag must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-autoprovisioning\-max\-unavailable\-upgrade\fR=\fIAUTOPROVISIONING_MAX_UNAVAILABLE_UPGRADE\fR
+Number of nodes that can be unavailable at the same time on each upgrade of an
+autoprovisioned node pool. This flag must be specified if any of the other
+arguments in this group are specified.
+
+.RE
+.sp
+.TP 2m
+
 Flags to specify identity for autoprovisioned nodes:
 
 .RS 2m
@@ -551,6 +568,25 @@ https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#\-\-scop
 The Google Cloud Platform Service Account to be used by node VMs in
 autoprovisioned node pools. If not specified, the project default service
 account is used.
+
+.RE
+.sp
+.TP 2m
+
+Flags to specify node management settings for autoprovisioned nodes:
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-autoprovisioning\-autorepair\fR
+Enable node autorepair for autoprovisioned node pools. Use
+\-\-no\-enable\-autoprovisioning\-autorepair to disable. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-enable\-autoprovisioning\-autoupgrade\fR
+Enable node autoupgrade for autoprovisioned node pools. Use
+\-\-no\-enable\-autoprovisioning\-autoupgrade to disable. This flag must be
+specified if any of the other arguments in this group are specified.
 
 .RE
 .sp

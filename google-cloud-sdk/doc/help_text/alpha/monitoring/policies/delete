@@ -1,12 +1,12 @@
 NAME
-    gcloud alpha monitoring policies delete - delete a Stackdriver alerting
-        policy
+    gcloud alpha monitoring policies delete - delete a Cloud Monitoring
+        alerting policy
 
 SYNOPSIS
     gcloud alpha monitoring policies delete POLICY [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Delete a Stackdriver alerting policy.
+    (ALPHA) Delete a Monitoring alerting policy.
 
 POSITIONAL ARGUMENTS
      Policy resource - The alerting policy to delete. This represents a Cloud

@@ -30,10 +30,6 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
-     commit
-        (ALPHA) (DEPRECATED) Commit the dry-run mode configuration for all
-        Service Perimeters.
-
      create
         (ALPHA) Create a dry-run mode configuration for a new or existing
         Service Perimeter.
@@ -58,10 +54,6 @@ COMMANDS
         (ALPHA) List the effective dry-run configuration across all Service
         Perimeters.
 
-     reset
-        (ALPHA) (DEPRECATED) Reset the dry-run mode configuration of a Service
-        Perimeter.
-
      update
         (ALPHA) Update the dry-run mode configuration for a Service Perimeter.
 
@@ -69,7 +61,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud access-context-manager perimeters dry-run
         $ gcloud beta access-context-manager perimeters dry-run
 

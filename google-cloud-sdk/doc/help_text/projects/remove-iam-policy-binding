@@ -4,11 +4,14 @@ NAME
 
 SYNOPSIS
     gcloud projects remove-iam-policy-binding PROJECT_ID --member=MEMBER
-        --role=ROLE [GCLOUD_WIDE_FLAG ...]
+        --role=ROLE
+        [--all | --condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Removes a policy binding to the IAM policy of a project, given a project ID
-    and the binding.
+    and the binding. One binding consists of a member, a role and an optional
+    condition.
 
 POSITIONAL ARGUMENTS
      Project resource - The project to remove the IAM policy binding from. This
@@ -34,6 +37,39 @@ REQUIRED FLAGS
 
      --role=ROLE
         The role to remove the member from.
+
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --all
+          Remove all bindings with this role and member, irrespective of any
+          conditions.
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be removed. When condition is explicitly
+          specified as None (e.g. --condition=None), it matches a binding
+          without a condition. Otherwise, only the binding with a condition
+          which exactly matches the specified condition (including the optional
+          description) will be removed.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -61,9 +97,28 @@ EXAMPLES
         $ gcloud projects remove-iam-policy-binding example-project-id-1 \
             --member='allAuthenticatedUsers' --role='roles/editor'
 
-    See https://cloud.google.com/iam/help/members/types for details about
-    member types. See https://cloud.google.com/iam/help/roles/reference for
-    details about roles.
+    To remove an IAM policy binding with a condition of
+    expression='request.time < timestamp("2019-01-01T00:00:00Z")',
+    title='expires_end_of_2018', and description='Expires at midnight on
+    2018-12-31' for the role of 'roles/browser' for the user
+    'test-user@gmail.com' on project with identifier 'example-project-id-1',
+    run:
+
+        $ gcloud projects remove-iam-policy-binding example-project-id-1 \
+            --member='user:test-user@gmail.com' --role='roles/browser' \
+            --condition='expression=request.time <
+         timestamp("2019-01-01T00:00:00Z"),title=expires_end_of_2018,descrip\
+        tion=Expires at midnight on 2018-12-31'
+
+    To remove all IAM policy bindings regardless of the condition for the role
+    of 'roles/browser' and for the user 'test-user@gmail.com' on project with
+    identifier 'example-project-id-1', run:
+
+        $ gcloud projects remove-iam-policy-binding example-project-id-1 \
+            --member='user:test-user@gmail.com' --role='roles/browser' --all
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
 
 NOTES
     These variants are also available:

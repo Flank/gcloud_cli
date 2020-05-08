@@ -68,7 +68,9 @@ REQUIRED FLAGS
 
          --vpc-allowed-services=[vpc_allowed_services,...]
             Comma-separated list of APIs accessible from within the Service
-            Perimeter. Requires vpc-accessible-services be enabled.
+            Perimeter. In order to include all restricted services, use
+            reference "RESTRICTED-SERVICES". Requires vpc-accessible-services
+            be enabled.
 
        Arguments for creating a dry-run spec for a new Service Perimeter.
 
@@ -114,7 +116,9 @@ REQUIRED FLAGS
 
          --perimeter-vpc-allowed-services=[vpc_allowed_services,...]
             Comma-separated list of APIs accessible from within the Service
-            Perimeter. Requires vpc-accessible-services be enabled.
+            Perimeter. In order to include all restricted services, use
+            reference "RESTRICTED-SERVICES". Requires vpc-accessible-services
+            be enabled.
 
 OPTIONAL FLAGS
      --async
@@ -148,8 +152,9 @@ EXAMPLES
         a_level" --perimeter-restricted-services="storage.googleapis.com"
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud access-context-manager perimeters dry-run create
         $ gcloud alpha access-context-manager perimeters dry-run create
 

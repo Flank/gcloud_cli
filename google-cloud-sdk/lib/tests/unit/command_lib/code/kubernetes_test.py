@@ -159,6 +159,18 @@ class StartKindTest(SdkPathTestCase):
 
     self.assertIn("delete", check_call.call_args[0][0])
 
+  def testDeleteKind(self):
+    with mock.patch.object(subprocess, "Popen") as popen:
+      with mock.patch.object(subprocess, "check_call") as check_call:
+        popen.return_value.communicate.return_value = ("cluster-name\n", None)
+
+        kubernetes.DeleteKindClusterIfExists("cluster-name")
+
+    check_call.assert_called_once_with(
+        [self.PATH_TO_KIND, "delete", "cluster", "--name", "cluster-name"],
+        stdout=mock.ANY,
+        stderr=mock.ANY)
+
 
 class KubeNamespace(SdkPathTestCase):
 

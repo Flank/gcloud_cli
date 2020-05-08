@@ -38,7 +38,9 @@ SYNOPSIS
           --reservation=RESERVATION
           --reservation-affinity=RESERVATION_AFFINITY; default="any"]
         [--single-node | --num-secondary-workers=NUM_SECONDARY_WORKERS
-          --num-workers=NUM_WORKERS] [GCLOUD_WIDE_FLAG ...]
+          --num-workers=NUM_WORKERS
+          --secondary-worker-type=TYPE; default="preemptible"]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Set a managed cluster for the workflow template.
@@ -534,6 +536,10 @@ FLAGS
          --num-workers=NUM_WORKERS
             The number of worker nodes in the cluster. Defaults to
             server-specified.
+
+         --secondary-worker-type=TYPE; default="preemptible"
+            The type of the secondary worker group. TYPE must be one of:
+            preemptible, non-preemptible.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

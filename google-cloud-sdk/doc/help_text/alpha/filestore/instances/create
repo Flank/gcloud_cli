@@ -4,6 +4,8 @@ NAME
 SYNOPSIS
     gcloud alpha filestore instances create (INSTANCE : --zone=ZONE)
         --file-share=[capacity=CAPACITY],[name=NAME],
+          [source-backup=SOURCE-BACKUP],
+          [source-backup-region=SOURCE-BACKUP-REGION],
           [source-snapshot=SOURCE-SNAPSHOT],
           [source-snapshot-region=SOURCE-SNAPSHOT-REGION]
         --network=[name=NAME],[reserved-ip-range=RESERVED-IP-RANGE] [--async]
@@ -32,7 +34,7 @@ POSITIONAL ARGUMENTS
           The zone of the instance.
 
 REQUIRED FLAGS
-     --file-share=[capacity=CAPACITY],[name=NAME],[source-snapshot=SOURCE-SNAPSHOT],[source-snapshot-region=SOURCE-SNAPSHOT-REGION]
+     --file-share=[capacity=CAPACITY],[name=NAME],[source-backup=SOURCE-BACKUP],[source-backup-region=SOURCE-BACKUP-REGION],[source-snapshot=SOURCE-SNAPSHOT],[source-snapshot-region=SOURCE-SNAPSHOT-REGION]
         File share configuration for an instance. Specifying both name and
         capacity is required.
 
@@ -45,7 +47,14 @@ REQUIRED FLAGS
          name
             The desired logical name of the volume.
 
-                *source-snapshot*::: The name of the snapshot to restore from.
+         source-backup
+            The name of the backup to restore from.
+
+         source-backup-region
+            The region of the source backup.
+
+         source-snapshot
+            The name of the snapshot to restore from.
 
          source-snapshot-region
             The region of the source snapshot. If unspecified, it is assumed

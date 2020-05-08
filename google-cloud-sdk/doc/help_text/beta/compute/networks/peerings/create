@@ -5,7 +5,8 @@ NAME
 SYNOPSIS
     gcloud beta compute networks peerings create NAME --network=NETWORK
         --peer-network=PEER_NETWORK [--async] [--auto-create-routes]
-        [--export-custom-routes] [--import-custom-routes]
+        [--export-custom-routes] [--export-subnet-routes-with-public-ip]
+        [--import-custom-routes] [--import-subnet-routes-with-public-ip]
         [--peer-project=PEER_PROJECT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -43,9 +44,19 @@ OPTIONAL FLAGS
         If set, the network will export custom routes to peer network. Use
         --no-export-custom-routes to disable it.
 
+     --export-subnet-routes-with-public-ip
+        If set, the network will export subnet routes with addresses in the
+        public IP ranges to peer network. Use
+        --no-export-subnet-routes-with-public-ip to disable it.
+
      --import-custom-routes
         If set, the network will import custom routes from peer network. Use
         --no-import-custom-routes to disable it.
+
+     --import-subnet-routes-with-public-ip
+        If set, the network will import subnet routes with addresses in the
+        public IP ranges from peer network. Use
+        --no-import-subnet-routes-with-public-ip to disable it.
 
      --peer-project=PEER_PROJECT
         The name of the project for the peer network. If not specified,
@@ -62,13 +73,15 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To create a network peering with the name 'peering-name' between the
     network 'local-network' and the network 'peer-network' which exports and
-    imports custom routes, run:
+    imports custom routes and subnet routes with public IPs, run:
 
         $ gcloud beta compute networks peerings create peering-name \
           --network=local-network \
           --peer-network=peer-network \
           --export-custom-routes \
-          --import-custom-routes
+          --import-custom-routes \
+          --export-subnet-routes-with-public-ip \
+          --import-subnet-routes-with-public-ip
 
 NOTES
     This command is currently in BETA and may change without notice. These

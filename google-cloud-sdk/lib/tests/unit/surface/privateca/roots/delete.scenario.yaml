@@ -5,33 +5,34 @@ summary:
 - execute:
   - command: privateca roots delete ca --location europe-west1
   - prompt:
-    - message: You are about to delete Certificate Authority [ca]
+    - message: You are about to delete Certificate Authority [projects/fake-project/locations/europe-west1/certificateAuthorities/ca]
     - input: y
   - stderr: |
-      Deleted Certificate Authority [ca].
+      Deleted Root CA [projects/fake-project/locations/europe-west1/certificateAuthorities/ca].
 - execute:
   - command: privateca roots delete ca --location europe-west1
   - prompt:
-    - message: You are about to delete Certificate Authority [ca]
+    - message: You are about to delete Certificate Authority [projects/fake-project/locations/europe-west1/certificateAuthorities/ca]
     - input: y
   - error: '1: Cannot perform roots command on Subordinate CA. Please use the `privateca
       subordinates` command group instead.'
 - execute:
   - command: privateca roots delete ca --location europe-west1 --quiet
   - stderr: |
-      Deleted Certificate Authority [ca].
+      Deleted Root CA [projects/fake-project/locations/europe-west1/certificateAuthorities/ca].
 - execute:
   - command: privateca roots delete ca --location europe-west1
   - prompt:
-    - message: You are about to delete Certificate Authority [ca]
+    - message: You are about to delete Certificate Authority [projects/fake-project/locations/europe-west1/certificateAuthorities/ca]
     - input: n
-  - error: '1: Aborted by user.'
+  - stderr: |
+      Aborted by user.
 actions:
 - execute_command:
     command: privateca roots delete ca --location europe-west1
     events:
     - expect_prompt_continue:
-        message: You are about to delete Certificate Authority [ca]
+        message: You are about to delete Certificate Authority [projects/fake-project/locations/europe-west1/certificateAuthorities/ca]
         user_input: y
     - api_call:
         expect_request:
@@ -58,14 +59,14 @@ actions:
           body:
             done: true
     - expect_stderr: |
-        Deleted Certificate Authority [ca].
+        Deleted Root CA [projects/fake-project/locations/europe-west1/certificateAuthorities/ca].
     - expect_exit:
         code: 0
 - execute_command:
     command: privateca roots delete ca --location europe-west1
     events:
     - expect_prompt_continue:
-        message: You are about to delete Certificate Authority [ca]
+        message: You are about to delete Certificate Authority [projects/fake-project/locations/europe-west1/certificateAuthorities/ca]
         user_input: y
     - api_call:
         expect_request:
@@ -111,15 +112,16 @@ actions:
           body:
             done: true
     - expect_stderr: |
-        Deleted Certificate Authority [ca].
+        Deleted Root CA [projects/fake-project/locations/europe-west1/certificateAuthorities/ca].
     - expect_exit:
         code: 0
 - execute_command:
     command: privateca roots delete ca --location europe-west1
     events:
     - expect_prompt_continue:
-        message: You are about to delete Certificate Authority [ca]
+        message: You are about to delete Certificate Authority [projects/fake-project/locations/europe-west1/certificateAuthorities/ca]
         user_input: n
+    - expect_stderr: |
+        Aborted by user.
     - expect_exit:
-        code: 1
-        message: Aborted by user.
+        code: 0

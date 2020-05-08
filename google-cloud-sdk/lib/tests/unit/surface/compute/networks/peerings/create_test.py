@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import lister
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -45,9 +44,11 @@ class PeeringsCreateTest(test_base.BaseTest):
           self.messages.ComputeNetworksAddPeeringRequest(
               network='network-1',
               networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
-                  autoCreateRoutes=True,
-                  name='peering-1',
-                  peerNetwork='projects/my-project/global/networks/network-2'),
+                  networkPeering=self.messages.NetworkPeering(
+                      exchangeSubnetRoutes=True,
+                      name='peering-1',
+                      network=
+                      'projects/my-project/global/networks/network-2')),
               project='my-project'))],)
 
   def testCreatePeeringDifferentProject(self):
@@ -60,10 +61,11 @@ class PeeringsCreateTest(test_base.BaseTest):
           self.messages.ComputeNetworksAddPeeringRequest(
               network='network-1',
               networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
-                  autoCreateRoutes=True,
-                  name='peering-1',
-                  peerNetwork='projects/my-project-2/global/networks/'
-                  'network-2'),
+                  networkPeering=self.messages.NetworkPeering(
+                      exchangeSubnetRoutes=True,
+                      name='peering-1',
+                      network=
+                      'projects/my-project-2/global/networks/network-2')),
               project='my-project'))],)
 
   def testCreatePeeringNoAutoCreateRoutes(self):
@@ -76,10 +78,11 @@ class PeeringsCreateTest(test_base.BaseTest):
           self.messages.ComputeNetworksAddPeeringRequest(
               network='network-1',
               networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
-                  autoCreateRoutes=False,
-                  name='peering-1',
-                  peerNetwork='projects/my-project-2/global/networks/'
-                  'network-2'),
+                  networkPeering=self.messages.NetworkPeering(
+                      exchangeSubnetRoutes=True,
+                      name='peering-1',
+                      network=
+                      'projects/my-project-2/global/networks/network-2')),
               project='my-project'))],)
 
   def testCreatePeeringNoArgumentsError(self):
@@ -99,22 +102,13 @@ class PeeringsCreateTest(test_base.BaseTest):
       self.Run('compute networks peerings create peering-1 --network '
                'network-1')
 
-
-class PeeringsCreateBetaTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
-
   def testCreatePeeringWithCustomRoutesFlags(self):
     self.Run('compute networks peerings create peering-1 --network '
              'network-1 --peer-network network-2 '
              '--export-custom-routes --import-custom-routes')
 
     self.CheckRequests(
-        [(self.compute_beta.networks, 'AddPeering',
+        [(self.compute.networks, 'AddPeering',
           self.messages.ComputeNetworksAddPeeringRequest(
               network='network-1',
               networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
@@ -132,7 +126,7 @@ class PeeringsCreateBetaTest(test_base.BaseTest):
              '--export-custom-routes --import-custom-routes')
 
     self.CheckRequests(
-        [(self.compute_beta.networks, 'AddPeering',
+        [(self.compute.networks, 'AddPeering',
           self.messages.ComputeNetworksAddPeeringRequest(
               network='network-1',
               networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
@@ -148,15 +142,6 @@ class PeeringsCreateBetaTest(test_base.BaseTest):
         'WARNING: Flag --auto-create-routes is deprecated and '
         'will be removed in a future release.')
 
-
-class PeeringsCreateAlphaTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
-
   def testCreatePeeringWithExportSubnetRouteWithPublicIp(self):
     self.Run('compute networks peerings create peering-1 --network '
              'network-1 --peer-network network-2 '
@@ -164,7 +149,7 @@ class PeeringsCreateAlphaTest(test_base.BaseTest):
              '--import-subnet-routes-with-public-ip')
 
     self.CheckRequests(
-        [(self.compute_alpha.networks, 'AddPeering',
+        [(self.compute.networks, 'AddPeering',
           self.messages.ComputeNetworksAddPeeringRequest(
               network='network-1',
               networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
@@ -175,6 +160,7 @@ class PeeringsCreateAlphaTest(test_base.BaseTest):
                       exportSubnetRoutesWithPublicIp=True,
                       importSubnetRoutesWithPublicIp=True)),
               project='my-project'))],)
+
 
 if __name__ == '__main__':
   test_case.main()

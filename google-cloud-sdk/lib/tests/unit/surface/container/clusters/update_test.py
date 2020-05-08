@@ -1569,6 +1569,126 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         '--max-cpu 100 --min-cpu 8 '
         '--max-accelerator type=nvidia-tesla-k80,count=2')
 
+  def testEnableAutoprovisioningWithUpgradeSettings(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            upgradeSettings=self.msgs.UpgradeSettings(
+                maxSurge=1, maxUnavailable=2),
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning --max-memory 128 '
+              '--max-cpu 100 --min-cpu 8 '
+              '--autoprovisioning-max-surge-upgrade=1 '
+              '--autoprovisioning-max-unavailable-upgrade=2 ')
+
+  def testEnableAutoprovisioningWithNodeManagement(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            management=self.msgs.NodeManagement(
+                autoRepair=False, autoUpgrade=True),
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning --max-memory 128 '
+              '--max-cpu 100 --min-cpu 8 '
+              '--no-enable-autoprovisioning-autorepair '
+              '--enable-autoprovisioning-autoupgrade')
+
+  def testEnableAutoprovisioningWithNodeManagementAndUpgradeSettings(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            management=self.msgs.NodeManagement(
+                autoRepair=False, autoUpgrade=True),
+            upgradeSettings=self.msgs.UpgradeSettings(
+                maxSurge=1, maxUnavailable=2),
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning --max-memory 128 '
+              '--max-cpu 100 --min-cpu 8 '
+              '--autoprovisioning-max-surge-upgrade=1 '
+              '--autoprovisioning-max-unavailable-upgrade=2 '
+              '--no-enable-autoprovisioning-autorepair '
+              '--enable-autoprovisioning-autoupgrade ')
+
+  def testEnableAutoprovisioningWithManagementFromFile(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+management:
+  autoRepair: false
+  autoUpgrade: true
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            management=self.msgs.NodeManagement(
+                autoRepair=False, autoUpgrade=True),
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(
+            autoprovisioning_config_file))
+
+  def testEnableAutoprovisioningWithUpgradeSettingsFromFile(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+upgradeSettings:
+  maxSurgeUpgrade: 1
+  maxUnavailableUpgrade: 2
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            upgradeSettings=self.msgs.UpgradeSettings(
+                maxSurge=1, maxUnavailable=2),
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(
+            autoprovisioning_config_file))
+
   def testEnableAutoprovisioningWithAcceleratorLimits(self):
     self._TestUpdateAutoprovisioning(
         enabled=True,

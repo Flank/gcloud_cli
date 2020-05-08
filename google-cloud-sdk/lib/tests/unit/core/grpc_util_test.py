@@ -36,9 +36,9 @@ if six.PY2:
   import grpc  # pylint: disable=g-import-not-at-top
 
 
-@test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/78118402')
 class GrpcUtilTest(sdk_test_base.WithFakeAuth):
 
+  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/78118402')
   def testMakeChannel(self):
     target = 'bigtableadmin.googleapis.com:443'
     channel = grpc_util.MakeSecureChannel(target)

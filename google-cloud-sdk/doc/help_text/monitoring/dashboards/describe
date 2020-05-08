@@ -1,12 +1,12 @@
 NAME
-    gcloud monitoring dashboards describe - describe a Stackdriver Monitoring
+    gcloud monitoring dashboards describe - describe a Cloud Monitoring
         dashboard
 
 SYNOPSIS
     gcloud monitoring dashboards describe DASHBOARD [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Describe a Stackdriver Monitoring dashboard.
+    Describe a Monitoring dashboard.
 
 POSITIONAL ARGUMENTS
      Dashboard resource - The dashboard to describe. This represents a Cloud

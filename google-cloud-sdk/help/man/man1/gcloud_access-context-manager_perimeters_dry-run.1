@@ -1,0 +1,101 @@
+
+.TH "GCLOUD_ACCESS\-CONTEXT\-MANAGER_PERIMETERS_DRY\-RUN" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud access\-context\-manager perimeters dry\-run \- enable management of dry\-run mode configuration for Service Perimeters
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud access\-context\-manager perimeters dry\-run\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+A Service Perimeter describes a set of Google Cloud Platform.RS 2m
+resources which can freely import and export data amongst themselves,
+but not externally, by default.
+
+.RE
+
+.RS 2m
+A dry\-run mode configuration (also known as the Service Perimeter
+`spec`) makes it possible to understand the impact of any changes to a
+VPC Service Controls policy change before committing the change to the
+enforcement mode configuration.
+.RE
+
+.RS 2m
+Note: For Service Perimeters without an explicit dry\-run mode
+configuration, the enforcement mode configuration is used as the dry\-run
+mode configuration, resulting in no audit logs being generated.
+.RE
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcreate\fR
+Create a dry\-run mode configuration for a new or existing Service Perimeter.
+
+.TP 2m
+\fBdelete\fR
+Mark the Service Perimeter as deleted in the dry\-run mode.
+
+.TP 2m
+\fBdescribe\fR
+Display the dry\-run mode configuration for a Service Perimeter.
+
+.TP 2m
+\fBdrop\fR
+Reset the dry\-run mode configuration of a Service Perimeter.
+
+.TP 2m
+\fBenforce\fR
+Enforces a Service Perimeter's dry\-run configuration.
+
+.TP 2m
+\fBenforce\-all\fR
+Enforces the dry\-run mode configuration for all Service Perimeters.
+
+.TP 2m
+\fBlist\fR
+List the effective dry\-run configuration across all Service Perimeters.
+
+.TP 2m
+\fBupdate\fR
+Update the dry\-run mode configuration for a Service Perimeter.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha access\-context\-manager perimeters dry\-run
+$ gcloud beta access\-context\-manager perimeters dry\-run
+.RE
+

@@ -222,9 +222,18 @@ class CloudFilestoreInstancesCreateAlphaTest(
   def AddInstanceFileShare(self, instance, file_shares):
     instance.fileShares = file_shares
 
-  def MakeFileShareConfig(self, name, capacity, source_snapshot=None):
-    return [self.FileShareMsg()(capacityGb=capacity, name=name,
-                                sourceSnapshot=source_snapshot)]
+  def MakeFileShareConfig(self,
+                          name,
+                          capacity,
+                          source_snapshot=None,
+                          source_backup=None):
+    return [
+        self.FileShareMsg()(
+            capacityGb=capacity,
+            name=name,
+            sourceSnapshot=source_snapshot,
+            sourceBackup=source_backup)
+    ]
 
   @parameterized.named_parameters(
       ('NoRange',
@@ -245,36 +254,60 @@ class CloudFilestoreInstancesCreateAlphaTest(
         networks=self.MakeNetworkConfig(
             expected_network, expected_range))
     self.AddInstanceFileShare(
-        config, self.MakeFileShareConfig(
-            expected_vol_name, expected_capacity, expected_source_snapshot))
+        config,
+        self.MakeFileShareConfig(expected_vol_name, expected_capacity,
+                                 expected_source_snapshot, None))
     self.ExpectCreateInstance(config)
     self.RunCreate(*args)
     self.AssertErrContains(_GetListCommandOuput(self._TRACK.prefix))
 
   @parameterized.named_parameters(
-      ('NoRange',
-       ['instance_name',
-        '--location=us-central1-c', '--async',
-        '--network=name=test_network',
-        '--file-share=name=my_vol,capacity=1TB,source-snapshot=snap',
-        '--description=test_description'],
-       'test_network', None, 'my_vol', 1024,
-       'projects/fake-project/locations/us-central1-c/snapshots/snap'))
-  def testCreateInstanceFromLocalSnapshot(self, args, expected_network,
-                                          expected_range, expected_vol_name,
-                                          expected_capacity,
-                                          expected_source_snapshot):
+      ('NoRange', [
+          'instance_name', '--location=us-central1-c', '--async',
+          '--network=name=test_network',
+          '--file-share=name=my_vol,capacity=1TB,source-backup=my-backup,source-backup-region=us-central1',
+          '--description=test_description'
+      ], 'test_network', None, 'my_vol', 1024,
+       'projects/fake-project/locations/us-central1/backups/my-backup'))
+  def testCreateInstanceFromBackup(self, args, expected_network, expected_range,
+                                   expected_vol_name, expected_capacity,
+                                   expected_source_backup):
     config = self.messages.Instance(
         tier=self.standard_tier,
         description='test_description',
         networks=self.MakeNetworkConfig(
             expected_network, expected_range))
     self.AddInstanceFileShare(
-        config, self.MakeFileShareConfig(
-            expected_vol_name, expected_capacity, expected_source_snapshot))
+        config,
+        self.MakeFileShareConfig(expected_vol_name, expected_capacity, None,
+                                 expected_source_backup))
     self.ExpectCreateInstance(config)
     self.RunCreate(*args)
     self.AssertErrContains(_GetListCommandOuput(self._TRACK.prefix))
+
+  @parameterized.named_parameters(('NoRange', [
+      'instance_name', '--location=us-central1-c', '--async',
+      '--network=name=test_network',
+      '--file-share=name=my_vol,capacity=1TB,source-backup=my-backup',
+      '--description=test_description'
+  ]))
+  def testCreateInstanceFromBackupNoRegion(self, args):
+    self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        "Invalid value for [--file-share]: If 'source-backup' is specified, "
+        "'source-backup-region' must also be specified.", self.RunCreate, *args)
+
+  @parameterized.named_parameters(('NoRange', [
+      'instance_name', '--location=us-central1-c', '--async',
+      '--network=name=test_network',
+      '--file-share=name=my_vol,capacity=1TB,source-backup=my-backup,source-backup-region=us-central1,source-snapshot=my-snapshot',
+      '--description=test_description'
+  ]))
+  def testCreateInstanceFromBackupMixedRestorables(self, args):
+    self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        "Invalid value for [--file-share]: At most one of ['source-snapshot', "
+        "'source-backup'] may be specified.", self.RunCreate, *args)
 
 
 if __name__ == '__main__':

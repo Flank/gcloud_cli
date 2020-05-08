@@ -32,30 +32,34 @@ import mock
 class SslCertificatesListTest(test_base.BaseTest,
                               completer_test_base.CompleterBase):
 
+  @property
+  def _api(self):
+    return 'v1'
+
   def SetUp(self):
-    self.SelectApi('v1')
-    self.prefix = ''
-    self._compute_api = self.compute_v1
+    self.SelectApi(self._api)
     self.SetEncoding('utf8')
-    self._resources = test_resources.SSL_CERTIFICATES
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson')
     self.addCleanup(list_json_patcher.stop)
     self.list_json = list_json_patcher.start()
+    self._resources = test_resources.MakeSslCertificates(
+        self.messages, self._api)
 
   def RunVersioned(self, command):
-    return self.Run('{prefix} {command}'.format(
-        prefix=self.prefix, command=command))
+    prefix = '' if self.api == 'v1' else self.api
+    return self.Run('{prefix} {command}'.format(prefix=prefix, command=command))
 
   def testTableOutput(self):
+    global_resources = [self._resources[0], self._resources[2]]
     self.list_json.side_effect = [
-        resource_projector.MakeSerializable(self._resources)
+        resource_projector.MakeSerializable(global_resources)
     ]
     self.RunVersioned("""
         compute ssl-certificates list --global
         """)
     self.list_json.assert_called_once_with(
-        requests=[(self._compute_api.sslCertificates, 'List',
+        requests=[(self.compute.sslCertificates, 'List',
                    self.messages.ComputeSslCertificatesListRequest(
                        project='my-project'))],
         http=self.mock_http(),
@@ -63,9 +67,38 @@ class SslCertificatesListTest(test_base.BaseTest,
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME       CREATION_TIMESTAMP
-            ssl-cert-1 2014-09-04T09:56:33.679-07:00
+            NAME TYPE CREATION_TIMESTAMP EXPIRE_TIME MANAGED_STATUS
+            ssl-cert-1 SELF_MANAGED 2017-12-18T11:11:11.000-07:00 2018-12-18T11:11:11.000-07:00
+            ssl-cert-3 MANAGED 2017-12-17T10:00:00.000-07:00 2018-12-17T10:00:00.000-07:00 ACTIVE
+            test1.certsbridge.com: ACTIVE
+            xn--8a342mzfam5b18csni3w.certsbridge.com: FAILED_CAA_FORBIDDEN
+            """),
+        normalize_space=True)
+
+  def testAggregateTableOutput(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(self._resources)
+    ]
+    self.RunVersioned("""
+        compute ssl-certificates list
+        """)
+
+    self.list_json.assert_called_once_with(
+        requests=[(self.compute.sslCertificates, 'AggregatedList',
+                   self.messages.ComputeSslCertificatesAggregatedListRequest(
+                       project='my-project', includeAllScopes=True))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME TYPE CREATION_TIMESTAMP EXPIRE_TIME MANAGED_STATUS
+            ssl-cert-1 SELF_MANAGED 2017-12-18T11:11:11.000-07:00 2018-12-18T11:11:11.000-07:00
             ssl-cert-2 2014-10-04T07:56:33.679-07:00
+            ssl-cert-3 MANAGED 2017-12-17T10:00:00.000-07:00 2018-12-17T10:00:00.000-07:00 ACTIVE
+              test1.certsbridge.com: ACTIVE
+              xn--8a342mzfam5b18csni3w.certsbridge.com: FAILED_CAA_FORBIDDEN
             """),
         normalize_space=True)
 
@@ -77,7 +110,7 @@ class SslCertificatesListTest(test_base.BaseTest,
         compute ssl-certificates list --uri
         """)
     self.list_json.assert_called_once_with(
-        requests=[(self._compute_api.sslCertificates, 'AggregatedList',
+        requests=[(self.compute.sslCertificates, 'AggregatedList',
                    self.messages.ComputeSslCertificatesAggregatedListRequest(
                        project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
@@ -88,20 +121,44 @@ class SslCertificatesListTest(test_base.BaseTest,
     self.getUriOutput()
     self.AssertOutputEquals(
         """\
-https://compute.googleapis.com/compute/v1/projects/my-project/global/sslCertificates/ssl-cert-1
-https://compute.googleapis.com/compute/v1/projects/my-project/global/sslCertificates/ssl-cert-2
-""",
+{compute_uri}/projects/my-project/global/sslCertificates/ssl-cert-1
+{compute_uri}/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
+{compute_uri}/projects/my-project/global/sslCertificates/ssl-cert-3
+""".format(compute_uri=self.compute_uri),
+        normalize_space=True)
+
+  def testRegionUriOutput(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(self._resources)
+    ]
+    self.RunVersioned("""
+        compute ssl-certificates list --regions us-west-1 --uri
+        """)
+
+    self.list_json.assert_called_once_with(
+        requests=[(self.compute.regionSslCertificates, 'List',
+                   self.messages.ComputeRegionSslCertificatesListRequest(
+                       project='my-project', region='us-west-1'))],
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[])
+
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            {compute_uri}/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
+            """.format(compute_uri=self.compute_uri)),
         normalize_space=True)
 
   def testSslCertificatesCompleter(self):
     # Completer always uses v1 API for List.
     self.SelectApi('v1')
-    self.prefix = ''
-    self._compute_api = self.compute_v1
+
+    global_resources = [self._resources[0], self._resources[2]]
+    regional_resources = [self._resources[1]]
 
     self.list_json.side_effect = [
-        resource_projector.MakeSerializable(self._resources),
-        resource_projector.MakeSerializable(self._resources)
+        resource_projector.MakeSerializable(global_resources),
+        resource_projector.MakeSerializable(regional_resources)
     ]
     self.RunCompleter(
         flags.SslCertificatesCompleterBeta,
@@ -113,23 +170,25 @@ https://compute.googleapis.com/compute/v1/projects/my-project/global/sslCertific
             '--uri',
             '--quiet',
             '--format=disable',
-        ], [
-            'compute',
-            'ssl-certificates',
-            'list',
-            '--filter=region:*',
-            '--uri',
-            '--quiet',
-            '--format=disable',
-        ]],
+        ],
+                          [
+                              'compute',
+                              'ssl-certificates',
+                              'list',
+                              '--filter=region:*',
+                              '--uri',
+                              '--quiet',
+                              '--format=disable',
+                          ]],
         expected_completions=[
             'ssl-cert-1',
             'ssl-cert-2',
+            'ssl-cert-3',
         ],
         cli=self.cli,
     )
     self.list_json.assert_called_with(
-        requests=[(self._compute_api.sslCertificates, 'AggregatedList',
+        requests=[(self.compute.sslCertificates, 'AggregatedList',
                    self.messages.ComputeSslCertificatesAggregatedListRequest(
                        project='my-project', includeAllScopes=True))],
         http=self.mock_http(),
@@ -139,211 +198,16 @@ https://compute.googleapis.com/compute/v1/projects/my-project/global/sslCertific
 
 class SslCertificatesListBetaTest(SslCertificatesListTest):
 
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.prefix = 'beta'
-    self._compute_api = self.compute_beta
-    self.SetEncoding('utf8')
-
-  def testTableOutput(self):
-    resources = test_resources.BETA_SSL_CERTIFICATES
-    self.list_json.side_effect = [
-        resource_projector.MakeSerializable(resources)
-    ]
-    self.Run('beta compute ssl-certificates list --global')
-
-    self.list_json.assert_called_once_with(
-        requests=[(self.compute_beta.sslCertificates, 'List',
-                   self.messages.ComputeSslCertificatesListRequest(
-                       project='my-project'))],
-        http=self.mock_http(),
-        batch_url=self.batch_url,
-        errors=[])
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME TYPE CREATION_TIMESTAMP EXPIRE_TIME MANAGED_STATUS
-            ssl-cert-1 SELF_MANAGED 2017-12-18T11:11:11.000-07:00 2018-12-18T11:11:11.000-07:00
-            ssl-cert-2 MANAGED 2017-12-17T10:00:00.000-07:00 2018-12-17T10:00:00.000-07:00 ACTIVE
-            test1.certsbridge.com: ACTIVE
-            xn--8a342mzfam5b18csni3w.certsbridge.com: FAILED_CAA_FORBIDDEN
-            """),
-        normalize_space=True)
-
-  def testUriOutput(self):
-    resources = test_resources.BETA_SSL_CERTIFICATES
-    self.list_json.side_effect = [
-        resource_projector.MakeSerializable(resources)
-    ]
-    self.Run('beta compute ssl-certificates list --global --uri')
-
-    self.list_json.assert_called_once_with(
-        requests=[(self.compute_beta.sslCertificates, 'List',
-                   self.messages.ComputeSslCertificatesListRequest(
-                       project='my-project'))],
-        http=self.mock_http(),
-        batch_url=self.batch_url,
-        errors=[])
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            https://compute.googleapis.com/compute/beta/projects/my-project/global/sslCertificates/ssl-cert-1
-            https://compute.googleapis.com/compute/beta/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
-            """),
-        normalize_space=True)
-
-  def testRegionUriOutput(self):
-    resources = test_resources.BETA_SSL_CERTIFICATES
-    self.list_json.side_effect = [
-        resource_projector.MakeSerializable(resources)
-    ]
-    self.Run('beta compute ssl-certificates list --regions us-west-1 --uri')
-
-    self.list_json.assert_called_once_with(
-        requests=[(self.compute_beta.regionSslCertificates, 'List',
-                   self.messages.ComputeRegionSslCertificatesListRequest(
-                       project='my-project', region='us-west-1'))],
-        http=self.mock_http(),
-        batch_url=self.batch_url,
-        errors=[])
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            https://compute.googleapis.com/compute/beta/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
-            """),
-        normalize_space=True)
-
-  def testAggregateTableOutput(self):
-    resources = test_resources.BETA_SSL_CERTIFICATES
-    self.list_json.side_effect = [
-        resource_projector.MakeSerializable(resources)
-    ]
-    self.Run('beta compute ssl-certificates list')
-
-    self.list_json.assert_called_once_with(
-        requests=[(self.compute_beta.sslCertificates, 'AggregatedList',
-                   self.messages.ComputeSslCertificatesAggregatedListRequest(
-                       project='my-project', includeAllScopes=True))],
-        http=self.mock_http(),
-        batch_url=self.batch_url,
-        errors=[])
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME TYPE CREATION_TIMESTAMP EXPIRE_TIME MANAGED_STATUS
-            ssl-cert-1 SELF_MANAGED 2017-12-18T11:11:11.000-07:00 2018-12-18T11:11:11.000-07:00
-            ssl-cert-2 MANAGED 2017-12-17T10:00:00.000-07:00 2018-12-17T10:00:00.000-07:00 ACTIVE
-              test1.certsbridge.com: ACTIVE
-              xn--8a342mzfam5b18csni3w.certsbridge.com: FAILED_CAA_FORBIDDEN
-            """),
-        normalize_space=True)
+  @property
+  def _api(self):
+    return 'beta'
 
 
-class SslCertificatesListAlphaTest(test_base.BaseTest,
-                                   completer_test_base.CompleterBase):
+class SslCertificatesListAlphaTest(SslCertificatesListTest):
 
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.prefix = 'alpha'
-    self._compute_api = self.compute_alpha
-    list_json_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
-    self.addCleanup(list_json_patcher.stop)
-    self.list_json = list_json_patcher.start()
-    self.SetEncoding('utf8')
-
-  def testTableOutput(self):
-    resources = test_resources.ALPHA_SSL_CERTIFICATES
-    self.list_json.side_effect = [
-        resource_projector.MakeSerializable(resources)
-    ]
-    self.Run('alpha compute ssl-certificates list --global')
-
-    self.list_json.assert_called_once_with(
-        requests=[(self.compute_alpha.sslCertificates, 'List',
-                   self.messages.ComputeSslCertificatesListRequest(
-                       project='my-project'))],
-        http=self.mock_http(),
-        batch_url=self.batch_url,
-        errors=[])
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME TYPE CREATION_TIMESTAMP EXPIRE_TIME MANAGED_STATUS
-            ssl-cert-1 SELF_MANAGED 2017-12-18T11:11:11.000-07:00 2018-12-18T11:11:11.000-07:00
-            ssl-cert-2 MANAGED 2017-12-17T10:00:00.000-07:00 2018-12-17T10:00:00.000-07:00 ACTIVE
-            test1.certsbridge.com: ACTIVE
-            xn--8a342mzfam5b18csni3w.certsbridge.com: FAILED_CAA_FORBIDDEN
-            """),
-        normalize_space=True)
-
-  def testUriOutput(self):
-    resources = test_resources.ALPHA_SSL_CERTIFICATES
-    self.list_json.side_effect = [
-        resource_projector.MakeSerializable(resources)
-    ]
-    self.Run('alpha compute ssl-certificates list --global --uri')
-
-    self.list_json.assert_called_once_with(
-        requests=[(self.compute_alpha.sslCertificates, 'List',
-                   self.messages.ComputeSslCertificatesListRequest(
-                       project='my-project'))],
-        http=self.mock_http(),
-        batch_url=self.batch_url,
-        errors=[])
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            https://compute.googleapis.com/compute/alpha/projects/my-project/global/sslCertificates/ssl-cert-1
-            https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
-            """),
-        normalize_space=True)
-
-  def testRegionUriOutput(self):
-    resources = test_resources.ALPHA_SSL_CERTIFICATES
-    self.list_json.side_effect = [
-        resource_projector.MakeSerializable(resources)
-    ]
-    self.Run('alpha compute ssl-certificates list --regions us-west-1 --uri')
-
-    self.list_json.assert_called_once_with(
-        requests=[(self.compute_alpha.regionSslCertificates, 'List',
-                   self.messages.ComputeRegionSslCertificatesListRequest(
-                       project='my-project', region='us-west-1'))],
-        http=self.mock_http(),
-        batch_url=self.batch_url,
-        errors=[])
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
-            """),
-        normalize_space=True)
-
-  def testAggregateTableOutput(self):
-    resources = test_resources.ALPHA_SSL_CERTIFICATES
-    self.list_json.side_effect = [
-        resource_projector.MakeSerializable(resources)
-    ]
-    self.Run('alpha compute ssl-certificates list')
-
-    self.list_json.assert_called_once_with(
-        requests=[(self.compute_alpha.sslCertificates, 'AggregatedList',
-                   self.messages.ComputeSslCertificatesAggregatedListRequest(
-                       project='my-project', includeAllScopes=True))],
-        http=self.mock_http(),
-        batch_url=self.batch_url,
-        errors=[])
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME TYPE CREATION_TIMESTAMP EXPIRE_TIME MANAGED_STATUS
-            ssl-cert-1 SELF_MANAGED 2017-12-18T11:11:11.000-07:00 2018-12-18T11:11:11.000-07:00
-            ssl-cert-2 MANAGED 2017-12-17T10:00:00.000-07:00 2018-12-17T10:00:00.000-07:00 ACTIVE
-              test1.certsbridge.com: ACTIVE
-              xn--8a342mzfam5b18csni3w.certsbridge.com: FAILED_CAA_FORBIDDEN
-            """),
-        normalize_space=True)
+  @property
+  def _api(self):
+    return 'alpha'
 
 
 if __name__ == '__main__':

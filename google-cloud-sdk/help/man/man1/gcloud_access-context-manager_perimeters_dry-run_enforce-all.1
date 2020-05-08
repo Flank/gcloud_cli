@@ -1,0 +1,83 @@
+
+.TH "GCLOUD_ACCESS\-CONTEXT\-MANAGER_PERIMETERS_DRY\-RUN_ENFORCE\-ALL" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud access\-context\-manager perimeters dry\-run enforce\-all \- enforces the dry\-run mode configuration for all Service Perimeters
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud access\-context\-manager perimeters dry\-run enforce\-all\fR [\fB\-\-etag\fR=\fIetag\fR] [\fB\-\-policy\fR=\fIpolicy\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+An enforce operation on a Service Perimeter involves copying its dry\-run mode
+configuration (\f5spec\fR) to that Service Perimeter's enforcement mode
+configration (\f5status\fR). This command performs this operation for \fBall\fR
+Service Perimeters in the user's Access Policy.
+
+Note: Only Service Perimeters with an explicit dry\-run mode configuration are
+affected by this operation. The overall operation succeeds once the dry\-run
+configurations of all such Service Perimeters have been enforced. If the
+operation fails for any given Service Perimeter, it will cause the entire
+operation to be aborted.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-etag\fR=\fIetag\fR
+The etag for the version of the Access Policy that this operation is to be
+performed on. If, at the time of the operation, the etag for the Access Policy
+stored in Access Context Manager is different from the specified etag, then the
+commit operation will not be performed and the call will fail. If etag is not
+provided, the operation will be performed as if a valid etag is provided.
+
+.TP 2m
+\fB\-\-policy\fR=\fIpolicy\fR
+The parent Access Policy which owns all Service Perimeters in scope for the
+commit operation.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To enforce the dry\-run mode configurations for all Service Perimeter in an
+Access Policy, run the following command:
+
+.RS 2m
+$ gcloud access\-context\-manager perimeters dry\-run enforce\-all
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha access\-context\-manager perimeters dry\-run enforce\-all
+$ gcloud beta access\-context\-manager perimeters dry\-run enforce\-all
+.RE
+

@@ -18,110 +18,56 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.auth import util as auth_util
-from googlecloudsdk.calliope import exceptions
-from googlecloudsdk.core import properties
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
+from googlecloudsdk.core.credentials import google_auth_credentials as c_google_auth
 from tests.lib import cli_test_base
 from tests.lib import test_case
+from tests.lib.core.credentials import credentials_test_base
 
-import mock
-from oauth2client import client
+from google.auth import _default as google_auth_default
+from google.auth import exceptions as google_auth_exceptions
 
 
-class PrintAccessTokenTest(cli_test_base.CliTestBase):
+def _MockRefreshGrant(request,
+                      token_uri,
+                      refresh_token,
+                      client_id,
+                      client_secret,
+                      scopes=None,
+                      rapt_token=None):
+  del request, token_uri, refresh_token, client_id, client_secret, scopes
+  del rapt_token
+  return 'new_access_token', 'new_refresh_token', None, {'id_token': 'id_token'}
 
-  def GetGoogleCredentials(self, token, scoped_required=False):
-    cred_mock = mock.MagicMock(autospec=True)
-    cred_mock.create_scoped_required.return_value = scoped_required
 
-    if token:
-      cred_mock.get_access_token.return_value = client.AccessTokenInfo(
-          access_token=token, expires_in=0)
-    else:
-      cred_mock.get_access_token.return_value = None
+class PrintAccessTokenTest(cli_test_base.CliTestBase,
+                           credentials_test_base.CredentialsTestBase):
 
-    return cred_mock
+  def SetUp(self):
+    self.mock_default_creds = self.StartObjectPatch(google_auth_default,
+                                                    'default')
+    self.mock_default_creds.return_value = (
+        self.MakeUserAccountCredentialsGoogleAuth(), 'project')
+    self.mock_refresh_grant = self.StartObjectPatch(
+        c_google_auth, '_RefreshGrant').side_effect = _MockRefreshGrant
 
   def testPrint(self):
-    # It would be best to use autospec here, but mock doesn't support it for
-    # static methods yet.
-    mock_get_adc = self.StartPatch(
-        'oauth2client.client.GoogleCredentials.get_application_default')
-    mock_get_adc.return_value = self.GetGoogleCredentials(
-        token='foo_access_token')
-
-    self.Run('beta auth application-default print-access-token')
-    self.AssertOutputContains('foo_access_token')
-
-  def testBadCred(self):
-    # It would be best to use autospec here, but mock doesn't support it for
-    # static methods yet.
-    mock_get_adc = self.StartPatch(
-        'oauth2client.client.GoogleCredentials.get_application_default')
-    mock_get_adc.return_value = self.GetGoogleCredentials(token=None)
-
-    with self.assertRaisesRegex(exceptions.ToolException,
-                                'No access token could be obtained'):
-      self.Run('beta auth application-default print-access-token')
+    self.Run('auth application-default print-access-token')
+    self.mock_default_creds.assert_called_with(
+        scopes=[auth_util.CLOUD_PLATFORM_SCOPE])
+    self.AssertOutputContains('new_access_token')
 
   def testNoCred(self):
-    mock_get_adc = self.StartPatch(
-        'oauth2client.client.GoogleCredentials.get_application_default')
-    mock_get_adc.side_effect = client.ApplicationDefaultCredentialsError(
+    self.mock_default_creds.side_effect = google_auth_exceptions.DefaultCredentialsError(
         'no file')
 
-    with self.assertRaisesRegex(exceptions.ToolException,
-                                'no file'):
-      self.Run('beta auth application-default print-access-token')
-
-  def testScopedDefault(self):
-    # It would be best to use autospec here, but mock doesn't support it for
-    # static methods yet.
-    mock_get_adc = self.StartPatch(
-        'oauth2client.client.GoogleCredentials.get_application_default')
-    mock_creds = self.GetGoogleCredentials(
-        token='foo_access_token', scoped_required=True)
-    mock_get_adc.return_value = mock_creds
-
-    mock_creds.create_scoped.return_value = mock_creds
-
-    self.Run('beta auth application-default print-access-token')
-    self.AssertOutputContains('foo_access_token')
-
-    mock_creds.create_scoped.assert_called_once_with(
-        [auth_util.CLOUD_PLATFORM_SCOPE])
-
-  def testServiceAccountTokenURIOverride(self):
-    # It would be best to use autospec here, but mock doesn't support it for
-    # static methods yet.
-    mock_get_adc = self.StartPatch(
-        'oauth2client.client.GoogleCredentials.get_application_default')
-    mock_creds = self.GetGoogleCredentials(
-        token='foo_access_token', scoped_required=True)
-
-    mock_creds.serialization_data = {'type': client.SERVICE_ACCOUNT}
-    properties.VALUES.auth.token_host.Set('token_uri_override')
-
-    mock_get_adc.return_value = mock_creds
-    mock_creds.create_scoped.return_value = mock_creds
-
-    self.Run('beta auth application-default print-access-token')
-    self.AssertOutputContains('foo_access_token')
-
-    mock_creds.create_scoped.assert_called_once_with(
-        [auth_util.CLOUD_PLATFORM_SCOPE], token_uri='token_uri_override')
+    with self.assertRaisesRegex(calliope_exceptions.ToolException, 'no file'):
+      self.Run('auth application-default print-access-token')
 
   def testImpersonateServiceAccount(self):
-    # It would be best to use autospec here, but mock doesn't support it for
-    # static methods yet.
-    mock_get_adc = self.StartPatch(
-        'oauth2client.client.GoogleCredentials.get_application_default')
-    mock_get_adc.return_value = self.GetGoogleCredentials(
-        token='foo_access_token')
-
-    self.Run(
-        'beta auth application-default print-access-token '
-        '--impersonate-service-account '
-        'serviceaccount@project.iam.gserviceaccount.com')
+    self.Run('auth application-default print-access-token '
+             '--impersonate-service-account '
+             'serviceaccount@project.iam.gserviceaccount.com')
     self.AssertErrContains(
         'Impersonate service account '
         "'serviceaccount@project.iam.gserviceaccount.com' is detected.")

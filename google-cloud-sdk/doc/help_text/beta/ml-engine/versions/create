@@ -9,8 +9,9 @@ SYNOPSIS
         [--machine-type=MACHINE_TYPE]
         [--num-integral-steps=NUM_INTEGRAL_STEPS; default=50]
         [--num-paths=NUM_PATHS; default=50] [--origin=ORIGIN]
-        [--python-version=PYTHON_VERSION] [--runtime-version=RUNTIME_VERSION]
-        [--service-account=SERVICE_ACCOUNT] [--staging-bucket=STAGING_BUCKET]
+        [--python-version=PYTHON_VERSION] [--region=REGION]
+        [--runtime-version=RUNTIME_VERSION] [--service-account=SERVICE_ACCOUNT]
+        [--staging-bucket=STAGING_BUCKET]
         [--package-uris=[PACKAGE_URI,...] --prediction-class=PREDICTION_CLASS]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -49,11 +50,11 @@ OPTIONAL FLAGS
 
      --config=CONFIG
         Path to a YAML configuration file containing configuration parameters
-        for the Version
+        for the version
         (https://cloud.google.com/ml/reference/rest/v1/projects.models.versions)
         to create.
 
-        The file is in YAML format. Note that not all attributes of a Version
+        The file is in YAML format. Note that not all attributes of a version
         are configurable; available attributes (with example values) are:
 
             description: A free-form description of the version.
@@ -69,11 +70,11 @@ OPTIONAL FLAGS
         The name of the version must always be specified via the required
         VERSION argument.
 
-        Only one of manualScaling or autoScaling must be specified. If both are
+        Only one of manualScaling or autoScaling can be specified. If both are
         specified in same yaml file an error will be returned.
 
         If an option is specified both in the configuration file and via
-        command line arguments, the command line arguments override the
+        command-line arguments, the command-line arguments override the
         configuration file.
 
      --description=DESCRIPTION
@@ -131,6 +132,17 @@ OPTIONAL FLAGS
         default version is 2.7. Python 3.5 is available when --runtime-version
         is set to 1.4 and above. Python 2.7 works with all supported runtime
         versions.
+
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
+
+        REGION must be one of: asia-east1, europe-west4, us-central1.
 
      --runtime-version=RUNTIME_VERSION
         AI Platform runtime version for this job. Must be specified unless

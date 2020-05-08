@@ -32,19 +32,29 @@ class UpdateSurfaceTestGA(base.MlGaPlatformTestBase):
                    labels=None,
                    description=None,
                    prediction_class=None,
-                   package_uris=None):
+                   package_uris=None,
+                   manual_scaling=None,
+                   auto_scaling=None):
     if labels is not None:
       labels_cls = self.short_msgs.Version.LabelsValue
       labels = labels_cls(additionalProperties=[
           labels_cls.AdditionalProperty(key=key, value=value)
           for key, value in sorted(labels.items())
       ])
+    if manual_scaling:
+      manual_scaling = self.short_msgs.ManualScaling(
+          nodes=manual_scaling['nodes'])
+    if auto_scaling:
+      auto_scaling = self.short_msgs.AutoScaling(
+          minNodes=auto_scaling['minNodes'])
     return self.short_msgs.Version(
         name=name,
         labels=labels,
         description=description,
         packageUris=package_uris or [],
-        predictionClass=prediction_class)
+        predictionClass=prediction_class,
+        manualScaling=manual_scaling,
+        autoScaling=auto_scaling)
 
   def _ExpectPoll(self):
     self.client.projects_operations.Get.Expect(
@@ -103,18 +113,103 @@ class UpdateSurfaceTestGA(base.MlGaPlatformTestBase):
   def testUpdateAll(self, module_name):
     self._ExpectGet()
     self._ExpectPatch(
-        'labels,description', labels={'key': 'value'}, description='Foo')
+        'description,labels', labels={'key': 'value'}, description='Foo')
     self._ExpectPoll()
     self.Run('{} versions update myVersion --model myModel '
              '--update-labels key=value --description Foo'.format(module_name))
     self.AssertErrContains('Updated AI Platform version [myVersion].')
 
 
+@parameterized.parameters('ml-engine', 'ai-platform')
 class UpdateSurfaceTestBeta(base.MlBetaPlatformTestBase, UpdateSurfaceTestGA):
 
-  pass
+  def testUpdateFromConfig(self, module_name):
+    yaml_contents = """\
+        description: Foo
+        manualScaling:
+          nodes: 10
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    self._ExpectPatch(
+        'description,manualScaling.nodes',
+        description='Foo',
+        manual_scaling={'nodes': 10},
+    )
+    self._ExpectPoll()
+    self.Run('{} versions update myVersion --model myModel '
+             '--config {}'.format(module_name, yaml_path))
+
+  def testUpdateFromConfigWithDescription(self, module_name):
+    yaml_contents = """\
+        description: Foo
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    self._ExpectPatch(
+        'description',
+        description='Foo'
+    )
+    self._ExpectPoll()
+    self.Run('{} versions update myVersion --model myModel '
+             '--config {}'.format(module_name, yaml_path))
+
+  # Since we defer validation of the actual autoScaling values to the API,
+  # here we only test the expect behavior of the surface namely that it parses
+  # the yaml values correctly and passes them to the API.
+  # Specifically, the API is expected to raise errors for
+  # the following conditions (based on current validation rules):
+  # - invalid autoscaling field names
+  # - both automaticScaling and manualScaling specified in same config
+  # - invalid values for minNodes
+  def testUpdateFromConfigWithAutoScaling(self, module_name):
+    yaml_contents = """\
+        autoScaling:
+          minNodes: 10
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    self._ExpectPatch(
+        'autoScaling.minNodes',
+        auto_scaling={'minNodes': 10},
+    )
+    self._ExpectPoll()
+    self.Run('{} versions update myVersion --model myModel '
+             '--config {}'.format(module_name, yaml_path))
+
+  def testUpdateFromConfigManualScaling(self, module_name):
+    yaml_contents = """\
+        manualScaling:
+          nodes: 10
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    self._ExpectPatch(
+        'manualScaling.nodes',
+        manual_scaling={'nodes': 10}
+    )
+    self._ExpectPoll()
+    self.Run('{} versions update myVersion --model myModel '
+             '--config {}'.format(module_name, yaml_path))
+
+  # Note that the backend is expected to validate and reject this request,
+  # so here we simply verify that the request is sent with both
+  # options.
+  def testUpdateFromConfigWithBothManualAndAutoScaling(self, module_name):
+    yaml_contents = """\
+        autoScaling:
+          minNodes: 31
+        manualScaling:
+          nodes: 41
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    self._ExpectPatch(
+        'autoScaling.minNodes,manualScaling.nodes',
+        auto_scaling={'minNodes': 31},
+        manual_scaling={'nodes': 41},
+    )
+    self._ExpectPoll()
+    self.Run('{} versions update myVersion --model myModel '
+             '--config {}'.format(module_name, yaml_path))
 
 
+@parameterized.parameters('ml-engine', 'ai-platform')
 class UpdateSurfaceTestAlpha(base.MlAlphaPlatformTestBase,
                              UpdateSurfaceTestBeta):
   pass

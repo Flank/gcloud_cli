@@ -1,0 +1,149 @@
+
+.TH "GCLOUD_HEALTHCARE_FHIR\-STORES_EXPORT_BQ" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud healthcare fhir\-stores export bq \- export Cloud Healthcare API FHIR resources to BigQuery
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud healthcare fhir\-stores export bq\fR (\fIFHIR_STORE\fR\ :\ \fB\-\-dataset\fR=\fIDATASET\fR\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-bq\-dataset\fR=\fIBQ_DATASET\fR [\fB\-\-async\fR] [\fB\-\-recursive\-depth\fR=\fIRECURSIVE_DEPTH\fR] [\fB\-\-schema\-type\fR=\fISCHEMA_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Export Cloud Healthcare API FHIR resources to BigQuery.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+FhirStore resource \- Cloud Healthcare API FHIR store to export resources from.
+The arguments in this group can be used to specify the attributes of this
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[fhir_store] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fIFHIR_STORE\fR
+ID of the fhirStore or fully qualified identifier for the fhirStore. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-dataset\fR=\fIDATASET\fR
+Cloud Healthcare dataset.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Google Cloud location.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-bq\-dataset\fR=\fIBQ_DATASET\fR
+BigQuery dataset that houses the BigQuery tables.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-recursive\-depth\fR=\fIRECURSIVE_DEPTH\fR
+The depth for all recursive structures in the output analytics schema. For
+example, concept in the CodeSystem resource is a recursive structure; when the
+depth is 2, the CodeSystem table will have a column called concept.concept but
+not concept.concept.concept. If not specified or set to 0, the server will use
+the default value 2.
+
+.TP 2m
+\fB\-\-schema\-type\fR=\fISCHEMA_TYPE\fR
+Specifies the output schema type. \fISCHEMA_TYPE\fR must be (currently only one
+value is supported):
+
+.RS 2m
+.TP 2m
+\fBanalytics\fR
+Analytics schema defined by the FHIR community. See
+https://github.com/rbrush/sql\-on\-fhir/blob/master/sql\-on\-fhir.md.
+
+.RE
+.sp
+
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity.
+
+Run \fB$ gcloud help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBhealthcare/v1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/healthcare
+
+
+
+.SH "EXAMPLES"
+
+To export the fhir\-store 'test\-fhir\-store' to the BigQuery dataset
+\'bqdataset', run:
+
+.RS 2m
+$ gcloud healthcare fhir\-stores export bq test\-fhir\-store \e
+    \-\-bq\-dataset=bq://my\-project.bqdataset \-\-dataset=test\-dataset
+.RE
+
+To perform the same export, but with the 'ANALYTICS' schema and the recursive
+structure depth of 3, run:
+
+.RS 2m
+$ gcloud healthcare fhir\-stores export bq test\-fhir\-store \e
+    \-\-bq\-dataset=bq://my\-project.bqdataset \-\-dataset=test\-dataset \e
+    \-\-schema\-type=analytics \-\-recursive\-depth=3
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha healthcare fhir\-stores export bq
+$ gcloud beta healthcare fhir\-stores export bq
+.RE
+

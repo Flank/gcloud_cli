@@ -3,7 +3,8 @@ NAME
         service perimeters
 
 SYNOPSIS
-    gcloud access-context-manager perimeters COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud access-context-manager perimeters GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     A service perimeter describes a set of Google Cloud Platform resources
@@ -19,6 +20,12 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity.
 
     Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     dry-run
+        Enable management of dry-run mode configuration for Service Perimeters.
 
 COMMANDS
     COMMAND is one of the following:

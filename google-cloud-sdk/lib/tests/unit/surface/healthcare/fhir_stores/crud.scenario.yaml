@@ -1,10 +1,10 @@
 title: fhir-stores crud test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: healthcare fhir-stores create my-store --location us-central1 --dataset
-      my-dataset
+      my-dataset --version r4
   - stderr: |
       Created fhirStore [my-store].
 - execute:
@@ -51,9 +51,10 @@ actions:
     track_values:
       ALPHA: v1alpha2
       BETA: v1beta1
+      GA: v1
 - execute_command:
     command: healthcare fhir-stores create my-store --location us-central1 --dataset
-      my-dataset
+      my-dataset --version r4
     events:
     - api_call:
         expect_request:
@@ -69,7 +70,8 @@ actions:
                   "pubsubTopic": "projects/fake-project/topics/my-topic"
                 },
                 "disableReferentialIntegrity": false,
-                "disableResourceVersioning": false
+                "disableResourceVersioning": false,
+                "version": "R4"
               }
             }
         return_response:
@@ -83,7 +85,8 @@ actions:
                 "pubsubTopic": "projects/fake-project/topics/my-topic"
               },
               "disableReferentialIntegrity": false,
-              "disableResourceVersioning": false
+              "disableResourceVersioning": false,
+              "version": "R4"
             }
     - expect_stderr: |
         Created fhirStore [my-store].

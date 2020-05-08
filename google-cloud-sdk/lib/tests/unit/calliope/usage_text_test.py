@@ -125,14 +125,15 @@ class UsageTextTest(util.WithTestTool):
 Usage: test sdk2 [optional flags] <group | command>
   group may be           lotsofargs
   command may be         arg-groups | bool-mutex | combinations | command2 |
-                         common-flags | common-other-flags | deprecated-args |
-                         dynamic-args | extra-args | list-command-flags |
-                         modal-group | multiple-positional | nested-groups |
-                         ordered-choices | other-flags | remainder |
-                         remainder-with-flags | required-common-flags |
-                         required-common-other-flags | required-flags |
-                         required-other-flags | required-vs-optional |
-                         requiredargcommand | suppressed-positional
+                         command3 | common-flags | common-other-flags |
+                         deprecated-args | dynamic-args | extra-args |
+                         list-command-flags | modal-group |
+                         multiple-positional | nested-groups | ordered-choices |
+                         other-flags | remainder | remainder-with-flags |
+                         required-common-flags | required-common-other-flags |
+                         required-flags | required-other-flags |
+                         required-vs-optional | requiredargcommand |
+                         suppressed-positional
 
 For detailed information on this command and its flags, run:
   test sdk2 --help
@@ -276,6 +277,7 @@ Available commands for test sdk2:
 
   Other
       command2                     A command with context and flags.
+      command3                     A command with context and flags.
       common-flags                 A command with common flags and explicit
                                    NOTES.
       common-other-flags           A command with common+other flags.

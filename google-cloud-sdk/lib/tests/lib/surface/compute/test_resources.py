@@ -2674,32 +2674,40 @@ IN_PLACE_SNAPSHOT_V1 = MakeInPlaceSnapshots(messages, 'v1')
 IN_PLACE_SNAPSHOT_BETA = MakeInPlaceSnapshots(beta_messages, 'beta')
 IN_PLACE_SNAPSHOT_ALPHA = MakeInPlaceSnapshots(alpha_messages, 'alpha')
 
-SSL_CERTIFICATES = [
-    messages.SslCertificate(
-        name='ssl-cert-1',
-        certificate=(
-            '-----BEGIN CERTIFICATE-----\n'
-            'MIICZzCCAdACCQDjYQHCnQOiTDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV\n'
-            'UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE\n'
-            'CgwGR29vZ2xlMRgwFgYDVQQLDA9DbG91ZCBQbGF0Zm9ybXMxFzAVBgNVBAMMDmdj\n'
-            'bG91ZCBjb21wdXRlMB4XDTE0MTAxMzIwMTcxMloXDTE1MTAxMzIwMTcxMloweDEL\n'
-            'MAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0\n'
-            'bGUxDzANBgNVBAoMBkdvb2dsZTEYMBYGA1UECwwPQ2xvdWQgUGxhdGZvcm1zMRcw\n'
-            'FQYDVQQDDA5nY2xvdWQgY29tcHV0ZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkC\n'
-            'gYEAw3JXUCTn8J2VeWqHuc9zJxdy1WfQJtbDxQUUy4nsqU6QPGso3HYXlI/eozg6\n'
-            'bGhkJNtDVV4AAPQVv01aoFMt3T6MKLzAkjfse7zKQmQ399vQaE7lbLAV9M4FSV9s\n'
-            'wksSvT7cOW9ddcdKdyV3NTbptW5PeUE8Zk/aCFLPLqOg800CAwEAATANBgkqhkiG\n'
-            '9w0BAQsFAAOBgQCKMIRiThp2O+wg7M8wcNSdPzAZ61UMeisQKS5OEY90OsekWYUT\n'
-            'zMkUznRtycTdTBxEqKQoJKeAXq16SezJaZYE48FpoObQc2ZLMvje7F82tOwC2kob\n'
-            'v83LejX3zZnirv2PZVcFgvUE0k3a8/14enHi7j6jZu+Pl5ZM9BZ+vkBO8g==\n'
-            '-----END CERTIFICATE-----'),
-        creationTimestamp='2014-09-04T09:56:33.679-07:00',
-        description='Certificate one.',
-        selfLink=_V1_URI_PREFIX + 'global/sslCertificates/ssl-cert-1',
-    ),
-    messages.SslCertificate(
-        name='ssl-cert-2',
-        certificate=(textwrap.dedent("""\
+
+def MakeSslCertificates(msgs, api):
+  """Make ssl Certificate test resources for the given api version."""
+  prefix = _COMPUTE_PATH + '/' + api + '/projects/my-project/'
+  return [
+      msgs.SslCertificate(
+          type=msgs.SslCertificate.TypeValueValuesEnum.SELF_MANAGED,
+          name='ssl-cert-1',
+          selfManaged=msgs.SslCertificateSelfManagedSslCertificate(
+              certificate=textwrap.dedent("""\
+                -----BEGIN CERTIFICATE-----
+                MIICZzCCAdACCQDjYQHCnQOiTDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
+                UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
+                CgwGR29vZ2xlMRgwFgYDVQQLDA9DbG91ZCBQbGF0Zm9ybXMxFzAVBgNVBAMMDmdj
+                bG91ZCBjb21wdXRlMB4XDTE0MTAxMzIwMTcxMloXDTE1MTAxMzIwMTcxMloweDEL
+                MAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0
+                bGUxDzANBgNVBAoMBkdvb2dsZTEYMBYGA1UECwwPQ2xvdWQgUGxhdGZvcm1zMRcw
+                FQYDVQQDDA5nY2xvdWQgY29tcHV0ZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkC
+                gYEAw3JXUCTn8J2VeWqHuc9zJxdy1WfQJtbDxQUUy4nsqU6QPGso3HYXlI/eozg6
+                bGhkJNtDVV4AAPQVv01aoFMt3T6MKLzAkjfse7zKQmQ399vQaE7lbLAV9M4FSV9s
+                wksSvT7cOW9ddcdKdyV3NTbptW5PeUE8Zk/aCFLPLqOg800CAwEAATANBgkqhkiG
+                9w0BAQsFAAOBgQCKMIRiThp2O+wg7M8wcNSdPzAZ61UMeisQKS5OEY90OsekWYUT
+                zMkUznRtycTdTBxEqKQoJKeAXq16SezJaZYE48FpoObQc2ZLMvje7F82tOwC2kob
+                v83LejX3zZnirv2PZVcFgvUE0k3a8/14enHi7j6jZu+Pl5ZM9BZ+vkBO8g==
+                -----END CERTIFICATE-----"""),),
+          creationTimestamp='2017-12-18T11:11:11.000-07:00',
+          expireTime='2018-12-18T11:11:11.000-07:00',
+          description='Self-managed certificate.',
+          selfLink=prefix + 'global/sslCertificates/ssl-cert-1',
+      ),
+      msgs.SslCertificate(
+          name='ssl-cert-2',
+          region='us-west-1',
+          certificate=(textwrap.dedent("""\
             -----BEGIN CERTIFICATE-----
             MIICZzCCAdACCQChX1chr91razANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
             UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
@@ -2715,144 +2723,44 @@ SSL_CERTIFICATES = [
             t9hMvJdXQ6vzKXBuX6ZLUxvL9SFT+pMLTWGStUFNcDFv/Fqdcre0jPoYEJv/tOHT
             n82GtW9nMhZfVj2PrRiuZwOV8qB6+uEadbcPcET3TcH1WJacbBlHufk1wQ==
             -----END CERTIFICATE-----""")),
-        creationTimestamp='2014-10-04T07:56:33.679-07:00',
-        description='Certificate two.',
-        selfLink=_V1_URI_PREFIX + 'global/sslCertificates/ssl-cert-2',
-    ),
-]
-
-BETA_SSL_CERTIFICATES = [
-    beta_messages.SslCertificate(
-        type=beta_messages.SslCertificate.TypeValueValuesEnum.SELF_MANAGED,
-        name='ssl-cert-1',
-        selfManaged=beta_messages.SslCertificateSelfManagedSslCertificate(
-            certificate=(textwrap.dedent("""\
-                -----BEGIN CERTIFICATE-----
-                MIICZzCCAdACCQDjYQHCnQOiTDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
-                UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
-                CgwGR29vZ2xlMRgwFgYDVQQLDA9DbG91ZCBQbGF0Zm9ybXMxFzAVBgNVBAMMDmdj
-                bG91ZCBjb21wdXRlMB4XDTE0MTAxMzIwMTcxMloXDTE1MTAxMzIwMTcxMloweDEL
-                MAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0
-                bGUxDzANBgNVBAoMBkdvb2dsZTEYMBYGA1UECwwPQ2xvdWQgUGxhdGZvcm1zMRcw
-                FQYDVQQDDA5nY2xvdWQgY29tcHV0ZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkC
-                gYEAw3JXUCTn8J2VeWqHuc9zJxdy1WfQJtbDxQUUy4nsqU6QPGso3HYXlI/eozg6
-                bGhkJNtDVV4AAPQVv01aoFMt3T6MKLzAkjfse7zKQmQ399vQaE7lbLAV9M4FSV9s
-                wksSvT7cOW9ddcdKdyV3NTbptW5PeUE8Zk/aCFLPLqOg800CAwEAATANBgkqhkiG
-                9w0BAQsFAAOBgQCKMIRiThp2O+wg7M8wcNSdPzAZ61UMeisQKS5OEY90OsekWYUT
-                zMkUznRtycTdTBxEqKQoJKeAXq16SezJaZYE48FpoObQc2ZLMvje7F82tOwC2kob
-                v83LejX3zZnirv2PZVcFgvUE0k3a8/14enHi7j6jZu+Pl5ZM9BZ+vkBO8g==
-                -----END CERTIFICATE-----"""))),
-        creationTimestamp='2017-12-18T11:11:11.000-07:00',
-        expireTime='2018-12-18T11:11:11.000-07:00',
-        description='Self-managed certificate.',
-        selfLink=_BETA_URI_PREFIX + 'global/sslCertificates/ssl-cert-1',
-    ),
-    beta_messages.SslCertificate(
-        name='ssl-cert-2',
-        region='us-west-1',
-        type=beta_messages.SslCertificate.TypeValueValuesEnum
-        .MANAGED,
-        managed=beta_messages.SslCertificateManagedSslCertificate(
-            domains=[
-                'test1.certsbridge.com',
-                # Punycode for Ṳᾔḯ¢◎ⅾℯ.certsbridge.com
-                'xn--8a342mzfam5b18csni3w.certsbridge.com',
-            ],
-            status=beta_messages.SslCertificateManagedSslCertificate
-            .StatusValueValuesEnum.ACTIVE,
-            domainStatus=beta_messages
-            .SslCertificateManagedSslCertificate.DomainStatusValue(
-                additionalProperties=[
-                    beta_messages.SslCertificateManagedSslCertificate
-                    .DomainStatusValue.AdditionalProperty(
-                        key='test1.certsbridge.com',
-                        value=beta_messages.SslCertificateManagedSslCertificate
-                        .DomainStatusValue.AdditionalProperty.ValueValueValuesEnum
-                        .ACTIVE,
-                    ),
-                    beta_messages.SslCertificateManagedSslCertificate
-                    .DomainStatusValue.AdditionalProperty(
-                        key='xn--8a342mzfam5b18csni3w.certsbridge.com',
-                        value=beta_messages.SslCertificateManagedSslCertificate
-                        .DomainStatusValue.AdditionalProperty.ValueValueValuesEnum
-                        .FAILED_CAA_FORBIDDEN,
-                    ),
-                ])),
-        creationTimestamp='2017-12-17T10:00:00.000-07:00',
-        expireTime='2018-12-17T10:00:00.000-07:00',
-        description='Managed certificate.',
-        selfLink=_BETA_URI_PREFIX +
-        'regions/us-west-1/sslCertificates/ssl-cert-2',
-    ),
-]
-
-ALPHA_SSL_CERTIFICATES = [
-    alpha_messages.SslCertificate(
-        type=alpha_messages.SslCertificate.TypeValueValuesEnum.SELF_MANAGED,
-        name='ssl-cert-1',
-        selfManaged=alpha_messages.SslCertificateSelfManagedSslCertificate(
-            certificate=(textwrap.dedent("""\
-                -----BEGIN CERTIFICATE-----
-                MIICZzCCAdACCQDjYQHCnQOiTDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
-                UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
-                CgwGR29vZ2xlMRgwFgYDVQQLDA9DbG91ZCBQbGF0Zm9ybXMxFzAVBgNVBAMMDmdj
-                bG91ZCBjb21wdXRlMB4XDTE0MTAxMzIwMTcxMloXDTE1MTAxMzIwMTcxMloweDEL
-                MAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0
-                bGUxDzANBgNVBAoMBkdvb2dsZTEYMBYGA1UECwwPQ2xvdWQgUGxhdGZvcm1zMRcw
-                FQYDVQQDDA5nY2xvdWQgY29tcHV0ZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkC
-                gYEAw3JXUCTn8J2VeWqHuc9zJxdy1WfQJtbDxQUUy4nsqU6QPGso3HYXlI/eozg6
-                bGhkJNtDVV4AAPQVv01aoFMt3T6MKLzAkjfse7zKQmQ399vQaE7lbLAV9M4FSV9s
-                wksSvT7cOW9ddcdKdyV3NTbptW5PeUE8Zk/aCFLPLqOg800CAwEAATANBgkqhkiG
-                9w0BAQsFAAOBgQCKMIRiThp2O+wg7M8wcNSdPzAZ61UMeisQKS5OEY90OsekWYUT
-                zMkUznRtycTdTBxEqKQoJKeAXq16SezJaZYE48FpoObQc2ZLMvje7F82tOwC2kob
-                v83LejX3zZnirv2PZVcFgvUE0k3a8/14enHi7j6jZu+Pl5ZM9BZ+vkBO8g==
-                -----END CERTIFICATE-----"""))),
-        creationTimestamp='2017-12-18T11:11:11.000-07:00',
-        expireTime='2018-12-18T11:11:11.000-07:00',
-        description='Self-managed certificate.',
-        selfLink=_ALPHA_URI_PREFIX + 'global/sslCertificates/ssl-cert-1',
-    ),
-    alpha_messages.SslCertificate(
-        name='ssl-cert-2',
-        region='us-west-1',
-        type=alpha_messages.SslCertificate.TypeValueValuesEnum.
-        MANAGED,
-        managed=alpha_messages.SslCertificateManagedSslCertificate(
-            domains=[
-                'test1.certsbridge.com',
-                # Punycode for Ṳᾔḯ¢◎ⅾℯ.certsbridge.com
-                'xn--8a342mzfam5b18csni3w.certsbridge.com',
-            ],
-            status=alpha_messages.SslCertificateManagedSslCertificate.
-            StatusValueValuesEnum.ACTIVE,
-            domainStatus=alpha_messages.
-            SslCertificateManagedSslCertificate.DomainStatusValue(
-                additionalProperties=[
-                    alpha_messages.SslCertificateManagedSslCertificate.
-                    DomainStatusValue.AdditionalProperty(
-                        key='test1.certsbridge.com',
-                        value=alpha_messages.
-                        SslCertificateManagedSslCertificate.
-                        DomainStatusValue.AdditionalProperty.
-                        ValueValueValuesEnum.ACTIVE,
-                    ),
-                    alpha_messages.SslCertificateManagedSslCertificate.
-                    DomainStatusValue.AdditionalProperty(
-                        key='xn--8a342mzfam5b18csni3w.certsbridge.com',
-                        value=alpha_messages.
-                        SslCertificateManagedSslCertificate.
-                        DomainStatusValue.
-                        AdditionalProperty.
-                        ValueValueValuesEnum.FAILED_CAA_FORBIDDEN,
-                    ),
-                ])),
-        creationTimestamp='2017-12-17T10:00:00.000-07:00',
-        expireTime='2018-12-17T10:00:00.000-07:00',
-        description='Managed certificate.',
-        selfLink=_ALPHA_URI_PREFIX +
-        'regions/us-west-1/sslCertificates/ssl-cert-2',
-    ),
-]
+          creationTimestamp='2014-10-04T07:56:33.679-07:00',
+          description='Self-managed certificate two.',
+          selfLink=prefix + 'regions/us-west-1/sslCertificates/ssl-cert-2',
+      ),
+      msgs.SslCertificate(
+          name='ssl-cert-3',
+          type=msgs.SslCertificate.TypeValueValuesEnum.MANAGED,
+          managed=msgs.SslCertificateManagedSslCertificate(
+              domains=[
+                  'test1.certsbridge.com',
+                  # Punycode for Ṳᾔḯ¢◎ⅾℯ.certsbridge.com
+                  'xn--8a342mzfam5b18csni3w.certsbridge.com',
+              ],
+              status=msgs.SslCertificateManagedSslCertificate
+              .StatusValueValuesEnum.ACTIVE,
+              domainStatus=msgs.SslCertificateManagedSslCertificate
+              .DomainStatusValue(additionalProperties=[
+                  msgs.SslCertificateManagedSslCertificate.DomainStatusValue
+                  .AdditionalProperty(
+                      key='test1.certsbridge.com',
+                      value=msgs.SslCertificateManagedSslCertificate
+                      .DomainStatusValue.AdditionalProperty.ValueValueValuesEnum
+                      .ACTIVE,
+                  ),
+                  msgs.SslCertificateManagedSslCertificate.DomainStatusValue
+                  .AdditionalProperty(
+                      key='xn--8a342mzfam5b18csni3w.certsbridge.com',
+                      value=msgs.SslCertificateManagedSslCertificate
+                      .DomainStatusValue.AdditionalProperty.ValueValueValuesEnum
+                      .FAILED_CAA_FORBIDDEN,
+                  ),
+              ])),
+          creationTimestamp='2017-12-17T10:00:00.000-07:00',
+          expireTime='2018-12-17T10:00:00.000-07:00',
+          description='Managed certificate.',
+          selfLink=prefix + 'global/sslCertificates/ssl-cert-3',
+      ),
+  ]
 
 
 def MakeOrgSecurityPolicy(msgs, security_policy_ref):

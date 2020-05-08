@@ -1,12 +1,12 @@
 NAME
-    gcloud alpha monitoring policies conditions - manage Stackdriver Monitoring
+    gcloud alpha monitoring policies conditions - manage Cloud Monitoring
         alerting policy conditions
 
 SYNOPSIS
     gcloud alpha monitoring policies conditions COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage Stackdriver Monitoring alerting policies conditions.
+    (ALPHA) Manage Monitoring alerting policies conditions.
 
     More information can be found here:
     https://cloud.google.com/monitoring/api/v3/
@@ -29,7 +29,7 @@ COMMANDS
         (ALPHA) Delete a condition in an alerting policy.
 
      describe
-        (ALPHA) Describe a condition in a Stackdriver alerting policy.
+        (ALPHA) Describe a condition in a Cloud Monitoring alerting policy.
 
      update
         (ALPHA) Update a condition in an alerting policy.

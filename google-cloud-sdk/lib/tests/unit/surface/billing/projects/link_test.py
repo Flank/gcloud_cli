@@ -110,10 +110,15 @@ class AccountsProjectsLinkTest(base.BillingMockNoDisplayTest):
           track=calliope_base.ReleaseTrack.ALPHA)
 
   def testLinkOldAccountFlag(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        "unrecognized arguments:\n"
-        "  --account-id (did you mean '--account'?)\n"
-        "  000000-000000-000000"):
+    err = """\
+ --account-id flag is available in one or more alternate release tracks. Try:
+
+  gcloud alpha billing projects link --account-id
+
+  --account-id (did you mean '--account'?)
+  000000-000000-000000
+"""
+    with self.AssertRaisesArgumentErrorMatches(err):
       self.Run(
           'billing projects link {project_id} '
           '    --account-id {account_id}'.format(

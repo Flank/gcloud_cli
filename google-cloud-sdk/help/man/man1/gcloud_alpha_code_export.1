@@ -11,7 +11,7 @@ gcloud alpha code export \- writes skaffold and kubernetes files for local devel
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha code export\fR [\fB\-\-build\-context\-directory\fR=\fIBUILD_CONTEXT_DIRECTORY\fR] [\fB\-\-builder\fR=\fIBUILDER\fR] [\fB\-\-cloudsql\-instances\fR=[\fICLOUDSQL_INSTANCE\fR,...]] [\fB\-\-cpu\-limit\fR=\fICPU_LIMIT\fR] [\fB\-\-dockerfile\fR=\fIDOCKERFILE\fR;\ default="Dockerfile"] [\fB\-\-image\-name\fR=\fIIMAGE_NAME\fR] [\fB\-\-kubernetes\-file\fR=\fIKUBERNETES_FILE\fR;\ default="pods_and_services.yaml"] [\fB\-\-local\-port\fR=\fILOCAL_PORT\fR] [\fB\-\-memory\-limit\fR=\fIMEMORY_LIMIT\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-service\-name\fR=\fISERVICE_NAME\fR] [\fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR] [\fB\-\-skaffold\-file\fR=\fISKAFFOLD_FILE\fR;\ default="skaffold.yaml"\ |\ \fB\-\-no\-skaffold\-file\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha code export\fR [\fB\-\-build\-context\-directory\fR=\fIBUILD_CONTEXT_DIRECTORY\fR] [\fB\-\-builder\fR=\fIBUILDER\fR] [\fB\-\-cloudsql\-instances\fR=[\fICLOUDSQL_INSTANCE\fR,...]] [\fB\-\-cpu\-limit\fR=\fICPU_LIMIT\fR] [\fB\-\-dockerfile\fR=\fIDOCKERFILE\fR;\ default="Dockerfile"] [\fB\-\-image\-name\fR=\fIIMAGE_NAME\fR] [\fB\-\-kubernetes\-file\fR=\fIKUBERNETES_FILE\fR;\ default="pods_and_services.yaml"] [\fB\-\-local\-port\fR=\fILOCAL_PORT\fR] [\fB\-\-memory\-limit\fR=\fIMEMORY_LIMIT\fR] [\fB\-\-service\-name\fR=\fISERVICE_NAME\fR] [\fB\-\-application\-default\-credential\fR\ |\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR] [\fB\-\-skaffold\-file\fR=\fISKAFFOLD_FILE\fR;\ default="skaffold.yaml"\ |\ \fB\-\-no\-skaffold\-file\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -74,13 +74,25 @@ number of bytes or an integer followed by a unit suffix. Valid unit suffixes are
 "B", "KB", "MB", "GB", "TB", "KiB", "MiB", "GiB", "TiB", or "PiB".
 
 .TP 2m
-\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
-When connecting to Google Cloud Platform services, use a service account key.
-
-.TP 2m
 \fB\-\-service\-name\fR=\fISERVICE_NAME\fR
 Name of the service.
 
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-application\-default\-credential\fR
+When connecting to Google Cloud Platform services, use the application default
+credential.
+
+.TP 2m
+\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
+When connecting to Google Cloud Platform services, use a service account key.
+
+.RE
+.sp
 .TP 2m
 
 At most one of these may be specified:

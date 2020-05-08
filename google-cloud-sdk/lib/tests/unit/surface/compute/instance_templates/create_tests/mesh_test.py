@@ -65,10 +65,10 @@ class InstanceTemplatesCreateWithMesh(
                     '"installSteps": [{'
                     '"scriptRun": {'
                     '"script": "#! /bin/bash\\n'
-                    'sudo adduser --system --disabled-login envoy\\n'
-                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz /home/envoy\\n'
-                    'sudo tar -xzf /home/envoy/mesh-agent-0.1.tgz -C /home/envoy\\n'
-                    'sudo /home/envoy/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
+                    'export MESH_AGENT_DIRECTORY=$(mktemp -d)\\n'
+                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz ${MESH_AGENT_DIRECTORY}\\n'
+                    'sudo tar -xzf ${MESH_AGENT_DIRECTORY}/mesh-agent-0.1.tgz -C ${MESH_AGENT_DIRECTORY}\\n'
+                    '${MESH_AGENT_DIRECTORY}/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
                 )),
         ]),
         labels=m.InstanceProperties.LabelsValue(additionalProperties=[
@@ -119,10 +119,10 @@ class InstanceTemplatesCreateWithMesh(
                     '"installSteps": [{'
                     '"scriptRun": {'
                     '"script": "#! /bin/bash\\n'
-                    'sudo adduser --system --disabled-login envoy\\n'
-                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz /home/envoy\\n'
-                    'sudo tar -xzf /home/envoy/mesh-agent-0.1.tgz -C /home/envoy\\n'
-                    'sudo /home/envoy/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
+                    'export MESH_AGENT_DIRECTORY=$(mktemp -d)\\n'
+                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz ${MESH_AGENT_DIRECTORY}\\n'
+                    'sudo tar -xzf ${MESH_AGENT_DIRECTORY}/mesh-agent-0.1.tgz -C ${MESH_AGENT_DIRECTORY}\\n'
+                    '${MESH_AGENT_DIRECTORY}/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
                 )),
         ]),
         labels=m.InstanceProperties.LabelsValue(additionalProperties=[
@@ -203,10 +203,10 @@ class InstanceTemplatesCreateWithMesh(
                     '"installSteps": [{'
                     '"scriptRun": {'
                     '"script": "#! /bin/bash\\n'
-                    'sudo adduser --system --disabled-login envoy\\n'
-                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz /home/envoy\\n'
-                    'sudo tar -xzf /home/envoy/mesh-agent-0.1.tgz -C /home/envoy\\n'
-                    'sudo /home/envoy/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
+                    'export MESH_AGENT_DIRECTORY=$(mktemp -d)\\n'
+                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz ${MESH_AGENT_DIRECTORY}\\n'
+                    'sudo tar -xzf ${MESH_AGENT_DIRECTORY}/mesh-agent-0.1.tgz -C ${MESH_AGENT_DIRECTORY}\\n'
+                    '${MESH_AGENT_DIRECTORY}/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
                 )),
         ]),
         labels=m.InstanceProperties.LabelsValue(additionalProperties=[
@@ -273,10 +273,10 @@ cat <<EOF > /var/www/html/index.html
                     '"installSteps": [{'
                     '"scriptRun": {'
                     '"script": "#! /bin/bash\\n'
-                    'sudo adduser --system --disabled-login envoy\\n'
-                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz /home/envoy\\n'
-                    'sudo tar -xzf /home/envoy/mesh-agent-0.1.tgz -C /home/envoy\\n'
-                    'sudo /home/envoy/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
+                    'export MESH_AGENT_DIRECTORY=$(mktemp -d)\\n'
+                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz ${MESH_AGENT_DIRECTORY}\\n'
+                    'sudo tar -xzf ${MESH_AGENT_DIRECTORY}/mesh-agent-0.1.tgz -C ${MESH_AGENT_DIRECTORY}\\n'
+                    '${MESH_AGENT_DIRECTORY}/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
                 )),
             m.Metadata.ItemsValueListEntry(
                 key='startup-script',
@@ -339,10 +339,10 @@ cat <<EOF > /var/www/html/index.html
                     '"installSteps": [{'
                     '"scriptRun": {'
                     '"script": "#! /bin/bash\\n'
-                    'sudo adduser --system --disabled-login envoy\\n'
-                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz /home/envoy\\n'
-                    'sudo tar -xzf /home/envoy/mesh-agent-0.1.tgz -C /home/envoy\\n'
-                    'sudo /home/envoy/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
+                    'export MESH_AGENT_DIRECTORY=$(mktemp -d)\\n'
+                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz ${MESH_AGENT_DIRECTORY}\\n'
+                    'sudo tar -xzf ${MESH_AGENT_DIRECTORY}/mesh-agent-0.1.tgz -C ${MESH_AGENT_DIRECTORY}\\n'
+                    '${MESH_AGENT_DIRECTORY}/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
                 )),
             m.Metadata.ItemsValueListEntry(key='x', value='y'),
             m.Metadata.ItemsValueListEntry(key='z', value='1'),
@@ -399,10 +399,10 @@ cat <<EOF > /var/www/html/index.html
                     '"installSteps": [{'
                     '"scriptRun": {'
                     '"script": "#! /bin/bash\\n'
-                    'sudo adduser --system --disabled-login envoy\\n'
-                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz /home/envoy\\n'
-                    'sudo tar -xzf /home/envoy/mesh-agent-0.1.tgz -C /home/envoy\\n'
-                    'sudo /home/envoy/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
+                    'export MESH_AGENT_DIRECTORY=$(mktemp -d)\\n'
+                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz ${MESH_AGENT_DIRECTORY}\\n'
+                    'sudo tar -xzf ${MESH_AGENT_DIRECTORY}/mesh-agent-0.1.tgz -C ${MESH_AGENT_DIRECTORY}\\n'
+                    '${MESH_AGENT_DIRECTORY}/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
                 )),
             m.Metadata.ItemsValueListEntry(key='x', value='y'),
             m.Metadata.ItemsValueListEntry(key='z', value='1'),
@@ -467,10 +467,10 @@ cat <<EOF > /var/www/html/index.html
                     '"installSteps": [{'
                     '"scriptRun": {'
                     '"script": "#! /bin/bash\\n'
-                    'sudo adduser --system --disabled-login envoy\\n'
-                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz /home/envoy\\n'
-                    'sudo tar -xzf /home/envoy/mesh-agent-0.1.tgz -C /home/envoy\\n'
-                    'sudo /home/envoy/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
+                    'export MESH_AGENT_DIRECTORY=$(mktemp -d)\\n'
+                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz ${MESH_AGENT_DIRECTORY}\\n'
+                    'sudo tar -xzf ${MESH_AGENT_DIRECTORY}/mesh-agent-0.1.tgz -C ${MESH_AGENT_DIRECTORY}\\n'
+                    '${MESH_AGENT_DIRECTORY}/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
                 )),
             m.Metadata.ItemsValueListEntry(key='x', value='y'),
             m.Metadata.ItemsValueListEntry(key='z', value='1'),
@@ -537,10 +537,10 @@ cat <<EOF > /var/www/html/index.html
                     '"installSteps": [{'
                     '"scriptRun": {'
                     '"script": "#! /bin/bash\\n'
-                    'sudo adduser --system --disabled-login envoy\\n'
-                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz /home/envoy\\n'
-                    'sudo tar -xzf /home/envoy/mesh-agent-0.1.tgz -C /home/envoy\\n'
-                    'sudo /home/envoy/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
+                    'export MESH_AGENT_DIRECTORY=$(mktemp -d)\\n'
+                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz ${MESH_AGENT_DIRECTORY}\\n'
+                    'sudo tar -xzf ${MESH_AGENT_DIRECTORY}/mesh-agent-0.1.tgz -C ${MESH_AGENT_DIRECTORY}\\n'
+                    '${MESH_AGENT_DIRECTORY}/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
                 )),
             m.Metadata.ItemsValueListEntry(key='x', value='y'),
             m.Metadata.ItemsValueListEntry(key='z', value='1'),
@@ -610,10 +610,10 @@ cat <<EOF > /var/www/html/index.html
                     '"installSteps": [{'
                     '"scriptRun": {'
                     '"script": "#! /bin/bash\\n'
-                    'sudo adduser --system --disabled-login envoy\\n'
-                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz /home/envoy\\n'
-                    'sudo tar -xzf /home/envoy/mesh-agent-0.1.tgz -C /home/envoy\\n'
-                    'sudo /home/envoy/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
+                    'export MESH_AGENT_DIRECTORY=$(mktemp -d)\\n'
+                    'sudo gsutil cp gs://gce-mesh/mesh-agent/releases/mesh-agent-0.1.tgz ${MESH_AGENT_DIRECTORY}\\n'
+                    'sudo tar -xzf ${MESH_AGENT_DIRECTORY}/mesh-agent-0.1.tgz -C ${MESH_AGENT_DIRECTORY}\\n'
+                    '${MESH_AGENT_DIRECTORY}/mesh-agent/mesh-agent-bootstrap.sh"}}]}]}'
                 )),
             m.Metadata.ItemsValueListEntry(key='x', value='y'),
             m.Metadata.ItemsValueListEntry(key='z', value='1'),

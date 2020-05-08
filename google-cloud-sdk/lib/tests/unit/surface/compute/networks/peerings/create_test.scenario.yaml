@@ -5,6 +5,8 @@ summary:
   - command: compute networks peerings create network-peering --network network-a
       --peer-network network-b --auto-create-routes
   - stderr: |
+      WARNING: Flag --auto-create-routes is deprecated and will be removed in a future release.
+  - stderr: |
       Updated [https://compute.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/network-a].
   - stdout: |
       --- {}
@@ -20,6 +22,8 @@ actions:
     command: compute networks peerings create network-peering --network network-a
       --peer-network network-b --auto-create-routes
     events:
+    - expect_stderr: |
+        WARNING: Flag --auto-create-routes is deprecated and will be removed in a future release.
     - api_call:
         expect_request:
           uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-a/addPeering?alt=json
@@ -27,9 +31,10 @@ actions:
           headers: {}
           body:
             json:
-              autoCreateRoutes: true
-              name: network-peering
-              peerNetwork: projects/fake-project/global/networks/network-b
+              networkPeering:
+                name: network-peering
+                exchangeSubnetRoutes: true
+                network: projects/fake-project/global/networks/network-b
         return_response:
           headers:
             status: '200'

@@ -1,22 +1,28 @@
 title: compute instances suspend scenario
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute instances suspend a1 a2 --zone us-east1-b --async
   - stderr: |
-      Suspend instance in progress for [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa00419-3eebf859-b97e1e84].
-      Suspend instance in progress for [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa005f7-eb50f0e0-f2444b53].
+      Suspend instance in progress for [https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa00419-3eebf859-b97e1e84].
+      Suspend instance in progress for [https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa005f7-eb50f0e0-f2444b53].
       Use [gcloud compute operations describe URI] command to check the status of the operation(s).
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
 - execute_command:
     command: compute instances suspend a1 a2 --zone us-east1-b --async
     events:
     - api_call:
         poll_operation: false
         expect_request:
-          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/a1/suspend?alt=json&discardLocalSsd=False
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b/instances/a1/suspend?alt=json&discardLocalSsd=False
           method: POST
           headers: {}
           body: null
@@ -30,15 +36,15 @@ actions:
             name: operation-1510689778697-55df6dfa00419-3eebf859-b97e1e84
             operationType: suspend
             progress: 0
-            selfLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa00419-3eebf859-b97e1e84
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa00419-3eebf859-b97e1e84
             status: PENDING
             targetId: '6396123599314809906'
-            targetLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z1
-            zone: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b
+            targetLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b/instances/z1
+            zone: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b
     - api_call:
         poll_operation: false
         expect_request:
-          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/a2/suspend?alt=json&discardLocalSsd=False
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b/instances/a2/suspend?alt=json&discardLocalSsd=False
           method: POST
           headers: {}
           body: null
@@ -52,14 +58,14 @@ actions:
             name: operation-1510689778697-55df6dfa005f7-eb50f0e0-f2444b53
             operationType: suspend
             progress: 0
-            selfLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa005f7-eb50f0e0-f2444b53
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa005f7-eb50f0e0-f2444b53
             status: PENDING
             targetId: '7854858208599798834'
-            targetLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z2
-            zone: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b
+            targetLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b/instances/z2
+            zone: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b
     - expect_stderr: |
-        Suspend instance in progress for [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa00419-3eebf859-b97e1e84].
-        Suspend instance in progress for [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa005f7-eb50f0e0-f2444b53].
+        Suspend instance in progress for [https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa00419-3eebf859-b97e1e84].
+        Suspend instance in progress for [https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-east1-b/operations/operation-1510689778697-55df6dfa005f7-eb50f0e0-f2444b53].
         Use [gcloud compute operations describe URI] command to check the status of the operation(s).
     - expect_exit:
         code: 0

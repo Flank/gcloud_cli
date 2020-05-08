@@ -90,8 +90,7 @@ class SetIamPolicyTest(test_base.CloudTasksTestBase):
     self.queues_service.SetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesSetIamPolicyRequest(
             resource=self.queue_name,
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=expected_policy)),
+            setIamPolicyRequest=self._SetIamPolicyRequest(expected_policy)),
         response=expected_policy)
 
     actual_policy = self.Run(
@@ -113,8 +112,7 @@ class SetIamPolicyTest(test_base.CloudTasksTestBase):
     self.queues_service.SetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesSetIamPolicyRequest(
             resource=queue_name,
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=expected_policy)),
+            setIamPolicyRequest=self._SetIamPolicyRequest(expected_policy)),
         response=expected_policy)
 
     actual_policy = self.Run(
@@ -123,11 +121,18 @@ class SetIamPolicyTest(test_base.CloudTasksTestBase):
 
     self.assertEqual(actual_policy, expected_policy)
 
+  def _SetIamPolicyRequest(self, expected_policy):
+    return self.messages.SetIamPolicyRequest(policy=expected_policy)
+
 
 class SetIamPolicyTestBeta(SetIamPolicyTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def _SetIamPolicyRequest(self, expected_policy):
+    return self.messages.SetIamPolicyRequest(
+        policy=expected_policy, updateMask='bindings')
 
 
 if __name__ == '__main__':

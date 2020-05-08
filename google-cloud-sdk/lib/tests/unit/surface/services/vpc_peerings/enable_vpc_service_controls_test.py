@@ -32,7 +32,7 @@ class EnableVpcServiceControlsTest(unit_test_base.SNUnitTestBase):
   NETWORK = 'hello'
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testEnableVpcServiceControls_Success(self):
     self.ExpectEnableVpcServiceControls(self.NETWORK, self.OPERATION_NAME)

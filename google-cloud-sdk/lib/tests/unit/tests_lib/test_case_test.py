@@ -791,5 +791,24 @@ class OSSkipsTest(test_case.Base):
     self.assertEqual(1, count['os'])
 
 
+class AssertDirectoryExistsTest(test_case.Base):
+  """Tests AssertDirectory*Exists variants."""
+
+  def CreateTestDirectory(self, directory):
+    test_dir = os.path.join(directory, 'test')
+    file_utils.MakeDir(test_dir)
+    with open(os.path.join(test_dir, 'something.file'), 'w') as f:
+      f.write('something\n')
+    return test_dir
+
+  def testAssertDirectoryExists(self):
+    with file_utils.TemporaryDirectory() as directory:
+      test_dir = self.CreateTestDirectory(directory)
+      self.AssertDirectoryExists(test_dir)
+
+  def testAssertDirectoryNotExists(self):
+    with file_utils.TemporaryDirectory() as directory:
+      self.AssertDirectoryNotExists(directory, 'tests')
+
 if __name__ == '__main__':
   test_case.main()

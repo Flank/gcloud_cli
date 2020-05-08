@@ -73,7 +73,7 @@ class HelpTextUtilTest(calliope_test_base.CalliopeTestBase,
     diff = Accumulator()
     prune = self.DiffCliHelpText('sdk1', 'sdk2', diff)
     self.assertEqual(None, prune)
-    self.assertEqual(52, diff.GetChanges())
+    self.assertEqual(53, diff.GetChanges())
 
   def testDirDiffOps(self):
 
@@ -103,6 +103,7 @@ add arg-groups
 add bool-mutex
 add combinations
 add command2
+add command3
 add common-flags
 add common-other-flags
 add deprecated-args
@@ -149,7 +150,7 @@ delete newstylegroup/subcommand
 delete recommand
 delete simple-command
 delete unsetprop
-edit GROUP 104 142
+edit GROUP 104 145
 edit requiredargcommand 17 20
 """
     self.AssertOutputEquals(expected.replace('/', os.path.sep))

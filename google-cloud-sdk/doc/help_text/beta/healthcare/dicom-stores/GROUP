@@ -57,8 +57,9 @@ COMMANDS
         (BETA) Update a Cloud Healthcare API DICOM store.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud healthcare dicom-stores
         $ gcloud alpha healthcare dicom-stores
 

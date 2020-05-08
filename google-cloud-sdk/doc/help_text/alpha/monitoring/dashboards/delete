@@ -1,12 +1,12 @@
 NAME
-    gcloud alpha monitoring dashboards delete - delete a Stackdriver Monitoring
+    gcloud alpha monitoring dashboards delete - delete a Cloud Monitoring
         dashboard
 
 SYNOPSIS
     gcloud alpha monitoring dashboards delete DASHBOARD [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Delete a Stackdriver Monitoring dashboard.
+    (ALPHA) Delete a Monitoring dashboard.
 
 POSITIONAL ARGUMENTS
      Dashboard resource - The dashboard to delete. This represents a Cloud

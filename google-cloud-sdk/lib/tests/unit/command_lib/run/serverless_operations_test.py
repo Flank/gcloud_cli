@@ -769,8 +769,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self._ExpectCreate(
         image=self.fake_image,
         annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
-        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL},
-        revision_labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
+        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
 
     self.serverless_client.ReleaseService(
         self._ServiceRef('foo'), [self.fake_deployable, endpoint_change])
@@ -792,8 +791,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self._ExpectExisting(
         image='gcr.io/oldthing',
         annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL},
-        revision_labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
+        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
 
     self._ExpectBaseRevision(
         image='gcr.io/oldthing',
@@ -823,8 +821,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self._ExpectUpdate(
         image='gcr.io/newthing@sha256:abcdef',
         annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL},
-        revision_labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
+        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
 
     self.serverless_client.ReleaseService(
         self._ServiceRef('foo'), [endpoint_change])

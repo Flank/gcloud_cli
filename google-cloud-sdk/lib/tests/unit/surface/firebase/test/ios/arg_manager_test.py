@@ -185,6 +185,16 @@ class IosArgsTests(unit_base.IosMockClientTest):
     self.assertIn('[test]: may not be used with test type [game-loop]',
                   six.text_type(ex_ctx.exception))
 
+  def testPrepareArgs_GameLoopAndTestSpecialEntitlementsAreInvalidTogether(
+      self):
+    args = self.NewTestArgs(type='game-loop', test_special_entitlements=True)
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.InvalidArgException) as ex_ctx:
+      args_mgr.Prepare(args)
+    self.assertIn(
+        '[test-special-entitlements]: may not be used with test type '
+        '[game-loop]', six.text_type(ex_ctx.exception))
+
   def testPrepareArgs_GameLoopNegativeScenarioInvalid(self):
     args = self.NewTestArgs(
         type='game-loop', app='app', scenario_numbers=[1, -1])

@@ -75,7 +75,8 @@ OPTIONAL FLAGS
 
      --vpc-allowed-services=[VPC_SERVICE,...]
         Comma-separated list of APIs accessible from within the Service
-        Perimeter. Requires vpc-accessible-services be enabled.
+        Perimeter. In order to include all restricted services, use reference
+        "RESTRICTED-SERVICES". Requires vpc-accessible-services be enabled.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

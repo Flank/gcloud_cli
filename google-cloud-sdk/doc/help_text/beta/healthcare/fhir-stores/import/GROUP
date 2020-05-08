@@ -24,8 +24,9 @@ COMMANDS
         Healthcare API FHIR store.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud healthcare fhir-stores import
         $ gcloud alpha healthcare fhir-stores import
 

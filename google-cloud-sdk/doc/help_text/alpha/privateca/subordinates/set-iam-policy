@@ -52,10 +52,11 @@ API REFERENCE
 
 EXAMPLES
     The following command will read am IAM policy defined in a JSON file
-    'policy.json' and set it for the CA 'server-tls-1' with the location 'us':
+    'policy.json' and set it for the CA 'server-tls-1' with the location
+    'us-west1':
 
         $ gcloud alpha privateca subordinates set-iam-policy server-tls-1 \
-            policy.json --location us
+            policy.json --location us-west1
 
 NOTES
     This command is an internal implementation detail and may change or

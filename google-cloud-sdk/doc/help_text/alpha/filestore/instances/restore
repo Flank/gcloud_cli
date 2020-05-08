@@ -4,8 +4,11 @@ NAME
 
 SYNOPSIS
     gcloud alpha filestore instances restore (INSTANCE : --zone=ZONE)
-        --file-share=FILE_SHARE --source-snapshot=SOURCE_SNAPSHOT [--async]
-        [--source-snapshot-region=SOURCE_SNAPSHOT_REGION]
+        --file-share=FILE_SHARE
+        (--source-backup=SOURCE_BACKUP
+          --source-backup-region=SOURCE_BACKUP_REGION
+          | [--source-snapshot=SOURCE_SNAPSHOT
+          : --source-snapshot-region=SOURCE_SNAPSHOT_REGION]) [--async]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -33,17 +36,35 @@ REQUIRED FLAGS
      --file-share=FILE_SHARE
         File share destination of the restored snapshot.
 
-     --source-snapshot=SOURCE_SNAPSHOT
-        Name of the Filestore snapshot to restore from.
+     Exactly one of these must be specified:
+
+       The name and region of the Filestore backup to restore from.
+
+         --source-backup=SOURCE_BACKUP
+            Name of the Filestore backup to restore from. This flag must be
+            specified if any of the other arguments in this group are
+            specified.
+
+         --source-backup-region=SOURCE_BACKUP_REGION
+            Region of the Filestore backup to restore from. This flag must be
+            specified if any of the other arguments in this group are
+            specified.
+
+       The name and region of the Filestore snapshot to restore from.
+
+         --source-snapshot=SOURCE_SNAPSHOT
+            Name of the Filestore snapshot to restore from. This flag must be
+            specified if any of the other arguments in this group are
+            specified.
+
+         --source-snapshot-region=SOURCE_SNAPSHOT_REGION
+            Region of the Filestore snapshot to restore from. If unspecified,
+            it is assumed that the Filestore snapshot is local.
 
 OPTIONAL FLAGS
      --async
         Return immediately, without waiting for the operation in progress to
         complete.
-
-     --source-snapshot-region=SOURCE_SNAPSHOT_REGION
-        Region of the Filestore snapshot to restore from. If unspecified, it is
-        assumed that the Filestore snapshot is local.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

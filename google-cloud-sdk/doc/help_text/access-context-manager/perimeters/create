@@ -8,7 +8,8 @@ SYNOPSIS
         [--access-levels=[LEVEL,...]] [--async] [--description=DESCRIPTION]
         [--perimeter-type=PERIMETER_TYPE; default="regular"]
         [--resources=[RESOURCES,...]] [--restricted-services=[SERVICE,...]]
-        [GCLOUD_WIDE_FLAG ...]
+        [--enable-vpc-accessible-services
+          --vpc-allowed-services=[VPC_SERVICE,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Create a new service perimeter in a given access policy.
@@ -67,6 +68,15 @@ OPTIONAL FLAGS
      --restricted-services=[SERVICE,...]
         Comma-separated list of services to which the perimeter boundary does
         apply (for example, storage.googleapis.com).
+
+     --enable-vpc-accessible-services
+        Whether to restrict API calls within the perimeter to those in the
+        vpc-allowed-services list.
+
+     --vpc-allowed-services=[VPC_SERVICE,...]
+        Comma-separated list of APIs accessible from within the Service
+        Perimeter. In order to include all restricted services, use reference
+        "RESTRICTED-SERVICES". Requires vpc-accessible-services be enabled.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

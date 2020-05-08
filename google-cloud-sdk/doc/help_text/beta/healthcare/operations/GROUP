@@ -25,8 +25,9 @@ COMMANDS
         (BETA) List Cloud Healthcare API operations.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud healthcare operations
         $ gcloud alpha healthcare operations
 

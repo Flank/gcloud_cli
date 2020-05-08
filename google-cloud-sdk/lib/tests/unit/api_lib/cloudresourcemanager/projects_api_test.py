@@ -19,23 +19,26 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from apitools.base.py import exceptions
-from apitools.base.py.testing import mock
+from apitools.base.py.testing import mock as apitools_mock
 
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.api_lib.resource_manager import operations
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.command_lib.projects import util as command_lib_util
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.projects import util
 
+import mock
+
 
 class ProjectsApiTest(sdk_test_base.WithFakeAuth):
 
   def SetUp(self):
     self.messages = core_apis.GetMessagesModule('cloudresourcemanager', 'v1')
-    self.mock_client = mock.Client(
+    self.mock_client = apitools_mock.Client(
         core_apis.GetClientClass('cloudresourcemanager', 'v1'),
         real_client=core_apis.GetClientInstance(
             'cloudresourcemanager', 'v1', no_http=True))
@@ -196,6 +199,48 @@ class ProjectsApiTest(sdk_test_base.WithFakeAuth):
     response = projects_api.TestIamPermissions(test_project_ref,
                                                requested_permissions)
     self.assertEqual(response.permissions, expected_permissions)
+
+
+class IamPolicyBindings(test_case.TestCase):
+
+  def SetUp(self):
+    self.mock_get_iam_policy = self.StartObjectPatch(
+        projects_api,
+        'GetIamPolicy'
+    )
+    self.mock_set_iam_policy = self.StartObjectPatch(
+        projects_api,
+        'SetIamPolicy'
+    )
+    self.mock_add_binding = self.StartObjectPatch(
+        iam_util,
+        'AddBindingToIamPolicy'
+    )
+
+  def testAddIamPolicyBindings(self):
+    test_project = util.GetTestActiveProject()
+    test_project_ref = command_lib_util.ParseProject(test_project.projectId)
+    policy = self.mock_get_iam_policy.return_value
+
+    projects_api.AddIamPolicyBindings(
+        test_project_ref,
+        [('member_1', 'role_1'), ('member_2', 'role_2')])
+
+    self.mock_get_iam_policy.assert_called_once_with(
+        test_project_ref,
+        projects_api.DEFAULT_API_VERSION)
+
+    self.mock_set_iam_policy.assert_called_once_with(
+        test_project_ref,
+        policy,
+        api_version=projects_api.DEFAULT_API_VERSION)
+
+    messages = core_apis.GetMessagesModule('cloudresourcemanager', 'v1')
+    expected_binding_calls = [
+        mock.call(messages.Binding, policy, 'member_1', 'role_1'),
+        mock.call(messages.Binding, policy, 'member_2', 'role_2'),
+    ]
+    self.mock_add_binding.assert_has_calls(expected_binding_calls)
 
 
 if __name__ == '__main__':

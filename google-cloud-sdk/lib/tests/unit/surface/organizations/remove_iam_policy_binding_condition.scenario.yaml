@@ -1,5 +1,5 @@
 title: organizations remove-iam-policy-binding scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 - execute_command:

@@ -11,7 +11,7 @@ gcloud beta firebase test ios run \- invoke a test in Firebase Test Lab for iOS 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta firebase test ios run\fR [\fIARGSPEC\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fIXCTEST_ZIP\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-xcode\-version\fR=\fIXCODE_VERSION\fR] [\fB\-\-xctestrun\-file\fR=\fIXCTESTRUN_FILE\fR] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-async\fR] [\fB\-\-client\-details\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta firebase test ios run\fR [\fIARGSPEC\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fIXCTEST_ZIP\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-xcode\-version\fR=\fIXCODE_VERSION\fR] [\fB\-\-xctestrun\-file\fR=\fIXCTESTRUN_FILE\fR] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-async\fR] [\fB\-\-client\-details\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-test\-special\-entitlements\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -205,6 +205,16 @@ A list of game\-loop scenario numbers which will be run as part of the test
 matrix, but the maximum number may also be limited by the overall test
 \fB\-\-timeout\fR setting. This flag is only valid when
 \fB\-\-type=game\-loop\fR is also set.
+
+.TP 2m
+\fB\-\-test\-special\-entitlements\fR
+Enables testing special app entitlements. Re\-signs an app having special
+entitlements with a new application\-identifier. This currently supports testing
+Push Notifications (aps\-environment) entitlement for up to one app in a
+project.
+
+Note: Because this changes the app's identifier, make sure none of the resources
+in your zip file contain direct references to the test app's bundle id.
 
 
 .RE

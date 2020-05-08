@@ -49,8 +49,9 @@ EXAMPLES
             --dataset=test-dataset
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud healthcare dicom-stores describe
         $ gcloud alpha healthcare dicom-stores describe
 

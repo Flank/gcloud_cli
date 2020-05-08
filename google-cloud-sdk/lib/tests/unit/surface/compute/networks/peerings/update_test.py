@@ -63,60 +63,11 @@ class PeeringsUpdateTest(test_base.BaseTest):
         'At least one property must be modified.'):
       self.Run('compute networks peerings update peering-1 --network network-1')
 
-
-class PeeringsUpdateBetaTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-    self.message_version = self.compute_beta
-
-  def testUpdatePeeringWithCustomRoutesFlagsTrueTrue(self):
-    self.Run('compute networks peerings update peering-1 --network '
-             'network-1 --export-custom-routes --import-custom-routes')
-    self.CheckRequests([(self.compute_beta.networks, 'UpdatePeering',
-                         self.messages.ComputeNetworksUpdatePeeringRequest(
-                             network='network-1',
-                             networksUpdatePeeringRequest=self.messages
-                             .NetworksUpdatePeeringRequest(
-                                 networkPeering=self.messages.NetworkPeering(
-                                     name='peering-1',
-                                     exportCustomRoutes=True,
-                                     importCustomRoutes=True)),
-                             project='my-project'))],)
-
-  def testUpdatePeeringWithCustomRoutesFlagsFalseFalse(self):
-    self.Run('compute networks peerings update peering-1 --network '
-             'network-1 --no-export-custom-routes --no-import-custom-routes')
-    self.CheckRequests([(self.compute_beta.networks, 'UpdatePeering',
-                         self.messages.ComputeNetworksUpdatePeeringRequest(
-                             network='network-1',
-                             networksUpdatePeeringRequest=self.messages
-                             .NetworksUpdatePeeringRequest(
-                                 networkPeering=self.messages.NetworkPeering(
-                                     name='peering-1',
-                                     exportCustomRoutes=False,
-                                     importCustomRoutes=False)),
-                             project='my-project'))],)
-
-  def testWithNoFlags(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        'At least one property must be modified.'):
-      self.Run('compute networks peerings update peering-1 --network network-1')
-
-
-class PeeringsUpdateAlphaTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
-    self.message_version = self.compute_alpha
-
   def testUpdatePeeringWithImportAndExportSubnetRouteWithPublicIp(self):
     self.Run('compute networks peerings update peering-1 --network '
              'network-1 --export-subnet-routes-with-public-ip '
              '--import-subnet-routes-with-public-ip')
-    self.CheckRequests([(self.compute_alpha.networks, 'UpdatePeering',
+    self.CheckRequests([(self.compute.networks, 'UpdatePeering',
                          self.messages.ComputeNetworksUpdatePeeringRequest(
                              network='network-1',
                              networksUpdatePeeringRequest=self.messages
@@ -131,7 +82,7 @@ class PeeringsUpdateAlphaTest(test_base.BaseTest):
     self.Run('compute networks peerings update peering-1 --network '
              'network-1 --no-export-subnet-routes-with-public-ip '
              '--no-import-subnet-routes-with-public-ip')
-    self.CheckRequests([(self.compute_alpha.networks, 'UpdatePeering',
+    self.CheckRequests([(self.compute.networks, 'UpdatePeering',
                          self.messages.ComputeNetworksUpdatePeeringRequest(
                              network='network-1',
                              networksUpdatePeeringRequest=self.messages
@@ -141,6 +92,7 @@ class PeeringsUpdateAlphaTest(test_base.BaseTest):
                                      exportSubnetRoutesWithPublicIp=False,
                                      importSubnetRoutesWithPublicIp=False)),
                              project='my-project'))],)
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -46,7 +46,7 @@ class InstanceImportTest(ovf_import_test_base.OVFimportTestBase):
     self.ovf_builder = daisy_utils._OVF_IMPORT_BUILDER.format(
         daisy_utils._DEFAULT_BUILDER_VERSION)
     self.os = 'ubuntu-1604'
-    self.tags = ['gce-ovf-import']
+    self.tags = ['gce-daisy', 'gce-ovf-import']
     self.zone = 'us-west1-c'
     properties.VALUES.compute.zone.Set(self.zone)
 

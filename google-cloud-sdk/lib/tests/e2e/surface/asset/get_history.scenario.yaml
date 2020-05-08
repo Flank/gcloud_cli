@@ -4,31 +4,32 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: asset get-history --project cloud-sdk-integration-testing --asset-names=//compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/do-not-delete-compute-instances-asset-get-history
-      --content-type resource --start-time='2020-03-16T01:24:36Z' --format=text(asset.name)
+      --content-type resource --start-time='-P10D' --format=text(asset.name)
   - stdout: |-
       .*asset.name: //compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/do-not-delete-compute-instances-asset-get-history.*
       $
 actions:
 - execute_command:
     command: asset get-history --project cloud-sdk-integration-testing --asset-names=//compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/do-not-delete-compute-instances-asset-get-history
-      --content-type resource --start-time='2020-03-16T01:24:36Z' --format=text(asset.name)
+      --content-type resource --start-time='-P10D' --format=text(asset.name)
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1/projects/cloud-sdk-integration-testing:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Fcloud-sdk-integration-testing%2Fzones%2Fus-central1-f%2Finstances%2Fdo-not-delete-compute-instances-asset-get-history&contentType=RESOURCE&readTimeWindow.startTime=2020-03-16T01%3A24%3A36.000Z
+          uri:
+            matches: https://cloudasset.googleapis.com/v1/projects/cloud-sdk-integration-testing:batchGetAssetsHistory\?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Fcloud-sdk-integration-testing%2Fzones%2Fus-central1-f%2Finstances%2Fdo-not-delete-compute-instances-asset-get-history&contentType=RESOURCE&readTimeWindow.startTime=.*
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
             cache-control: private
-            content-length: '7638'
+            content-length: '7749'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             assets:
             - window:
-                startTime: '2020-02-28T02:00:00Z'
+                startTime: '2020-03-23T23:34:51.595730Z'
                 endTime: '2262-04-11T23:47:16.854775807Z'
               asset:
                 name: //compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/do-not-delete-compute-instances-asset-get-history
@@ -39,34 +40,50 @@ actions:
                   discoveryName: Instance
                   parent: //cloudresourcemanager.googleapis.com/projects/462803083913
                   data:
+                    startRestricted: false
+                    deletionProtection: false
+                    fingerprint: jyFzhEIGHjY=
+                    status: RUNNING
+                    serviceAccounts:
+                    - email: 462803083913-compute@developer.gserviceaccount.com
+                      scopes:
+                      - https://www.googleapis.com/auth/devstorage.read_only
+                      - https://www.googleapis.com/auth/logging.write
+                      - https://www.googleapis.com/auth/monitoring.write
+                      - https://www.googleapis.com/auth/pubsub
+                      - https://www.googleapis.com/auth/service.management.readonly
+                      - https://www.googleapis.com/auth/servicecontrol
+                      - https://www.googleapis.com/auth/trace.append
+                    name: do-not-delete-compute-instances-asset-get-history
                     disks:
-                    - type: PERSISTENT
+                    - boot: true
+                      source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/do-not-delete-compute-instances-asset-get-history
+                      shieldedInstanceInitialState: {}
+                      interface: SCSI
+                      mode: READ_WRITE
+                      autoDelete: true
+                      deviceName: persistent-disk-0
+                      type: PERSISTENT
                       diskSizeGb: '10'
                       guestOsFeatures:
                       - type: VIRTIO_SCSI_MULTIQUEUE
                       licenses:
                       - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
                       index: 0
-                      boot: true
-                      source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/do-not-delete-compute-instances-asset-get-history
-                      interface: SCSI
-                      mode: READ_WRITE
-                      autoDelete: true
-                      deviceName: persistent-disk-0
                     tags:
                       fingerprint: 42WmSpB8rSM=
                     id: '7434508496582954710'
                     canIpForward: false
                     networkInterfaces:
-                    - network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
-                      networkIP: 10.240.0.131
+                    - networkIP: 10.240.0.131
+                      fingerprint: TZs1UfTe4p8=
                       accessConfigs:
-                      - natIP: 35.222.135.155
-                        networkTier: PREMIUM
+                      - networkTier: PREMIUM
+                        natIP: 35.222.135.155
                         name: external-nat
                         type: ONE_TO_ONE_NAT
-                      fingerprint: TZs1UfTe4p8=
                       name: nic0
+                      network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
                     scheduling:
                       onHostMaintenance: MIGRATE
                       preemptible: false
@@ -77,21 +94,6 @@ actions:
                     cpuPlatform: Intel Haswell
                     selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/do-not-delete-compute-instances-asset-get-history
                     machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
-                    startRestricted: false
-                    deletionProtection: false
-                    status: RUNNING
-                    fingerprint: GV+KE6FOTwQ=
-                    serviceAccounts:
-                    - scopes:
-                      - https://www.googleapis.com/auth/devstorage.read_only
-                      - https://www.googleapis.com/auth/logging.write
-                      - https://www.googleapis.com/auth/monitoring.write
-                      - https://www.googleapis.com/auth/pubsub
-                      - https://www.googleapis.com/auth/service.management.readonly
-                      - https://www.googleapis.com/auth/servicecontrol
-                      - https://www.googleapis.com/auth/trace.append
-                      email: 462803083913-compute@developer.gserviceaccount.com
-                    name: do-not-delete-compute-instances-asset-get-history
                   internalData:
                     '@type': type.googleapis.com/compute.Instance
                     id: '7434508496582954710'
@@ -127,6 +129,7 @@ actions:
                       guestOsFeature:
                       - type: VIRTIO_SCSI_MULTIQUEUE
                       diskSizeGb: '10'
+                      shieldedInstanceInitialState: {}
                     serviceAccount:
                     - email: 462803083913-compute@developer.gserviceaccount.com
                       scope:
@@ -146,7 +149,7 @@ actions:
                     labelFingerprint: 42WmSpB8rSM=
                     startRestricted: false
                     deletionProtection: false
-                    fingerprint: GV+KE6FOTwQ=
+                    fingerprint: jyFzhEIGHjY=
                   location: us-central1-f
                 ancestors:
                 - projects/462803083913

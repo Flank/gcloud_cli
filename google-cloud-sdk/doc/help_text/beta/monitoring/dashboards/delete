@@ -1,12 +1,12 @@
 NAME
-    gcloud beta monitoring dashboards delete - delete a Stackdriver Monitoring
+    gcloud beta monitoring dashboards delete - delete a Cloud Monitoring
         dashboard
 
 SYNOPSIS
     gcloud beta monitoring dashboards delete DASHBOARD [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Delete a Stackdriver Monitoring dashboard.
+    (BETA) Delete a Monitoring dashboard.
 
 POSITIONAL ARGUMENTS
      Dashboard resource - The dashboard to delete. This represents a Cloud

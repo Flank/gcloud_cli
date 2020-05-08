@@ -22,9 +22,9 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --zone=ZONE
-          The pubsub/lite_zone of the Pub/Sub Lite resource.
+          ID of the location of the Pub/Sub Lite resource.
 
-          If not specified, will use default pubsub/lite_zone.
+          If not specified, will use default pubsub/lite_zone property.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

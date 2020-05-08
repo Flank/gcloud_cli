@@ -227,13 +227,6 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
                '    --title "My Perimeter Title" ')
     self.assertIn('set to the policy number', text_type(ex.exception))
 
-
-class PerimetersUpdateTestBeta(PerimetersUpdateTestGA):
-
-  def PreSetUp(self):
-    self.api_version = 'v1'
-    self.track = calliope_base.ReleaseTrack.BETA
-
   def testUpdate_AddServiceFilterFields(self):
     self.SetUpForAPI(self.api_version)
 
@@ -295,6 +288,13 @@ class PerimetersUpdateTestBeta(PerimetersUpdateTestGA):
                       '   --enable-vpc-accessible-services ')
 
     self.assertEqual(result, perimeter_after)
+
+
+class PerimetersUpdateTestBeta(PerimetersUpdateTestGA):
+
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class PerimetersUpdateTestAlpha(PerimetersUpdateTestBeta):

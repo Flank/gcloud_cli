@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha ai-platform versions update (VERSION : --model=MODEL)
-        [--description=DESCRIPTION] [--update-labels=[KEY=VALUE,...]]
+        [--config=CONFIG] [--description=DESCRIPTION] [--region=REGION]
+        [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -27,8 +28,47 @@ POSITIONAL ARGUMENTS
           The model for the version.
 
 FLAGS
+     --config=CONFIG
+        Path to a YAML configuration file containing configuration parameters
+        for the version
+        (https://cloud.google.com/ml/reference/rest/v1/projects.models.versions)
+        to create.
+
+        The file is in YAML format. Note that not all attributes of a version
+        are configurable; available attributes (with example values) are:
+
+            description: A free-form description of the version.
+            manualScaling:
+              nodes: 10  # The number of nodes to allocate for this model.
+            autoScaling:
+              minNodes: 0  # The minimum number of nodes to allocate for this model.
+
+        The name of the version must always be specified via the required
+        VERSION argument.
+
+        Only one of manualScaling or autoScaling can be specified. If both are
+        specified in same yaml file, an error will be returned.
+
+        Labels cannot currently be set in the config.yaml; please use the
+        command-line flags to alter them.
+
+        If an option is specified both in the configuration file and via
+        command-line arguments, the command-line arguments override the
+        configuration file.
+
      --description=DESCRIPTION
         The description of the version.
+
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
+
+        REGION must be one of: asia-east1, europe-west4, us-central1.
 
      --update-labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to update. If a label exists its value is

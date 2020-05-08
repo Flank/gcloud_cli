@@ -1,13 +1,13 @@
 NAME
     gcloud alpha monitoring policies conditions describe - describe a condition
-        in a Stackdriver alerting policy
+        in a Cloud Monitoring alerting policy
 
 SYNOPSIS
     gcloud alpha monitoring policies conditions describe
         (CONDITION : --policy=POLICY) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Describe a condition in a Stackdriver alerting policy.
+    (ALPHA) Describe a condition in a Cloud Monitoring alerting policy.
 
 POSITIONAL ARGUMENTS
      Condition resource - The name of the Condition to describe. The arguments

@@ -52,10 +52,11 @@ API REFERENCE
 
 EXAMPLES
     The following command will read am IAM policy defined in a JSON file
-    'policy.json' and set it for the CA 'prod-root' with the location 'us':
+    'policy.json' and set it for the CA 'prod-root' with the location
+    'us-west1':
 
         $ gcloud alpha privateca roots set-iam-policy prod-root \
-            policy.json --location us
+            policy.json --location us-west1
 
 NOTES
     This command is an internal implementation detail and may change or

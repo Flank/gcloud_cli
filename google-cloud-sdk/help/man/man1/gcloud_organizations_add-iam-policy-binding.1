@@ -11,14 +11,15 @@ gcloud organizations add\-iam\-policy\-binding \- add IAM policy binding for an 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud organizations add\-iam\-policy\-binding\fR \fIORGANIZATION\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud organizations add\-iam\-policy\-binding\fR \fIORGANIZATION\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 Adds a policy binding to the IAM policy of an organization, given an
-organization ID and the binding. One binding consists of a member and a role.
+organization ID and the binding. One binding consists of a member, a role, and
+an optional condition.
 
 
 
@@ -73,6 +74,49 @@ Define the role of the member.
 .RE
 .sp
 
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+
+Condition of the binding to be added. When condition is explicitly specified as
+\f5None\fR (e.g. \-\-condition=None), a binding without a condition is added.
+When \-\-condition is specified and is not a \f5None\fR condition,
+\f5\-\-role\fR cannot be a primitive role. Primitive roles are
+\f5roles/editor\fR, \f5roles/owner\fR, and \f5roles/viewer\fR.
+
+.TP 2m
+\fBexpression\fR
+(Required) Expression of the condition which evaluates to True or False. This
+uses a subset of Common Expression Language syntax.
+
+.TP 2m
+\fBtitle\fR
+(Required) Title for the expression, i.e. a short string describing its purpose.
+
+.TP 2m
+\fBdescription\fR
+(Optional) Description for the expression. This is a longer text which describes
+the expression.
+
+NOTE: An unsatisfied condition will not allow access via this binding.
+
+.TP 2m
+\fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR
+Path to a local JSON or YAML file that defines the condition. To see available
+fields, see the help for \f5\-\-condition\fR.
+
+
+.RE
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
 These flags are available to all commands: \-\-account, \-\-billing\-project,
@@ -108,7 +152,7 @@ account 'test\-proj1@example.domain.com', run:
 
 .RS 2m
 $ gcloud organizations add\-iam\-policy\-binding \e
-  example\-organization\-id\-1 \e
+  test\-proj1@example.domain.com \e
   \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
   \-\-role='roles/editor'
 .RE
@@ -123,9 +167,21 @@ $ gcloud organizations add\-iam\-policy\-binding \e
   \-\-role='roles/editor'
 .RE
 
-See https://cloud.google.com/iam/help/members/types for details about member
-types. See https://cloud.google.com/iam/help/roles/reference for details about
-roles.
+To add an IAM policy binding which expires at the end of the year 2018 for the
+role of 'roles/browser' and the user 'test\-user@gmail.com' on an organization
+with identifier 'example\-organization\-id\-1', run:
+
+.RS 2m
+$ gcloud organizations add\-iam\-policy\-binding \e
+  example\-organization\-id\-1 \-\-member='user:test\-user@gmail.com' \e
+  \-\-role='roles/browser' \e
+  \-\-condition='expression=request.time <
+timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
+tion=Expires at midnight on 2018\-12\-31'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
 
 
 

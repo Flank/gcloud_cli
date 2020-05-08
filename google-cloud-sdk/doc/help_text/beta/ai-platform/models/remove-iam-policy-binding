@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud beta ai-platform models remove-iam-policy-binding MODEL
-        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+        --member=MEMBER --role=ROLE [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Removes a policy binding from an AI Platform Model. One binding
@@ -40,6 +40,18 @@ REQUIRED FLAGS
 
      --role=ROLE
         The role to remove the member from.
+
+OPTIONAL FLAGS
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
+
+        REGION must be one of: asia-east1, europe-west4, us-central1.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

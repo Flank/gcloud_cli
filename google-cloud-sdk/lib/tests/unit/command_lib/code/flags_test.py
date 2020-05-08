@@ -38,7 +38,18 @@ class FlagsValidateTest(test_case.TestCase):
     # No exception means everything is OK
     flags.Validate(namespace)
 
+  def testSqlExistsADCPresent(self):
+    namespace = self.parser.parse_args(
+        ['--cloudsql-instances=blah', '--application-default-credential'])
+    # No exception means everything is OK
+    flags.Validate(namespace)
+
   def testSqlMissingServiceAccountPresent(self):
     namespace = self.parser.parse_args(['--service-account=alsoblah'])
+    # No exception means everything is OK
+    flags.Validate(namespace)
+
+  def testSqlMissingADCtPresent(self):
+    namespace = self.parser.parse_args(['--application-default-credential'])
     # No exception means everything is OK
     flags.Validate(namespace)

@@ -61,9 +61,7 @@ class SearchTests(help_search_test_base.HelpSearchTestBase):
     self.AssertErrContains(
         'Generating the gcloud CLI for one-time use (no SDK root)')
     # Assert that results are found.
-    self.assertEqual(set(['gcloud sdk long-help', 'gcloud sdk',
-                          'gcloud beta sdk long-help', 'gcloud beta sdk',
-                          'gcloud alpha sdk long-help', 'gcloud alpha sdk']),
+    self.assertEqual({'gcloud sdk long-help', 'gcloud sdk'},
                      set([' '.join(c[lookup.PATH]) for c in results]))
 
   def testRunSearchWalksAllCommands(self):
@@ -72,6 +70,10 @@ class SearchTests(help_search_test_base.HelpSearchTestBase):
       return ' '.join(command[lookup.PATH])
     self.StartObjectPatch(search.Searcher, '_PossiblyGetResult',
                           side_effect=FakeSearch)
+    searcher = search.Searcher(
+        parent=cli_tree.Load(cli=self.test_cli, one_time_use_ok=True),
+        terms=['term']
+    )
     self.assertEqual(
         [
             'gcloud',
@@ -129,7 +131,7 @@ class SearchTests(help_search_test_base.HelpSearchTestBase):
             'gcloud sdk xyzzy',
             'gcloud version',
         ],
-        sorted(search.RunSearch(['term'], self.test_cli)))
+        sorted(searcher._WalkTree(searcher.parent, [])))
 
   def testPossiblyGetResultNotResult(self):
     """Test _PossiblyGetResult returns None when no match is found."""
@@ -248,10 +250,7 @@ class SearchTests(help_search_test_base.HelpSearchTestBase):
 
     result = search.RunSearch(['castle'], self.test_cli)
     self.assertIn(long_help, result)
-    self.assertEqual(3, len(result))
-    self.assertIn(alpha, result)
-    self.assertIn(beta, result)
-    self.assertIn(long_help, result)
+    self.assertEqual(1, len(result))
 
   def testRunSearchMultipleTerms(self):
     """Overall test of search with three search terms."""
@@ -273,8 +272,8 @@ class SearchTests(help_search_test_base.HelpSearchTestBase):
     self.assertIn(sdk, result)
     self.assertIn(xyzzy, result)
     self.assertEqual(
-        set(['xyzzy', 'sdk', 'long-help', 'second-level-command-b',
-             'second-level-command-1']),
+        {'xyzzy', 'sdk', 'long-help', 'second-level-command-b',
+         'second-level-command-1'},
         set([command[lookup.NAME] for command in result]))
 
 

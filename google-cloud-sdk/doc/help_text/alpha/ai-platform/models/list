@@ -2,12 +2,24 @@ NAME
     gcloud alpha ai-platform models list - list existing AI Platform models
 
 SYNOPSIS
-    gcloud alpha ai-platform models list [--filter=EXPRESSION] [--limit=LIMIT]
-        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha ai-platform models list [--region=REGION]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) List existing AI Platform models.
+
+FLAGS
+     --region=REGION
+        Google Cloud region of the regional endpoint to use for this command.
+        If unspecified, the command uses the global endpoint of the AI Platform
+        Training and Prediction API.
+
+        Learn more about regional endpoints and see a list of available
+        regions:
+        https://cloud.google.com/ai-platform/prediction/docs/regional-endpoints
+
+        REGION must be one of: asia-east1, europe-west4, us-central1.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

@@ -1,11 +1,11 @@
 NAME
-    gcloud monitoring - manage Stackdriver Monitoring dashboards
+    gcloud monitoring - manage Cloud Monitoring dashboards
 
 SYNOPSIS
     gcloud monitoring GROUP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Manage Stackdriver Monitoring dashboards.
+    Manage Monitoring dashboards.
 
     More information can be found here:
       o https://cloud.google.com/monitoring/dashboards/api-dashboard
@@ -22,7 +22,7 @@ GROUPS
     GROUP is one of the following:
 
      dashboards
-        Manage Stackdriver Monitoring dashboards.
+        Manage Cloud Monitoring dashboards.
 
 NOTES
     These variants are also available:

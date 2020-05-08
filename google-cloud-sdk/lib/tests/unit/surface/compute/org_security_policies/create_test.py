@@ -75,11 +75,6 @@ class OrgSecurityPoliciesCreateBetaTest(sdk_test_base.WithFakeAuth,
             'locations/global/securityPolicies/{1}'.format(
                 self.api_version, '123456789')))
 
-    self.mock_client.organizationSecurityPolicies.Get.Expect(
-        self.messages.ComputeOrganizationSecurityPoliciesGetRequest(
-            securityPolicy='123456789'),
-        response=self.CreateTestOrgSecurityPolicyMessage())
-
     self.Run('compute org-security-policies create --organization 12345 '
              '--description test-description '
              '--display-name test-sp ')
@@ -104,11 +99,6 @@ class OrgSecurityPoliciesCreateBetaTest(sdk_test_base.WithFakeAuth,
             resource_uri='https://compute.googleapis.com/compute/{0}/'
             'locations/global/securityPolicies/{1}'.format(
                 self.api_version, '123456789')))
-
-    self.mock_client.organizationSecurityPolicies.Get.Expect(
-        self.messages.ComputeOrganizationSecurityPoliciesGetRequest(
-            securityPolicy='123456789'),
-        response=self.CreateTestOrgSecurityPolicyMessage())
 
     self.Run('compute org-security-policies create --folder 55555 '
              '--description test-description '

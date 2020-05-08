@@ -73,10 +73,6 @@ class OrgSecurityPoliciesCopyRulesBetaTest(sdk_test_base.WithFakeAuth,
             resource_uri='https://compute.googleapis.com/compute/{0}/'
             'locations/global/securityPolicies/{1}'.format(
                 self.api_version, '9999999999')))
-    self.mock_client.organizationSecurityPolicies.Get.Expect(
-        self.messages.ComputeOrganizationSecurityPoliciesGetRequest(
-            securityPolicy='9999999999'),
-        response=self.CreateTestOrgSecurityPolicyMessage())
     self.Run('compute org-security-policies copy-rules 9999999999 '
              '--source-security-policy 111111111')
     self.AssertOutputEquals('')

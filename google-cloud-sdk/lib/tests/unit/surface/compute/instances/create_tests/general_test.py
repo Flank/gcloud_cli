@@ -226,6 +226,52 @@ class InstancesCreateGeneralTest(create_test_base.InstancesCreateTestBase):
           ))],
     )
 
+  def testWithValidServiceAccount(self):
+    m = self.messages
+    self.Run("""
+          compute instances create instance-1
+            --service-account user@domain.com
+            --zone central2-a
+          """)
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances,
+          'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[m.AttachedDisk(
+                      autoDelete=True,
+                      boot=True,
+                      initializeParams=m.AttachedDiskInitializeParams(
+                          sourceImage=self._default_image,
+                      ),
+                      mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                      type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[m.NetworkInterface(
+                      accessConfigs=[m.AccessConfig(
+                          name='external-nat',
+                          type=self._one_to_one_nat)],
+                      network=self._default_network)],
+                  serviceAccounts=[
+                      m.ServiceAccount(
+                          email='user@domain.com',
+                          scopes=create_test_base.DEFAULT_SCOPES
+                      ),
+                  ],
+                  scheduling=m.Scheduling(
+                      automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
+
   def testWithInvalidServiceAccount(self):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
@@ -236,6 +282,22 @@ class InstancesCreateGeneralTest(create_test_base.InstancesCreateTestBase):
       self.Run("""
           compute instances create instance-1
             --service-account user@google.com=https://www.googleapis.com/auth/trace.append
+            --zone central2-a
+          """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request)
+
+  def testWithInvalidServiceAccountNoSuffix(self):
+    with self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        r'Invalid value for \[--service-account]: Invalid format: expected '
+        r'default or user@domain\.com, received user'
+    ):
+      self.Run("""
+          compute instances create instance-1
+            --service-account user
             --zone central2-a
           """)
 

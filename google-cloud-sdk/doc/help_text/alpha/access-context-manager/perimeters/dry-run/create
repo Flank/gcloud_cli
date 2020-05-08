@@ -68,7 +68,9 @@ REQUIRED FLAGS
 
          --vpc-allowed-services=[vpc_allowed_services,...]
             Comma-separated list of APIs accessible from within the Service
-            Perimeter. Requires vpc-accessible-services be enabled.
+            Perimeter. In order to include all restricted services, use
+            reference "RESTRICTED-SERVICES". Requires vpc-accessible-services
+            be enabled.
 
        Arguments for creating a dry-run spec for a new Service Perimeter.
 
@@ -114,7 +116,9 @@ REQUIRED FLAGS
 
          --perimeter-vpc-allowed-services=[vpc_allowed_services,...]
             Comma-separated list of APIs accessible from within the Service
-            Perimeter. Requires vpc-accessible-services be enabled.
+            Perimeter. In order to include all restricted services, use
+            reference "RESTRICTED-SERVICES". Requires vpc-accessible-services
+            be enabled.
 
 OPTIONAL FLAGS
      --async
@@ -151,7 +155,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud access-context-manager perimeters dry-run create
         $ gcloud beta access-context-manager perimeters dry-run create
 

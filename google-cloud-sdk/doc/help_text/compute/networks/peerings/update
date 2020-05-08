@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud compute networks peerings update NAME --network=NETWORK
-        [--export-custom-routes] [--import-custom-routes]
+        [--export-custom-routes] [--export-subnet-routes-with-public-ip]
+        [--import-custom-routes] [--import-subnet-routes-with-public-ip]
         [GCLOUD_WIDE_FLAG ...]
 
 POSITIONAL ARGUMENTS
@@ -21,9 +22,19 @@ OPTIONAL FLAGS
         If set, the network will export custom routes to peer network. Use
         --no-export-custom-routes to disable it.
 
+     --export-subnet-routes-with-public-ip
+        If set, the network will export subnet routes with addresses in the
+        public IP ranges to peer network. Use
+        --no-export-subnet-routes-with-public-ip to disable it.
+
      --import-custom-routes
         If set, the network will import custom routes from peer network. Use
         --no-import-custom-routes to disable it.
+
+     --import-subnet-routes-with-public-ip
+        If set, the network will import subnet routes with addresses in the
+        public IP ranges from peer network. Use
+        --no-import-subnet-routes-with-public-ip to disable it.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -40,6 +51,13 @@ EXAMPLES
         $ gcloud compute networks peerings update peering-name \
           --export-custom-routes \
           --import-custom-routes
+
+    To update the peering named peering-name to both export and import subnet
+    routes with public ip, run:
+
+        $ gcloud compute networks peerings update peering-name \
+          --export-subnet-routes-with-public-ip \
+          --import-subnet-routes-with-public-ip
 
 NOTES
     These variants are also available:

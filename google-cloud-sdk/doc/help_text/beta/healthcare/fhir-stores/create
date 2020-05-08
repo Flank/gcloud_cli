@@ -95,18 +95,19 @@ EXAMPLES
     To create a FHIR store called 'test-fhir-store', run:
 
         $ gcloud beta healthcare fhir-stores create test-fhir-store \
-            --dataset=test-dataset
+            --dataset=test-dataset --version=r4
 
     To create a fhir store with the Cloud Pub/Sub topic 'test-pubsub-topic',
     run:
 
         $ gcloud beta healthcare fhir-stores create test-fhir-store \
-            --dataset=test-dataset \
+            --dataset=test-dataset --version=r4 \
             --pubsub-topic=projects/my-project/topics/test-pubsub-topic
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud healthcare fhir-stores create
         $ gcloud alpha healthcare fhir-stores create
 

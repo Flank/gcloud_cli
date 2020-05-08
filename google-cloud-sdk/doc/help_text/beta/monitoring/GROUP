@@ -1,12 +1,12 @@
 NAME
-    gcloud beta monitoring - manage Stackdriver Monitoring dashboards and
+    gcloud beta monitoring - manage Cloud Monitoring dashboards and
         notification channels
 
 SYNOPSIS
     gcloud beta monitoring GROUP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Manage Stackdriver Monitoring dashboards and notification channels.
+    (BETA) Manage Monitoring dashboards and notification channels.
 
     More information can be found here:
       o https://cloud.google.com/monitoring/api/v3/
@@ -25,13 +25,13 @@ GROUPS
     GROUP is one of the following:
 
      channel-descriptors
-        (BETA) Read Stackdriver Monitoring notification channel descriptors.
+        (BETA) Read Cloud Monitoring notification channel descriptors.
 
      channels
-        (BETA) Manage Stackdriver Monitoring notification channels.
+        (BETA) Manage Cloud Monitoring notification channels.
 
      dashboards
-        (BETA) Manage Stackdriver Monitoring dashboards.
+        (BETA) Manage Cloud Monitoring dashboards.
 
 NOTES
     This command is currently in BETA and may change without notice. These

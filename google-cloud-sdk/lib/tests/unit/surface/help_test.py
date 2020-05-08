@@ -30,7 +30,6 @@ from tests.lib import calliope_test_base
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
-
 import mock
 
 
@@ -309,7 +308,7 @@ class TableBundleTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
     """Test that in bundled SDK, table already exists and help search runs."""
     self.assertTrue(os.path.exists(cli_tree.CliTreePath()))
     # Make basic assertion that we can run search and find results.
-    results = self.Run('help -- project')
+    results = self.Run('help -- dataflow')
     self.assertTrue(results)
 
 

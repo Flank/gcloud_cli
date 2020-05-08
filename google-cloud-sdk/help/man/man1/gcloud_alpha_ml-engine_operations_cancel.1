@@ -11,7 +11,7 @@ gcloud alpha ml\-engine operations cancel \- cancel an AI Platform operation
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml\-engine operations cancel\fR \fIOPERATION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml\-engine operations cancel\fR \fIOPERATION\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,6 +27,25 @@ gcloud alpha ml\-engine operations cancel \- cancel an AI Platform operation
 .TP 2m
 \fIOPERATION\fR
 Name of the operation.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Google Cloud region of the regional endpoint to use for this command. If
+unspecified, the command uses the global endpoint of the AI Platform Training
+and Prediction API.
+
+Learn more about regional endpoints and see a list of available regions:
+https://cloud.google.com/ai\-platform/prediction/docs/regional\-endpoints
+
+\fIREGION\fR must be one of: \fBasia\-east1\fR, \fBeurope\-west4\fR,
+\fBus\-central1\fR.
 
 
 .RE

@@ -46,8 +46,10 @@ ALL_GA_TEST_RUN_ARGS = [
 ]
 
 ALL_TEST_RUN_ARGS = {
-    calliope_base.ReleaseTrack.GA: ALL_GA_TEST_RUN_ARGS,
-    calliope_base.ReleaseTrack.BETA: ALL_GA_TEST_RUN_ARGS + ['client_details']
+    calliope_base.ReleaseTrack.GA:
+        ALL_GA_TEST_RUN_ARGS,
+    calliope_base.ReleaseTrack.BETA:
+        ALL_GA_TEST_RUN_ARGS + ['client_details', 'test_special_entitlements']
 }
 
 

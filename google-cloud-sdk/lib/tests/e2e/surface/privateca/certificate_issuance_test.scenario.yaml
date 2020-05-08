@@ -1,8 +1,3 @@
-filters:
-  skipAlways:
-    reason: Temporarily skip this test until rollout is complete.
-    bug: b/154249345
-    locally: true
 title: Issue a certificate from an existing root, describe it, and revoke it.
 release_tracks: [ALPHA]
 summary:
@@ -13,8 +8,6 @@ summary:
   - progress_tracker:
     - message: Creating Certificate.
     - status: SUCCESS
-  - stderr: |
-      Publishing a new Certificate Revocation List.
   - stderr: |
       Created Certificate [projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$/certificates/$$ca-cert-name$$].
 - execute:
@@ -49,7 +42,8 @@ summary:
   - progress_tracker:
     - message: Revoking Certificate.
     - status: SUCCESS
-  - stdout: |-
+  - stderr: |-
+      Publishing a new Certificate Revocation List.
       Revoked certificate \[[^\]]+\] at \d{4}-\d{2}-\d{2}T[0-9-.:]+.
       $
 actions:
@@ -302,8 +296,6 @@ actions:
     - expect_progress_tracker:
         message: Revoking Certificate.
         status: SUCCESS
-    - expect_stderr: |
-        Publishing a new Certificate Revocation List.
     - api_call:
         expect_request:
           uri: https://privateca.googleapis.com/v1alpha1/projects/$$project$$/locations/$$location$$/certificateAuthorities/$$root-certificate-authority$$:publishCrl?alt=json
@@ -328,8 +320,9 @@ actions:
               ula+ns96xSpZ+0a1RUvMrn+EY6V14YYxZyi4Kx/WpwJExF9DljRe2GE9hI00PyP8
               SJQxJwdlkqSaaME2DkivdOayC90WFQ+YZkI4r5uLt60muPWMsLvkrg==
               -----END X509 CRL-----
-    - expect_stdout:
+    - expect_stderr:
         matches: |
+          Publishing a new Certificate Revocation List.
           Revoked certificate \[[^\]]+\] at \d{4}-\d{2}-\d{2}T[0-9-.:]+.
     - expect_exit:
         code: 0

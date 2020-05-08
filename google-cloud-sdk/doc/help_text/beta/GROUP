@@ -252,8 +252,7 @@ GROUPS
         (BETA) Manage AI Platform jobs and models.
 
      monitoring
-        (BETA) Manage Stackdriver Monitoring dashboards and notification
-        channels.
+        (BETA) Manage Cloud Monitoring dashboards and notification channels.
 
      network-management
         (BETA) Manage Network Management resources.

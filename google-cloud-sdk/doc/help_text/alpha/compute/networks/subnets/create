@@ -88,8 +88,9 @@ OPTIONAL FLAGS
      --logging-metadata=LOGGING_METADATA
         Can only be specified if VPC Flow Logs for this subnetwork is enabled.
         Configures whether metadata fields should be added to the reported
-        logs. Default is to include all metadata. LOGGING_METADATA must be one
-        of: custom, exclude-all, include-all.
+        logs. Default is to include all metadata. Note that "include-all" does
+        not include GKE annotations. LOGGING_METADATA must be one of: custom,
+        exclude-all, include-all.
 
      --logging-metadata-fields=[METADATA_FIELD,...]
         Can only be specified if VPC Flow Logs for this subnetwork is enabled
@@ -99,7 +100,8 @@ OPTIONAL FLAGS
      --metadata=METADATA
         Can only be specified if VPC Flow Logs for this subnetwork is enabled.
         Configures whether metadata fields should be added to the reported
-        logs. Default is to include all metadata. METADATA must be one of:
+        logs. Default is to include all metadata. Note that "include-all" does
+        not include GKE annotations. METADATA must be one of:
         exclude-all-metadata, include-all-metadata.
 
      --private-ipv6-google-access-service-accounts=EMAIL,[EMAIL,...]

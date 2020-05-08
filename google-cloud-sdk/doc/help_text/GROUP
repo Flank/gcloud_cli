@@ -210,6 +210,9 @@ GROUPS
      functions
         Manage Google Cloud Functions.
 
+     healthcare
+        Manage Cloud Healthcare resources.
+
      iam
         Manage IAM service accounts and keys.
 
@@ -232,7 +235,7 @@ GROUPS
         Manage AI Platform jobs and models.
 
      monitoring
-        Manage Stackdriver Monitoring dashboards.
+        Manage Cloud Monitoring dashboards.
 
      network-management
         Manage Network Management resources.

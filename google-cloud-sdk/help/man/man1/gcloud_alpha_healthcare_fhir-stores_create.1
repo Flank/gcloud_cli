@@ -141,14 +141,14 @@ To create a FHIR store called 'test\-fhir\-store', run:
 
 .RS 2m
 $ gcloud alpha healthcare fhir\-stores create test\-fhir\-store \e
-    \-\-dataset=test\-dataset
+    \-\-dataset=test\-dataset \-\-version=r4
 .RE
 
 To create a fhir store with the Cloud Pub/Sub topic 'test\-pubsub\-topic', run:
 
 .RS 2m
 $ gcloud alpha healthcare fhir\-stores create test\-fhir\-store \e
-    \-\-dataset=test\-dataset \e
+    \-\-dataset=test\-dataset \-\-version=r4 \e
     \-\-pubsub\-topic=projects/my\-project/topics/test\-pubsub\-topic
 .RE
 
@@ -159,9 +159,10 @@ $ gcloud alpha healthcare fhir\-stores create test\-fhir\-store \e
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud healthcare fhir\-stores create
 $ gcloud beta healthcare fhir\-stores create
 .RE
 

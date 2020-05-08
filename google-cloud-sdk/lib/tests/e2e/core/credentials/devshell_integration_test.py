@@ -53,6 +53,11 @@ class ProxiedAuthIntegration(e2e_base.WithServiceAuth):
     self.assertEqual(type(creds), devshell.DevshellCredentials)
     self.Run('sql flags list')
 
+  def testSimpleGoogleAuthIntegration(self):
+    creds = c_store.Load(use_google_auth=True)
+    self.assertIsInstance(creds, devshell.DevShellCredentialsGoogleAuth)
+    self.Run('sql flags list')
+
 
 if __name__ == '__main__':
   test_case.main()

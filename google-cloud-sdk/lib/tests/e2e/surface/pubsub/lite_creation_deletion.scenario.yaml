@@ -1,12 +1,9 @@
 title: Create, describe, list, and delete a Lite topic
-release_tracks: [ALPHA, BETA]
+release_tracks: [BETA]
 actions:
 - generate_resource_id:
     reference: my-topic
     prefix: lite-topic
-
-- set_property:
-    api_endpoint_overrides/pubsublite: https://staging-pubsublite.sandbox.googleapis.com/
 
 - execute_command:
     command: pubsub lite-topics create $$my-topic$$ --zone us-central1-a --partitions 1 --per-partition-bytes 30GiB
@@ -34,7 +31,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://us-central1-staging-pubsublite.sandbox.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics?alt=json&topicId=$$my-topic$$
+          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics?alt=json&topicId=$$my-topic$$
           method: POST
           body:
             json:
@@ -59,6 +56,189 @@ actions:
             }
     - expect_stderr: |
         Created [$$my-topic$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      pubsub lite-topics describe $$my-topic$$ --zone us-central1-a
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
+          method: GET
+          body:
+            json:
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "projectNumber": "462803083913",
+              "projectId": "cloud-sdk-integration-testing",
+              "lifecycleState": "ACTIVE",
+              "name": "cloud-sdk-integration-testing",
+              "createTime": "2019-07-19T15:49:12.034Z",
+              "parent": {
+                "type": "folder",
+                "id": "54321"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics/$$my-topic$$?alt=json
+          method: GET
+          body:
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/462803083913/locations/us-central1-a/topics/$$my-topic$$",
+              "partitionConfig": {
+                "count": "1",
+                "scale": 1
+              },
+              "retentionConfig": {
+                "perPartitionBytes": "32212254720",
+                "period": "0s"
+              }
+            }
+    - expect_stdout: |
+        name: projects/462803083913/locations/us-central1-a/topics/$$my-topic$$
+        partitionConfig:
+          count: '1'
+          scale: 1
+        retentionConfig:
+          perPartitionBytes: '32212254720'
+          period: 0s
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      pubsub lite-topics list --zone us-central1-a
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
+          method: GET
+          body:
+            json:
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "projectNumber": "462803083913",
+              "projectId": "cloud-sdk-integration-testing",
+              "lifecycleState": "ACTIVE",
+              "name": "cloud-sdk-integration-testing",
+              "createTime": "2019-07-19T15:49:12.034Z",
+              "parent": {
+                "type": "folder",
+                "id": "54321"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics?alt=json
+          method: GET
+          body:
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "topics": [
+                {
+                  "name": "projects/462803083913/locations/us-central1-a/topics/$$my-topic$$",
+                  "partitionConfig": {
+                    "count": "1",
+                    "scale": 1
+                  },
+                  "retentionConfig": {
+                    "perPartitionBytes": "32212254720",
+                    "period": "0s"
+                  }
+                }
+              ]
+            }
+    - expect_stdout:
+        # Allow other resources to be listed in case some exist from other e2e tests.
+        matches: |
+          (\s|.)*---
+          name: projects/462803083913/locations/us-central1-a/topics/$$my-topic$$
+          partitionConfig:
+            count: '1'
+            scale: 1
+          retentionConfig:
+            perPartitionBytes: '32212254720'
+            period: 0s(\s---(\s|.)*)*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      pubsub lite-topics update $$my-topic$$ --zone us-central1-a --scale 2 --per-partition-bytes 40GiB --message-retention-period 2w
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
+          method: GET
+          body:
+            json:
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "projectNumber": "462803083913",
+              "projectId": "cloud-sdk-integration-testing",
+              "lifecycleState": "ACTIVE",
+              "name": "cloud-sdk-integration-testing",
+              "createTime": "2019-07-19T15:49:12.034Z",
+              "parent": {
+                "type": "folder",
+                "id": "54321"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics/$$my-topic$$?alt=json&updateMask=partitionConfig.scale%2CretentionConfig.perPartitionBytes%2CretentionConfig.period
+          method: PATCH
+          body:
+            json:
+              partitionConfig:
+                scale: 2
+              retentionConfig:
+                perPartitionBytes: '42949672960'
+                period: '1209600s'
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "projects/462803083913/locations/us-central1-a/topics/$$my-topic$$",
+              "partitionConfig": {
+                "count": "1",
+                "scale": 2
+              },
+              "retentionConfig": {
+                "perPartitionBytes": "42949672960",
+                "period": "1209600s"
+              }
+            }
+    - expect_stderr: |
+        Updated topic [$$my-topic$$].
+    - expect_stdout: |
+        name: projects/462803083913/locations/us-central1-a/topics/$$my-topic$$
+        partitionConfig:
+          count: '1'
+          scale: 2
+        retentionConfig:
+          perPartitionBytes: '42949672960'
+          period: 1209600s
     - expect_exit:
         code: 0
 
@@ -93,7 +273,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://us-central1-staging-pubsublite.sandbox.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics/$$my-topic$$?alt=json
+          uri: https://us-central1-pubsublite.googleapis.com/v1/admin/projects/462803083913/locations/us-central1-a/topics/$$my-topic$$?alt=json
           method: DELETE
           body:
         return_response:

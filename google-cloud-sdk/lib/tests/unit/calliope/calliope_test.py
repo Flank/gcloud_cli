@@ -2629,6 +2629,39 @@ Usage: test [optional flags] <group | command>
         err):
       self.cli.Execute('beta sdk2 command2 --coolstuff'.split())
 
+  def testSuggestFlagInOtherTrackEqSign(self):
+    err = """\
+ --coolstuff flag is available in one or more alternate release tracks. Try:
+
+  test sdk2 command2 --coolstuff
+"""
+    with self.AssertRaisesArgumentErrorMatches(
+        err):
+      self.cli.Execute('beta sdk2 command2 --coolstuff=test'.split())
+
+  def testSuggestFlagInOtherTrackAndSuggestion(self):
+    err = """\
+ --coolstuff flag is available in one or more alternate release tracks. Try:
+
+  test sdk2 command3 --coolstuff
+
+  --coolstuff (did you mean '--colstuff'?)
+"""
+    with self.AssertRaisesArgumentErrorMatches(
+        err):
+      self.cli.Execute('beta sdk2 command3 --coolstuff'.split())
+
+  def testSuggestFlagInOtherTrackAndSuggestionEqSign(self):
+    err = """\
+ --coolstuff flag is available in one or more alternate release tracks. Try:
+
+  test sdk2 command3 --coolstuff
+
+  --coolstuff=test (did you mean '--colstuff'?)
+"""
+    with self.AssertRaisesArgumentErrorMatches(
+        err):
+      self.cli.Execute('beta sdk2 command3 --coolstuff=test'.split())
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,12 +1,12 @@
 NAME
-    gcloud beta monitoring channels - manage Stackdriver Monitoring
-        notification channels
+    gcloud beta monitoring channels - manage Cloud Monitoring notification
+        channels
 
 SYNOPSIS
     gcloud beta monitoring channels COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Manage Stackdriver Monitoring notification channels.
+    (BETA) Manage Monitoring notification channels.
 
     More information can be found here:
     https://cloud.google.com/monitoring/api/v3/

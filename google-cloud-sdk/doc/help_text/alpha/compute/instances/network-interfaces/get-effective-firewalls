@@ -115,6 +115,28 @@ EXAMPLES
     To show all fields of the firewall rules, please show in JSON format with
     option --format=json
 
+    To see more firewall rule fields in table format, run the following for
+    "example-instance":
+
+        $ gcloud alpha compute instances network-interfaces \
+            get-effective-firewalls example-instance --format="table(
+          type,
+          security_policy_id,
+          priority,
+          action,
+          direction,
+          ip_ranges.list():label=IP_RANGES,
+          target_svc_acct,
+          enableLogging,
+          description,
+          name,
+          disabled,
+          target_tags,
+          src_svc_acct,
+          src_tags,
+          ruleTupleCount,
+          targetResources:label=TARGET_RESOURCES)"
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

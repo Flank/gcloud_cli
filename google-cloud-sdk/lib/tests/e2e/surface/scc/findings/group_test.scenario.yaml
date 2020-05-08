@@ -1,3 +1,7 @@
+filters:
+  skip:
+    reason: stdout change
+    bug: b/155053287
 title: scc findings list scenario test
 release_tracks: [ALPHA]
 summary:

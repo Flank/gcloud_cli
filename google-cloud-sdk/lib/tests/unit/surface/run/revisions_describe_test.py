@@ -47,7 +47,13 @@ class DescribeTest(base.ServerlessSurfaceBase):
     self.operations.GetRevision.assert_called_once_with(
         self._RevisionRef('12345'))
     for s in [
-        'spec', 'kind: Revision', 'name: \'12345\'', 'name: n1', 'value: v1']:
+        'Revision 12345 in namespace us-central1.fake-project',
+        'Env vars:',
+        'n1',
+        'v1',
+        'n2',
+        'v2',
+    ]:
       self.AssertOutputContains(s)
 
   def testDescribe_Succeed_CustomFormat(self):

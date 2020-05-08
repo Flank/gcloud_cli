@@ -1945,32 +1945,35 @@ class CreateTestGAOnly(CreateTestGA):
                 ' create {0} --enable-stackdriver-kubernetes '
                 '--addons=CloudRun').format(self.CLUSTER_NAME))
 
-  def testEnableAutoprovisioningWithManagementFromFileWithError(self):
-    autoprovisioning_config_file = self.Touch(
-        self.temp_path,
-        'autoprovisioning-config',
-        contents="""
-management:
-  autoRepair: false
-  autoUpgrade: true
-resourceLimits:
-  - resourceType: 'cpu'
-    minimum: 8
-    maximum: 100
-  - resourceType: 'memory'
-    maximum: 20
-        """)
-
-    with self.assertRaises(c_util.Error):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
-          '--enable-autoprovisioning '
-          '--autoprovisioning-config-file {}'.format(
-              autoprovisioning_config_file))
-    self.AssertErrContains('Node Management settings not implemented in GA.')
-
-  def testEnableAutoprovisioningWithUpgradeSettingsFromFileWithError(self):
-    autoprovisioning_config_file = self.Touch(
+  def testCreateAutoprovisioningUpgradeSettingsFromFile(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    upgradeSettings=m.UpgradeSettings(
+                        maxSurge=1, maxUnavailable=2),
+                    oauthScopes=[],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=1, maximum=2),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=10, maximum=20),
+                ]),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    autoprovisioning_config = self.Touch(
         self.temp_path,
         'autoprovisioning-config',
         contents="""
@@ -1979,6 +1982,108 @@ upgradeSettings:
   maxUnavailableUpgrade: 2
 resourceLimits:
   - resourceType: 'cpu'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'memory'
+    minimum: 10
+    maximum: 20
+        """)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testCreateAutoprovisioningUpgradeSettingsFromFlags(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    upgradeSettings=m.UpgradeSettings(
+                        maxSurge=1, maxUnavailable=2),
+                    oauthScopes=[],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=10, maximum=20),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=16, maximum=128)
+                ]),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--enable-autoprovisioning --min-cpu 10 --max-cpu 20 '
+        '--autoprovisioning-max-surge-upgrade=1 --autoprovisioning-max-unavailable-upgrade=2 '
+        '--min-memory 16 --max-memory 128')
+
+  def testCreateAutoprovisioningNodeManagementSettingsFromFile(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    management=m.NodeManagement(
+                        autoRepair=False, autoUpgrade=True),
+                    oauthScopes=[],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=1, maximum=2),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=10, maximum=20),
+                ]),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    autoprovisioning_config = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+management:
+  autoRepair: false
+  autoUpgrade: true
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'memory'
+    minimum: 10
+    maximum: 20
+        """)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testCreateAutoprovisioningOnlyOneNodeManagementFromFileWithError(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+management:
+  autoRepair: false
+resourceLimits:
+  - resourceType: 'cpu'
     minimum: 8
     maximum: 100
   - resourceType: 'memory'
@@ -1987,11 +2092,73 @@ resourceLimits:
 
     with self.assertRaises(c_util.Error):
       self.Run(
-          self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
-          '--enable-autoprovisioning '
+          self.clusters_command_base.format(self.ZONE) + ' create my-cluster '
+          ' --enable-autoprovisioning '
           '--autoprovisioning-config-file {}'.format(
               autoprovisioning_config_file))
-    self.AssertErrContains('Upgrade settings not implemented in GA.')
+    self.AssertErrContains(
+        'Must specify both \'autoUpgrade\' and \'autoRepair\' in \'management\''
+    )
+
+  def testCreateAutoprovisioningOnlyOneUpgradeSettingsFromFileWithError(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+upgradeSettings:
+  maxSurgeUpgrade: 1
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+
+    with self.assertRaises(c_util.Error):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' create my-cluster '
+          ' --enable-autoprovisioning '
+          '--autoprovisioning-config-file {}'.format(
+              autoprovisioning_config_file))
+    self.AssertErrContains(
+        'Must specify both \'maxSurgeUpgrade\' and \'maxUnavailableUpgrade\' in \'upgradeSettings\''
+    )
+
+  def testCreateAutoprovisioningNodeManagementFromFlags(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    management=m.NodeManagement(
+                        autoRepair=False, autoUpgrade=True),
+                    oauthScopes=[],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=10, maximum=20),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=16, maximum=128)
+                ]),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--enable-autoprovisioning --min-cpu 10 --max-cpu 20 '
+        '--no-enable-autoprovisioning-autorepair '
+        '--enable-autoprovisioning-autoupgrade '
+        '--min-memory 16 --max-memory 128')
 
   def testEnableAutoprovisioningWithFromFileWithError(self):
     autoprovisioning_config_file = self.Touch(

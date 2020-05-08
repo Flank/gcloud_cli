@@ -890,6 +890,17 @@ class Base(WithContentAssertions):
     if not os.path.isdir(path):
       self.fail('Expected directory [{0}] does not exist.'.format(path))
 
+  def AssertDirectoryNotExists(self, *path_parts):
+    """Asserts that the given directory does not exists.
+
+    Args:
+      *path_parts: str, The pieces of the path to combine to get the path to the
+        directory.
+    """
+    path = os.path.join(*path_parts)
+    if os.path.isdir(path):
+      self.fail('Directory [{0}] exists but was not expected to.'.format(path))
+
   def AssertFileExists(self, *path_parts):
     """Asserts that the given file exists."""
     path = os.path.join(*path_parts)

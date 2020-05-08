@@ -49,14 +49,14 @@ class DryRunEnforceAllTestBeta(accesscontextmanager.Base):
     self.SetUpForAPI(self.api_version)
     self._ExpectCommit('123', None)
 
-    self.Run('access-context-manager perimeters dry-run commit'
+    self.Run('access-context-manager perimeters dry-run enforce-all'
              '   --policy 123')
 
   def testEnforceAll_withEtag(self):
     self.SetUpForAPI(self.api_version)
     self._ExpectCommit('123', '32322646464')
 
-    self.Run('access-context-manager perimeters dry-run commit'
+    self.Run('access-context-manager perimeters dry-run enforce-all'
              '   --policy 123 --etag 32322646464')
 
 

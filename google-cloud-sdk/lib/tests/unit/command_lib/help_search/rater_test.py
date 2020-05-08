@@ -58,10 +58,9 @@ class RaterTest(test_case.TestCase, parameterized.TestCase):
   def testRatingSingleLocation(self, location, expected_rating):
     results = search_util.CommandSearchResults({'t': location})
     command = self.DummyCommand()
-    found_commands = [command]
     self.assertEqual(
         expected_rating,
-        rater.CommandRater(results, command, found_commands).Rate())
+        rater.CommandRater(results, command).Rate())
 
   @parameterized.named_parameters(
       ('OneNotFound', {'t': lookup.NAME, 't1': lookup.NAME, 't2': ''}, 0.1),
@@ -71,10 +70,9 @@ class RaterTest(test_case.TestCase, parameterized.TestCase):
   def testRatingSomeTermsNotFound(self, results_data, expected_rating):
     results = search_util.CommandSearchResults(results_data)
     command = self.DummyCommand()
-    found_commands = [command]
     self.assertEqual(
         expected_rating,
-        rater.CommandRater(results, command, found_commands).Rate())
+        rater.CommandRater(results, command).Rate())
 
   @parameterized.named_parameters(
       ('CommandNameAndPath', {'t': lookup.NAME, 't1': lookup.PATH}, 0.5),
@@ -87,10 +85,9 @@ class RaterTest(test_case.TestCase, parameterized.TestCase):
   def testRatingMultipleLocations(self, results_data, expected_rating):
     results = search_util.CommandSearchResults(results_data)
     command = self.DummyCommand()
-    found_commands = [command]
     self.assertEqual(
         expected_rating,
-        rater.CommandRater(results, command, found_commands).Rate())
+        rater.CommandRater(results, command).Rate())
 
   # The below cases go in order from most to least relevant.
   @parameterized.named_parameters(
@@ -121,10 +118,9 @@ class RaterTest(test_case.TestCase, parameterized.TestCase):
                                               expected_rating):
     results = search_util.CommandSearchResults(results_data)
     command = self.DummyCommand()
-    found_commands = [command]
     self.assertEqual(
         expected_rating,
-        rater.CommandRater(results, command, found_commands).Rate())
+        rater.CommandRater(results, command).Rate())
 
   @parameterized.named_parameters(
       # No penalty for duplicates because this is the highest release track.
@@ -135,13 +131,6 @@ class RaterTest(test_case.TestCase, parameterized.TestCase):
         {'release': lookup.BETA, 'path': ['gcloud', 'beta', 'foo']},
         {'release': lookup.GA}],
        0.25),
-      ('Beta',
-       {'t': 'sections.DESCRIPTION'},
-       {'release': lookup.BETA, 'path': ['gcloud', 'beta', 'foo']},
-       [{'release': lookup.ALPHA, 'path': ['gcloud', 'alpha', 'foo']},
-        {'release': lookup.BETA, 'path': ['gcloud', 'beta', 'foo']},
-        {'release': lookup.GA}],
-       0.25 * 0.1),
       # Double penalty for two higher release tracks.
       ('Alpha',
        {'t': 'sections.DESCRIPTION'},
@@ -149,7 +138,7 @@ class RaterTest(test_case.TestCase, parameterized.TestCase):
        [{'release': lookup.ALPHA, 'path': ['gcloud', 'alpha', 'foo']},
         {'release': lookup.BETA, 'path': ['gcloud', 'beta', 'foo']},
         {'release': lookup.GA}],
-       0.25 * (0.1 ** 2)),
+       0.25 * (1 ** 2)),
       # There's no GA command, so beta command isn't penalized.
       ('BetaPrimary',
        {'t': 'sections.DESCRIPTION'},
@@ -175,36 +164,35 @@ class RaterTest(test_case.TestCase, parameterized.TestCase):
       found_commands.append(self.DummyCommand(**kwargs))
     self.assertEqual(
         expected_rating,
-        rater.CommandRater(results, command, found_commands).Rate())
+        rater.CommandRater(results, command).Rate())
 
   def testCumulativeRater(self):
     cumulative_rater = rater.CumulativeRater()
-    alpha_command = self.DummyCommand(
-        release=lookup.ALPHA,
-        path=['gcloud', 'alpha', 'foo'],
-        results={'t': 'sections.DESCRIPTION'})
-    beta_command = self.DummyCommand(
+    command1 = self.DummyCommand(
+        release=lookup.GA,
+        results={'t': 'section.EXAMPLES'})
+    command2 = self.DummyCommand(
         release=lookup.BETA,
-        path=['gcloud', 'beta', 'foo'],
-        results={'t': 'sections.DESCRIPTION'})
-    ga_command = self.DummyCommand(
+        results={'t': 'sections.NAME'})
+    command3 = self.DummyCommand(
         release=lookup.ALPHA,
-        results={'t': 'sections.EXAMPLES'})
+        results={'t': 'sections.PATH'})
 
     cumulative_rater.AddFoundCommand(
-        alpha_command,
-        search_util.CommandSearchResults({'t': 'sections.DESCRIPTION'}))
+        command1,
+        search_util.CommandSearchResults({'t': 'examples'}))
     cumulative_rater.AddFoundCommand(
-        beta_command,
-        search_util.CommandSearchResults({'t': 'sections.DESCRIPTION'}))
+        command2,
+        search_util.CommandSearchResults({'t': 'name'}))
+    cumulative_rater.RateAll()
     cumulative_rater.AddFoundCommand(
-        ga_command,
-        search_util.CommandSearchResults({'t': 'sections.EXAMPLES'}))
+        command3,
+        search_util.CommandSearchResults({'t': 'path'}))
     cumulative_rater.RateAll()
 
-    self.assertEqual(0.25 * 0.1, alpha_command[lookup.RELEVANCE])
-    self.assertEqual(0.25, beta_command[lookup.RELEVANCE])
-    self.assertEqual(0.25, ga_command[lookup.RELEVANCE])
+    self.assertEqual(0.25, command1[lookup.RELEVANCE])
+    self.assertEqual(1, command2[lookup.RELEVANCE])
+    self.assertEqual(0.5, command3[lookup.RELEVANCE])
 
 
 if __name__ == '__main__':

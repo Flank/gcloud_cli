@@ -46,14 +46,14 @@ class InstancesCreateCustomMachineTest(create_test_base.InstancesCreateTestBase
             m.Zone(name=zone_name),
         ],
          [
+             self.messages.Project(
+                 defaultServiceAccount='default@service.account'),
+         ],
+         [
              m.MachineType(
                  creationTimestamp='2013-09-06T17:54:10.636-07:00',
                  guestCpus=int(custom_cpu),
                  memoryMb=int(custom_ram_mib)),
-         ],
-         [
-             self.messages.Project(
-                 defaultServiceAccount='default@service.account'),
          ], []])
 
     self.Run("""
@@ -77,12 +77,12 @@ class InstancesCreateCustomMachineTest(create_test_base.InstancesCreateTestBase
 
     self.CheckRequests(
         self.zone_get_request,
+        self.project_get_request,
         [(self.compute.machineTypes, 'Get',
           m.ComputeMachineTypesGetRequest(
               machineType=custom_machine_type_name,
               project=project_name,
               zone=zone_name))],
-        self.project_get_request,
         [(self.compute.instances, 'Insert',
           m.ComputeInstancesInsertRequest(
               instance=m.Instance(
@@ -136,14 +136,14 @@ class InstancesCreateCustomMachineTest(create_test_base.InstancesCreateTestBase
             m.Zone(name=zone_name),
         ],
          [
+             self.messages.Project(
+                 defaultServiceAccount='default@service.account'),
+         ],
+         [
              m.MachineType(
                  creationTimestamp='2013-09-06T17:54:10.636-07:00',
                  guestCpus=int(custom_cpu),
                  memoryMb=int(custom_ram_mib)),
-         ],
-         [
-             self.messages.Project(
-                 defaultServiceAccount='default@service.account'),
          ], []])
 
     self.Run("""
@@ -165,12 +165,12 @@ class InstancesCreateCustomMachineTest(create_test_base.InstancesCreateTestBase
 
     self.CheckRequests(
         self.zone_get_request,
+        self.project_get_request,
         [(self.compute.machineTypes, 'Get',
           m.ComputeMachineTypesGetRequest(
               machineType=custom_machine_type_name,
               project=project_name,
               zone=zone_name))],
-        self.project_get_request,
         [(self.compute.instances, 'Insert',
           m.ComputeInstancesInsertRequest(
               instance=m.Instance(
@@ -218,20 +218,16 @@ class InstancesCreateCustomMachineTest(create_test_base.InstancesCreateTestBase
     project_name = 'my-project'
     zone_name = 'central2-a'
 
-    self.make_requests.side_effect = iter(
-        [[
-            m.Zone(name=zone_name),
-        ],
-         [
-             m.MachineType(
-                 creationTimestamp='2013-09-06T17:54:10.636-07:00',
-                 guestCpus=int(custom_cpu),
-                 memoryMb=int(custom_ram_mib)),
-         ],
-         [
-             self.messages.Project(
-                 defaultServiceAccount='default@service.account'),
-         ], []])
+    self.make_requests.side_effect = iter([[
+        m.Zone(name=zone_name),
+    ], [
+        self.messages.Project(defaultServiceAccount='default@service.account'),
+    ], [
+        m.MachineType(
+            creationTimestamp='2013-09-06T17:54:10.636-07:00',
+            guestCpus=int(custom_cpu),
+            memoryMb=int(custom_ram_mib)),
+    ], []])
 
     self.Run("""
         compute instances create {instance_name}
@@ -257,12 +253,12 @@ class InstancesCreateCustomMachineTest(create_test_base.InstancesCreateTestBase
 
     self.CheckRequests(
         self.zone_get_request,
+        self.project_get_request,
         [(self.compute.machineTypes, 'Get',
           m.ComputeMachineTypesGetRequest(
               machineType=custom_machine_type_name,
               project=project_name,
               zone=zone_name))],
-        self.project_get_request,
         [(self.compute.instances, 'Insert',
           m.ComputeInstancesInsertRequest(
               instance=m.Instance(
@@ -342,14 +338,14 @@ class InstancesCreateCustomMachineTest(create_test_base.InstancesCreateTestBase
             m.Zone(name=zone_name),
         ],
         [
+            self.messages.Project(
+                defaultServiceAccount='default@service.account'),
+        ],
+        [
             m.MachineType(
                 creationTimestamp='2013-09-06T17:54:10.636-07:00',
                 guestCpus=int(custom_cpu),
                 memoryMb=int(custom_ram_mib)),
-        ],
-        [
-            self.messages.Project(
-                defaultServiceAccount='default@service.account'),
         ], []
     ])
 
@@ -373,12 +369,12 @@ class InstancesCreateCustomMachineTest(create_test_base.InstancesCreateTestBase
         self.zones_list_request,
         [(self.compute.zones, 'Get',
           m.ComputeZonesGetRequest(project=project_name, zone=zone_name))],
+        self.project_get_request,
         [(self.compute.machineTypes, 'Get',
           m.ComputeMachineTypesGetRequest(
               machineType=custom_machine_type_name,
               project=project_name,
               zone=zone_name))],
-        self.project_get_request,
         [(self.compute.instances, 'Insert',
           m.ComputeInstancesInsertRequest(
               instance=m.Instance(

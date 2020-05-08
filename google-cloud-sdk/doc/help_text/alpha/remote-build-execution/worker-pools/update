@@ -12,6 +12,8 @@ SYNOPSIS
         [--worker-count=WORKER_COUNT]
         [--clear-accelerator-config | --accelerator-count=ACCELERATOR_COUNT
           --accelerator-type=ACCELERATOR_TYPE]
+        [--clear-autoscale | --autoscale-max-size=AUTOSCALE_MAX_SIZE
+          --autoscale-min-size=AUTOSCALE_MIN_SIZE]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -116,6 +118,24 @@ FLAGS
             accelerator-types list to learn about all available accelerator
             types. This flag must be specified if any of the other arguments in
             this group are specified.
+
+     At most one of these may be specified:
+
+       --clear-autoscale
+          Remove the autoscale settings.
+
+       Either both or none of autoscale-min-size and autoscale-max-size should
+       be set.
+
+         --autoscale-max-size=AUTOSCALE_MAX_SIZE
+            The maximal number of autoscale workers. Must be equal to or
+            greater than autoscale-min-size. This flag must be specified if any
+            of the other arguments in this group are specified.
+
+         --autoscale-min-size=AUTOSCALE_MIN_SIZE
+            The minimal number of autoscale workers. Must be greater than 0.
+            This flag must be specified if any of the other arguments in this
+            group are specified.
 
      At most one of these may be specified:
 

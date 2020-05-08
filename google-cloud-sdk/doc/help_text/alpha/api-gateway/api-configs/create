@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha api-gateway api-configs create (API_CONFIG : --api=API)
-        (--grpc-files=[FILE,...] | --openapi-spec=OPENAPI_SPEC) [--async]
+        (--grpc-files=[FILE,...] | --openapi-spec=[FILE,...]) [--async]
         [--backend-auth-service-account=BACKEND_AUTH_SERVICE_ACCOUNT]
         [--display-name=DISPLAY_NAME] [--labels=[KEY=VALUE,...]]
         [GCLOUD_WIDE_FLAG ...]
@@ -40,8 +40,8 @@ REQUIRED FLAGS
           in JSON or YAML formats as well as Proto descriptors should be
           listed.
 
-       --openapi-spec=OPENAPI_SPEC
-          The OpenAPI v2 specification containing service configuration
+       --openapi-spec=[FILE,...]
+          The OpenAPI v2 specifications containing service configuration
           information, and API specification for the gateway.
 
 OPTIONAL FLAGS

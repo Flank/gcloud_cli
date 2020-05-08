@@ -628,6 +628,59 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0         - 
 """,
         normalize_space=True)
 
+  def testCreateReadReplicaOverridingCustomMachineType(self):
+    # This test ensures that the user is able to specify a custom machine type
+    # different than the custom machine type of the master.
+
+    master_diff = {
+        'name':
+            'create-instance1',
+        'settings': {
+            'tier':
+                'db-custom-1-4096',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
+        },
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_9_6,
+        'region':
+            'us-west1',
+    }
+    replica_diff = {
+        'name':
+            'create-replica1',
+        'settings': {
+            'tier':
+                'db-custom-2-7680',
+            'replicationType':
+                self.messages.Settings.ReplicationTypeValueValuesEnum
+                .ASYNCHRONOUS,
+        },
+        'databaseVersion':
+            self.messages.DatabaseInstance.DatabaseVersionValueValuesEnum
+            .POSTGRES_9_6,
+        'region':
+            'us-west1',
+        'masterInstanceName':
+            'create-instance1',
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
+
+    self.Run('sql instances create create-replica1 --master-instance-name '
+             'create-instance1  --cpu=2 --memory=7680MiB')
+    # pylint:disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME             DATABASE_VERSION  LOCATION TIER              PRIMARY_ADDRESS PRIVATE_ADDRESS STATUS
+create-replica1  POSTGRES_9_6      us-west1 db-custom-2-7680  0.0.0.0         -               RUNNABLE
+""",
+        normalize_space=True)
+
   def testCreateReadReplicaWithCmek(self):
     # This test ensures that a warning shows up when a replica of a instance
     # with a customer-managed encryption key is being created.

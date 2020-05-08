@@ -28,13 +28,27 @@ from tests.lib.surface.compute import test_resources
 class SslCertificatesDescribeTest(test_base.BaseTest,
                                   test_case.WithOutputCapture):
 
-  def testSimpleCase(self):
+  @property
+  def _api(self):
+    return 'v1'
+
+  def SetUp(self):
+    self.SelectApi(self._api)
+    self.SetEncoding('utf8')
+    self._resources = test_resources.MakeSslCertificates(
+        self.messages, self.api)
+
+  def RunVersioned(self, command):
+    prefix = '' if self.api == 'v1' else self.api
+    return self.Run('{prefix} {command}'.format(prefix=prefix, command=command))
+
+  def testSelfManagedCase(self):
     messages = self.messages
     self.make_requests.side_effect = iter([
-        [test_resources.SSL_CERTIFICATES[0]],
+        [self._resources[0]],
     ])
 
-    self.Run("""
+    self.RunVersioned("""
         compute ssl-certificates describe my-cert
         """)
 
@@ -48,96 +62,45 @@ class SslCertificatesDescribeTest(test_base.BaseTest,
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            certificate: |-
-              -----BEGIN CERTIFICATE-----
-              MIICZzCCAdACCQDjYQHCnQOiTDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
-              UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
-              CgwGR29vZ2xlMRgwFgYDVQQLDA9DbG91ZCBQbGF0Zm9ybXMxFzAVBgNVBAMMDmdj
-              bG91ZCBjb21wdXRlMB4XDTE0MTAxMzIwMTcxMloXDTE1MTAxMzIwMTcxMloweDEL
-              MAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0
-              bGUxDzANBgNVBAoMBkdvb2dsZTEYMBYGA1UECwwPQ2xvdWQgUGxhdGZvcm1zMRcw
-              FQYDVQQDDA5nY2xvdWQgY29tcHV0ZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkC
-              gYEAw3JXUCTn8J2VeWqHuc9zJxdy1WfQJtbDxQUUy4nsqU6QPGso3HYXlI/eozg6
-              bGhkJNtDVV4AAPQVv01aoFMt3T6MKLzAkjfse7zKQmQ399vQaE7lbLAV9M4FSV9s
-              wksSvT7cOW9ddcdKdyV3NTbptW5PeUE8Zk/aCFLPLqOg800CAwEAATANBgkqhkiG
-              9w0BAQsFAAOBgQCKMIRiThp2O+wg7M8wcNSdPzAZ61UMeisQKS5OEY90OsekWYUT
-              zMkUznRtycTdTBxEqKQoJKeAXq16SezJaZYE48FpoObQc2ZLMvje7F82tOwC2kob
-              v83LejX3zZnirv2PZVcFgvUE0k3a8/14enHi7j6jZu+Pl5ZM9BZ+vkBO8g==
-              -----END CERTIFICATE-----
-            creationTimestamp: '2014-09-04T09:56:33.679-07:00'
-            description: Certificate one.
+            creationTimestamp: '2017-12-18T11:11:11.000-07:00'
+            description: Self-managed certificate.
+            expireTime: '2018-12-18T11:11:11.000-07:00'
             name: ssl-cert-1
-            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/sslCertificates/ssl-cert-1
-            """))
-
-
-class SslCertificatesDescribeBetaTest(test_base.BaseTest,
-                                      test_case.WithOutputCapture):
-
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.SetEncoding('utf8')
-
-  def testSelfManagedCase(self):
-    messages = self.messages
-    self.make_requests.side_effect = iter([
-        [test_resources.BETA_SSL_CERTIFICATES[0]],
-    ])
-
-    self.Run("""
-        beta compute ssl-certificates describe ssl-cert-1
-        """)
-
-    self.CheckRequests(
-        [(self.compute.sslCertificates,
-          'Get',
-          messages.ComputeSslCertificatesGetRequest(
-              sslCertificate='ssl-cert-1',
-              project='my-project'))],
-    )
-    self.assertMultiLineEqual(
-        self.GetOutput(),
-        textwrap.dedent("""\
-                creationTimestamp: '2017-12-18T11:11:11.000-07:00'
-                description: Self-managed certificate.
-                expireTime: '2018-12-18T11:11:11.000-07:00'
-                name: ssl-cert-1
-                selfLink: https://compute.googleapis.com/compute/beta/projects/my-project/global/sslCertificates/ssl-cert-1
-                selfManaged:
-                  certificate: |-
-                    -----BEGIN CERTIFICATE-----
-                    MIICZzCCAdACCQDjYQHCnQOiTDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
-                    UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
-                    CgwGR29vZ2xlMRgwFgYDVQQLDA9DbG91ZCBQbGF0Zm9ybXMxFzAVBgNVBAMMDmdj
-                    bG91ZCBjb21wdXRlMB4XDTE0MTAxMzIwMTcxMloXDTE1MTAxMzIwMTcxMloweDEL
-                    MAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0
-                    bGUxDzANBgNVBAoMBkdvb2dsZTEYMBYGA1UECwwPQ2xvdWQgUGxhdGZvcm1zMRcw
-                    FQYDVQQDDA5nY2xvdWQgY29tcHV0ZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkC
-                    gYEAw3JXUCTn8J2VeWqHuc9zJxdy1WfQJtbDxQUUy4nsqU6QPGso3HYXlI/eozg6
-                    bGhkJNtDVV4AAPQVv01aoFMt3T6MKLzAkjfse7zKQmQ399vQaE7lbLAV9M4FSV9s
-                    wksSvT7cOW9ddcdKdyV3NTbptW5PeUE8Zk/aCFLPLqOg800CAwEAATANBgkqhkiG
-                    9w0BAQsFAAOBgQCKMIRiThp2O+wg7M8wcNSdPzAZ61UMeisQKS5OEY90OsekWYUT
-                    zMkUznRtycTdTBxEqKQoJKeAXq16SezJaZYE48FpoObQc2ZLMvje7F82tOwC2kob
-                    v83LejX3zZnirv2PZVcFgvUE0k3a8/14enHi7j6jZu+Pl5ZM9BZ+vkBO8g==
-                    -----END CERTIFICATE-----
-                type: SELF_MANAGED
-            """))
+            selfLink: {compute_uri}/projects/my-project/global/sslCertificates/ssl-cert-1
+            selfManaged:
+              certificate: |-
+                -----BEGIN CERTIFICATE-----
+                MIICZzCCAdACCQDjYQHCnQOiTDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
+                UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
+                CgwGR29vZ2xlMRgwFgYDVQQLDA9DbG91ZCBQbGF0Zm9ybXMxFzAVBgNVBAMMDmdj
+                bG91ZCBjb21wdXRlMB4XDTE0MTAxMzIwMTcxMloXDTE1MTAxMzIwMTcxMloweDEL
+                MAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0
+                bGUxDzANBgNVBAoMBkdvb2dsZTEYMBYGA1UECwwPQ2xvdWQgUGxhdGZvcm1zMRcw
+                FQYDVQQDDA5nY2xvdWQgY29tcHV0ZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkC
+                gYEAw3JXUCTn8J2VeWqHuc9zJxdy1WfQJtbDxQUUy4nsqU6QPGso3HYXlI/eozg6
+                bGhkJNtDVV4AAPQVv01aoFMt3T6MKLzAkjfse7zKQmQ399vQaE7lbLAV9M4FSV9s
+                wksSvT7cOW9ddcdKdyV3NTbptW5PeUE8Zk/aCFLPLqOg800CAwEAATANBgkqhkiG
+                9w0BAQsFAAOBgQCKMIRiThp2O+wg7M8wcNSdPzAZ61UMeisQKS5OEY90OsekWYUT
+                zMkUznRtycTdTBxEqKQoJKeAXq16SezJaZYE48FpoObQc2ZLMvje7F82tOwC2kob
+                v83LejX3zZnirv2PZVcFgvUE0k3a8/14enHi7j6jZu+Pl5ZM9BZ+vkBO8g==
+                -----END CERTIFICATE-----
+            type: SELF_MANAGED
+           """.format(compute_uri=self.compute_uri)))
 
   def testManagedCase(self):
     messages = self.messages
     self.make_requests.side_effect = iter([
-        [test_resources.BETA_SSL_CERTIFICATES[1]],
+        [self._resources[2]],
     ])
 
-    self.Run("""
-        beta compute ssl-certificates describe --region us-west-1 ssl-cert-2
+    self.RunVersioned("""
+        compute ssl-certificates describe --global ssl-cert-3
         """)
 
-    self.CheckRequests([(self.compute.regionSslCertificates, 'Get',
-                         messages.ComputeRegionSslCertificatesGetRequest(
-                             sslCertificate='ssl-cert-2',
-                             project='my-project',
-                             region='us-west-1'))],)
+    self.CheckRequests(
+        [(self.compute.sslCertificates, 'Get',
+          messages.ComputeSslCertificatesGetRequest(
+              sslCertificate='ssl-cert-3', project='my-project'))],)
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
@@ -152,99 +115,24 @@ class SslCertificatesDescribeBetaTest(test_base.BaseTest,
                   - test1.certsbridge.com
                   - xn--8a342mzfam5b18csni3w.certsbridge.com
                   status: ACTIVE
-                name: ssl-cert-2
-                region: us-west-1
-                selfLink: https://compute.googleapis.com/compute/beta/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
+                name: ssl-cert-3
+                selfLink: {compute_uri}/projects/my-project/global/sslCertificates/ssl-cert-3
                 type: MANAGED
-            """))
+            """.format(compute_uri=self.compute_uri)))
 
 
-class SslCertificatesDescribeAlphaTest(test_base.BaseTest,
-                                       test_case.WithOutputCapture):
+class SslCertificatesDescribeBetaTest(SslCertificatesDescribeTest):
 
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.SetEncoding('utf8')
+  @property
+  def _api(self):
+    return 'beta'
 
-  def testSelfManagedCase(self):
-    messages = self.messages
-    self.make_requests.side_effect = iter([
-        [test_resources.ALPHA_SSL_CERTIFICATES[0]],
-    ])
 
-    self.Run("""
-        alpha compute ssl-certificates describe ssl-cert-1
-        """)
+class SslCertificatesDescribeAlphaTest(SslCertificatesDescribeTest):
 
-    self.CheckRequests(
-        [(self.compute.sslCertificates,
-          'Get',
-          messages.ComputeSslCertificatesGetRequest(
-              sslCertificate='ssl-cert-1',
-              project='my-project'))],
-    )
-    self.assertMultiLineEqual(
-        self.GetOutput(),
-        textwrap.dedent("""\
-                creationTimestamp: '2017-12-18T11:11:11.000-07:00'
-                description: Self-managed certificate.
-                expireTime: '2018-12-18T11:11:11.000-07:00'
-                name: ssl-cert-1
-                selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/global/sslCertificates/ssl-cert-1
-                selfManaged:
-                  certificate: |-
-                    -----BEGIN CERTIFICATE-----
-                    MIICZzCCAdACCQDjYQHCnQOiTDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
-                    UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
-                    CgwGR29vZ2xlMRgwFgYDVQQLDA9DbG91ZCBQbGF0Zm9ybXMxFzAVBgNVBAMMDmdj
-                    bG91ZCBjb21wdXRlMB4XDTE0MTAxMzIwMTcxMloXDTE1MTAxMzIwMTcxMloweDEL
-                    MAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0
-                    bGUxDzANBgNVBAoMBkdvb2dsZTEYMBYGA1UECwwPQ2xvdWQgUGxhdGZvcm1zMRcw
-                    FQYDVQQDDA5nY2xvdWQgY29tcHV0ZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkC
-                    gYEAw3JXUCTn8J2VeWqHuc9zJxdy1WfQJtbDxQUUy4nsqU6QPGso3HYXlI/eozg6
-                    bGhkJNtDVV4AAPQVv01aoFMt3T6MKLzAkjfse7zKQmQ399vQaE7lbLAV9M4FSV9s
-                    wksSvT7cOW9ddcdKdyV3NTbptW5PeUE8Zk/aCFLPLqOg800CAwEAATANBgkqhkiG
-                    9w0BAQsFAAOBgQCKMIRiThp2O+wg7M8wcNSdPzAZ61UMeisQKS5OEY90OsekWYUT
-                    zMkUznRtycTdTBxEqKQoJKeAXq16SezJaZYE48FpoObQc2ZLMvje7F82tOwC2kob
-                    v83LejX3zZnirv2PZVcFgvUE0k3a8/14enHi7j6jZu+Pl5ZM9BZ+vkBO8g==
-                    -----END CERTIFICATE-----
-                type: SELF_MANAGED
-            """))
-
-  def testManagedCase(self):
-    messages = self.messages
-    self.make_requests.side_effect = iter([
-        [test_resources.ALPHA_SSL_CERTIFICATES[1]],
-    ])
-
-    self.Run("""
-        alpha compute ssl-certificates describe --region us-west-1 ssl-cert-2
-        """)
-
-    self.CheckRequests([(self.compute.regionSslCertificates, 'Get',
-                         messages.ComputeRegionSslCertificatesGetRequest(
-                             sslCertificate='ssl-cert-2',
-                             project='my-project',
-                             region='us-west-1'))],)
-    self.assertMultiLineEqual(
-        self.GetOutput(),
-        textwrap.dedent("""\
-                creationTimestamp: '2017-12-17T10:00:00.000-07:00'
-                description: Managed certificate.
-                expireTime: '2018-12-17T10:00:00.000-07:00'
-                managed:
-                  domainStatus:
-                    test1.certsbridge.com: ACTIVE
-                    xn--8a342mzfam5b18csni3w.certsbridge.com: FAILED_CAA_FORBIDDEN
-                  domains:
-                  - test1.certsbridge.com
-                  - xn--8a342mzfam5b18csni3w.certsbridge.com
-                  status: ACTIVE
-                name: ssl-cert-2
-                region: us-west-1
-                selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
-                type: MANAGED
-            """))
+  @property
+  def _api(self):
+    return 'alpha'
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 title: cloud healthcare fhir-stores crud scenario
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -45,6 +45,7 @@ actions:
     track_values:
       ALPHA: v1alpha2
       BETA: v1beta1
+      GA: v1
 - generate_resource_id:
     reference: test-dataset
     prefix: gcloud-test-dataset

@@ -57,17 +57,19 @@ class ConnectionContextTest(test_case.TestCase, parameterized.TestCase):
     self.args = mock.Mock()
 
   @parameterized.parameters(
-      (flags.Product.RUN, base.ReleaseTrack.ALPHA, None, 'v1'),
-      (flags.Product.RUN, base.ReleaseTrack.BETA, None, 'v1'),
-      (flags.Product.RUN, base.ReleaseTrack.GA, None, 'v1'),
-      (flags.Product.RUN, base.ReleaseTrack.ALPHA, 'v1alpha1', 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, None, 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.BETA, None, 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.GA, None, 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, 'v1', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.ALPHA, None, 'run', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.BETA, None, 'run', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.GA, None, 'run', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.ALPHA, 'v1alpha1', 'run',
+       'v1alpha1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, None, 'run', 'v1alpha1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.BETA, None, 'run', 'v1alpha1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.GA, None, 'run', 'v1alpha1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, 'v1', 'run', 'v1'),
   )
   def testGetConnectionContextGke(self, product, release_track,
-                                  version_override, expected_api_version):
+                                  version_override, expected_api_name,
+                                  expected_api_version):
     properties.VALUES.run.platform.Set('gke')
     cluster_ref = mock.Mock()
     self.args.CONCEPTS.cluster.Parse.return_value = cluster_ref
@@ -77,20 +79,22 @@ class ConnectionContextTest(test_case.TestCase, parameterized.TestCase):
     connection_context.GetConnectionContext(self.args, product, release_track,
                                             version_override)
 
-    gke_context.assert_called_once_with(cluster_ref, expected_api_version)
+    gke_context.assert_called_once_with(cluster_ref, expected_api_name,
+                                        expected_api_version)
 
   @parameterized.parameters(
-      (flags.Product.RUN, base.ReleaseTrack.ALPHA, None, 'v1'),
-      (flags.Product.RUN, base.ReleaseTrack.BETA, None, 'v1'),
-      (flags.Product.RUN, base.ReleaseTrack.GA, None, 'v1'),
-      (flags.Product.RUN, base.ReleaseTrack.ALPHA, 'v1alpha1', 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, None, 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.BETA, None, 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.GA, None, 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, 'v1', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.ALPHA, None, 'run', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.BETA, None, 'run', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.GA, None, 'run', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.ALPHA, 'v1alpha1', 'run',
+       'v1alpha1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, None, 'run', 'v1alpha1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.BETA, None, 'run', 'v1alpha1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.GA, None, 'run', 'v1alpha1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, 'v1', 'run', 'v1'),
   )
   def testGetConnectionContextKubernetes(self, product, release_track,
-                                         version_override,
+                                         version_override, expected_api_name,
                                          expected_api_version):
     properties.VALUES.run.platform.Set('kubernetes')
     kubeconfig_obj = kubeconfig.Kubeconfig.Default()
@@ -103,20 +107,23 @@ class ConnectionContextTest(test_case.TestCase, parameterized.TestCase):
                                             version_override)
 
     kubernetes_context.assert_called_once_with(kubeconfig_obj,
+                                               expected_api_name,
                                                expected_api_version, 'context')
 
   @parameterized.parameters(
-      (flags.Product.RUN, base.ReleaseTrack.ALPHA, None, 'v1'),
-      (flags.Product.RUN, base.ReleaseTrack.BETA, None, 'v1'),
-      (flags.Product.RUN, base.ReleaseTrack.GA, None, 'v1'),
-      (flags.Product.RUN, base.ReleaseTrack.ALPHA, 'v1alpha1', 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, None, 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.BETA, None, 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.GA, None, 'v1alpha1'),
-      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, 'v1', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.ALPHA, None, 'run', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.BETA, None, 'run', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.GA, None, 'run', 'v1'),
+      (flags.Product.RUN, base.ReleaseTrack.ALPHA, 'v1alpha1', 'run',
+       'v1alpha1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, None, 'run', 'v1alpha1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.BETA, None, 'events', 'v1beta1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.GA, None, 'events', 'v1beta1'),
+      (flags.Product.EVENTS, base.ReleaseTrack.ALPHA, 'v1', 'run', 'v1'),
   )
   def testGetConnectionContextManaged(self, product, release_track,
-                                      version_override, expected_api_version):
+                                      version_override, expected_api_name,
+                                      expected_api_version):
     properties.VALUES.run.platform.Set('managed')
     self.StartObjectPatch(flags, 'GetRegion', return_value='us-central1')
     regional_context = self.StartObjectPatch(connection_context,
@@ -125,13 +132,13 @@ class ConnectionContextTest(test_case.TestCase, parameterized.TestCase):
     connection_context.GetConnectionContext(self.args, product, release_track,
                                             version_override)
 
-    regional_context.assert_called_once_with('us-central1',
+    regional_context.assert_called_once_with('us-central1', expected_api_name,
                                              expected_api_version)
 
   @parameterized.parameters('v1', 'v1alpha1')
   def testConnectToGKECluster(self, version):
     cluster_ref = mock.Mock()
-    with connection_context._GKEConnectionContext(cluster_ref, version):
+    with connection_context._GKEConnectionContext(cluster_ref, 'run', version):
       if six.PY3:
         self.assertEqual(
             properties.VALUES.api_endpoint_overrides.run.Get(),
@@ -143,11 +150,17 @@ class ConnectionContextTest(test_case.TestCase, parameterized.TestCase):
 
   @parameterized.parameters('v1', 'v1alpha1')
   def testConnectToRegion(self, version):
-    with connection_context._RegionalConnectionContext(
-        'us-central1', version):
+    with connection_context._RegionalConnectionContext('us-central1', 'run',
+                                                       version):
       self.assertEqual(
           properties.VALUES.api_endpoint_overrides.run.Get(),
           'https://us-central1-run.googleapis.com/')
+
+  def testConnectToEventsRegion(self):
+    with connection_context._RegionalConnectionContext('us-central1', 'events',
+                                                       'v1beta1'):
+      self.assertEqual(properties.VALUES.api_endpoint_overrides.events.Get(),
+                       'https://us-central1-events.googleapis.com/')
 
   @parameterized.parameters('v1', 'v1alpha1')
   def testConnectToKubeconfigClusterWithCurrentContext(self, version):
@@ -161,7 +174,8 @@ class ConnectionContextTest(test_case.TestCase, parameterized.TestCase):
     config.users['user'] = user
     config.contexts['context'] = context
     config.SetCurrentContext('context')
-    with connection_context._KubeconfigConnectionContext(config, version):
+    with connection_context._KubeconfigConnectionContext(
+        config, 'run', version):
       if six.PY3:
         self.assertEqual(
             properties.VALUES.api_endpoint_overrides.run.Get(),
@@ -184,7 +198,7 @@ class ConnectionContextTest(test_case.TestCase, parameterized.TestCase):
     config.contexts['context'] = context
     config.SetCurrentContext('some_other_context')
     with connection_context._KubeconfigConnectionContext(
-        config, version, 'context'):
+        config, 'run', version, 'context'):
       if six.PY3:
         self.assertEqual(
             properties.VALUES.api_endpoint_overrides.run.Get(),

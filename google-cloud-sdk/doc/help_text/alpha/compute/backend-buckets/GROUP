@@ -11,7 +11,7 @@ DESCRIPTION
 
     For more information about backend buckets, see the backend buckets
     documentation
-    (https://cloud.google.com/load-balancing/docs/https/adding-backend-buckets-to-load-balancers).
+    (https://cloud.google.com/load-balancing/docs/https/ext-load-balancer-backend-buckets).
 
     See also: Backend buckets API
     (https://cloud.google.com/compute/docs/reference/rest/v1/backendBuckets).

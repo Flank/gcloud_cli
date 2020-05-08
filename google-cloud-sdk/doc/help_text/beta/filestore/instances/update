@@ -4,10 +4,8 @@ NAME
 SYNOPSIS
     gcloud beta filestore instances update (INSTANCE : --zone=ZONE) [--async]
         [--description=DESCRIPTION]
-        [--file-share=[capacity=CAPACITY],[name=NAME],
-          [source-snapshot=SOURCE-SNAPSHOT],
-          [source-snapshot-region=SOURCE-SNAPSHOT-REGION]]
-        [--location=LOCATION] [--update-labels=[KEY=VALUE,...]]
+        [--file-share=[capacity=CAPACITY],[name=NAME]] [--location=LOCATION]
+        [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -38,7 +36,7 @@ FLAGS
      --description=DESCRIPTION
         A description of the Cloud Filestore instance.
 
-     --file-share=[capacity=CAPACITY],[name=NAME],[source-snapshot=SOURCE-SNAPSHOT],[source-snapshot-region=SOURCE-SNAPSHOT-REGION]
+     --file-share=[capacity=CAPACITY],[name=NAME]
         File share configuration for an instance. Specifying both name and
         capacity is required.
 

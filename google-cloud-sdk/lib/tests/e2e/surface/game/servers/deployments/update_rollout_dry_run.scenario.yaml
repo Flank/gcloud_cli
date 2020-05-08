@@ -1,7 +1,3 @@
-filters:
-  skipAlways:
-    reason: To mitgate request latency spike for now
-    bug: b/151437013
 title: Cloud Game Servers deployments rollout dry-run test
 release_tracks: [ALPHA, BETA]
 summary:
@@ -154,7 +150,12 @@ actions:
       [
         {
           "name": "sc1",
-          "fleetAutoscalerSpec": {"replicas": 100},
+          "fleetAutoscalerSpec": {
+            "policy": {
+              "type": "Buffer",
+              "buffer": {"bufferSize": 5, "minReplicas": 10, "MaxReplicas": 20}
+            }
+          },
           "schedules":[
             {
               "cronJobDuration": "3600s",
@@ -164,7 +165,12 @@ actions:
         },
         {
           "name": "sc2",
-          "fleetAutoscalerSpec": {"replicas": 200}
+          "fleetAutoscalerSpec": {
+            "policy": {
+              "type": "Buffer",
+              "buffer": {"bufferSize": 5, "minReplicas": 10, "MaxReplicas": 20}
+            }
+          }
         }
       ]
 - write_file:

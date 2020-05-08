@@ -1,0 +1,80 @@
+NAME
+    gcloud alpha pubsub lite-topics update - update a Pub/Sub Lite topic
+
+SYNOPSIS
+    gcloud alpha pubsub lite-topics update (TOPIC : --zone=ZONE)
+        (--message-retention-period=MESSAGE_RETENTION_PERIOD
+          --per-partition-bytes=PER_PARTITION_BYTES --scale=SCALE)
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Update a Pub/Sub Lite topic.
+
+POSITIONAL ARGUMENTS
+     Topic resource - Topic to update. The arguments in this group can be used
+     to specify the attributes of this resource. (NOTE) Some attributes are not
+     given arguments in this group but can be set in other ways. To set the
+     [project] attribute: provide the argument [topic] on the command line with
+     a fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
+
+       TOPIC
+          ID of the topic or fully qualified identifier for the topic. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --zone=ZONE
+          ID of the location of the Pub/Sub Lite resource.
+
+          If not specified, will use default pubsub/lite_zone property.
+
+REQUIRED FLAGS
+     At least one of these must be specified:
+
+       --message-retention-period=MESSAGE_RETENTION_PERIOD
+          How long a published message is retained. If unset, messages will
+          only be dropped to make space for new ones once the
+          per-partition-bytes limit is reached. A valid example value of this
+          flag would be message-retention-period="2w".
+
+       --per-partition-bytes=PER_PARTITION_BYTES
+          Provisioned storage, in bytes, per partition. If the number of bytes
+          stored in any of the topic's partitions exceeds this value, older
+          messages will be dropped to make room for newer ones, regardless of
+          the value of message-retention-period. A valid example value of this
+          flag would be per-partition-bytes=30GiB.
+
+       --scale=SCALE
+          Topic partition scale value. Every partition in the topic is
+          allocated throughput equivalent to scale times the standard partition
+          throughput (4 MiB/s of publishing throughput and 8 MiB/s of
+          subscribing throughput). This is also reflected in the cost of this
+          topic; a topic with scale of 2 and count of 10 is charged for 20
+          partitions.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the pubsublite/v1 API. The full documentation for this
+    API can be found at: https://cloud.google.com/pubsub/docs
+
+EXAMPLES
+    To update a Pub/Sub Lite topic, run:
+
+        $ gcloud alpha pubsub lite-topics update mytopic \
+            --zone=us-central1-a \
+            --scale=2
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

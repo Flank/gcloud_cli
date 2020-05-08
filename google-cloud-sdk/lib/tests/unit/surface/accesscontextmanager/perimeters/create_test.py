@@ -34,13 +34,6 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
 
-  def _SupportsServiceFilters(self):
-    return {
-        calliope_base.ReleaseTrack.ALPHA: True,
-        calliope_base.ReleaseTrack.BETA: True,
-        calliope_base.ReleaseTrack.GA: False
-    }[self.track]
-
   def _ExpectCreate(self, perimeter, policy):
     policy_name = 'accessPolicies/{}'.format(policy)
     m = self.messages
@@ -139,13 +132,6 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
                '    --resources projects/12345,projects/67890')
     self.assertIn('set to the policy number', text_type(ex.exception))
 
-
-class PerimetersCreateTestBeta(PerimetersCreateTestGA):
-
-  def PreSetUp(self):
-    self.api_version = 'v1alpha'
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def testCreate_ServiceFilterCreation(self):
     self.SetUpForAPI(self.api_version)
     perimeter_kwargs = {
@@ -175,11 +161,18 @@ class PerimetersCreateTestBeta(PerimetersCreateTestGA):
     self.assertEqual(result, perimeter)
 
 
-class PerimetersCreateTestAlpha(PerimetersCreateTestBeta):
+class PerimetersCreateTestBeta(PerimetersCreateTestGA):
 
   def PreSetUp(self):
     self.api_version = 'v1'
     self.track = calliope_base.ReleaseTrack.BETA
+
+
+class PerimetersCreateTestAlpha(PerimetersCreateTestBeta):
+
+  def PreSetUp(self):
+    self.api_version = 'v1alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

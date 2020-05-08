@@ -70,9 +70,11 @@ API REFERENCE
     this API can be found at: https://cloud.google.com/
 
 EXAMPLES
-    To get the IAM policy for the CA 'prod-root' with the location 'us', run:
+    To get the IAM policy for the CA 'prod-root' with the location 'us-west1',
+    run:
 
-        $ gcloud alpha privateca roots get-iam-policy prod-root --location us
+        $ gcloud alpha privateca roots get-iam-policy prod-root \
+            --location us-west1
 
 NOTES
     This command is an internal implementation detail and may change or

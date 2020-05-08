@@ -56,6 +56,24 @@ summary:
           GAME\s+game-config:game.properties
         Timeout:\s+300s
       $
+- execute:
+  - command: run revisions describe aahello-001
+  - stdout: |-
+      \+ Revision aahello-001 in region us-central1\n\s+
+          + Revision aahello-001 in region us-central1
+
+          Image:\s+gcr.io/knative-samples/helloworld-go@sha256:5ea96ba4b872685ff4ddb5cd8d1a97ec18c18fae79ee8df0d29f446c5efe5f50
+          Env vars:
+            TARGET\s+Go Sample v1
+          Secrets:
+            /var/baz\s+githubsecret:secretToken
+            /var/quux\s+githubsecret
+            FOO\s+githubsecret:accessToken
+          Config Maps:
+            /var/game\s+game-config
+            GAME\s+game-config:game.properties
+          Timeout:\s+300s
+          VPC connector:\s+glue
 actions:
 - set_property:
     run/platform: gke
@@ -450,5 +468,104 @@ actions:
               GAME\s+game-config:game.properties
             Timeout:\s+300s
             VPC connector:\s+glue
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: run revisions describe aahello-001
+    events:
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/fake-project/revisions/aahello-001\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            content-length: '1775'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1
+            kind: Revision
+            metadata:
+              labels:
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-go:latest
+                run.googleapis.com/vpc-access-connector: "glue"
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 1
+              name: aahello-001
+              namespace: '123456789'
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1/namespaces/123456789/revisions/aahello-001
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              containers:
+              - env:
+                - name: TARGET
+                  value: Go Sample v1
+                - name: FOO
+                  valueFrom:
+                    secretKeyRef:
+                      key: accessToken
+                      name: githubsecret
+                - name: GAME
+                  valueFrom:
+                    configMapKeyRef:
+                      key: game.properties
+                      name: game-config
+                image: gcr.io/knative-samples/helloworld-go@sha256:5ea96ba4b872685ff4ddb5cd8d1a97ec18c18fae79ee8df0d29f446c5efe5f50
+                name: ''
+                resources: {}
+                volumeMounts:
+                - mountPath: /var/baz
+                  name: githubsecret-tel-ruk-ziz
+                  readOnly: true
+                - mountPath: /var/quux
+                  name: githubsecret-tul-qec-hos
+                  readOnly: true
+                - mountPath: /var/game
+                  name: game-config-xid-qug-dul
+                  readOnly: true
+              timeoutSeconds: 300
+              volumes:
+              - name: githubsecret-tel-ruk-ziz
+                secret:
+                  items:
+                  - key: secretToken
+                    path: secretToken
+                  secretName: githubsecret
+              - name: githubsecret-tul-qec-hos
+                secret:
+                  secretName: githubsecret
+              - configMap:
+                  name: game-config
+                name: game-config-xid-qug-dul
+            status:
+              address:
+                url: https://aahello-irvkrntpmq-uc.a.run.app
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:28Z'
+                status: 'True'
+                type: Ready
+              observedGeneration: 1
+    - expect_stdout:
+        matches: |
+          \+ Revision aahello-001 in region us-central1
+          \s+
+          Image:\s+gcr.io/knative-samples/helloworld-go:latest at \w+\.\.\.
+          Env vars:
+            TARGET\s+Go Sample v1
+          Secrets:
+            /var/baz\s+githubsecret:secretToken
+            /var/quux\s+githubsecret
+            FOO\s+githubsecret:accessToken
+          Config Maps:
+            /var/game\s+game-config
+            GAME\s+game-config:game.properties
+          Timeout:\s+300s
+          VPC connector:\s+glue
     - expect_exit:
         code: 0

@@ -62,11 +62,10 @@ class GetEffectiveFirewallsAlphaTest(test_base.BaseTest):
               network='my-network', project=self.Project()))],)
 
     expected_str = textwrap.dedent(
-        'TYPE              PRIORITY  ACTION  DIRECTION  SRC_IP_RANGES  DEST_IP_RANGES  TARGET_SVC_ACCT  ENABLE_LOGGING  DESCRIPTION  NAME    DISABLED  SECURITY_POLICY_ID  TARGET_TAGS  SRC_SVC_ACCT  SRC_TAGS  RULE_TUPLE_COUNT  TARGET_RESOURCES\n'
-        'network-firewall  9         DENY    INGRESS                                                                                 rule9   False\n'
-        'network-firewall  10        DENY    INGRESS                                                                                 rule10  False\n'
-        'network-firewall  8         DENY    EGRESS                                                                                  rule8   False'
-    )
+        'TYPE              SECURITY_POLICY_ID  PRIORITY  ACTION  DIRECTION  IP_RANGES\n'
+        'network-firewall                      9         DENY    INGRESS\n'
+        'network-firewall                      10        DENY    INGRESS\n'
+        'network-firewall                      8         DENY    EGRESS')
 
     self.assertMultiLineEqual(self.GetOutput().strip(),
                               textwrap.dedent(expected_str))

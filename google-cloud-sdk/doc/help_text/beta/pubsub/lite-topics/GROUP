@@ -24,6 +24,18 @@ COMMANDS
      delete
         (BETA) Delete a Pub/Sub Lite topic.
 
+     describe
+        (BETA) Describe a Pub/Sub Lite topic.
+
+     list
+        (BETA) List Pub/Sub Lite topics.
+
+     list-subscriptions
+        (BETA) List Pub/Sub Lite subscriptions for a given Lite topic.
+
+     update
+        (BETA) Update a Pub/Sub Lite topic.
+
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in BETA and may change

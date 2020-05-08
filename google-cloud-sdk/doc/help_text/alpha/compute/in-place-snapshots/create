@@ -13,7 +13,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      IN_PLACE_SNAPSHOT_NAME
-        Name of the in place snapshot to create.
+        Name of the in-place snapshot to create.
 
 FLAGS
      --labels=[KEY=VALUE,...]
@@ -27,7 +27,7 @@ FLAGS
      At most one of these may be specified:
 
        --region=REGION
-          Region of the in place snapshot to create. If not specified, you may
+          Region of the in-place snapshot to create. If not specified, you may
           be prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
@@ -47,7 +47,7 @@ FLAGS
           CLOUDSDK_COMPUTE_REGION.
 
        --zone=ZONE
-          Zone of the in place snapshot to create. If not specified and the
+          Zone of the in-place snapshot to create. If not specified and the
           compute/zone property isn't set, you may be prompted to select a
           zone.
 

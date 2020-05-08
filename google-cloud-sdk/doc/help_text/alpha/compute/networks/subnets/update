@@ -77,8 +77,9 @@ FLAGS
      --logging-metadata=LOGGING_METADATA
         Can only be specified if VPC Flow Logs for this subnetwork is enabled.
         Configures whether metadata fields should be added to the reported
-        logs. Default is to include all metadata. LOGGING_METADATA must be one
-        of: custom, exclude-all, include-all.
+        logs. Default is to include all metadata. Note that "include-all" does
+        not include GKE annotations. LOGGING_METADATA must be one of: custom,
+        exclude-all, include-all.
 
      --logging-metadata-fields=[METADATA_FIELD,...]
         Can only be specified if VPC Flow Logs for this subnetwork is enabled
@@ -88,7 +89,8 @@ FLAGS
      --metadata=METADATA
         Can only be specified if VPC Flow Logs for this subnetwork is enabled.
         Configures whether metadata fields should be added to the reported
-        logs. Default is to include all metadata. METADATA must be one of:
+        logs. Default is to include all metadata. Note that "include-all" does
+        not include GKE annotations. METADATA must be one of:
         exclude-all-metadata, include-all-metadata.
 
      --region=REGION
@@ -123,10 +125,11 @@ FLAGS
           + RANGE - IP range in CIDR format.
 
          --[no-]enable-flow-logs
-            Enable/disable VPC Flow Logs for this subnet. More information for
-            VPC Flow Logs can be found at
-            https://cloud.google.com/vpc/docs/using-flow-logs. Use
-            --enable-flow-logs to enable and --no-enable-flow-logs to disable.
+            Enable/disable VPC Flow Logs for this subnet. If the subnet does
+            not support VPC Flow Logs, this flag has no effect. For more
+            information, see https://cloud.google.com/vpc/docs/using-flow-logs.
+            Use --enable-flow-logs to enable and --no-enable-flow-logs to
+            disable.
 
          --[no-]enable-private-ip-google-access
             Enable/disable access to Google Cloud APIs from this subnet for

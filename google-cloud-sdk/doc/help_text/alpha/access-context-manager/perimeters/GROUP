@@ -49,10 +49,6 @@ COMMANDS
      update
         (ALPHA) Update an existing access zone.
 
-     update-dry-run-config
-        (ALPHA) (DEPRECATED) Update the dry-run config for an existing Service
-        Perimeter.
-
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

@@ -22,7 +22,7 @@ import datetime
 import textwrap
 
 from googlecloudsdk.core.credentials import creds
-from googlecloudsdk.core.credentials import reauth
+from googlecloudsdk.core.credentials import google_auth_credentials as c_google_auth
 from tests.lib import test_case
 
 from oauth2client import client
@@ -130,7 +130,7 @@ class CredentialsTestBase(test_case.Base):
     return credentials
 
   def MakeUserAccountCredentialsGoogleAuth(self):
-    credentials = reauth.UserCredWithReauth.from_authorized_user_info(
+    credentials = c_google_auth.UserCredWithReauth.from_authorized_user_info(
         self.GOOGLE_AUTH_USER_ACCOUNT_INFO, scopes=['scope1'])
     credentials.expiry = datetime.datetime(2001, 2, 3, 14, 15, 16)
     return credentials

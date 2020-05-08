@@ -9,9 +9,10 @@ SYNOPSIS
           | --context=CONTEXT --kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Initialize a cluster for eventing. Creates a new key for the
-    provided service account. This command is only available with Cloud Run for
-    Anthos.
+    (ALPHA) Initialize a cluster for eventing. Enables necessary services for
+    the project, adds necessary IAM policy bindings to the provided service
+    account, and creates a new key for the provided service account. This
+    command is only available with Cloud Run for Anthos.
 
 REQUIRED FLAGS
      --service-account=SERVICE_ACCOUNT

@@ -1,5 +1,5 @@
 {
-  "CLI_VERSION": "v1.14.10-dispatcher",
+  "CLI_VERSION": "v1.15.11-dispatcher",
   "VERSION": "1",
   "capsule": "",
   "commands": {
@@ -2128,7 +2128,7 @@
           "positionals": [],
           "release": "GA",
           "sections": {
-            "DESCRIPTION": "Renames a context from the kubeconfig file.\n\n CONTEXT_NAME is the context name that you wish change.\n\n NEW_NAME is the new name you wish to set.\n\n Note: In case the context being renamed is the 'current-context', this field will also be updated.",
+            "DESCRIPTION": "Renames a context from the kubeconfig file.\n\n CONTEXT_NAME is the context name that you wish to change.\n\n NEW_NAME is the new name you wish to set.\n\n Note: In case the context being renamed is the 'current-context', this field will also be updated.",
             "EXAMPLES": "  # Rename the context 'old-name' to 'new-name' in your kubeconfig file\n  kubectl config rename-context old-name new-name"
           }
         },
@@ -2279,6 +2279,62 @@
               "nargs": "0",
               "type": "bool",
               "value": ""
+            },
+            "--exec-api-version": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "API version of the exec credential plugin for the user entry in kubeconfig",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--exec-api-version",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--exec-arg": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "New arguments for the exec credential plugin command for the user entry in kubeconfig",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--exec-arg",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--exec-command": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Command for the exec credential plugin for the user entry in kubeconfig",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--exec-command",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--exec-env": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "'key=value' environment values for the exec credential plugin",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--exec-env",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             }
           },
           "groups": {},
@@ -2293,7 +2349,7 @@
           "release": "GA",
           "sections": {
             "DESCRIPTION": "Sets a user entry in kubeconfig\n\n Specifying a name that already exists will merge new fields on top of existing values.\n\n  Client-certificate flags:\n  --client-certificate=certfile --client-key=keyfile\n\n  Bearer token flags:\n    --token=bearer_token\n\n  Basic auth flags:\n    --username=basic_user --password=basic_password\n\n Bearer token and basic auth are mutually exclusive.",
-            "EXAMPLES": "  # Set only the \"client-key\" field on the \"cluster-admin\"\n  # entry, without touching other values:\n  kubectl config set-credentials cluster-admin --client-key=~/.kube/admin.key\n\n  # Set basic auth for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --username=admin --password=uXFGweU9l35qcif\n\n  # Embed client certificate data in the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --client-certificate=~/.kube/admin.crt --embed-certs=true\n\n  # Enable the Google Compute Platform auth provider for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --auth-provider=gcp\n\n  # Enable the OpenID Connect auth provider for the \"cluster-admin\" entry with additional args\n  kubectl config set-credentials cluster-admin --auth-provider=oidc --auth-provider-arg=client-id=foo --auth-provider-arg=client-secret=bar\n\n  # Remove the \"client-secret\" config value for the OpenID Connect auth provider for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --auth-provider=oidc --auth-provider-arg=client-secret-"
+            "EXAMPLES": "  # Set only the \"client-key\" field on the \"cluster-admin\"\n  # entry, without touching other values:\n  kubectl config set-credentials cluster-admin --client-key=~/.kube/admin.key\n\n  # Set basic auth for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --username=admin --password=uXFGweU9l35qcif\n\n  # Embed client certificate data in the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --client-certificate=~/.kube/admin.crt --embed-certs=true\n\n  # Enable the Google Compute Platform auth provider for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --auth-provider=gcp\n\n  # Enable the OpenID Connect auth provider for the \"cluster-admin\" entry with additional args\n  kubectl config set-credentials cluster-admin --auth-provider=oidc --auth-provider-arg=client-id=foo --auth-provider-arg=client-secret=bar\n\n  # Remove the \"client-secret\" config value for the OpenID Connect auth provider for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --auth-provider=oidc --auth-provider-arg=client-secret-\n\n  # Enable new exec auth plugin for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --exec-command=/path/to/the/executable --exec-api-version=client.authentication.k8s.io/v1beta\n\n  # Define new exec auth plugin args for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --exec-arg=arg1 --exec-arg=arg2\n\n  # Create or update exec auth plugin environment variables for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --exec-env=key1=val1 --exec-env=key2=val2\n\n  # Remove exec auth plugin environment variables for the \"cluster-admin\" entry\n  kubectl config set-credentials cluster-admin --exec-env=var-to-remove-"
           }
         },
         "unset": {
@@ -3993,6 +4049,20 @@
               "type": "string",
               "value": "VALUE"
             },
+            "--preemption-policy": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "preemption-policy is the policy for preempting pods with lower priority.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--preemption-policy",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
             "--save-config": {
               "attr": {},
               "category": "",
@@ -4062,7 +4132,7 @@
           "release": "GA",
           "sections": {
             "DESCRIPTION": "Create a priorityclass with the specified name, value, globalDefault and description\n\nAliases:\npriorityclass, pc",
-            "EXAMPLES": "  # Create a priorityclass named high-priority\n  kubectl create priorityclass high-priority --value=1000 --description=\"high priority\"\n\n  # Create a priorityclass named default-priority that considered as the global default priority\n  kubectl create priorityclass default-priority --value=1000 --global-default=true --description=\"default priority\""
+            "EXAMPLES": "  # Create a priorityclass named high-priority\n  kubectl create priorityclass high-priority --value=1000 --description=\"high priority\"\n\n  # Create a priorityclass named default-priority that considered as the global default priority\n  kubectl create priorityclass default-priority --value=1000 --global-default=true --description=\"default priority\"\n\n  # Create a priorityclass named high-priority that can not preempt pods with lower priority\n  kubectl create priorityclass high-priority --value=1000 --description=\"high priority\" --preemption-policy=\"Never\""
           }
         },
         "quota": {
@@ -4923,7 +4993,7 @@
               "release": "GA",
               "sections": {
                 "DESCRIPTION": "Create a secret based on a file, directory, or specified literal value.\n\n A single secret may package one or more key/value pairs.\n\n When creating a secret based on a file, the key will default to the basename of the file, and the value will default to the file content. If the basename is an invalid key or you wish to chose your own, you may specify an alternate key.\n\n When creating a secret based on a directory, each file whose basename is a valid key in the directory will be packaged into the secret. Any directory entries except regular files are ignored (e.g. subdirectories, symlinks, devices, pipes, etc).",
-                "EXAMPLES": "  # Create a new secret named my-secret with keys for each file in folder bar\n  kubectl create secret generic my-secret --from-file=path/to/bar\n\n  # Create a new secret named my-secret with specified keys instead of names on disk\n  kubectl create secret generic my-secret --from-file=ssh-privatekey=~/.ssh/id_rsa --from-file=ssh-publickey=~/.ssh/id_rsa.pub\n\n  # Create a new secret named my-secret with key1=supersecret and key2=topsecret\n  kubectl create secret generic my-secret --from-literal=key1=supersecret --from-literal=key2=topsecret\n\n  # Create a new secret named my-secret using a combination of a file and a literal\n  kubectl create secret generic my-secret --from-file=ssh-privatekey=~/.ssh/id_rsa --from-literal=passphrase=topsecret\n\n  # Create a new secret named my-secret from an env file\n  kubectl create secret generic my-secret --from-env-file=path/to/bar.env"
+                "EXAMPLES": "  # Create a new secret named my-secret with keys for each file in folder bar\n  kubectl create secret generic my-secret --from-file=path/to/bar\n\n  # Create a new secret named my-secret with specified keys instead of names on disk\n  kubectl create secret generic my-secret --from-file=ssh-privatekey=path/to/id_rsa --from-file=ssh-publickey=path/to/id_rsa.pub\n\n  # Create a new secret named my-secret with key1=supersecret and key2=topsecret\n  kubectl create secret generic my-secret --from-literal=key1=supersecret --from-literal=key2=topsecret\n\n  # Create a new secret named my-secret using a combination of a file and a literal\n  kubectl create secret generic my-secret --from-file=ssh-privatekey=path/to/id_rsa --from-literal=passphrase=topsecret\n\n  # Create a new secret named my-secret from an env file\n  kubectl create secret generic my-secret --from-env-file=path/to/bar.env"
               }
             },
             "tls": {
@@ -6784,6 +6854,20 @@
           "type": "string",
           "value": "VALUE"
         },
+        "--pod-running-timeout": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "The length of time (like 5s, 2m, or 3h, higher than zero) to wait until at least one pod is running",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--pod-running-timeout",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
         "--stdin": {
           "attr": {},
           "category": "",
@@ -6824,7 +6908,7 @@
       "release": "GA",
       "sections": {
         "DESCRIPTION": "Execute a command in a container.",
-        "EXAMPLES": "  # Get output from running 'date' from pod 123456-7890, using the first container by default\n  kubectl exec 123456-7890 date\n\n  # Get output from running 'date' in ruby-container from pod 123456-7890\n  kubectl exec 123456-7890 -c ruby-container date\n\n  # Switch to raw terminal mode, sends stdin to 'bash' in ruby-container from pod 123456-7890\n  # and sends stdout/stderr from 'bash' back to the client\n  kubectl exec 123456-7890 -c ruby-container -i -t -- bash -il\n\n  # List contents of /usr from the first container of pod 123456-7890 and sort by modification time.\n  # If the command you want to execute in the pod has any flags in common (e.g. -i),\n  # you must use two dashes (--) to separate your command's flags/arguments.\n  # Also note, do not surround your command and its flags/arguments with quotes\n  # unless that is how you would execute it normally (i.e., do ls -t /usr, not \"ls -t /usr\").\n  kubectl exec 123456-7890 -i -t -- ls -t /usr"
+        "EXAMPLES": "  # Get output from running 'date' command from pod mypod, using the first container by default\n  kubectl exec mypod date\n\n  # Get output from running 'date' command in ruby-container from pod mypod\n  kubectl exec mypod -c ruby-container date\n\n  # Switch to raw terminal mode, sends stdin to 'bash' in ruby-container from pod mypod\n  # and sends stdout/stderr from 'bash' back to the client\n  kubectl exec mypod -c ruby-container -i -t -- bash -il\n\n  # List contents of /usr from the first container of pod mypod and sort by modification time.\n  # If the command you want to execute in the pod has any flags in common (e.g. -i),\n  # you must use two dashes (--) to separate your command's flags/arguments.\n  # Also note, do not surround your command and its flags/arguments with quotes\n  # unless that is how you would execute it normally (i.e., do ls -t /usr, not \"ls -t /usr\").\n  kubectl exec mypod -i -t -- ls -t /usr\n\n  # Get output from running 'date' command from the first pod of the deployment mydeployment, using the first container by default\n  kubectl exec deploy/mydeployment date\n\n  # Get output from running 'date' command from the first pod of the service myservice, using the first container by default\n  kubectl exec svc/myservice date"
       }
     },
     "explain": {
@@ -7755,7 +7839,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Get all containers's logs in the pod(s).",
+          "description": "Get all containers' logs in the pod(s).",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -7789,6 +7873,20 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--follow",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
+        "--ignore-errors": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If watching / following pod logs, allow for any errors that occur to be non-fatal",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--ignore-errors",
           "nargs": "0",
           "type": "bool",
           "value": ""
@@ -8816,6 +8914,110 @@
           "sections": {
             "DESCRIPTION": "Mark the provided resource as paused\n\n Paused resources will not be reconciled by a controller. Use \"kubectl rollout resume\" to resume a paused resource. Currently only deployments support being paused.",
             "EXAMPLES": "  # Mark the nginx deployment as paused. Any current state of\n  # the deployment will continue its function, new updates to the deployment will not\n  # have an effect as long as the deployment is paused.\n  kubectl rollout pause deployment/nginx"
+          }
+        },
+        "restart": {
+          "capsule": "",
+          "commands": {},
+          "flags": {
+            "--allow-missing-template-keys": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to golang and jsonpath output formats.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--allow-missing-template-keys",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--filename": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Filename, directory, or URL to files identifying the resource to get from a server.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--filename",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--kustomize": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the kustomization directory. This flag can't be used together with -f or -R.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--kustomize",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--output": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--output",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--recursive": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests organized within the same directory.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--recursive",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--template": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Template string or path to template file to use when -o=go-template, -o=go-template-file. The template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--template",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            }
+          },
+          "groups": {},
+          "is_group": false,
+          "is_hidden": false,
+          "path": [
+            "kubectl",
+            "rollout",
+            "restart"
+          ],
+          "positionals": [],
+          "release": "GA",
+          "sections": {
+            "DESCRIPTION": "Restart a resource.\n\n     Resource will be rollout restarted.",
+            "EXAMPLES": "  # Restart a deployment\n  kubectl rollout restart deployment/nginx\n\n  # Restart a daemonset\n  kubectl rollout restart daemonset/abc"
           }
         },
         "resume": {
@@ -11241,8 +11443,8 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Update the taints on one or more nodes.\n\n  *  A taint consists of a key, value, and effect. As an argument here, it is expressed as key=value:effect.\n  *  The key must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  253 characters.\n  *  Optionally, the key can begin with a DNS subdomain prefix and a single '/', like example.com/my-app\n  *  The value must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  63 characters.\n  *  The effect must be NoSchedule, PreferNoSchedule or NoExecute.\n  *  Currently taint can only apply to node.",
-        "EXAMPLES": "  # Update node 'foo' with a taint with key 'dedicated' and value 'special-user' and effect 'NoSchedule'.\n  # If a taint with that key and effect already exists, its value is replaced as specified.\n  kubectl taint nodes foo dedicated=special-user:NoSchedule\n\n  # Remove from node 'foo' the taint with key 'dedicated' and effect 'NoSchedule' if one exists.\n  kubectl taint nodes foo dedicated:NoSchedule-\n\n  # Remove from node 'foo' all the taints with key 'dedicated'\n  kubectl taint nodes foo dedicated-\n\n  # Add a taint with key 'dedicated' on nodes having label mylabel=X\n  kubectl taint node -l myLabel=X  dedicated=foo:PreferNoSchedule"
+        "DESCRIPTION": "Update the taints on one or more nodes.\n\n  *  A taint consists of a key, value, and effect. As an argument here, it is expressed as key=value:effect.\n  *  The key must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  253 characters.\n  *  Optionally, the key can begin with a DNS subdomain prefix and a single '/', like example.com/my-app\n  *  The value is optional. If given, it must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to  63 characters.\n  *  The effect must be NoSchedule, PreferNoSchedule or NoExecute.\n  *  Currently taint can only apply to node.",
+        "EXAMPLES": "  # Update node 'foo' with a taint with key 'dedicated' and value 'special-user' and effect 'NoSchedule'.\n  # If a taint with that key and effect already exists, its value is replaced as specified.\n  kubectl taint nodes foo dedicated=special-user:NoSchedule\n\n  # Remove from node 'foo' the taint with key 'dedicated' and effect 'NoSchedule' if one exists.\n  kubectl taint nodes foo dedicated:NoSchedule-\n\n  # Remove from node 'foo' all the taints with key 'dedicated'\n  kubectl taint nodes foo dedicated-\n\n  # Add a taint with key 'dedicated' on nodes having label mylabel=X\n  kubectl taint node -l myLabel=X  dedicated=foo:PreferNoSchedule\n\n  # Add to node 'foo' a taint with key 'bar' and no value\n  kubectl taint nodes foo bar:NoSchedule"
       }
     },
     "top": {
@@ -11332,6 +11534,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--selector",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--sort-by": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If non-empty, sort nodes list using specified field. The field can be either 'cpu' or 'memory'.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--sort-by",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -11464,6 +11680,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--selector",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--sort-by": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If non-empty, sort pods list using specified field. The field can be either 'cpu' or 'memory'.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--sort-by",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -11992,6 +12222,20 @@
       "type": "string",
       "value": "VALUE"
     },
+    "--log-file-max-size": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "Defines the maximum size a log file can grow to. Unit is megabytes. If the value is 0, the maximum file size is unlimited.",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--log-file-max-size",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    },
     "--log-flush-frequency": {
       "attr": {},
       "category": "",
@@ -12128,6 +12372,20 @@
       "is_hidden": false,
       "is_required": false,
       "name": "--skip-headers",
+      "nargs": "0",
+      "type": "bool",
+      "value": ""
+    },
+    "--skip-log-headers": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "If true, avoid headers when opening log files",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--skip-log-headers",
       "nargs": "0",
       "type": "bool",
       "value": ""

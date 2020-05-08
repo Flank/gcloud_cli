@@ -55,11 +55,6 @@ Run \fB$ gcloud help\fR for details.
 
 .RS 2m
 .TP 2m
-\fBcommit\fR
-\fB(ALPHA)\fR \fB(DEPRECATED)\fR Commit the dry\-run mode configuration for all
-Service Perimeters.
-
-.TP 2m
 \fBcreate\fR
 \fB(ALPHA)\fR Create a dry\-run mode configuration for a new or existing Service
 Perimeter.
@@ -91,11 +86,6 @@ Perimeters.
 Perimeters.
 
 .TP 2m
-\fBreset\fR
-\fB(ALPHA)\fR \fB(DEPRECATED)\fR Reset the dry\-run mode configuration of a
-Service Perimeter.
-
-.TP 2m
 \fBupdate\fR
 \fB(ALPHA)\fR Update the dry\-run mode configuration for a Service Perimeter.
 
@@ -108,9 +98,10 @@ Service Perimeter.
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud access\-context\-manager perimeters dry\-run
 $ gcloud beta access\-context\-manager perimeters dry\-run
 .RE
 

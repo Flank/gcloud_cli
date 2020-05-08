@@ -1,5 +1,5 @@
 title: operations get/list test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -33,6 +33,7 @@ actions:
     track_values:
       ALPHA: v1alpha2
       BETA: v1beta1
+      GA: v1
 - execute_command:
     command: healthcare operations describe my-operation --location us-central1 --dataset
       my-dataset
