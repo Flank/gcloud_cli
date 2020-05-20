@@ -86,7 +86,7 @@ setup(
         'futures==3.0.5',
         'google-apitools>=0.5.13',
         'grpcio>=1.4.0',
-        'httplib2==0.9.2',
+        'httplib2==0.18.0',
         'ipaddr==2.1.11',
         'jsonschema>=2.0.0',
         'Mako>=0.7.3',
